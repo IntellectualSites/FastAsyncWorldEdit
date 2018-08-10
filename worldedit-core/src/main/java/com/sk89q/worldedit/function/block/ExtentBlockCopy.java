@@ -24,10 +24,11 @@ import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.jnbt.CompoundTagBuilder;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.internal.helper.MCDirections;
@@ -125,9 +126,13 @@ public class ExtentBlockCopy implements RegionFunction {
 
 //                    Direction newDirection = Direction.findClosest(applyAbsolute, Flag.CARDINAL | Flag.ORDINAL | Flag.SECONDARY_ORDINAL);
 
+//<<<<<<< HEAD
                     if (newDirection != null) {
                         Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
                         values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
+//=======
+//                        return state.toBaseBlock(builder.build());
+//>>>>>>> f54d6afb... Make BaseBlock more memory efficient, and make it clear in the API that it's not intended to be used for every single block.
                     }
                 }
             }

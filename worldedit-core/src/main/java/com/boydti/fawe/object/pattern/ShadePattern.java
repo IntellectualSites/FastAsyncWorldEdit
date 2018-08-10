@@ -2,7 +2,7 @@ package com.boydti.fawe.object.pattern;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.TextureUtil;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;

@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.extent;
 
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;

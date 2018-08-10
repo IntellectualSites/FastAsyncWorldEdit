@@ -24,7 +24,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -80,11 +80,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
+    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
         ItemStack itemStack = handSide == HandSide.MAIN_HAND
                 ? player.getInventory().getItemInMainHand()
                 : player.getInventory().getItemInOffHand();
-        return BukkitAdapter.asBlockState(itemStack);
+        return BukkitAdapter.asBlockState(itemStack).toBaseBlock();
     }
 
     @Override

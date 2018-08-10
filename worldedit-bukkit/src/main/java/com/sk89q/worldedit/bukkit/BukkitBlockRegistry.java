@@ -20,9 +20,9 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.bekvon.bukkit.residence.commands.material;
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.command.tool.BlockDataCyler;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;

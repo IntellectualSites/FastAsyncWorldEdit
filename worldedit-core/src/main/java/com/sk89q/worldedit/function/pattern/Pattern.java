@@ -21,7 +21,7 @@ package com.sk89q.worldedit.function.pattern;
 
 import com.sk89q.minecraft.util.commands.Link;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.extent.Extent;
@@ -37,17 +37,17 @@ import com.sk89q.worldedit.world.block.BlockState;
  */
 @Link(clazz = UtilityCommands.class, value = "patterns")
 @Deprecated
-public interface Pattern extends com.sk89q.worldedit.patterns.Pattern{
+public interface Pattern{
 
-    @Override
-    default BaseBlock next(BlockVector3 position) {
-        return new BaseBlock(apply(position));
-    }
-
-    @Override
-    default BaseBlock next(int x, int y, int z) {
-        return new BaseBlock(apply(BlockVector3.at(x, y, z)));
-    }
+//    @Override
+//    default BaseBlock next(BlockVector3 position) {
+//        return new BaseBlock(apply(position));
+//    }
+//
+//    @Override
+//    default BaseBlock next(int x, int y, int z) {
+//        return new BaseBlock(apply(BlockVector3.at(x, y, z)));
+//    }
 
     /**
      * Return a {@link BlockStateHolder} for the given position.

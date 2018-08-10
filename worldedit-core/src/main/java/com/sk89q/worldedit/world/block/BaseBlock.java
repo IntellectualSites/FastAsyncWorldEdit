@@ -17,7 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.blocks;
+package com.sk89q.worldedit.world.block;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
@@ -28,7 +30,11 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.registry.state.Property;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -53,15 +59,15 @@ public class BaseBlock extends BlockState {
         this(BlockTypes.AIR.getDefaultState());
     }
 
-    /**
-     * Construct a block with a state.
-     * @deprecated Just use the BlockStateHolder instead
-     * @param blockState The blockstate
-     */
-    @Deprecated
-    public BaseBlock(BlockStateHolder blockState) {
-        this(blockState, blockState.getNbtData());
-    }
+//    /**
+//     * Construct a block with a state.
+//     * @deprecated Just use the BlockStateHolder instead
+//     * @param blockState The blockstate
+//     */
+//    @Deprecated
+//    public BaseBlock(BlockStateHolder blockState) {
+//        this(blockState, blockState.getNbtData());
+//    }
 
     @Deprecated
     public BaseBlock(BlockTypes id) {
@@ -78,15 +84,20 @@ public class BaseBlock extends BlockState {
         this(blockType.getDefaultState());
     }
 
+    public BaseBlock(BlockState blockState) {
+        this(blockState, blockState.getNbtData());
+    }
+
     /**
      * Construct a block with the given ID, data value and NBT data structure.
      *
      * @param state The block state
-     * @param nbtData NBT data, which may be null
+     * @param nbtData NBT data, which must be provided
      */
-    public BaseBlock(BlockStateHolder state, @Nullable CompoundTag nbtData) {
-        super();
-        this.blockState = state.toImmutableState();
+    public BaseBlock(BlockState state, CompoundTag nbtData) {
+    	super(state.getBlockType());
+        checkNotNull(nbtData);
+        this.blockState = state;
         this.nbtData = nbtData;
     }
 
@@ -195,6 +206,22 @@ public class BaseBlock extends BlockState {
     @Override
     public int getOrdinal() {
         return blockState.getOrdinal();
+    }
+
+    @Override
+    public BaseBlock toBaseBlock() {
+        return this;
+    }
+
+    @Override
+    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+        if (compoundTag == null) {
+            return this.blockState.toBaseBlock();
+        } else if (compoundTag == this.nbtData) {
+            return this;
+        } else {
+            return new BaseBlock(this.blockState, compoundTag);
+        }
     }
 
     @Override

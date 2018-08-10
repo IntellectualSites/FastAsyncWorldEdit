@@ -37,7 +37,7 @@ public class HollowCylinderBrush implements Brush {
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
         if (pattern == null) {
-            pattern = BlockTypes.COBBLESTONE.getDefaultState();
+            pattern = new BlockPattern(BlockTypes.COBBLESTONE.getDefaultState());
         }
         editSession.makeCylinder(position, pattern, size, size, height, false);
     }

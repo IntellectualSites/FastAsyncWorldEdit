@@ -1,6 +1,5 @@
 package com.boydti.fawe.object;
 
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import java.util.Collections;

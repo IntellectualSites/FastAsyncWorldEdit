@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.chunk;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 

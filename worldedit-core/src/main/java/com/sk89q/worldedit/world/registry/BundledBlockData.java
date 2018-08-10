@@ -22,7 +22,6 @@ package com.sk89q.worldedit.world.registry;
 import com.google.common.io.Resources;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 

@@ -27,12 +27,13 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashMap;
@@ -59,7 +60,7 @@ public class ServerCUIHandler {
      * @return The structure block, or null
      */
     @Nullable
-    public static com.sk89q.worldedit.blocks.BaseBlock createStructureBlock(Player player) {
+    public static BaseBlock createStructureBlock(Player player) {
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
         RegionSelector regionSelector = session.getRegionSelector(player.getWorld());
 

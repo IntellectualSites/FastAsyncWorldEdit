@@ -3,7 +3,7 @@ package com.sk89q.worldedit.math.convolution;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;

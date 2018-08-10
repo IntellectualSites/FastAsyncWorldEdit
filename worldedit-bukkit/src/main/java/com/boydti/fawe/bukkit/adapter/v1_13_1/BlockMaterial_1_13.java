@@ -1,7 +1,8 @@
 package com.boydti.fawe.bukkit.adapter.v1_13_1;
 
 import com.sk89q.util.ReflectionUtil;
-import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
+
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 

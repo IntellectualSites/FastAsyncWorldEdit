@@ -21,7 +21,7 @@ package com.sk89q.worldedit;
 
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.MainUtil;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.command.ClipboardCommands;
 import com.sk89q.worldedit.command.FlattenedClipboardTransform;
 import com.sk89q.worldedit.command.SchematicCommands;
@@ -38,6 +38,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.DataException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -477,7 +478,7 @@ public class CuboidClipboard {
         List<Countable<BaseBlock>> distribution = new ArrayList<>();
         List<Countable<BlockStateHolder>> distr = clipboard.getBlockDistributionWithData(clipboard.getRegion());
         for (Countable<BlockStateHolder> item : distr) {
-            distribution.add(new Countable<>(new BaseBlock(item.getID()), item.getAmount()));
+            distribution.add(new Countable<>(item.getID().toBaseBlock(), item.getAmount()));
         }
         return distribution;
     }

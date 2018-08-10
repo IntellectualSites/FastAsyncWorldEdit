@@ -43,7 +43,6 @@ import com.boydti.fawe.util.*;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.google.common.base.Supplier;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.function.mask.*;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -53,6 +52,7 @@ import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
 import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
@@ -1092,17 +1092,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             throw new RuntimeException("Unexpected exception", e);
         }
     }
-    
-    @Deprecated
-    public boolean setBlock(int x, int y, int z, com.sk89q.worldedit.patterns.Pattern pattern) {
-        return setBlock(x, y, z, (Pattern) pattern);
-    }
-
-    @Deprecated
-    public boolean setBlock(BlockVector3 position, com.sk89q.worldedit.patterns.Pattern pattern) {
-        return setBlock(position, (Pattern) pattern);
-    }
-
     @Deprecated
     public boolean setBlock(int x, int y, int z, BaseBlock block) {
         return setBlock(x, y, z, (BlockState) block);

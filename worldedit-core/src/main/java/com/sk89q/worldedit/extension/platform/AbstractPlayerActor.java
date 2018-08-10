@@ -22,8 +22,7 @@ package com.sk89q.worldedit.extension.platform;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.PlayerDirection;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -42,6 +41,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -401,9 +401,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
         final ItemType typeId = getItemInHand(handSide).getType();
         if (typeId.hasBlockType()) {
-            return typeId.getBlockType().getDefaultState();
+            return typeId.getBlockType().getDefaultState().toBaseBlock();
         } else {
-            throw new NotABlockException();
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
     }
 

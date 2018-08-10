@@ -1,8 +1,8 @@
 package com.sk89q.worldedit.world.block;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 public class BlockStateImpl extends BlockState {
     private final int internalId;
@@ -11,6 +11,7 @@ public class BlockStateImpl extends BlockState {
     private BlockMaterial material;
 
     protected BlockStateImpl(BlockTypes type, int internalId, int ordinal) {
+    	super(type);
         this.type = type;
         this.internalId = internalId;
         this.ordinal = ordinal;

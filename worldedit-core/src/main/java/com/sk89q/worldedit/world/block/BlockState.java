@@ -26,10 +26,10 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
@@ -84,6 +84,14 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
      */
     public static BlockState get(@Nullable BlockType type, String state) throws InputParseException {
         return get(type, state, null);
+    }
+    private BaseBlock emptyBaseBlock;
+
+    // Neighbouring state table.
+    private Table<Property<?>, Object, BlockState> states;
+
+    protected BlockState(BlockType blockType) {
+        this.emptyBaseBlock = new BaseBlock(this);
     }
 
     /**
@@ -296,6 +304,22 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
         // Lazily initialize the map
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) input -> getState(input));
         return (Map<Property<?>, Object>) map;
+    }
+
+    @Override
+    public BaseBlock toBaseBlock() {
+//        if (this.fuzzy) {
+//            throw new IllegalArgumentException("Can't create a BaseBlock from a fuzzy BlockState!");
+//        }
+        return this.emptyBaseBlock;
+    }
+
+    @Override
+    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+        if (compoundTag == null) {
+            return toBaseBlock();
+        }
+        return new BaseBlock(this, compoundTag);
     }
 
     /**

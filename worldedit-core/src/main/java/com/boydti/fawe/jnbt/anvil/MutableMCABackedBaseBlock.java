@@ -2,7 +2,7 @@ package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.FaweCache;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import javax.annotation.Nullable;
 

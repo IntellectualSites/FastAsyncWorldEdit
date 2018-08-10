@@ -1,7 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.FaweCache;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;

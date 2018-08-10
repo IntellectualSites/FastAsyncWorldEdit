@@ -163,16 +163,12 @@ public class ExtentEntityCopy implements EntityFunction {
             boolean hasFacing = tag.containsKey("Facing");
 
             if (hasTilePosition) {
-<<<<<<< HEAD
 //<<<<<<< HEAD
                 changed = true;
 //                Vector tilePosition = new Vector(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
 //                Vector newTilePosition = transform.apply(tilePosition.subtract(from)).add(to);
 //=======
-                Vector3 tilePosition = new Vector3(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
-=======
                 Vector3 tilePosition = Vector3.at(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
->>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                 BlockVector3 newTilePosition = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
 //>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
@@ -213,7 +209,7 @@ public class ExtentEntityCopy implements EntityFunction {
                 double pitch = Math.toRadians(rotation.getFloat(1));
 
                 double xz = Math.cos(pitch);
-                Vector3 direction = new Vector3(-xz * Math.sin(yaw), -Math.sin(pitch), xz * Math.cos(yaw));
+                Vector3 direction = Vector3.at(-xz * Math.sin(yaw), -Math.sin(pitch), xz * Math.cos(yaw));
                 direction = transform.apply(direction);
                 FloatTag yawTag = new FloatTag((float)direction.toYaw());
                 FloatTag pitchTag = new FloatTag((float)direction.toPitch());

@@ -44,8 +44,9 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -451,6 +452,16 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 //                        }
 //>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                     }
+//<<<<<<< HEAD
+//=======
+//                    values.put("x", new IntTag(pt.getBlockX()));
+//                    values.put("y", new IntTag(pt.getBlockY()));
+//                    values.put("z", new IntTag(pt.getBlockZ()));
+//                    values.put("id", values.get("Id"));
+//                    values.remove("Id");
+//                    values.remove("Pos");
+//                    clipboard.setBlock(pt, state.toBaseBlock(new CompoundTag(values)));
+//>>>>>>> f54d6afb... Make BaseBlock more memory efficient, and make it clear in the API that it's not intended to be used for every single block.
                 } else {
                     for (int index = 0; index < volume; index++) {
                         BlockState state = BlockTypes.states[palette[fis.readVarInt()]];

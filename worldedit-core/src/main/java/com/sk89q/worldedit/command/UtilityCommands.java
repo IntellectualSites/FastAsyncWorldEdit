@@ -39,7 +39,7 @@ import com.boydti.fawe.util.gui.FormBuilder;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
 

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.internal.expression.runtime;
 
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 
 /**

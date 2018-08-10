@@ -19,13 +19,14 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -131,11 +132,30 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
     boolean equalsFuzzy(BlockStateHolder o);
 
     /**
+<<<<<<< HEAD
      * Returns an immutable BlockStateHolder from this BlockStateHolder.
+=======
+     * Returns an immutable {@link BlockState} from this BlockStateHolder.
+>>>>>>> f54d6afb... Make BaseBlock more memory efficient, and make it clear in the API that it's not intended to be used for every single block.
      *
      * @return A BlockState
      */
     BlockState toImmutableState();
+
+    /**
+     * Gets a {@link BaseBlock} from this BlockStateHolder.
+     *
+     * @return The BaseBlock
+     */
+    BaseBlock toBaseBlock();
+
+    /**
+     * Gets a {@link BaseBlock} from this BlockStateHolder.
+     *
+     * @param compoundTag The NBT Data to apply
+     * @return The BaseBlock
+     */
+    BaseBlock toBaseBlock(CompoundTag compoundTag);
 
     default String getAsString() {
         if (getStates().isEmpty()) {

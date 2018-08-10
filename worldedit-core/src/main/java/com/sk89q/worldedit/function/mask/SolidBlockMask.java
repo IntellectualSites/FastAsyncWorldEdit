@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.function.mask;
 
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;

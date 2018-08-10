@@ -25,6 +25,10 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
+<<<<<<< HEAD
+=======
+import com.sk89q.worldedit.world.block.BaseBlock;
+>>>>>>> f54d6afb... Make BaseBlock more memory efficient, and make it clear in the API that it's not intended to be used for every single block.
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;

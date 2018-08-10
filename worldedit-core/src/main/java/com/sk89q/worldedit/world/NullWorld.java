@@ -23,6 +23,7 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -131,13 +132,13 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public BlockState getFullBlock(BlockVector3 position) {
-        return getBlock(position);
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return getBlock(position).toBaseBlock();
+    }
 //=======
 //    public BaseBlock getFullBlock(BlockVector3 position) {
 //        return getBlock(position).toBaseBlock();
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
-    }
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner    }
 
     @Override
     public List<Entity> getEntities(Region region) {

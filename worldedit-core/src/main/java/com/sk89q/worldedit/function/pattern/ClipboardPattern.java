@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.function.pattern;
 
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 import static com.google.common.base.Preconditions.checkNotNull;
 

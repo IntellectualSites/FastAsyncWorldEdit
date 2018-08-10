@@ -110,11 +110,11 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
 
 
     default boolean contains(int x, int y, int z) {
-        return contains(new BlockVector3(x, y, z));
+        return contains(BlockVector3.at(x, y, z));
     }
 
     default boolean contains(int x, int z) {
-        return contains(new BlockVector3(x, 0, z));
+        return contains(BlockVector3.at(x, 0, z));
     }
 
     default boolean isGlobal() {
