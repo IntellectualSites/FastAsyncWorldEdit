@@ -24,7 +24,6 @@ import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExpEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
@@ -57,22 +56,8 @@ public abstract class ChunkListener implements Listener {
         if (Settings.IMP.TICK_LIMITER.ENABLED) {
             PluginManager plm = Bukkit.getPluginManager();
             Plugin plugin = Fawe.<FaweBukkit>imp().getPlugin();
-            for (Method method : this.getClass().getMethods()) {
-                if (method.isAnnotationPresent(EventHandler.class)) {
-                    try {
-                        EventHandler annotation = method.getAnnotation(EventHandler.class);
-                        EventPriority priority = annotation.priority();
-                        boolean ignoreC = annotation.ignoreCancelled();
-                        Class<? extends Event> event = (Class<? extends Event>) method.getParameterTypes()[0];
-                        EventExecutor executor = EventExecutor.create(method, event);
-                        plm.registerEvent(event, this, priority, executor, plugin, ignoreC);
-                        System.out.println("Registered " + method);
-                    } catch (Throwable e) {
-                        Fawe.debug("Failed to register " + method + " | " + e.getMessage());
-                        e.printStackTrace();
-                    }
-                }
-            }
+            plm.registerEvents(this, plugin);
+            try { plm.registerEvents(new ChunkListener_8Plus(this), plugin); } catch (Throwable ignore) {}
             TaskManager.IMP.repeat(new Runnable() {
                 @Override
                 public void run() {
@@ -139,7 +124,7 @@ public abstract class ChunkListener implements Listener {
     protected long physStart;
     protected long physTick;
 
-    private void reset() {
+    public final void reset() {
         physSkip = 0;
         physStart = System.currentTimeMillis();
         physCancel = false;
@@ -159,9 +144,6 @@ public abstract class ChunkListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void event(BlockExpEvent event) { reset(); }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void event(BlockExplodeEvent event) { reset(); }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void event(BlockFadeEvent event) { reset(); }
