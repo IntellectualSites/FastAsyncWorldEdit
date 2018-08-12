@@ -678,8 +678,4 @@ public class Vector2D implements Serializable {
         this.x = stream.readDouble();
         this.z = stream.readDouble();
     }
-
-    public static Class<?> inject() {
-        return Vector2D.class;
-    }
 }

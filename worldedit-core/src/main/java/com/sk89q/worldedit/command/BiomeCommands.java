@@ -235,8 +235,4 @@ public class BiomeCommands extends MethodCommands {
         if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
             BBC.TIP_BIOME_PATTERN.or(BBC.TIP_BIOME_MASK).send(player);
     }
-
-    public static Class<BiomeCommands> inject() {
-        return BiomeCommands.class;
-    }
 }

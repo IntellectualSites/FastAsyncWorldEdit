@@ -72,9 +72,5 @@ public class For extends Node {
         this.body = this.body.bindVariables(expression, false);
         return this;
     }
-
-    public static Class<For> inject() {
-        return For.class;
-    }
 }
 

@@ -271,8 +271,4 @@ public class SnapshotCommands {
             }
         }
     }
-
-    public static Class<SnapshotCommands> inject() {
-        return SnapshotCommands.class;
-    }
 }

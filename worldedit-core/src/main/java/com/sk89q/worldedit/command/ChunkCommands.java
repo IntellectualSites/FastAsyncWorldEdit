@@ -184,8 +184,4 @@ public class ChunkCommands {
             player.printError(BBC.getPrefix() + "Shell script type must be configured: 'bat' or 'bash' expected.");
         }
     }
-
-    public static Class<ChunkCommands> inject() {
-        return ChunkCommands.class;
-    }
 }

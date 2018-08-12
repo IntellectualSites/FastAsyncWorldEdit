@@ -394,8 +394,4 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         int maxY = extent.getMaximumPoint().getBlockY();
         return new CylinderRegion(center, radiusVec, minY, maxY);
     }
-
-    public static Class<CylinderRegion> inject() {
-        return CylinderRegion.class;
-    }
 }

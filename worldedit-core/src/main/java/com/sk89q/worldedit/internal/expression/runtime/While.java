@@ -129,8 +129,4 @@ public class While extends Node {
 
         return this;
     }
-
-    public static Class<While> inject() {
-        return While.class;
-    }
 }

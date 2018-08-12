@@ -100,8 +100,4 @@ public class SuperPickaxeCommands {
         session.enableSuperPickAxe();
         BBC.SUPERPICKAXE_AREA_ENABLED.send(player);
     }
-
-    public static Class<SuperPickaxeCommands> inject() {
-        return SuperPickaxeCommands.class;
-    }
 }

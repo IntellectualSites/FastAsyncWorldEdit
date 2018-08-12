@@ -82,8 +82,4 @@ public class MaskUnion extends MaskIntersection {
         }
         return new MaskUnion2D(mask2dList);
     }
-
-    public static Class<MaskUnion> inject() {
-        return MaskUnion.class;
-    }
 }

@@ -250,8 +250,4 @@ public class WorldEditCommands {
     public void help(Actor actor, CommandContext args) throws WorldEditException {
         UtilityCommands.help(args, we, actor);
     }
-
-    public static Class<WorldEditCommands> inject() {
-        return WorldEditCommands.class;
-    }
 }

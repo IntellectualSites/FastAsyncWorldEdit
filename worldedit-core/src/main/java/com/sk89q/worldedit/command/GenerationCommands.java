@@ -466,8 +466,4 @@ public class GenerationCommands extends MethodCommands {
             fp.sendMessage(BBC.getPrefix() + e.getMessage());
         }
     }
-
-    public static Class<GenerationCommands> inject() {
-        return GenerationCommands.class;
-    }
 }

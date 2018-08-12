@@ -258,8 +258,4 @@ public class EllipsoidRegion extends AbstractRegion {
     public EllipsoidRegion clone() {
         return (EllipsoidRegion) super.clone();
     }
-
-    public static Class<EllipsoidRegion> inject() {
-        return EllipsoidRegion.class;
-    }
 }

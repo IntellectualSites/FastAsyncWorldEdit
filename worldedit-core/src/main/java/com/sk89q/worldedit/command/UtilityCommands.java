@@ -1248,8 +1248,4 @@ public class UtilityCommands extends MethodCommands {
 
         builder.run();
     }
-
-    public static Class<UtilityCommands> inject() {
-        return UtilityCommands.class;
-    }
 }

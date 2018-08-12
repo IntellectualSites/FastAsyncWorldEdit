@@ -45,8 +45,4 @@ public class BlockPattern implements Pattern {
         checkNotNull(block);
         this.block = block;
     }
-
-    public static Class<BlockPattern> inject() {
-        return BlockPattern.class;
-    }
 }

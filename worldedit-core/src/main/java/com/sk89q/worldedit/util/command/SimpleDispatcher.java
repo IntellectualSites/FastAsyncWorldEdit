@@ -187,9 +187,4 @@ public class SimpleDispatcher implements Dispatcher {
         // Checking every perm in the class here was unnecessarily stupid
         return true;
     }
-
-    public static Class<SimpleDispatcher> inject() {
-        return SimpleDispatcher.class;
-    }
-
 }

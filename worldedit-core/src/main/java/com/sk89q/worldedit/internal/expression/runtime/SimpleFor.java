@@ -100,8 +100,4 @@ public class SimpleFor extends Node {
 
         return this;
     }
-
-    public static Class<SimpleFor> inject() {
-        return SimpleFor.class;
-    }
 }

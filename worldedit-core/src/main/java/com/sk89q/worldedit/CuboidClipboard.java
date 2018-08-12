@@ -719,8 +719,4 @@ public class CuboidClipboard {
 //            this.relativePosition = entity.getPosition().getPosition().subtract(getOrigin());
 //        }
 //    }
-//
-//    public static Class<?> inject() {
-//        return CuboidClipboard.class;
-//    }
 }
