@@ -1,34 +1,31 @@
-![WorldEdit](http://static.sk89q.com/readme/worldedit.png)
-=========
+<p align="center">
+  <img src="https://i.imgur.com/Fog5fDB.png">
+</p>
 
-WorldEdit is Minecraft mod that turns Minecraft into an in-game map editor (sorta, kinda).
+---
 
-* Make awesome stuff with half the time OR make ***quadriply** awesome* creations with the same time :sparkles:
-* Get lost in hundreds of options and functions that even we've forgotten existed
-* Utilize Photoshop-like tools like "selection areas" and "brushes"
-* Making fjords and other natural wonders with weird names
-* Also: fix grief, broken water, missing snow, raging fires, and other :poop:
+FAWE is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
 
-WorldEdit is open source!, so if you've just learned how to make a button blink, I probably recommend picking up a book on CS algorithms. The project is licensed using the GNU Lesser General Public License license, v3.
+It is available for Bukkit, Forge, Sponge and Nukkit.
 
-Compiling
----------
+## Chat
+### - **`> `**[`Discord`](https://discord.gg/ngZCzbU)`|`[`IRC`](http://webchat.esper.net/?nick=&channels=IntellectualCrafters)` | `[`Spigot Forums`](https://www.spigotmc.org/threads/fast-async-worldedit.100104/)**` <`**
 
-See [COMPILING.md](COMPILING.md) for a guide on compiling WorldEdit.
+## Releases
 
-Contributing
-------------
+### - [**`> Download <`**](https://empcraft.com/fawe/download/)
+### - [**`> Jenkins <`**](https://ci.athion.net/job/FastAsyncWorldEdit/)
 
-We happily accept contributions, especially through pull requests on GitHub.
-Submissions must be licensed under the GNU Lesser General Public License v3.
+## Building
+FAWE uses gradle to build
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for important guidelines to follow.
+```
+$ gradlew setupDecompWorkspace
+$ gradlew build
+```
 
-Links
------
-
-* [Visit our website](http://www.enginehub.org/)
-* [IRC channel](http://skq.me/irc/irc.esper.net/sk89q/) (#sk89q on irc.esper.net)
-* [Issue tracker](http://youtrack.sk89q.com/issues/WORLDEDIT)
-* [Continuous integration](http://builds.enginehub.org) [![Build Status](https://travis-ci.org/sk89q/WorldEdit.svg?branch=master)](https://travis-ci.org/sk89q/WorldEdit)
-* [End-user documentation](http://wiki.sk89q.com/wiki/WorldEdit)
+## Contributing
+Have an idea for an optimization, or a cool feature?
+ - I'll accept most PR's
+ - Let me know what you've tested / what may need further testing
+ - If you need any help, create a ticket or discuss on Discord
