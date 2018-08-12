@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
+
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -28,12 +31,9 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.WorldVector;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.parametric.Optional;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
 
 /**
  * Commands for moving the player around.
@@ -75,9 +75,12 @@ public class NavigationCommands {
     )
     @CommandPermissions("worldedit.navigation.ascend")
     public void ascend(Player player, @Optional("1") int levelsToAscend) throws WorldEditException {
-        int ascentLevels = 1;
-        while (player.ascendLevel() && levelsToAscend != ascentLevels) {
+        int ascentLevels = 0;
+        while (player.ascendLevel()) {
             ++ascentLevels;
+            if (levelsToAscend == ascentLevels) {
+                break;
+            }
         }
         if (ascentLevels == 0) {
             player.printError("No free spot above you found.");
@@ -95,12 +98,15 @@ public class NavigationCommands {
     )
     @CommandPermissions("worldedit.navigation.descend")
     public void descend(Player player, @Optional("1") int levelsToDescend) throws WorldEditException {
-        int descentLevels = 1;
-        while (player.descendLevel() && levelsToDescend != descentLevels) {
+        int descentLevels = 0;
+        while (player.descendLevel()) {
             ++descentLevels;
+            if (levelsToDescend == descentLevels) {
+                break;
+            }
         }
         if (descentLevels == 0) {
-            player.printError("No free spot above you found.");
+            player.printError("No free spot below you found.");
         } else {
             player.print((descentLevels != 1) ? "Descended " + Integer.toString(descentLevels) + " levels." : "Descended a level.");
         }
@@ -155,7 +161,7 @@ public class NavigationCommands {
     @CommandPermissions("worldedit.navigation.jumpto.command")
     public void jumpTo(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
 
-        WorldVector pos = player.getSolidBlockTrace(300);
+        Location pos = player.getSolidBlockTrace(300);
         if (pos != null) {
             player.findFreePosition(pos);
             player.print("Poof!");

@@ -28,12 +28,10 @@ import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.util.command.CommandMapping;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.world.World;
-
-import net.minecraft.block.Block;
+import com.sk89q.worldedit.world.registry.Registries;
 import net.minecraft.command.ServerCommandManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
@@ -41,13 +39,13 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import javax.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
 
@@ -65,30 +63,8 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
     }
 
     @Override
-    public int resolveItem(String name) {
-        if (name == null) return 0;
-
-        int index = name.indexOf(':');
-
-        if (index != 0 && index != name.length() - 1) {
-            Block block = Block.getBlockFromName(name);
-            if (block != null) {
-                return Block.getIdFromBlock(block);
-            }
-        }
-
-        for (Item item : Item.REGISTRY) {
-            if (item == null) continue;
-            if (item.getUnlocalizedName() == null) continue;
-            if (item.getUnlocalizedName().startsWith("item.")) {
-                if (item.getUnlocalizedName().equalsIgnoreCase("item." + name)) return Item.getIdFromItem(item);
-            }
-            if (item.getUnlocalizedName().startsWith("tile.")) {
-                if (item.getUnlocalizedName().equalsIgnoreCase("tile." + name)) return Item.getIdFromItem(item);
-            }
-            if (item.getUnlocalizedName().equalsIgnoreCase(name)) return Item.getIdFromItem(item);
-        }
-        return -1;
+    public Registries getRegistries() {
+        return ForgeRegistries.getInstance();
     }
 
     @Override
@@ -109,7 +85,7 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
     @Override
     public List<? extends com.sk89q.worldedit.world.World> getWorlds() {
         WorldServer[] worlds = DimensionManager.getWorlds();
-        List<com.sk89q.worldedit.world.World> ret = new ArrayList<com.sk89q.worldedit.world.World>(worlds.length);
+        List<com.sk89q.worldedit.world.World> ret = new ArrayList<>(worlds.length);
         for (WorldServer world : worlds) {
             ret.add(new ForgeWorld(world));
         }
@@ -188,7 +164,7 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
 
     @Override
     public Map<Capability, Preference> getCapabilities() {
-        Map<Capability, Preference> capabilities = new EnumMap<Capability, Preference>(Capability.class);
+        Map<Capability, Preference> capabilities = new EnumMap<>(Capability.class);
         capabilities.put(Capability.CONFIGURATION, Preference.PREFER_OTHERS);
         capabilities.put(Capability.WORLDEDIT_CUI, Preference.NORMAL);
         capabilities.put(Capability.GAME_HOOKS, Preference.NORMAL);
@@ -200,7 +176,7 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
 
     @Override
     public Collection<Actor> getConnectedUsers() {
-        List<Actor> users = new ArrayList<Actor>();
+        List<Actor> users = new ArrayList<>();
         PlayerList scm = server.getPlayerList();
         for (EntityPlayerMP entity : scm.getPlayers()) {
             if (entity != null) {

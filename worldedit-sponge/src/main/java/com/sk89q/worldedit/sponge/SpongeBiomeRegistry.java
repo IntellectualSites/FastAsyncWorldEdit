@@ -19,16 +19,16 @@
 
 package com.sk89q.worldedit.sponge;
 
-import com.sk89q.worldedit.sponge.nms.IDHelper;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.biome.BiomeData;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.biome.BiomeType;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 /**
  * Provides access to biome data in Sponge.
@@ -43,9 +43,9 @@ class SpongeBiomeRegistry implements BiomeRegistry {
 
     @Override
     public List<BaseBiome> getBiomes() {
-        List<BaseBiome> list = new ArrayList<BaseBiome>();
+        List<BaseBiome> list = new ArrayList<>();
         for (BiomeType biome : Sponge.getGame().getRegistry().getAllOf(BiomeType.class)) {
-            list.add(new BaseBiome(IDHelper.resolve(biome)));
+            list.add(new BaseBiome(SpongeWorldEdit.inst().getAdapter().resolve(biome)));
         }
         return list;
     }
@@ -53,7 +53,7 @@ class SpongeBiomeRegistry implements BiomeRegistry {
     @Nullable
     @Override
     public BiomeData getData(BaseBiome biome) {
-        return new SpongeBiomeData(IDHelper.resolveBiome(biome.getId()));
+        return new SpongeBiomeData(SpongeWorldEdit.inst().getAdapter().resolveBiome(biome.getId()));
     }
 
     private static class SpongeBiomeData implements BiomeData {

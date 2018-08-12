@@ -19,27 +19,30 @@
 
 package com.sk89q.worldedit.forge;
 
-import org.apache.logging.log4j.Logger;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Joiner;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldVector;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.internal.LocalWorldAdapter;
-import com.sk89q.worldedit.util.Java8Detector;
-
-import java.io.File;
-import java.util.Map;
+import com.sk89q.worldedit.forge.net.LeftClickAirEventMessage;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickEmpty;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -53,22 +56,19 @@ import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.apache.logging.log4j.Logger;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.io.File;
 
 /**
  * The Forge implementation of WorldEdit.
  */
 @Mod(modid = ForgeWorldEdit.MOD_ID, name = "WorldEdit", version = "%VERSION%", acceptableRemoteVersions = "*")
 public class ForgeWorldEdit {
-    
-    static {
-        Java8Detector.notifyIfNot8();
-    }
 
     public static Logger logger;
     public static final String MOD_ID = "worldedit";
-    public static final String CUI_PLUGIN_CHANNEL = "WECUI";
+    public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
 
     private ForgePermissionsProvider provider;
 
@@ -99,6 +99,7 @@ public class ForgeWorldEdit {
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
         WECUIPacketHandler.init();
+        InternalPacketHandler.init();
         proxy.registerHandlers();
     }
 
@@ -122,6 +123,14 @@ public class ForgeWorldEdit {
             this.provider = new ForgePermissionsProvider.SpongePermissionsProvider();
         } else {
             this.provider = new ForgePermissionsProvider.VanillaPermissionsProvider(platform);
+        }
+
+        for (Block block : Block.REGISTRY) {
+            BlockTypes.register(new BlockType(Block.REGISTRY.getNameForObject(block).toString()));
+        }
+
+        for (Item item : Item.REGISTRY) {
+            ItemTypes.register(new ItemType(Item.REGISTRY.getNameForObject(item).toString()));
         }
     }
 
@@ -157,6 +166,12 @@ public class ForgeWorldEdit {
         if (!platform.isHookingEvents())
             return; // We have to be told to catch these events
 
+        if (event.getWorld().isRemote && event instanceof LeftClickEmpty) {
+            // catch LCE, pass it to server
+            InternalPacketHandler.CHANNEL.sendToServer(new LeftClickAirEventMessage());
+            return;
+        }
+        
         boolean isLeftDeny = event instanceof PlayerInteractEvent.LeftClickBlock
                 && ((PlayerInteractEvent.LeftClickBlock) event)
                         .getUseItem() == Result.DENY;
@@ -172,10 +187,13 @@ public class ForgeWorldEdit {
         ForgePlayer player = wrap((EntityPlayerMP) event.getEntityPlayer());
         ForgeWorld world = getWorld(event.getEntityPlayer().world);
 
-        if (event instanceof PlayerInteractEvent.LeftClickBlock) {
-            @SuppressWarnings("deprecation")
-            WorldVector pos = new WorldVector(LocalWorldAdapter.adapt(world),
-                    event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
+        if (event instanceof PlayerInteractEvent.LeftClickEmpty) {
+            if (we.handleArmSwing(player)) {
+                // this event cannot be canceled
+                // event.setCanceled(true);
+            }
+        } else if (event instanceof PlayerInteractEvent.LeftClickBlock) {
+            Location pos = new Location(world, event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
 
             if (we.handleBlockLeftClick(player, pos)) {
                 event.setCanceled(true);
@@ -185,9 +203,7 @@ public class ForgeWorldEdit {
                 event.setCanceled(true);
             }
         } else if (event instanceof PlayerInteractEvent.RightClickBlock) {
-            @SuppressWarnings("deprecation")
-            WorldVector pos = new WorldVector(LocalWorldAdapter.adapt(world),
-                    event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
+            Location pos = new Location(world, event.getPos().getX(), event.getPos().getY(), event.getPos().getZ());
 
             if (we.handleBlockRightClick(player, pos)) {
                 event.setCanceled(true);
@@ -204,12 +220,11 @@ public class ForgeWorldEdit {
     }
 
     public static ItemStack toForgeItemStack(BaseItemStack item) {
-        ItemStack ret = new ItemStack(Item.getItemById(item.getType()), item.getAmount(), item.getData());
-        for (Map.Entry<Integer, Integer> entry : item.getEnchantments().entrySet()) {
-            ret.addEnchantment(net.minecraft.enchantment.Enchantment.getEnchantmentByID(entry.getKey()), entry.getValue());
+        NBTTagCompound forgeCompound = null;
+        if (item.getNbtData() != null) {
+            forgeCompound = NBTConverter.toNative(item.getNbtData());
         }
-
-        return ret;
+        return new ItemStack(Item.getByNameOrId(item.getType().getId()), item.getAmount(), 0, forgeCompound);
     }
 
     /**

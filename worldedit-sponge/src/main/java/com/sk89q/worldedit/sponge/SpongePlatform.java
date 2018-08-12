@@ -23,22 +23,32 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
-import com.sk89q.worldedit.extension.platform.*;
+import com.sk89q.worldedit.extension.platform.AbstractPlatform;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
+import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.sponge.config.SpongeConfiguration;
-import com.sk89q.worldedit.sponge.nms.IDHelper;
-import com.sk89q.worldedit.sponge.nms.SpongeNMSWorld;
 import com.sk89q.worldedit.util.command.CommandMapping;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.registry.Registries;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.world.Location;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
-import java.util.*;
 
 class SpongePlatform extends AbstractPlatform implements MultiUserPlatform {
 
@@ -54,16 +64,8 @@ class SpongePlatform extends AbstractPlatform implements MultiUserPlatform {
     }
 
     @Override
-    public int resolveItem(String name) {
-        if (name == null) return 0;
-
-        Optional<ItemType> optType = Sponge.getRegistry().getType(ItemType.class, name);
-
-        if (optType.isPresent()) {
-            return IDHelper.resolve(optType.get());
-        }
-
-        return 0;
+    public Registries getRegistries() {
+        return SpongeRegistries.getInstance();
     }
 
     @Override
@@ -87,7 +89,7 @@ class SpongePlatform extends AbstractPlatform implements MultiUserPlatform {
         Collection<org.spongepowered.api.world.World> worlds = Sponge.getServer().getWorlds();
         List<com.sk89q.worldedit.world.World> ret = new ArrayList<>(worlds.size());
         for (org.spongepowered.api.world.World world : worlds) {
-            ret.add(new SpongeNMSWorld(world));
+            ret.add(SpongeWorldEdit.inst().getAdapter().getWorld(world));
         }
         return ret;
     }
@@ -99,7 +101,7 @@ class SpongePlatform extends AbstractPlatform implements MultiUserPlatform {
             return player;
         } else {
             Optional<org.spongepowered.api.entity.living.player.Player> optPlayer = Sponge.getServer().getPlayer(player.getUniqueId());
-            return optPlayer.isPresent() ? new SpongePlayer(this, optPlayer.get()) : null;
+            return optPlayer.<Player>map(player1 -> new SpongePlayer(this, player1)).orElse(null);
         }
     }
 
@@ -111,7 +113,7 @@ class SpongePlatform extends AbstractPlatform implements MultiUserPlatform {
         } else {
             for (org.spongepowered.api.world.World ws : Sponge.getServer().getWorlds()) {
                 if (ws.getName().equals(world.getName())) {
-                    return new SpongeNMSWorld(ws);
+                    return SpongeWorldEdit.inst().getAdapter().getWorld(ws);
                 }
             }
 
@@ -131,7 +133,7 @@ class SpongePlatform extends AbstractPlatform implements MultiUserPlatform {
                 }
 
                 @Override
-                public List<String> getSuggestions(CommandSource source, String arguments) throws org.spongepowered.api.command.CommandException {
+                public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<org.spongepowered.api.world.World> targetPosition) throws CommandException {
                     CommandSuggestionEvent weEvent = new CommandSuggestionEvent(SpongeWorldEdit.inst().wrapCommandSource(source), command.getPrimaryAlias() + " " + arguments);
                     WorldEdit.getInstance().getEventBus().post(weEvent);
                     return weEvent.getSuggestions();
@@ -181,7 +183,7 @@ class SpongePlatform extends AbstractPlatform implements MultiUserPlatform {
 
     @Override
     public Collection<Actor> getConnectedUsers() {
-        List<Actor> users = new ArrayList<Actor>();
+        List<Actor> users = new ArrayList<>();
         for (org.spongepowered.api.entity.living.player.Player player : Sponge.getServer().getOnlinePlayers()) {
             users.add(new SpongePlayer(this, player));
         }

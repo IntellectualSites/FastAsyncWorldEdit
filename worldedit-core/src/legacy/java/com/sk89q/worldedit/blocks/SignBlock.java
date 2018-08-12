@@ -23,6 +23,8 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.util.gson.GsonUtil;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,25 +39,13 @@ public class SignBlock extends BaseBlock implements TileEntityBlock {
     private static String EMPTY =  "{\"text\":\"\"}";
 
     /**
-     * Construct the sign without text.
-     * 
-     * @param type type ID
-     * @param data data value (orientation)
-     */
-    public SignBlock(int type, int data) {
-        super(type, data);
-        this.text = new String[] { EMPTY, EMPTY, EMPTY, EMPTY };
-    }
-
-    /**
      * Construct the sign with text.
      * 
-     * @param type type ID
-     * @param data data value (orientation)
+     * @param blockState The block state
      * @param text lines of text
      */
-    public SignBlock(int type, int data, String[] text) {
-        super(type, data);
+    public SignBlock(BlockState blockState, String[] text) {
+        super(blockState);
         if (text == null) {
             this.text = new String[] { EMPTY, EMPTY, EMPTY, EMPTY };
             return;
@@ -103,7 +93,7 @@ public class SignBlock extends BaseBlock implements TileEntityBlock {
 
     @Override
     public CompoundTag getNbtData() {
-        Map<String, Tag> values = new HashMap<String, Tag>();
+        Map<String, Tag> values = new HashMap<>();
         values.put("Text1", new StringTag(text[0]));
         values.put("Text2", new StringTag(text[1]));
         values.put("Text3", new StringTag(text[2]));

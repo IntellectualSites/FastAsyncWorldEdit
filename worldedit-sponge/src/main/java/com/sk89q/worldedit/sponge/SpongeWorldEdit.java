@@ -19,19 +19,23 @@
 
 package com.sk89q.worldedit.sponge;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.inject.Inject;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldVector;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.internal.LocalWorldAdapter;
+import com.sk89q.worldedit.sponge.adapter.AdapterLoadException;
+import com.sk89q.worldedit.sponge.adapter.SpongeImplAdapter;
+import com.sk89q.worldedit.sponge.adapter.SpongeImplLoader;
 import com.sk89q.worldedit.sponge.config.SpongeConfiguration;
-import com.sk89q.worldedit.sponge.nms.NMSHelper;
-import com.sk89q.worldedit.sponge.nms.SpongeNMSWorld;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -41,7 +45,13 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.game.state.*;
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -50,10 +60,9 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The Sponge implementation of WorldEdit.
@@ -84,6 +93,7 @@ public class SpongeWorldEdit {
     }
 
     private SpongePlatform platform;
+    private SpongeImplAdapter spongeAdapter;
 
     @Inject
     private SpongeConfiguration config;
@@ -123,6 +133,15 @@ public class SpongeWorldEdit {
         this.platform = new SpongePlatform(this);
         this.provider = new SpongePermissionsProvider();
 
+        for (BlockType blockType : Sponge.getRegistry().getAllOf(BlockType.class)) {
+            // TODO Handle blockstate stuff
+            com.sk89q.worldedit.world.block.BlockTypes.register(new com.sk89q.worldedit.world.block.BlockType(blockType.getId()));
+        }
+
+        for (ItemType itemType : Sponge.getRegistry().getAllOf(ItemType.class)) {
+            ItemTypes.register(new com.sk89q.worldedit.world.item.ItemType(itemType.getId()));
+        }
+
         WorldEdit.getInstance().getPlatformManager().register(platform);
     }
 
@@ -134,6 +153,44 @@ public class SpongeWorldEdit {
     @Listener
     public void serverStarted(GameStartedServerEvent event) {
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
+
+        loadAdapter();
+    }
+
+    private void loadAdapter() {
+        WorldEdit worldEdit = WorldEdit.getInstance();
+
+        // Attempt to load a Sponge adapter
+        SpongeImplLoader adapterLoader = new SpongeImplLoader();
+
+        try {
+            adapterLoader.addFromPath(getClass().getClassLoader());
+        } catch (IOException e) {
+            logger.warn("Failed to search path for Sponge adapters");
+        }
+
+        try {
+            adapterLoader.addFromJar(container.getSource().get().toFile());
+        } catch (IOException e) {
+            logger.warn("Failed to search " + container.getSource().get().toFile() + " for Sponge adapters", e);
+        }
+        try {
+            spongeAdapter = adapterLoader.loadAdapter();
+            logger.info("Using " + spongeAdapter.getClass().getCanonicalName() + " as the Sponge adapter");
+        } catch (AdapterLoadException e) {
+            Platform platform = worldEdit.getPlatformManager().queryCapability(Capability.WORLD_EDITING);
+            if (platform instanceof SpongePlatform) {
+                logger.warn(e.getMessage());
+            } else {
+                logger.info("WorldEdit could not find a Sponge adapter for this MC version, " +
+                        "but it seems that you have another implementation of WorldEdit installed (" + platform.getPlatformName() + ") " +
+                        "that handles the world editing.");
+            }
+        }
+    }
+
+    public SpongeImplAdapter getAdapter() {
+        return this.spongeAdapter;
     }
 
     @Listener
@@ -160,7 +217,8 @@ public class SpongeWorldEdit {
                 }
 
                 Location<World> loc = optLoc.get();
-                WorldVector pos = new WorldVector(LocalWorldAdapter.adapt(world), loc.getX(), loc.getY(), loc.getZ());
+                com.sk89q.worldedit.util.Location pos = new com.sk89q.worldedit.util.Location(
+                        world, loc.getX(), loc.getY(), loc.getZ());
 
                 if (we.handleBlockLeftClick(player, pos)) {
                     event.setCancelled(true);
@@ -181,7 +239,8 @@ public class SpongeWorldEdit {
                 }
 
                 Location<World> loc = optLoc.get();
-                WorldVector pos = new WorldVector(LocalWorldAdapter.adapt(world), loc.getX(), loc.getY(), loc.getZ());
+                com.sk89q.worldedit.util.Location pos = new com.sk89q.worldedit.util.Location(
+                        world, loc.getX(), loc.getY(), loc.getZ());
 
                 if (we.handleBlockRightClick(player, pos)) {
                     event.setCancelled(true);
@@ -199,7 +258,7 @@ public class SpongeWorldEdit {
     }
 
     public static ItemStack toSpongeItemStack(BaseItemStack item) {
-        return NMSHelper.makeSpongeStack(item);
+        return inst().getAdapter().makeSpongeStack(item);
     }
 
     /**
@@ -249,7 +308,7 @@ public class SpongeWorldEdit {
      */
     public SpongeWorld getWorld(World world) {
         checkNotNull(world);
-        return new SpongeNMSWorld(world);
+        return getAdapter().getWorld(world);
     }
 
     /**
