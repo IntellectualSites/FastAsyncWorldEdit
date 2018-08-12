@@ -96,7 +96,5 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
         return "sphere";
     }
 
-    public static Class<?> inject() {
-        return SphereRegionSelector.class;
-    }
+
 }

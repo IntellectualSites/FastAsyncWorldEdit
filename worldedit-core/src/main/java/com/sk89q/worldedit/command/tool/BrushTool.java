@@ -499,9 +499,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         return act(BrushAction.SECONDARY, server, config, player, session);
     }
 
-    public static Class<?> inject() {
-        return BrushTool.class;
-    }
+
 
     public void setScrollAction(ScrollAction scrollAction) {
         this.getContext().setScrollAction(scrollAction);

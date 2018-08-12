@@ -49,7 +49,5 @@ public class ClipboardPattern extends AbstractPattern {
         return clipboard.getBlock(mutable);
     }
 
-    public static Class<?> inject() {
-        return ClipboardPattern.class;
-    }
+
 }

@@ -165,8 +165,6 @@ public class Expression {
         this.environment = environment;
     }
 
-    public static Class<?> inject() {
-        return Expression.class;
-    }
+
 
 }

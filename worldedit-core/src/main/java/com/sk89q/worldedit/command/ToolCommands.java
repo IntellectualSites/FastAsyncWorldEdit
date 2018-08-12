@@ -183,7 +183,5 @@ public class ToolCommands {
         BBC.TOOL_LRBUILD_INFO.send(player, secondary, primary);
     }
 
-    public static Class<?> inject() {
-        return ToolCommands.class;
-    }
+
 }

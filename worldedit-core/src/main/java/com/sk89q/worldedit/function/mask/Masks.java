@@ -153,7 +153,5 @@ public final class Masks {
         }
     }
 
-    public static Class<?> inject() {
-        return Masks.class;
-    }
+
 }

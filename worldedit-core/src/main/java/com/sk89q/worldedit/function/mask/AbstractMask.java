@@ -25,7 +25,5 @@ import java.io.Serializable;
  * A base class of {@link Mask} that all masks should inherit from.
  */
 public abstract class AbstractMask implements Mask, Serializable {
-    public static Class<?> inject() {
-        return AbstractMask.class;
-    }
+
 }

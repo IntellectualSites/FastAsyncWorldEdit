@@ -101,7 +101,7 @@ public class TargetBlock {
         boolean searchForLastBlock = true;
         Location lastBlock = null;
         while (getNextBlock() != null) {
-            if (world.getLazyBlock(getCurrentBlock().toVector()).getBlockType().getMaterial().isAir()) {
+            if (world.getBlockType(getCurrentBlock().toVector()).getMaterial().isAir()) {
                 if (searchForLastBlock) {
                     lastBlock = getCurrentBlock();
                     if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
@@ -123,7 +123,7 @@ public class TargetBlock {
      * @return Block
      */
     public Location getTargetBlock() {
-        while (getNextBlock() != null && world.getLazyBlock(getCurrentBlock().toVector()).getBlockType().getMaterial().isAir()) ;
+        while (getNextBlock() != null && world.getBlockType(getCurrentBlock().toVector()).getMaterial().isAir()) ;
         return getCurrentBlock();
     }
 
@@ -134,7 +134,7 @@ public class TargetBlock {
      * @return Block
      */
     public Location getSolidTargetBlock() {
-        while (getNextBlock() != null && !world.getBlock(getCurrentBlock().toVector()).getBlockType().getMaterial().isMovementBlocker()) ;
+        while (getNextBlock() != null && !world.getBlockType(getCurrentBlock().toVector()).getMaterial().isMovementBlocker()) ;
         return getCurrentBlock();
     }
 

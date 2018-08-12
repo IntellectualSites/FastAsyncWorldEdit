@@ -85,7 +85,5 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
         this.current = current;
     }
 
-    public static Class<?> inject() {
-        return WorldEditExpressionEnvironment.class;
-    }
+
 }

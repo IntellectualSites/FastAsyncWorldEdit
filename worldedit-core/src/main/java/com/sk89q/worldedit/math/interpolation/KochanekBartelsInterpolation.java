@@ -256,7 +256,5 @@ public class KochanekBartelsInterpolation implements Interpolation {
         return (int) Math.floor(position);
     }
 
-    public static Class<?> inject() {
-        return KochanekBartelsInterpolation.class;
-    }
+
 }

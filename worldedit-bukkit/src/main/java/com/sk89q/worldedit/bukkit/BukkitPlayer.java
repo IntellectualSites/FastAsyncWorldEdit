@@ -34,6 +34,7 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import jdk.nashorn.internal.ir.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -67,11 +68,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
+    public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
         ItemStack itemStack = handSide == HandSide.MAIN_HAND
                 ? player.getInventory().getItemInMainHand()
                 : player.getInventory().getItemInOffHand();
-        return new BaseBlock(BukkitAdapter.asBlockState(itemStack));
+        return BukkitAdapter.asBlockState(itemStack);
     }
 
     @Override

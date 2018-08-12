@@ -522,7 +522,5 @@ public final class CommandManager {
         return commandLog;
     }
 
-    public static Class<?> inject() {
-        return CommandManager.class;
-    }
+
 }

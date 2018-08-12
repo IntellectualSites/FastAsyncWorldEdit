@@ -176,7 +176,5 @@ public class EditSessionEvent extends Event implements Cancellable {
         return clone;
     }
 
-    public static Class<?> inject() {
-        return EditSessionEvent.class;
-    }
+
 }

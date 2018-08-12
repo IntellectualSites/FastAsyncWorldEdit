@@ -368,12 +368,12 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
-    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
+    public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
         final ItemType typeId = getItemInHand(handSide).getType();
         if (typeId.hasBlockType()) {
-            return new BaseBlock(typeId.getBlockType());
+            return typeId.getBlockType().getDefaultState();
         } else {
-            return new BaseBlock(BlockTypes.AIR);
+            return BlockTypes.AIR.getDefaultState();
         }
     }
 

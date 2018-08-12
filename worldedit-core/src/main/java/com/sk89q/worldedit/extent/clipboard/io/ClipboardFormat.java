@@ -558,7 +558,5 @@ public enum ClipboardFormat {
         return newEnum;
     }
 
-    public static Class<?> inject() {
-        return ClipboardFormat.class;
-    }
+
 }

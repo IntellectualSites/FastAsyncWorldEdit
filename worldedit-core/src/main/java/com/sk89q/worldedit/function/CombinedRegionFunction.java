@@ -106,7 +106,5 @@ public class CombinedRegionFunction implements RegionFunction {
     }
 
 
-    public static Class<?> inject() {
-        return CombinedRegionFunction.class;
-    }
+
 }

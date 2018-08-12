@@ -121,7 +121,5 @@ public class Function extends Node {
         return this;
     }
 
-    public static Class<?> inject() {
-        return Function.class;
-    }
+
 }

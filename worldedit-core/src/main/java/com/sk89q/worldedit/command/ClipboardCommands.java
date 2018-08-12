@@ -595,7 +595,5 @@ public class ClipboardCommands extends MethodCommands {
         BBC.CLIPBOARD_CLEARED.send(player);
     }
 
-    public static Class<?> inject() {
-        return ClipboardCommands.class;
-    }
+
 }

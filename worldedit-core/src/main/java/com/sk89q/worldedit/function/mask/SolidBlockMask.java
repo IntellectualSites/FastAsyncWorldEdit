@@ -28,7 +28,5 @@ public class SolidBlockMask extends BlockTypeMask {
         return null;
     }
 
-    public static Class<?> inject() {
-        return SolidBlockMask.class;
-    }
+
 }

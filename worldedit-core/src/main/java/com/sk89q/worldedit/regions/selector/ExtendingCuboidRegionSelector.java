@@ -142,7 +142,5 @@ public class ExtendingCuboidRegionSelector extends CuboidRegionSelector {
         explainRegionAdjust(player, session);
     }
 
-    public static Class<?> inject() {
-        return ExtendingCuboidRegionSelector.class;
-    }
+
 }

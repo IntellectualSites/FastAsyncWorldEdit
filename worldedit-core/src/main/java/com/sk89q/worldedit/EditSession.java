@@ -3320,7 +3320,5 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         world.setWeather(weatherType, duration);
     }
 
-    public static Class<?> inject() {
-        return EditSession.class;
-    }
+
 }

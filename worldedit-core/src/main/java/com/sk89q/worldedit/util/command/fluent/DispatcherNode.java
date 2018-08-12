@@ -191,7 +191,5 @@ public class DispatcherNode {
         return dispatcher;
     }
 
-    public static Class<?> inject() {
-        return DispatcherNode.class;
-    }
+
 }

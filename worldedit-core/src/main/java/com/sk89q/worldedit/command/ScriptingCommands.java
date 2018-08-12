@@ -219,7 +219,5 @@ public class ScriptingCommands {
         }
     }
 
-    public static Class<?> inject() {
-        return ScriptingCommands.class;
-    }
+
 }

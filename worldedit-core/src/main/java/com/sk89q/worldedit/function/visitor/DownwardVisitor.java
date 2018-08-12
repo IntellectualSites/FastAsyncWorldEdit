@@ -69,7 +69,5 @@ public class DownwardVisitor extends RecursiveVisitor {
         return ((fromY == this.baseY) || (to.getBlockY() - from.getBlockY() < 0)) && super.isVisitable(from, to);
     }
 
-    public static Class<?> inject() {
-        return DownwardVisitor.class;
-    }
+
 }

@@ -313,7 +313,5 @@ public class OptionsCommands {
         }
     }
 
-    public static Class<?> inject() {
-        return OptionsCommands.class;
-    }
+
 }

@@ -636,7 +636,5 @@ public class SchematicCommands extends MethodCommands {
         });
     }
 
-    public static Class<?> inject() {
-        return SchematicCommands.class;
-    }
+
 }

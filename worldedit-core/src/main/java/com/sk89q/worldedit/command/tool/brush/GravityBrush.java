@@ -65,8 +65,6 @@ public class GravityBrush implements Brush {
         }
     }
 
-    public static Class<?> inject() {
-        return GravityBrush.class;
-    }
+
 
 }

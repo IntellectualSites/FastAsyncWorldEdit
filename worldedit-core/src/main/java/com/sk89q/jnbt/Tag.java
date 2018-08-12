@@ -35,9 +35,7 @@ public abstract class Tag {
         return getValue();
     }
 
-    public static Class<?> inject() {
-        return Tag.class;
-    }
+
 
 
 }

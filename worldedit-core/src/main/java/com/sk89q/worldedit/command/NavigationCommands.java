@@ -231,7 +231,5 @@ public class NavigationCommands {
         return forceGlass || (config.navigationUseGlass && !forceFlight);
     }
 
-    public static Class<?> inject() {
-        return NavigationCommands.class;
-    }
+
 }

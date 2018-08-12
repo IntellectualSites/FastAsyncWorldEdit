@@ -52,8 +52,6 @@ public class NonRisingVisitor extends RecursiveVisitor {
         directions.add(new Vector(0, -1, 0));
     }
 
-    public static Class<?> inject() {
-        return NonRisingVisitor.class;
-    }
+
 
 }

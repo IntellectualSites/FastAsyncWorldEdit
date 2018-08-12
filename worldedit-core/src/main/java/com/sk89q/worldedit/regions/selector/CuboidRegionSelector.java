@@ -312,7 +312,5 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         return "cuboid";
     }
 
-    public static Class<?> inject() {
-        return CuboidRegionSelector.class;
-    }
+
 }

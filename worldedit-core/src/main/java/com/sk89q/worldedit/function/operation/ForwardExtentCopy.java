@@ -377,7 +377,5 @@ public class ForwardExtentCopy implements Operation {
     public void addStatusMessages(List<String> messages) {
     }
 
-    public static Class<?> inject() {
-        return ForwardExtentCopy.class;
-    }
+
 }

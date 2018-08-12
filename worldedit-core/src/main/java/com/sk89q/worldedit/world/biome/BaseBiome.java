@@ -86,7 +86,5 @@ public class BaseBiome {
     }
 
 
-    public static Class<?> inject() {
-        return BaseBiome.class;
-    }
+
 }

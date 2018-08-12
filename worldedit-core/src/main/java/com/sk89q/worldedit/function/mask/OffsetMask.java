@@ -87,7 +87,5 @@ public class OffsetMask extends AbstractMask {
         }
     }
 
-    public static Class<?> inject() {
-        return OffsetMask.class;
-    }
+
 }

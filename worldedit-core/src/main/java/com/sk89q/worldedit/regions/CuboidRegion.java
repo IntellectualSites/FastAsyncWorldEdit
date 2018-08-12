@@ -655,7 +655,5 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return new CuboidRegion(origin.subtract(size), origin.add(size));
     }
 
-    public static Class<?> inject() {
-        return CuboidRegion.class;
-    }
+
 }

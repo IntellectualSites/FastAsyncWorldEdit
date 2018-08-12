@@ -249,7 +249,5 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
         return region.getCenter().toBlockVector();
     }
 
-    public static Class<?> inject() {
-        return EllipsoidRegionSelector.class;
-    }
+
 }

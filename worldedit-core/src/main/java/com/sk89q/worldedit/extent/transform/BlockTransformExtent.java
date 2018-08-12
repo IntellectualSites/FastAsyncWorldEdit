@@ -268,7 +268,5 @@ public class BlockTransformExtent extends ResettableExtent {
         return super.setBlock(location, transformFastInverse((BlockState) block));
     }
 
-    public static Class<?> inject() {
-        return BlockTransformExtent.class;
-    }
+
 }

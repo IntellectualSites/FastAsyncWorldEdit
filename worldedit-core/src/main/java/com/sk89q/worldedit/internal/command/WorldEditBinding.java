@@ -385,8 +385,6 @@ public class WorldEditBinding extends BindingHelper {
         }
     }
 
-    public static Class<?> inject() {
-        return WorldEditBinding.class;
-    }
+
 
 }

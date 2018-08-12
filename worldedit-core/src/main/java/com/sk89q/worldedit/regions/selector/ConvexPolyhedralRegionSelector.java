@@ -278,7 +278,5 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         }
     }
 
-    public static Class<?> inject() {
-        return ConvexPolyhedralRegionSelector.class;
-    }
+
 }

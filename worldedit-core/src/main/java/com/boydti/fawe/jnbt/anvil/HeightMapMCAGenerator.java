@@ -216,7 +216,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         main = new DifferentialArray(new int[getArea()]);
 
         int stone = BlockTypes.STONE.getInternalId();
-        int grass = BlockTypes.GRASS.getInternalId();
+        int grass = BlockTypes.GRASS_BLOCK.getInternalId();
         Arrays.fill(main.getIntArray(), stone);
         Arrays.fill(floor.getIntArray(), grass);
     }

@@ -34,7 +34,5 @@ public interface ExpressionEnvironment {
     int getBlockTypeRel(double x, double y, double z);
     int getBlockDataRel(double x, double y, double z);
 
-    public static Class<?> inject() {
-        return ExpressionEnvironment.class;
-    }
+
 }

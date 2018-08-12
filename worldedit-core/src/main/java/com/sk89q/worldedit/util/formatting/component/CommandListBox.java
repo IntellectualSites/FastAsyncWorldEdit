@@ -47,7 +47,5 @@ public class CommandListBox extends MessageBox {
         return this;
     }
 
-    public static Class<?> inject() {
-        return CommandListBox.class;
-    }
+
 }

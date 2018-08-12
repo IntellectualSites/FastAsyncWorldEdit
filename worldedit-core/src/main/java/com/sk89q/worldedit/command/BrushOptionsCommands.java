@@ -508,7 +508,5 @@ public class BrushOptionsCommands extends MethodCommands {
         BBC.BRUSH_SIZE.send(player);
     }
 
-    public static Class<?> inject() {
-        return BrushOptionsCommands.class;
-    }
+
 }

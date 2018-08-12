@@ -163,7 +163,5 @@ public class DefaultMaskParser extends FaweParser<Mask> {
         }
     }
 
-    public static Class<?> inject() {
-        return DefaultMaskParser.class;
-    }
+
 }

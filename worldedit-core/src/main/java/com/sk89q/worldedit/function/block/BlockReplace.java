@@ -54,8 +54,6 @@ public class BlockReplace implements RegionFunction {
         return pattern.apply(extent, position, position);
     }
 
-    public static Class<?> inject() {
-        return BlockReplace.class;
-    }
+
 
 }

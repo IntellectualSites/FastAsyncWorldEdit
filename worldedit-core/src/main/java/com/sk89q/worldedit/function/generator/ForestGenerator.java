@@ -53,7 +53,7 @@ public class ForestGenerator implements RegionFunction {
         BlockStateHolder block = editSession.getBlock(position);
         BlockType t = block.getBlockType();
 
-        if (t == BlockTypes.GRASS || t == BlockTypes.DIRT) {
+        if (t == BlockTypes.GRASS_BLOCK || t == BlockTypes.DIRT) {
             treeType.generate(editSession, position.add(0, 1, 0));
             return true;
         } else if (t == BlockTypes.TALL_GRASS || t == BlockTypes.DEAD_BUSH || t == BlockTypes.POPPY || t == BlockTypes.DANDELION) { // TODO: This list needs to be moved

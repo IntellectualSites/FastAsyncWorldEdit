@@ -50,7 +50,5 @@ public class MessageBox extends StyledFragment {
         return contents;
     }
 
-    public static Class<?> inject() {
-        return MessageBox.class;
-    }
+
 }

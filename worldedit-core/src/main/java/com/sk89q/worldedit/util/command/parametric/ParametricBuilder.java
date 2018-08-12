@@ -293,8 +293,6 @@ public class ParametricBuilder {
         this.defaultCompleter = defaultCompleter;
     }
 
-    public static Class<?> inject() {
-        return ParametricBuilder.class;
-    }
+
 
 }

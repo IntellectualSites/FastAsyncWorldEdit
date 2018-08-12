@@ -49,8 +49,6 @@ import java.util.Map;
  */
 public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pattern {
 
-    private static final BlockStateHolder AIR = BlockTypes.AIR.getDefaultState();
-
     private final Map<BlockVector, BlockStateHolder> buffer = new LinkedHashMap<>();
     private final Mask mask;
     private Vector min = null;
@@ -110,7 +108,7 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
         if (block != null) {
             return block;
         } else {
-            return AIR;
+            return BlockTypes.AIR.getDefaultState();
         }
     }
 

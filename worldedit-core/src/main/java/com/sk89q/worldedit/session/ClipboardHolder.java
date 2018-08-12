@@ -120,8 +120,6 @@ public class ClipboardHolder {
         clipboard = null;
     }
 
-    public static Class<?> inject() {
-        return ClipboardHolder.class;
-    }
+
 
 }

@@ -177,8 +177,6 @@ public class ContextArgumentStack implements ArgumentStack {
         return context;
     }
 
-    public static Class<?> inject() {
-        return ContextArgumentStack.class;
-    }
+
 
 }

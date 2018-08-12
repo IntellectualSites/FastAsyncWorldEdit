@@ -288,8 +288,6 @@ public class HeightMap {
         return blocksChanged;
     }
 
-    public static Class<?> inject() {
-        return HeightMap.class;
-    }
+
 
 }

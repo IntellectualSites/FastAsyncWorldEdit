@@ -6,7 +6,5 @@ public abstract class AbstractPattern implements Pattern, Serializable {
     public AbstractPattern() {
     }
 
-    public static Class<?> inject() {
-        return AbstractPattern.class;
-    }
+
 }

@@ -95,8 +95,6 @@ public class SimpleCommandMapping implements CommandMapping {
                 '}';
     }
 
-    public static Class<?> inject() {
-        return SimpleCommandMapping.class;
-    }
+
 
 }

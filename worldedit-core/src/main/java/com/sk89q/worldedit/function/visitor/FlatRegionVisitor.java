@@ -100,8 +100,6 @@ public class FlatRegionVisitor implements Operation {
         messages.add(BBC.VISITOR_FLAT.format(getAffected()));
     }
 
-    public static Class<?> inject() {
-        return Operations.class;
-    }
+
 
 }

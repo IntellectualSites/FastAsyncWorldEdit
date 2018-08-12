@@ -196,7 +196,5 @@ public class BlockMask extends AbstractExtentMask {
         return null;
     }
 
-    public static Class<?> inject() {
-        return BlockMask.class;
-    }
+
 }

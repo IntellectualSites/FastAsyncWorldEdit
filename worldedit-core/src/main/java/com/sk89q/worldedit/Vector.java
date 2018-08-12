@@ -910,7 +910,5 @@ public class Vector extends Vector2D implements Comparable<Vector>, Serializable
         this.z = stream.readDouble();
     }
 
-    public static Class<?> inject() {
-        return Vector.class;
-    }
+
 }

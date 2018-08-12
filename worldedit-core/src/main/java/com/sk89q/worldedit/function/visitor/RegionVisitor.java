@@ -198,7 +198,5 @@ public class RegionVisitor implements Operation {
         messages.add(BBC.VISITOR_BLOCK.format(getAffected()));
     }
 
-    public static Class<?> inject() {
-        return Operations.class;
-    }
+
 }

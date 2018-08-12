@@ -298,7 +298,5 @@ public class HistoryCommands extends MethodCommands {
         BBC.COMMAND_HISTORY_CLEAR.send(player);
     }
 
-    public static Class<?> inject() {
-        return HistoryCommands.class;
-    }
+
 }

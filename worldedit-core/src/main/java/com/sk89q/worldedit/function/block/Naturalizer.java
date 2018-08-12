@@ -52,7 +52,7 @@ public class Naturalizer implements LayerFunction {
     public Naturalizer(EditSession editSession) {
         checkNotNull(editSession);
         this.editSession = editSession;
-        this.mask = new BlockTypeMask(editSession, BlockTypes.GRASS, BlockTypes.DIRT, BlockTypes.STONE);
+        this.mask = new BlockTypeMask(editSession, BlockTypes.GRASS_BLOCK, BlockTypes.DIRT, BlockTypes.STONE);
     }
 
     /**
@@ -75,7 +75,7 @@ public class Naturalizer implements LayerFunction {
             affected++;
             switch (depth) {
                 case 0:
-                    editSession.setBlock(position, BlockTypes.GRASS);
+                    editSession.setBlock(position, BlockTypes.GRASS_BLOCK);
                     break;
                 case 1:
                 case 2:

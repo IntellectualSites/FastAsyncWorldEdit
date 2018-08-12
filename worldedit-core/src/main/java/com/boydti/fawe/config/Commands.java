@@ -180,8 +180,4 @@ public class Commands {
             return command.anyFlags();
         }
     }
-
-    public static Class<Commands> inject() {
-        return Commands.class;
-    }
 }

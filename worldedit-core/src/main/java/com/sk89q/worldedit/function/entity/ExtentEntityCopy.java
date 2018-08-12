@@ -203,8 +203,6 @@ public class ExtentEntityCopy implements EntityFunction {
         return state;
     }
 
-    public static Class<?> inject() {
-        return ExtentEntityCopy.class;
-    }
+
 
 }

@@ -1369,7 +1369,5 @@ public class LocalSession implements TextureHolder {
         this.transform = transform;
     }
 
-    public static Class<?> inject() {
-        return LocalSession.class;
-    }
+
 }

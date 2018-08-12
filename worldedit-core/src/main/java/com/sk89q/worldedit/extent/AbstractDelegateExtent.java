@@ -285,7 +285,5 @@ public class AbstractDelegateExtent implements LightingExtent {
         }
     }
 
-    public static Class<?> inject() {
-        return AbstractDelegateExtent.class;
-    }
+
 }

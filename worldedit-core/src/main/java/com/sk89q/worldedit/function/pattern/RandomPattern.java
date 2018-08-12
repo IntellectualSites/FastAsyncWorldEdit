@@ -72,8 +72,6 @@ public class RandomPattern extends AbstractPattern {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, set, get);
     }
 
-    public static Class<?> inject() {
-        return RandomPattern.class;
-    }
+
 
 }

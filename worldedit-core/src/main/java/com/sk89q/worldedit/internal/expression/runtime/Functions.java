@@ -489,7 +489,5 @@ public final class Functions {
         return queryInternal(type, data, typeId, dataValue);
     }
 
-    public static Class<?> inject() {
-        return Functions.class;
-    }
+
 }

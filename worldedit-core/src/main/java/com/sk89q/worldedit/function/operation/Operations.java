@@ -80,7 +80,5 @@ public final class Operations {
         return;
     }
 
-    public static Class<?> inject() {
-        return Operations.class;
-    }
+
 }

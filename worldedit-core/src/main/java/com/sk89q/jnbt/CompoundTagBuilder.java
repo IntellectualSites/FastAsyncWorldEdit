@@ -201,7 +201,5 @@ public class CompoundTagBuilder {
         return new CompoundTagBuilder();
     }
 
-    public static Class<?> inject() {
-        return CompoundTagBuilder.class;
-    }
+
 }

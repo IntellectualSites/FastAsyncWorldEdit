@@ -60,7 +60,5 @@ public class RecursiveVisitor extends BreadthFirstSearch {
         return this.mask.test(to);
     }
 
-    public static Class<?> inject() {
-        return RecursiveVisitor.class;
-    }
+
 }

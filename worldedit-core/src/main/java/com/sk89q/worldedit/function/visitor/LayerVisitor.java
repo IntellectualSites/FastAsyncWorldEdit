@@ -132,7 +132,5 @@ public class LayerVisitor implements Operation {
     public void addStatusMessages(final List<String> messages) {
     }
 
-    public static Class<?> inject() {
-        return Operations.class;
-    }
+
 }

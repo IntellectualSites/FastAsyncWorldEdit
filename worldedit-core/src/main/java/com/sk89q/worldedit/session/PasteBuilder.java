@@ -132,7 +132,5 @@ public class PasteBuilder {
         return copy;
     }
 
-    public static Class<?> inject() {
-        return PasteBuilder.class;
-    }
+
 }

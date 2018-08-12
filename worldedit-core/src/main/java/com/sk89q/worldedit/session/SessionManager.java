@@ -325,9 +325,7 @@ public class SessionManager {
         }
     }
 
-    public static Class<?> inject() {
-        return SessionManager.class;
-    }
+
 
 
 }

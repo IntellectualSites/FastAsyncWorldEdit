@@ -521,8 +521,6 @@ public class PlatformManager {
         }
     }
 
-    public static Class<?> inject() {
-        return PlatformManager.class;
-    }
+
 
 }

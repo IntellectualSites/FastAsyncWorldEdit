@@ -63,7 +63,5 @@ public class SinglePickaxe implements BlockTool {
         return true;
     }
 
-    public static Class<?> inject() {
-        return SinglePickaxe.class;
-    }
+
 }

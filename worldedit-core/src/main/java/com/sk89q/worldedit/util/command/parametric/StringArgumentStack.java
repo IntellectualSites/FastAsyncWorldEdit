@@ -151,7 +151,5 @@ public class StringArgumentStack implements ArgumentStack {
         return value;
     }
 
-    public static Class<?> inject() {
-        return StringArgumentStack.class;
-    }
+
 }

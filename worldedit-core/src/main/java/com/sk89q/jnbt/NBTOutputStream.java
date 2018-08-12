@@ -409,7 +409,5 @@ public final class NBTOutputStream implements Closeable {
         if (os instanceof Flushable) ((Flushable) os).flush();
     }
 
-    public static Class<?> inject() {
-        return NBTOutputStream.class;
-    }
+
 }

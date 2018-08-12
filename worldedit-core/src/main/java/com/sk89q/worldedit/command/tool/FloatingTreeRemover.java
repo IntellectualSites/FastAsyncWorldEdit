@@ -24,16 +24,16 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.world.block.BlockCategories;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockCategories;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -44,7 +44,6 @@ import java.util.Set;
  * to anything else)
  */
 public class FloatingTreeRemover implements BlockTool {
-    private static final BlockStateHolder AIR = BlockTypes.AIR.getDefaultState();
     private int rangeSq;
 
     public FloatingTreeRemover() {
@@ -67,10 +66,10 @@ public class FloatingTreeRemover implements BlockTool {
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config,
-            Player player, LocalSession session, Location clicked) {
+                              Player player, LocalSession session, Location clicked) {
 
         final World world = (World) clicked.getExtent();
-        final BlockStateHolder state = world.getBlock(clicked.toVector());
+        final BlockState state = world.getBlock(clicked.toVector());
 
         if (!isTreeBlock(state.getBlockType())) {
             player.printError("That's not a tree.");
@@ -87,9 +86,9 @@ public class FloatingTreeRemover implements BlockTool {
             }
 
             for (Vector blockVector : blockSet) {
-                final BlockStateHolder otherState = editSession.getBlock(blockVector);
+                final BlockState otherState = editSession.getBlock(blockVector);
                 if (isTreeBlock(otherState.getBlockType())) {
-                    editSession.setBlock(blockVector, AIR);
+                    editSession.setBlock(blockVector, BlockTypes.AIR.getDefaultState());
                 }
             }
         } catch (MaxChangedBlocksException e) {
@@ -134,7 +133,7 @@ public class FloatingTreeRemover implements BlockTool {
                 }
 
                 if (visited.add(next)) {
-                    BlockStateHolder state = world.getBlock(next);
+                    BlockState state = world.getBlock(next);
                     if (state.getBlockType() == BlockTypes.AIR || state.getBlockType() == BlockTypes.SNOW) {
                         continue;
                     }

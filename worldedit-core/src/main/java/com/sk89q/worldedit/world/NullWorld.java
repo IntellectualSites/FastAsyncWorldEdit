@@ -127,13 +127,13 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public LazyBlock getLazyBlock(Vector position) {
-        return new LazyBlock(getBlock(position), this, position);
+    public BlockState getLazyBlock(Vector position) {
+        return getBlock(position);
     }
 
     @Override
-    public BaseBlock getFullBlock(Vector position) {
-        return new BaseBlock(getBlock(position));
+    public BlockState getFullBlock(Vector position) {
+        return getBlock(position);
     }
 
     @Override

@@ -135,7 +135,5 @@ public class HashTagPatternParser extends FaweParser<Pattern> {
         }
     }
 
-    public static Class<?> inject() {
-        return HashTagPatternParser.class;
-    }
+
 }

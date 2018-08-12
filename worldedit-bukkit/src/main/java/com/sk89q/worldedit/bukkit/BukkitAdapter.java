@@ -221,8 +221,6 @@ public class BukkitAdapter {
         return Material.getMaterial(itemType.getId().replace("minecraft:", "").toUpperCase());
     }
 
-    private static boolean test;
-
     /**
      * Create a Bukkit Material form a WorldEdit BlockType
      *
@@ -314,7 +312,7 @@ public class BukkitAdapter {
      * @param itemStack The Bukkit ItemStack
      * @return The WorldEdit BlockState
      */
-    public static BlockStateHolder asBlockState(ItemStack itemStack) {
+    public static BlockState asBlockState(ItemStack itemStack) {
         checkNotNull(itemStack);
         if (itemStack.getType().isBlock()) {
             return adapt(itemStack.getType().createBlockData());

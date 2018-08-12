@@ -89,7 +89,5 @@ public class Fragment {
         return builder.toString();
     }
 
-    public static Class<?> inject() {
-        return Fragment.class;
-    }
+
 }

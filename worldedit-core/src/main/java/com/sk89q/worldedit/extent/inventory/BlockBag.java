@@ -38,7 +38,7 @@ public abstract class BlockBag {
     public void storeDroppedBlock(BlockState blockState) throws BlockBagException {
         BlockState dropped = blockState; // TODO BlockType.getBlockBagItem(id, data);
         if (dropped == null) return;
-        if (dropped.getBlockType() == BlockTypes.AIR) return;
+        if (dropped.getBlockType().getMaterial().isAir()) return;
 
         storeBlock(dropped);
     }
@@ -52,29 +52,9 @@ public abstract class BlockBag {
     public void fetchPlacedBlock(BlockState blockState) throws BlockBagException {
         try {
             // Blocks that can't be fetched...
-//            TODO switch (id) {
-//            case BlockTypesBEDROCK:
-//            case BlockTypesGOLD_ORE:
-//            case BlockTypesIRON_ORE:
-//            case BlockTypesCOAL_ORE:
-//            case BlockTypesDIAMOND_ORE:
-//            case BlockTypesTNT:
-//            case BlockTypesMOB_SPAWNER:
-//            case BlockTypesCROPS:
-//            case BlockTypesREDSTONE_ORE:
-//            case BlockTypesGLOWING_REDSTONE_ORE:
-//            case BlockTypesSNOW:
-//            case BlockTypesLIGHTSTONE:
-//            case BlockTypesPORTAL:
-//                throw new UnplaceableBlockException();
-//
-//            case BlockTypesWATER:
-//            case BlockTypesSTATIONARY_WATER:
-//            case BlockTypesLAVA:
-//            case BlockTypesSTATIONARY_LAVA:
-//                // Override liquids
-//                return;
-//            }
+            if (blockState.getBlockType().getMaterial().isReplacedDuringPlacement()) {
+                return;
+            }
             fetchBlock(blockState);
         } catch (OutOfBlocksException e) {
             BlockState placed = blockState;// TODO BlockType.getBlockBagItem(id, data);

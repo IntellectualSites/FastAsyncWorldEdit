@@ -352,7 +352,5 @@ public class ParametricCallable extends AParametricCallable {
         }
     }
 
-    public static Class<?> inject() {
-        return ParametricCallable.class;
-    }
+
 }

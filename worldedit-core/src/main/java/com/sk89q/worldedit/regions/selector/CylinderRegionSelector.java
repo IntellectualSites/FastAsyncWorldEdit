@@ -284,7 +284,5 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         return "cuboid";
     }
 
-    public static Class<?> inject() {
-        return CylinderRegionSelector.class;
-    }
+
 }

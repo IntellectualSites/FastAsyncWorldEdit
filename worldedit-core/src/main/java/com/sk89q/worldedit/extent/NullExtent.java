@@ -83,7 +83,7 @@ public class NullExtent implements Extent {
 
     @Override
     public BlockState getLazyBlock(Vector position) {
-        return new LazyBlock(BlockTypes.AIR, this, position);
+        return BlockTypes.AIR.getDefaultState();
     }
 
     @Override

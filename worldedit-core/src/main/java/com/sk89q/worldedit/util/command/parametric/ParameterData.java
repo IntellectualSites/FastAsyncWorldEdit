@@ -198,7 +198,5 @@ public class ParameterData extends SimpleParameter {
         }
     }
 
-    public static Class<?> inject() {
-        return ParameterData.class;
-    }
+
 }

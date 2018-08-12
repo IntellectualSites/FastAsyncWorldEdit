@@ -134,7 +134,5 @@ public class FlattenedClipboardTransform {
         return new FlattenedClipboardTransform(original, transform);
     }
 
-    public static Class<?> inject() {
-        return FlattenedClipboardTransform.class;
-    }
+
 }

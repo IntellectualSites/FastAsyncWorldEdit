@@ -80,9 +80,4 @@ public class RandomTransform extends SelectTransform {
     public RandomCollection<ResettableExtent> getCollection() {
         return collection;
     }
-
-    public static Class<?> inject() {
-        return RandomPattern.class;
-    }
-
 }

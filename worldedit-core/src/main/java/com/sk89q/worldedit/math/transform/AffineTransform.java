@@ -324,7 +324,5 @@ public class AffineTransform implements Transform, Serializable {
         mutable = new MutableBlockVector();
     }
 
-    public static Class<?> inject() {
-        return AffineTransform.class;
-    }
+
 }

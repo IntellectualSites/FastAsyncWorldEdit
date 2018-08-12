@@ -821,7 +821,5 @@ public class SelectionCommands {
         session.dispatchCUISelection(player);
     }
 
-    public static Class<?> inject() {
-        return SelectionCommands.class;
-    }
+
 }

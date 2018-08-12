@@ -59,7 +59,5 @@ public class AreaPickaxe implements BlockTool {
         return true;
     }
 
-    public static Class<?> inject() {
-        return AreaPickaxe.class;
-    }
+
 }

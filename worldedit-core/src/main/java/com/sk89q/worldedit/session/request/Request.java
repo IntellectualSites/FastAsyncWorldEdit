@@ -137,7 +137,5 @@ public final class Request {
         threadLocal.remove();
     }
 
-    public static Class<?> inject() {
-        return Request.class;
-    }
+
 }

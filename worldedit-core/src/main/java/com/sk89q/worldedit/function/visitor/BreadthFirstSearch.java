@@ -215,7 +215,5 @@ public abstract class BreadthFirstSearch implements Operation {
     public void cancel() {
     }
 
-    public static Class<?> inject() {
-        return BreadthFirstSearch.class;
-    }
+
 }

@@ -54,7 +54,7 @@ public class FloodFillTool implements BlockTool {
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
         World world = (World) clicked.getExtent();
 
-        BlockType initialType = world.getLazyBlock(clicked.toVector()).getBlockType();
+        BlockType initialType = world.getBlockType(clicked.toVector());
 
         if (initialType.getMaterial().isAir()) {
             return true;
@@ -67,7 +67,7 @@ public class FloodFillTool implements BlockTool {
         EditSession editSession = session.createEditSession(player);
 
         try {
-            recurse(server, editSession, world, clicked.toVector().toBlockVector(),
+            recurse(editSession, world, clicked.toVector().toBlockVector(),
                     clicked.toVector(), range, initialType, new HashSet<BlockVector>());
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
@@ -77,7 +77,7 @@ public class FloodFillTool implements BlockTool {
         return true;
     }
 
-    private void recurse(Platform server, EditSession editSession, World world, BlockVector pos, Vector origin, int size, BlockType initialType,
+    private void recurse(EditSession editSession, World world, BlockVector pos, Vector origin, int size, BlockType initialType,
                          Set<BlockVector> visited) throws WorldEditException {
 
         if (origin.distance(pos) > size || visited.contains(pos)) {
@@ -92,21 +92,19 @@ public class FloodFillTool implements BlockTool {
             return;
         }
 
-        recurse(server, editSession, world, pos.add(1, 0, 0).toBlockVector(),
+        recurse(editSession, world, pos.add(1, 0, 0).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(-1, 0, 0).toBlockVector(),
+        recurse(editSession, world, pos.add(-1, 0, 0).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(0, 0, 1).toBlockVector(),
+        recurse(editSession, world, pos.add(0, 0, 1).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(0, 0, -1).toBlockVector(),
+        recurse(editSession, world, pos.add(0, 0, -1).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(0, 1, 0).toBlockVector(),
+        recurse(editSession, world, pos.add(0, 1, 0).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(0, -1, 0).toBlockVector(),
+        recurse(editSession, world, pos.add(0, -1, 0).toBlockVector(),
                 origin, size, initialType, visited);
     }
 
-    public static Class<?> inject() {
-        return FloodFillTool.class;
-    }
+
 }

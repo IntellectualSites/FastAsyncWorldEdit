@@ -71,7 +71,7 @@ public interface Player extends Entity, Actor {
      *
      * @return the item id of the item the player is holding
      */
-    BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException;
+    BlockState getBlockInHand(HandSide handSide) throws WorldEditException;
 
     /**
      * Gives the player an item.

@@ -109,8 +109,6 @@ public class CommandUsageBox extends StyledFragment {
         append(box);
     }
 
-    public static Class<?> inject() {
-        return CommandUsageBox.class;
-    }
+
 
 }

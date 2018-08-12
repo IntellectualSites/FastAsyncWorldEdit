@@ -425,7 +425,5 @@ public final class CompoundTag extends Tag {
         return bldr.toString();
     }
 
-    public static Class<?> inject() {
-        return CompoundTag.class;
-    }
+
 }

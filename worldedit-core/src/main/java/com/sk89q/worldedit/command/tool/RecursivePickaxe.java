@@ -63,7 +63,5 @@ public class RecursivePickaxe implements BlockTool {
         return true;
     }
 
-    public static Class<?> inject() {
-        return RecursivePickaxe.class;
-    }
+
 }

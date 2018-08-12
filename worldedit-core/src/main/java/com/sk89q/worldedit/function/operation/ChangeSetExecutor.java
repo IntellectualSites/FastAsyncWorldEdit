@@ -114,7 +114,5 @@ public class ChangeSetExecutor implements Operation {
         return new ChangeSetExecutor(changeSet, Type.REDO, context, null, 0);
     }
 
-    public static Class<?> inject() {
-        return ChangeSetExecutor.class;
-    }
+
 }

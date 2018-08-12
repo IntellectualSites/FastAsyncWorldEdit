@@ -189,8 +189,6 @@ public class SelectionCommand extends SimpleCommand<Operation> {
         return locals.get(Actor.class).hasPermission(permission);
     }
 
-    public static Class<?> inject() {
-        return SelectionCommand.class;
-    }
+
 
 }

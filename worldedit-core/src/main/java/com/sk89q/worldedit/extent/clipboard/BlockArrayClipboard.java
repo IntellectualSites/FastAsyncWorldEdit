@@ -252,9 +252,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         return null;
     }
 
-    public static Class<?> inject() {
-        return BlockArrayClipboard.class;
-    }
+
 
     @Override
     public int getLight(int x, int y, int z) {

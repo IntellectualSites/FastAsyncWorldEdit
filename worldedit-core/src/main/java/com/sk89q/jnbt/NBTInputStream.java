@@ -611,7 +611,5 @@ public final class NBTInputStream implements Closeable {
         }
     }
 
-    public static Class<?> inject() {
-        return NBTInputStream.class;
-    }
+
 }

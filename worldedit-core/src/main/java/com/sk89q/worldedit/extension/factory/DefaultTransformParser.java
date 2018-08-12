@@ -146,7 +146,5 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
         }
     }
 
-    public static Class<?> inject() {
-        return HashTagPatternParser.class;
-    }
+
 }

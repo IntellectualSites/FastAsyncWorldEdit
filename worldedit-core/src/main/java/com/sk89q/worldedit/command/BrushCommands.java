@@ -868,7 +868,5 @@ public class BrushCommands extends BrushProcessor {
                 .setSize(radius);
     }
 
-    public static Class<?> inject() {
-        return BrushCommands.class;
-    }
+
 }

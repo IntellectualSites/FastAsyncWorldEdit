@@ -789,7 +789,5 @@ public class RegionCommands extends MethodCommands {
         BBC.COMMAND_FLORA.send(player, ground.getAffected());
     }
 
-    public static Class<?> inject() {
-        return RegionCommands.class;
-    }
+
 }
