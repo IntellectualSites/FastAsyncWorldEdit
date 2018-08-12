@@ -15,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -39,7 +40,13 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.plugin.EventExecutor;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 public abstract class ChunkListener implements Listener {
 
@@ -48,7 +55,24 @@ public abstract class ChunkListener implements Listener {
 
     public ChunkListener() {
         if (Settings.IMP.TICK_LIMITER.ENABLED) {
-            Bukkit.getPluginManager().registerEvents(ChunkListener.this, Fawe.<FaweBukkit>imp().getPlugin());
+            PluginManager plm = Bukkit.getPluginManager();
+            Plugin plugin = Fawe.<FaweBukkit>imp().getPlugin();
+            for (Method method : this.getClass().getMethods()) {
+                if (method.isAnnotationPresent(EventHandler.class)) {
+                    try {
+                        EventHandler annotation = method.getAnnotation(EventHandler.class);
+                        EventPriority priority = annotation.priority();
+                        boolean ignoreC = annotation.ignoreCancelled();
+                        Class<? extends Event> event = (Class<? extends Event>) method.getParameterTypes()[0];
+                        EventExecutor executor = EventExecutor.create(method, event);
+                        plm.registerEvent(event, this, priority, executor, plugin, ignoreC);
+                        System.out.println("Registered " + method);
+                    } catch (Throwable e) {
+                        Fawe.debug("Failed to register " + method + " | " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
             TaskManager.IMP.repeat(new Runnable() {
                 @Override
                 public void run() {
@@ -212,8 +236,8 @@ public abstract class ChunkListener implements Listener {
         }
         switch (event.getChangedType()) {
             case AIR:
-            case VOID_AIR:
             case CAVE_AIR:
+            case VOID_AIR:
                 return;
         }
         Exception e = new Exception();
@@ -224,10 +248,10 @@ public abstract class ChunkListener implements Listener {
                 int cx = block.getX() >> 4;
                 int cz = block.getZ() >> 4;
                 physCancelPair = MathMan.pairInt(cx, cz);
-                    if (rateLimit <= 0) {
-                        rateLimit = 20;
-                        Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled physics  lag source at " + block.getLocation());
-                    }
+                if (rateLimit <= 0) {
+                    rateLimit = 20;
+                    Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled physics  lag source at " + block.getLocation());
+                }
                 cancelNearby(cx, cz);
                 event.setCancelled(true);
                 physCancel = true;
