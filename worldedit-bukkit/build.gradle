@@ -54,7 +54,7 @@ shadowJar {
     dependencies {
         include(dependency(':worldedit-core'))
     }
-    archiveName = "${parent.name}-${project.name}-${parent.version}.jar"
+    archiveName = "${parent.name}-${project.name.replaceAll("worldedit-", "")}-${parent.version}.jar"
     destinationDir = file '../target'
 }
 

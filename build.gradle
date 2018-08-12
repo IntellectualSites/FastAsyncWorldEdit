@@ -39,6 +39,10 @@ ext {
         date = git.head().date.format("yy.MM.dd")
         revision = "-${git.head().abbreviatedId}"
         index = 0;  // Offset to match CI
+        for (; parents != null && !parents.isEmpty(); index++) {
+            commit = git.getResolve().toCommit(parents.get(0));
+            parents = commit.getParentIds()
+        }
         buildNumber = "-${index}"
     } catch (Throwable ignore) {
         revision = "unknown";
