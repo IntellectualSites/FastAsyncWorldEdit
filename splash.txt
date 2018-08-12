@@ -1,0 +1,23 @@
+
+============= You are compiling: =============
+ _______    ___   ____    __    ____  _______
+|   ____|  /   \  \   \  /  \  /   / |   ____|
+|  |__    /  ^  \  \   \/    \/   /  |  |__
+|   __|  /  /_\  \  \            /   |   __|
+|  |    /  _____  \  \    /\    /    |  |____
+|__|   /__/     \__\  \__/  \__/     |_______|
+
+======= By Empire92 and WorldEdit team =======
+
+If you encounter trouble:
+ - Read COMPILING.md if you haven't yet
+ - Run `build` in a separate Gradle run
+ - Use gradlew and not gradle
+ - Ask us!
+   - https://discord.gg/ngZCzbU (Discord)
+   - https://goo.gl/Zwvv8J (IRC)
+
+Files will be output to `/target`
+
+==============================================
+
