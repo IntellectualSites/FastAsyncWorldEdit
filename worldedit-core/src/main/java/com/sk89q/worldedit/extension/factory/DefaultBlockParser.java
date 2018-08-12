@@ -60,7 +60,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
         super(worldEdit);
     }
 
-    private static BaseBlock getBlockInHand(Actor actor, HandSide handSide) throws InputParseException {
+    private static BlockState getBlockInHand(Actor actor, HandSide handSide) throws InputParseException {
         if (actor instanceof Player) {
             try {
                 return ((Player) actor).getBlockInHand(handSide);

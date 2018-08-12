@@ -21,7 +21,6 @@ package com.boydti.fawe.bukkit.adapter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import ignore.test.DummyServer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -113,7 +112,7 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
 
     public Spigot_v1_13_R1() throws NoSuchFieldException, NoSuchMethodException {
         // A simple test
-        if (Bukkit.getServer().getClass() != DummyServer.class) CraftServer.class.cast(Bukkit.getServer());
+        if (!Bukkit.getServer().getClass().getName().endsWith("DummyServer")) CraftServer.class.cast(Bukkit.getServer());
         // test between 1.12 and 1.12.1 since md_5 didn't update revision numbers
         TileEntity.class.getDeclaredMethod("load", NBTTagCompound.class);
 

@@ -50,7 +50,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
+    public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
         return parent.getBlockInHand(handSide);
     }
 

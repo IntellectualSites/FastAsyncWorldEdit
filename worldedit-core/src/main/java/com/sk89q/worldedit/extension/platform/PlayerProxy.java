@@ -65,7 +65,7 @@ public class PlayerProxy extends AbstractPlayerActor {
 
 
     @Override
-    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
+    public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
         return basePlayer.getBlockInHand(handSide);
     }
 

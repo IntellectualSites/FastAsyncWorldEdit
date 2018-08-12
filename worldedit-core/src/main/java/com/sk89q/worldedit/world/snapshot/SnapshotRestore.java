@@ -149,7 +149,7 @@ public class SnapshotRestore {
                 // Now just copy blocks!
                 for (Vector pos : entry.getValue()) {
                     try {
-                        BaseBlock block = chunk.getBlock(pos);
+                        BlockState block = chunk.getBlock(pos);
                         editSession.setBlock(pos, block);
                     } catch (DataException e) {
                         // this is a workaround: just ignore for now
