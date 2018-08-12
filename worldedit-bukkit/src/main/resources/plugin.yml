@@ -1,8 +1,164 @@
-name: WorldEdit
+name: FastAsyncWorldEdit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
-softdepend: [Spout] #hack to fix trove errors
 api-version: 1.13
-
-# Permissions aren't here. Read http://wiki.sk89q.com/wiki/WEPIF/DinnerPerms
-# for how WorldEdit permissions actually work.
+description: Fast Async WorldEdit plugin
+authors: [Empire92]
+loadbefore: [WorldEdit,AsyncWorldEdit,AsyncWorldEditInjector,WorldGuard]
+load: STARTUP
+database: false
+#softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
+commands:
+  fcancel:
+    description: (FAWE) Cancel your edit
+    aliases: [fawecancel,/fcancel,/cancel,/fawecancel]
+permissions:
+  fawe.plotsquared:
+      default: true
+      children:
+        fawe.plotsquared.trusted: true
+  fawe.plotme:
+    default: true
+  fawe.bypass.regions:
+    default: false
+  fawe.bypass:
+    default: false
+    children:
+      fawe.bypass.regions: true
+      fawe.limit.*: true
+  fawe.tips:
+    default: false
+  fawe.admin:
+    default: op
+  fawe.reload:
+    default: false
+  fawe.permpack.basic:
+    default: op
+    children:
+      fawe.worldeditregion: true
+      fawe.cancel: true
+      worldedit.biome.info: true
+      worldedit.biome.set: true
+      worldedit.biome.list: true
+      worldedit.chunkinfo: true
+      worldedit.listchunks: true
+      worldedit.clipboard.cut: true
+      worldedit.clipboard.paste: true
+      worldedit.schematic.formats: true
+      worldedit.schematic.load: true
+      worldedit.schematic.list: true
+      worldedit.schematic.save: true
+      worldedit.clipboard.clear: true
+      worldedit.clipboard.copy: true
+      worldedit.clipboard.lazycopy: true
+      worldedit.clipboard.place: true
+      worldedit.clipboard.download: true
+      worldedit.clipboard.flip: true
+      worldedit.clipboard.rotate: true
+      worldedit.help: true
+      worldedit.global-mask: true
+      worldedit.global-transform: true
+      worldedit.generation.cylinder: true
+      worldedit.generation.sphere: true
+      worldedit.generation.forest: true
+      worldedit.generation.pumpkins: true
+      worldedit.generation.pyramid: true
+      worldedit.generation.shape: true
+      worldedit.biome.set: true
+      worldedit.history.undo: true
+      worldedit.history.redo: true
+      worldedit.history.rollback: true
+      worldedit.navigation.unstuck: true
+      worldedit.navigation.ascend: true
+      worldedit.navigation.descend: true
+      worldedit.navigation.ceiling: true
+      worldedit.navigation.thru.command: true
+      worldedit.navigation.jumpto.command: true
+      worldedit.navigation.up: true
+      worldedit.region.hollow: true
+      worldedit.region.line: true
+      worldedit.region.curve: true
+      worldedit.region.overlay: true
+      worldedit.region.center: true
+      worldedit.region.naturalize: true
+      worldedit.region.walls: true
+      worldedit.region.faces: true
+      worldedit.region.smooth: true
+      worldedit.region.move: true
+      worldedit.region.forest: true
+      worldedit.region.replace: true
+      worldedit.region.stack: true
+      worldedit.region.set: true
+      worldedit.selection.pos: true
+      worldedit.selection.chunk: true
+      worldedit.selection.hpos: true
+      worldedit.wand: true
+      worldedit.wand.toggle: true
+      worldedit.selection.contract: true
+      worldedit.selection.outset: true
+      worldedit.selection.inset: true
+      worldedit.analysis.distr: true
+      worldedit.analysis.count: true
+      worldedit.selection.size: true
+      worldedit.selection.expand: true
+      worldedit.selection.shift: true
+      worldedit.snapshots.list: true
+      worldedit.superpickaxe: true
+      worldedit.superpickaxe.area: true
+      worldedit.superpickaxe.recursive: true
+      worldedit.brush.blendball: true
+      worldedit.brush.erode: true
+      worldedit.brush.pull: true
+      worldedit.brush.circle: true
+      worldedit.brush.recursive: true
+      worldedit.brush.line: true
+      worldedit.brush.spline: true
+      worldedit.brush.surfacespline: true
+      worldedit.brush.shatter: true
+      worldedit.brush.stencil: true
+      worldedit.brush.height: true
+      worldedit.brush.layer: true
+      worldedit.brush.populateschematic: true
+      worldedit.brush.scatter: true
+      worldedit.brush.splatter: true
+      worldedit.brush.scattercommand: true
+      worldedit.brush.copy: true
+      worldedit.brush.command: true
+      worldedit.brush.apply: true
+      worldedit.brush.sphere: true
+      worldedit.brush.cylinder: true
+      worldedit.brush.clipboard: true
+      worldedit.brush.smooth: true
+      worldedit.brush.ex: true
+      worldedit.brush.gravity: true
+      worldedit.brush.options.range: true
+      worldedit.brush.options.material: true
+      worldedit.brush.options.size: true
+      worldedit.brush.options.mask: true
+      worldedit.brush.options.smask: true
+      worldedit.brush.options.transform: true
+      worldedit.brush.options.scroll: true
+      worldedit.brush.options.visualize: true
+      worldedit.tool.deltree: true
+      worldedit.tool.farwand: true
+      worldedit.tool.lrbuild: true
+      worldedit.tool.info: true
+      worldedit.tool.tree: true
+      worldedit.tool.replacer: true
+      worldedit.tool.data-cycler: true
+      worldedit.tool.flood-fill: true
+      worldedit.tool.inspect: true
+      worldedit.fill.recursive: true
+      worldedit.drain: true
+      worldedit.fixlava: true
+      worldedit.fixwater: true
+      worldedit.removeabove: true
+      worldedit.removebelow: true
+      worldedit.removenear: true
+      worldedit.replacenear: true
+      worldedit.snow: true
+      worldedit.thaw: true
+      worldedit.green: true
+      worldedit.extinguish: true
+      worldedit.calc: true
+      worldedit.fill: true

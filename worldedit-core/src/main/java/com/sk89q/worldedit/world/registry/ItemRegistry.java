@@ -22,6 +22,8 @@ package com.sk89q.worldedit.world.registry;
 import com.sk89q.worldedit.blocks.BaseItem;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
 
 public interface ItemRegistry {
 
@@ -33,5 +35,12 @@ public interface ItemRegistry {
      */
     @Nullable
     BaseItem createFromId(String id);
+
+    /**
+     * Register all items
+     */
+    default Collection<String> registerItems() {
+        return Collections.emptyList();
+    }
 
 }

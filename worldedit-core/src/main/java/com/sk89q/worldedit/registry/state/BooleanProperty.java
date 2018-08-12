@@ -25,8 +25,30 @@ import javax.annotation.Nullable;
 
 public class BooleanProperty extends AbstractProperty<Boolean> {
 
+    private int defaultIndex;
+
     public BooleanProperty(final String name, final List<Boolean> values) {
-        super(name, values);
+        this(name, values, 0);
+    }
+
+    public BooleanProperty(final String name, final List<Boolean> values, int bitOffset) {
+        super(name, values, bitOffset);
+        defaultIndex = values.get(0).booleanValue() == Boolean.TRUE ? 0 : 1;
+    }
+
+    @Override
+    public int getIndex(Boolean value) {
+        return value ? defaultIndex : 1 - defaultIndex;
+    }
+
+    @Override
+    public BooleanProperty withOffset(int bitOffset) {
+        return new BooleanProperty(getName(), getValues(), bitOffset);
+    }
+
+    @Override
+    public int getIndexFor(CharSequence string) throws IllegalArgumentException {
+        return string.charAt(0) == 't' ? defaultIndex : 1 - defaultIndex;
     }
 
     @Nullable

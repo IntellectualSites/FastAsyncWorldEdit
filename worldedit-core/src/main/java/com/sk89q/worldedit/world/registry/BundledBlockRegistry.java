@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockType;
 

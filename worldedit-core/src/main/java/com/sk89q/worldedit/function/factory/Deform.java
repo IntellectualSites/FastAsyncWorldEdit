@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.function.factory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
-
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
@@ -36,6 +33,9 @@ import com.sk89q.worldedit.regions.NullRegion;
 import com.sk89q.worldedit.regions.Region;
 
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
 
 public class Deform implements Contextual<Operation> {
 

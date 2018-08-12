@@ -19,8 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -36,12 +35,13 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import javax.annotation.Nullable;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Creates a {@code Polygonal2DRegion} from a user's selections.
@@ -65,6 +65,11 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
      */
     public Polygonal2DRegionSelector(@Nullable World world) {
         region = new Polygonal2DRegion(world);
+    }
+
+
+    public Polygonal2DRegionSelector(Polygonal2DRegion region) {
+        this.region = region;
     }
 
     /**
@@ -164,7 +169,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, Vector pos) {
-        player.print("Starting a new polygon at " + pos + ".");
+        BBC.SELECTOR_POS.send(player, 1, pos, region.getArea());
 
         session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
         session.dispatchCUIEvent(player, new SelectionPoint2DEvent(0, pos, getArea()));
@@ -173,7 +178,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, Vector pos) {
-        player.print("Added point #" + region.size() + " at " + pos + ".");
+        BBC.SELECTOR_POS.send(player, region.size(), pos, region.getArea());
 
         session.dispatchCUIEvent(player, new SelectionPoint2DEvent(region.size() - 1, pos, getArea()));
         session.dispatchCUIEvent(player, new SelectionMinMaxEvent(region.getMinimumY(), region.getMaximumY()));
@@ -279,4 +284,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
         return "polygon2d";
     }
 
+    public static Class<?> inject() {
+        return Polygonal2DRegionSelector.class;
+    }
 }

@@ -19,48 +19,45 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
+import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Set;
 
-import javax.annotation.Nullable;
+public interface BlockType extends FawePattern, Comparable<BlockTypes> {
 
-public class BlockType {
-
-    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
-
-    private String id;
-    private BlockState defaultState;
-    private Map<String, ? extends Property> properties;
-    private BlockMaterial blockMaterial;
-
-    public BlockType(String id) {
-        this(id, null);
+    default BlockTypes getTypeEnum() {
+        return (BlockTypes) this;
     }
 
-    public BlockType(String id, Function<BlockState, BlockState> values) {
-        // If it has no namespace, assume minecraft.
-        if (!id.contains(":")) {
-            id = "minecraft:" + id;
-        }
-        this.id = id;
-        this.defaultState = new ArrayList<>(BlockState.generateStateMap(this).values()).get(0);
-        if (values != null) {
-            this.defaultState = values.apply(this.defaultState);
-        }
+    @Deprecated
+    int getMaxStateId();
+
+    @Override
+    default boolean apply(Extent extent, Vector get, Vector set) throws WorldEditException {
+        return extent.setBlock(set, this.getDefaultState());
+    }
+
+    @Override
+    default BlockStateHolder apply(Vector position) {
+        return this.getDefaultState();
+    }
+
+    default Mask toMask(Extent extent) {
+        return new SingleBlockTypeMask(extent, this);
     }
 
     /**
@@ -68,17 +65,15 @@ public class BlockType {
      *
      * @return The id
      */
-    public String getId() {
-        return this.id;
-    }
+    String getId();
 
     /**
      * Gets the name of this block, or the ID if the name cannot be found.
      *
      * @return The name, or ID
      */
-    public String getName() {
-        BundledBlockData.BlockEntry entry = BundledBlockData.getInstance().findById(this.id);
+    default String getName() {
+        BundledBlockData.BlockEntry entry = BundledBlockData.getInstance().findById(this.getId());
         if (entry == null) {
             return getId();
         } else {
@@ -86,27 +81,30 @@ public class BlockType {
         }
     }
 
+    @Deprecated
+    default BlockState withPropertyId(int internalPropertiesId) {
+        if (internalPropertiesId == 0) return getDefaultState();
+        return BlockState.get(getInternalId() + (internalPropertiesId << BlockTypes.BIT_OFFSET));
+    }
+
     /**
      * Gets the properties of this BlockType in a key->property mapping.
      *
      * @return The properties map
      */
-    public Map<String, ? extends Property> getPropertyMap() {
-        if (properties == null) {
-            properties = ImmutableMap.copyOf(WorldEdit.getInstance().getPlatformManager()
-                    .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getProperties(this));
-        }
-        return this.properties;
-    }
+    @Deprecated
+    Map<String, ? extends Property> getPropertyMap();
 
     /**
      * Gets the properties of this BlockType.
      *
      * @return the properties
      */
-    public List<? extends Property> getProperties() {
-        return ImmutableList.copyOf(this.getPropertyMap().values());
-    }
+    @Deprecated
+    List<? extends Property> getProperties();
+
+    @Deprecated
+    Set<? extends Property> getPropertiesSet();
 
     /**
      * Gets a property by name.
@@ -114,25 +112,26 @@ public class BlockType {
      * @param name The name
      * @return The property
      */
-    public <V> Property<V> getProperty(String name) {
-        return getPropertyMap().get(name);
-    }
+    @Deprecated
+    <V> Property<V> getProperty(String name);
+
+    boolean hasProperty(PropertyKey key);
+
+    <V> Property<V> getProperty(PropertyKey key);
 
     /**
      * Gets the default state of this block type.
      *
      * @return The default state
      */
-    public BlockState getDefaultState() {
-        return this.defaultState;
-    }
+    BlockState getDefaultState();
 
     /**
      * Gets whether this block type has an item representation.
      *
      * @return If it has an item
      */
-    public boolean hasItemType() {
+    default boolean hasItemType() {
         return getItemType() != null;
     }
 
@@ -142,46 +141,32 @@ public class BlockType {
      * @return The item representation
      */
     @Nullable
-    public ItemType getItemType() {
-        return ItemTypes.get(this.id);
-    }
+    ItemType getItemType();
 
     /**
      * Get the material for this BlockType.
      *
      * @return The material
      */
-    public BlockMaterial getMaterial() {
-        if (this.blockMaterial == null) {
-            this.blockMaterial = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
-        }
-        return this.blockMaterial;
+    BlockMaterial getMaterial();
+
+    default int getLegacyCombinedId() {
+        Integer combinedId = LegacyMapper.getInstance().getLegacyFromBlock(this);
+        return combinedId == null ? 0 : combinedId;
     }
 
     /**
-     * Gets the legacy ID. Needed for legacy reasons.
+     * The internal index of this type.
      *
-     * DO NOT USE THIS.
+     * This number is not necessarily consistent across restarts.
      *
-     * @return legacy id or 0, if unknown
+     * @return internal id
      */
-    @Deprecated
-    public int getLegacyId() {
-        int[] id = LegacyMapper.getInstance().getLegacyFromBlock(this.getDefaultState());
-        if (id != null) {
-            return id[0];
-        } else {
-            return 0;
-        }
-    }
+    int getInternalId();
 
     @Override
-    public int hashCode() {
-        return this.id.hashCode();
-    }
+    boolean equals(Object obj);
 
     @Override
-    public boolean equals(Object obj) {
-        return obj instanceof BlockType && this.id.equals(((BlockType) obj).id);
-    }
+    int hashCode();
 }

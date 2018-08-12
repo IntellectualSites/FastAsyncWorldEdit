@@ -19,22 +19,48 @@
 
 package com.sk89q.worldedit.registry.state;
 
+import com.sk89q.worldedit.util.Direction;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
 public class EnumProperty extends AbstractProperty<String> {
 
+    private Map<String, Integer> offsets = new HashMap<>();
+
     public EnumProperty(final String name, final List<String> values) {
-        super(name, values);
+        this(name, values, 0);
+    }
+
+    public EnumProperty(final String name, final List<String> values, int bitOffset) {
+        super(name, values, bitOffset);
+        for (int i = 0; i < values.size(); i++) {
+            String value = values.get(i).intern();
+            values.set(i, value);
+            offsets.put(value, i);
+        }
+    }
+
+    @Override
+    public EnumProperty withOffset(int bitOffset) {
+        return new EnumProperty(getName(), getValues(), bitOffset);
+    }
+
+    @Override
+    public int getIndexFor(CharSequence string) throws IllegalArgumentException {
+        return offsets.get(string);
     }
 
     @Nullable
     @Override
     public String getValueFor(String string) {
-        if (!getValues().contains(string)) {
+        Integer offset = offsets.get(string);
+        if (offset == null) {
             throw new IllegalArgumentException("Invalid value: " + string + ". Must be in " + getValues().toString());
         }
-        return string;
+        return getValues().get(offset);
     }
 }

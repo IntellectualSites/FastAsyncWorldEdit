@@ -19,21 +19,21 @@
 
 package com.sk89q.worldedit.history.change;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.util.Location;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Logs the creation of an entity and removes the entity upon undo.
  */
 public class EntityCreate implements Change {
 
-    private final Location location;
-    private final BaseEntity state;
+    public final Location location;
+    public final BaseEntity state;
     private Entity entity;
 
     /**
@@ -58,6 +58,10 @@ public class EntityCreate implements Change {
             entity.remove();
             entity = null;
         }
+    }
+
+    public Entity getEntity() {
+        return entity;
     }
 
     @Override

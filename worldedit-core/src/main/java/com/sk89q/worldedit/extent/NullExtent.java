@@ -22,21 +22,23 @@ package com.sk89q.worldedit.extent;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.blocks.LazyBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
-
-import java.util.Collections;
-import java.util.List;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * An extent that returns air blocks for all blocks and does not
@@ -45,6 +47,8 @@ import javax.annotation.Nullable;
 public class NullExtent implements Extent {
 
     private final Vector nullPoint = new Vector(0, 0, 0);
+
+    public static final NullExtent INSTANCE = new NullExtent();
 
     @Override
     public Vector getMinimumPoint() {
@@ -78,8 +82,13 @@ public class NullExtent implements Extent {
     }
 
     @Override
-    public BaseBlock getFullBlock(Vector position) {
-        return getBlock(position).toBaseBlock();
+    public BlockState getLazyBlock(Vector position) {
+        return new LazyBlock(BlockTypes.AIR, this, position);
+    }
+
+    @Override
+    public BlockState getFullBlock(Vector position) {
+        return new BaseBlock(getBlock(position));
     }
 
     @Nullable

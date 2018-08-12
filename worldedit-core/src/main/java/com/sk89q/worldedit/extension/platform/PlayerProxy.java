@@ -19,9 +19,10 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Player;
@@ -33,18 +34,21 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 
-import java.util.UUID;
-
 import javax.annotation.Nullable;
 
-class PlayerProxy extends AbstractPlayerActor {
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class PlayerProxy extends AbstractPlayerActor {
 
     private final Player basePlayer;
     private final Actor permActor;
     private final Actor cuiActor;
     private final World world;
+    private Vector offset = Vector.ZERO;
 
-    PlayerProxy(Player basePlayer, Actor permActor, Actor cuiActor, World world) {
+    public PlayerProxy(Player basePlayer, Actor permActor, Actor cuiActor, World world) {
         checkNotNull(basePlayer);
         checkNotNull(permActor);
         checkNotNull(cuiActor);
@@ -53,6 +57,16 @@ class PlayerProxy extends AbstractPlayerActor {
         this.permActor = permActor;
         this.cuiActor = cuiActor;
         this.world = world;
+    }
+
+    public void setOffset(Vector position) {
+        this.offset = position;
+    }
+
+
+    @Override
+    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
+        return basePlayer.getBlockInHand(handSide);
     }
 
     @Override
@@ -82,12 +96,13 @@ class PlayerProxy extends AbstractPlayerActor {
 
     @Override
     public BaseEntity getState() {
-        throw new UnsupportedOperationException("Can't getState() on a player");
+        throw new UnsupportedOperationException("Can't withPropertyId() on a player");
     }
 
     @Override
     public Location getLocation() {
-        return basePlayer.getLocation();
+        Location loc = this.basePlayer.getLocation();
+        return new Location(loc.getExtent(), loc.toVector().add(offset), loc.getDirection());
     }
 
     @Override

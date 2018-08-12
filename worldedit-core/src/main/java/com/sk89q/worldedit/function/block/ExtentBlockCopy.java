@@ -19,19 +19,26 @@
 
 package com.sk89q.worldedit.function.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.boydti.fawe.util.ReflectionUtils;
+import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.CompoundTagBuilder;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.internal.helper.MCDirections;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.Map;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Copies blocks from one extent to another.
@@ -47,11 +54,11 @@ public class ExtentBlockCopy implements RegionFunction {
     /**
      * Make a new copy.
      *
-     * @param source the source extent
-     * @param from the source offset
+     * @param source      the source extent
+     * @param from        the source offset
      * @param destination the destination extent
-     * @param to the destination offset
-     * @param transform a transform to apply to positions (after source offset, before destination offset)
+     * @param to          the destination offset
+     * @param transform   a transform to apply to positions (after source offset, before destination offset)
      */
     public ExtentBlockCopy(Extent source, Vector from, Extent destination, Vector to, Transform transform) {
         checkNotNull(source);
@@ -68,12 +75,11 @@ public class ExtentBlockCopy implements RegionFunction {
 
     @Override
     public boolean apply(Vector position) throws WorldEditException {
-        BaseBlock block = source.getFullBlock(position);
         Vector orig = position.subtract(from);
         Vector transformed = transform.apply(orig);
 
         // Apply transformations to NBT data if necessary
-        block = transformNbtData(block);
+        BlockStateHolder block = transformNbtData(source.getBlock(position));
 
         return destination.setBlock(transformed.add(to), block);
     }
@@ -85,9 +91,8 @@ public class ExtentBlockCopy implements RegionFunction {
      * @param state the existing state
      * @return a new state or the existing one
      */
-    private BaseBlock transformNbtData(BaseBlock state) {
+    private BlockState transformNbtData(BlockState state) {
         CompoundTag tag = state.getNbtData();
-
         if (tag != null) {
             // Handle blocks which store their rotation in NBT
             if (tag.containsKey("Rot")) {
@@ -96,21 +101,26 @@ public class ExtentBlockCopy implements RegionFunction {
                 Direction direction = MCDirections.fromRotation(rot);
 
                 if (direction != null) {
-                    Vector vector = transform.apply(direction.toVector()).subtract(transform.apply(Vector.ZERO)).normalize();
-                    Direction newDirection = Direction.findClosest(vector, Flag.CARDINAL | Flag.ORDINAL | Flag.SECONDARY_ORDINAL);
+                    Vector applyAbsolute = transform.apply(direction.toVector());
+                    Vector applyOrigin = transform.apply(Vector.ZERO);
+                    applyAbsolute.mutX(applyAbsolute.getX() - applyOrigin.getX());
+                    applyAbsolute.mutY(applyAbsolute.getY() - applyOrigin.getY());
+                    applyAbsolute.mutZ(applyAbsolute.getZ() - applyOrigin.getZ());
+
+                    Direction newDirection = Direction.findClosest(applyAbsolute, Flag.CARDINAL | Flag.ORDINAL | Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
-                        CompoundTagBuilder builder = tag.createBuilder();
-
-                        builder.putByte("Rot", (byte) MCDirections.toRotation(newDirection));
-
-                        return state.toBaseBlock(builder.build());
+                        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+                        values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
                     }
                 }
             }
         }
-
         return state;
+    }
+
+    public static Class<?> inject() {
+        return ExtentBlockCopy.class;
     }
 
 }

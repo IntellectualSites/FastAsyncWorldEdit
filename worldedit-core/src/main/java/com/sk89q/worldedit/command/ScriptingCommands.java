@@ -19,24 +19,36 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
-
+import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.scripting.CraftScriptEngine;
+import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
+import com.sk89q.worldedit.session.request.Request;
+import org.mozilla.javascript.NativeJavaObject;
 
-import java.io.File;
+import javax.annotation.Nullable;
+import javax.script.ScriptException;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
 
 /**
  * Commands related to scripting.
  */
+@Command(aliases = {}, desc = "Run craftscripts: [More Info](https://goo.gl/dHDxLG)")
 public class ScriptingCommands {
 
     private final WorldEdit worldEdit;
@@ -46,24 +58,117 @@ public class ScriptingCommands {
      *
      * @param worldEdit reference to WorldEdit
      */
-    public ScriptingCommands(WorldEdit worldEdit) {
+    public ScriptingCommands(final WorldEdit worldEdit) {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
     }
 
     @Command(
-        aliases = { "cs" },
-        usage = "<filename> [args...]",
-        desc = "Execute a CraftScript",
-        min = 1,
-        max = -1
+            aliases = {"setupdispatcher"},
+            desc = "",
+            usage = "",
+            min = 1,
+            max = 1
     )
+    public void setupdispatcher(Player player, LocalSession session, final CommandContext args) throws WorldEditException {
+        CommandManager.getInstance().setupDispatcher();
+    }
+
+    public static <T> T runScript(Player player, File f, String[] args) throws WorldEditException {
+        return runScript(player, f, args, null);
+    }
+
+    public static <T> T runScript(Actor actor, File f, String[] args, @Nullable Function<String, String> processor) throws WorldEditException {
+        Request.reset();
+
+        String filename = f.getPath();
+        int index = filename.lastIndexOf(".");
+        String ext = filename.substring(index + 1, filename.length());
+
+        if (!ext.equalsIgnoreCase("js")) {
+            actor.printError("Only .js scripts are currently supported");
+            return null;
+        }
+
+        String script;
+
+        try {
+            InputStream file;
+
+            if (!f.exists()) {
+                file = WorldEdit.class.getResourceAsStream("craftscripts/" + filename);
+
+                if (file == null) {
+                    actor.printError("Script does not exist: " + filename);
+                    return null;
+                }
+            } else {
+                file = new FileInputStream(f);
+            }
+
+            DataInputStream in = new DataInputStream(file);
+            byte[] data = new byte[in.available()];
+            in.readFully(data);
+            in.close();
+            script = new String(data, 0, data.length, "utf-8");
+        } catch (IOException e) {
+            actor.printError("Script read error: " + e.getMessage());
+            return null;
+        }
+
+        if (processor != null) {
+            script = processor.apply(script);
+        }
+
+        WorldEdit worldEdit = WorldEdit.getInstance();
+        LocalSession session = worldEdit.getSessionManager().get(actor);
+
+        CraftScriptEngine engine = null;
+
+        Object result = null;
+        try {
+
+            engine = new RhinoCraftScriptEngine();
+        } catch (NoClassDefFoundError e) {
+            actor.printError("Failed to find an installed script engine.");
+            actor.printError("Download: https://github.com/downloads/mozilla/rhino/rhino1_7R4.zip");
+            actor.printError("Extract: `js.jar` to `plugins` or `mods` directory`");
+            actor.printError("More info: https://github.com/boy0001/CraftScripts/");
+            return null;
+        }
+
+        engine.setTimeLimit(worldEdit.getConfiguration().scriptTimeout);
+
+        Map<String, Object> vars = new HashMap<String, Object>();
+        vars.put("argv", args);
+        vars.put("actor", actor);
+
+        try {
+            result = engine.evaluate(script, filename, vars);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+            actor.printError("Failed to execute:");
+            actor.printRaw(e.getMessage());
+        } catch (NumberFormatException e) {
+            throw e;
+        } catch (WorldEditException e) {
+            throw e;
+        } catch (Throwable e) {
+            actor.printError("Failed to execute (see console):");
+            actor.printRaw(e.getClass().getCanonicalName());
+        }
+        if (result instanceof NativeJavaObject) {
+            return (T) ((NativeJavaObject) result).unwrap();
+        }
+        return (T) result;
+    }
+
+    @Command(aliases = {"cs"}, usage = "<filename> [args...]", desc = "Execute a CraftScript", min = 1, max = -1)
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void execute(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-
-        String[] scriptArgs = args.getSlice(1);
-        String name = args.getString(0);
+    public void execute(final Player player, final LocalSession session, final CommandContext args) throws WorldEditException {
+        final String[] scriptArgs = args.getSlice(1);
+        final String name = args.getString(0);
 
         if (!player.hasPermission("worldedit.scripting.execute." + name)) {
             player.printError("You don't have permission to use that script.");
@@ -72,24 +177,25 @@ public class ScriptingCommands {
 
         session.setLastScript(name);
 
-        File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().scriptsDir);
-        File f = worldEdit.getSafeOpenFile(player, dir, name, "js", "js");
-
-        worldEdit.runScript(player, f, scriptArgs);
+        final File dir = this.worldEdit.getWorkingDirectoryFile(this.worldEdit.getConfiguration().scriptsDir);
+        final File f = this.worldEdit.getSafeOpenFile(player, dir, name, "js", "js");
+        try {
+            new RhinoCraftScriptEngine();
+        } catch (NoClassDefFoundError e) {
+            player.printError("Failed to find an installed script engine.");
+            player.printError("Download: https://github.com/downloads/mozilla/rhino/rhino1_7R4.zip");
+            player.printError("Extract: `js.jar` to `plugins` or `mods` directory`");
+            player.printError("More info: https://github.com/boy0001/CraftScripts/");
+            return;
+        }
+        this.worldEdit.runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
     }
 
-    @Command(
-        aliases = { ".s" },
-        usage = "[args...]",
-        desc = "Execute last CraftScript",
-        min = 0,
-        max = -1
-    )
+    @Command(aliases = {".s"}, usage = "[args...]", desc = "Execute last CraftScript", min = 0, max = -1)
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void executeLast(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-        
-        String lastScript = session.getLastScript();
+    public void executeLast(final Player player, final LocalSession session, final CommandContext args) throws WorldEditException {
+        final String lastScript = session.getLastScript();
 
         if (!player.hasPermission("worldedit.scripting.execute." + lastScript)) {
             player.printError("You don't have permission to use that script.");
@@ -101,11 +207,19 @@ public class ScriptingCommands {
             return;
         }
 
-        String[] scriptArgs = args.getSlice(0);
+        final String[] scriptArgs = args.getSlice(0);
 
-        File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().scriptsDir);
-        File f = worldEdit.getSafeOpenFile(player, dir, lastScript, "js", "js");
+        final File dir = this.worldEdit.getWorkingDirectoryFile(this.worldEdit.getConfiguration().scriptsDir);
+        final File f = this.worldEdit.getSafeOpenFile(player, dir, lastScript, "js", "js");
 
-        worldEdit.runScript(player, f, scriptArgs);
+        try {
+            this.worldEdit.runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
+        } catch (final WorldEditException ex) {
+            player.printError("Error while executing CraftScript.");
+        }
+    }
+
+    public static Class<?> inject() {
+        return ScriptingCommands.class;
     }
 }

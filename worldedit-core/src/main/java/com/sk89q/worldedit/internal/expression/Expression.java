@@ -29,30 +29,29 @@ import com.sk89q.worldedit.internal.expression.runtime.Functions;
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.internal.expression.runtime.ReturnException;
 import com.sk89q.worldedit.internal.expression.runtime.Variable;
-
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 /**
  * Compiles and evaluates expressions.
- *
+ * <p>
  * <p>Supported operators:</p>
- *
+ * <p>
  * <ul>
- *     <li>Logical: &&, ||, ! (unary)</li>
- *     <li>Bitwise: ~ (unary), &gt;&gt;, &lt;&lt;</li>
- *     <li>Arithmetic: +, -, *, /, % (modulo), ^ (power), - (unary), --, ++ (prefix only)</li>
- *     <li>Comparison: &lt;=, &gt;=, &gt;, &lt;, ==, !=, ~= (near)</li>
+ * <li>Logical: &&, ||, ! (unary)</li>
+ * <li>Bitwise: ~ (unary), &gt;&gt;, &lt;&lt;</li>
+ * <li>Arithmetic: +, -, *, /, % (modulo), ^ (power), - (unary), --, ++ (prefix only)</li>
+ * <li>Comparison: &lt;=, &gt;=, &gt;, &lt;, ==, !=, ~= (near)</li>
  * </ul>
- *
+ * <p>
  * <p>Supported functions: abs, acos, asin, atan, atan2, cbrt, ceil, cos, cosh,
  * exp, floor, ln, log, log10, max, max, min, min, rint, round, sin, sinh,
  * sqrt, tan, tanh and more. (See the Functions class or the wiki)</p>
- *
+ * <p>
  * <p>Constants: e, pi</p>
- *
+ * <p>
  * <p>To compile an equation, run
  * {@code Expression.compile("expression here", "var1", "var2"...)}.
  * If you wish to run the equation multiple times, you can then optimize it,
@@ -62,16 +61,17 @@ import java.util.Stack;
  * To query variables after evaluation, you can use
  * {@link #getVariable(String, boolean)}. To get a value out of these, use
  * {@link Variable#getValue()}.</p>
- *
+ * <p>
  * <p>Variables are also supported and can be set either by passing values
  * to {@link #evaluate(double...)}.</p>
  */
 public class Expression {
 
-    private static final ThreadLocal<Stack<Expression>> instance = new ThreadLocal<>();
+    private static final ThreadLocal<ArrayDeque<Expression>> instance = ThreadLocal.withInitial(ArrayDeque::new);
 
-    private final Map<String, RValue> variables = new HashMap<>();
+    private final Map<String, RValue> variables = new HashMap<String, RValue>();
     private final String[] variableNames;
+    private Variable[] variableArray;
     private RValue root;
     private final Functions functions = new Functions();
     private ExpressionEnvironment environment;
@@ -85,34 +85,31 @@ public class Expression {
     }
 
     private Expression(List<Token> tokens, String... variableNames) throws ExpressionException {
-        this.variableNames = variableNames;
-
         variables.put("e", new Constant(-1, Math.E));
         variables.put("pi", new Constant(-1, Math.PI));
         variables.put("true", new Constant(-1, 1));
         variables.put("false", new Constant(-1, 0));
 
-        for (String variableName : variableNames) {
+        this.variableNames = variableNames;
+        variableArray = new Variable[variableNames.length];
+        for (int i = 0; i < variableNames.length; i++) {
+            String variableName = variableNames[i];
             if (variables.containsKey(variableName)) {
                 throw new ExpressionException(-1, "Tried to overwrite identifier '" + variableName + "'");
             }
-            variables.put(variableName, new Variable(0));
+            Variable var = new Variable(0);
+            variables.put(variableName, var);
+            variableArray[i] = var;
         }
 
         root = Parser.parse(tokens, this);
     }
 
     public double evaluate(double... values) throws EvaluationException {
-        for (int i = 0; i < values.length; ++i) {
-            final String variableName = variableNames[i];
-            final RValue invokable = variables.get(variableName);
-            if (!(invokable instanceof Variable)) {
-                throw new EvaluationException(invokable.getPosition(), "Tried to assign constant " + variableName + ".");
-            }
-
-            ((Variable) invokable).value = values[i];
+        for (int i = 0; i < values.length; i++) {
+            Variable var = variableArray[i];
+            var.value = values[i];
         }
-
         pushInstance();
         try {
             return root.getValue();
@@ -146,22 +143,14 @@ public class Expression {
     }
 
     private void pushInstance() {
-        Stack<Expression> foo = instance.get();
-        if (foo == null) {
-            instance.set(foo = new Stack<>());
-        }
-
+        ArrayDeque<Expression> foo = instance.get();
         foo.push(this);
     }
 
     private void popInstance() {
-        Stack<Expression> foo = instance.get();
+        ArrayDeque<Expression> foo = instance.get();
 
         foo.pop();
-
-        if (foo.isEmpty()) {
-            instance.set(null);
-        }
     }
 
     public Functions getFunctions() {
@@ -174,6 +163,10 @@ public class Expression {
 
     public void setEnvironment(ExpressionEnvironment environment) {
         this.environment = environment;
+    }
+
+    public static Class<?> inject() {
+        return Expression.class;
     }
 
 }

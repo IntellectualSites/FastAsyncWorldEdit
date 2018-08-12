@@ -19,12 +19,12 @@
 
 package com.sk89q.jnbt;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A class which contains NBT-related utility methods.
@@ -69,8 +69,6 @@ public final class NBTUtils {
             return "TAG_String";
         } else if (clazz.equals(IntArrayTag.class)) {
             return "TAG_Int_Array";
-        } else if (clazz.equals(LongArrayTag.class)) {
-            return "TAG_Long_Array";
         } else {
             throw new IllegalArgumentException("Invalid tag classs ("
                     + clazz.getName() + ").");

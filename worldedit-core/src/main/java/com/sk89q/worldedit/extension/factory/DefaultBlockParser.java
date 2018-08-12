@@ -19,12 +19,15 @@
 
 package com.sk89q.worldedit.extension.factory;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.NotABlockException;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.boydti.fawe.jnbt.JSON2NBT;
+import com.boydti.fawe.jnbt.NBTException;
+import com.boydti.fawe.util.MathMan;
+import com.boydti.fawe.util.StringMan;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.MobSpawnerBlock;
 import com.sk89q.worldedit.blocks.SignBlock;
 import com.sk89q.worldedit.blocks.SkullBlock;
@@ -36,25 +39,24 @@ import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
-import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
 /**
  * Parses block input strings.
  */
-class DefaultBlockParser extends InputParser<BlockStateHolder> {
+public class DefaultBlockParser extends InputParser<BlockStateHolder> {
 
-    protected DefaultBlockParser(WorldEdit worldEdit) {
+    public DefaultBlockParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 
@@ -72,7 +74,6 @@ class DefaultBlockParser extends InputParser<BlockStateHolder> {
         }
     }
 
-    @Override
     public BlockStateHolder parseFromInput(String input, ParserContext context)
             throws InputParseException {
         String originalInput = input;
@@ -148,47 +149,12 @@ class DefaultBlockParser extends InputParser<BlockStateHolder> {
         }
     }
 
-    private static BlockState applyProperties(BlockState state, String[] stateProperties) throws NoMatchException {
-        if (stateProperties.length > 0) { // Block data not yet detected
-            // Parse the block data (optional)
-            for (String parseableData : stateProperties) {
-                try {
-                    String[] parts = parseableData.split("=");
-                    if (parts.length != 2) {
-                        throw new NoMatchException("Bad state format in " + parseableData);
-                    }
-
-                    Property propertyKey = state.getBlockType().getPropertyMap().get(parts[0]);
-                    if (propertyKey == null) {
-                        throw new NoMatchException("Unknown state " + parts[0] + " for block " + state.getBlockType().getName());
-                    }
-                    Object value;
-                    try {
-                        value = propertyKey.getValueFor(parts[1]);
-                    } catch (IllegalArgumentException e) {
-                        throw new NoMatchException("Unknown value " + parts[1] + " for state " + parts[0]);
-                    }
-
-                    state = state.with(propertyKey, value);
-                } catch (NoMatchException e) {
-                    throw e; // Pass-through
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new NoMatchException("Unknown state '" + parseableData + "'");
-                }
-            }
-        }
-
-        return state;
-    }
-
     private BlockStateHolder parseLogic(String input, ParserContext context) throws InputParseException {
-        BlockType blockType = null;
-        Map<Property<?>, Object> blockStates = new HashMap<>();
-        String[] blockAndExtraData = input.trim().split("\\|");
+        String[] blockAndExtraData = input.trim().split("\\|", 2);
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
 
         BlockState state = null;
+        CompoundTag nbt = null;
 
         // Legacy matcher
         if (context.isTryingLegacy()) {
@@ -196,14 +162,15 @@ class DefaultBlockParser extends InputParser<BlockStateHolder> {
                 String[] split = blockAndExtraData[0].split(":");
                 if (split.length == 1) {
                     state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]));
-                } else {
+                } else if (MathMan.isInteger(split[0])) {
                     state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+                } else {
+                    BlockTypes type = BlockTypes.get(split[0].toLowerCase());
+                    if (type != null) {
+                        state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, Integer.parseInt(split[1]));
+                    }
                 }
-                if (state != null) {
-                    blockType = state.getBlockType();
-                }
-            } catch (NumberFormatException e) {
-            }
+            } catch (NumberFormatException ignore) {}
         }
 
         if (state == null) {
@@ -219,72 +186,84 @@ class DefaultBlockParser extends InputParser<BlockStateHolder> {
             if (typeString == null || typeString.isEmpty()) {
                 throw new InputParseException("Invalid format");
             }
-            String[] stateProperties = EMPTY_STRING_ARRAY;
-            if (stateString != null) {
-                stateProperties = stateString.split(",");
-            }
-
-            if ("hand".equalsIgnoreCase(typeString)) {
-                // Get the block type from the item in the user's hand.
-                final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
-                if (blockInHand.getClass() != BaseBlock.class) {
-                    return blockInHand;
-                }
-
-                blockType = blockInHand.getBlockType();
-                blockStates = blockInHand.getStates();
-            } else if ("offhand".equalsIgnoreCase(typeString)) {
-                // Get the block type from the item in the user's off hand.
-                final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
-                if (blockInHand.getClass() != BaseBlock.class) {
-                    return blockInHand;
-                }
-
-                blockType = blockInHand.getBlockType();
-                blockStates = blockInHand.getStates();
-            } else if ("pos1".equalsIgnoreCase(typeString)) {
+            // PosX
+            if (typeString.matches("pos[0-9]+")) {
+                int index = Integer.parseInt(typeString.replaceAll("[a-z]+", ""));
                 // Get the block type from the "primary position"
                 final World world = context.requireWorld();
-                final BlockVector primaryPosition;
+                final Vector primaryPosition;
                 try {
-                    primaryPosition = context.requireSession().getRegionSelector(world).getPrimaryPosition();
+                    primaryPosition = context.requireSession().getRegionSelector(world).getVerticies().get(index - 1);
                 } catch (IncompleteRegionException e) {
                     throw new InputParseException("Your selection is not complete.");
                 }
-                final BlockState blockInHand = world.getBlock(primaryPosition);
+                state = world.getBlock(primaryPosition);
+            } else if (typeString.equalsIgnoreCase("hand")) {
+                // Get the block type from the item in the user's hand.
+                state = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
+            } else if (typeString.equalsIgnoreCase("offhand")) {
+                // Get the block type from the item in the user's off hand.
+                state = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
+            } else if (typeString.matches("slot[0-9]+")) {
+                int slot = Integer.parseInt(typeString.substring(4)) - 1;
+                Actor actor = context.requireActor();
+                if (!(actor instanceof Player)) {
+                    throw new InputParseException("The user is not a player!");
+                }
+                Player player = (Player) actor;
+                BlockBag bag = player.getInventoryBlockBag();
+                if (bag == null || !(bag instanceof SlottableBlockBag)) {
+                    throw new InputParseException("Unsupported!");
+                }
+                SlottableBlockBag slottable = (SlottableBlockBag) bag;
+                BaseItem item = slottable.getItem(slot);
 
-                blockType = blockInHand.getBlockType();
-                blockStates = blockInHand.getStates();
+                if (!item.getType().hasBlockType()) {
+                    throw new InputParseException("You're not holding a block!");
+                }
+                state = item.getType().getBlockType().getDefaultState();
+                nbt = item.getNbtData();
             } else {
-                // Attempt to lookup a block from ID or name.
-                blockType = BlockTypes.get(typeString.toLowerCase());
+                state = BlockTypes.parse(typeString.toLowerCase()).getDefaultState();
 
-                if (blockType == null) {
+                if (state == null) {
                     throw new NoMatchException("Does not match a valid block type: '" + input + "'");
                 }
             }
+            if (nbt == null) nbt = state.getNbtData();
 
-            if (!context.isPreferringWildcard()) {
-                // No wildcards allowed => eliminate them. (Start with default state)
-                state = blockType.getDefaultState();
-            } else {
-                state = blockType.getDefaultState().toFuzzy();
-                for (Map.Entry<Property<?>, Object> blockState : blockStates.entrySet()) {
-                    state = state.with((Property) blockState.getKey(), blockState.getValue());
-                }
+            if (stateString != null) {
+                state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state.getInternalPropertiesId());
             }
+        }
 
-            state = applyProperties(state, stateProperties);
+        if (blockAndExtraData.length > 1 && blockAndExtraData[1].startsWith("{")) {
+            String joined = StringMan.join(Arrays.copyOfRange(blockAndExtraData, 1, blockAndExtraData.length), "|");
+            try {
+                nbt = JSON2NBT.getTagFromJson(joined);
+            } catch (NBTException e) {
+                throw new NoMatchException(e.getMessage());
+            }
         }
 
         // Check if the item is allowed
+        BlockTypes blockType = state.getBlockType();
+
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
-            if (actor != null && !actor.hasPermission("worldedit.anyblock")
-                    && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
-                throw new DisallowedUsageException("You are not allowed to use '" + input + "'");
+            if (actor != null) {
+                if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
+                    throw new DisallowedUsageException("You are not allowed to use '" + input + "'");
+                }
+                if (nbt != null) {
+                    if (!actor.hasPermission("worldedit.anyblock")) {
+                        throw new DisallowedUsageException("You are not allowed to nbt'");
+                    }
+                }
             }
         }
+
+        if (nbt != null) return new BaseBlock(state, nbt);
 
         if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN) {
             // Allow special sign text syntax
@@ -324,5 +303,4 @@ class DefaultBlockParser extends InputParser<BlockStateHolder> {
             return state;
         }
     }
-
 }

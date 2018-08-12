@@ -19,13 +19,14 @@
 
 package com.sk89q.worldedit.function.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.pattern.Pattern;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Replaces blocks with a given pattern.
@@ -38,7 +39,7 @@ public class BlockReplace implements RegionFunction {
     /**
      * Create a new instance.
      *
-     * @param extent an extent
+     * @param extent  an extent
      * @param pattern a pattern
      */
     public BlockReplace(Extent extent, Pattern pattern) {
@@ -50,7 +51,11 @@ public class BlockReplace implements RegionFunction {
 
     @Override
     public boolean apply(Vector position) throws WorldEditException {
-        return extent.setBlock(position, pattern.apply(position));
+        return pattern.apply(extent, position, position);
+    }
+
+    public static Class<?> inject() {
+        return BlockReplace.class;
     }
 
 }

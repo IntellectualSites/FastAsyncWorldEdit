@@ -26,11 +26,7 @@ import com.sk89q.worldedit.internal.expression.runtime.Conditional;
 import com.sk89q.worldedit.internal.expression.runtime.Operators;
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Helper classfor Parser. Contains processors for statements and operators.

@@ -19,47 +19,41 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.LocalConfiguration;
-import com.sk89q.worldedit.LocalSession;
+import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.brush.visualization.VirtualWorld;
+import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.pattern.PatternTraverser;
+import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
+import com.boydti.fawe.wrappers.PlayerWrapper;
+import com.boydti.fawe.wrappers.WorldWrapper;
+import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.tool.BlockTool;
-import com.sk89q.worldedit.command.tool.DoubleActionBlockTool;
-import com.sk89q.worldedit.command.tool.DoubleActionTraceTool;
-import com.sk89q.worldedit.command.tool.Tool;
-import com.sk89q.worldedit.command.tool.TraceTool;
+import com.sk89q.worldedit.command.tool.*;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.event.platform.BlockInteractEvent;
-import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
-import com.sk89q.worldedit.event.platform.Interaction;
-import com.sk89q.worldedit.event.platform.PlatformInitializeEvent;
-import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
-import com.sk89q.worldedit.event.platform.PlayerInputEvent;
+import com.sk89q.worldedit.event.platform.*;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.World;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Manages registered {@link Platform}s for WorldEdit. Platforms are
  * implementations of WorldEdit.
- *
+ * <p>
  * <p>This class is thread-safe.</p>
  */
 public class PlatformManager {
@@ -68,8 +62,8 @@ public class PlatformManager {
 
     private final WorldEdit worldEdit;
     private final CommandManager commandManager;
-    private final List<Platform> platforms = new ArrayList<>();
-    private final Map<Capability, Platform> preferences = new EnumMap<>(Capability.class);
+    private final List<Platform> platforms = new ArrayList<Platform>();
+    private final Map<Capability, Platform> preferences = new EnumMap<Capability, Platform>(Capability.class);
     private @Nullable String firstSeenVersion;
     private final AtomicBoolean initialized = new AtomicBoolean();
     private final AtomicBoolean configured = new AtomicBoolean();
@@ -107,7 +101,7 @@ public class PlatformManager {
             if (!firstSeenVersion.equals(platform.getVersion())) {
                 logger.log(Level.WARNING, "Multiple ports of WorldEdit are installed but they report different versions ({0} and {1}). " +
                                 "If these two versions are truly different, then you may run into unexpected crashes and errors.",
-                        new Object[]{ firstSeenVersion, platform.getVersion() });
+                        new Object[]{firstSeenVersion, platform.getVersion()});
             }
         } else {
             firstSeenVersion = platform.getVersion();
@@ -116,7 +110,7 @@ public class PlatformManager {
 
     /**
      * Unregister a platform from WorldEdit.
-     *
+     * <p>
      * <p>If the platform has been chosen for any capabilities, then a new
      * platform will be found.</p>
      *
@@ -165,7 +159,7 @@ public class PlatformManager {
         if (platform != null) {
             return platform;
         } else {
-            if (preferences.isEmpty()) {
+            if (preferences.isEmpty() && !platforms.isEmpty()) {
                 return platforms.get(0); // Use the first available if preferences have not been decided yet.
             }
             throw new NoCapablePlatformException("No platform was found supporting " + capability.name());
@@ -214,13 +208,13 @@ public class PlatformManager {
 
     /**
      * Get a list of loaded platforms.
-     *
+     * <p>
      * <p>The returned list is a copy of the original and is mutable.</p>
      *
      * @return a list of platforms
      */
     public synchronized List<Platform> getPlatforms() {
-        return new ArrayList<>(platforms);
+        return new ArrayList<Platform>(platforms);
     }
 
     /**
@@ -232,6 +226,7 @@ public class PlatformManager {
      */
     public World getWorldForEditing(World base) {
         checkNotNull(base);
+        base = WorldWrapper.unwrap(base);
         World match = queryCapability(Capability.WORLD_EDITING).matchWorld(base);
         return match != null ? match : base;
     }
@@ -249,18 +244,8 @@ public class PlatformManager {
 
         if (base instanceof Player) {
             Player player = (Player) base;
-
-            Player permActor = queryCapability(Capability.PERMISSIONS).matchPlayer(player);
-            if (permActor == null) {
-                permActor = player;
-            }
-
-            Player cuiActor = queryCapability(Capability.WORLDEDIT_CUI).matchPlayer(player);
-            if (cuiActor == null) {
-                cuiActor = player;
-            }
-
-            return (T) new PlayerProxy(player, permActor, cuiActor, getWorldForEditing(player.getWorld()));
+            FawePlayer fp = FawePlayer.wrap(player);
+            return (T) fp.createProxy();
         } else {
             return base;
         }
@@ -277,7 +262,7 @@ public class PlatformManager {
 
     /**
      * Get the current configuration.
-     *
+     * <p>
      * <p>If no platform has been registered yet, then a default configuration
      * will be returned.</p>
      *
@@ -295,161 +280,249 @@ public class PlatformManager {
         }
     }
 
+    private <T extends Tool> T reset(T tool) {
+        new PatternTraverser(tool).reset(null);
+        return tool;
+    }
+
+    @SuppressWarnings("deprecation")
     @Subscribe
     public void handleBlockInteract(BlockInteractEvent event) {
         // Create a proxy actor with a potentially different world for
         // making changes to the world
-        Actor actor = createProxyActor(event.getCause());
+        Request.reset();
+        final Actor actor = createProxyActor(event.getCause());
+        try {
+            final Location location = event.getLocation();
+            final Vector vector = location.toVector();
 
-        Location location = event.getLocation();
-        Vector vector = location.toVector();
+            // At this time, only handle interaction from players
+            if (actor instanceof Player) {
+                final LocalSession session = worldEdit.getSessionManager().get(actor);
+                Player playerActor = (Player) actor;
 
-        // At this time, only handle interaction from players
-        if (actor instanceof Player) {
-            Player player = (Player) actor;
-            LocalSession session = worldEdit.getSessionManager().get(actor);
-
-            if (event.getType() == Interaction.HIT) {
-                if (player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
-                    if (!session.isToolControlEnabled()) {
-                        return;
-                    }
-
-                    if (!actor.hasPermission("worldedit.selection.pos")) {
-                        return;
-                    }
-
-                    RegionSelector selector = session.getRegionSelector(player.getWorld());
-
-                    if (selector.selectPrimary(location.toVector(), ActorSelectorLimits.forActor(player))) {
-                        selector.explainPrimarySelection(actor, session, vector);
-                    }
-
-                    event.setCancelled(true);
-                    return;
+                VirtualWorld virtual = session.getVirtualWorld();
+                if (virtual != null) {
+                    virtual.handleBlockInteract(playerActor, vector, event);
+                    if (event.isCancelled()) return;
                 }
 
-                if (player.isHoldingPickAxe() && session.hasSuperPickAxe()) {
-                    final BlockTool superPickaxe = session.getSuperPickaxe();
-                    if (superPickaxe != null && superPickaxe.canUse(player)) {
-                        event.setCancelled(superPickaxe.actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location));
-                        return;
-                    }
-                }
+                if (event.getType() == Interaction.HIT) {
+                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().wandItem)) {
+                        FawePlayer<?> fp = FawePlayer.wrap(playerActor);
+                        if (!actor.hasPermission("worldedit.selection.pos")) {
+                            return;
+                        }
+                        final RegionSelector selector = session.getRegionSelector(playerActor.getWorld());
+                        final Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
+                        fp.runAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (selector.selectPrimary(location.toVector(), ActorSelectorLimits.forActor(player))) {
+                                    selector.explainPrimarySelection(actor, session, vector);
+                                }
+                            }
+                        }, false, true);
 
-                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
-                if (tool instanceof DoubleActionBlockTool) {
-                    if (tool.canUse(player)) {
-                        ((DoubleActionBlockTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
                         event.setCancelled(true);
-                    }
-                }
-
-            } else if (event.getType() == Interaction.OPEN) {
-                if (player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
-                    if (!session.isToolControlEnabled()) {
                         return;
                     }
-
-                    if (!actor.hasPermission("worldedit.selection.pos")) {
-                        return;
+                    if (session.hasSuperPickAxe() && playerActor.isHoldingPickAxe()) {
+                        final BlockTool superPickaxe = session.getSuperPickaxe();
+                        if (superPickaxe != null && superPickaxe.canUse(playerActor)) {
+                            FawePlayer<?> fp = FawePlayer.wrap(playerActor);
+                            final Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
+                            fp.runAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reset(superPickaxe).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
+                                }
+                            }, false, true);
+                            event.setCancelled(true);
+                            return;
+                        }
                     }
-
-                    RegionSelector selector = session.getRegionSelector(player.getWorld());
-                    if (selector.selectSecondary(vector, ActorSelectorLimits.forActor(player))) {
-                        selector.explainSecondarySelection(actor, session, vector);
+                    final Tool tool = session.getTool(playerActor);
+                    if (tool != null && tool instanceof DoubleActionBlockTool) {
+                        if (tool.canUse(playerActor)) {
+                            FawePlayer<?> fp = FawePlayer.wrap(playerActor);
+                            final Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
+                            fp.runAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reset(((DoubleActionBlockTool) tool)).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
+                                }
+                            }, false, true);
+                            event.setCancelled(true);
+                            return;
+                        }
                     }
-
-                    event.setCancelled(true);
-                    return;
-                }
-
-                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
-                if (tool instanceof BlockTool) {
-                    if (tool.canUse(player)) {
-                        ((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
+                } else if (event.getType() == Interaction.OPEN) {
+                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().wandItem)) {
+                        FawePlayer<?> fp = FawePlayer.wrap(playerActor);
+                        if (!actor.hasPermission("worldedit.selection.pos")) {
+                            return;
+                        }
+                        if (fp.checkAction()) {
+                            final RegionSelector selector = session.getRegionSelector(playerActor.getWorld());
+                            final Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
+                            fp.runAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (selector.selectSecondary(vector, ActorSelectorLimits.forActor(player))) {
+                                        selector.explainSecondarySelection(actor, session, vector);
+                                    }
+                                }
+                            }, false, true);
+                        }
                         event.setCancelled(true);
+                        return;
+                    }
+
+                    final Tool tool = session.getTool(playerActor);
+                    if (tool != null && tool instanceof BlockTool) {
+                        if (tool.canUse(playerActor)) {
+                            FawePlayer<?> fp = FawePlayer.wrap(playerActor);
+                            if (fp.checkAction()) {
+                                final Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
+                                fp.runAction(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (tool instanceof BrushTool) {
+                                            ((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
+                                        } else {
+                                            reset((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
+                                        }
+                                    }
+                                }, false, true);
+                                event.setCancelled(true);
+                                return;
+                            }
+                        }
                     }
                 }
             }
+        } catch (Throwable e) {
+            handleThrowable(e, actor);
         }
     }
 
+    public void handleThrowable(Throwable e, Actor actor) {
+        FaweException faweException = FaweException.get(e);
+        if (faweException != null) {
+            BBC.WORLDEDIT_CANCEL_REASON.send(actor, faweException.getMessage());
+        } else {
+            actor.printError("Please report this error: [See console]");
+            actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
+            MainUtil.handleError(e);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
     @Subscribe
     public void handlePlayerInput(PlayerInputEvent event) {
         // Create a proxy actor with a potentially different world for
         // making changes to the world
-        Player player = createProxyActor(event.getPlayer());
+        Player actor = createProxyActor(event.getPlayer());
+        final Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap(actor), actor.getLocation(), true);
+        final LocalSession session = worldEdit.getSessionManager().get(player);
 
-        switch (event.getInputType()) {
-            case PRIMARY: {
-                if (player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
-                    if (getConfiguration().navigationWandMaxDistance <= 0) {
-                        return;
-                    }
+        VirtualWorld virtual = session.getVirtualWorld();
+        if (virtual != null) {
+            virtual.handlePlayerInput(player,  event);
+            if (event.isCancelled()) return;
+        }
 
-                    if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
-                        return;
-                    }
+        try {
+            switch (event.getInputType()) {
+                case PRIMARY: {
+                    if (player.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().navigationWand)) {
+                        if (getConfiguration().navigationWandMaxDistance <= 0) {
+                            return;
+                        }
 
-                    Location pos = player.getSolidBlockTrace(getConfiguration().navigationWandMaxDistance);
-                    if (pos != null) {
-                        player.findFreePosition(pos);
-                    } else {
-                        player.printError("No block in sight (or too far)!");
-                    }
+                        if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
+                            return;
+                        }
 
-                    event.setCancelled(true);
-                    return;
-                }
+                        Location pos = player.getSolidBlockTrace(getConfiguration().navigationWandMaxDistance);
+                        if (pos != null) {
+                            player.findFreePosition(pos);
+                        } else {
+                            BBC.NO_BLOCK.send(player);
+                        }
 
-                LocalSession session = worldEdit.getSessionManager().get(player);
-
-                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
-                if (tool instanceof DoubleActionTraceTool) {
-                    if (tool.canUse(player)) {
-                        ((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session);
                         event.setCancelled(true);
                         return;
                     }
+
+                    final Tool tool = session.getTool(player);
+                    if (tool != null && tool instanceof DoubleActionTraceTool) {
+                        if (tool.canUse(player)) {
+                            FawePlayer<?> fp = FawePlayer.wrap(player);
+                            fp.runAsyncIfFree(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session);
+                                }
+                            });
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+                    break;
                 }
 
-                break;
+                case SECONDARY: {
+                    if (player.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().navigationWand)) {
+                        if (getConfiguration().navigationWandMaxDistance <= 0) {
+                            return;
+                        }
+
+                        if (!player.hasPermission("worldedit.navigation.thru.tool")) {
+                            return;
+                        }
+
+                        if (!player.passThroughForwardWall(40)) {
+                            BBC.NAVIGATION_WAND_ERROR.send(player);
+                        }
+
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    final Tool tool = session.getTool(player);
+                    if (tool != null && tool instanceof TraceTool) {
+                        if (tool.canUse(player)) {
+                            FawePlayer<?> fp = FawePlayer.wrap(player);
+                            fp.runAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session);
+                                }
+                            }, false, true);
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
+
+                    break;
+                }
             }
-
-            case SECONDARY: {
-                if (player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
-                    if (getConfiguration().navigationWandMaxDistance <= 0) {
-                        return;
-                    }
-
-                    if (!player.hasPermission("worldedit.navigation.thru.tool")) {
-                        return;
-                    }
-
-                    if (!player.passThroughForwardWall(40)) {
-                        player.printError("Nothing to pass through!");
-                    }
-
-                    event.setCancelled(true);
-                    return;
-                }
-
-                LocalSession session = worldEdit.getSessionManager().get(player);
-
-                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
-                if (tool instanceof TraceTool) {
-                    if (tool.canUse(player)) {
-                        ((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session);
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-
-                break;
+        } catch (Throwable e) {
+            FaweException faweException = FaweException.get(e);
+            if (faweException != null) {
+                BBC.WORLDEDIT_CANCEL_REASON.send(player, faweException.getMessage());
+            } else {
+                player.printError("Please report this error: [See console]");
+                player.printRaw(e.getClass().getName() + ": " + e.getMessage());
+                MainUtil.handleError(e);
             }
         }
     }
 
+    public static Class<?> inject() {
+        return PlatformManager.class;
+    }
 
 }

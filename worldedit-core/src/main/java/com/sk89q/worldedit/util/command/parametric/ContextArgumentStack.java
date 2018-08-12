@@ -25,24 +25,24 @@ import com.sk89q.worldedit.util.command.MissingParameterException;
 /**
  * Makes an instance of a {@link CommandContext} into a stack of arguments
  * that can be consumed.
- * 
+ *
  * @see ParametricBuilder a user of this class
  */
 public class ContextArgumentStack implements ArgumentStack {
-    
+
     private final CommandContext context;
     private int index = 0;
     private int markedIndex = 0;
-    
+
     /**
      * Create a new instance using the given context.
-     * 
+     *
      * @param context the context
      */
     public ContextArgumentStack(CommandContext context) {
         this.context = context;
     }
-    
+
     @Override
     public String next() throws ParameterException {
         try {
@@ -94,14 +94,14 @@ public class ContextArgumentStack implements ArgumentStack {
 
     /**
      * Get the unconsumed arguments left over, without touching the stack.
-     * 
+     *
      * @return the unconsumed arguments
      */
     public String getUnconsumed() {
         if (index >= context.argsLength()) {
             return null;
         }
-        
+
         return context.getJoinedStrings(index);
     }
 
@@ -112,42 +112,44 @@ public class ContextArgumentStack implements ArgumentStack {
 
     /**
      * Return the current position.
-     * 
+     *
      * @return the position
      */
     public int position() {
         return index;
     }
-    
+
     /**
      * Mark the current position of the stack.
-     * 
+     *
      * <p>The marked position initially starts at 0.</p>
      */
+    @Override
     public void mark() {
         markedIndex = index;
     }
-    
+
     /**
      * Reset to the previously {@link #mark()}ed position of the stack, and return
      * the arguments that were consumed between this point and that previous point.
-     * 
+     *
      * <p>The marked position initially starts at 0.</p>
-     * 
+     *
      * @return the consumed arguments
      */
+    @Override
     public String reset() {
-        String value = context.getString(markedIndex, index);
+        String value = context.getString(markedIndex, index - 1);
         index = markedIndex;
         return value;
     }
-    
+
     /**
      * Return whether any arguments were consumed between the marked position
      * and the current position.
-     * 
+     *
      * <p>The marked position initially starts at 0.</p>
-     * 
+     *
      * @return true if values were consumed.
      */
     public boolean wasConsumed() {
@@ -156,23 +158,27 @@ public class ContextArgumentStack implements ArgumentStack {
 
     /**
      * Return the arguments that were consumed between this point and that marked point.
-     * 
+     *
      * <p>The marked position initially starts at 0.</p>
-     * 
+     *
      * @return the consumed arguments
      */
     public String getConsumed() {
         return context.getString(markedIndex, index);
     }
-    
+
     /**
      * Get the underlying context.
-     * 
+     *
      * @return the context
      */
     @Override
     public CommandContext getContext() {
         return context;
+    }
+
+    public static Class<?> inject() {
+        return ContextArgumentStack.class;
     }
 
 }

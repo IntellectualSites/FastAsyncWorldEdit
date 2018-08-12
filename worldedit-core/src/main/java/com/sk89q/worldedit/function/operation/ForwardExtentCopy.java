@@ -19,33 +19,45 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.Lists;
+import com.boydti.fawe.example.MappedFaweQueue;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.extent.BlockTranslateExtent;
+import com.boydti.fawe.object.extent.PositionTransformExtent;
+import com.boydti.fawe.object.function.block.BiomeCopy;
+import com.boydti.fawe.object.function.block.CombinedBlockCopy;
+import com.boydti.fawe.object.function.block.SimpleBlockCopy;
+import com.boydti.fawe.util.MaskTraverser;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MutableBlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.RegionMaskTestFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
-import com.sk89q.worldedit.function.block.ExtentBlockCopy;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
+import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
-
+import java.util.ArrayList;
 import java.util.List;
+
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Makes a copy of a portion of one extent to another extent or another point.
- *
+ * <p>
  * <p>This is a forward extent copy, meaning that it iterates over the blocks
  * in the source extent, and will copy as many blocks as there are in the
  * source. Therefore, interpolation will not occur to fill in the gaps.</p>
@@ -60,21 +72,22 @@ public class ForwardExtentCopy implements Operation {
     private int repetitions = 1;
     private Mask sourceMask = Masks.alwaysTrue();
     private boolean removingEntities;
-    private boolean copyingEntities = true; // default to true for backwards compatibility, sort of
     private RegionFunction sourceFunction = null;
     private Transform transform = new Identity();
     private Transform currentTransform = null;
-    private RegionVisitor lastVisitor;
     private int affected;
+    private boolean copyEntities = true;
+    private boolean copyBiomes = false;
+    private RegionFunction filterFunction;
 
     /**
      * Create a new copy using the region's lowest minimum point as the
      * "from" position.
      *
-     * @param source the source extent
-     * @param region the region to copy
+     * @param source      the source extent
+     * @param region      the region to copy
      * @param destination the destination extent
-     * @param to the destination position
+     * @param to          the destination position
      * @see #ForwardExtentCopy(Extent, Region, Vector, Extent, Vector) the main constructor
      */
     public ForwardExtentCopy(Extent source, Region region, Extent destination, Vector to) {
@@ -84,11 +97,11 @@ public class ForwardExtentCopy implements Operation {
     /**
      * Create a new copy.
      *
-     * @param source the source extent
-     * @param region the region to copy
-     * @param from the source position
+     * @param source      the source extent
+     * @param region      the region to copy
+     * @param from        the source position
      * @param destination the destination extent
-     * @param to the destination position
+     * @param to          the destination position
      */
     public ForwardExtentCopy(Extent source, Region region, Vector from, Extent destination, Vector to) {
         checkNotNull(source);
@@ -105,7 +118,7 @@ public class ForwardExtentCopy implements Operation {
 
     /**
      * Get the transformation that will occur on every point.
-     *
+     * <p>
      * <p>The transformation will stack with each repetition.</p>
      *
      * @return a transformation
@@ -127,13 +140,29 @@ public class ForwardExtentCopy implements Operation {
 
     /**
      * Get the mask that gets applied to the source extent.
-     *
+     * <p>
      * <p>This mask can be used to filter what will be copied from the source.</p>
      *
      * @return a source mask
      */
     public Mask getSourceMask() {
         return sourceMask;
+    }
+
+    public void setCopyEntities(boolean copyEntities) {
+        this.copyEntities = copyEntities;
+    }
+
+    public boolean isCopyEntities() {
+        return copyEntities;
+    }
+
+    public void setCopyBiomes(boolean copyBiomes) {
+        this.copyBiomes = copyBiomes;
+    }
+
+    public boolean isCopyBiomes() {
+        return copyBiomes;
     }
 
     /**
@@ -145,6 +174,10 @@ public class ForwardExtentCopy implements Operation {
     public void setSourceMask(Mask sourceMask) {
         checkNotNull(sourceMask);
         this.sourceMask = sourceMask;
+    }
+
+    public void setFilterFunction(RegionFunction filterFunction) {
+        this.filterFunction = filterFunction;
     }
 
     /**
@@ -163,6 +196,7 @@ public class ForwardExtentCopy implements Operation {
      *
      * @param function a source function, or null if none is to be applied
      */
+    @Deprecated
     public void setSourceFunction(RegionFunction function) {
         this.sourceFunction = function;
     }
@@ -184,24 +218,6 @@ public class ForwardExtentCopy implements Operation {
     public void setRepetitions(int repetitions) {
         checkArgument(repetitions >= 0, "number of repetitions must be non-negative");
         this.repetitions = repetitions;
-    }
-
-    /**
-     * Return whether entities should be copied along with blocks.
-     *
-     * @return true if copying
-     */
-    public boolean isCopyingEntities() {
-        return copyingEntities;
-    }
-
-    /**
-     * Set whether entities should be copied along with blocks.
-     *
-     * @param copyingEntities true if copying
-     */
-    public void setCopyingEntities(boolean copyingEntities) {
-        this.copyingEntities = copyingEntities;
     }
 
     /**
@@ -233,43 +249,124 @@ public class ForwardExtentCopy implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        if (lastVisitor != null) {
-            affected += lastVisitor.getAffected();
-            lastVisitor = null;
+        if (currentTransform == null) {
+            currentTransform = transform;
+        }
+        FaweQueue queue;
+        if (source instanceof EditSession) {
+            queue = ((EditSession) source).getQueue();
+        } else if (destination instanceof EditSession) {
+            queue = ((EditSession) destination).getQueue();
+        } else {
+            queue = null;
         }
 
-        if (repetitions > 0) {
-            repetitions--;
+        Extent finalDest = destination;
+        Vector translation = to.subtract(from);
 
-            if (currentTransform == null) {
-                currentTransform = transform;
+        if (!translation.equals(Vector.ZERO)) {
+            finalDest = new BlockTranslateExtent(finalDest, translation.getBlockX(), translation.getBlockY(), translation.getBlockZ());
+        }
+
+        RegionFunction copy;
+        Operation blockCopy = null;
+        PositionTransformExtent transExt = null;
+        if (!currentTransform.isIdentity()) {
+            if (!(currentTransform instanceof AffineTransform) || ((AffineTransform) currentTransform).isOffAxis()) {
+                transExt = new PositionTransformExtent(source, currentTransform.inverse());
+                transExt.setOrigin(from);
+                copy = new SimpleBlockCopy(transExt, finalDest);
+                if (this.filterFunction != null) {
+                    copy = new IntersectRegionFunction(filterFunction, copy);
+                }
+                if (sourceFunction != null) {
+                    copy = CombinedRegionFunction.combine(copy, sourceFunction);
+                }
+                if (sourceMask != Masks.alwaysTrue()) {
+                    new MaskTraverser(sourceMask).reset(transExt);
+                    copy = new RegionMaskingFilter(sourceMask, copy);
+                }
+                if (copyBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
+                    copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
+                }
+                blockCopy = new BackwardsExtentBlockCopy(transExt, region, finalDest, from, transform, copy);
             } else {
-                currentTransform = currentTransform.combine(transform);
+                transExt = new PositionTransformExtent(finalDest, currentTransform);
+                transExt.setOrigin(from);
+                finalDest = transExt;
             }
+        }
 
-            ExtentBlockCopy blockCopy = new ExtentBlockCopy(source, from, destination, to, currentTransform);
-            RegionMaskingFilter filter = new RegionMaskingFilter(sourceMask, blockCopy);
-            RegionFunction function = sourceFunction != null ? new CombinedRegionFunction(filter, sourceFunction) : filter;
-            RegionVisitor blockVisitor = new RegionVisitor(region, function);
+        if (blockCopy == null) {
+            RegionFunction maskFunc = null;
 
-            lastVisitor = blockVisitor;
+            if (sourceFunction != null) {
+                Vector disAbs = translation.positive();
+                Vector size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
+                boolean overlap = (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size.getBlockZ());
 
-            if (copyingEntities) {
+                RegionFunction copySrcFunc = sourceFunction;
+                if (overlap && translation.length() != 0) {
+                    MutableBlockVector mutable = new MutableBlockVector();
+
+                    int x = translation.getBlockX();
+                    int y = translation.getBlockY();
+                    int z = translation.getBlockZ();
+
+                    maskFunc = position -> {
+                        mutable.setComponents(position.getBlockX() + x, position.getBlockY() + y, position.getBlockZ() + z);
+                        if (region.contains(mutable)) {
+                            return sourceFunction.apply(mutable);
+                        }
+                        return false;
+                    };
+
+                    copySrcFunc = position -> {
+                        mutable.setComponents(position.getBlockX() - x, position.getBlockY() - y, position.getBlockZ() - z);
+                        if (!region.contains(mutable)) {
+                            return sourceFunction.apply(position);
+                        }
+                        return false;
+                    };
+                }
+                copy = new CombinedBlockCopy(source, finalDest, copySrcFunc);
+            }
+            else {
+                copy = new SimpleBlockCopy(source, finalDest);
+            }
+            if (this.filterFunction != null) {
+                copy = new IntersectRegionFunction(filterFunction, copy);
+            }
+            if (sourceMask != Masks.alwaysTrue()) {
+                if (maskFunc != null) copy = new RegionMaskTestFunction(sourceMask, copy, maskFunc);
+                else copy = new RegionMaskingFilter(sourceMask, copy);
+            }
+            if (copyBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
+                copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
+            }
+            blockCopy = new RegionVisitor(region, copy, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
+        }
+
+        List<? extends Entity> entities = isCopyEntities() ? source.getEntities(region) : new ArrayList<>();
+
+        for (int i = 0; i < repetitions; i++) {
+            Operations.completeBlindly(blockCopy);
+
+            if (!entities.isEmpty()) {
                 ExtentEntityCopy entityCopy = new ExtentEntityCopy(from, destination, to, currentTransform);
                 entityCopy.setRemoving(removingEntities);
-                List<? extends Entity> entities = Lists.newArrayList(source.getEntities(region));
-                entities.removeIf(entity -> {
-                    EntityProperties properties = entity.getFacet(EntityProperties.class);
-                    return properties != null && !properties.isPasteable();
-                });
                 EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
-                return new DelegateOperation(this, new OperationQueue(blockVisitor, entityVisitor));
-            } else {
-                return new DelegateOperation(this, blockVisitor);
+                Operations.completeBlindly(entityVisitor);
             }
-        } else {
-            return null;
+
+            if (transExt != null) {
+                currentTransform = currentTransform.combine(transform);
+                transExt.setTransform(currentTransform);
+            }
+
         }
+        affected = region.getArea();
+        return null;
     }
 
     @Override
@@ -280,4 +377,7 @@ public class ForwardExtentCopy implements Operation {
     public void addStatusMessages(List<String> messages) {
     }
 
+    public static Class<?> inject() {
+        return ForwardExtentCopy.class;
+    }
 }

@@ -19,22 +19,24 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.entity.metadata.Metadatable;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.internal.cui.CUIEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.util.UUID;
-
 import javax.annotation.Nullable;
+import java.io.File;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class BukkitCommandSender implements Actor {
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class BukkitCommandSender implements Actor, Metadatable {
 
     /**
      * One time generated ID.
@@ -43,6 +45,7 @@ public class BukkitCommandSender implements Actor {
 
     private CommandSender sender;
     private WorldEditPlugin plugin;
+    private ConcurrentHashMap<String, Object> meta;
 
     public BukkitCommandSender(WorldEditPlugin plugin, CommandSender sender) {
         checkNotNull(plugin);
@@ -51,6 +54,12 @@ public class BukkitCommandSender implements Actor {
 
         this.plugin = plugin;
         this.sender = sender;
+    }
+
+    @Override
+    public synchronized Map<String, Object> getMetaMap() {
+        if (meta == null) meta = new ConcurrentHashMap<>();
+        return meta;
     }
 
     @Override

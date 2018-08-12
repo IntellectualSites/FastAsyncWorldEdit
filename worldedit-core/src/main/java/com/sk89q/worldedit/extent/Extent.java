@@ -19,15 +19,29 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.sk89q.worldedit.Vector;
+import com.boydti.fawe.jnbt.anvil.generator.*;
+import com.boydti.fawe.object.PseudoRandom;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.registry.state.PropertyGroup;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
-
-import java.util.List;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A world, portion of a world, clipboard, or other object that can have blocks
@@ -68,7 +82,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param region the region in which entities must be contained
      * @return a list of entities
      */
-    List<? extends Entity> getEntities(Region region);
+    default List<? extends Entity> getEntities(Region region) {
+        return Collections.emptyList();
+    }
 
     /**
      * Get a list of all entities.
@@ -79,7 +95,9 @@ public interface Extent extends InputExtent, OutputExtent {
      *
      * @return a list of entities
      */
-    List<? extends Entity> getEntities();
+    default List<? extends Entity> getEntities() {
+        return Collections.emptyList();
+    }
 
     /**
      * Create an entity at the given location.
@@ -88,6 +106,204 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param location the location
      * @return a reference to the created entity, or null if the entity could not be created
      */
-    @Nullable Entity createEntity(Location location, BaseEntity entity);
+    default @Nullable Entity createEntity(Location location, BaseEntity entity) {
+        return null;
+    }
 
+    @Override
+    default BlockState getBlock(Vector position) {
+        return getFullBlock(position);
+    }
+
+    @Override
+    default BlockState getLazyBlock(Vector position) {
+        return getFullBlock(position);
+    }
+
+    default BlockState getLazyBlock(int x, int y, int z) {
+        return getLazyBlock(MutableBlockVector.get(x, y, z));
+    }
+
+    default boolean setBlock(int x, int y, int z, BlockStateHolder state) throws WorldEditException {
+        return setBlock(MutableBlockVector.get(x, y, z), state);
+    }
+
+    default boolean setBiome(int x, int y, int z, BaseBiome biome) {
+        return setBiome(MutableBlockVector2D.get(x, z), biome);
+    }
+
+    default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
+        maxY = Math.min(maxY, Math.max(0, maxY));
+        minY = Math.max(0, minY);
+        for (int y = maxY; y >= minY; --y) {
+            BlockState block = getLazyBlock(x, y, z);
+            if (block.getBlockType().getMaterial().isMovementBlocker()) {
+                return y;
+            }
+        }
+        return minY;
+    }
+
+    default int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
+        int clearanceAbove = maxY - y;
+        int clearanceBelow = y - minY;
+        int clearance = Math.min(clearanceAbove, clearanceBelow);
+
+        BlockState block = getLazyBlock(x, y, z);
+        boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
+        int data1 = PropertyGroup.LEVEL.get(block);
+        int data2 = data1;
+        int offset = state ? 0 : 1;
+        for (int d = 0; d <= clearance; d++) {
+            int y1 = y + d;
+            block = getLazyBlock(x, y1, z);
+            if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
+                return ((y1 - offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data1));
+            }
+            data1 = PropertyGroup.LEVEL.get(block);
+            int y2 = y - d;
+            block = getLazyBlock(x, y2, z);
+            if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
+                return ((y2 + offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data2));
+            }
+            data2 = PropertyGroup.LEVEL.get(block);
+        }
+        if (clearanceAbove != clearanceBelow) {
+            if (clearanceAbove < clearanceBelow) {
+                for (int layer = y - clearance - 1; layer >= minY; layer--) {
+                    block = getLazyBlock(x, layer, z);
+                    if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
+
+//                        int blockHeight = (newHeight) >> 3;
+//                        int layerHeight = (newHeight) & 0x7;
+
+                        int data = (state ? PropertyGroup.LEVEL.get(block) : data1);
+                        return ((layer + offset) << 4) + 0;
+                    }
+                    data1 = PropertyGroup.LEVEL.get(block);
+                }
+            } else {
+                for (int layer = y + clearance + 1; layer <= maxY; layer++) {
+                    block = getLazyBlock(x, layer, z);
+                    if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
+                        return ((layer - offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data2));
+                    }
+                    data2 = PropertyGroup.LEVEL.get(block);
+                }
+            }
+        }
+        return (state ? minY : maxY) << 4;
+    }
+
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY, ignoreAir);
+    }
+
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY);
+    }
+
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, true);
+    }
+
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
+        y = Math.max(minY, Math.min(maxY, y));
+        int clearanceAbove = maxY - y;
+        int clearanceBelow = y - minY;
+        int clearance = Math.min(clearanceAbove, clearanceBelow);
+        BlockStateHolder block = getLazyBlock(x, y, z);
+        boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
+        int offset = state ? 0 : 1;
+        for (int d = 0; d <= clearance; d++) {
+            int y1 = y + d;
+            block = getLazyBlock(x, y1, z);
+            if (!block.getBlockType().getMaterial().isMovementBlocker() != state && block != EditSession.nullBlock) return y1 - offset;
+            int y2 = y - d;
+            block = getLazyBlock(x, y2, z);
+            if (!block.getBlockType().getMaterial().isMovementBlocker() != state && block != EditSession.nullBlock) return y2 + offset;
+        }
+        if (clearanceAbove != clearanceBelow) {
+            if (clearanceAbove < clearanceBelow) {
+                for (int layer = y - clearance - 1; layer >= minY; layer--) {
+                    block = getLazyBlock(x, layer, z);
+                    if (!block.getBlockType().getMaterial().isMovementBlocker() != state && block != EditSession.nullBlock) return layer + offset;
+                }
+            } else {
+                for (int layer = y + clearance + 1; layer <= maxY; layer++) {
+                    block = getLazyBlock(x, layer, z);
+                    if (!block.getBlockType().getMaterial().isMovementBlocker() != state && block != EditSession.nullBlock) return layer - offset;
+                }
+            }
+        }
+        int result = state ? failedMin : failedMax;
+        if(result > 0 && !ignoreAir) {
+            block = getLazyBlock(x, result, z);
+            return block.getBlockType().getMaterial().isAir() ? -1 : result;
+        }
+        return result;
+    }
+
+    default void addCaves(Region region) throws WorldEditException {
+        generate(region, new CavesGen(8));
+    }
+
+    default void generate(Region region, GenBase gen) throws WorldEditException {
+        for (Vector2D chunkPos : region.getChunks()) {
+            gen.generate(chunkPos, this);
+        }
+    }
+
+    default public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+        spawnResource(region, new SchemGen(mask, this, clipboards, rotate), rarity, 1);
+    }
+
+    default void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        for (Vector2D chunkPos : region.getChunks()) {
+            for (int i = 0; i < frequency; i++) {
+                if (random.nextInt(100) > rarity) {
+                    continue;
+                }
+                int x = (chunkPos.getBlockX() << 4) + PseudoRandom.random.nextInt(16);
+                int z = (chunkPos.getBlockZ() << 4) + PseudoRandom.random.nextInt(16);
+                gen.spawn(random, x, z);
+            }
+        }
+    }
+
+    default boolean contains(Vector pt) {
+        Vector min = getMinimumPoint();
+        Vector max = getMaximumPoint();
+        return (pt.containedWithin(min, max));
+    }
+
+    default public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+        spawnResource(region, new OreGen(this, mask, material, size, minY, maxY), rarity, frequency);
+    }
+
+    default public void addOres(Region region, Mask mask) throws WorldEditException {
+        addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, 0, 255);
+        addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, 0, 255);
+        addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, 0, 79);
+        addOre(region, mask, BlockTypes.DIORITE.getDefaultState(), 33, 10, 100, 0, 79);
+        addOre(region, mask, BlockTypes.GRANITE.getDefaultState(), 33, 10, 100, 0, 79);
+        addOre(region, mask, BlockTypes.COAL_ORE.getDefaultState(), 17, 20, 100, 0, 127);
+        addOre(region, mask, BlockTypes.IRON_ORE.getDefaultState(), 9, 20, 100, 0, 63);
+        addOre(region, mask, BlockTypes.GOLD_ORE.getDefaultState(), 9, 2, 100, 0, 31);
+        addOre(region, mask, BlockTypes.REDSTONE_ORE.getDefaultState(), 8, 8, 100, 0, 15);
+        addOre(region, mask, BlockTypes.DIAMOND_ORE.getDefaultState(), 8, 1, 100, 0, 15);
+        addOre(region, mask, BlockTypes.LAPIS_ORE.getDefaultState(), 7, 1, 100, 0, 15);
+        addOre(region, mask, BlockTypes.EMERALD_ORE.getDefaultState(), 5, 1, 100, 4, 31);
+    }
+
+    @Nullable
+    @Override
+    default Operation commit() {
+        return null;
+    }
+
+    default int getMaxY() {
+        return 255;
+    }
 }

@@ -19,9 +19,10 @@
 
 package com.sk89q.worldedit.extent.inventory;
 
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.util.Location;
 
 /**
  * Represents a source to get blocks from and store removed ones.
@@ -52,25 +53,25 @@ public abstract class BlockBag {
         try {
             // Blocks that can't be fetched...
 //            TODO switch (id) {
-//            case BlockID.BEDROCK:
-//            case BlockID.GOLD_ORE:
-//            case BlockID.IRON_ORE:
-//            case BlockID.COAL_ORE:
-//            case BlockID.DIAMOND_ORE:
-//            case BlockID.TNT:
-//            case BlockID.MOB_SPAWNER:
-//            case BlockID.CROPS:
-//            case BlockID.REDSTONE_ORE:
-//            case BlockID.GLOWING_REDSTONE_ORE:
-//            case BlockID.SNOW:
-//            case BlockID.LIGHTSTONE:
-//            case BlockID.PORTAL:
+//            case BlockTypesBEDROCK:
+//            case BlockTypesGOLD_ORE:
+//            case BlockTypesIRON_ORE:
+//            case BlockTypesCOAL_ORE:
+//            case BlockTypesDIAMOND_ORE:
+//            case BlockTypesTNT:
+//            case BlockTypesMOB_SPAWNER:
+//            case BlockTypesCROPS:
+//            case BlockTypesREDSTONE_ORE:
+//            case BlockTypesGLOWING_REDSTONE_ORE:
+//            case BlockTypesSNOW:
+//            case BlockTypesLIGHTSTONE:
+//            case BlockTypesPORTAL:
 //                throw new UnplaceableBlockException();
 //
-//            case BlockID.WATER:
-//            case BlockID.STATIONARY_WATER:
-//            case BlockID.LAVA:
-//            case BlockID.STATIONARY_LAVA:
+//            case BlockTypesWATER:
+//            case BlockTypesSTATIONARY_WATER:
+//            case BlockTypesLAVA:
+//            case BlockTypesSTATIONARY_LAVA:
 //                // Override liquids
 //                return;
 //            }

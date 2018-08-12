@@ -19,22 +19,19 @@
 
 package com.sk89q.worldedit.function;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Executes several region functions in order.
  */
 public class CombinedRegionFunction implements RegionFunction {
 
-    private final List<RegionFunction> functions = new ArrayList<>();
+    private RegionFunction[] functions;
 
     /**
      * Create a combined region function.
@@ -49,7 +46,8 @@ public class CombinedRegionFunction implements RegionFunction {
      */
     public CombinedRegionFunction(Collection<RegionFunction> functions) {
         checkNotNull(functions);
-        this.functions.addAll(functions);
+        this.functions = functions.toArray(new RegionFunction[functions.size()]);
+
     }
 
     /**
@@ -58,7 +56,21 @@ public class CombinedRegionFunction implements RegionFunction {
      * @param function an array of functions to match
      */
     public CombinedRegionFunction(RegionFunction... function) {
-        this(Arrays.asList(checkNotNull(function)));
+        this.functions = function;
+    }
+
+    public static CombinedRegionFunction combine(RegionFunction function, RegionFunction add) {
+        CombinedRegionFunction combined;
+        if (function instanceof CombinedRegionFunction) {
+            combined = ((CombinedRegionFunction) function);
+            combined.add(add);
+        } else if (add instanceof CombinedRegionFunction) {
+            combined = new CombinedRegionFunction(function);
+            combined.add(((CombinedRegionFunction) add).functions);
+        } else {
+            combined = new CombinedRegionFunction(function, add);
+        }
+        return combined;
     }
 
     /**
@@ -68,7 +80,9 @@ public class CombinedRegionFunction implements RegionFunction {
      */
     public void add(Collection<RegionFunction> functions) {
         checkNotNull(functions);
-        this.functions.addAll(functions);
+        ArrayList<RegionFunction> functionsList = new ArrayList<>(Arrays.asList(this.functions));
+        functionsList.addAll(functions);
+        this.functions = functionsList.toArray(new RegionFunction[functionsList.size()]);
     }
 
     /**
@@ -91,4 +105,8 @@ public class CombinedRegionFunction implements RegionFunction {
         return ret;
     }
 
+
+    public static Class<?> inject() {
+        return CombinedRegionFunction.class;
+    }
 }

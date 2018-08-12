@@ -19,9 +19,10 @@
 
 package com.sk89q.worldedit;
 
-import com.sk89q.worldedit.util.logging.LogFormat;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 
@@ -33,74 +34,10 @@ import java.util.Set;
  * Represents WorldEdit's configuration.
  */
 public abstract class LocalConfiguration {
-
-    protected static final String[] defaultDisallowedBlocks = new String[] {
-            // dangerous stuff (physics/drops items)
-            BlockTypes.OAK_SAPLING.getId(),
-            BlockTypes.JUNGLE_SAPLING.getId(),
-            BlockTypes.DARK_OAK_SAPLING.getId(),
-            BlockTypes.SPRUCE_SAPLING.getId(),
-            BlockTypes.BIRCH_SAPLING.getId(),
-            BlockTypes.ACACIA_SAPLING.getId(),
-            BlockTypes.BLACK_BED.getId(),
-            BlockTypes.BLUE_BED.getId(),
-            BlockTypes.BROWN_BED.getId(),
-            BlockTypes.CYAN_BED.getId(),
-            BlockTypes.GRAY_BED.getId(),
-            BlockTypes.GREEN_BED.getId(),
-            BlockTypes.LIGHT_BLUE_BED.getId(),
-            BlockTypes.LIGHT_GRAY_BED.getId(),
-            BlockTypes.LIME_BED.getId(),
-            BlockTypes.MAGENTA_BED.getId(),
-            BlockTypes.ORANGE_BED.getId(),
-            BlockTypes.PINK_BED.getId(),
-            BlockTypes.PURPLE_BED.getId(),
-            BlockTypes.RED_BED.getId(),
-            BlockTypes.WHITE_BED.getId(),
-            BlockTypes.YELLOW_BED.getId(),
-            BlockTypes.POWERED_RAIL.getId(),
-            BlockTypes.DETECTOR_RAIL.getId(),
-            BlockTypes.GRASS.getId(),
-            BlockTypes.DEAD_BUSH.getId(),
-            BlockTypes.MOVING_PISTON.getId(),
-            BlockTypes.PISTON_HEAD.getId(),
-            BlockTypes.SUNFLOWER.getId(),
-            BlockTypes.ROSE_BUSH.getId(),
-            BlockTypes.DANDELION.getId(),
-            BlockTypes.POPPY.getId(),
-            BlockTypes.BROWN_MUSHROOM.getId(),
-            BlockTypes.RED_MUSHROOM.getId(),
-            BlockTypes.TNT.getId(),
-            BlockTypes.TORCH.getId(),
-            BlockTypes.FIRE.getId(),
-            BlockTypes.REDSTONE_WIRE.getId(),
-            BlockTypes.WHEAT.getId(),
-            BlockTypes.POTATOES.getId(),
-            BlockTypes.CARROTS.getId(),
-            BlockTypes.MELON_STEM.getId(),
-            BlockTypes.PUMPKIN_STEM.getId(),
-            BlockTypes.BEETROOTS.getId(),
-            BlockTypes.RAIL.getId(),
-            BlockTypes.LEVER.getId(),
-            BlockTypes.REDSTONE_TORCH.getId(),
-            BlockTypes.REDSTONE_WALL_TORCH.getId(),
-            BlockTypes.REPEATER.getId(),
-            BlockTypes.COMPARATOR.getId(),
-            BlockTypes.STONE_BUTTON.getId(),
-            BlockTypes.BIRCH_BUTTON.getId(),
-            BlockTypes.ACACIA_BUTTON.getId(),
-            BlockTypes.DARK_OAK_BUTTON.getId(),
-            BlockTypes.JUNGLE_BUTTON.getId(),
-            BlockTypes.OAK_BUTTON.getId(),
-            BlockTypes.SPRUCE_BUTTON.getId(),
-            BlockTypes.CACTUS.getId(),
-            BlockTypes.SUGAR_CANE.getId(),
-            // ores and stuff
-            BlockTypes.BEDROCK.getId(),
-    };
+    protected static final String[] defaultDisallowedBlocks = new String[] {};
 
     public boolean profile = false;
-    public Set<String> disallowedBlocks = new HashSet<>();
+    public Set<BlockType> disallowedBlocks = new HashSet<>();
     public int defaultChangeLimit = -1;
     public int maxChangeLimit = -1;
     public int defaultMaxPolygonalPoints = -1;
@@ -116,7 +53,7 @@ public abstract class LocalConfiguration {
     public String logFile = "";
     public String logFormat = LogFormat.DEFAULT_FORMAT;
     public boolean registerHelp = true; // what is the point of this, it's not even used
-    public String wandItem = ItemTypes.WOODEN_AXE.getId();
+    public ItemTypes wandItem = ItemTypes.WOODEN_AXE;
     public boolean superPickaxeDrop = true;
     public boolean superPickaxeManyDrop = true;
     public boolean noDoubleSlash = false;
@@ -124,10 +61,10 @@ public abstract class LocalConfiguration {
     public boolean useInventoryOverride = false;
     public boolean useInventoryCreativeOverride = false;
     public boolean navigationUseGlass = true;
-    public String navigationWand = ItemTypes.COMPASS.getId();
+    public ItemTypes navigationWand = ItemTypes.COMPASS;
     public int navigationWandMaxDistance = 50;
     public int scriptTimeout = 3000;
-    public Set<String> allowedDataCycleBlocks = new HashSet<>();
+    public Set<BlockType> allowedDataCycleBlocks = new HashSet<>();
     public String saveDir = "schematics";
     public String scriptsDir = "craftscripts";
     public boolean showHelpInfo = true;
@@ -148,24 +85,4 @@ public abstract class LocalConfiguration {
     public File getWorkingDirectory() {
         return new File(".");
     }
-
-    public String convertLegacyItem(String legacy) {
-        String item = legacy;
-        try {
-            String[] splitter = item.split(":", 2);
-            int id = 0;
-            byte data = 0;
-            if (splitter.length == 1) {
-                id = Integer.parseInt(item);
-            } else {
-                id = Integer.parseInt(splitter[0]);
-                data = Byte.parseByte(splitter[1]);
-            }
-            item = LegacyMapper.getInstance().getItemFromLegacy(id, data).getId();
-        } catch (Throwable e) {
-        }
-
-        return item;
-    }
-
 }

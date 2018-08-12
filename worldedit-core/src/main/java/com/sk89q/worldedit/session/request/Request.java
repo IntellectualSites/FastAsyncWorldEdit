@@ -21,8 +21,8 @@ package com.sk89q.worldedit.session.request;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
-
 import javax.annotation.Nullable;
 
 /**
@@ -32,9 +32,18 @@ public final class Request {
 
     private static final ThreadLocal<Request> threadLocal = ThreadLocal.withInitial(Request::new);
 
-    private @Nullable World world;
-    private @Nullable LocalSession session;
-    private @Nullable EditSession editSession;
+    private
+    @Nullable
+    World world;
+    private
+    @Nullable
+    LocalSession session;
+    private
+    @Nullable
+    EditSession editSession;
+    private
+    @Nullable
+    Extent extent;
 
     private Request() {
     }
@@ -44,7 +53,9 @@ public final class Request {
      *
      * @return the world, which may be null
      */
-    public @Nullable World getWorld() {
+    public
+    @Nullable
+    World getWorld() {
         return world;
     }
 
@@ -57,12 +68,27 @@ public final class Request {
         this.world = world;
     }
 
+    public void setExtent(@Nullable Extent extent) {
+        this.extent = extent;
+    }
+
+    public
+    @Nullable
+    Extent getExtent() {
+        if (extent != null) return extent;
+        if (editSession != null) return editSession;
+        if (world != null) return world;
+        return null;
+    }
+
     /**
      * Get the request session.
      *
      * @return the session, which may be null
      */
-    public @Nullable LocalSession getSession() {
+    public
+    @Nullable
+    LocalSession getSession() {
         return session;
     }
 
@@ -80,7 +106,9 @@ public final class Request {
      *
      * @return the edit session, which may be null
      */
-    public @Nullable EditSession getEditSession() {
+    public
+    @Nullable
+    EditSession getEditSession() {
         return editSession;
     }
 
@@ -107,5 +135,9 @@ public final class Request {
      */
     public static void reset() {
         threadLocal.remove();
+    }
+
+    public static Class<?> inject() {
+        return Request.class;
     }
 }

@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.worldedit.blocks.BlockMaterial;
+
 class SimpleBlockMaterial implements BlockMaterial {
 
     private boolean fullCube;
@@ -39,6 +41,26 @@ class SimpleBlockMaterial implements BlockMaterial {
     private boolean replacedDuringPlacement;
     private boolean isTranslucent;
     private boolean hasContainer;
+    private int lightOpacity;
+    private boolean isAir;
+
+    @Override
+    public boolean isAir() {
+        return isAir;
+    }
+
+    public void setAir(boolean air) {
+        isAir = air;
+    }
+
+    @Override
+    public int getLightOpacity() {
+        return lightOpacity;
+    }
+
+    public void setLightOpacity(int lightOpacity) {
+        this.lightOpacity = lightOpacity;
+    }
 
     @Override
     public boolean isFullCube() {

@@ -19,16 +19,19 @@
 
 package com.sk89q.worldedit.function.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.world.block.BlockTypes;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Makes a layer of grass on top, three layers of dirt below, and smooth stone
@@ -49,11 +52,7 @@ public class Naturalizer implements LayerFunction {
     public Naturalizer(EditSession editSession) {
         checkNotNull(editSession);
         this.editSession = editSession;
-        this.mask = new BlockMask(editSession, Sets.newHashSet(
-                BlockTypes.GRASS_BLOCK.getDefaultState(),
-                BlockTypes.DIRT.getDefaultState(),
-                BlockTypes.STONE.getDefaultState()
-        ));
+        this.mask = new BlockTypeMask(editSession, BlockTypes.GRASS, BlockTypes.DIRT, BlockTypes.STONE);
     }
 
     /**
@@ -76,15 +75,15 @@ public class Naturalizer implements LayerFunction {
             affected++;
             switch (depth) {
                 case 0:
-                    editSession.setBlock(position, BlockTypes.GRASS_BLOCK.getDefaultState());
+                    editSession.setBlock(position, BlockTypes.GRASS);
                     break;
                 case 1:
                 case 2:
                 case 3:
-                    editSession.setBlock(position, BlockTypes.DIRT.getDefaultState());
+                    editSession.setBlock(position, BlockTypes.DIRT);
                     break;
                 default:
-                    editSession.setBlock(position, BlockTypes.STONE.getDefaultState());
+                    editSession.setBlock(position, BlockTypes.STONE);
             }
         }
 

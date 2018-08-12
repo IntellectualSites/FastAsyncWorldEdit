@@ -19,16 +19,12 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
-
-import javax.annotation.Nullable;
 
 /**
  * Represents a physical shape.
@@ -40,14 +36,14 @@ public interface Region extends Iterable<BlockVector>, Cloneable {
      *
      * @return min. point
      */
-    Vector getMinimumPoint();
+    public Vector getMinimumPoint();
 
     /**
      * Get the upper point of a region.
      *
      * @return max. point
      */
-    Vector getMaximumPoint();
+    public Vector getMaximumPoint();
 
     /**
      * Get the center point of a region.
@@ -56,35 +52,35 @@ public interface Region extends Iterable<BlockVector>, Cloneable {
      *
      * @return center point
      */
-    Vector getCenter();
+    public Vector getCenter();
 
     /**
      * Get the number of blocks in the region.
      *
      * @return number of blocks
      */
-    int getArea();
+    public int getArea();
 
     /**
      * Get X-size.
      *
      * @return width
      */
-    int getWidth();
+    public int getWidth();
 
     /**
      * Get Y-size.
      *
      * @return height
      */
-    int getHeight();
+    public int getHeight();
 
     /**
      * Get Z-size.
      *
      * @return length
      */
-    int getLength();
+    public int getLength();
 
     /**
      * Expand the region.
@@ -92,7 +88,7 @@ public interface Region extends Iterable<BlockVector>, Cloneable {
      * @param changes array/arguments with multiple related changes
      * @throws RegionOperationException
      */
-    void expand(Vector... changes) throws RegionOperationException;
+    public void expand(Vector... changes) throws RegionOperationException;
 
     /**
      * Contract the region.
@@ -100,7 +96,7 @@ public interface Region extends Iterable<BlockVector>, Cloneable {
      * @param changes array/arguments with multiple related changes
      * @throws RegionOperationException
      */
-    void contract(Vector... changes) throws RegionOperationException;
+    public void contract(Vector... changes) throws RegionOperationException;
 
     /**
      * Shift the region.
@@ -108,7 +104,7 @@ public interface Region extends Iterable<BlockVector>, Cloneable {
      * @param change the change
      * @throws RegionOperationException
      */
-    void shift(Vector change) throws RegionOperationException;
+    public void shift(Vector change) throws RegionOperationException;
 
     /**
      * Returns true based on whether the region contains the point.
@@ -116,42 +112,57 @@ public interface Region extends Iterable<BlockVector>, Cloneable {
      * @param position the position
      * @return true if contained
      */
-    boolean contains(Vector position);
+    public boolean contains(Vector position);
+
+    default boolean contains(int x, int y, int z) {
+        return contains(MutableBlockVector.get(x, y, z));
+    }
+
+    default boolean contains(int x, int z) {
+        return contains(MutableBlockVector.get(x, 0, z));
+    }
+
+    default boolean isGlobal() {
+        Vector pos1 = getMinimumPoint();
+        Vector pos2 = getMaximumPoint();
+        return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2.getBlockZ() == Integer.MAX_VALUE && pos1.getBlockY() <= 0 && pos2.getBlockY() >= 255;
+    }
 
     /**
      * Get a list of chunks.
      *
      * @return a list of chunk coordinates
      */
-    Set<Vector2D> getChunks();
+    public Set<Vector2D> getChunks();
 
     /**
      * Return a list of 16*16*16 chunks in a region
      *
      * @return the chunk cubes this region overlaps with
      */
-    Set<Vector> getChunkCubes();
+    public Set<Vector> getChunkCubes();
 
     /**
      * Sets the world that the selection is in.
      *
      * @return the world, or null
      */
-    @Nullable World getWorld();
+    @Nullable
+    public World getWorld();
 
     /**
      * Sets the world that the selection is in.
      *
      * @param world the world, which may be null
      */
-    void setWorld(@Nullable World world);
+    public void setWorld(@Nullable World world);
 
     /**
      * Make a clone of the region.
      *
      * @return a cloned version
      */
-    Region clone();
+    public Region clone();
 
     /**
      * Polygonizes a cross-section or a 2D projection of the region orthogonal to the Y axis.
@@ -159,5 +170,5 @@ public interface Region extends Iterable<BlockVector>, Cloneable {
      * @param maxPoints maximum number of points to generate. -1 for no limit.
      * @return the points.
      */
-    List<BlockVector2D> polygonize(int maxPoints);
+    public List<BlockVector2D> polygonize(int maxPoints);
 }

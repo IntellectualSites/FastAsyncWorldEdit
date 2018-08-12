@@ -19,11 +19,10 @@
 
 package com.sk89q.worldedit.extent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.history.change.BlockChange;
@@ -32,12 +31,13 @@ import com.sk89q.worldedit.history.change.EntityRemove;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores changes to a {@link ChangeSet}.
@@ -60,7 +60,7 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
-        BaseBlock previous = getFullBlock(location);
+        BlockStateHolder previous = getBlock(location);
         changeSet.add(new BlockChange(location.toBlockVector(), previous, block));
         return super.setBlock(location, block);
     }

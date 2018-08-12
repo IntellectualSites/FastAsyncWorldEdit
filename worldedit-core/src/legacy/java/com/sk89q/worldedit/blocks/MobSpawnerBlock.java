@@ -25,8 +25,8 @@ import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
 import java.util.HashMap;
@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * A mob spawner block.
  */
-public class MobSpawnerBlock extends BaseBlock implements TileEntityBlock {
+public class MobSpawnerBlock extends BaseBlock {
 
     private String mobType;
     private short delay;
@@ -118,7 +118,7 @@ public class MobSpawnerBlock extends BaseBlock implements TileEntityBlock {
 
     @Override
     public CompoundTag getNbtData() {
-        Map<String, Tag> values = new HashMap<>();
+        Map<String, Tag> values = new HashMap<String, Tag>();
         values.put("EntityId", new StringTag(mobType));
         values.put("Delay", new ShortTag(delay));
         values.put("SpawnCount", new ShortTag(spawnCount));

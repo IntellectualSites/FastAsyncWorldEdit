@@ -53,6 +53,9 @@ public class SimpleFor extends Node {
             if (iterations > 256) {
                 throw new EvaluationException(getPosition(), "Loop exceeded 256 iterations.");
             }
+            if(Thread.currentThread().isInterrupted()){
+                throw new EvaluationException(this.getPosition(), "Thread has been interrupted.");
+            }
             ++iterations;
 
             try {
@@ -98,4 +101,7 @@ public class SimpleFor extends Node {
         return this;
     }
 
+    public static Class<SimpleFor> inject() {
+        return SimpleFor.class;
+    }
 }

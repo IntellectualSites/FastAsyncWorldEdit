@@ -1,24 +1,6 @@
-/*
- * WorldEdit, a Minecraft world manipulation toolkit
- * Copyright (C) sk89q <http://www.sk89q.com>
- * Copyright (C) WorldEdit team and contributors
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.sk89q.jnbt;
 
+import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +12,6 @@ import java.util.Map;
 public final class CompoundTag extends Tag {
 
     private final Map<String, Tag> value;
-
     /**
      * Creates the tag with an empty name.
      *
@@ -38,7 +19,16 @@ public final class CompoundTag extends Tag {
      */
     public CompoundTag(Map<String, Tag> value) {
         super();
-        this.value = Collections.unmodifiableMap(value);
+        this.value = value;
+    }
+
+    @Override
+    public Map<String, Object> getRaw() {
+        HashMap<String, Object> raw = new HashMap<>();
+        for (Map.Entry<String, Tag> entry : value.entrySet()) {
+            raw.put(entry.getKey(), entry.getValue().getRaw());
+        }
+        return raw;
     }
 
     /**
@@ -72,7 +62,7 @@ public final class CompoundTag extends Tag {
      * @return the builder
      */
     public CompoundTagBuilder createBuilder() {
-        return new CompoundTagBuilder(new HashMap<>(value));
+        return new CompoundTagBuilder(new HashMap<String, Tag>(value));
     }
 
     /**
@@ -435,4 +425,7 @@ public final class CompoundTag extends Tag {
         return bldr.toString();
     }
 
+    public static Class<?> inject() {
+        return CompoundTag.class;
+    }
 }

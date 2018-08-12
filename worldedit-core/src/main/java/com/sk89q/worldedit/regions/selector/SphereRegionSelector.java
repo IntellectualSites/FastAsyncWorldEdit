@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
-
 import javax.annotation.Nullable;
 
 /**
@@ -86,11 +86,7 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, Vector pos) {
-        if (isDefined()) {
-            player.print("Radius set to " + region.getRadius().getX() + " (" + region.getArea() + ").");
-        } else {
-            player.print("Radius set to " + region.getRadius().getX() + ".");
-        }
+        BBC.SELECTOR_RADIUS.send(player, region.getRadius().getX(), region.getArea());
 
         session.describeCUI(player);
     }
@@ -100,4 +96,7 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
         return "sphere";
     }
 
+    public static Class<?> inject() {
+        return SphereRegionSelector.class;
+    }
 }

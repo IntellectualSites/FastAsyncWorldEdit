@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit;
 
+import java.io.IOException;
+
 /**
  * Extension of {@code Vector} that that compares with other instances
  * using integer components.
@@ -37,7 +39,7 @@ public class BlockVector extends Vector {
      * @param position the other position
      */
     public BlockVector(Vector position) {
-        super(position);
+        this(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
     /**
@@ -59,7 +61,7 @@ public class BlockVector extends Vector {
      * @param z the Z coordinate
      */
     public BlockVector(float x, float y, float z) {
-        super(x, y, z);
+        this((int) x, (int) y, (int) z);
     }
 
     /**
@@ -70,12 +72,7 @@ public class BlockVector extends Vector {
      * @param z the Z coordinate
      */
     public BlockVector(double x, double y, double z) {
-        super(x, y, z);
-    }
-
-    @Override
-    public int hashCode() {
-        return ((int) x ^ ((int) z << 12)) ^ ((int) y << 24);
+        this((int) x, (int) y, (int) z);
     }
 
     @Override
@@ -84,9 +81,31 @@ public class BlockVector extends Vector {
             return false;
         }
         Vector other = (Vector) obj;
-        return (int) other.getX() == (int) this.x && (int) other.getY() == (int) this.y
-                && (int) other.getZ() == (int) this.z;
+        return (int) other.getX() == (int) this.getX() && (int) other.getY() == (int) this.getY()
+                && (int) other.getZ() == (int) this.getZ();
 
+    }
+
+    public boolean equals(BlockVector obj) {
+        return obj.getBlockX() == this.getBlockX() && obj.getBlockY() == this.getBlockY() && obj.getBlockZ() == this.getBlockZ();
+    }
+
+    @Override
+    public int hashCode() {
+        return ((int) getX() ^ ((int) getZ() << 16)) ^ ((int) getY() << 30);
+    }
+
+    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
+        if (!(this instanceof MutableBlockVector)) {
+            stream.writeInt(getBlockX());
+            stream.writeInt(getBlockY());
+            stream.writeInt(getBlockZ());
+        }
+    }
+
+    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        if (this instanceof MutableBlockVector) return;
+        this.setComponents(stream.readInt(), stream.readInt(), stream.readInt());
     }
 
     @Override
@@ -94,4 +113,8 @@ public class BlockVector extends Vector {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "(" + getBlockX() + ", " + getBlockY() + ", " + getBlockZ() + ")";
+    }
 }

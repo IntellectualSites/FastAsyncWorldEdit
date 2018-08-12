@@ -19,10 +19,13 @@
 
 package com.sk89q.worldedit.function.entity;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.boydti.fawe.util.ReflectionUtils;
+import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.CompoundTagBuilder;
+import com.sk89q.jnbt.FloatTag;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -34,6 +37,11 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
 import com.sk89q.worldedit.util.Location;
+import java.util.Arrays;
+import java.util.Map;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Copies entities provided to the function to the provided destination
@@ -50,10 +58,10 @@ public class ExtentEntityCopy implements EntityFunction {
     /**
      * Create a new instance.
      *
-     * @param from the from position
+     * @param from        the from position
      * @param destination the destination {@code Extent}
-     * @param to the destination position
-     * @param transform the transformation to apply to both position and orientation
+     * @param to          the destination position
+     * @param transform   the transformation to apply to both position and orientation
      */
     public ExtentEntityCopy(Vector from, Extent destination, Vector to, Transform transform) {
         checkNotNull(from);
@@ -94,19 +102,19 @@ public class ExtentEntityCopy implements EntityFunction {
             Vector pivot = from.round().add(0.5, 0.5, 0.5);
             Vector newPosition = transform.apply(location.toVector().subtract(pivot));
             Vector newDirection;
-
-            newDirection = transform.isIdentity() ?
-                    entity.getLocation().getDirection()
-                    : transform.apply(location.getDirection()).subtract(transform.apply(Vector.ZERO)).normalize();
-            newLocation = new Location(destination, newPosition.add(to.round().add(0.5, 0.5, 0.5)), newDirection);
-
-            // Some entities store their position data in NBT
-            state = transformNbtData(state);
+            if (transform.isIdentity()) {
+                newDirection = entity.getLocation().getDirection();
+                newLocation = new Location(destination, newPosition.add(to.round().add(0.5, 0.5, 0.5)), newDirection);
+            } else {
+                newDirection = new Vector(transform.apply(location.getDirection())).subtract(transform.apply(Vector.ZERO)).normalize();
+                newLocation = new Location(destination, newPosition.add(to.round().add(0.5, 0.5, 0.5)), newDirection);
+                state = transformNbtData(state);
+            }
 
             boolean success = destination.createEntity(newLocation, state) != null;
 
             // Remove
-            if (isRemoving() && success) {
+            if (isRemoving()) {
                 entity.remove();
             }
 
@@ -125,22 +133,27 @@ public class ExtentEntityCopy implements EntityFunction {
      */
     private BaseEntity transformNbtData(BaseEntity state) {
         CompoundTag tag = state.getNbtData();
-
         if (tag != null) {
+            boolean changed = false;
             // Handle hanging entities (paintings, item frames, etc.)
+
+            tag = tag.createBuilder().build();
+
+            Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+
             boolean hasTilePosition = tag.containsKey("TileX") && tag.containsKey("TileY") && tag.containsKey("TileZ");
             boolean hasDirection = tag.containsKey("Direction");
             boolean hasLegacyDirection = tag.containsKey("Dir");
             boolean hasFacing = tag.containsKey("Facing");
 
             if (hasTilePosition) {
+                changed = true;
                 Vector tilePosition = new Vector(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
                 Vector newTilePosition = transform.apply(tilePosition.subtract(from)).add(to);
 
-                CompoundTagBuilder builder = tag.createBuilder()
-                        .putInt("TileX", newTilePosition.getBlockX())
-                        .putInt("TileY", newTilePosition.getBlockY())
-                        .putInt("TileZ", newTilePosition.getBlockZ());
+                values.put("TileX", new IntTag(newTilePosition.getBlockX()));
+                values.put("TileY", new IntTag(newTilePosition.getBlockY()));
+                values.put("TileZ", new IntTag(newTilePosition.getBlockZ()));
 
                 if (hasDirection || hasLegacyDirection || hasFacing) {
                     int d;
@@ -160,18 +173,38 @@ public class ExtentEntityCopy implements EntityFunction {
 
                         if (newDirection != null) {
                             byte hangingByte = (byte) MCDirections.toHanging(newDirection);
-                            builder.putByte("Direction", hangingByte);
-                            builder.putByte("Facing", hangingByte);
-                            builder.putByte("Dir", MCDirections.toLegacyHanging(MCDirections.toHanging(newDirection)));
+                            values.put("Direction", new ByteTag(hangingByte));
+                            values.put("Facing", new ByteTag(hangingByte));
+                            values.put("Dir", new ByteTag(MCDirections.toLegacyHanging(MCDirections.toHanging(newDirection))));
                         }
                     }
                 }
+            }
 
-                return new BaseEntity(state.getType(), builder.build());
+            ListTag rotation = tag.getListTag("Rotation");
+            if (rotation != null && rotation.getValue().size() >= 2) {
+                changed = true;
+                double yaw = Math.toRadians(rotation.getFloat(0));
+                double pitch = Math.toRadians(rotation.getFloat(1));
+
+                double xz = Math.cos(pitch);
+                Vector direction = new Vector(-xz * Math.sin(yaw), -Math.sin(pitch), xz * Math.cos(yaw));
+                direction = transform.apply(direction);
+                FloatTag yawTag = new FloatTag(direction.toYaw());
+                FloatTag pitchTag = new FloatTag(direction.toPitch());
+                values.put("Rotation", new ListTag(FloatTag.class, Arrays.asList(yawTag, pitchTag)));
+            }
+
+            if (changed) {
+                return new BaseEntity(state.getType(), tag);
             }
         }
 
         return state;
+    }
+
+    public static Class<?> inject() {
+        return ExtentEntityCopy.class;
     }
 
 }

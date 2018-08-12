@@ -19,10 +19,10 @@
 
 package com.sk89q.jnbt;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helps create compound tags.
@@ -34,8 +34,8 @@ public class CompoundTagBuilder {
     /**
      * Create a new instance.
      */
-    CompoundTagBuilder() {
-        this.entries = new HashMap<>();
+    public CompoundTagBuilder() {
+        this.entries = new HashMap<String, Tag>();
     }
 
     /**
@@ -43,7 +43,7 @@ public class CompoundTagBuilder {
      *
      * @param value the value
      */
-    CompoundTagBuilder(Map<String, Tag> value) {
+    public CompoundTagBuilder(Map<String, Tag> value) {
         checkNotNull(value);
         this.entries = value;
     }
@@ -135,18 +135,6 @@ public class CompoundTagBuilder {
 
     /**
      * Put the given key and value into the compound tag as a
-     * {@code LongArrayTag}.
-     *
-     * @param key they key
-     * @param value the value
-     * @return this object
-     */
-    public CompoundTagBuilder putLongArray(String key, long[] value) {
-        return put(key, new LongArrayTag(value));
-    }
-
-    /**
-     * Put the given key and value into the compound tag as a
      * {@code LongTag}.
      *
      * @param key they key
@@ -201,7 +189,7 @@ public class CompoundTagBuilder {
      * @return the new compound tag
      */
     public CompoundTag build() {
-        return new CompoundTag(new HashMap<>(entries));
+        return new CompoundTag(new HashMap<String, Tag>(entries));
     }
 
     /**
@@ -213,4 +201,7 @@ public class CompoundTagBuilder {
         return new CompoundTagBuilder();
     }
 
+    public static Class<?> inject() {
+        return CompoundTagBuilder.class;
+    }
 }

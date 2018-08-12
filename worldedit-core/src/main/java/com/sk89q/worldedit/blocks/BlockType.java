@@ -19,8 +19,16 @@
 
 package com.sk89q.worldedit.blocks;
 
-import com.sk89q.worldedit.PlayerDirection;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.PlayerDirection;
+import com.sk89q.worldedit.registry.state.PropertyGroup;
+import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
+import jdk.nashorn.internal.ir.Block;
+
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,129 +38,111 @@ import java.util.Map;
  * {@deprecated Please use {@link com.sk89q.worldedit.world.block.BlockType }}
  */
 @Deprecated
-public enum BlockType {
+public class BlockType {
 
-    ;
-
-    private static final Map<Integer, PlayerDirection> dataAttachments = new HashMap<>();
-    private static final Map<Integer, PlayerDirection> nonDataAttachments = new HashMap<>();
-    static {
-        nonDataAttachments.put(BlockID.SAPLING, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.LONG_GRASS, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.DEAD_BUSH, PlayerDirection.DOWN);
-        for (int offset = 0; offset < 16; offset += 8) {
-            dataAttachments.put(typeDataKey(BlockID.PISTON_EXTENSION, offset + 0), PlayerDirection.UP);
-            dataAttachments.put(typeDataKey(BlockID.PISTON_EXTENSION, offset + 1), PlayerDirection.DOWN);
-            addCardinals(BlockID.PISTON_EXTENSION, offset + 2, offset + 5, offset + 3, offset + 4);
-        }
-        nonDataAttachments.put(BlockID.YELLOW_FLOWER, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.RED_FLOWER, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.BROWN_MUSHROOM, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.RED_MUSHROOM, PlayerDirection.DOWN);
-        for (int blockId : new int[] { BlockID.TORCH, BlockID.REDSTONE_TORCH_ON, BlockID.REDSTONE_TORCH_OFF }) {
-            dataAttachments.put(typeDataKey(blockId, 0), PlayerDirection.DOWN);
-            dataAttachments.put(typeDataKey(blockId, 5), PlayerDirection.DOWN); // According to the minecraft wiki, this one is history. Keeping both, for now...
-            addCardinals(blockId, 4, 1, 3, 2);
-        }
-        nonDataAttachments.put(BlockID.REDSTONE_WIRE, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.CROPS, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.SIGN_POST, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.WOODEN_DOOR, PlayerDirection.DOWN);
-        addCardinals(BlockID.LADDER, 2, 5, 3, 4);
-        addCardinals(BlockID.WALL_SIGN, 2, 5, 3, 4);
-        for (int offset = 0; offset < 16; offset += 8) {
-            addCardinals(BlockID.LEVER, offset + 4, offset + 1, offset + 3, offset + 2);
-            dataAttachments.put(typeDataKey(BlockID.LEVER, offset + 5), PlayerDirection.DOWN);
-            dataAttachments.put(typeDataKey(BlockID.LEVER, offset + 6), PlayerDirection.DOWN);
-            dataAttachments.put(typeDataKey(BlockID.LEVER, offset + 7), PlayerDirection.UP);
-            dataAttachments.put(typeDataKey(BlockID.LEVER, offset + 0), PlayerDirection.UP);
-        }
-        nonDataAttachments.put(BlockID.STONE_PRESSURE_PLATE, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.IRON_DOOR, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.WOODEN_PRESSURE_PLATE, PlayerDirection.DOWN);
-        // redstone torches: see torches
-        for (int offset = 0; offset < 16; offset += 8) {
-            addCardinals(BlockID.STONE_BUTTON, offset + 4, offset + 1, offset + 3, offset + 2);
-            addCardinals(BlockID.WOODEN_BUTTON, offset + 4, offset + 1, offset + 3, offset + 2);
-        }
-        dataAttachments.put(typeDataKey(BlockID.STONE_BUTTON, 0), PlayerDirection.UP);
-        dataAttachments.put(typeDataKey(BlockID.STONE_BUTTON, 5), PlayerDirection.DOWN);
-        dataAttachments.put(typeDataKey(BlockID.WOODEN_BUTTON, 0), PlayerDirection.UP);
-        dataAttachments.put(typeDataKey(BlockID.WOODEN_BUTTON, 5), PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.CACTUS, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.REED, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.CAKE_BLOCK, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.REDSTONE_REPEATER_OFF, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.REDSTONE_REPEATER_ON, PlayerDirection.DOWN);
-        for (int offset = 0; offset < 16; offset += 4) {
-            addCardinals(BlockID.TRAP_DOOR, offset + 0, offset + 3, offset + 1, offset + 2);
-            addCardinals(BlockID.IRON_TRAP_DOOR, offset + 0, offset + 3, offset + 1, offset + 2);
-        }
-        nonDataAttachments.put(BlockID.PUMPKIN_STEM, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.MELON_STEM, PlayerDirection.DOWN);
-        // vines are complicated, but I'll list the single-attachment variants anyway
-        dataAttachments.put(typeDataKey(BlockID.VINE, 0), PlayerDirection.UP);
-        addCardinals(BlockID.VINE, 1, 2, 4, 8);
-        nonDataAttachments.put(BlockID.NETHER_WART, PlayerDirection.DOWN);
-        for (int offset = 0; offset < 16; offset += 4) {
-            addCardinals(BlockID.COCOA_PLANT, offset + 0, offset + 1, offset + 2, offset + 3);
-        }
-        for (int offset = 0; offset < 16; offset += 4) {
-            addCardinals(BlockID.TRIPWIRE_HOOK, offset + 2, offset + 3, offset + 0, offset + 1);
-        }
-        nonDataAttachments.put(BlockID.TRIPWIRE, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.FLOWER_POT, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.CARROTS, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.POTATOES, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.ANVIL, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.PRESSURE_PLATE_LIGHT, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.PRESSURE_PLATE_HEAVY, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.COMPARATOR_OFF, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.COMPARATOR_ON, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.CARPET, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.DOUBLE_PLANT, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.STANDING_BANNER, PlayerDirection.DOWN);
-        addCardinals(BlockID.WALL_BANNER, 4, 2, 5, 3);
-        nonDataAttachments.put(BlockID.SPRUCE_DOOR, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.BIRCH_DOOR, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.JUNGLE_DOOR, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.ACACIA_DOOR, PlayerDirection.DOWN);
-        nonDataAttachments.put(BlockID.DARK_OAK_DOOR, PlayerDirection.DOWN);
-
-        // Rails are hardcoded to be attached to the block below them.
-        // In addition to that, let's attach ascending rails to the block they're ascending towards.
-        for (int offset = 0; offset < 16; offset += 8) {
-            addCardinals(BlockID.POWERED_RAIL, offset + 3, offset + 4, offset + 2, offset + 5);
-            addCardinals(BlockID.DETECTOR_RAIL, offset + 3, offset + 4, offset + 2, offset + 5);
-            addCardinals(BlockID.MINECART_TRACKS, offset + 3, offset + 4, offset + 2, offset + 5);
-            addCardinals(BlockID.ACTIVATOR_RAIL, offset + 3, offset + 4, offset + 2, offset + 5);
-        }
+    public static double centralTopLimit(com.sk89q.worldedit.world.block.BlockType type) {
+        checkNotNull(type);
+        return centralTopLimit(type.getDefaultState());
     }
 
     /**
-     * Returns the direction to the block(B) this block(A) is attached to.
-     * Attached means that if block B is destroyed, block A will pop off.
+     * TODO FIXME use registry
+     * Returns the y offset a player falls to when falling onto the top of a block at xp+0.5/zp+0.5.
      *
-     * @param type the block id of block A
-     * @param data the data value of block A
-     * @return direction to block B
+     * @param block the block
+     * @return the y offset
      */
-    public static PlayerDirection getAttachment(int type, int data) {
-        PlayerDirection direction = nonDataAttachments.get(type);
-        if (direction != null) return direction;
-
-        return dataAttachments.get(typeDataKey(type, data));
+    public static double centralTopLimit(BlockStateHolder block) {
+        checkNotNull(block);
+        switch (block.getBlockType().getTypeEnum()) {
+            case BLACK_BED:
+            case BLUE_BED:
+            case BROWN_BED:
+            case CYAN_BED:
+            case GRAY_BED:
+            case GREEN_BED:
+            case LIGHT_BLUE_BED:
+            case LIGHT_GRAY_BED:
+            case LIME_BED:
+            case MAGENTA_BED:
+            case ORANGE_BED:
+            case PINK_BED:
+            case PURPLE_BED:
+            case RED_BED:
+            case WHITE_BED:
+            case YELLOW_BED: return 0.5625;
+            case BREWING_STAND: return 0.875;
+            case CAKE: return (block.getState(PropertyKey.BITES) == (Integer) 6) ? 0 : 0.4375;
+            case CAULDRON: return 0.3125;
+            case COCOA: return 0.750;
+            case ENCHANTING_TABLE: return 0.75;
+            case END_PORTAL_FRAME: return block.getState(PropertyKey.EYE) == Boolean.TRUE ? 1 : 0.8125;
+            case CREEPER_HEAD:
+            case DRAGON_HEAD:
+            case PISTON_HEAD:
+            case PLAYER_HEAD:
+            case ZOMBIE_HEAD: return 0.5;
+            case CREEPER_WALL_HEAD:
+            case DRAGON_WALL_HEAD:
+            case PLAYER_WALL_HEAD:
+            case ZOMBIE_WALL_HEAD: return 0.75;
+            case ACACIA_FENCE:
+            case BIRCH_FENCE:
+            case DARK_OAK_FENCE:
+            case JUNGLE_FENCE:
+            case NETHER_BRICK_FENCE:
+            case OAK_FENCE:
+            case SPRUCE_FENCE: return 1.5;
+            case ACACIA_SLAB:
+            case BIRCH_SLAB:
+            case BRICK_SLAB:
+            case COBBLESTONE_SLAB:
+            case DARK_OAK_SLAB:
+            case DARK_PRISMARINE_SLAB:
+            case JUNGLE_SLAB:
+            case NETHER_BRICK_SLAB:
+            case OAK_SLAB:
+            case PETRIFIED_OAK_SLAB:
+            case PRISMARINE_BRICK_SLAB:
+            case PRISMARINE_SLAB:
+            case PURPUR_SLAB:
+            case QUARTZ_SLAB:
+            case RED_SANDSTONE_SLAB:
+            case SANDSTONE_SLAB:
+            case SPRUCE_SLAB:
+            case STONE_BRICK_SLAB:
+            case STONE_SLAB: return 0.5;
+            case LILY_PAD: return 0.015625;
+            case REPEATER: return 0.125;
+            case SOUL_SAND: return 0.875;
+            case COBBLESTONE_WALL:
+            case MOSSY_COBBLESTONE_WALL: return 1.5;
+            case FLOWER_POT: return 0.375;
+            case COMPARATOR: return 0.125;
+            case DAYLIGHT_DETECTOR: return 0.375;
+            case HOPPER: return 0.625;
+            case ACACIA_TRAPDOOR:
+            case BIRCH_TRAPDOOR:
+            case DARK_OAK_TRAPDOOR:
+            case IRON_TRAPDOOR:
+            case JUNGLE_TRAPDOOR:
+            case OAK_TRAPDOOR:
+            case SPRUCE_TRAPDOOR:
+                if (block.getState(PropertyKey.OPEN) == Boolean.TRUE) {
+                    return 0;
+                } else if ("top".equals(block.getState(PropertyKey.HALF))) {
+                    return 1;
+                } else {
+                    return 0.1875;
+                }
+            case ACACIA_FENCE_GATE:
+            case BIRCH_FENCE_GATE:
+            case DARK_OAK_FENCE_GATE:
+            case JUNGLE_FENCE_GATE:
+            case OAK_FENCE_GATE:
+            case SPRUCE_FENCE_GATE: return block.getState(PropertyKey.OPEN) == Boolean.TRUE ? 0 : 1.5;
+            default:
+                return PropertyGroup.LEVEL.get(block);
+        }
     }
-
-    private static int typeDataKey(int type, int data) {
-        return (type << 4) | (data & 0xf);
-    }
-
-    private static void addCardinals(int type, int west, int north, int east, int south) {
-        dataAttachments.put(typeDataKey(type, west), PlayerDirection.WEST);
-        dataAttachments.put(typeDataKey(type, north), PlayerDirection.NORTH);
-        dataAttachments.put(typeDataKey(type, east), PlayerDirection.EAST);
-        dataAttachments.put(typeDataKey(type, south), PlayerDirection.SOUTH);
-    }
-
 }

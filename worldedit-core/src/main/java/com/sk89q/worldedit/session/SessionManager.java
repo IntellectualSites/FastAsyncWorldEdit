@@ -19,10 +19,7 @@
 
 package com.sk89q.worldedit.session;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.boydti.fawe.object.collection.SoftHashMap;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -39,35 +36,41 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nullable;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Session manager for WorldEdit.
- *
+ * <p>
  * <p>Get a reference to one from {@link WorldEdit}.</p>
- *
+ * <p>
  * <p>While this class is thread-safe, the returned session may not be.</p>
  */
 public class SessionManager {
 
+    @Deprecated
     public static int EXPIRATION_GRACE = 600000;
-    private static final int FLUSH_PERIOD = 1000 * 30;
+
     private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5));
     private static final Logger log = Logger.getLogger(SessionManager.class.getCanonicalName());
     private final Timer timer = new Timer();
     private final WorldEdit worldEdit;
-    private final Map<UUID, SessionHolder> sessions = new HashMap<>();
+    private final Map<UUID, SessionHolder> sessions = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private final Map<UUID, Reference<SessionHolder>> softSessions = new SoftHashMap<>();
+
     private SessionStore store = new VoidStore();
+    private File path;
 
     /**
      * Create a new session manager.
@@ -79,7 +82,6 @@ public class SessionManager {
         this.worldEdit = worldEdit;
 
         worldEdit.getEventBus().register(this);
-        timer.schedule(new SessionTracker(), FLUSH_PERIOD, FLUSH_PERIOD);
     }
 
     /**
@@ -90,7 +92,7 @@ public class SessionManager {
      */
     public synchronized boolean contains(SessionOwner owner) {
         checkNotNull(owner);
-        return sessions.containsKey(getKey(owner));
+        return sessions.containsKey(getKey(owner)) || softSessions.containsKey(owner);
     }
 
     /**
@@ -108,7 +110,24 @@ public class SessionManager {
                 return holder.session;
             }
         }
-
+        Iterator<Map.Entry<UUID, Reference<SessionHolder>>> iter = softSessions.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<UUID, Reference<SessionHolder>> entry = iter.next();
+            UUID key = entry.getKey();
+            SessionHolder holder = entry.getValue().get();
+            if (holder == null) {
+                iter.remove();
+                continue;
+            }
+            String test = holder.key.getName();
+            if (test != null && name.equals(test)) {
+//                if (holder.key.isActive()) {
+                iter.remove();
+                sessions.put(key, holder);
+//                }
+                return holder.session;
+            }
+        }
         return null;
     }
 
@@ -122,12 +141,24 @@ public class SessionManager {
     @Nullable
     public synchronized LocalSession getIfPresent(SessionOwner owner) {
         checkNotNull(owner);
-        SessionHolder stored = sessions.get(getKey(owner));
+        UUID key = getKey(owner);
+        SessionHolder stored = sessions.get(key);
         if (stored != null) {
             return stored.session;
         } else {
-            return null;
+            Reference<SessionHolder> reference = softSessions.get(key);
+            if (reference != null) {
+                stored = reference.get();
+                if (stored != null) {
+//                if (stored.key.isActive()) {
+                    softSessions.remove(key);
+                    sessions.put(key, stored);
+//                }
+                    return stored.session;
+                }
+            }
         }
+        return null;
     }
 
     /**
@@ -148,7 +179,7 @@ public class SessionManager {
             try {
                 session = store.load(getKey(sessionKey));
                 session.postLoad();
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 log.log(Level.WARNING, "Failed to load saved session", e);
                 session = new LocalSession();
             }
@@ -156,10 +187,7 @@ public class SessionManager {
             session.setConfiguration(config);
             session.setBlockChangeLimit(config.defaultChangeLimit);
 
-            // Remember the session if the session is still active
-            if (sessionKey.isActive()) {
-                sessions.put(getKey(owner), new SessionHolder(sessionKey, session));
-            }
+            sessions.put(getKey(owner), new SessionHolder(sessionKey, session));
         }
 
         // Set the limit on the number of blocks that an operation can
@@ -193,41 +221,27 @@ public class SessionManager {
         return session;
     }
 
-    /**
-     * Save a map of sessions to disk.
-     *
-     * @param sessions a map of sessions to save
-     * @return a future that completes on save or error
-     */
-    private ListenableFuture<?> commit(final Map<SessionKey, LocalSession> sessions) {
-        checkNotNull(sessions);
-
-        if (sessions.isEmpty()) {
-            return Futures.immediateFuture(sessions);
-        }
-
-        return executorService.submit((Callable<Object>) () -> {
-            Exception exception = null;
-
-            for (Map.Entry<SessionKey, LocalSession> entry : sessions.entrySet()) {
-                SessionKey key = entry.getKey();
-
-                if (key.isPersistent()) {
-                    try {
-                        store.save(getKey(key), entry.getValue());
-                    } catch (IOException e) {
-                        log.log(Level.WARNING, "Failed to write session for UUID " + getKey(key), e);
-                        exception = e;
+    private void save(SessionHolder holder) {
+        SessionKey key = holder.key;
+        holder.session.setClipboard(null);
+        if (key.isPersistent()) {
+            try {
+                if (holder.session.compareAndResetDirty()) {
+                    if (holder.session.save()) {
+                        store.save(getKey(key), holder.session);
+                    } else if (path != null) {
+                        File file = new File(path, getKey(key) + ".json");
+                        if (file.exists()) {
+                            if (!file.delete()) {
+                                file.deleteOnExit();
+                            }
+                        }
                     }
                 }
+            } catch (IOException e) {
+                log.log(Level.WARNING, "Failed to write session for UUID " + getKey(key), e);
             }
-
-            if (exception != null) {
-                throw exception;
-            }
-
-            return sessions;
-        });
+        }
     }
 
     /**
@@ -263,13 +277,29 @@ public class SessionManager {
      */
     public synchronized void remove(SessionOwner owner) {
         checkNotNull(owner);
-        sessions.remove(getKey(owner));
+        SessionHolder session = sessions.remove(getKey(owner));
+        if (session != null) {
+            save(session);
+        }
+    }
+
+    public synchronized void forget(SessionOwner owner) {
+        checkNotNull(owner);
+        UUID key = getKey(owner);
+        SessionHolder holder = sessions.remove(key);
+        if (holder != null) {
+            softSessions.put(key, new SoftReference(holder));
+            save(holder);
+        }
     }
 
     /**
      * Remove all sessions.
      */
     public synchronized void clear() {
+        for (Map.Entry<UUID, SessionHolder> entry : sessions.entrySet()) {
+            save(entry.getValue());
+        }
         sessions.clear();
     }
 
@@ -278,6 +308,7 @@ public class SessionManager {
         LocalConfiguration config = event.getConfiguration();
         File dir = new File(config.getWorkingDirectory(), "sessions");
         store = new JsonFileSessionStore(dir);
+        this.path = dir;
     }
 
     /**
@@ -294,42 +325,9 @@ public class SessionManager {
         }
     }
 
-    /**
-     * Removes inactive sessions after they have been inactive for a period
-     * of time. Commits them as well.
-     */
-    private class SessionTracker extends TimerTask {
-        @Override
-        public void run() {
-            synchronized (SessionManager.this) {
-                long now = System.currentTimeMillis();
-                Iterator<SessionHolder> it = sessions.values().iterator();
-                Map<SessionKey, LocalSession> saveQueue = new HashMap<>();
-
-                while (it.hasNext()) {
-                    SessionHolder stored = it.next();
-                    if (stored.key.isActive()) {
-                        stored.lastActive = now;
-
-                        if (stored.session.compareAndResetDirty()) {
-                            saveQueue.put(stored.key, stored.session);
-                        }
-                    } else {
-                        if (now - stored.lastActive > EXPIRATION_GRACE) {
-                            if (stored.session.compareAndResetDirty()) {
-                                saveQueue.put(stored.key, stored.session);
-                            }
-
-                            it.remove();
-                        }
-                    }
-                }
-
-                if (!saveQueue.isEmpty()) {
-                    commit(saveQueue);
-                }
-            }
-        }
+    public static Class<?> inject() {
+        return SessionManager.class;
     }
+
 
 }

@@ -45,6 +45,10 @@ public interface Property<T> {
      */
     List<T> getValues();
 
+    default int getIndex(T value) {
+        return getValues().indexOf(value);
+    }
+
     /**
      * Gets the value for the given string, or null.
      *
@@ -54,4 +58,12 @@ public interface Property<T> {
      */
     @Nullable
     T getValueFor(String string) throws IllegalArgumentException;
+
+    default int getIndexFor(CharSequence string) throws IllegalArgumentException {
+        return getIndex(getValueFor(string.toString()));
+    }
+
+    default PropertyKey getKey() {
+        return PropertyKey.getOrCreate(getName());
+    }
 }

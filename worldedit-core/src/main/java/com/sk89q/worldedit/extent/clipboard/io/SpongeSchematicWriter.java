@@ -32,9 +32,11 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -128,7 +130,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 for (int x = 0; x < width; x++) {
                     int x0 = min.getBlockX() + x;
                     BlockVector point = new BlockVector(x0, y0, z0);
-                    BaseBlock block = clipboard.getFullBlock(point);
+                    BlockStateHolder block = clipboard.getFullBlock(point);
                     if (block.getNbtData() != null) {
                         Map<String, Tag> values = new HashMap<>();
                         for (Map.Entry<String, Tag> entry : block.getNbtData().getValue().entrySet()) {

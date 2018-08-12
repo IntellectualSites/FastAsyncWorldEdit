@@ -20,8 +20,10 @@
 package com.sk89q.worldedit.blocks;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
 
 import javax.annotation.Nullable;
 
@@ -57,13 +59,18 @@ public class BaseItem implements NbtValued {
         this.nbtData = tag;
     }
 
+    @Deprecated
+    public @Nullable Object getNativeItem() {
+        return null;
+    }
+
     /**
      * Get the type of item.
      *
      * @return the type
      */
-    public ItemType getType() {
-        return this.itemType;
+    public ItemTypes getType() {
+        return (ItemTypes) this.itemType;
     }
 
     /**

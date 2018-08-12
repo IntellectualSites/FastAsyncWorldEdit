@@ -1,29 +1,11 @@
-/*
- * WorldEdit, a Minecraft world manipulation toolkit
- * Copyright (C) sk89q <http://www.sk89q.com>
- * Copyright (C) WorldEdit team and contributors
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.sk89q.worldedit.function.mask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.sk89q.worldedit.MutableBlockVector;
 import com.sk89q.worldedit.Vector;
-
 import javax.annotation.Nullable;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Checks whether another mask tests true for a position that is offset
@@ -33,11 +15,12 @@ public class OffsetMask extends AbstractMask {
 
     private Mask mask;
     private Vector offset;
+    private MutableBlockVector mutable = new MutableBlockVector();
 
     /**
      * Create a new instance.
      *
-     * @param mask the mask
+     * @param mask   the mask
      * @param offset the offset
      */
     public OffsetMask(Mask mask, Vector offset) {
@@ -87,7 +70,10 @@ public class OffsetMask extends AbstractMask {
 
     @Override
     public boolean test(Vector vector) {
-        return getMask().test(vector.add(offset));
+        mutable.mutX((vector.getX() + offset.getX()));
+        mutable.mutY((vector.getY() + offset.getY()));
+        mutable.mutZ((vector.getZ() + offset.getZ()));
+        return getMask().test(mutable);
     }
 
     @Nullable
@@ -101,4 +87,7 @@ public class OffsetMask extends AbstractMask {
         }
     }
 
+    public static Class<?> inject() {
+        return OffsetMask.class;
+    }
 }

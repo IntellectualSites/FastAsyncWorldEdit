@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.regions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
@@ -34,13 +32,16 @@ import com.sk89q.worldedit.world.World;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Represents a cylindrical region.
  */
 public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
-    private Vector2D center;
-    private Vector2D radius;
+    private BlockVector2D center;
+    private BlockVector2D radius;
+    private Vector2D radiusInverse;
     private int minY;
     private int maxY;
     private boolean hasY = false;
@@ -104,7 +105,17 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public Vector getCenter() {
-        return center.toVector((maxY + minY) / 2);
+        return center.toVector((getMaximumY() + getMinimumY()) / 2);
+    }
+
+    /**
+     * Sets the main center point of the region
+     *
+     * @deprecated replaced by {@link #setCenter(Vector2D)}
+     */
+    @Deprecated
+    public void setCenter(Vector center) {
+        setCenter(center.toVector2D());
     }
 
     /**
@@ -113,7 +124,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      * @param center the center point
      */
     public void setCenter(Vector2D center) {
-        this.center = center;
+        this.center = new BlockVector2D(center);
     }
 
     /**
@@ -131,7 +142,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      * @param radius the radius along the X and Z axes
      */
     public void setRadius(Vector2D radius) {
-        this.radius = radius.add(0.5, 0.5);
+        this.radius = radius.add(0.5, 0.5).toBlockVector2D();
+        this.radiusInverse = Vector2D.ONE.divide(radius);
     }
 
     /**
@@ -165,21 +177,28 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public Vector getMinimumPoint() {
-        return center.subtract(getRadius()).toVector(minY);
+        return center.subtract(getRadius()).toVector(getMinimumY());
     }
 
     @Override
     public Vector getMaximumPoint() {
-        return center.add(getRadius()).toVector(maxY);
+        return center.add(getRadius()).toVector(getMaximumY());
     }
 
     @Override
     public int getMaximumY() {
+        int worldMax = world != null ? world.getMaxY() - 1 : 255;
+        if (maxY > worldMax) {
+            return maxY = worldMax;
+        }
         return maxY;
     }
 
     @Override
     public int getMinimumY() {
+        if (minY < 0) {
+            return minY = 0;
+        }
         return minY;
     }
 
@@ -195,7 +214,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public int getHeight() {
-        return maxY - minY + 1;
+        return getMaximumY() - getMinimumY() + 1;
     }
 
     @Override
@@ -234,8 +253,9 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      */
     @Override
     public void expand(Vector... changes) throws RegionOperationException {
-        center = center.add(calculateDiff2D(changes));
-        radius = radius.add(calculateChanges2D(changes));
+        center = center.add(calculateDiff2D(changes)).toBlockVector2D();
+        radius = radius.add(calculateChanges2D(changes)).toBlockVector2D();
+        this.radiusInverse = Vector2D.ONE.divide(radius);
         for (Vector change : changes) {
             int changeY = change.getBlockY();
             if (changeY > 0) {
@@ -254,9 +274,10 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      */
     @Override
     public void contract(Vector... changes) throws RegionOperationException {
-        center = center.subtract(calculateDiff2D(changes));
+        center = center.subtract(calculateDiff2D(changes)).toBlockVector2D();
         Vector2D newRadius = radius.subtract(calculateChanges2D(changes));
-        radius = Vector2D.getMaximum(new Vector2D(1.5, 1.5), newRadius);
+        radius = Vector2D.getMaximum(new Vector2D(1.5, 1.5), newRadius).toBlockVector2D();
+        this.radiusInverse = Vector2D.ONE.divide(radius);
         for (Vector change : changes) {
             int height = maxY - minY;
             int changeY = change.getBlockY();
@@ -270,7 +291,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public void shift(Vector change) throws RegionOperationException {
-        center = center.add(change.toVector2D());
+        center = center.add(change.toVector2D()).toBlockVector2D();
 
         int changeY = change.getBlockY();
         maxY += changeY;
@@ -282,12 +303,17 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      */
     @Override
     public boolean contains(Vector position) {
-        final int blockY = position.getBlockY();
-        if (blockY < minY || blockY > maxY) {
+        final int pt = position.getBlockY();
+        if (pt < getMinimumY() || pt > getMaximumY()) {
             return false;
         }
+        int px = position.getBlockX();
+        int pz = position.getBlockZ();
 
-        return position.toVector2D().subtract(center).divide(radius).lengthSq() <= 1;
+        double dx = Math.abs(px - center.getBlockX()) * radiusInverse.getX();
+        double dz = Math.abs(pz - center.getBlockZ()) * radiusInverse.getZ();
+
+        return dx * dx + dz * dz <= 1;
     }
 
 
@@ -321,7 +347,12 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public Iterable<Vector2D> asFlatRegion() {
-        return () -> new FlatRegionIterator(CylinderRegion.this);
+        return new Iterable<Vector2D>() {
+            @Override
+            public Iterator<Vector2D> iterator() {
+                return new FlatRegionIterator(CylinderRegion.this);
+            }
+        };
     }
 
     /**
@@ -364,4 +395,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         return new CylinderRegion(center, radiusVec, minY, maxY);
     }
 
+    public static Class<CylinderRegion> inject() {
+        return CylinderRegion.class;
+    }
 }

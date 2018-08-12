@@ -19,14 +19,16 @@
 
 package com.sk89q.worldedit;
 
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-
+import java.io.IOException;
+import java.io.Serializable;
 import javax.annotation.Nullable;
 
 /**
  * An immutable 3-dimensional vector.
  */
-public class Vector implements Comparable<Vector> {
+public class Vector extends Vector2D implements Comparable<Vector>, Serializable {
 
     public static final Vector ZERO = new Vector(0, 0, 0);
     public static final Vector UNIT_X = new Vector(1, 0, 0);
@@ -34,7 +36,7 @@ public class Vector implements Comparable<Vector> {
     public static final Vector UNIT_Z = new Vector(0, 0, 1);
     public static final Vector ONE = new Vector(1, 1, 1);
 
-    protected final double x, y, z;
+    private transient double y;
 
     /**
      * Construct an instance.
@@ -44,9 +46,9 @@ public class Vector implements Comparable<Vector> {
      * @param z the Z coordinate
      */
     public Vector(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.mutX(x);
+        this.mutY(y);
+        this.mutZ(z);
     }
 
     /**
@@ -57,9 +59,9 @@ public class Vector implements Comparable<Vector> {
      * @param z the Z coordinate
      */
     public Vector(int x, int y, int z) {
-        this.x = (double) x;
-        this.y = (double) y;
-        this.z = (double) z;
+        this.mutX(x);
+        this.mutY(y);
+        this.mutZ(z);
     }
 
     /**
@@ -70,9 +72,9 @@ public class Vector implements Comparable<Vector> {
      * @param z the Z coordinate
      */
     public Vector(float x, float y, float z) {
-        this.x = (double) x;
-        this.y = (double) y;
-        this.z = (double) z;
+        this.mutX(x);
+        this.mutY(y);
+        this.mutZ(z);
     }
 
     /**
@@ -81,20 +83,64 @@ public class Vector implements Comparable<Vector> {
      * @param other another vector to make a copy of
      */
     public Vector(Vector other) {
-        this.x = other.x;
-        this.y = other.y;
-        this.z = other.z;
+        this.mutX(other.getX());
+        this.mutY(other.getY());
+        this.mutZ(other.getZ());
+    }
+
+    public Vector(double[] arr) {
+        this.mutX(arr[0]);
+        this.mutY(arr[1]);
+        this.mutZ(arr[2]);
     }
 
     /**
      * Construct a new instance with X, Y, and Z coordinates set to 0.
-     *
+     * <p>
      * <p>One can also refer to a static {@link #ZERO}.</p>
      */
     public Vector() {
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
+        this.mutX(0);
+        this.mutY(0);
+        this.mutZ(0);
+    }
+
+    public Vector setComponents(int x, int y, int z) {
+        this.mutX(x);
+        this.mutY(y);
+        this.mutZ(z);
+        return this;
+    }
+
+    public Vector setComponents(double x, double y, double z) {
+        this.mutX(x);
+        this.mutY(y);
+        this.mutZ(z);
+        return this;
+    }
+
+    public void mutX(int x) {
+        this.x = x;
+    }
+
+    public void mutY(int y) {
+        this.y = y;
+    }
+
+    public void mutZ(int z) {
+        this.z = z;
+    }
+
+    public void mutX(double x) {
+        this.x = x;
+    }
+
+    public void mutY(double y) {
+        this.y = y;
+    }
+
+    public void mutZ(double z) {
+        this.z = z;
     }
 
     /**
@@ -112,7 +158,7 @@ public class Vector implements Comparable<Vector> {
      * @return the x coordinate
      */
     public int getBlockX() {
-        return (int) Math.round(x);
+        return MathMan.roundInt(getX());
     }
 
     /**
@@ -122,7 +168,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector setX(double x) {
-        return new Vector(x, y, z);
+        return new Vector(x, getY(), getZ());
     }
 
     /**
@@ -132,7 +178,7 @@ public class Vector implements Comparable<Vector> {
      * @return new vector
      */
     public Vector setX(int x) {
-        return new Vector(x, y, z);
+        return new Vector(x, getY(), getZ());
     }
 
     /**
@@ -150,7 +196,7 @@ public class Vector implements Comparable<Vector> {
      * @return the y coordinate
      */
     public int getBlockY() {
-        return (int) Math.round(y);
+        return MathMan.roundInt(getY());
     }
 
     /**
@@ -160,7 +206,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector setY(double y) {
-        return new Vector(x, y, z);
+        return new Vector(getX(), y, getZ());
     }
 
     /**
@@ -170,7 +216,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector setY(int y) {
-        return new Vector(x, y, z);
+        return new Vector(getX(), y, getZ());
     }
 
     /**
@@ -188,7 +234,7 @@ public class Vector implements Comparable<Vector> {
      * @return the z coordinate
      */
     public int getBlockZ() {
-        return (int) Math.round(z);
+        return MathMan.roundInt(getZ());
     }
 
     /**
@@ -198,7 +244,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector setZ(double z) {
-        return new Vector(x, y, z);
+        return new Vector(getX(), getY(), z);
     }
 
     /**
@@ -208,7 +254,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector setZ(int z) {
-        return new Vector(x, y, z);
+        return new Vector(getX(), getY(), z);
     }
 
     /**
@@ -218,7 +264,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector add(Vector other) {
-        return new Vector(x + other.x, y + other.y, z + other.z);
+        return new Vector(getX() + other.getX(), getY() + other.getY(), getZ() + other.getZ());
     }
 
     /**
@@ -230,7 +276,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector add(double x, double y, double z) {
-        return new Vector(this.x + x, this.y + y, this.z + z);
+        return new Vector(this.getX() + x, this.getY() + y, this.getZ() + z);
     }
 
     /**
@@ -242,7 +288,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector add(int x, int y, int z) {
-        return new Vector(this.x + x, this.y + y, this.z + z);
+        return new Vector(this.getX() + x, this.getY() + y, this.getZ() + z);
     }
 
     /**
@@ -253,12 +299,12 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector add(Vector... others) {
-        double newX = x, newY = y, newZ = z;
+        double newX = getX(), newY = getY(), newZ = getZ();
 
         for (Vector other : others) {
-            newX += other.x;
-            newY += other.y;
-            newZ += other.z;
+            newX += other.getX();
+            newY += other.getY();
+            newZ += other.getZ();
         }
 
         return new Vector(newX, newY, newZ);
@@ -272,7 +318,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector subtract(Vector other) {
-        return new Vector(x - other.x, y - other.y, z - other.z);
+        return new Vector(getX() - other.getX(), getY() - other.getY(), getZ() - other.getZ());
     }
 
     /**
@@ -285,7 +331,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector subtract(double x, double y, double z) {
-        return new Vector(this.x - x, this.y - y, this.z - z);
+        return new Vector(this.getX() - x, this.getY() - y, this.getZ() - z);
     }
 
     /**
@@ -298,7 +344,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector subtract(int x, int y, int z) {
-        return new Vector(this.x - x, this.y - y, this.z - z);
+        return new Vector(this.getX() - x, this.getY() - y, this.getZ() - z);
     }
 
     /**
@@ -309,12 +355,12 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector subtract(Vector... others) {
-        double newX = x, newY = y, newZ = z;
+        double newX = getX(), newY = getY(), newZ = getZ();
 
         for (Vector other : others) {
-            newX -= other.x;
-            newY -= other.y;
-            newZ -= other.z;
+            newX -= other.getX();
+            newY -= other.getY();
+            newZ -= other.getZ();
         }
 
         return new Vector(newX, newY, newZ);
@@ -327,7 +373,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector multiply(Vector other) {
-        return new Vector(x * other.x, y * other.y, z * other.z);
+        return new Vector(getX() * other.getX(), getY() * other.getY(), getZ() * other.getZ());
     }
 
     /**
@@ -339,7 +385,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector multiply(double x, double y, double z) {
-        return new Vector(this.x * x, this.y * y, this.z * z);
+        return new Vector(this.getX() * x, this.getY() * y, this.getZ() * z);
     }
 
     /**
@@ -351,7 +397,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector multiply(int x, int y, int z) {
-        return new Vector(this.x * x, this.y * y, this.z * z);
+        return new Vector(this.getX() * x, this.getY() * y, this.getZ() * z);
     }
 
     /**
@@ -361,12 +407,12 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector multiply(Vector... others) {
-        double newX = x, newY = y, newZ = z;
+        double newX = getX(), newY = getY(), newZ = getZ();
 
         for (Vector other : others) {
-            newX *= other.x;
-            newY *= other.y;
-            newZ *= other.z;
+            newX *= other.getX();
+            newY *= other.getY();
+            newZ *= other.getZ();
         }
 
         return new Vector(newX, newY, newZ);
@@ -379,7 +425,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector multiply(double n) {
-        return new Vector(this.x * n, this.y * n, this.z * n);
+        return new Vector(this.getX() * n, this.getY() * n, this.getZ() * n);
     }
 
     /**
@@ -389,7 +435,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector multiply(float n) {
-        return new Vector(this.x * n, this.y * n, this.z * n);
+        return new Vector(this.getX() * n, this.getY() * n, this.getZ() * n);
     }
 
     /**
@@ -399,7 +445,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector multiply(int n) {
-        return new Vector(this.x * n, this.y * n, this.z * n);
+        return new Vector(this.getX() * n, this.getY() * n, this.getZ() * n);
     }
 
     /**
@@ -409,7 +455,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector divide(Vector other) {
-        return new Vector(x / other.x, y / other.y, z / other.z);
+        return new Vector(getX() / other.getX(), getY() / other.getY(), getZ() / other.getZ());
     }
 
     /**
@@ -421,7 +467,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector divide(double x, double y, double z) {
-        return new Vector(this.x / x, this.y / y, this.z / z);
+        return new Vector(this.getX() / x, this.getY() / y, this.getZ() / z);
     }
 
     /**
@@ -433,7 +479,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector divide(int x, int y, int z) {
-        return new Vector(this.x / x, this.y / y, this.z / z);
+        return new Vector(this.getX() / x, this.getY() / y, this.getZ() / z);
     }
 
     /**
@@ -443,7 +489,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector divide(int n) {
-        return new Vector(x / n, y / n, z / n);
+        return new Vector(getX() / n, getY() / n, getZ() / n);
     }
 
     /**
@@ -453,7 +499,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector divide(double n) {
-        return new Vector(x / n, y / n, z / n);
+        return new Vector(getX() / n, getY() / n, getZ() / n);
     }
 
     /**
@@ -463,7 +509,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector divide(float n) {
-        return new Vector(x / n, y / n, z / n);
+        return new Vector(getX() / n, getY() / n, getZ() / n);
     }
 
     /**
@@ -472,7 +518,7 @@ public class Vector implements Comparable<Vector> {
      * @return length
      */
     public double length() {
-        return Math.sqrt(x * x + y * y + z * z);
+        return Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
     }
 
     /**
@@ -481,7 +527,11 @@ public class Vector implements Comparable<Vector> {
      * @return length, squared
      */
     public double lengthSq() {
-        return x * x + y * y + z * z;
+        return getX() * getX() + getY() * getY() + getZ() * getZ();
+    }
+
+    public double volume() {
+        return getX() * getY() * getZ();
     }
 
     /**
@@ -491,9 +541,9 @@ public class Vector implements Comparable<Vector> {
      * @return distance
      */
     public double distance(Vector other) {
-        return Math.sqrt(Math.pow(other.x - x, 2) +
-                Math.pow(other.y - y, 2) +
-                Math.pow(other.z - z, 2));
+        return Math.sqrt(Math.pow(other.getX() - getX(), 2) +
+                Math.pow(other.getY() - getY(), 2) +
+                Math.pow(other.getZ() - getZ(), 2));
     }
 
     /**
@@ -503,9 +553,9 @@ public class Vector implements Comparable<Vector> {
      * @return distance
      */
     public double distanceSq(Vector other) {
-        return Math.pow(other.x - x, 2) +
-                Math.pow(other.y - y, 2) +
-                Math.pow(other.z - z, 2);
+        return Math.pow(other.getX() - getX(), 2) +
+                Math.pow(other.getY() - getY(), 2) +
+                Math.pow(other.getZ() - getZ(), 2);
     }
 
     /**
@@ -525,7 +575,7 @@ public class Vector implements Comparable<Vector> {
      * @return the dot product of this and the other vector
      */
     public double dot(Vector other) {
-        return x * other.x + y * other.y + z * other.z;
+        return getX() * other.getX() + getY() * other.getY() + getZ() * other.getZ();
     }
 
     /**
@@ -536,9 +586,9 @@ public class Vector implements Comparable<Vector> {
      */
     public Vector cross(Vector other) {
         return new Vector(
-            y * other.z - z * other.y,
-            z * other.x - x * other.z,
-            x * other.y - y * other.x
+                getY() * other.getZ() - getZ() * other.getY(),
+                getZ() * other.getX() - getX() * other.getZ(),
+                getX() * other.getY() - getY() * other.getX()
         );
     }
 
@@ -550,7 +600,7 @@ public class Vector implements Comparable<Vector> {
      * @return true if the vector is contained
      */
     public boolean containedWithin(Vector min, Vector max) {
-        return x >= min.x && x <= max.x && y >= min.y && y <= max.y && z >= min.z && z <= max.z;
+        return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max.getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
     }
 
     /**
@@ -575,7 +625,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector clampY(int min, int max) {
-        return new Vector(x, Math.max(min, Math.min(max, y)), z);
+        return new Vector(getX(), Math.max(min, Math.min(max, getY())), getZ());
     }
 
     /**
@@ -584,7 +634,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector floor() {
-        return new Vector(Math.floor(x), Math.floor(y), Math.floor(z));
+        return new Vector(Math.floor(getX()), Math.floor(getY()), Math.floor(getZ()));
     }
 
     /**
@@ -593,18 +643,18 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector ceil() {
-        return new Vector(Math.ceil(x), Math.ceil(y), Math.ceil(z));
+        return new Vector(Math.ceil(getX()), Math.ceil(getY()), Math.ceil(getZ()));
     }
 
     /**
      * Rounds all components to the closest integer.
-     *
+     * <p>
      * <p>Components &lt; 0.5 are rounded down, otherwise up.</p>
      *
      * @return a new vector
      */
     public Vector round() {
-        return new Vector(Math.floor(x + 0.5), Math.floor(y + 0.5), Math.floor(z + 0.5));
+        return new Vector(Math.floor(getX() + 0.5), Math.floor(getY() + 0.5), Math.floor(getZ() + 0.5));
     }
 
     /**
@@ -614,15 +664,15 @@ public class Vector implements Comparable<Vector> {
      * @return a new vector
      */
     public Vector positive() {
-        return new Vector(Math.abs(x), Math.abs(y), Math.abs(z));
+        return new Vector(Math.abs(getX()), Math.abs(getY()), Math.abs(getZ()));
     }
 
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle in degrees
-     * @param aboutX about which x coordinate to rotate
-     * @param aboutZ about which z coordinate to rotate
+     * @param angle      in degrees
+     * @param aboutX     about which x coordinate to rotate
+     * @param aboutZ     about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
@@ -630,15 +680,15 @@ public class Vector implements Comparable<Vector> {
      */
     public Vector transform2D(double angle, double aboutX, double aboutZ, double translateX, double translateZ) {
         angle = Math.toRadians(angle);
-        double x = this.x - aboutX;
-        double z = this.z - aboutZ;
+        double x = this.getX() - aboutX;
+        double z = this.getZ() - aboutZ;
         double x2 = x * Math.cos(angle) - z * Math.sin(angle);
         double z2 = x * Math.sin(angle) + z * Math.cos(angle);
 
         return new Vector(
-            x2 + aboutX + translateX,
-            y,
-            z2 + aboutZ + translateZ
+                x2 + aboutX + translateX,
+                getY(),
+                z2 + aboutZ + translateZ
         );
     }
 
@@ -649,35 +699,35 @@ public class Vector implements Comparable<Vector> {
      * @return true if collinear
      */
     public boolean isCollinearWith(Vector other) {
-        if (x == 0 && y == 0 && z == 0) {
+        if (getX() == 0 && getY() == 0 && getZ() == 0) {
             // this is a zero vector
             return true;
         }
 
-        final double otherX = other.x;
-        final double otherY = other.y;
-        final double otherZ = other.z;
+        final double otherX = other.getX();
+        final double otherY = other.getY();
+        final double otherZ = other.getZ();
 
         if (otherX == 0 && otherY == 0 && otherZ == 0) {
             // other is a zero vector
             return true;
         }
 
-        if ((x == 0) != (otherX == 0)) return false;
-        if ((y == 0) != (otherY == 0)) return false;
-        if ((z == 0) != (otherZ == 0)) return false;
+        if ((getX() == 0) != (otherX == 0)) return false;
+        if ((getY() == 0) != (otherY == 0)) return false;
+        if ((getZ() == 0) != (otherZ == 0)) return false;
 
-        final double quotientX = otherX / x;
+        final double quotientX = otherX / getX();
         if (!Double.isNaN(quotientX)) {
             return other.equals(multiply(quotientX));
         }
 
-        final double quotientY = otherY / y;
+        final double quotientY = otherY / getY();
         if (!Double.isNaN(quotientY)) {
             return other.equals(multiply(quotientY));
         }
 
-        final double quotientZ = otherZ / z;
+        final double quotientZ = otherZ / getZ();
         if (!Double.isNaN(quotientZ)) {
             return other.equals(multiply(quotientZ));
         }
@@ -729,9 +779,9 @@ public class Vector implements Comparable<Vector> {
      */
     public static BlockVector toBlockPoint(double x, double y, double z) {
         return new BlockVector(
-            Math.floor(x),
-            Math.floor(y),
-            Math.floor(z)
+                Math.floor(x),
+                Math.floor(y),
+                Math.floor(z)
         );
     }
 
@@ -742,9 +792,9 @@ public class Vector implements Comparable<Vector> {
      */
     public BlockVector toBlockPoint() {
         return new BlockVector(
-            Math.floor(x),
-            Math.floor(y),
-            Math.floor(z)
+                Math.floor(getX()),
+                Math.floor(getY()),
+                Math.floor(getZ())
         );
     }
 
@@ -754,8 +804,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new {@code BlockVector}
      */
     public BlockVector toBlockVector() {
-        return toBlockPoint();
-//        return new BlockVector(this); TODO Look into this further.
+        return new BlockVector(this);
     }
 
     /**
@@ -764,7 +813,7 @@ public class Vector implements Comparable<Vector> {
      * @return a new {@code Vector2D}
      */
     public Vector2D toVector2D() {
-        return new Vector2D(x, z);
+        return new Vector2D(getX(), getZ());
     }
 
     @Override
@@ -774,7 +823,7 @@ public class Vector implements Comparable<Vector> {
         }
 
         Vector other = (Vector) obj;
-        return other.x == this.x && other.y == this.y && other.z == this.z;
+        return other.getX() == this.getX() && other.getZ() == this.getZ() && other.getY() == this.getY();
     }
 
     @Override
@@ -782,19 +831,22 @@ public class Vector implements Comparable<Vector> {
         if (other == null) {
             throw new IllegalArgumentException("null not supported");
         }
-        if (y != other.y) return Double.compare(y, other.y);
-        if (z != other.z) return Double.compare(z, other.z);
-        if (x != other.x) return Double.compare(x, other.x);
+        if (getY() != other.getY()) return Double.compare(getY(), other.getY());
+        if (getZ() != other.getZ()) return Double.compare(getZ(), other.getZ());
+        if (getX() != other.getX()) return Double.compare(getX(), other.getX());
         return 0;
     }
 
     @Override
     public int hashCode() {
-        return ((int) x ^ ((int) z << 12)) ^ ((int) y << 24);
+        return ((int) getX() ^ ((int) getZ() << 16)) ^ ((int) getY() << 30);
     }
 
     @Override
     public String toString() {
+        String x = (getX() == getBlockX() ? "" + getBlockX() : "" + getX());
+        String y = (getY() == getBlockY() ? "" + getBlockY() : "" + getY());
+        String z = (getZ() == getBlockZ() ? "" + getBlockZ() : "" + getZ());
         return "(" + x + ", " + y + ", " + z + ")";
     }
 
@@ -807,9 +859,9 @@ public class Vector implements Comparable<Vector> {
      */
     public static Vector getMinimum(Vector v1, Vector v2) {
         return new Vector(
-                Math.min(v1.x, v2.x),
-                Math.min(v1.y, v2.y),
-                Math.min(v1.z, v2.z)
+                Math.min(v1.getX(), v2.getX()),
+                Math.min(v1.getY(), v2.getY()),
+                Math.min(v1.getZ(), v2.getZ())
         );
     }
 
@@ -822,12 +874,12 @@ public class Vector implements Comparable<Vector> {
      */
     public static Vector getMaximum(Vector v1, Vector v2) {
         return new Vector(
-                Math.max(v1.x, v2.x),
-                Math.max(v1.y, v2.y),
-                Math.max(v1.z, v2.z)
+                Math.max(v1.getX(), v2.getX()),
+                Math.max(v1.getY(), v2.getY()),
+                Math.max(v1.getZ(), v2.getZ())
         );
     }
-
+    
     /**
      * Gets the midpoint of two vectors.
      *
@@ -837,10 +889,28 @@ public class Vector implements Comparable<Vector> {
      */
     public static Vector getMidpoint(Vector v1, Vector v2) {
         return new Vector(
-                (v1.x + v2.x) / 2,
-                (v1.y + v2.y) / 2,
-                (v1.z + v2.z) / 2
+                (v1.getX() + v2.getX()) / 2,
+                (v1.getY() + v2.getY()) / 2,
+                (v1.getZ() + v2.getZ()) / 2
         );
     }
 
+    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
+        if (!(this instanceof MutableBlockVector)) {
+            stream.writeDouble(x);
+            stream.writeDouble(y);
+            stream.writeDouble(z);
+        }
+    }
+
+    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        if (this instanceof MutableBlockVector) return;
+        this.x = stream.readDouble();
+        this.y = stream.readDouble();
+        this.z = stream.readDouble();
+    }
+
+    public static Class<?> inject() {
+        return Vector.class;
+    }
 }

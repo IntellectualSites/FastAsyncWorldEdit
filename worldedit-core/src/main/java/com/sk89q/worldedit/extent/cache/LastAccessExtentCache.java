@@ -21,13 +21,17 @@ package com.sk89q.worldedit.extent.cache;
 
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.blocks.LazyBlock;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 /**
- * Returns the same cached {@link BlockState} for repeated calls to
- * {@link #getBlock(Vector)} with the same position.
+ * Returns the same cached {@link BaseBlock} for repeated calls to
+ * {@link #getLazyBlock(Vector)} with the same position.
  */
 public class LastAccessExtentCache extends AbstractDelegateExtent {
 
@@ -43,13 +47,13 @@ public class LastAccessExtentCache extends AbstractDelegateExtent {
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getLazyBlock(Vector position) {
         BlockVector blockVector = position.toBlockVector();
         CachedBlock lastBlock = this.lastBlock;
         if (lastBlock != null && lastBlock.position.equals(blockVector)) {
             return lastBlock.block;
         } else {
-            BlockState block = super.getBlock(position);
+            BlockState block = super.getLazyBlock(position);
             this.lastBlock = new CachedBlock(blockVector, block);
             return block;
         }

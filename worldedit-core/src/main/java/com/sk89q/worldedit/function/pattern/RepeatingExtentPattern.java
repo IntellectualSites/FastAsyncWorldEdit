@@ -19,11 +19,12 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.extent.Extent;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Returns the blocks from {@link Extent}, repeating when out of bounds.
@@ -89,7 +90,6 @@ public class RepeatingExtentPattern extends AbstractPattern {
         int x = base.getBlockX() % size.getBlockX();
         int y = base.getBlockY() % size.getBlockY();
         int z = base.getBlockZ() % size.getBlockZ();
-        return extent.getFullBlock(new Vector(x, y, z));
+        return extent.getBlock(new Vector(x, y, z));
     }
-
 }

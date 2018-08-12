@@ -19,8 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
-
+import com.boydti.fawe.config.BBC;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -38,11 +37,14 @@ import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.snapshot.SnapshotRestore;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
+
+@Command(aliases = {}, desc = "[More Info](http://wiki.sk89q.com/wiki/WorldEdit/Snapshots)")
 public class SnapshotUtilCommands {
 
     private static final Logger logger = Logger.getLogger("Minecraft.WorldEdit");
@@ -54,7 +56,7 @@ public class SnapshotUtilCommands {
     }
 
     @Command(
-            aliases = { "restore", "/restore" },
+            aliases = {"restore", "/restore"},
             usage = "[snapshot]",
             desc = "Restore the selection from a snapshot",
             min = 0,
@@ -97,10 +99,10 @@ public class SnapshotUtilCommands {
                     File dir = config.snapshotRepo.getDirectory();
 
                     try {
-                        logger.info("WorldEdit found no snapshots: looked in: "
+                        logger.info("FAWE found no snapshots: looked in: "
                                 + dir.getCanonicalPath());
                     } catch (IOException e) {
-                        logger.info("WorldEdit found no snapshots: looked in "
+                        logger.info("FAWE found no snapshots: looked in "
                                 + "(NON-RESOLVABLE PATH - does it exist?): "
                                 + dir.getPath());
                     }
@@ -118,8 +120,11 @@ public class SnapshotUtilCommands {
         // Load chunk store
         try {
             chunkStore = snapshot.getChunkStore();
-            player.print("Snapshot '" + snapshot.getName() + "' loaded; now restoring...");
-        } catch (DataException | IOException e) {
+            BBC.SNAPSHOT_LOADED.send(player, snapshot.getName());
+        } catch (DataException e) {
+            player.printError("Failed to load snapshot: " + e.getMessage());
+            return;
+        } catch (IOException e) {
             player.printError("Failed to load snapshot: " + e.getMessage());
             return;
         }
@@ -140,8 +145,8 @@ public class SnapshotUtilCommands {
                     player.printError("No chunks could be loaded. (Bad archive?)");
                 }
             } else {
-                player.print(String.format("Restored; %d "
-                        + "missing chunks and %d other errors.",
+                player.print(BBC.getPrefix() + String.format("Restored; %d "
+                                + "missing chunks and %d other errors.",
                         restore.getMissingChunks().size(),
                         restore.getErrorChunks().size()));
             }
@@ -151,5 +156,9 @@ public class SnapshotUtilCommands {
             } catch (IOException ignored) {
             }
         }
+    }
+
+    public static Class<SnapshotUtilCommands> inject() {
+        return SnapshotUtilCommands.class;
     }
 }

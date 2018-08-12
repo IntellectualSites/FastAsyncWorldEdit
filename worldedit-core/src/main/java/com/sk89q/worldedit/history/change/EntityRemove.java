@@ -19,21 +19,21 @@
 
 package com.sk89q.worldedit.history.change;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.util.Location;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Tracks the removal of an entity.
  */
 public class EntityRemove implements Change {
 
-    private final Location location;
-    private final BaseEntity state;
+    public final Location location;
+    public final BaseEntity state;
     private Entity entity;
 
     /**
@@ -47,6 +47,10 @@ public class EntityRemove implements Change {
         checkNotNull(state);
         this.location = location;
         this.state = state;
+    }
+
+    public Entity getEntity() {
+        return entity;
     }
 
     @Override

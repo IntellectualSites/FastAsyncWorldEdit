@@ -1,0 +1,316 @@
+info:
+  prefix: '&7'
+  file_deleted: '%s0 был удален.'
+  schematic_pasting: '&7Вставка схематического файла. Это не может быть отменено.'
+  lighting_propogate_selection: '&7Освещение было распространено в %s0 чанках. (Примечание:
+    Для удаления освещения используйте //removelight)'
+  updated_lighting_selection: '&7Освещение было обновлено в %s0 чанках. (Это может
+    занять секунду для отправки пакетов)'
+  set_region: '&7Выделение установлено в вашем текущем регионе WorldEdit'
+  worldedit_command_limit: '&7Пожалуйста, подождите, пока ваше текущее действие завершится'
+  worldedit_delayed: '&7Пожалуйста, подождите, пока мы обрабатываем ваши действия
+    WorldEdit...'
+  worldedit_run: '&7Простите за задержку. Выполнение: %s'
+  worldedit_complete: '&7Действие WorldEdit выполнено.'
+  require_selection_in_mask: '&7%s вашего выделения не находится в пределах вашей
+    маски. Вы можете только вносить изменения в пределах разрешенных регионов.'
+  worldedit_volume: '&7Вы не можете выбрать значение %current%. Максимальное значение,
+    которое вы можете изменить - %max%.'
+  worldedit_iterations: '&7Вы не можете выполнить интерацию %current% раз. Максимальное
+    число допустимых итераций - %max%.'
+  worldedit_unsafe: '&7Доступ к этой команде был заблокирован!'
+  worldedit_dangerous_worldedit: '&cFAWE обрабатывает небезопасный WorldEdit в %s0
+    на %s1'
+  worldedit_bypass: '&7&oЧтобы обойти ваши ограничения используйте &c/wea'
+  worldedit_toggle_tips_on: '&7Советы WorldEdit &cвключены&7.'
+  worldedit_toggle_tips_off: '&7Советы WorldEdit &cвключены&7.'
+  worldedit_bypassed: '&7Обход ограничений WorldEdit &cвключен&7.'
+  worldedit_unmasked: '&7Ваш WorldEdit теперь неограниченный.'
+  worldedit_restricted: '&7Обход ограничений WorldEdit &cвыключен&7.'
+  worldedit_oom_admin: |-
+    &cВозможные варианты:
+    &8 - &7//fast
+    &8 - &7Сделать небольшие изменения
+    &8 - &7Выделить больше памяти
+    &8 - &7Отключить `max-memory-percent`
+  compressed: История сжата. Сохранено ~ %s0b (%s1x меньше)
+  action_complete: Действие выполенено за %s0 секунд
+error:
+  worldedit_extend: '&cВаше выделение WorldEdit может быть расширено за пределами
+    разрешенного региона.'
+  command_syntax: '&cИспользование: &7%s0'
+  no_perm: '&cУ вас нет разрешения: %s0'
+  setting_disable: '&cОтсутствует параметр: %s0'
+  schematic_not_found: '&cСхематический файл не найден: &7%s0'
+  no_region: '&cУ вас нет текущего региона WorldEdit'
+  no_mask: '&cУ вас нет текущей установленой маски'
+  not_player: '&cВы должны быть игроком, чтобы выполнить это действие!'
+  player_not_found: '&cИгрок не найден:&7 %s0'
+  oom: |-
+    &8[&cОпасно&8] &cОбнаружено мало память, т.е. < 1%. FAWE предпримет следующие действия:
+    &8 - &7Прекратить размещение блоков WE
+    &8 - &7Очистить историю WE
+    &8 - &7Выгрузить не необходимые чанки
+    &8 - &7Убить энтити
+    &8 - &7Собрать мусор
+    &cИгнорирование этого может призвести к крашу сервера.
+    &7Примечание: Нехватка памяти скорее всего (но не обязательно) вызванно WE
+  worldedit_some_fails: '&c%s0 блок(ов) не были размещены, потому что они были за
+    пределами вашего региона.'
+  worldedit_some_fails_blockbag: '&cНедостающие блоки: %s0'
+  web_unauthorized: 'Разрешены только ссылки с настроенного веб-хостинга: %s0'
+web:
+  generating_link: Загрузка %s, пожалуйста подождите...
+  generating_link_failed: '&cНе удалось создать ссылку!'
+  download_link: '%s'
+worldedit:
+  general:
+    mask_disabled: Глобальная маска отключена
+    mask: Глобальная маска установлена
+    source_mask_disabled: Глобальный источник маски отключен
+    source_mask: Глобальный источник маски установлен
+    transform_disabled: Глобальное преобразование отключено
+    transform: Глобальное преобразование установлено
+    fast_enabled: Быстрый режим включен. История и редактирование ограничений будут обойдены.
+    fast_disabled: Быстрый режим отключен
+    place_enabled: 'Теперь размещение в позиции #1.'
+    place_disabled: Теперь размещение в блоке, на котором вы стоите.
+  copy:
+    command_copy: '%s0 блок(ов) скопировано.'
+  cut:
+    command_cut_slow: |-
+      %s0 блок(ов) вырезано.
+      Совет: lazycut безопаснее
+    command_cut_lazy: '%s0 блок(ов) будут удалены при вставке'
+  paste:
+    command_paste: |-
+      Буфер обмена был вставлен в %s0
+      Совет: Вставка по клику - &c//br copypaste
+  rotate:
+    command_rotate: Буфер обмена был повернут
+  flip:
+    command_flipped: Буфер обмена было перевернут
+  regen:
+    command_regen_0: |-
+      Регион регенерирован.
+      Tip: Используйте биом - /regen [biome]
+    command_regen_1: |-
+      Регион регенерирован.
+      Совет: Используйте сид - /regen [biome] [seed]
+    command_regen_2: Регион регенерирован.
+  tree:
+    command_tree: '%s0 деревьев создано.'
+    command_pumpkin: '%s0 тыкв создано.'
+  flora:
+    command_flora: '%s0 флор создано.'
+  history:
+    command_history_clear: История очищена
+    command_redo_error: Ничего не осталось для возврата. (Смотрите также `/inspect` и `/frb`)
+    command_redo_success: Успешно возвращено.
+    command_undo_error: Ничего не осталось для отмены. (Смотрите также `/inspect` и `/frb`)
+    command_undo_success: Успешно отменено.
+    command_history_other_error: Не удалось найти сессию %s0.
+  operation:
+    operation: Операция в очереди (%s0)
+  selection:
+    selection_wand: 'ЛКМ: установить точку #1; ПКМ: установить точку #2'
+    selection_wand_disable: Палочка редактирования выключена.
+    selection_wand_enable: Палочка редактирования включена.
+    selection_chunk: Чанк выбран (%s0)
+    selection_chunks: Чанков выбрано (%s0) - (%s1)
+    selection_contract: Регион сокращен на %s0 блоков.
+    selection_count: Подсчитано %s0 блоков.
+    selection_distr: '# всего блоков: %s0'
+    selection_expand: Регион расширен на %s0 блоков
+    selection_expand_vert: Регион расширен на %s0 блоков (сверху вниз)
+    selection_inset: Region inset
+    selection_outset: Region outset
+    selection_shift: Регион сдвинут
+    selection_cleared: Выделение очищено
+  brush:
+    brush_none: Вы не держите кисть!
+    brush_butcher: Кисть мясника сформирована (%s0)
+    brush_clipboard: Форма кисти буфера обемна сформирована
+    brush_cylinder: Цилиндрическая форма кисти сформирована (%s0 по %s1).
+    brush_extinguisher: Форма кисти огнерушения сформирована (%s0).
+    brush_gravity: Кисть гравитации сформирована (%s0)
+    brush_height: Кисть высоты сформирована (%s0)
+    brush_try_other: |-
+      &cFAWE добавляет другие, более подходящие кисти, например,
+      &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
+    brush_copy: Кисть копирования сформирована (%s0). ПКМ по обьекту для копирования, ПКМ для вставки. При необходимости увеличьте радиус кисти.
+    brush_command: Командная кисть сформирована (%s0)
+    brush_height_invalid: Неверная высота файла карты (%s0)
+    brush_smooth: Кисть сглаживания сформирована (%s0 x %s1 используя %s2).
+    brush_sphere: Форма сферической кисти сформирована (%s0).
+    brush_line: Форма кисти линий сформирована (%s0).
+    brush_spline: Форма кисти линий сформирована (%s0). ПКМ по концу, чтобы добавить форму
+    brush_spline_secondary_error: Не хватает установленных позиций!
+    brush_spline_secondary: Склеивание создано
+    brush_blend_ball: Кисть смеси шара сформирована (%s0).
+    brush_erode: Кисть разрушения сформирована (%s0).
+    brush_recursive: Кисть рекурсии сформирована (%s0).
+    brush_size: Размер кисти установлен
+    brush_range: Размер кисти установлен
+    brush_mask_disabled: Маска кисти отключена
+    brush_mask: Маска кисти сформирована
+    brush_source_mask_disabled: Кисть источника маски отключена
+    brush_source_mask: Кисть источника маски сформирована
+    brush_transform_disabled: Кисть преобразвания сформирована
+    brush_transform: Кисть преобразования сформирована
+    brush_material: Материал кисти установлен
+    brush_scroll_action_set: Установлено действие прокрутки %s0
+    brush_visual_mode_set: Установлен визуальный режим для %s0
+    brush_target_mode_set: Установлен целевой режим для %s0
+    brush_spline_primary_2: Добавлена ​​позиция, Нажмите на том же месте, чтобы присоединиться!
+    brush_circle: Кисть создания круга оборудована (%s0). Щелкните правой кнопкой мыши, чтобы создать круг.
+    brush_shatter: Форма разрешающей кисти сформирована (%s0, %s1).
+    brush_stencil: Форма кисти по шаблону сформирована (%s0).
+    brush_scatter: Форма кисти рассеивания сформирована (%s0, %s1).
+  rollback:
+    rollback_element: Отмена %s0
+  tool:
+    tool_inspect: Инструмент проверки связан с %s0.
+    tool_inspect_info: '&7%s0 изменено %s1 на %s2 %s3 назад'
+    tool_inspect_info_footer: '&6Всего: &7%s0 изменений'
+    tool_none: Инструмент больше не связан с вашим предметом.
+    tool_info: Информационный инструмент связан с %s0.
+    tool_tree: Инструмент Девера связан с %s0.
+    tool_tree_error: Неизвестный тип дерева %s0.
+    tool_repl: Инструмент замены блока связан к %s0.
+    tool_cycler: Block data cycler tool bound to %s0.
+    tool_flood_fill: Инструмент Заливки блоков связан с %s0.
+    tool_deltree: Инструмент для удаления летающих деревьев связан с %s0.
+    tool_farwand: Инструмент дальной полочки связан с %s0.
+    tool_lrbuild_bound: Строительный инструмент дальнего действия связан с %s0.
+    tool_lrbuild_info: ЛКМ для установки %s0; ПКМ для установки %s1.
+    superpickaxe_enabled: Супер Кирка включена.
+    superpickaxe_disabled: Супер Кирка выключена.
+    tool_range_error: 'Максимальный диапазон: %s0.'
+    tool_radius_error: 'Максимально допустимый радиус кисти: %s0.'
+    superpickaxe_area_enabled: Режим изменен. Щелкните левой кнопкой мыши с киркой. // для отключения.
+  schematic:
+    schematic_format: 'Доступные форматы буфера обмена (Имя: Имена поиска)'
+    schematic_loaded: '%s0 загружен. Вставить его //paste'
+    schematic_saved: '%s0 сохранен.'
+    schematic_page: Страница должна быть %s
+    schematic_none: Схематических фалов не найдено.
+    schematic_list: 'Доступные схематические файлы (Имя файла: Формат) [%s0/%s1]:'
+  clipboard:
+    clipboard_cleared: Буфер обмена очищен
+    clipboard_invalid_format: 'Неизвестный формат буфера обмена:  %s0'
+  visitor:
+    visitor_block: '%s0 блок(ов) затронуто'
+    visitor_entity: '%s0 энтити затронуто'
+    visitor_flat: '%s0 колонн затронуто'
+  selector:
+    selector_fuzzy_pos1: Регион установлен и расширен %s0 %s1.
+    selector_fuzzy_pos2: Добавлено расширение %s0 %s1.
+    selector_cuboid_pos1: Первая точка установлена на %s0 %s1.
+    selector_cuboid_pos2: Вторая точка установлена на %s0 %s1.
+    selector_invalid_coordinates: Неверные координаты %s0
+    selector_already_set: Позиция уже установлена.
+    selector_set_default: Ваш выбранный регион по умолчанию теперь %s0.
+  command:
+    command_invalid_syntax: Команда не используется должным образом (нет больше помощи).
+  snapshot:
+    snapshot_loaded: Снимок '%s0' загружен; Восстановление...
+    snapshot_set: 'Снимок установлен: %s0'
+    snapshot_newest: Теперь с использованием новейших снимков.
+    snapshot_list_header: 'Снимки для мира (%s0):'
+    snapshot_list_footer: Используйте /snap use [snapshot] или /snap use latest.
+  biome:
+    biome_list_header: 'Биомы (стр. %s0/%s1):'
+    biome_changed: Биом был изменен в %s0 колонн.
+  utility:
+    kill_success: Убито %s0 энтити в радиусе %s1.
+  timezone:
+    timezone_set: 'Часовой пояс для этой сессии: %s0'
+    timezone_display: 'Текущее время в этом часовом поясе:  %s0'
+progress:
+  progress_message: '[ Очередь: %s0 | Отправляется: %s1 ]'
+  progress_finished: '[ Готово! ]'
+cancel:
+  worldedit_cancel_count: '&cОтменено %s0 изменений.'
+  worldedit_cancel_reason: '&cВаше действие WorldEdit было отменено:&7 %s0&c.'
+  worldedit_cancel_reason_manual: Ручная отмена
+  worldedit_cancel_reason_low_memory: Мало памяти
+  worldedit_cancel_reason_max_changes: Слишком много блоков изменено
+  worldedit_cancel_reason_max_checks: Слишком много проверок блоков
+  worldedit_cancel_reason_max_tiles: Слишком много blockstates
+  worldedit_cancel_reason_max_entities: Слишком много энтити
+  worldedit_cancel_reason_max_iterations: Максимальное количество итераций
+  worldedit_cancel_reason_max_fails: Вне разрешенного региона (обход, используя /wea, или выключите `region-restrictions` в config.yml)
+  worldedit_cancel_reason_no_region: Нет разрешенного региона (обход, используя /wea, или выключите `region-restrictions` в config.yml)
+  worldedit_failed_load_chunk: '&cПропущенные загруженные чанки: &7%s0;%s1&c. Попробуйте
+    увеличить ожидание чанка.'
+history: {}
+navigation:
+  ascend_fail: Свободного места над вами не найдено.
+  ascended_plural: Вы поднялись на %s0 уровень(ней).
+  ascended_singular: Подняться на уровень.
+  unstuck: Уииии!
+  descend_fail: Свободного места под вами не найдено.
+  descend_plural: Вы спустились на %s0 уровень(ней).
+  descend_singular: Спуститься на уровень.
+  whoosh: Уииии!
+  poof: Бум!
+  thru_fail: Свободного места впереди вас не найдено.
+  up_fail: Вы бы ударились об что-то над вами.
+  no_block: Нету блоков в поле зрения! (или слишком далеко)
+selection:
+  sel_cuboid: 'Кубоид: ЛКМ для точки 1, ПКМ для точки 2'
+  sel_cuboid_extend: 'Кубоид: ЛКМ для начальной точки, ПКМ для расширения'
+  sel_2d_polygon: 'Полигональное 2D выделение: ЛКМ/ПКМ для добавления точек.'
+  sel_ellipsiod: 'Эллипсоидное выделение: ЛКМ - центр, ПКМ для расширения'
+  sel_sphere: 'Сферическое выделение: ЛКМ - центр, ПКМ для установки радиуса'
+  sel_cylindrical: 'Цилиндрическое выделение: ЛКМ - центр, ПКМ для расширения'
+  sel_max: '%s0 максимум точек.'
+  sel_fuzzy: 'Нечеткое выделение: ЛКМ, чтобы выбрать все условные блоки, ПКМ, чтобы
+    добавить'
+  sel_convex_polyhedral: 'Выпуклое многогранное выделение: ЛКМ - первая вершина, ПКМ
+    для добавления больше.'
+  sel_list: Для получения списка типов выделения используйте:&c //sel list
+  sel_modes: 'Выберите один из перечисленных режимов ниже:'
+tips:
+  tip_sel_list: 'Совет: Смотрите различные режимы выделения - &c//sel list'
+  tip_select_connected: 'Совет: Выберите все подключенные блоки - //sel fuzzy'
+  tip_set_pos1: 'Совет: Используйте Pos1 как шаблон - &c//set pos1'
+  tip_farwand: 'Совет: Выберите удаленные точки - &c//farwand'
+  tip_fast: '&7Совет: Установить быстро и без отмены, используя &c//fast'
+  tip_cancel: '&7Совет: Вы можете &c//cancel &7от изменений в процессе'
+  tip_mask: '&7Совет: Задайте маску глобального назначения - &c/gmask'
+  tip_mask_angle: 'Совет: Заменить верхний слой 3-20 блоков -&c //replace /-20:-3
+    bedrock'
+  tip_set_linear: '&7Совет: Установка блоков -&c //set #l3d:wood,bedrock'
+  tip_surface_spread: '&7Совет: Распространение плоской поверхности -&c //set #surfacespread:5:0:5:#existing'
+  tip_set_hand: '&7Совет: Используйте свою текущую руку - &c//set hand'
+  tip_replace_id: '&7Совет: Заменить только ID блока -&c //replace woodenstair #id:cobblestair'
+  tip_replace_light: 'Совет: Удалить источники света -&c //replace #brightness:1:15
+    0'
+  tip_tab_complete: 'Совет: Команда replace поддерживает автозаполение'
+  tip_flip: 'Совет: Отобразить - &c//flip'
+  tip_deform: 'Совет: Изменить - &c//deform'
+  tip_transform: 'Совет: Установка преобразования - &c//gtransform'
+  tip_copypaste: 'Совет: Вставка по клику - &c//br copypaste'
+  tip_source_mask: 'Совет: Установить маску источника - &c/gsmask <mask>&7'
+  tip_replace_marker: 'Совет: Замените блок с помощью полного буфера обмена - &c//replace
+    wool #fullcopy'
+  tip_paste: 'Совет: Вставить - &c//paste'
+  tip_lazycopy: 'Совет: lazycopy быстрее'
+  tip_download: 'Совет: Попробовать - &c//download'
+  tip_rotate: 'Совет: Ориентация - &c//rotate'
+  tip_copy_pattern: 'Совет: Для использования шаблона используйте &c#copy'
+  tip_brush_spline: '&7Совет: Команда &c//brush &7соединяет несколько фигур вместе'
+  tip_brush_height: '&7Совет: Команда &c//brush &7плавно повышает или понижает ландшафт'
+  tip_brush_copy: '&7Совет: Команда &c//brush &7позволяет легко копировать и вставлять
+    объекты'
+  tip_brush_mask: '&7Совет: Задайте маску назначения кисти - &c/mask'
+  tip_brush_mask_source: '&7Совет: Задайте маску источника кисти - &c/smask'
+  tip_brush_transform: '&7Совет: Установите кисть преобразования - &c/transform'
+  tip_brush_relative: '&7Совет: Используйте шаблон относительного буфера обмена -
+    //br sphere #~:#copy'
+  tip_brush_command: '&7Совет: Попробуйте командную кисть - &c//br cmd <radius> <cmd1;cmd2>'
+  tip_lazycut: '&7Совет: Это безопаснее использовать &c//lazycut'
+  tip_regen_0: 'Совет: Используйте биом - &c/regen [biome]'
+  tip_regen_1: 'Совет: Используйте сид - &c/regen [biome] [seed]'

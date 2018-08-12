@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command.tool.brush;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.pattern.Pattern;
 
 /**
@@ -38,6 +39,6 @@ public interface Brush {
      * @param size the size of the brush
      * @throws MaxChangedBlocksException 
      */
-    public void build(EditSession editSession, Vector position, Pattern pattern, double size) throws MaxChangedBlocksException;
+    public void build(EditSession editSession, Vector position, Pattern pattern, double size) throws WorldEditException;
 
 }

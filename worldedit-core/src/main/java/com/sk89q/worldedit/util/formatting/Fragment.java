@@ -25,12 +25,12 @@ package com.sk89q.worldedit.util.formatting;
 public class Fragment {
 
     private final StringBuilder builder = new StringBuilder();
-    
-    Fragment() {
+
+    public Fragment() {
     }
 
     public Fragment append(String str) {
-        builder.append(Style.stripColor(str));
+        builder.append(str);
         return this;
     }
 
@@ -88,5 +88,8 @@ public class Fragment {
     public String toString() {
         return builder.toString();
     }
-    
+
+    public static Class<?> inject() {
+        return Fragment.class;
+    }
 }

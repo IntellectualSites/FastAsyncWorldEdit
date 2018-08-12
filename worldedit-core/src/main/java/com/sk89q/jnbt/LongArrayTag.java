@@ -16,18 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sk89q.jnbt;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * The {@code TAG_Long_Array} tag.
  */
 public class LongArrayTag extends Tag {
-
     private final long[] value;
-
     /**
      * Creates the tag with an empty name.
      *
@@ -38,12 +33,10 @@ public class LongArrayTag extends Tag {
         checkNotNull(value);
         this.value = value;
     }
-
     @Override
     public long[] getValue() {
         return value;
     }
-
     @Override
     public String toString() {
         StringBuilder hex = new StringBuilder();
@@ -56,5 +49,4 @@ public class LongArrayTag extends Tag {
         }
         return "TAG_Long_Array(" + hex + ")";
     }
-
 }

@@ -25,7 +25,7 @@ public interface ArgumentStack {
 
     /**
      * Get the next string, which may come from the stack or a value flag.
-     * 
+     *
      * @return the value
      * @throws ParameterException on a parameter error
      */
@@ -33,7 +33,7 @@ public interface ArgumentStack {
 
     /**
      * Get the next integer, which may come from the stack or a value flag.
-     * 
+     *
      * @return the value
      * @throws ParameterException on a parameter error
      */
@@ -41,7 +41,7 @@ public interface ArgumentStack {
 
     /**
      * Get the next double, which may come from the stack or a value flag.
-     * 
+     *
      * @return the value
      * @throws ParameterException on a parameter error
      */
@@ -49,7 +49,7 @@ public interface ArgumentStack {
 
     /**
      * Get the next boolean, which may come from the stack or a value flag.
-     * 
+     *
      * @return the value
      * @throws ParameterException on a parameter error
      */
@@ -57,7 +57,7 @@ public interface ArgumentStack {
 
     /**
      * Get all remaining string values, which will consume the rest of the stack.
-     * 
+     *
      * @return the value
      * @throws ParameterException on a parameter error
      */
@@ -70,9 +70,29 @@ public interface ArgumentStack {
 
     /**
      * Get the underlying context.
-     * 
+     *
      * @return the context
      */
     CommandContext getContext();
 
+    /**
+     * Mark the current position of the stack.
+     *
+     * <p>The marked position initially starts at 0.</p>
+     */
+    void mark();
+
+    /**
+     * Reset to the previously {@link #mark()}ed position of the stack, and return
+     * the arguments that were consumed between this point and that previous point.
+     *
+     * <p>The marked position initially starts at 0.</p>
+     *
+     * @return the consumed arguments
+     */
+    String reset();
+
+    static Class<ArgumentStack> inject0() {
+        return ArgumentStack.class;
+    }
 }

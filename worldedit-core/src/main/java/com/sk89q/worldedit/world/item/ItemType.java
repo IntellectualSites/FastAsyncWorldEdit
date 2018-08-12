@@ -19,44 +19,29 @@
 
 package com.sk89q.worldedit.world.item;
 
-import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.registry.BundledItemData;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
 
-public class ItemType {
+public interface ItemType {
 
-    public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type");
-
-    private String id;
-
-    public ItemType(String id) {
-        // If it has no namespace, assume minecraft.
-        if (!id.contains(":")) {
-            id = "minecraft:" + id;
-        }
-        this.id = id;
+    default ItemTypes toEnum() {
+        return (ItemTypes) this;
     }
 
-    public String getId() {
-        return this.id;
-    }
+    String getId();
+
+    int getInternalId();
 
     /**
      * Gets the name of this item, or the ID if the name cannot be found.
      *
      * @return The name, or ID
      */
-    public String getName() {
-        BundledItemData.ItemEntry entry = BundledItemData.getInstance().findById(this.id);
-        if (entry == null) {
-            return getId();
-        } else {
-            return entry.localizedName;
-        }
-    }
+    String getName();
 
 
     /**
@@ -64,7 +49,7 @@ public class ItemType {
      *
      * @return If it has a block
      */
-    public boolean hasBlockType() {
+    default boolean hasBlockType() {
         return getBlockType() != null;
     }
 
@@ -74,17 +59,11 @@ public class ItemType {
      * @return The block representation
      */
     @Nullable
-    public BlockType getBlockType() {
-        return BlockTypes.get(this.id);
+    default BlockType getBlockType() {
+        return BlockTypes.get(getId());
     }
 
-    @Override
-    public int hashCode() {
-        return this.id.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof ItemType && this.id.equals(((ItemType) obj).id);
+    default BaseItem getDefaultState() {
+        return new BaseItem(this);
     }
 }

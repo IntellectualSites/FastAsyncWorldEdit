@@ -19,14 +19,47 @@
 
 package com.sk89q.worldedit.registry.state;
 
+import com.boydti.fawe.util.StringMan;
+
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 public class IntegerProperty extends AbstractProperty<Integer> {
 
+    private final int[] map;
+
     public IntegerProperty(final String name, final List<Integer> values) {
-        super(name, values);
+        this(name, values, 0);
+    }
+
+    public IntegerProperty(final String name, final List<Integer> values, int bitOffset) {
+        super(name, values, bitOffset);
+        int max = Collections.max(values);
+        this.map = new int[max + 1];
+        for (int i = 0; i < values.size(); i++) {
+            this.map[values.get(i)] = i;
+        }
+    }
+
+    @Override
+    public IntegerProperty withOffset(int bitOffset) {
+        return new IntegerProperty(getName(), getValues(), bitOffset);
+    }
+
+    @Override
+    public int getIndex(Integer value) {
+        try {
+            return this.map[value];
+        } catch (IndexOutOfBoundsException ignore) {
+            return -1;
+        }
+    }
+
+    @Override
+    public int getIndexFor(CharSequence string) throws IllegalArgumentException {
+        return this.map[StringMan.parseInt(string)];
     }
 
     @Nullable
@@ -34,9 +67,9 @@ public class IntegerProperty extends AbstractProperty<Integer> {
     public Integer getValueFor(String string) {
         try {
             int val = Integer.parseInt(string);
-            if (!getValues().contains(val)) {
-                throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + getValues().toString());
-            }
+//            if (!getValues().contains(val)) {
+//                throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + getValues().toString());
+//            }
             return val;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid int value: " + string + ". Not an int.");

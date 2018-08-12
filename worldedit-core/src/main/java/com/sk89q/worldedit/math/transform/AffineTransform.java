@@ -1,35 +1,21 @@
-/*
- * WorldEdit, a Minecraft world manipulation toolkit
- * Copyright (C) sk89q <http://www.sk89q.com>
- * Copyright (C) WorldEdit team and contributors
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.sk89q.worldedit.math.transform;
 
+import com.sk89q.worldedit.MutableBlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.math.MathUtils;
+import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * An affine transform.
- *
+ * <p>
  * <p>This class is from the
  * <a href="http://geom-java.sourceforge.net/index.html">JavaGeom project</a>,
  * which is licensed under LGPL v2.1.</p>
  */
-public class AffineTransform implements Transform {
+public class AffineTransform implements Transform, Serializable {
+
+    private transient MutableBlockVector mutable = new MutableBlockVector();
 
     /**
      * coefficients for x coordinate.
@@ -147,12 +133,24 @@ public class AffineTransform implements Transform {
         return new double[]{m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23};
     }
 
+    public boolean isOffAxis() {
+        double[] c = coefficients();
+        for (int i = 0; i < c.length; i++) {
+            if ((i + 1) % 4 != 0) {
+                if (Math.abs(c[i]) != 1 && c[i] != 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Computes the determinant of this transform. Can be zero.
      *
      * @return the determinant of the transform.
      */
-    private double determinant() {
+    public double determinant() {
         return m00 * (m11 * m22 - m12 * m21) - m01 * (m10 * m22 - m20 * m12)
                 + m02 * (m10 * m21 - m20 * m11);
     }
@@ -165,17 +163,17 @@ public class AffineTransform implements Transform {
         double det = this.determinant();
         return new AffineTransform(
                 (m11 * m22 - m21 * m12) / det,
-                (m21 * m02 - m01 * m22) / det,
+                (m02 * m21 - m22 * m01) / det,
                 (m01 * m12 - m11 * m02) / det,
                 (m01 * (m22 * m13 - m12 * m23) + m02 * (m11 * m23 - m21 * m13)
                         - m03 * (m11 * m22 - m21 * m12)) / det,
-                (m20 * m12 - m10 * m22) / det,
+                (m12 * m20 - m22 * m10) / det,
                 (m00 * m22 - m20 * m02) / det,
-                (m10 * m02 - m00 * m12) / det,
+                (m02 * m10 - m12 * m00) / det,
                 (m00 * (m12 * m23 - m22 * m13) - m02 * (m10 * m23 - m20 * m13)
                         + m03 * (m10 * m22 - m20 * m12)) / det,
                 (m10 * m21 - m20 * m11) / det,
-                (m20 * m01 - m00 * m21) / det,
+                (m01 * m20 - m21 * m00) / det,
                 (m00 * m11 - m10 * m01) / det,
                 (m00 * (m21 * m13 - m11 * m23) + m01 * (m10 * m23 - m20 * m13)
                         - m03 * (m10 * m21 - m20 * m11)) / det);
@@ -288,10 +286,17 @@ public class AffineTransform implements Transform {
 
     @Override
     public Vector apply(Vector vector) {
+        // vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03
+        // vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13
+        // vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23
         return new Vector(
                 vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03,
                 vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13,
                 vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23);
+//        mutable.mutX((vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03));
+//        mutable.mutY((vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13));
+//        mutable.mutZ((vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23));
+//        return mutable;
     }
 
     public AffineTransform combine(AffineTransform other) {
@@ -300,7 +305,9 @@ public class AffineTransform implements Transform {
 
     @Override
     public Transform combine(Transform other) {
-        if (other instanceof AffineTransform) {
+        if (other instanceof Identity || other.isIdentity()) {
+            return this;
+        } else if (other instanceof AffineTransform) {
             return concatenate((AffineTransform) other);
         } else {
             return new CombinedTransform(this, other);
@@ -312,5 +319,12 @@ public class AffineTransform implements Transform {
         return String.format("Affine[%g %g %g %g, %g %g %g %g, %g %g %g %g]}", m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23);
     }
 
+    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        mutable = new MutableBlockVector();
+    }
 
+    public static Class<?> inject() {
+        return AffineTransform.class;
+    }
 }

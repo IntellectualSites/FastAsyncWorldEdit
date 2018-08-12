@@ -19,24 +19,25 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.google.common.collect.ArrayTable;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Lists;
+import com.boydti.fawe.object.string.MutableCharSequence;
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
+import com.sk89q.worldedit.function.pattern.FawePattern;
+import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.registry.state.PropertyKey;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An immutable class that represents the state a block can be in.
@@ -44,130 +45,252 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class BlockState implements BlockStateHolder<BlockState> {
 
-    private final BlockType blockType;
-    private final Map<Property<?>, Object> values;
-    private final boolean fuzzy;
+    private final int internalId;
 
-    private BaseBlock emptyBaseBlock;
-
-    // Neighbouring state table.
-    private Table<Property<?>, Object, BlockState> states;
-
-    private BlockState(BlockType blockType) {
-        this.blockType = blockType;
-        this.values = new LinkedHashMap<>();
-        this.emptyBaseBlock = new BaseBlock(this);
-        this.fuzzy = false;
+    // TODO FIXME have field for BlockType & propertyId (to avoid all the bit shifting / masking)
+    protected BlockState(int internalId) {
+        this.internalId = internalId;
     }
 
     /**
-     * Creates a fuzzy BlockState. This can be used for partial matching.
-     *
-     * @param blockType The block type
-     * @param values The block state values
+     * Returns a temporary BlockState for a given internal id
+     * @param combinedId
+     * @deprecated magic number
+     * @return BlockState
      */
-    private BlockState(BlockType blockType, Map<Property<?>, Object> values) {
-        this.blockType = blockType;
-        this.values = values;
-        this.fuzzy = true;
+    @Deprecated
+    public static BlockState get(int combinedId) {
+        return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
     }
 
-    static Map<Map<Property<?>, Object>, BlockState> generateStateMap(BlockType blockType) {
-        Map<Map<Property<?>, Object>, BlockState> stateMap = new LinkedHashMap<>();
-        List<? extends Property> properties = blockType.getProperties();
+    /**
+     * Returns a temporary BlockState for a given type and string
+     * @param state String e.g. minecraft:water[level=4]
+     * @return BlockState
+     */
+    public static BlockState get(String state) {
+        return get(null, state);
+    }
 
-        if (!properties.isEmpty()) {
-            List<List<Object>> separatedValues = Lists.newArrayList();
-            for (Property prop : properties) {
-                List<Object> vals = Lists.newArrayList();
-                vals.addAll(prop.getValues());
-                separatedValues.add(vals);
+    /**
+     * Returns a temporary BlockState for a given type and string
+     *  - It's faster if a BlockType is provided compared to parsing the string
+     * @param type BlockType e.g. BlockTypes.STONE (or null)
+     * @param state String e.g. minecraft:water[level=4]
+     * @return BlockState
+     */
+    public static BlockState get(@Nullable BlockType type, String state) {
+        return get(type, state, 0);
+    }
+
+    /**
+     * Returns a temporary BlockState for a given type and string
+     *  - It's faster if a BlockType is provided compared to parsing the string
+     * @param type BlockType e.g. BlockTypes.STONE (or null)
+     * @param state String e.g. minecraft:water[level=4]
+     * @return BlockState
+     */
+    public static BlockState get(@Nullable BlockType type, String state, int propId) {
+        int propStrStart = state.indexOf('[');
+        if (type == null) {
+            CharSequence key;
+            if (propStrStart == -1) {
+                key = state;
+            } else {
+                MutableCharSequence charSequence = MutableCharSequence.getTemporal();
+                charSequence.setString(state);
+                charSequence.setSubstring(0, propStrStart);
+                key = charSequence;
             }
-            List<List<Object>> valueLists = Lists.cartesianProduct(separatedValues);
-            for (List<Object> valueList : valueLists) {
-                Map<Property<?>, Object> valueMap = Maps.newTreeMap(Comparator.comparing(Property::getName));
-                BlockState stateMaker = new BlockState(blockType);
-                for (int i = 0; i < valueList.size(); i++) {
-                    Property<?> property = properties.get(i);
-                    Object value = valueList.get(i);
-                    valueMap.put(property, value);
-                    stateMaker.setState(property, value);
+            type = BlockTypes.get(key);
+        }
+        if (propStrStart == -1) {
+            return type.getDefaultState();
+        }
+
+        List<? extends Property> propList = type.getProperties();
+
+        MutableCharSequence charSequence = MutableCharSequence.getTemporal();
+        charSequence.setString(state);
+
+        if (propList.size() == 1) {
+            AbstractProperty property = (AbstractProperty) propList.get(0);
+            String name = property.getName();
+
+            charSequence.setSubstring(propStrStart + name.length() + 2, state.length() - 1);
+
+            return type.withPropertyId(property.getIndexFor(charSequence));
+        }
+
+        int stateId = type.getInternalId() + (propId << BlockTypes.BIT_OFFSET);
+        int length = state.length();
+        AbstractProperty property = null;
+
+        int last = propStrStart + 1;
+        for (int i = last; i < length; i++) {
+            char c = state.charAt(i);
+            switch (c) {
+                case ']':
+                case ',': {
+                    charSequence.setSubstring(last, i);
+                    int index = property.getIndexFor(charSequence);
+                    stateId = property.modifyIndex(stateId, index);
+                    last = i + 1;
+                    break;
                 }
-                stateMap.put(valueMap, stateMaker);
+                case '=': {
+                    charSequence.setSubstring(last, i);
+                    property = (AbstractProperty) type.getPropertyMap().get(charSequence);
+                    last = i + 1;
+                    break;
+                }
+                default:
+                    continue;
             }
         }
-
-        if (stateMap.isEmpty()) {
-            // No properties.
-            stateMap.put(new LinkedHashMap<>(), new BlockState(blockType));
-        }
-
-        for (BlockState state : stateMap.values()) {
-            state.populate(stateMap);
-        }
-
-        return stateMap;
-    }
-
-    private void populate(Map<Map<Property<?>, Object>, BlockState> stateMap) {
-        final Table<Property<?>, Object, BlockState> states = HashBasedTable.create();
-
-        for(final Map.Entry<Property<?>, Object> entry : this.values.entrySet()) {
-            final Property property = entry.getKey();
-
-            property.getValues().forEach(value -> {
-                if(value != entry.getValue()) {
-                    BlockState modifiedState = stateMap.get(this.withValue(property, value));
-                    if (modifiedState != null) {
-                        states.put(property, value, modifiedState);
-                    } else {
-                        System.out.println(stateMap);
-                        WorldEdit.logger.warning("Found a null state at " + this.withValue(property, value));
-                    }
-                }
-            });
-        }
-
-        this.states = states.isEmpty() ? states : ArrayTable.create(states);
-    }
-
-    private <V> Map<Property<?>, Object> withValue(final Property<V> property, final V value) {
-        final Map<Property<?>, Object> values = Maps.newHashMap(this.values);
-        values.put(property, value);
-        return values;
+        return type.withPropertyId(stateId >> BlockTypes.BIT_OFFSET);
     }
 
     @Override
-    public BlockType getBlockType() {
-        return this.blockType;
+    public BlockState withPropertyId(int propertyId) {
+        return getBlockType().withPropertyId(propertyId);
+    }
+
+    @Override
+    public Mask toMask(Extent extent) {
+        return new SingleBlockStateMask(extent, this);
+    }
+
+    @Override
+    public boolean apply(Extent extent, Vector get, Vector set) throws WorldEditException {
+        return extent.setBlock(set, this);
+    }
+
+    @Override
+    public BlockState apply(Vector position) {
+        return this;
+    }
+
+    @Deprecated
+    public int getInternalId() {
+        return this.internalId;
+    }
+
+    @Override
+    public boolean hasNbtData() {
+        return getNbtData() != null;
+    }
+
+    @Override
+    public String getNbtId() {
+        return "";
+    }
+
+    @Nullable
+    @Override
+    public CompoundTag getNbtData() {
+        return null;
+    }
+
+    @Override
+    public void setNbtData(@Nullable CompoundTag nbtData) {
+        throw new UnsupportedOperationException("This class is immutable.");
+    }
+
+    /**
+     * The internal id with no type information
+     * @return
+     */
+    @Deprecated
+    @Override
+    public final int getInternalPropertiesId() {
+        return this.getInternalId() >> BlockTypes.BIT_OFFSET;
+    }
+
+    @Override
+    public final BlockTypes getBlockType() {
+        return BlockTypes.get(this.getInternalId() & BlockTypes.BIT_MASK);
+    }
+
+    @Deprecated
+    @Override
+    public final int getInternalBlockTypeId() {
+        return this.getInternalId() & BlockTypes.BIT_MASK;
     }
 
     @Override
     public <V> BlockState with(final Property<V> property, final V value) {
-        if (fuzzy) {
-            return setState(property, value);
-        } else {
-            BlockState result = states.get(property, value);
-            return result == null ? this : result;
+        try {
+            int newState = ((AbstractProperty) property).modify(this.getInternalId(), value);
+            return newState != this.getInternalId() ? new BlockState(newState) : this;
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Property not found: " + property);
         }
     }
 
     @Override
-    public <V> V getState(final Property<V> property) {
-        return (V) this.values.get(property);
+    public <V> BlockState with(final PropertyKey property, final V value) {
+        try {
+            int newState = ((AbstractProperty) getBlockType().getProperty(property)).modify(this.getInternalId(), value);
+            return newState != this.getInternalId() ? new BlockState(newState) : this;
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Property not found: " + property);
+        }
     }
 
     @Override
-    public Map<Property<?>, Object> getStates() {
-        return Collections.unmodifiableMap(this.values);
+    public final <V> V getState(final Property<V> property) {
+        try {
+            AbstractProperty ap = (AbstractProperty) property;
+            return (V) ap.getValue(this.getInternalId());
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Property not found: " + property);
+        }
     }
 
+    @Deprecated
+    @Override
+    public final <V> V getState(final PropertyKey key) {
+        return getState(getBlockType().getProperty(key));
+    }
+
+    @Override
+    @Deprecated
+    public final Map<Property<?>, Object> getStates() {
+        BlockType type = this.getBlockType();
+        // Lazily initialize the map
+        Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) input -> getState(input));
+        return (Map<Property<?>, Object>) map;
+    }
+
+    /**
+     * Deprecated, use masks - not try to this fuzzy/non fuzzy state nonsense
+     * @return
+     */
+    @Deprecated
     public BlockState toFuzzy() {
-        return new BlockState(this.getBlockType(), new HashMap<>());
+        return this;
     }
 
     @Override
+    public int hashCode() {
+        return getInternalId();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    @Deprecated
     public boolean equalsFuzzy(BlockStateHolder o) {
+        try {
+            return o.getInternalId() == this.getInternalId();
+        } catch (ClassCastException e) {
+            // Shouldn't happen unless something modifies WorldEdit
+            e.printStackTrace();
+        }
         if (!getBlockType().equals(o.getBlockType())) {
             return false;
         }
@@ -202,37 +325,36 @@ public class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    public BaseBlock toBaseBlock() {
-        if (this.fuzzy) {
-            throw new IllegalArgumentException("Can't create a BaseBlock from a fuzzy BlockState!");
-        }
-        return this.emptyBaseBlock;
-    }
-
-    @Override
-    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
-        if (compoundTag == null) {
-            return toBaseBlock();
-        }
-        return new BaseBlock(this, compoundTag);
-    }
-
-    /**
-     * Internal method used for creating the initial BlockState.
-     *
-     * Sets a value. DO NOT USE THIS.
-     *
-     * @param property The state
-     * @param value The value
-     * @return The blockstate, for chaining
-     */
-    private BlockState setState(final Property<?> property, final Object value) {
-        this.values.put(property, value);
-        return this;
-    }
-
-    @Override
     public String toString() {
         return getAsString();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

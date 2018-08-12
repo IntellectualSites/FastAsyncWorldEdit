@@ -19,11 +19,12 @@
 
 package com.sk89q.worldedit.function;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Applies a {@link RegionFunction} to the first ground block.
@@ -37,7 +38,7 @@ public class GroundFunction implements LayerFunction {
     /**
      * Create a new ground function.
      *
-     * @param mask a mask
+     * @param mask     a mask
      * @param function the function to apply
      */
     public GroundFunction(Mask mask, RegionFunction function) {
@@ -87,7 +88,6 @@ public class GroundFunction implements LayerFunction {
                 affected++;
             }
         }
-
         return false;
     }
 

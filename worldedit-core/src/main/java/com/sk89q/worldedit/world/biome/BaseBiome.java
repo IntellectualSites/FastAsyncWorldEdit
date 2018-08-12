@@ -19,11 +19,16 @@
 
 package com.sk89q.worldedit.world.biome;
 
+import com.sk89q.minecraft.util.commands.Link;
+import com.sk89q.worldedit.command.BiomeCommands;
+
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Basic storage object to represent a given biome.
  */
+@Link(clazz = BiomeCommands.class, value = "biomelist")
 public class BaseBiome {
 
     private int id;
@@ -78,5 +83,10 @@ public class BaseBiome {
     @Override
     public int hashCode() {
         return id;
+    }
+
+
+    public static Class<?> inject() {
+        return BaseBiome.class;
     }
 }

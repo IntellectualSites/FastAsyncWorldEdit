@@ -22,7 +22,6 @@ package com.sk89q.worldedit.command.tool;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -43,9 +42,8 @@ public class SinglePickaxe implements BlockTool {
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
         World world = (World) clicked.getExtent();
-        final BlockType blockType = world.getBlock(clicked.toVector()).getBlockType();
-        if (blockType == BlockTypes.BEDROCK
-                && !player.canDestroyBedrock()) {
+        final BlockType blockType = world.getLazyBlock(clicked.toVector()).getBlockType();
+        if (blockType == BlockTypes.BEDROCK && !player.canDestroyBedrock()) {
             return true;
         }
 
@@ -53,16 +51,19 @@ public class SinglePickaxe implements BlockTool {
         editSession.getSurvivalExtent().setToolUse(config.superPickaxeDrop);
 
         try {
-            editSession.setBlock(clicked.toVector(), BlockTypes.AIR.getDefaultState());
-        } catch (MaxChangedBlocksException e) {
-            player.printError("Max blocks change limit reached.");
+            if (editSession.setBlock(clicked.getBlockX(), clicked.getBlockY(), clicked.getBlockZ(), EditSession.nullBlock)) {
+                // TODO FIXME play effect
+//                world.playEffect(clicked.toVector(), 2001, blockType);
+            }
         } finally {
             editSession.flushQueue();
+            session.remember(editSession);
         }
-
-        world.playEffect(clicked.toVector(), 2001, blockType.getLegacyId());
 
         return true;
     }
 
+    public static Class<?> inject() {
+        return SinglePickaxe.class;
+    }
 }

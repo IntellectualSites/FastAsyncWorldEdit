@@ -24,6 +24,8 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * A item registry that uses {@link BundledItemRegistry} to serve information
@@ -36,5 +38,10 @@ public class BundledItemRegistry implements ItemRegistry {
     public BaseItem createFromId(String id) {
         ItemType itemType = ItemTypes.get(id);
         return itemType == null ? null : new BaseItem(itemType);
+    }
+
+    @Override
+    public Collection<String> registerItems() {
+        return Collections.emptyList();
     }
 }

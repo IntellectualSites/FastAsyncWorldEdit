@@ -19,19 +19,22 @@
 
 package com.sk89q.worldedit.session;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
+import java.util.Collections;
+import java.util.List;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Holds the clipboard and the current transform on the clipboard.
  */
 public class ClipboardHolder {
-
-    private final Clipboard clipboard;
+    private Clipboard clipboard;
     private Transform transform = new Identity();
 
     /**
@@ -44,16 +47,42 @@ public class ClipboardHolder {
         this.clipboard = clipboard;
     }
 
+    protected ClipboardHolder() {}
+
     /**
      * Get the clipboard.
      * <p>
      * If there is a transformation applied, the returned clipboard will
      * not contain its effect.
      *
+     * @deprecated FAWE supports multiple loaded schematics {@link #getClipboards()}
      * @return the clipboard
      */
+    @Deprecated
     public Clipboard getClipboard() {
         return clipboard;
+    }
+
+    /**
+     * Get all currently held clipboards
+     * @return
+     */
+    public List<Clipboard> getClipboards() {
+        return Collections.singletonList(getClipboard());
+    }
+
+    public boolean contains(Clipboard clipboard) {
+        return this.clipboard == clipboard;
+    }
+
+    /**
+     * Get all end ClipboardHolders<br/>
+     *  - Usually this will return itself.<br/>
+     *  - If this is a multi clipboard, it will return the children
+     * @return Set of end ClipboardHolders
+     */
+    public List<ClipboardHolder> getHolders() {
+        return Collections.singletonList(this);
     }
 
     /**
@@ -82,6 +111,17 @@ public class ClipboardHolder {
      */
     public PasteBuilder createPaste(Extent targetExtent) {
         return new PasteBuilder(this, targetExtent);
+    }
+
+    public void close() {
+        if (clipboard instanceof BlockArrayClipboard) {
+            ((BlockArrayClipboard) clipboard).close();
+        }
+        clipboard = null;
+    }
+
+    public static Class<?> inject() {
+        return ClipboardHolder.class;
     }
 
 }

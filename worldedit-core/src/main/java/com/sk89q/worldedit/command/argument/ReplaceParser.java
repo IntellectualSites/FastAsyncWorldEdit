@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.command.argument;
 
-import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
-
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.extent.NullExtent;
@@ -28,9 +26,13 @@ import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.EditContext;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.command.argument.CommandArgs;
 import com.sk89q.worldedit.util.command.composition.SimpleCommand;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
 
 
 public class ReplaceParser extends SimpleCommand<Contextual<? extends RegionFunction>> {

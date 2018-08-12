@@ -35,7 +35,11 @@ import java.util.Set;
 public class CommandRegistration {
 
     static {
-      Bukkit.getServer().getHelpMap().registerHelpTopicFactory(DynamicPluginCommand.class, new DynamicPluginCommandHelpTopic.Factory());
+        try {
+            Bukkit.getServer().getHelpMap().registerHelpTopicFactory(DynamicPluginCommand.class, new DynamicPluginCommandHelpTopic.Factory());
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     protected final Plugin plugin;

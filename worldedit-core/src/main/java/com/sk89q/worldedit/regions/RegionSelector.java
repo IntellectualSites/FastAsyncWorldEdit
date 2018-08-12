@@ -27,9 +27,9 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Region selectors create {@link Region}s from a series of "selected points."
@@ -156,5 +156,14 @@ public interface RegionSelector {
      * @return a list of lines describing the region
      */
     public List<String> getInformationLines();
+
+    /**
+     * Get the verticies
+     * @return
+     * @throws IncompleteRegionException
+     */
+    default List<Vector> getVerticies() throws IncompleteRegionException {
+        return Collections.singletonList(getPrimaryPosition());
+    }
 
 }

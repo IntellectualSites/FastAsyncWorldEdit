@@ -19,24 +19,27 @@
 
 package com.sk89q.worldedit.world.registry;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.util.gson.VectorAdapter;
+import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.util.gson.VectorAdapter;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,10 +51,10 @@ public class LegacyMapper {
     private static final Logger log = Logger.getLogger(LegacyMapper.class.getCanonicalName());
     private static LegacyMapper INSTANCE;
 
-    private Multimap<String, BlockState> stringToBlockMap = HashMultimap.create();
-    private Multimap<BlockState, String> blockToStringMap = HashMultimap.create();
-    private Multimap<String, ItemType> stringToItemMap = HashMultimap.create();
-    private Multimap<ItemType, String> itemToStringMap = HashMultimap.create();
+    private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
+    private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
+    private final int[] blockArr = new int[4096];
+    private final BiMap<Integer, ItemTypes> itemMap = HashBiMap.create();
 
     /**
      * Create a new instance.
@@ -60,6 +63,7 @@ public class LegacyMapper {
         try {
             loadFromResource();
         } catch (Throwable e) {
+            e.printStackTrace();
             log.log(Level.WARNING, "Failed to load the built-in legacy id registry", e);
         }
     }
@@ -77,8 +81,8 @@ public class LegacyMapper {
         if (url == null) {
             throw new IOException("Could not find legacy.json");
         }
-        String data = Resources.toString(url, Charset.defaultCharset());
-        LegacyDataFile dataFile = gson.fromJson(data, new TypeToken<LegacyDataFile>() {}.getType());
+        String source = Resources.toString(url, Charset.defaultCharset());
+        LegacyDataFile dataFile = gson.fromJson(source, new TypeToken<LegacyDataFile>() {}.getType());
 
         ParserContext parserContext = new ParserContext();
         parserContext.setPreferringWildcard(false);
@@ -87,65 +91,114 @@ public class LegacyMapper {
 
         for (Map.Entry<String, String> blockEntry : dataFile.blocks.entrySet()) {
             try {
-                String id = blockEntry.getKey();
-                BlockState state = WorldEdit.getInstance().getBlockFactory().parseFromInput(blockEntry.getValue(), parserContext).toImmutableState();
-                blockToStringMap.put(state, id);
-                stringToBlockMap.put(id, state);
+                BlockStateHolder blockState = BlockState.get(null, blockEntry.getValue());
+                BlockTypes type = blockState.getBlockType();
+                if (type.hasProperty(PropertyKey.WATERLOGGED)) {
+                    blockState = blockState.with(PropertyKey.WATERLOGGED, false);
+                }
+                int combinedId = getCombinedId(blockEntry.getKey());
+                blockArr[combinedId] = blockState.getInternalId();
+
+                blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
+                blockStateToLegacyId4Data.putIfAbsent(blockState.getInternalBlockTypeId(), combinedId);
             } catch (Exception e) {
-                log.warning("Unknown block: " + blockEntry.getValue());
+                log.fine("Unknown block: " + blockEntry.getValue());
+            }
+        }
+        for (int id = 0; id < 256; id++) {
+            int combinedId = id << 4;
+            int base = blockArr[combinedId];
+            if (base != 0) {
+                for (int data = 0; data < 16; data++, combinedId++) {
+                    if (blockArr[combinedId] == 0) blockArr[combinedId] = base;
+                }
             }
         }
 
         for (Map.Entry<String, String> itemEntry : dataFile.items.entrySet()) {
             try {
-                String id = itemEntry.getKey();
-                ItemType type = ItemTypes.get(itemEntry.getValue());
-                itemToStringMap.put(type, id);
-                stringToItemMap.put(id, type);
+                itemMap.put(getCombinedId(itemEntry.getKey()), ItemTypes.get(itemEntry.getValue()));
             } catch (Exception e) {
-                log.warning("Unknown item: " + itemEntry.getValue());
+                log.fine("Unknown item: " + itemEntry.getValue());
             }
         }
     }
 
-    @Nullable
-    public ItemType getItemFromLegacy(int legacyId) {
-        return getItemFromLegacy(legacyId, 0);
+    private int getCombinedId(String input) {
+        String[] split = input.split(":");
+        return (Integer.parseInt(split[0]) << 4) + (split.length == 2 ? Integer.parseInt(split[1]) : 0);
     }
 
     @Nullable
-    public ItemType getItemFromLegacy(int legacyId, int data) {
-        return stringToItemMap.get(legacyId + ":" + data).stream().findFirst().orElse(null);
+    public ItemTypes getItemFromLegacy(int legacyId) {
+        return itemMap.get(legacyId << 4);
+    }
+
+    public ItemTypes getItemFromLegacy(String input) {
+        if (input.startsWith("minecraft:")) input = input.substring(10);
+        return itemMap.get(getCombinedId(input));
+    }
+
+    public BlockState getBlockFromLegacy(String input) {
+        if (input.startsWith("minecraft:")) input = input.substring(10);
+        return BlockState.get(blockArr[getCombinedId(input)]);
     }
 
     @Nullable
-    public int[] getLegacyFromItem(ItemType itemType) {
-        if (!itemToStringMap.containsKey(itemType)) {
-            return null;
-        } else {
-            String value = itemToStringMap.get(itemType).stream().findFirst().get();
-            return Arrays.stream(value.split(":")).mapToInt(Integer::parseInt).toArray();
-        }
+    public ItemTypes getItemFromLegacy(int legacyId, int data) {
+        return itemMap.get((legacyId << 4) + data);
+    }
+
+    @Nullable
+    public Integer getLegacyFromItem(ItemType itemType) {
+        return itemMap.inverse().get(itemType);
     }
 
     @Nullable
     public BlockState getBlockFromLegacy(int legacyId) {
-        return getBlockFromLegacy(legacyId, 0);
+        return getBlock(legacyId << 4);
+    }
+
+    @Nullable
+    public BlockState getBlockFromLegacyCombinedId(int combinedId) {
+        return getBlock(combinedId);
     }
 
     @Nullable
     public BlockState getBlockFromLegacy(int legacyId, int data) {
-        return stringToBlockMap.get(legacyId + ":" + data).stream().findFirst().orElse(null);
+        return getBlock((legacyId << 4) + data);
+    }
+
+    private BlockState getBlock(int combinedId) {
+        if (combinedId < blockArr.length) {
+            return BlockState.get(blockArr[combinedId]);
+        }
+        Integer extra = extraId4DataToStateId.get(combinedId);
+        if (extra == null) {
+            extra = extraId4DataToStateId.get(combinedId & 0xFF0);
+        }
+        if (extra != null) {
+            return BlockState.get(extra);
+        }
+        return BlockTypes.AIR.getDefaultState();
+    }
+
+    public void register(int id, int data, BlockStateHolder state) {
+        int combinedId = ((id << 4) + data);
+        extraId4DataToStateId.put((int) combinedId, (Integer) state.getInternalId());
+        blockStateToLegacyId4Data.putIfAbsent(state.getInternalId(), combinedId);
     }
 
     @Nullable
-    public int[] getLegacyFromBlock(BlockState blockState) {
-        if (!blockToStringMap.containsKey(blockState)) {
-            return null;
-        } else {
-            String value = blockToStringMap.get(blockState).stream().findFirst().get();
-            return Arrays.stream(value.split(":")).mapToInt(Integer::parseInt).toArray();
-        }
+    public Integer getLegacyFromBlock(BlockState blockState) {
+        Integer result = blockStateToLegacyId4Data.get(blockState.getInternalId());
+        if (result == null) result = blockStateToLegacyId4Data.get(blockState.getInternalBlockTypeId());
+        return result;
+    }
+
+    @Nullable
+    public Integer getLegacyFromBlock(BlockType type) {
+        return blockStateToLegacyId4Data.get(type.getDefaultState());
     }
 
     public static LegacyMapper getInstance() {

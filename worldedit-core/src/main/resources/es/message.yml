@@ -1,0 +1,329 @@
+info:
+  prefix: '&4&lFAWE:&f&7'
+  file_deleted: '%s0 ha sido eliminado.'
+  schematic_pasting: '&7La schematic está peganda. Esto no se puede deshacer.'
+  lighting_propogate_selection: '&7La iluminación se ha propagado en %s0 chunks. (Nota:
+    Para quitar el uso de la luz //removelight)'
+  updated_lighting_selection: '&7La iluminación se ha actualizado en %s0 trozos. (Puede
+    tardar un segundo en enviar los paquetes)'
+  set_region: '&7Selección ajustada a su región permitida actual'
+  worldedit_command_limit: '&7Espere hasta que se complete la acción actual'
+  worldedit_delayed: '&7Espere mientras procesamos su acción ...'
+  worldedit_run: '&7Perdón por el retraso. Ahora ejecutando: %s0'
+  worldedit_complete: '&7Editar completado.'
+  require_selection_in_mask: '&7%s de su selección no está dentro de su máscara. Tú
+    sólo puede realizar ediciones dentro de las regiones permitidas.'
+  worldedit_volume: '&7No puede seleccionar un volumen de %current%. El volumen máximo
+    que puede modificar es %max%.'
+  worldedit_iterations: '&7No se puede iterar %current% times. El número máximo de
+    iteraciones permitidas es %max%.'
+  worldedit_unsafe: '&7Acceso a ese comando ha sido bloqueado'
+  worldedit_dangerous_worldedit: '&4Proceso de edición insegura en %s0 por %s1'
+  worldedit_toggle_tips_on: '&7Desabilitado FAWE tips.'
+  worldedit_toggle_tips_off: '&7Habilitado FAWE tips.'
+  worldedit_bypassed: '&7Consejos FAWE habilitados.'
+  worldedit_unmasked: '&6Las ediciones de FAWE ya no están restringidas.'
+  worldedit_restricted: '&6Vos ediciones de FAWE están restringidas ahora.'
+  worldedit_oom_admin: |-
+    &cOpciones Posibles:
+    &8 - &7//fast
+    &8 - &7Para ediciones más pequeñas
+    &8 - &7Asignar más memoria
+    &8 - &7Desabilitado `max-memory-percent`
+  compressed: Historial comprimido. Guardado ~ %s0b (%s1x menor)
+  action_complete: Acción completada en %s0 segundos
+error:
+  worldedit_extend: '&4Es posible que tu edición se haya extendido fuera de tu región
+    permitida.'
+  web_unauthorized: 'Solo se permiten enlaces desde el host web configurado: %s0'
+  command_syntax: '&4Usage: &7%s0'
+  no_perm: '&4Está faltando el nodo de permiso: %s0'
+  setting_disable: '&4Pregunta de ajuste: %s0'
+  brush_not_found: '&4Brushes disponibles: %s0'
+  brush_incompatible: '&cBrush no compatible con esta versión'
+  schematic_not_found: '&4Schematic no encontrada: &7%s0'
+  no_region: '&4No tienes región actual permitida'
+  no_mask: '&4No tienes ningún conjunto de máscara actual'
+  not_player: '&4Usted debe ser un jugador para realizar esta acción!'
+  player_not_found: '&4Jugador no encontrado:&7 %s0'
+  oom: |-
+    &8[&4Critical&8] &4Detected baja memoria i.e. < 1%. Tomaremos las siguientes acciones:
+    &8 - &7Terminate bloqueamos la colocación
+    &8 - &7Borrar Historia de WE
+    &8 - &7Unload shunk no esenciales
+    &8 - &7Matar entidades
+    &8 - &7La recogida de basura
+    &4Ignore esto si intenta bloquear el servidor.
+    &7Nota: Es probable que la memoria baja (pero no necesariamente) sea causada por WE
+  worldedit_some_fails: '&4%s0 bloques fueron''t pcolocado porque estaban fuera de
+    su región permitida.'
+  worldedit_some_fails_blockbag: '&4Bloques perdidos: %s0'
+web:
+  generating_link: Subiendo %s, por favor espere...
+  generating_link_failed: '&4Fallo al generar el enlace de descarga!'
+  download_link: '%s'
+worldedit:
+  general:
+    mask_disabled: Máscara global desactivada
+    mask: Seleccionar máscara global
+    source_mask_disabled: Máscara de fuente global desactivada
+    source_mask: Seleccionar máscaras de fuentes globales
+    transform_disabled: Transformación global deshabilitada
+    transform: Seleccionar transformación global
+    fast_enabled: Modo rápido activado. Las restricciones de edición se evitarán.
+    fast_disabled: Modo rápido inhabilitado.
+    place_enabled: 'Ahora colocando en pos #1.'
+    place_disabled: Ahora colocando en el bloque en el que estás.
+  copy:
+    command_copy: Se copiaron %s0 bloques.
+  cut:
+    command_cut_slow: '%s0 bloques fueron cortados.'
+    command_cut_lazy: '%s0 bloques se eliminarán al pegar/paste'
+  paste:
+    command_paste: El portapapeles se ha pegado en %s0
+  rotate:
+    command_rotate: Se ha roto el portapapeles
+  flip:
+    command_flipped: Se ha volcado el portapapeles
+  regen:
+    command_regen_0: Región regenerada.
+    command_regen_1: Región regenerada.
+    command_regen_2: Región regenerada.
+  tree:
+    command_tree: '%s0 árboles/trees creados.'
+    command_pumpkin: '%s0 parches de calabaza/pumpkin creados.'
+  flora:
+    command_flora: '%s0 flora creada.'
+  history:
+    command_history_clear: Historial eliminado
+    command_redo_error: No queda nada para rehacer. (Véase también `/inspect` y `/frb`)
+    command_history_other_error: No se puede encontrar la sesión para %s0.
+    command_redo_success: Rehacer correctamente.
+    command_undo_error: No queda nada para deshacer. (Véase también `/inspect` y `/frb`)
+    command_undo_success: Deshacer, completada correctamente.
+  operation:
+    operation: Operación en cola (%s0)
+  selection:
+    selection_wand: 'Click izquierdo: seleccione posicion #1; Haga click derecho:
+      seleccione posicion #2'
+    selection_wand_disable: Hacha de editar esactivada.
+    selection_wand_enable: Hacha de edición activada.
+    selection_chunk: Chunk seleccionado (%s0)
+    selection_chunks: Chunks seleccionados (%s0) - (%s1)
+    selection_contract: Región contratada %s0 bloques.
+    selection_count: Contado %s0 bloques.
+    selection_distr: '# Contado: %s0'
+    selection_expand: Región expandida %s0 bloques
+    selection_expand_vert: Región expandida %s0 bloques (de arriba hacia abajo)
+    selection_inset: Inserción de región
+    selection_outset: Comienzo de la región
+    selection_shift: Región desplazada
+    selection_cleared: Selección borrada
+  navigation:
+    navigation_wand_error: '&4Nada por lo que pasar'
+  anvil:
+    world_is_loaded: El mundo no debe estar en uso durante la ejecución. Descargue
+      el mundo, o utilice el uso -f para anular (guardar primero)
+  brush:
+    brush_reset: Restablece el pincel.
+    brush_none: Usted no está sosteniendo un pincel!
+    brush_scroll_action_set: Establece la acción de desplazamiento en %s0
+    brush_scroll_action_unset: Acción de desplazamiento eliminada
+    brush_visual_mode_set: Establece el modo visual a %s0
+    brush_target_mode_set: Establece el modo de destino en %s0
+    brush_target_mask_set: Establece la máscara de destino en %s0
+    brush_target_offset_set: Establece el desplazamiento de destino en %s0
+    brush_equipped: Pincel Equipado %s0
+    brush_try_other: |-
+      &4Hay otros pinceles más adecuados e.g.
+      &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
+    brush_copy: Haga clic con el botón izquierdo en la base de un objeto para copiar,
+      haga clic derecho para pegar. Incrementar el radio del pincel si es necesario.
+    brush_height_invalid: Archivo de mapa de altura no válido (%s0)
+    brush_smooth: 'Nota: Use el pincel de mezcla si desea suavizar salientes o cuevas.'
+    brush_spline: Haga clic para agregar un punto, haga clic en el mismo lugar para
+      terminar
+    brush_line_primary: Añadido punto %s0, haga clic en otra posición para crear la
+      línea
+    brush_line_secondary: Spline creada
+    brush_spline_primary_2: Añadido posición, haga clic en el mismo lugar para unirse!
+    brush_spline_secondary_error: No hay suficientes posiciones definidas!
+    brush_spline_secondary: Creado spline
+    brush_size: Juego de pinceles
+    brush_range: Conjunto de pinceles
+    brush_mask_disabled: Máscara de pincel desactivada
+    brush_mask: Juego de máscaras de pincel
+    brush_source_mask_disabled: Cepillado de la máscara de origen desactivada
+    brush_source_mask: Conjunto de máscaras de fuentes de pincel
+    brush_transform_disabled: Transformación de pincel desactivada
+    brush_transform: Conjunto de transformación de pincel
+    brush_material: Brush material set
+  rollback:
+    rollback_element: Deshacer %s0
+  tool:
+    tool_inspect: Inspecciona la herramienta enlazada a %s0.
+    tool_inspect_info: '&7%s0 cambiado %s1 a %s2 %s3 hace'
+    tool_inspect_info_footer: '&6Total: &7%s0 changes'
+    tool_none: Herramienta desvinculada de su elemento actual.
+    tool_info: Herramienta de información vinculada a %s0.
+    tool_tree: Herramienta de árbol vinculada a %s0.
+    tool_tree_error: El tipo de árbol/tree %s0 es desconocido.
+    tool_repl: Herramienta de sustitución de bloques vinculada a %s0.
+    tool_cycler: Herramienta de bloqueo de ciclos de datos vinculada a %s0.
+    tool_flood_fill: bloquea la herramienta de relleno asociada a %s0.
+    tool_range_error: 'Rango máximo: %s0.'
+    tool_radius_error: 'Radio de pincel máximo permitido: %s0.'
+    tool_deltree: Herramienta de eliminación de árbol flotante vinculada a %s0.
+    tool_farwand: Herramienta de varillalejana/wand tool limitada/bound a %s0.
+    tool_lrbuild_bound: Herramienta de construcción de largo alcance vinculada a %s0.
+    tool_lrbuild_info: Haga clic con el botón izquierdo en %s0; haga clic con el botón
+      secundario en %s1.
+    superpickaxe_enabled: Super Pico habilitado.
+    superpickaxe_disabled: Super Pico deshabilitado.
+    superpickaxe_area_enabled: Modo cambiado. Clic izquierdo con un pico. // to disable.
+  snapshot:
+    snapshot_loaded: Snapshot '%s0' cargado; ahora restaurando...
+    snapshot_set: 'Snapshot establecida en: %s0'
+    snapshot_newest: Ahora utiliza la más nueva snapshot.
+    snapshot_list_header: 'Snapshots para el mundo (%s0):'
+    snapshot_list_footer: Utilice /snap use [snapshot] o /snap use latest.
+  biome:
+    biome_list_header: 'Biomas (page %s0/%s1):'
+    biome_changed: Se modificaron los biomas en %s0 columnas.
+  utility:
+    kill_success: Matado %s0 entidades en un radio de %s1.
+    nothing_confirmed: No tiene ninguna acción pendiente de confirmación.
+    page_footer: Utilizar %s0 para ir a la página siguiente
+  schematic:
+    schematic_format: 'Formatos disponibles (Nombre: Buscar nombres)'
+    schematic_loaded: '%s0 cargado. Pegarlo con //paste'
+    schematic_saved: '%s0 guardado.'
+    schematic_page: La página debe ser %s
+    schematic_none: No se han encontrado archivos.
+    schematic_list: 'Archivos disponibles (Filename: Format) [%s0/%s1]:'
+    schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
+  clipboard:
+    clipboard_cleared: Portapapeles despejado
+    clipboard_invalid_format: 'Formato del portapapeles desconocido:  %s0'
+    clipboard_uri_not_found: You do not have %s0 loaded
+  visitor:
+    visitor_block: '%s0 bloques afectados'
+    visitor_entity: '%s0 entidades afectadas'
+    visitor_flat: '%s0 columnas afectadas'
+  selector:
+    selector_fuzzy_pos1: Región establecida y ampliada de %s0 %s1.
+    selector_fuzzy_pos2: Añadido expansión de %s0 %s1.
+    selector_invalid_coordinates: Coordenadas no válidas %s0
+    selector_already_set: Posición ya establecida.
+    selector_set_default: El selector de región predeterminado es ahora %s0.
+    selector_pos: Posicion &8[&8%s0&8] &7establecida en &8%s1 (%s2)&7.
+    selector_center: Centro establecido en &8%s0 (%s1).
+    selector_radius: Radio configurado para &8%s0 (%s1).
+    selector_expanded: Región ampliada a &(%s0 (%s1)
+  timezone:
+    timezone_set: 'Zona horaria establecida para esta sesión: %s0'
+    timezone_display: 'La hora actual en esa zona horaria es:  %s0'
+  command:
+    command_invalid_syntax: El comando no se usó correctamente (no hay más ayuda disponible).
+  help:
+    command_clarifying_bracket: '&7Ajustador de clarificación añadido para &c%s0'
+    help_suggest: '&7Podría no encontrar %s0. Tal vez pruebe con &4%s1 &7?'
+    help_header_categories: Tipos de comando
+    help_header_subcommands: Subcomandos
+    help_header_command: '&cAyuda para: &7%s0'
+    help_item_allowed: '&a%s0&8 - &7%s1'
+    help_item_denied: '&c%s0&8 - &7%s1'
+    help_header: 'Ayuda: Pagina %s0/%s1'
+    help_footer: '&7Wiki: https://git.io/vSKE5'
+progress:
+  progress_message: '%s1/%s0 (%s2%) @%s3cps %s4s izquierda'
+  progress_finished: '[ Hecho! ]'
+cancel:
+  worldedit_cancel_count: '&4Cancelado %s0 ediciones.'
+  worldedit_cancel_reason_confirm: '&7Vuestra selección es grande (%s0 -> %s1). Usar
+    &c//confirm &7para ejecutar &c%s2'
+  worldedit_cancel_reason: '&4La acción de WorldEdit se canceló:&7 %s0&c.'
+  worldedit_cancel_reason_manual: Cancelación manual
+  worldedit_cancel_reason_low_memory: Memoria baja
+  worldedit_cancel_reason_max_changes: Demasiados bloques cambiados
+  worldedit_cancel_reason_max_checks: Demasiados controles de bloqueo
+  worldedit_cancel_reason_max_tiles: Demasiados bloqueos
+  worldedit_cancel_reason_max_entities: Demasiadas entidades
+  worldedit_cancel_reason_max_iterations: Maximas iteraciones
+  worldedit_cancel_reason_no_region: No hay región permitida (bypass con /wea, o deshabilitar
+    `region-restrictions` en el archivo config.yml)
+  worldedit_failed_load_chunk: '&4Cambio de chunk ignorado: &7%s0;%s1&c. Trate de
+    aumentar chunk-wait.'
+  worldedit_cancel_reason_outside_level: Mundo exterior
+  worldedit_cancel_reason_outside_region: Fuera de la región permitida (Ulilize /wea,
+    o deshabilitar `region-restrictions` en config.yml)
+navigation:
+  ascend_fail: No hay lugar libre por encima de lo que encontró.
+  ascended_plural: Ascendido %s0 nivel(es).
+  ascended_singular: Ascendió un nivel.
+  unstuck: Ahí tienes!
+  descend_fail: No hay lugar libre por debajo de lo encontrado.
+  descend_plural: Descendido %s0 nivel(es).
+  descend_singular: Descendió un nivel.
+  whoosh: Whoosh!
+  poof: Poof!
+  thru_fail: No hay lugar libre por delante de usted encontró.
+  no_block: No hay bloque a la vista! (o demasiado lejos)
+  up_fail: Usted golpearía algo por encima de usted.
+selection:
+  sel_cuboid: 'Cuboid: clic izquierdo en el punto 1, clic derecho en el punto 2'
+  sel_cuboid_extend: 'Cuboid: haga clic izquierdo para un punto de inicio, haga clic
+    derecho para ampliar'
+  sel_2d_polygon: 'Selector de polígonos 2D: Clic izquierdo/derecho para añadir un
+    punto.'
+  sel_ellipsiod: 'Selector de elipses: clic izquierdo=centro, clic derecho para ampliar'
+  sel_sphere: 'Selector de esfera: clic izquierdo=centro, haga clic derecho para establecer
+    el radio'
+  sel_cylindrical: 'Selector de cilíndrico: Clic izquierdo=centro, clic derecho para
+    ampliar.'
+  sel_max: '%s0 puntos máximos.'
+  sel_fuzzy: 'Selector difuso: haga clic con el botón izquierdo para seleccionar todos
+    los bloques contingentes, haga clic con el botón derecho to add. Para seleccionar
+    una cavidad de aire, utilice //pos1.'
+  sel_convex_polyhedral: 'Selector poliédrico convexo: clic izquierdo=primer vértice,
+    derecha haga clic para agregar más.'
+  sel_list: Para obtener una lista de tipos de selección, utilice:&4 //sel list
+  sel_modes: 'Seleccione uno de los siguientes modos:'
+tips:
+  tip_sel_list: 'Sugerencia: Consulte los diferentes modos de selección con &4//sel
+    list'
+  tip_select_connected: 'Consejo: Seleccione todos los bloques conectados con &4//sel
+    fuzzy'
+  tip_set_pos1: 'Sugerencia: utilice pos1 como patrón con &4//set pos1'
+  tip_farwand: 'Sugerencia: Seleccione puntos distantes con &4//farwand'
+  tip_lazycut: '&7Sugerencia: Es más seguro usar &4//lazycut'
+  tip_fast: '&7Sugerencia: Ajuste rápido y sin deshacer usando &4//fast'
+  tip_cancel: '&7Sugerencia: Usted puede &4//cancel &7un editar en curso'
+  tip_mask: '&7Sugerencia: Establecer una máscara de destino global con &4/gmask'
+  tip_mask_angle: 'Sugerencia: Reemplace las pendientes ascendentes de 3-20 bloques
+    utilizando&4 //replace /[-20][-3] bedrock'
+  tip_set_linear: '&7Sugerencia: Establecer bloques linealmente con&4 //set [ID/wood,ID/bedrock]'
+  tip_surface_spread: '&7Sugerencia: Separe una superficie plana con&4 //set #surfacespread[5][0][5][#existing]'
+  tip_set_hand: '&7Sugerencia: Utiliza tu mano actual con &4//set hand'
+  tip_replace_id: '&7Sugerencia: Reemplazar sólo la ID del bloque:&4 //replace woodenstair
+    #id[cobblestair]'
+  tip_replace_light: 'Sugerencia: Retire las fuentes de luz&4 //replace #brightness[1][15]
+    0'
+  tip_tab_complete: 'Sugerencia: El comando replace admite la finalización de la pestaña'
+  tip_flip: 'Sugerencia: Espejo con &4//flip'
+  tip_deform: 'Sugerencia: Reformar con &4//deform'
+  tip_transform: 'Sugerencia: Establecer una transformación con &4//gtransform'
+  tip_copypaste: 'Sugerencia: Pegar en clic con &c//br copypaste'
+  tip_source_mask: 'Sugerencia: Establezca una máscara de origen con &4/gsmask <mask>&7'
+  tip_replace_marker: 'Sugerencia: Reemplace un bloque con su portapapeles completo
+    usando &4//replace wool #fullcopy'
+  tip_paste: 'Sugerencia: Colocar con &4//paste'
+  tip_lazycopy: 'Sugerencia: lazycopy es más rápido'
+  tip_download: 'Sugerencia: Pruebe y &4//download'
+  tip_rotate: 'Sugerencia: Orientar con &4//rotate'
+  tip_copy_pattern: 'Sugerencia: Para usar como un patrón try &4#copiar'
+  tip_regen_0: 'Sugerencia: Utilice un bioma con /regen [biome]'
+  tip_regen_1: 'Sugerencia: Utilice una semilla con /regen [biome] [seed]'
+  tip_biome_pattern: 'Sugerencia: El &c#biome[forest]&7 pattern se puede usar en cualquier
+    comando'
+  tip_biome_mask: 'Sugerencia: Restrinja a un bioma con la máscara `$jungle`'

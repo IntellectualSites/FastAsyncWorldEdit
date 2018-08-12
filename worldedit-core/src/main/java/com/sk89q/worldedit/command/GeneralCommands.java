@@ -19,23 +19,19 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalConfiguration;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.util.command.parametric.Optional;
-import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * General WorldEdit commands.
@@ -149,20 +145,20 @@ public class GeneralCommands {
     }
 
     @Command(
-        aliases = { "/searchitem", "/l", "/search", "searchitem" },
-        usage = "<query>",
-        flags = "bi",
-        desc = "Search for an item",
-        help =
-            "Searches for an item.\n" +
-            "Flags:\n" +
-            "  -b only search for blocks\n" +
-            "  -i only search for items",
-        min = 1,
-        max = 1
+            aliases = { "/searchitem", "/l", "/search", "searchitem" },
+            usage = "<query>",
+            flags = "bi",
+            desc = "Search for an item",
+            help =
+                    "Searches for an item.\n" +
+                            "Flags:\n" +
+                            "  -b only search for blocks\n" +
+                            "  -i only search for items",
+            min = 1,
+            max = 1
     )
     public void searchItem(Actor actor, CommandContext args) throws WorldEditException {
-        
+
         String query = args.getString(0).trim().toLowerCase();
         boolean blocksOnly = args.hasFlag('b');
         boolean itemsOnly = args.hasFlag('i');
@@ -190,7 +186,7 @@ public class GeneralCommands {
 
             int found = 0;
 
-            for (ItemType searchType : ItemType.REGISTRY) {
+            for (ItemType searchType : ItemTypes.values) {
                 if (found >= 15) {
                     actor.print("Too many results!");
                     break;

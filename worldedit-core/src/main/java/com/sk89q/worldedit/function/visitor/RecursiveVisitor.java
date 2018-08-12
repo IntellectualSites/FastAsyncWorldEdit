@@ -19,11 +19,13 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.boydti.fawe.object.HasFaweQueue;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An implementation of an {@link BreadthFirstSearch} that uses a mask to
@@ -33,20 +35,32 @@ public class RecursiveVisitor extends BreadthFirstSearch {
 
     private final Mask mask;
 
+    public RecursiveVisitor(final Mask mask, final RegionFunction function) {
+        this(mask, function, Integer.MAX_VALUE);
+    }
+
     /**
      * Create a new recursive visitor.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the function
      */
-    public RecursiveVisitor(Mask mask, RegionFunction function) {
-        super(function);
+    public RecursiveVisitor(final Mask mask, final RegionFunction function, int maxDepth) {
+        this(mask, function, maxDepth, null);
+    }
+
+    public RecursiveVisitor(final Mask mask, final RegionFunction function, int maxDepth, HasFaweQueue faweQueue) {
+        super(function, maxDepth, faweQueue);
         checkNotNull(mask);
         this.mask = mask;
     }
 
     @Override
-    protected boolean isVisitable(Vector from, Vector to) {
-        return mask.test(to);
+    public boolean isVisitable(final Vector from, final Vector to) {
+        return this.mask.test(to);
+    }
+
+    public static Class<?> inject() {
+        return RecursiveVisitor.class;
     }
 }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.sk89q.worldedit.entity.metadata.Metadatable;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.session.SessionOwner;
 import com.sk89q.worldedit.util.Identifiable;

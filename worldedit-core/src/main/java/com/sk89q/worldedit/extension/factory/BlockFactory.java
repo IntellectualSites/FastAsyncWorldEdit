@@ -19,13 +19,15 @@
 
 package com.sk89q.worldedit.extension.factory;
 
-import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.internal.registry.AbstractFactory;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.internal.registry.AbstractFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -60,8 +62,7 @@ public class BlockFactory extends AbstractFactory<BlockStateHolder> {
      */
     public Set<BlockStateHolder> parseFromListInput(String input, ParserContext context) throws InputParseException {
         Set<BlockStateHolder> blocks = new HashSet<>();
-        String[] splits = input.split(",");
-        for (String token : StringUtil.parseListInQuotes(splits, ',', '[', ']')) {
+        for (String token : input.split(",")) {
             blocks.add(parseFromInput(token, context));
         }
         return blocks;

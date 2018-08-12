@@ -22,7 +22,8 @@ package com.sk89q.worldedit.bukkit;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
@@ -70,7 +71,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         ItemStack itemStack = handSide == HandSide.MAIN_HAND
                 ? player.getInventory().getItemInMainHand()
                 : player.getInventory().getItemInOffHand();
-        return BukkitAdapter.asBlockState(itemStack).toBaseBlock();
+        return new BaseBlock(BukkitAdapter.asBlockState(itemStack));
     }
 
     @Override
@@ -156,7 +157,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         if (params.length > 0) {
             send = send + "|" + StringUtil.joinString(params, "|");
         }
-        player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
+        player.sendPluginMessage(plugin, WorldEditPlugin.getCuiPluginChannel(), send.getBytes(CUIChannelListener.UTF_8_CHARSET));
     }
 
     public Player getPlayer() {

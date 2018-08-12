@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.boydti.fawe.object.HasFaweQueue;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
-
 import java.util.Collection;
 
 /**
@@ -33,18 +33,27 @@ public class NonRisingVisitor extends RecursiveVisitor {
     /**
      * Create a new recursive visitor.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the function
      */
+
     public NonRisingVisitor(Mask mask, RegionFunction function) {
-        super(mask, function);
-        Collection<Vector> directions = getDirections();
+        this(mask, function, Integer.MAX_VALUE, null);
+    }
+
+    public NonRisingVisitor(Mask mask, RegionFunction function, int depth, HasFaweQueue hasFaweQueue) {
+        super(mask, function, depth, hasFaweQueue);
+        final Collection<Vector> directions = this.getDirections();
         directions.clear();
         directions.add(new Vector(1, 0, 0));
         directions.add(new Vector(-1, 0, 0));
         directions.add(new Vector(0, 0, 1));
         directions.add(new Vector(0, 0, -1));
         directions.add(new Vector(0, -1, 0));
+    }
+
+    public static Class<?> inject() {
+        return NonRisingVisitor.class;
     }
 
 }

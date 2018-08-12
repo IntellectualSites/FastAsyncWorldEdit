@@ -19,11 +19,10 @@
 
 package com.sk89q.worldedit.blocks;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.EnumSet;
 
 /**
  * The colors for wool.

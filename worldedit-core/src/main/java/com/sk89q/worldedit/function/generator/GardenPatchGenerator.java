@@ -26,8 +26,8 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Random;
@@ -104,7 +104,7 @@ public class GardenPatchGenerator implements RegionFunction {
         int h = random.nextInt(3) - 1;
         Vector p;
 
-        BlockState log = BlockTypes.OAK_LOG.getDefaultState();
+        BlockStateHolder log = BlockTypes.OAK_LOG.getDefaultState();
 
         switch (t) {
             case 0:
@@ -163,11 +163,11 @@ public class GardenPatchGenerator implements RegionFunction {
             position = position.add(0, 1, 0);
         }
 
-        if (editSession.getBlock(position.add(0, -1, 0)).getBlockType() != BlockTypes.GRASS_BLOCK) {
+        if (editSession.getBlock(position.add(0, -1, 0)).getBlockType() != BlockTypes.GRASS) {
             return false;
         }
 
-        BlockState leavesBlock = BlockTypes.OAK_LEAVES.getDefaultState();
+        BlockStateHolder leavesBlock = BlockTypes.OAK_LEAVES.getDefaultState();
 
         if (editSession.getBlock(position).getBlockType() == BlockTypes.AIR) {
             editSession.setBlock(position, leavesBlock);
@@ -187,7 +187,7 @@ public class GardenPatchGenerator implements RegionFunction {
      * @return a pumpkin pattern
      */
     public static Pattern getPumpkinPattern() {
-        return new BlockPattern(BlockTypes.PUMPKIN.getDefaultState());
+        return new BlockPattern(BlockTypes.CARVED_PUMPKIN.getDefaultState());
     }
 
     /**

@@ -19,8 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -36,12 +35,13 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Nullable;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Creates a {@code CylinderRegionSelector} from a user's selections.
@@ -61,6 +61,11 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
      */
     public CylinderRegionSelector() {
         this((World) null);
+    }
+
+    public CylinderRegionSelector(CylinderRegion region) {
+        checkNotNull(region);
+        this.region = region;
     }
 
     /**
@@ -165,7 +170,7 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, Vector pos) {
-        player.print("Starting a new cylindrical selection at " + pos + ".");
+        BBC.SELECTOR_CENTER.send(player, pos, 0);
 
         session.describeCUI(player);
     }
@@ -175,9 +180,9 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         Vector center = region.getCenter();
 
         if (!center.equals(Vector.ZERO)) {
-            player.print("Radius set to " + NUMBER_FORMAT.format(region.getRadius().getX()) + "/" + NUMBER_FORMAT.format(region.getRadius().getZ()) + " blocks. (" + region.getArea() + ").");
+            BBC.SELECTOR_RADIUS.send(player, NUMBER_FORMAT.format(region.getRadius().getX()) + "/" + NUMBER_FORMAT.format(region.getRadius().getZ()), region.getArea());
         } else {
-            player.printError("You must select the center point before setting the radius.");
+            BBC.SELECTION_WAND.send(player);
             return;
         }
 
@@ -233,7 +238,7 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public List<String> getInformationLines() {
-        final List<String> lines = new ArrayList<>();
+        final List<String> lines = new ArrayList<String>();
 
         if (!region.getCenter().equals(Vector.ZERO)) {
             lines.add("Center: " + region.getCenter());
@@ -279,4 +284,7 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         return "cuboid";
     }
 
+    public static Class<?> inject() {
+        return CylinderRegionSelector.class;
+    }
 }

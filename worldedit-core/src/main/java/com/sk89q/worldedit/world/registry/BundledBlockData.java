@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 
 import java.io.IOException;

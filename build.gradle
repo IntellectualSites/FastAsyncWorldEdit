@@ -1,16 +1,4 @@
-println """
-*******************************************
- You are building WorldEdit!
-
- If you encounter trouble:
- 1) Read COMPILING.md if you haven't yet
- 2) Try running 'build' in a separate Gradle run
- 3) Use gradlew and not gradle
- 4) If you still need help, ask on IRC! irc.esper.net #sk89q
-
- Output files will be in [subproject]/build/libs
-*******************************************
-"""
+print new File('splash.txt').text
 
 buildscript {
     repositories {
@@ -38,73 +26,62 @@ allprojects {
     version = '7.0.0-SNAPSHOT'
 }
 
-if (!project.hasProperty("artifactory_contextUrl")) ext.artifactory_contextUrl = "http://localhost"
-if (!project.hasProperty("artifactory_user")) ext.artifactory_user = "guest"
-if (!project.hasProperty("artifactory_password")) ext.artifactory_password = ""
+apply plugin: 'java'
+clean { delete "target" }
 
-if (!project.hasProperty("gitCommitHash") && !JavaVersion.current().isJava6()) {
+group = 'com.boydti.fawe'
+def revision = ""
+def buildNumber = ""
+def date = ""
+ext {
     try {
-        def repo = org.ajoberstar.grgit.Grgit.open(dir: '.')
-        ext.gitCommitHash = repo.head().abbreviatedId
-    } catch (Exception e) {
-        println "Error getting commit hash: " + e.getMessage()
+        git = org.ajoberstar.grgit.Grgit.open(file(".git"))
+        date = git.head().date.format("yy.MM.dd")
+        revision = "-${git.head().abbreviatedId}"
+        index = 0;  // Offset to match CI
+        buildNumber = "-${index}"
+    } catch (Throwable ignore) {
+        revision = "unknown";
     }
-}
-if (!project.hasProperty("gitCommitHash")) {
-    ext.gitCommitHash = "no_git_id"
 }
 
-apply plugin: 'com.jfrog.artifactory'
-artifactory {
-    contextUrl = "${artifactory_contextUrl}"
-    publish {
-        repository {
-            repoKey = project.version.contains("SNAPSHOT") ? 'libs-snapshot-local' : 'libs-release-local'
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-            maven = true
-            ivy = false
-        }
-    }
-
-    resolve {
-        repository {
-            repoKey = 'repo'
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-            maven = true
-        }
-    }
+version = date + revision + buildNumber
+if ( project.hasProperty("lzNoVersion") ) { // gradle build -PlzNoVersion
+    version = "unknown";
 }
-artifactoryPublish.skip = true
+description = """FastAsyncWorldEdit"""
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
-    apply plugin: 'checkstyle'
     apply plugin: 'com.github.johnrengelman.shadow'
-    apply plugin: 'com.jfrog.artifactory'
 
-    ext.internalVersion = version + ";" + gitCommitHash
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    ext.internalVersion = version
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-
-    checkstyle.configFile = new File(rootProject.projectDir, "config/checkstyle/checkstyle.xml")
-    checkstyle.toolVersion = '7.6.1'
 
     repositories {
         mavenCentral()
         maven { url "http://repo.bukkit.org/content/groups/public" }
         maven { url "http://maven.sk89q.com/repo/" }
         maven { url "http://repo.maven.apache.org/maven2" }
-    }
-
-    if (JavaVersion.current().isJava8Compatible()) {
-        // Java 8 turns on doclint which we fail
-        tasks.withType(Javadoc) {
-            options.addStringOption('Xdoclint:none', '-quiet')
-        }
+        // Fawe
+        maven {url "https://mvnrepository.com/artifact/"}
+        maven {url "http://repo.dmulloy2.net/content/groups/public/"}
+        maven {url "https://repo.destroystokyo.com/repository/maven-public//"}
+        maven {url "http://ci.emc.gs/nexus/content/groups/aikar/" }
+        maven {url "http://ci.athion.net/job/PlotSquared/ws/mvn/"}
+        maven {url "http://empcraft.com/maven2"}
+        maven {url "https://hub.spigotmc.org/nexus/content/groups/public/"}
+        maven {url "http://ci.frostcast.net/plugin/repository/everything"}
+        maven {url "http://maven.sk89q.com/artifactory/repo"}
+        maven {url "http://repo.spongepowered.org/maven"}
+        maven {url "https://repo.inventivetalent.org/content/groups/public/"}
+        maven {url "http://dl.bintray.com/tastybento/maven-repo"}
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -114,7 +91,6 @@ subprojects {
 
     artifacts {
         archives jar
-        archives javadocJar
     }
 
     if (!(name.equals('worldedit-forge') || name.equals('worldedit-sponge'))) {
@@ -129,23 +105,17 @@ subprojects {
         build.dependsOn(sourcesJar)
     }
 
-    build.dependsOn(checkstyleMain)
-    build.dependsOn(checkstyleTest)
-    build.dependsOn(javadocJar)
-
     shadowJar {
         classifier 'dist'
         dependencies {
             include(dependency('com.sk89q:jchronic:0.2.4a'))
             include(dependency('com.thoughtworks.paranamer:paranamer:2.6'))
             include(dependency('com.sk89q.lib:jlibnoise:1.0.0'))
+            include(dependency('com.github.luben:zstd-jni:1.1.1'))
+            include(dependency('co.aikar:fastutil-lite:1.0'))
         }
         exclude 'GradleStart**'
         exclude '.cache'
         exclude 'LICENSE*'
-    }
-
-    artifactoryPublish {
-        publishConfigs('archives')
     }
 }

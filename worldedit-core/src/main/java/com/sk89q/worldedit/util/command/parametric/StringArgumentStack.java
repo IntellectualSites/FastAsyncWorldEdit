@@ -20,23 +20,24 @@
 package com.sk89q.worldedit.util.command.parametric;
 
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.util.command.MissingParameterException;
+import com.sk89q.util.StringUtil;
 
 /**
- * A virtual scope that does not actually read from the underlying 
+ * A virtual scope that does not actually read from the underlying
  * {@link CommandContext}.
  */
 public class StringArgumentStack implements ArgumentStack {
-    
+
     private final boolean nonNullBoolean;
     private final CommandContext context;
     private final String[] arguments;
+    private int markedIndex = 0;
     private int index = 0;
-    
+
     /**
      * Create a new instance using the given context.
-     * 
+     *
      * @param context the context
      * @param arguments a list of arguments
      * @param nonNullBoolean true to have {@link #nextBoolean()} return false instead of null
@@ -47,10 +48,10 @@ public class StringArgumentStack implements ArgumentStack {
         this.arguments = arguments;
         this.nonNullBoolean = nonNullBoolean;
     }
-    
+
     /**
      * Create a new instance using the given context.
-     * 
+     *
      * @param context the context
      * @param arguments an argument string to be parsed
      * @param nonNullBoolean true to have {@link #nextBoolean()} return false instead of null
@@ -99,7 +100,7 @@ public class StringArgumentStack implements ArgumentStack {
             if (nonNullBoolean) { // Special case
                 return false;
             }
-            
+
             throw new MissingParameterException();
         }
     }
@@ -125,4 +126,32 @@ public class StringArgumentStack implements ArgumentStack {
         return context;
     }
 
+    /**
+     * Mark the current position of the stack.
+     *
+     * <p>The marked position initially starts at 0.</p>
+     */
+    @Override
+    public void mark() {
+        markedIndex = index;
+    }
+
+    /**
+     * Reset to the previously {@link #mark()}ed position of the stack, and return
+     * the arguments that were consumed between this point and that previous point.
+     *
+     * <p>The marked position initially starts at 0.</p>
+     *
+     * @return the consumed arguments
+     */
+    @Override
+    public String reset() {
+        String value = context.getString(markedIndex, index - 1);
+        index = markedIndex;
+        return value;
+    }
+
+    public static Class<?> inject() {
+        return StringArgumentStack.class;
+    }
 }

@@ -21,10 +21,14 @@ package com.sk89q.worldedit.command.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.util.SetQueue;
+import com.boydti.fawe.util.TaskManager;
+import com.google.common.base.Supplier;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.function.EntityFunction;
 
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -143,11 +147,10 @@ public class EntityRemover {
             EntityProperties registryType = entity.getFacet(EntityProperties.class);
             if (registryType != null) {
                 if (type.matches(registryType)) {
-                    entity.remove();
+                    TaskManager.IMP.sync(entity::remove);
                     return true;
                 }
             }
-
             return false;
         };
     }

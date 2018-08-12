@@ -19,12 +19,10 @@
 
 package com.sk89q.worldedit;
 
-import static com.sk89q.worldedit.event.platform.Interaction.HIT;
-import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
@@ -56,11 +54,8 @@ import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.script.ScriptException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +63,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.ScriptException;
+import static com.sk89q.worldedit.event.platform.Interaction.HIT;
+import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
 
 /**
  * The entry point and container for a working implementation of WorldEdit.

@@ -22,20 +22,23 @@ package com.sk89q.worldedit.world;
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.PriorityQueue;
-
 import javax.annotation.Nullable;
+import java.util.PriorityQueue;
 
 /**
  * An abstract implementation of {@link World}.
@@ -62,9 +65,7 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public Mask createLiquidMask() {
-        return new BlockMask(this,
-                BlockTypes.LAVA.getDefaultState().toFuzzy(),
-                BlockTypes.WATER.getDefaultState().toFuzzy());
+        return new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
     }
 
     @Override
@@ -89,6 +90,11 @@ public abstract class AbstractWorld implements World {
     @Override
     public boolean playEffect(Vector position, int type, int data) {
         return false;
+    }
+
+    @Override
+    public BlockState getLazyBlock(Vector position) {
+        return new BaseBlock(getBlock(position));
     }
 
     @Override
@@ -140,7 +146,7 @@ public abstract class AbstractWorld implements World {
         }
 
         public void play() {
-            playEffect(position, 2001, blockType.getLegacyId());
+            playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4);
         }
 
         @Override
@@ -148,5 +154,4 @@ public abstract class AbstractWorld implements World {
             return Double.compare(priority, other != null ? other.priority : 0);
         }
     }
-
 }

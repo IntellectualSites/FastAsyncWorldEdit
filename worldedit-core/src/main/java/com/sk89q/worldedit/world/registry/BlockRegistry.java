@@ -19,9 +19,13 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockType;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -48,4 +52,11 @@ public interface BlockRegistry {
      */
     Map<String, ? extends Property> getProperties(BlockType blockType);
 
+
+    /**
+     * Register all blocks
+     */
+    default Collection<String> registerBlocks() {
+        return Collections.emptyList();
+    }
 }

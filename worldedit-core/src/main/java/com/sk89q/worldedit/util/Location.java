@@ -19,10 +19,11 @@
 
 package com.sk89q.worldedit.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.world.NullWorld;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a location in a world with has a direction.
@@ -34,10 +35,9 @@ import com.sk89q.worldedit.extent.Extent;
  * {@link #equals(Object)} are subject to minor differences caused by
  * floating point errors.</p>
  */
-public class Location {
+public class Location extends Vector {
 
     private final Extent extent;
-    private final Vector position;
     private final float pitch;
     private final float yaw;
 
@@ -126,10 +126,9 @@ public class Location {
      * @param pitch the pitch, in degrees
      */
     public Location(Extent extent, Vector position, float yaw, float pitch) {
+        super(position);
         checkNotNull(extent);
-        checkNotNull(position);
         this.extent = extent;
-        this.position = position;
         this.pitch = pitch;
         this.yaw = yaw;
     }
@@ -150,7 +149,7 @@ public class Location {
      * @return the new instance
      */
     public Location setExtent(Extent extent) {
-        return new Location(extent, position, getDirection());
+        return new Location(extent, this, getDirection());
     }
 
     /**
@@ -169,7 +168,7 @@ public class Location {
      * @return the new instance
      */
     public Location setYaw(float yaw) {
-        return new Location(extent, position, yaw, pitch);
+        return new Location(extent, this, yaw, pitch);
     }
 
     /**
@@ -188,7 +187,7 @@ public class Location {
      * @return the new instance
      */
     public Location setPitch(float pitch) {
-        return new Location(extent, position, yaw, pitch);
+        return new Location(extent, this, yaw, pitch);
     }
 
     /**
@@ -199,7 +198,7 @@ public class Location {
      * @return the new instance
      */
     public Location setDirection(float yaw, float pitch) {
-        return new Location(extent, position, yaw, pitch);
+        return new Location(extent, this, yaw, pitch);
     }
 
     /**
@@ -233,7 +232,7 @@ public class Location {
      * @return the new instance
      */
     public Location setDirection(Vector direction) {
-        return new Location(extent, position, direction.toYaw(), direction.toPitch());
+        return new Location(extent, this, direction.toYaw(), direction.toPitch());
     }
 
     /**
@@ -242,25 +241,7 @@ public class Location {
      * @return a vector
      */
     public Vector toVector() {
-        return position;
-    }
-
-    /**
-     * Get the X component of the position vector.
-     *
-     * @return the X component
-     */
-    public double getX() {
-        return position.getX();
-    }
-
-    /**
-     * Get the rounded X component of the position vector.
-     *
-     * @return the rounded X component
-     */
-    public int getBlockX() {
-        return position.getBlockX();
+        return this;
     }
 
     /**
@@ -271,7 +252,7 @@ public class Location {
      * @return a new immutable instance
      */
     public Location setX(double x) {
-        return new Location(extent, position.setX(x), yaw, pitch);
+        return new Location(extent, super.setX(x), yaw, pitch);
     }
 
     /**
@@ -282,25 +263,7 @@ public class Location {
      * @return a new immutable instance
      */
     public Location setX(int x) {
-        return new Location(extent, position.setX(x), yaw, pitch);
-    }
-
-    /**
-     * Get the Y component of the position vector.
-     *
-     * @return the Y component
-     */
-    public double getY() {
-        return position.getY();
-    }
-
-    /**
-     * Get the rounded Y component of the position vector.
-     *
-     * @return the rounded Y component
-     */
-    public int getBlockY() {
-        return position.getBlockY();
+        return new Location(extent, super.setX(x), yaw, pitch);
     }
 
     /**
@@ -311,7 +274,7 @@ public class Location {
      * @return a new immutable instance
      */
     public Location setY(double y) {
-        return new Location(extent, position.setY(y), yaw, pitch);
+        return new Location(extent, super.setY(y), yaw, pitch);
     }
 
     /**
@@ -322,25 +285,7 @@ public class Location {
      * @return a new immutable instance
      */
     public Location setY(int y) {
-        return new Location(extent, position.setY(y), yaw, pitch);
-    }
-
-    /**
-     * Get the Z component of the position vector.
-     *
-     * @return the Z component
-     */
-    public double getZ() {
-        return position.getZ();
-    }
-
-    /**
-     * Get the rounded Z component of the position vector.
-     *
-     * @return the rounded Z component
-     */
-    public int getBlockZ() {
-        return position.getBlockZ();
+        return new Location(extent, super.setY(y), yaw, pitch);
     }
 
     /**
@@ -351,7 +296,7 @@ public class Location {
      * @return a new immutable instance
      */
     public Location setZ(double z) {
-        return new Location(extent, position.setZ(z), yaw, pitch);
+        return new Location(extent, super.setZ(z), yaw, pitch);
     }
 
     /**
@@ -362,7 +307,7 @@ public class Location {
      * @return a new immutable instance
      */
     public Location setZ(int z) {
-        return new Location(extent, position.setZ(z), yaw, pitch);
+        return new Location(extent, super.setZ(z), yaw, pitch);
     }
 
     /**
@@ -384,7 +329,9 @@ public class Location {
 
         if (Double.doubleToLongBits(pitch) != Double.doubleToLongBits(location.pitch)) return false;
         if (Double.doubleToLongBits(yaw) != Double.doubleToLongBits(location.yaw)) return false;
-        if (!position.equals(location.position)) return false;
+        if (this.getX() != location.getX()) return false;
+        if (this.getZ() != location.getZ()) return false;
+        if (this.getY() != location.getY()) return false;
         if (!extent.equals(location.extent)) return false;
 
         return true;
@@ -393,7 +340,7 @@ public class Location {
     @Override
     public int hashCode() {
         int result = extent.hashCode();
-        result = 31 * result + position.hashCode();
+        result = 31 * result + this.hashCode();
         result = 31 * result + Float.floatToIntBits(this.pitch);
         result = 31 * result + Float.floatToIntBits(this.yaw);
         return result;

@@ -1,0 +1,342 @@
+#Adjusted and updated by NotMyFault
+info:
+  prefix: '&4&lFAWE:&f&7'
+  schematic_pasting: '&7Die Schematic wird eingefügt. Dies kann nicht rückgängig gemacht
+    werden.'
+  updated_lighting_selection: '&7Das Licht wird in %s0 Chunks aktualisiert. (Es kann
+    einige Sekunden dauern, bis die Pakete gesendet werden.)'
+  set_region: '&7Markierung wurde auf aktuelle WorldEdit Region übertragen.'
+  worldedit_command_limit: '&7Bitte warte, bis deine momentane Aktion fertig gestellt
+    wurde.'
+  worldedit_delayed: '&7Bitte warte, während deine aktuelle WorldEdit Aktion durchgeführt
+    wird..'
+  worldedit_run: '&7Entschuldige die Verzögerung. Nun führen wir folgende Aktion von
+    dir aus: %s'
+  worldedit_complete: '&7WorldEdit Aktion fertiggestellt..'
+  require_selection_in_mask: '&7%s deiner Auswahl ist nicht innerhalb deiner Maske.
+    Du darfst nur innerhalb erlaubter Regionen Veränderungen durchführen.'
+  worldedit_volume: '&7Du kannst keine %current% verändern. Die maximale Anzahl an
+    Blöcken die du verändern darfst ist %max%.'
+  worldedit_iterations: '&7Du kannst keine Aktion %current% Mal wiederholen. Die maximale
+    Anzahl an erlaubten Wiederholungen ist %max%.'
+  worldedit_unsafe: '&7Der Zugang zu diesem Befehl wurde verboten.'
+  worldedit_dangerous_worldedit: '&cFAWE führt unsicher WorldEdit Aktionen aus! Position:
+    %s0 Spielername: %s1'
+  worldedit_bypassed: '&7Beschränkungen werden nun ignoriert.'
+  worldedit_unmasked: '&6Deine WorldEdit Beschränkungen sind nun aufgehoben.'
+  worldedit_restricted: '&6Deine WorldEdit Beschränkungen sind nun aktiv.'
+  worldedit_oom_admin: |-
+    &cMögliche Optionen:
+    &8 - &7//fast
+    &8 - &7Kleinere Aktionen ausführen
+    &8 - &7Mehr Arbeitsspeicher zuweisen
+    &8 - &7Diese Meldungen deaktivieren
+  compressed: WorldEdit Verlauf komprimiert. Um ~ %s0b reduziert (%s1x kleiner)
+  action_complete: Aktion fertiggestellt in %s0 Sekunden
+  lighting_propogate_selection: '&7Licht wurde berechnet in %s0 Chunks. (Info: Um
+    Licht zu entfernen nutze //removelight)'
+  worldedit_toggle_tips_on: '&7WorldEdit Tipps deaktiviert.'
+  worldedit_toggle_tips_off: '&7WorldEdit Tipps aktiviert.'
+  file_deleted: '%s0 wurde gelöscht.'
+error:
+  worldedit_extend: '&cDeine WorldEdit Aktion überschreitet die erlaubte Region'
+  command_syntax: '&cBenutzung: &7%s0'
+  no_perm: '&cDir fehlt die Berechtigung: %s0'
+  setting_disable: '&cFehlende Einstellung: %s0'
+  schematic_not_found: '&cSchematic nicht gefunden: &7%s0'
+  no_region: '&cDu hast keine aktive WorldEdit Markierung'
+  no_mask: '&cDu hast keine Maske gesetzt'
+  not_player: '&cDieser Befehl kann nur von Spielern ausgeführt werden!'
+  player_not_found: '&cSpieler nicht gefunden:&7 %s0'
+  oom: |-
+    &8[&cKritisch&8] &cWenig Arbeitsspeicher frei (< 1%). FAWE wird folgendes machen:
+    &8 - &7Alle Aktionen terminieren
+    &8 - &7Vergangene Bearbeitungen vergessen
+    &8 - &7Alle unwichtigen Chunks entladen
+    &8 - &7Alle Entities töten
+    &8 - &7Unnötig verwendeten Speicher freigeben.
+    &cIgnoriere diese Meldung, wenn du versuchst den Server zu crashen.
+    &7Note: Wenig freier Speicher kann unter Umständen wegen WE passiert sein.
+  worldedit_some_fails: '&c%s0 Blöcke wurden nicht platziert, da sie außerhalb der
+    erlaubten Region sind.'
+  worldedit_some_fails_blockbag: '&cFehlende Blöcke: %s0'
+  web_unauthorized: 'Es sind nur Links vom konfigurierten Webhost erlaubt: %s0'
+  brush_not_found: '&Verfügbare Brushes: %s0'
+  brush_incompatible: '&cBrush ist nicht kompatibel mit dieser Version'
+web:
+  generating_link: Lade %s hoch, bitte warten...
+  generating_link_failed: '&cErstellung eines Download-Links fehlgeschlagen!'
+  download_link: '%s'
+worldedit:
+  general:
+    mask_disabled: Globale Maske deaktiviert
+    mask: Globale Maske gesetzt
+    transform_disabled: Globale Transformation deaktiviert
+    transform: Globale Transformation gesetzt
+    source_mask_disabled: Globale Quell-Maske deaktiviert
+    source_mask: Global Quell-Maske gesetzt
+    fast_enabled: Fast-Modus aktiviert. Verlauf und Beschränkungen werden ignoriert.
+    fast_disabled: Fast-Modus deaktiviert
+    place_enabled: 'Platziere nun an Pos. #1.'
+    place_disabled: Platziere nun an dem Block in dem du stehst.
+    texture_disabled: Texturen zurückgesetzt
+    texture_set: Textur auf %s1 gestellt
+  copy:
+    command_copy: '%s0 Blöcke kopiert'
+  cut:
+    command_cut_slow: |-
+      %s0 Blöcke wurden ausgeschnitten.
+      Tipp: Lazycut ist sicherer
+    command_cut_lazy: '%s0 Blöcke werden beim Einfügen entfernt'
+  paste:
+    command_paste: Zwischenablage wurde bei Position %s0 eingefügt
+  rotate:
+    command_rotate: Zwischenablage wurde gedreht
+  flip:
+    command_flipped: Zwischenablage wurde gespiegelt
+  regen:
+    command_regen_0: |-
+      Region regeneriert.
+      Tipp: Nutze dies für Biome mit /regen [biome]
+    command_regen_1: |-
+      Region regeneriert.
+      Tipp: Nutze einen Seed mit /regen [biome] [seed]
+    command_regen_2: Region regeneriert.
+  tree:
+    command_tree: '%s0 Bäume erstellt.'
+    command_pumpkin: '%s0 Kürbis-Haufen erstellt.'
+  flora:
+    command_flora: '%s0 Pflanzen erstellt.'
+  history:
+    command_history_clear: Verlauf gelöscht
+    command_redo_success: Redo erfolgreich.
+    command_undo_success: Undo erfolgreich.
+    command_redo_error: Es gibt nichts zum Wiederherstellen. (Siehe `/inspect` und
+      `/frb`)
+    command_undo_error: Es gibt nichts zum Rückgängigmachen. (Siehe `/inspect` und
+      `/frb`)
+    command_history_other_error: WorldEdit Verlauf für %s0 konnte nicht gefunden werden.
+  operation:
+    operation: Operation wird durchgeführt (%s0)
+  selection:
+    selection_wand: 'Linksklick: Markiere Position #1; Rechtsklick: Markiere Position
+      #2'
+    selection_wand_disable: Bearbeitungs-Tool deaktiviert.
+    selection_wand_enable: Bearbeitungs-Tool aktiviert.
+    selection_chunk: Chunk ausgewählt (%s0)
+    selection_chunks: Chunks ausgewählt (%s0) - (%s1)
+    selection_contract: Markierung verkleinert um %s0 Blöcke.
+    selection_count: '%s0 Blöcke wurden gezählt.'
+    selection_distr: '# Gesamtanzahl Blöcke: %s0'
+    selection_expand: Markierung erweitert um %s0 Blöcke
+    selection_expand_vert: Markierung erweitert um %s0 Blöcke (Maximaler Baubereich)
+    selection_inset: Markierung verkleinert
+    selection_outset: Markierung vergößert
+    selection_shift: Region verschoben
+    selection_cleared: Auswahl gelöscht
+  brush:
+    brush_copy: Copy Brush ausgerüstet (%s0)
+    brush_height_invalid: Ungültige Höhenkarte (%s0)
+    brush_smooth: Glättungs-Brush ausgerüstet (%s0 x %s1 using %s2).
+    brush_spline: Linien Brush Format ausgerüstet (%s0). Rechstklicke ein Ende um
+      ein Format hinzuzufügen
+    brush_spline_secondary_error: Nicht genügend Positionen gesetzt!
+    brush_spline_secondary: Kurve erstellt
+    brush_size: Brush Größe gesetzt
+    brush_range: Brush Weite gesetzt
+    brush_mask_disabled: Brush Maske deaktiviert
+    brush_mask: Brush Maske gesetzt
+    brush_transform_disabled: Brush Transformation deaktiviert
+    brush_transform: Brush-Transformation gesetzt
+    brush_material: Brush-Material gesetzt
+    brush_try_other: |-
+      &cFAWE verfügt über andere, passendere Brushes. z.B.:
+      &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
+    brush_none: Du hältst kein Tool in der Hand, das man als Brush verwenden kann!
+    brush_source_mask_disabled: Brush Quell-Maske deaktiviert
+    brush_source_mask: Brush Quell-Maske gesetzt
+    brush_reset: Brush zurückgesetzt.
+    brush_scroll_action_set: Scroll Aktion auf %s0 gesetzt
+    brush_scroll_action_unset: Scroll Aktion entfernt
+    brush_visual_mode_set: Visualiserungsmodus auf %s0 gesetzt
+    brush_target_mode_set: Zielmodus auf %s0 gesetzt
+    brush_target_mask_set: Zielmaske auf %s0 gesetzt
+    brush_target_offset_set: Zielausrichtung auf %s0 gesetzt
+    brush_equipped: Brush %s0 ausgerüstet
+    brush_line_primary: Punkt %s0 hinzugefügt, klicke auf eine andere Position um die Linie zu erstellen
+    brush_line_secondary: Spline erstellt
+    brush_spline_primary_2: Position hinzugefügt, klicke auf die gleiche Postiion um zu beginnen!
+  rollback:
+    rollback_element: annulliere %s0
+  tool:
+    tool_inspect: Inpektions-Tool gebunden an %s0.
+    tool_inspect_info: '&7%s0 änderte %s1 zu %s2 %s3 zuvor'
+    tool_inspect_info_footer: '&6Total: &7%s0 Änderungen'
+    tool_none: Tool vom aktuellen Item entfernt.
+    tool_info: Info-Tool gebunden an %s0.
+    tool_tree: Tree-Tool gebunden an %s0.
+    tool_tree_error: Baum Typ %s0 ist unbekannt.
+    tool_repl: Block Replacer-Tool gebunden an %s0.
+    tool_cycler: Block Data Cycler-Tool gebunden an %s0.
+    tool_flood_fill: Block Flood Fill-Tool gebunden an %s0.
+    tool_deltree: Floating Tree Remover-Tool gebunden an %s0.
+    tool_farwand: Far Wand-Tool gebunden an%s0.
+    tool_lrbuild_bound: Long-range Building-Tool gebunden an %s0.
+    tool_lrbuild_info: 'Linksklick: Setze Position %s0; Rechtsklick: Setze Position
+      %s1'
+    superpickaxe_enabled: Super-Spitzhacke aktiviert.
+    superpickaxe_disabled: Super-Spitzhacke deaktiviert.
+    tool_range_error: 'Maximale Reichweite: %s0.'
+    tool_radius_error: 'Maximal erlaubter Brush Radius: %s0.'
+    superpickaxe_area_enabled: Modus geändert. Linksklick mit einer Spitzhacke. //
+      zum deaktivieren.
+  schematic:
+    schematic_format: 'Verfügbare Zwischenablage Formate (Name: Suche Namen)'
+    schematic_loaded: Schematic %s0 geladen. Platziere sie mit //paste
+    schematic_saved: Schematic %s0 gespeichert.
+    schematic_page: Seite muss %s sein
+    schematic_none: Keine Schematics gefunden.
+    schematic_list: 'Verfügbare Schematics (Dateiname: Format) [%s0/%s1]:'
+    schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
+    schematic_prompt_clear: '&7Meintest du &c%s0 &7um deine Zwischenablage zu leeren'
+    schematic_show: |-
+      &7Displaying &a%s0&7 Schematics von &a%s1&7:
+      &8 - &aLinksklick &7a um der Zwischenablage hinzuzufügen
+      &8 - &aRechtsklick &7um etwas deiner Multi-Zwischenablage hinzuzufügen
+      &8 - &7Benutze &a%s2&7 um zur richtigen Welt zurückzukehren
+    schematic_move_exists: '&c%s0 existiert bereits'
+    schematic_move_success: '&a%s0 -> %s1'
+    schematic_move_failed: '&a%s0 wurde nicht bewegt: %s1'
+  clipboard:
+    clipboard_cleared: Zwischenablage geleert
+    clipboard_invalid_format: 'Unbekanntes Zwischenablage Format:  %s0'
+    clipboard_uri_not_found: Du hast %s0 nicht geladen
+  visitor:
+    visitor_block: '%s0 Blöcke betroffen'
+    visitor_entity: '%s0 Entities betroffen'
+    visitor_flat: '%s0 Spalten betroffen'
+  selector:
+    selector_invalid_coordinates: Ungültige Koordinaten %s0
+    selector_already_set: Position bereits gesetzt.
+    selector_fuzzy_pos1: Region gesetzt und expandiert von %s0 %s1.
+    selector_fuzzy_pos2: Erweiterung hinzugefügt um %s0 %s1.
+    selector_set_default: Dein Standard Auswahl-Tool ist nun %s0.
+    selector_pos: Position%s0 zu %s1 (%s2) gesetzt.
+    selector_center: Mittelpunkt zu %s0 (%s1) gesetzt.
+    selector_radius: Radius zu %s0 (%s1) gesetzt.
+    selector_expanded: Region expandiert auf %s0 (%s1).
+  command:
+    command_invalid_syntax: Der Befehl wurde nicht richtig benutzt. (Keine weitere
+      Hilfe verfügbar).
+  snapshot:
+    snapshot_loaded: Snapshot '%s0' geladen; Wiederherstellung läuft...
+    snapshot_set: 'Snapshot gesetzt auf: %s0'
+    snapshot_newest: Neuester Snapshot wird jetzt benutzt.
+    snapshot_list_header: 'Snapshots für die Welt (%s0):'
+    snapshot_list_footer: Nutze /snap use [snapshot] oder /snap use latest.
+  biome:
+    biome_list_header: 'Biome (Seite %s0/%s1):'
+    biome_changed: Biome wurden geändert in %s0 Chunks.
+  utility:
+    kill_success: '%s0 Entities in einem Radius von %s1 getötet.'
+    nothing_confirmed: Du hast keine zur Autorisierung ausstehenden Aktionen.
+    page_footer: Benutze %s0 um zur nächsten Seite zu gehen
+  timezone:
+    timezone_set: 'Zeitzone für diese Sitzung gesetzt auf: %s0'
+    timezone_display: 'Aktuelle Zeit in dieser Zeitzone:  %s0'
+  navigation:
+    navigation_wand_error: '&cNichts zu durchqueren'
+  anvil:
+    world_is_loaded: Die Welt sollte nicht in Benutzung sein währen der Ausführung. Entlade die Welt, oder überschreibe diese mit -f (vorher speichern)
+  help:
+    command_clarifying_bracket: '&7Klammer für&c%s0 wurde hinzugefügt'
+    help_suggest: '&7%s0 konnte nicht gefunden werden. Versuche &c%s1 &7'
+    help_header_categories: Befehlstypen
+    help_header_subcommands: Unterbefehle
+    help_header_command: '&cHilfe für: &7%s0'
+    help_item_allowed: '&a%s0&8 - &7%s1'
+    help_item_denied: '&c%s0&8 - &7%s1'
+    help_header: 'Hilfe: Seite %s0/%s1'
+    help_footer: '&7Wiki: https://git.io/vSKE5'
+progress:
+  progress_message: '[ Zwischenspeicher: %s0 | Erledigt: %s1 ]'
+  progress_finished: '[ Fertiggestellt! ]'
+cancel:
+  worldedit_cancel_count: '&c%s0 Veränderungen abgebrochen.'
+  worldedit_cancel_reason: '&cDeine WorldEdit Aktion wurde abgebrochen:&7 %s0&c.'
+  worldedit_cancel_reason_manual: Manueller Abbruch
+  worldedit_cancel_reason_low_memory: Zu wenig Speicher
+  worldedit_cancel_reason_max_changes: Zu viele Blöcke bearbeitet
+  worldedit_cancel_reason_max_checks: Zu viele Blöcke gecheckt
+  worldedit_cancel_reason_max_tiles: Zu viele Blockstatus
+  worldedit_cancel_reason_max_entities: Zu viele Entities
+  worldedit_cancel_reason_max_iterations: Maximale Wiederholungen
+  worldedit_cancel_reason_no_region: Keine erlaubte Region (Ignorieren mit /wea)
+  worldedit_failed_load_chunk: '&cÜberspringe das Laden von Chunk: &7%s0;%s1&c. Versuche
+    chunk-wait zu erhöhen.'
+  worldedit_cancel_reason_confirm: '&7Deine Selektion ist zu groß (%s0 -> %s1). Benutze &c//confirm
+    &7um &c%s2 auszuführen'
+  worldedit_cancel_reason_outside_level: Außerhalb der Welt
+  worldedit_cancel_reason_outside_region: Außerhalb erlaubter Region (Bypass mit /wea,
+    oder deaktiviere `region-restrictions` in der config.yml)
+history: {}
+navigation:
+  ascend_fail: Kein freier Platz über dir gefunden.
+  ascended_plural: '%s0 Schichten aufgestiegen.'
+  ascended_singular: Eine Schicht aufgestiegen.
+  unstuck: Sollte jetzt besser sein!
+  descend_fail: Kein freier Platz unter dir gefunden.
+  descend_plural: '%s0 Schichten abgestiegen.'
+  descend_singular: Eine Schicht abgestiegen.
+  whoosh: Wusch!
+  poof: Puff!
+  thru_fail: Kein freier Platz vor dir gefunden.
+  up_fail: Du würdest einen Block treffen!
+  no_block: Kein Block in Sichweite! (oder zu weit entfernt)
+selection:
+  sel_cuboid: 'Quader: Linksklick für Position1, Rechtsklick für Position2'
+  sel_cuboid_extend: 'Quader: Linksklick für einen Startpunkt, Rechtsklick zum erweitern'
+  sel_2d_polygon: '2D Polygon Auswahl: Links/Rechtsklick um eine Markierung hinzuzufügen.'
+  sel_ellipsiod: 'Ellipsen Auswahl: Linksklick=Mitte, Rechtsklick zum erweitern'
+  sel_sphere: 'Kugel Auswahl : Linksklick=Mitte, Rechtsklick um den Radius zu setzen'
+  sel_cylindrical: 'Zylinder Auswahl: Linksklick=Mitte, Rechtsklick zum erweitern'
+  sel_max: '%s0 Punkte maximal.'
+  sel_fuzzy: 'Fuzzy Auswahl: Linksklick um alle verbundenen Blöcke zu markieren, Rechtsklick
+    zum hinzufügen'
+  sel_convex_polyhedral: 'Convexe Polyeder Auswahl: Linksklick=Erster Vertex, Rechtsklick,
+    um mehr hinzuzufügen.'
+  sel_list: Für eine Liste der Selektoren nutze:&c //sel
+  sel_modes: 'Wähle einen der unten aufgelisteten Modi:'
+tips:
+  tip_cancel: 'Tipp: Du kannst eine Aktion abbrechen mit `//cancel`'
+  tip_download: 'Tipp: Du kannst deine Zwischenablage mit `//download` herunterladen'
+  tip_sel_list: 'Tipp: Liste die verschiedenen Selektoren auf mit &c//sel list'
+  tip_select_connected: 'Tipp: Wähle alle verbundenen Blöcke mit //sel fuzzy'
+  tip_set_pos1: 'Tipp: Nutze pos1 als Muster &c//set pos1'
+  tip_farwand: 'Tipp: Markiere entferne Blöcke mit &c//farwand'
+  tip_fast: '&7Tipp: Platziere schnell und ohne Undo-Historie &c//fast'
+  tip_mask: '&7Tipp: Setze eine Globale Zielmaske mit &c/gmask'
+  tip_mask_angle: 'Tipp: Ersetze aufwärts Steigungen von 3-20 Blöcken mit&c //replace
+    /-20:-3 bedrock'
+  tip_set_linear: '&7Tipp: Setze Blöcke linear mit&c //set #l3d:wood,bedrock'
+  tip_surface_spread: '&7Tipp: Streue einen flachen Untergrund mit&c //set #surfacespread:5:0:5:#existing'
+  tip_set_hand: '&7Tipp: Setze das Item in deiner Hand mit&c//set hand'
+  tip_replace_id: '&7Tipp: Ersetze nur die Block-ID:&c //replace woodenstair #id:cobblestair'
+  tip_replace_light: 'Tipp: Entferne Licht-Quellen&c //replace #brightness:1:15 0'
+  tip_tab_complete: 'Tipp: Der Replace-Befehl unterstützt Tab-Vervollständigung'
+  tip_flip: 'Tipp: Spiegeln mit &c//flip'
+  tip_deform: 'Tipp: Forme um mit &c//deform'
+  tip_transform: 'Tipp: Platziere eine Umformung mit &c//gtransform'
+  tip_copypaste: 'Tipp: Füge durch Klick ein mit &c//br copypaste'
+  tip_source_mask: 'Tipp: Setze eine Quell-Maske &c/gsmask <mask>&7'
+  tip_replace_marker: 'Tipp: Ersetze einen Block mit deiner vollständigen Zwischenablage
+    mit &c//replace wool #fullcopy'
+  tip_paste: 'Tipp: Füge deine Zwischeneinlage mit &c//paste ein'
+  tip_lazycopy: 'Tipp: lazycopy ist schneller'
+  tip_rotate: 'Tipp: Ausrichten mit &c//rotate'
+  tip_copy_pattern: 'Tipp: Um ein Muster zu verwenden nutze &c#copy'
+  tip_lazycut: '&7Tipp: Es ist sicherer den Befehl &c//lazycut zu verwenden.'
+  tip_regen_0: 'Tipp: Benutze ein Biom mit /regen [biome]'
+  tip_regen_1: 'Tipp: Benutzte einen Seed mit /regen [biome] [seed]'
+  tip_biome_pattern: 'Tipp: Das &c#biome[forest]&7 Muster kann in jedem Befehl genutzt werden'
+  tip_biome_mask: 'Tipp: Beschränke ein Biom mit der `$jungle` Maske'

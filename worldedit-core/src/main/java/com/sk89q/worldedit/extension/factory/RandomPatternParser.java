@@ -19,15 +19,15 @@
 
 package com.sk89q.worldedit.extension.factory;
 
-import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 class RandomPatternParser extends InputParser<Pattern> {
 
@@ -40,8 +40,7 @@ class RandomPatternParser extends InputParser<Pattern> {
         BlockFactory blockRegistry = worldEdit.getBlockFactory();
         RandomPattern randomPattern = new RandomPattern();
 
-        String[] splits = input.split(",");
-        for (String token : StringUtil.parseListInQuotes(splits, ',', '[', ']')) {
+        for (String token : input.split(",")) {
             BlockStateHolder block;
 
             double chance;
@@ -61,7 +60,7 @@ class RandomPatternParser extends InputParser<Pattern> {
                 block = blockRegistry.parseFromInput(token, context);
             }
 
-            randomPattern.add(new BlockPattern(block), chance);
+            randomPattern.add(block, chance);
         }
 
         return randomPattern;

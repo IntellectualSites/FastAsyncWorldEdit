@@ -19,12 +19,18 @@
 
 package com.sk89q.worldedit.extent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.sk89q.worldedit.MutableBlockVector;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Requires that all mutating methods pass a given {@link Mask}.
@@ -32,12 +38,13 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 public class MaskingExtent extends AbstractDelegateExtent {
 
     private Mask mask;
+    private MutableBlockVector mutable = new MutableBlockVector();
 
     /**
      * Create a new instance.
      *
      * @param extent the extent
-     * @param mask the mask
+     * @param mask   the mask
      */
     public MaskingExtent(Extent extent, Mask mask) {
         super(extent);
@@ -67,6 +74,20 @@ public class MaskingExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
         return mask.test(location) && super.setBlock(location, block);
+    }
+
+    @Override
+    public boolean setBiome(Vector2D position, BaseBiome biome) {
+        return mask.test(mutable.setComponents(position.getBlockX(), 0, position.getBlockZ())) && super.setBiome(position, biome);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BaseBiome biome) {
+        return mask.test(mutable.setComponents(x, y, z)) && super.setBiome(x, y, z, biome);
+    }
+
+    public static Class<?> inject() {
+        return MaskingExtent.class;
     }
 
 }

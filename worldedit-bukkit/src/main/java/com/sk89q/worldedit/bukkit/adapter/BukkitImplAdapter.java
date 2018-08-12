@@ -19,11 +19,15 @@
 
 package com.sk89q.worldedit.bukkit.adapter;
 
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.world.block.BlockType;
+import net.minecraft.server.v1_13_R1.NBTBase;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Entity;
@@ -35,7 +39,7 @@ import javax.annotation.Nullable;
 /**
  * An interface for adapters of various Bukkit implementations.
  */
-public interface BukkitImplAdapter {
+public interface BukkitImplAdapter<T> {
 
     /**
      * Get the biome ID for the given biome.
@@ -63,7 +67,7 @@ public interface BukkitImplAdapter {
      * @param location the location
      * @return the block
      */
-    BaseBlock getBlock(Location location);
+    BlockState getBlock(Location location);
 
     /**
      * Set the block at the given location.
@@ -101,4 +105,12 @@ public interface BukkitImplAdapter {
      * @return The properties map
      */
     Map<String, ? extends Property> getProperties(BlockType blockType);
+
+    default Tag toNative(T foreign) {
+        return null;
+    }
+
+    default T fromNative(Tag foreign) {
+        return null;
+    }
 }

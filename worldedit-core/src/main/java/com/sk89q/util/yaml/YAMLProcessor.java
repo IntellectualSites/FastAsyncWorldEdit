@@ -23,18 +23,11 @@ import com.sk89q.util.StringUtil;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-import org.yaml.snakeyaml.emitter.ScalarAnalysis;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 import org.yaml.snakeyaml.representer.Representer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -298,16 +291,15 @@ public class YAMLProcessor extends YAMLNode {
 
     // This will be included in snakeyaml 1.10, but until then we have to do it manually.
     private class FancyDumperOptions extends DumperOptions {
-        @Override
-        public DumperOptions.ScalarStyle calculateScalarStyle(ScalarAnalysis analysis,
-                                                              DumperOptions.ScalarStyle style) {
-            if (format == YAMLFormat.EXTENDED
-                    && (analysis.scalar.contains("\n") || analysis.scalar.contains("\r"))) {
-                return ScalarStyle.LITERAL;
-            } else {
-                return super.calculateScalarStyle(analysis, style);
-            }
-        }
+//        @Override
+//        public DumperOptions.ScalarStyle calculateScalarStyle(ScalarAnalysis analysis,
+//                                                              DumperOptions.ScalarStyle style) {
+//            if (format == YAMLFormat.EXTENDED && (analysis.scalar.contains("\n") || analysis.scalar.contains("\r"))) {
+//                return ScalarStyle.LITERAL;
+//            } else {
+//                return super.calculateScalarStyle(analysis, style);
+//            }
+//        }
     }
 
     private static class FancyRepresenter extends Representer {
@@ -315,5 +307,4 @@ public class YAMLProcessor extends YAMLNode {
             this.nullRepresenter = o -> representScalar(Tag.NULL, "");
         }
     }
-
 }

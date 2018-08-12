@@ -19,26 +19,27 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 /**
  * A tool that can place (or remove) blocks at a distance.
  */
 public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTool {
 
-    private BlockStateHolder primary;
-    private BlockStateHolder secondary;
+    private Pattern primary;
+    private Pattern secondary;
 
-    public LongRangeBuildTool(BlockStateHolder primary, BlockStateHolder secondary) {
+    public LongRangeBuildTool(Pattern primary, Pattern secondary) {
         super("worldedit.tool.lrbuild");
         this.primary = primary;
         this.secondary = secondary;
@@ -54,18 +55,12 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         Location pos = getTargetFace(player);
         if (pos == null) return false;
         EditSession eS = session.createEditSession(player);
-        try {
-            if (secondary.getBlockType() == BlockTypes.AIR) {
-                eS.setBlock(pos.toVector(), secondary);
-            } else {
-                eS.setBlock(pos.getDirection(), secondary);
-            }
-            return true;
-        } catch (MaxChangedBlocksException e) {
-            // one block? eat it
+        if (secondary instanceof BlockStateHolder && ((BlockStateHolder) secondary).getBlockType().getMaterial().isAir()) {
+            eS.setBlock(pos.toVector(), secondary);
+        } else {
+            eS.setBlock(pos.getDirection(), secondary);
         }
-        return false;
-
+        return true;
     }
 
     @Override
@@ -73,24 +68,19 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         Location pos = getTargetFace(player);
         if (pos == null) return false;
         EditSession eS = session.createEditSession(player);
-        try {
-            if (primary.getBlockType() == BlockTypes.AIR) {
-                eS.setBlock(pos.toVector(), primary);
-            } else {
-                eS.setBlock(pos.getDirection(), primary);
-            }
-            return true;
-        } catch (MaxChangedBlocksException e) {
-            // one block? eat it
+        if (primary instanceof BlockStateHolder && ((BlockStateHolder) primary).getBlockType().getMaterial().isAir()) {
+            eS.setBlock(pos.toVector(), primary);
+        } else {
+            eS.setBlock(pos.getDirection(), primary);
         }
-        return false;
+        return true;
     }
 
     public Location getTargetFace(Player player) {
         Location target = player.getBlockTraceFace(getRange(), true);
 
         if (target == null) {
-            player.printError("No block in sight!");
+            BBC.NO_BLOCK.send(player);
             return null;
         }
 

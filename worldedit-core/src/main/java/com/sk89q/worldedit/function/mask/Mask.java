@@ -19,13 +19,19 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.sk89q.minecraft.util.commands.Link;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.command.UtilityCommands;
 
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.function.mask.Masks.negate;
 
 /**
  * Tests whether a given vector meets a criteria.
  */
+@Link(clazz = UtilityCommands.class, value = "masks")
 public interface Mask {
 
     /**
@@ -42,6 +48,28 @@ public interface Mask {
      * @return a 2D mask version or {@code null} if this mask can't be 2D
      */
     @Nullable
-    Mask2D toMask2D();
+    default Mask2D toMask2D() {
+        return null;
+    }
 
+    default Mask optimize() {
+        return null;
+    }
+
+    default Mask and(Mask other) {
+        return null;
+    }
+
+    default Mask or(Mask other) {
+        return null;
+    }
+
+    default Mask inverse() {
+        if (this instanceof Masks.AlwaysTrue) {
+            return Masks.ALWAYS_FALSE;
+        } else if (this instanceof Masks.AlwaysFalse) {
+            return Masks.ALWAYS_TRUE;
+        }
+        return new InverseMask(this);
+    }
 }

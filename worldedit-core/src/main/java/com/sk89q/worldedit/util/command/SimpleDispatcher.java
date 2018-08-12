@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.util.command;
 
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.util.StringMan;
 import com.google.common.base.Joiner;
-import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class SimpleDispatcher implements Dispatcher {
 
-    private final Map<String, CommandMapping> commands = new HashMap<>();
+    private final Map<String, CommandMapping> commands = new HashMap<String, CommandMapping>();
     private final SimpleDescription description = new SimpleDescription();
 
     /**
@@ -56,35 +56,42 @@ public class SimpleDispatcher implements Dispatcher {
     @Override
     public void registerCommand(CommandCallable callable, String... alias) {
         CommandMapping mapping = new SimpleCommandMapping(callable, alias);
-        
+
         // Check for replacements
         for (String a : alias) {
             String lower = a.toLowerCase();
-            if (commands.containsKey(lower)) {
-                throw new IllegalArgumentException(
-                        "Replacing commands is currently undefined behavior");
+            CommandMapping existing = commands.get(lower);
+            if (existing != null) {
+                CommandCallable existingCallable = existing.getCallable();
+                if (existingCallable instanceof Dispatcher && callable instanceof Dispatcher) {
+                    Dispatcher existingDispatcher = (Dispatcher) existingCallable;
+                    Dispatcher newDispatcher = (Dispatcher) callable;
+                    for (CommandMapping add : newDispatcher.getCommands()) {
+                        existingDispatcher.registerCommand(add.getCallable(), add.getAllAliases());
+                    }
+                    continue;
+                } else {
+                    Fawe.debug("Replacing commands is currently undefined behavior: " + StringMan.getString(alias));
+                    continue;
+                }
             }
-        }
-        
-        for (String a : alias) {
-            String lower = a.toLowerCase();
-            commands.put(lower, mapping);
+            commands.putIfAbsent(lower, mapping);
         }
     }
 
     @Override
     public Set<CommandMapping> getCommands() {
-        return Collections.unmodifiableSet(new HashSet<>(commands.values()));
+        return Collections.unmodifiableSet(new HashSet<CommandMapping>(commands.values()));
     }
-    
+
     @Override
     public Set<String> getAliases() {
         return Collections.unmodifiableSet(commands.keySet());
     }
-    
+
     @Override
     public Set<String> getPrimaryAliases() {
-        Set<String> aliases = new HashSet<>();
+        Set<String> aliases = new HashSet<String>();
         for (CommandMapping mapping : getCommands()) {
             aliases.add(mapping.getPrimaryAlias());
         }
@@ -108,7 +115,7 @@ public class SimpleDispatcher implements Dispatcher {
             throw new CommandPermissionsException();
         }
 
-        String[] split = CommandContext.split(arguments);
+        String[] split = arguments.split(" ", -1);
         Set<String> aliases = getPrimaryAliases();
 
         if (aliases.isEmpty()) {
@@ -138,12 +145,12 @@ public class SimpleDispatcher implements Dispatcher {
 
     @Override
     public List<String> getSuggestions(String arguments, CommandLocals locals) throws CommandException {
-        String[] split = CommandContext.split(arguments);
+        String[] split = arguments.split(" ", -1);
 
         if (split.length <= 1) {
             String prefix = split.length > 0 ? split[0] : "";
 
-            List<String> suggestions = new ArrayList<>();
+            List<String> suggestions = new ArrayList<String>();
 
             for (CommandMapping mapping : getCommands()) {
                 if (mapping.getCallable().testPermission(locals)) {
@@ -177,13 +184,12 @@ public class SimpleDispatcher implements Dispatcher {
 
     @Override
     public boolean testPermission(CommandLocals locals) {
-        for (CommandMapping mapping : getCommands()) {
-            if (mapping.getCallable().testPermission(locals)) {
-                return true;
-            }
-        }
+        // Checking every perm in the class here was unnecessarily stupid
+        return true;
+    }
 
-        return false;
+    public static Class<SimpleDispatcher> inject() {
+        return SimpleDispatcher.class;
     }
 
 }

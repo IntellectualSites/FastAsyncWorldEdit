@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.worldedit.blocks.BlockMaterial;
+
 import javax.annotation.Nullable;
 
 public class PassthroughBlockMaterial implements BlockMaterial {
@@ -27,6 +29,15 @@ public class PassthroughBlockMaterial implements BlockMaterial {
 
     public PassthroughBlockMaterial(@Nullable BlockMaterial material) {
         this.blockMaterial = material;
+    }
+
+    @Override
+    public boolean isAir() {
+        if (blockMaterial == null) {
+            return false;
+        } else {
+            return blockMaterial.isAir();
+        }
     }
 
     @Override
@@ -107,6 +118,15 @@ public class PassthroughBlockMaterial implements BlockMaterial {
             return 0;
         } else {
             return blockMaterial.getLightValue();
+        }
+    }
+
+    @Override
+    public int getLightOpacity() {
+        if (blockMaterial == null) {
+            return 0;
+        } else {
+            return blockMaterial.getLightOpacity();
         }
     }
 

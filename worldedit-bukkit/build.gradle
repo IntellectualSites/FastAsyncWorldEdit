@@ -9,8 +9,27 @@ repositories {
 dependencies {
     compile project(':worldedit-core')
     compile 'com.sk89q:dummypermscompat:1.8'
-    compile 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT' // zzz
+    compile 'com.destroystokyo.paper:paper-api:1.13-R0.1-SNAPSHOT'
+    compile "org.bukkit:craftbukkit:1.13-R0.1-SNAPSHOT"
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
+    compile 'net.milkbowl.vault:VaultAPI:1.5.6'
+    compile 'com.massivecraft:factions:2.8.0'
+    compile 'com.drtshock:factions:1.6.9.5'
+    compile 'com.factionsone:FactionsOne:1.2.2'
+    compile 'me.ryanhamshire:GriefPrevention:11.5.2'
+    compile 'com.massivecraft:mcore:7.0.1'
+    compile 'net.sacredlabyrinth.Phaed:PreciousStones:10.0.4-SNAPSHOT'
+    compile 'net.jzx7:regios:5.9.9'
+    compile 'com.bekvon.bukkit.residence:Residence:4.5._13.1'
+    compile 'com.palmergames.bukkit:towny:0.84.0.9'
+    compile 'com.worldcretornica:plotme_core:0.16.3'
+    compile 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
+    compile 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
+    compile 'com.wasteofplastic:askyblock:3.0.8.2'
+    compile 'com.sk89q:worldguard:6.0.0-SNAPSHOT'
+    compile('org.inventivetalent:mapmanager:1.4.0-SNAPSHOT') {
+        transitive = false
+    }
 }
 
 processResources {
@@ -35,6 +54,8 @@ shadowJar {
     dependencies {
         include(dependency(':worldedit-core'))
     }
+    archiveName = "${parent.name}-${project.name}-${parent.version}.jar"
+    destinationDir = file '../target'
 }
 
 build.dependsOn(shadowJar)

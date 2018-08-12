@@ -21,13 +21,12 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
+import com.bekvon.bukkit.residence.commands.material;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -40,23 +39,18 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
-
-import javax.annotation.Nullable;
 
 /**
  * Adapts between Bukkit and WorldEdit equivalent objects.
  */
 public class BukkitAdapter {
-
-    private BukkitAdapter() {
-    }
 
     private static final ParserContext TO_BLOCK_CONTEXT = new ParserContext();
 
@@ -105,26 +99,6 @@ public class BukkitAdapter {
     public static World adapt(org.bukkit.World world) {
         checkNotNull(world);
         return new BukkitWorld(world);
-    }
-
-    /**
-     * Create a WorldEdit Player from a Bukkit Player.
-     *
-     * @param player The Bukkit player
-     * @return The WorldEdit player
-     */
-    public static BukkitPlayer adapt(Player player) {
-        return WorldEditPlugin.getInstance().wrapPlayer(player);
-    }
-
-    /**
-     * Create a Bukkit Player from a WorldEdit Player.
-     *
-     * @param player The WorldEdit player
-     * @return The Bukkit player
-     */
-    public static Player adapt(com.sk89q.worldedit.entity.Player player) {
-        return ((BukkitPlayer) player).getPlayer();
     }
 
     /**
@@ -247,6 +221,8 @@ public class BukkitAdapter {
         return Material.getMaterial(itemType.getId().replace("minecraft:", "").toUpperCase());
     }
 
+    private static boolean test;
+
     /**
      * Create a Bukkit Material form a WorldEdit BlockType
      *
@@ -258,7 +234,8 @@ public class BukkitAdapter {
         if (!blockType.getId().startsWith("minecraft:")) {
             throw new IllegalArgumentException("Bukkit only supports Minecraft blocks");
         }
-        return Material.getMaterial(blockType.getId().replace("minecraft:", "").toUpperCase());
+        String id = blockType.getId().substring(10).toUpperCase();
+        return Material.getMaterial(id);
     }
 
     /**
@@ -281,10 +258,17 @@ public class BukkitAdapter {
     public static BlockType asBlockType(Material material) {
         checkNotNull(material);
         if (!material.isBlock()) {
-            throw new IllegalArgumentException(material.getKey().toString() + " is not a block!");
+            throw new IllegalArgumentException(material.getKey().toString() + " is not a block!") {
+                @Override
+                public synchronized Throwable fillInStackTrace() {
+                    return this;
+                }
+            };
         }
         return BlockTypes.get(material.getKey().toString());
     }
+
+
 
     /**
      * Converts a Material to a ItemType
@@ -293,35 +277,25 @@ public class BukkitAdapter {
      * @return The itemtype
      */
     public static ItemType asItemType(Material material) {
-        checkNotNull(material);
-        if (!material.isItem()) {
-            throw new IllegalArgumentException(material.getKey().toString() + " is not an item!");
-        }
-        return ItemTypes.get(material.getKey().toString());
+        return CachedBukkitAdapter.asItemType(material);
     }
 
-    private static Map<String, BlockState> blockStateCache = new HashMap<>();
-
     /**
-     * Create a WorldEdit BlockState from a Bukkit BlockData
+     * Create a WorldEdit BlockStateHolder from a Bukkit BlockData
      *
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
      */
     public static BlockState adapt(BlockData blockData) {
-        checkNotNull(blockData);
-        return blockStateCache.computeIfAbsent(blockData.getAsString(), new Function<String, BlockState>() {
-            @Nullable
-            @Override
-            public BlockState apply(@Nullable String input) {
-                try {
-                    return WorldEdit.getInstance().getBlockFactory().parseFromInput(input, TO_BLOCK_CONTEXT).toImmutableState();
-                } catch (InputParseException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        });
+        return CachedBukkitAdapter.adapt(blockData);
+    }
+
+    public static BlockData getBlockData(int combinedId) {
+        return CachedBukkitAdapter.getBlockData(combinedId);
+    }
+
+    public static BlockTypes adapt(Material material) {
+        return CachedBukkitAdapter.adapt(material);
     }
 
     /**
@@ -331,17 +305,16 @@ public class BukkitAdapter {
      * @return The Bukkit BlockData
      */
     public static BlockData adapt(BlockStateHolder block) {
-        checkNotNull(block);
-        return Bukkit.createBlockData(block.getAsString());
+        return CachedBukkitAdapter.adapt(block);
     }
 
     /**
-     * Create a WorldEdit BlockState from a Bukkit ItemStack
+     * Create a WorldEdit BlockStateHolder from a Bukkit ItemStack
      *
      * @param itemStack The Bukkit ItemStack
      * @return The WorldEdit BlockState
      */
-    public static BlockState asBlockState(ItemStack itemStack) {
+    public static BlockStateHolder asBlockState(ItemStack itemStack) {
         checkNotNull(itemStack);
         if (itemStack.getType().isBlock()) {
             return adapt(itemStack.getType().createBlockData());
@@ -358,6 +331,8 @@ public class BukkitAdapter {
      */
     public static BaseItemStack adapt(ItemStack itemStack) {
         checkNotNull(itemStack);
+
+
         return new BaseItemStack(ItemTypes.get(itemStack.getType().getKey().toString()), itemStack.getAmount());
     }
 
@@ -370,5 +345,24 @@ public class BukkitAdapter {
     public static ItemStack adapt(BaseItemStack item) {
         checkNotNull(item);
         return new ItemStack(adapt(item.getType()), item.getAmount());
+    }
+
+    /**
+     * Create a WorldEdit Player from a Bukkit Player.
+     *
+     * @param player The Bukkit player
+     * @return The WorldEdit player
+     */
+    public static BukkitPlayer adapt(Player player) {
+        return WorldEditPlugin.getInstance().wrapPlayer(player);
+    }
+    /**
+     * Create a Bukkit Player from a WorldEdit Player.
+     *
+     * @param player The WorldEdit player
+     * @return The Bukkit player
+     */
+    public static Player adapt(com.sk89q.worldedit.entity.Player player) {
+        return ((BukkitPlayer) player).getPlayer();
     }
 }

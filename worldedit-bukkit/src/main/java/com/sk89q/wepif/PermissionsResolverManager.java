@@ -21,6 +21,7 @@ package com.sk89q.wepif;
 
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.event.EventHandler;
@@ -102,7 +103,6 @@ public class PermissionsResolverManager implements PermissionsResolver {
     protected PermissionsResolverManager(Plugin plugin) {
         this.server = plugin.getServer();
         (new ServerListener()).register(plugin); // Register the events
-
         loadConfig(new File("wepif.yml"));
         findResolver();
     }

@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.internal.expression.runtime;
 
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+
 /**
  * Represents a way to access blocks in a world. Has to accept non-rounded coordinates.
  */
@@ -31,4 +34,7 @@ public interface ExpressionEnvironment {
     int getBlockTypeRel(double x, double y, double z);
     int getBlockDataRel(double x, double y, double z);
 
+    public static Class<?> inject() {
+        return ExpressionEnvironment.class;
+    }
 }

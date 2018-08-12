@@ -19,10 +19,9 @@
 
 package com.sk89q.worldedit.util.command;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
 
 /**
  * Compares the primary aliases of two {@link CommandMapping} using

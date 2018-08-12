@@ -19,18 +19,85 @@
 
 package com.sk89q.worldedit.registry.state;
 
-import static com.google.common.base.Preconditions.checkState;
+import com.boydti.fawe.util.MathMan;
+import com.sk89q.worldedit.internal.expression.runtime.Function;
+import com.sk89q.worldedit.math.MathUtils;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public abstract class AbstractProperty<T> implements Property<T> {
+public class AbstractProperty<T> implements Property<T> {
 
-    private String name;
-    private List<T> values;
+    private final PropertyKey key;
+    private final String name;
+    private final List<T> values;
+
+    private final int bitMask;
+    private final int bitMaskInverse;
+    private final int bitOffset;
+    private final int numBits;
 
     public AbstractProperty(final String name, final List<T> values) {
+        this(name, values, 0);
+    }
+
+    public AbstractProperty(final String name, final List<T> values, int bitOffset) {
         this.name = name;
         this.values = values;
+        this.numBits = MathMan.log2nlz(values.size());
+        this.bitOffset = bitOffset + BlockTypes.BIT_OFFSET;
+        this.bitMask = (((1 << numBits) - 1)) << this.bitOffset;
+        this.bitMaskInverse = ~this.bitMask;
+        this.key = PropertyKey.getOrCreate(name);
+    }
+
+    @Override
+    public PropertyKey getKey() {
+        return key;
+    }
+
+    @Deprecated
+    public int getNumBits() {
+        return numBits;
+    }
+
+    @Deprecated
+    public int getBitOffset() {
+        return bitOffset;
+    }
+
+    @Deprecated
+    public int getBitMask() {
+        return bitMask;
+    }
+
+    public <C extends AbstractProperty<T>> C withOffset(int bitOffset) {
+        return (C) new AbstractProperty<>(name, values, bitOffset);
+    }
+
+    @Deprecated
+    public int modify(int state, T value) {
+        int index = getIndex(value);
+        if (index != -1) {
+            return modifyIndex(state, index);
+        }
+        return state;
+    }
+
+    public int modifyIndex(int state, int index) {
+        return ((state & bitMaskInverse) | (index << this.bitOffset));
+    }
+
+    public T getValue(int state) {
+        return values.get((state & bitMask) >> bitOffset);
+    }
+
+    public int getIndex(int state) {
+        return (state & bitMask) >> bitOffset;
     }
 
     @Override
@@ -38,17 +105,15 @@ public abstract class AbstractProperty<T> implements Property<T> {
         return this.values;
     }
 
+    @Nullable
+    @Override
+    public T getValueFor(String string) throws IllegalArgumentException {
+        return (T) string;
+    }
+
     @Override
     public String getName() {
         return this.name;
-    }
-
-    /**
-     * Internal method for name setting post-deserialise. Do not use.
-     */
-    public void setName(final String name) {
-        checkState(this.name == null, "name already set");
-        this.name = name;
     }
 
     @Override

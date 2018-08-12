@@ -19,13 +19,21 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.sk89q.worldedit.world.registry.BlockMaterial;
+import com.bekvon.bukkit.residence.commands.material;
+import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.command.tool.BlockDataCyler;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BundledBlockRegistry;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.registry.PassthroughBlockMaterial;
 import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -38,7 +46,11 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
     @Nullable
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
-        return materialMap.computeIfAbsent(BukkitAdapter.adapt(blockType),
+        Material type = BukkitAdapter.adapt(blockType);
+        if (type == null) {
+            type = Material.AIR;
+        }
+        return materialMap.computeIfAbsent(type,
                 material -> new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), material));
     }
 
@@ -74,5 +86,17 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         public boolean isTranslucent() {
             return material.isTransparent();
         }
+    }
+
+    @Override
+    public Collection<String> registerBlocks() {
+        ArrayList<String> blocks = new ArrayList<>();
+        for (Material m : Material.values()) {
+            if (!m.isLegacy() && m.isBlock()) {
+                BlockData blockData = m.createBlockData();
+                blocks.add(blockData.getAsString());
+            }
+        }
+        return blocks;
     }
 }

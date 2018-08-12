@@ -19,14 +19,13 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
-
+import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -34,10 +33,16 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.world.World;
+
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
 
 /**
  * Commands for moving the player around.
  */
+@Command(aliases = {}, desc = "Commands for moving the player around: [More Info](https://goo.gl/uQTUiT)")
 public class NavigationCommands {
 
     @SuppressWarnings("unused")
@@ -54,24 +59,24 @@ public class NavigationCommands {
     }
 
     @Command(
-        aliases = { "unstuck", "!" },
-        usage = "",
-        desc = "Escape from being stuck inside a block",
-        min = 0,
-        max = 0
+            aliases = {"unstuck", "!"},
+            usage = "",
+            desc = "Escape from being stuck inside a block",
+            min = 0,
+            max = 0
     )
     @CommandPermissions("worldedit.navigation.unstuck")
     public void unstuck(Player player) throws WorldEditException {
-        player.print("There you go!");
         player.findFreePosition();
+        BBC.UNSTUCK.send(player);
     }
 
     @Command(
-        aliases = { "ascend", "asc" },
-        usage = "[# of levels]",
-        desc = "Go up a floor",
-        min = 0,
-        max = 1
+            aliases = {"ascend", "asc"},
+            usage = "[# of levels]",
+            desc = "Go up a floor",
+            min = 0,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.ascend")
     public void ascend(Player player, @Optional("1") int levelsToAscend) throws WorldEditException {
@@ -83,18 +88,22 @@ public class NavigationCommands {
             }
         }
         if (ascentLevels == 0) {
-            player.printError("No free spot above you found.");
+            BBC.ASCEND_FAIL.send(player);
         } else {
-            player.print((ascentLevels != 1) ? "Ascended " + Integer.toString(ascentLevels) + " levels." : "Ascended a level.");
+            if (ascentLevels == 1) {
+                BBC.ASCENDED_SINGULAR.send(player);
+            } else {
+                BBC.ASCENDED_PLURAL.send(player, ascentLevels);
+            }
         }
     }
 
     @Command(
-        aliases = { "descend", "desc" },
-        usage = "[# of floors]",
-        desc = "Go down a floor",
-        min = 0,
-        max = 1
+            aliases = {"descend", "desc"},
+            usage = "[# of floors]",
+            desc = "Go down a floor",
+            min = 0,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.descend")
     public void descend(Player player, @Optional("1") int levelsToDescend) throws WorldEditException {
@@ -106,94 +115,110 @@ public class NavigationCommands {
             }
         }
         if (descentLevels == 0) {
-            player.printError("No free spot below you found.");
+            BBC.DESCEND_FAIL.send(player);
         } else {
-            player.print((descentLevels != 1) ? "Descended " + Integer.toString(descentLevels) + " levels." : "Descended a level.");
+            if (descentLevels == 1) {
+                BBC.DESCEND_SINGULAR.send(player);
+            } else {
+                BBC.DESCEND_PLURAL.send(player, descentLevels);
+            }
         }
     }
 
     @Command(
-        aliases = { "ceil" },
-        usage = "[clearance]",
-        desc = "Go to the celing",
-        flags = "fg",
-        min = 0,
-        max = 1
+            aliases = {"ceil"},
+            usage = "[clearance]",
+            desc = "Go to the celing",
+            flags = "fg",
+            min = 0,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.ceiling")
     @Logging(POSITION)
-    public void ceiling(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+    public void ceiling(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
         final int clearance = args.argsLength() > 0 ?
-            Math.max(0, args.getInteger(0)) : 0;
+                Math.max(0, args.getInteger(0)) : 0;
 
         final boolean alwaysGlass = getAlwaysGlass(args);
         if (player.ascendToCeiling(clearance, alwaysGlass)) {
-            player.print("Whoosh!");
+            BBC.WHOOSH.send(player);
         } else {
-            player.printError("No free spot above you found.");
+            BBC.ASCEND_FAIL.send(player);
         }
     }
 
     @Command(
-        aliases = { "thru" },
-        usage = "",
-        desc = "Passthrough walls",
-        min = 0,
-        max = 0
+            aliases = {"thru"},
+            usage = "",
+            desc = "Passthrough walls",
+            min = 0,
+            max = 0
     )
     @CommandPermissions("worldedit.navigation.thru.command")
-    public void thru(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+    public void thru(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         if (player.passThroughForwardWall(6)) {
-            player.print("Whoosh!");
+            BBC.WHOOSH.send(player);
         } else {
-            player.printError("No free spot ahead of you found.");
+            BBC.THRU_FAIL.send(player);
         }
     }
 
     @Command(
-        aliases = { "jumpto", "j" },
-        usage = "",
-        desc = "Teleport to a location",
-        min = 0,
-        max = 0
+            aliases = {"jumpto", "j"},
+            usage = "[world,x,y,z]",
+            desc = "Teleport to a location",
+            min = 0,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.jumpto.command")
-    public void jumpTo(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-
-        Location pos = player.getSolidBlockTrace(300);
+    public void jumpTo(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+        Location pos;
+        if (args.argsLength() == 1) {
+            String arg = args.getString(0);
+            String[] split = arg.split(",");
+            World world = FaweAPI.getWorld(split[0]);
+            if (world != null && split.length == 4 && MathMan.isInteger(split[1]) && MathMan.isInteger(split[2]) && MathMan.isInteger(split[3])) {
+                pos = new Location(world, Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]));
+            } else {
+                BBC.SELECTOR_INVALID_COORDINATES.send(player, args.getString(0));
+                return;
+            }
+        } else {
+            pos = player.getSolidBlockTrace(300);
+        }
         if (pos != null) {
             player.findFreePosition(pos);
-            player.print("Poof!");
+            BBC.POOF.send(player);
         } else {
-            player.printError("No block in sight!");
+            BBC.NO_BLOCK.send(player);
         }
     }
 
     @Command(
-        aliases = { "up" },
-        usage = "<block>",
-        desc = "Go upwards some distance",
-        flags = "fg",
-        min = 1,
-        max = 1
+            aliases = {"up"},
+            usage = "<number>",
+            desc = "Go upwards some distance",
+            flags = "fg",
+            min = 1,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.up")
     @Logging(POSITION)
-    public void up(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+    public void up(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         final int distance = args.getInteger(0);
 
         final boolean alwaysGlass = getAlwaysGlass(args);
         if (player.ascendUpwards(distance, alwaysGlass)) {
-            player.print("Whoosh!");
+            BBC.WHOOSH.send(player);
         } else {
-            player.printError("You would hit something above you.");
+            BBC.UP_FAIL.send(player);
         }
     }
 
     /**
      * Helper function for /up and /ceil.
-     * 
+     *
      * @param args The {@link CommandContext} to extract the flags from.
      * @return true, if glass should always be put under the player
      */
@@ -204,5 +229,9 @@ public class NavigationCommands {
         final boolean forceGlass = args.hasFlag('g');
 
         return forceGlass || (config.navigationUseGlass && !forceFlight);
+    }
+
+    public static Class<?> inject() {
+        return NavigationCommands.class;
     }
 }

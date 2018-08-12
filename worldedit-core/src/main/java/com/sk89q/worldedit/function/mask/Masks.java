@@ -1,40 +1,25 @@
-/*
- * WorldEdit, a Minecraft world manipulation toolkit
- * Copyright (C) sk89q <http://www.sk89q.com>
- * Copyright (C) WorldEdit team and contributors
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.sk89q.worldedit.function.mask;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Various utility functions related to {@link Mask} and {@link Mask2D}.
  */
 public final class Masks {
 
-    private static final AlwaysTrue ALWAYS_TRUE = new AlwaysTrue();
-    private static final AlwaysFalse ALWAYS_FALSE = new AlwaysFalse();
+    protected static final AlwaysTrue ALWAYS_TRUE = new AlwaysTrue();
+    protected static final AlwaysFalse ALWAYS_FALSE = new AlwaysFalse();
 
     private Masks() {
+    }
+
+    public static boolean isNull(Mask mask) {
+        return mask == null || mask == ALWAYS_TRUE;
     }
 
     /**
@@ -44,6 +29,10 @@ public final class Masks {
      */
     public static Mask alwaysTrue() {
         return ALWAYS_TRUE;
+    }
+
+    public static Mask alwaysFalse() {
+        return ALWAYS_FALSE;
     }
 
     /**
@@ -58,34 +47,11 @@ public final class Masks {
     /**
      * Negate the given mask.
      *
-     * @param mask the mask
+     * @param finalMask the mask
      * @return a new mask
      */
-    public static Mask negate(final Mask mask) {
-        if (mask instanceof AlwaysTrue) {
-            return ALWAYS_FALSE;
-        } else if (mask instanceof AlwaysFalse) {
-            return ALWAYS_TRUE;
-        }
-
-        checkNotNull(mask);
-        return new AbstractMask() {
-            @Override
-            public boolean test(Vector vector) {
-                return !mask.test(vector);
-            }
-
-            @Nullable
-            @Override
-            public Mask2D toMask2D() {
-                Mask2D mask2d = mask.toMask2D();
-                if (mask2d != null) {
-                    return negate(mask2d);
-                } else {
-                    return null;
-                }
-            }
-        };
+    public static Mask negate(final Mask finalMask) {
+        return finalMask.inverse();
     }
 
     /**
@@ -131,7 +97,7 @@ public final class Masks {
         };
     }
 
-    private static class AlwaysTrue implements Mask, Mask2D {
+    protected static class AlwaysTrue implements Mask, Mask2D {
         @Override
         public boolean test(Vector vector) {
             return true;
@@ -147,9 +113,19 @@ public final class Masks {
         public Mask2D toMask2D() {
             return this;
         }
+
+        @Override
+        public Mask and(Mask other) {
+            return other;
+        }
+
+        @Override
+        public Mask or(Mask other) {
+            return other;
+        }
     }
 
-    private static class AlwaysFalse implements Mask, Mask2D {
+    protected static class AlwaysFalse implements Mask, Mask2D {
         @Override
         public boolean test(Vector vector) {
             return false;
@@ -165,6 +141,19 @@ public final class Masks {
         public Mask2D toMask2D() {
             return this;
         }
+
+        @Override
+        public Mask and(Mask other) {
+            return this;
+        }
+
+        @Override
+        public Mask or(Mask other) {
+            return other;
+        }
     }
 
+    public static Class<?> inject() {
+        return Masks.class;
+    }
 }

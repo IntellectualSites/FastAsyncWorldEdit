@@ -19,25 +19,35 @@
 
 package com.sk89q.util;
 
-import java.lang.reflect.Field;
+import sun.reflect.ConstructorAccessor;
+import sun.reflect.FieldAccessor;
+import sun.reflect.ReflectionFactory;
+
+import java.lang.reflect.*;
+import java.util.*;
 
 public final class ReflectionUtil {
 
-    private ReflectionUtil() {
-    }
+    private ReflectionUtil() {}
 
     @SuppressWarnings("unchecked")
     public static <T> T getField(Object from, String name) {
-        Class<?> checkClass = from.getClass();
+        if (from instanceof Class)
+            return getField((Class) from, null, name);
+        else
+            return getField(from.getClass(), from, name);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getField(Class checkClass, Object obj, String name) {
         do {
             try {
                 Field field = checkClass.getDeclaredField(name);
                 field.setAccessible(true);
-                return (T) field.get(from);
+                return (T) field.get(obj);
             } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
         } while (checkClass.getSuperclass() != Object.class && ((checkClass = checkClass.getSuperclass()) != null));
         return null;
     }
-
 }

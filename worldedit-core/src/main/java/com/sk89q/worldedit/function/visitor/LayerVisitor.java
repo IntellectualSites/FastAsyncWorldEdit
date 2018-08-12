@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
@@ -29,44 +26,48 @@ import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.regions.FlatRegion;
-
 import java.util.List;
+
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Visits the layers within a region.
- *
+ * <p>
  * <p>This class works by iterating over all the columns in a {@link FlatRegion},
  * finding the first ground block in each column (searching from a given
  * maximum Y down to a minimum Y), and then applies a {@link LayerFunction} to
  * each layer.</p>
  */
+@Deprecated
 public class LayerVisitor implements Operation {
 
-    private final FlatRegion flatRegion;
     private final LayerFunction function;
     private Mask2D mask = Masks.alwaysTrue2D();
-    private int minY;
-    private int maxY;
+    private final int minY;
+    private final int maxY;
+    private final Iterable<Vector2D> iterator;
 
     /**
      * Create a new visitor.
      *
      * @param flatRegion the flat region to visit
-     * @param minY the minimum Y to stop the search at
-     * @param maxY the maximum Y to begin the search at
-     * @param function the layer function to apply t blocks
+     * @param minY       the minimum Y to stop the search at
+     * @param maxY       the maximum Y to begin the search at
+     * @param function   the layer function to apply t blocks
      */
-    public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function) {
+    public LayerVisitor(final FlatRegion flatRegion, final int minY, final int maxY, final LayerFunction function) {
         checkNotNull(flatRegion);
         checkArgument(minY <= maxY, "minY <= maxY required");
         checkNotNull(function);
-
-        this.flatRegion = flatRegion;
         this.minY = minY;
         this.maxY = maxY;
         this.function = function;
+        this.iterator = flatRegion.asFlatRegion();
     }
 
     /**
@@ -76,7 +77,7 @@ public class LayerVisitor implements Operation {
      * @return a 2D mask
      */
     public Mask2D getMask() {
-        return mask;
+        return this.mask;
     }
 
     /**
@@ -85,42 +86,41 @@ public class LayerVisitor implements Operation {
      *
      * @param mask a 2D mask
      */
-    public void setMask(Mask2D mask) {
+    public void setMask(final Mask2D mask) {
         checkNotNull(mask);
         this.mask = mask;
     }
 
     @Override
-    public Operation resume(RunContext run) throws WorldEditException {
-        for (Vector2D column : flatRegion.asFlatRegion()) {
-            if (!mask.test(column)) {
+    public Operation resume(final RunContext run) throws WorldEditException {
+        for (final Vector2D column : this.iterator) {
+            if (!this.mask.test(column)) {
                 continue;
             }
 
             // Abort if we are underground
-            if (function.isGround(column.toVector(maxY + 1))) {
+            if (this.function.isGround(column.toVector(this.maxY + 1))) {
                 return null;
             }
 
             boolean found = false;
             int groundY = 0;
-            for (int y = maxY; y >= minY; --y) {
-                Vector test = column.toVector(y);
+            for (int y = this.maxY; y >= this.minY; --y) {
+                final Vector test = column.toVector(y);
                 if (!found) {
-                    if (function.isGround(test)) {
+                    if (this.function.isGround(test)) {
                         found = true;
                         groundY = y;
                     }
                 }
 
                 if (found) {
-                    if (!function.apply(test, groundY - y)) {
+                    if (!this.function.apply(test, groundY - y)) {
                         break;
                     }
                 }
             }
         }
-
         return null;
     }
 
@@ -129,7 +129,10 @@ public class LayerVisitor implements Operation {
     }
 
     @Override
-    public void addStatusMessages(List<String> messages) {
+    public void addStatusMessages(final List<String> messages) {
     }
 
+    public static Class<?> inject() {
+        return Operations.class;
+    }
 }

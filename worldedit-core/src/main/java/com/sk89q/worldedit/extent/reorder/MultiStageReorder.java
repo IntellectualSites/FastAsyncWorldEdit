@@ -35,8 +35,8 @@ import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.collection.TupleArrayList;
 import com.sk89q.worldedit.world.block.BlockCategories;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Deque;
@@ -97,7 +97,7 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
 
     @Override
     public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
-        BlockState existing = getBlock(location);
+        BlockStateHolder existing = getBlock(location);
 
         if (!enabled) {
             return super.setBlock(location, block);
@@ -175,13 +175,12 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
                         }
                     }
 
-                    final PlayerDirection attachment = BlockType.getAttachment(blockStateHolder.getBlockType().getLegacyId(), 0); // TODO
-                    if (attachment == null) {
+                    if (!blockStateHolder.getBlockType().getMaterial().isFragileWhenPushed()) {
                         // Block is not attached to anything => we can place it
                         break;
                     }
 
-                    current = current.add(attachment.vector()).toBlockVector();
+//                    current = current.add(attachment.vector()).toBlockVector();
 
                     if (!blocks.contains(current)) {
                         // We ran outside the remaining set => assume we can place blocks on this
