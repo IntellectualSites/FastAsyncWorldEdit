@@ -69,6 +69,8 @@ public final class NBTUtils {
             return "TAG_String";
         } else if (clazz.equals(IntArrayTag.class)) {
             return "TAG_Int_Array";
+        } else if (clazz.equals(LongArrayTag.class)) {
+            return "TAG_Long_Array";
         } else {
             throw new IllegalArgumentException("Invalid tag classs ("
                     + clazz.getName() + ").");
