@@ -104,7 +104,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         byte free = 0;
 
-        while (y <= world.getMinimumPoint().getBlockY() + 2) {
+        while (y <= world.getMaximumPoint().getBlockY() + 2) {
             if (!world.getBlock(new Vector(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 ++free;
             } else {

@@ -96,7 +96,7 @@ public class FloraGenerator implements RegionFunction {
      */
     public static Pattern getTemperatePattern() {
         RandomPattern pattern = new RandomPattern();
-        pattern.add(new BlockPattern(BlockTypes.GRASS_BLOCK.getDefaultState()), 300);
+        pattern.add(new BlockPattern(BlockTypes.GRASS.getDefaultState()), 300);
         pattern.add(new BlockPattern(BlockTypes.POPPY.getDefaultState()), 5);
         pattern.add(new BlockPattern(BlockTypes.DANDELION.getDefaultState()), 5);
         return pattern;

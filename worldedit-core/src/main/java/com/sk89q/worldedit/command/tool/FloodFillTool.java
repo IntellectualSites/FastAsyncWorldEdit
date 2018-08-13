@@ -67,7 +67,7 @@ public class FloodFillTool implements BlockTool {
         EditSession editSession = session.createEditSession(player);
 
         try {
-            recurse(editSession, world, clicked.toVector().toBlockVector(),
+            recurse(editSession, clicked.toVector().toBlockVector(),
                     clicked.toVector(), range, initialType, new HashSet<BlockVector>());
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
@@ -77,7 +77,7 @@ public class FloodFillTool implements BlockTool {
         return true;
     }
 
-    private void recurse(EditSession editSession, World world, BlockVector pos, Vector origin, int size, BlockType initialType,
+    private void recurse(EditSession editSession, BlockVector pos, Vector origin, int size, BlockType initialType,
                          Set<BlockVector> visited) throws WorldEditException {
 
         if (origin.distance(pos) > size || visited.contains(pos)) {
@@ -92,17 +92,17 @@ public class FloodFillTool implements BlockTool {
             return;
         }
 
-        recurse(editSession, world, pos.add(1, 0, 0).toBlockVector(),
+        recurse(editSession, pos.add(1, 0, 0).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(editSession, world, pos.add(-1, 0, 0).toBlockVector(),
+        recurse(editSession, pos.add(-1, 0, 0).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(editSession, world, pos.add(0, 0, 1).toBlockVector(),
+        recurse(editSession, pos.add(0, 0, 1).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(editSession, world, pos.add(0, 0, -1).toBlockVector(),
+        recurse(editSession, pos.add(0, 0, -1).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(editSession, world, pos.add(0, 1, 0).toBlockVector(),
+        recurse(editSession, pos.add(0, 1, 0).toBlockVector(),
                 origin, size, initialType, visited);
-        recurse(editSession, world, pos.add(0, -1, 0).toBlockVector(),
+        recurse(editSession, pos.add(0, -1, 0).toBlockVector(),
                 origin, size, initialType, visited);
     }
 

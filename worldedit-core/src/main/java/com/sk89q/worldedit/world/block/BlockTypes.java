@@ -1011,6 +1011,10 @@ public enum BlockTypes implements BlockType {
         return existing;
     }
 
+    public static final @Nullable BlockTypes get(final String id) {
+        return $REGISTRY.get(id);
+    }
+
     public static final @Nullable BlockTypes get(final CharSequence id) {
         return $REGISTRY.get(id);
     }
