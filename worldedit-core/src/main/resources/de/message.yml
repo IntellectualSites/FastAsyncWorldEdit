@@ -236,7 +236,7 @@ worldedit:
     snapshot_list_footer: Nutze /snap use [snapshot] oder /snap use latest.
   biome:
     biome_list_header: 'Biome (Seite %s0/%s1):'
-    biome_changed: Biome wurden geändert in %s0 Chunks.
+    biome_changed: Biome wurden in %s0 Blöcken geändert.
   utility:
     kill_success: '%s0 Entities in einem Radius von %s1 getötet.'
     nothing_confirmed: Du hast keine zur Autorisierung ausstehenden Aktionen.
