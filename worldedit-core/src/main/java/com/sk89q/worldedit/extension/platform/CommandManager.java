@@ -244,6 +244,9 @@ public final class CommandManager {
             }
         }
 
+        commandMap.clear();
+        methodMap.clear();
+
         dispatcher = graph
                 .group("/anvil")
                 .describeAs("Anvil command")
