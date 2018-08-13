@@ -23,6 +23,7 @@ import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -30,6 +31,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 /**
  * A tool that can place (or remove) blocks at a distance.
@@ -39,7 +41,7 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
     private Pattern primary;
     private Pattern secondary;
 
-    public LongRangeBuildTool(Pattern primary, Pattern secondary) {
+    public LongRangeBuildTool(Pattern secondary, Pattern primary) {
         super("worldedit.tool.lrbuild");
         this.primary = primary;
         this.secondary = secondary;
@@ -55,7 +57,9 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         Location pos = getTargetFace(player);
         if (pos == null) return false;
         EditSession eS = session.createEditSession(player);
-        if (secondary instanceof BlockStateHolder && ((BlockStateHolder) secondary).getBlockType().getMaterial().isAir()) {
+
+        BlockStateHolder applied = secondary.apply(pos.toVector());
+        if (applied.getBlockType().getMaterial().isAir()) {
             eS.setBlock(pos.toVector(), secondary);
         } else {
             eS.setBlock(pos.getDirection(), secondary);
@@ -68,7 +72,8 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         Location pos = getTargetFace(player);
         if (pos == null) return false;
         EditSession eS = session.createEditSession(player);
-        if (primary instanceof BlockStateHolder && ((BlockStateHolder) primary).getBlockType().getMaterial().isAir()) {
+        BlockStateHolder applied = primary.apply(pos.toVector());
+        if (applied.getBlockType().getMaterial().isAir()) {
             eS.setBlock(pos.toVector(), primary);
         } else {
             eS.setBlock(pos.getDirection(), primary);

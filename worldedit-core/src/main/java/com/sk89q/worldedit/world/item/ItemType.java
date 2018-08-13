@@ -59,7 +59,7 @@ public interface ItemType {
      * @return The block representation
      */
     @Nullable
-    default BlockType getBlockType() {
+    default BlockTypes getBlockType() {
         return BlockTypes.get(getId());
     }
 

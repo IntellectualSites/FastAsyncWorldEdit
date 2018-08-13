@@ -46,6 +46,10 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.function.pattern.BlockPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.TreeGenerator;
 
 @Command(aliases = {"brush", "br", "tool"}, desc = "Bind functions to held items: [More Info](https://goo.gl/xPnPxj)")
 public class ToolCommands {
@@ -133,13 +137,13 @@ public class ToolCommands {
             max = 2
     )
     @CommandPermissions("worldedit.tool.flood-fill")
-    public void floodFill(Player player, EditSession editSession, LocalSession session, Pattern pattern, double range) throws WorldEditException {
+    public void floodFill(Player player, EditSession editSession, LocalSession session, Pattern pattern, int range) throws WorldEditException {
         LocalConfiguration config = we.getConfiguration();
         if (range > config.maxSuperPickaxeSize) {
             BBC.TOOL_RANGE_ERROR.send(player, config.maxSuperPickaxeSize);
             return;
         }
-        session.setTool(new FloodFillTool((int) range, pattern), player);
+        session.setTool(new FloodFillTool(range, pattern), player);
         BBC.TOOL_FLOOD_FILL.send(player, player.getItemInHand(HandSide.MAIN_HAND).getType().getName());
     }
 
