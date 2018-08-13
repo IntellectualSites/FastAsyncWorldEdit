@@ -39,6 +39,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * An Immutable virtual world used to display & select schematics
  */
@@ -53,6 +55,18 @@ public class SchemVis extends ImmutableVirtualWorld {
     private final Location origin;
     private final BlockVector2D chunkOffset;
     private BlockVector2D lastPosition;
+
+    public static SchemVis create(FawePlayer player, Collection<File> files) throws IOException {
+        checkNotNull(player);
+        checkNotNull(files);
+        SchemVis visExtent = new SchemVis(player);
+        for (File file : files) {
+            visExtent.add(file);
+        }
+        visExtent.bind();
+        visExtent.update();
+        return visExtent;
+    }
 
     public SchemVis(FawePlayer player) {
         this.files = new Long2ObjectOpenHashMap<>();
