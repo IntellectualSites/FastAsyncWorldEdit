@@ -148,7 +148,7 @@ public class CuboidClipboard {
 //    }
 //
 //    public boolean setBlock(int x, int y, int z, BaseBlock block) {
-//        if (block == null || block.getBlockType() == BlockTypes.AIR) {
+//        if (block == null || block.getBlockType().getMaterial().isAir()) {
 //            int i = x + z * dx + (y >> 4) * dxz;
 //            int y2 = y & 0xF;
 //            int[] idArray = states[i];
@@ -238,7 +238,7 @@ public class CuboidClipboard {
 //                final int newZ = v.getBlockZ();
 //                for (int y = 0; y < height; ++y) {
 //                    BaseBlock block = getBlock(x, y, z);
-//                    if (block.getBlockType() == BlockTypes.AIR) {
+//                    if (block.getBlockType().getMaterial().isAir()) {
 //                        continue;
 //                    }
 //                    if (reverse) {
@@ -484,7 +484,7 @@ public class CuboidClipboard {
 //                    if (block == null) {
 //                        continue;
 //                    }
-//                    if (noAir && block.getBlockType() == BlockTypes.AIR) {
+//                    if (noAir && block.getBlockType().getMaterial().isAir()) {
 //                        continue;
 //                    }
 //                    editSession.setBlock(x + ox, y + oy, z + oz, block);

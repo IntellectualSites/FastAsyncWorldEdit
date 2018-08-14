@@ -233,7 +233,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
         Extent world = getLocation().getExtent();
 
         // No free space above
-        if (world.getBlock(new Vector(x, y, z)).getBlockType() != BlockTypes.AIR) {
+        if (!world.getBlock(new Vector(x, y, z)).getBlockType().getMaterial().isAir()) {
             return false;
         }
 

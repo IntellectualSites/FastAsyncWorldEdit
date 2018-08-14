@@ -214,18 +214,22 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 while (y >= 0) {
                     final Vector platform = new Vector(x, y, z);
                     final BlockStateHolder block = world.getBlock(platform);
-                    final com.sk89q.worldedit.world.block.BlockType type = block.getBlockType();
+                    final com.sk89q.worldedit.world.block.BlockTypes type = block.getBlockType();
 
                     // Don't want to end up in lava
-                    if (type != BlockTypes.AIR && type != BlockTypes.LAVA) {
-                        // Found a block!
-                        setPosition(platform.add(0.5, BlockType.centralTopLimit(block), 0.5));
-                        return true;
+                    switch (type) {
+                        case AIR:
+                        case CAVE_AIR:
+                        case VOID_AIR:
+                        case LAVA:
+                            --y;
+                            continue;
+                        default:
+                            // Found a block!
+                            setPosition(platform.add(0.5, BlockType.centralTopLimit(block), 0.5));
+                            return true;
                     }
-
-                    --y;
                 }
-
                 return false;
             }
 
@@ -250,7 +254,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         Extent world = getLocation().getExtent();
 
         // No free space above
-        if (world.getBlock(new Vector(x, y, z)).getBlockType() != BlockTypes.AIR) {
+        if (!world.getBlock(new Vector(x, y, z)).getBlockType().getMaterial().isAir()) {
             return false;
         }
 

@@ -82,7 +82,7 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
-        if (toolUse && block.getBlockType() == BlockTypes.AIR) {
+        if (toolUse && block.getBlockType().getMaterial().isAir()) {
             world.simulateBlockMine(location);
             return true;
         } else {
@@ -92,7 +92,7 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        if (toolUse && block.getBlockType() == BlockTypes.AIR) {
+        if (toolUse && block.getBlockType().getMaterial().isAir()) {
             world.simulateBlockMine(MutableBlockVector.get(x, y, z));
             return true;
         } else {
