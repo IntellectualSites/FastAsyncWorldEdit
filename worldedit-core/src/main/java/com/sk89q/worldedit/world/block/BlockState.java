@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
@@ -132,9 +133,13 @@ public class BlockState implements BlockStateHolder<BlockState> {
             switch (c) {
                 case ']':
                 case ',': {
-                    charSequence.setSubstring(last, i);
-                    int index = property.getIndexFor(charSequence);
-                    stateId = property.modifyIndex(stateId, index);
+                    if (property != null) {
+                        charSequence.setSubstring(last, i);
+                        int index = property.getIndexFor(charSequence);
+                        stateId = property.modifyIndex(stateId, index);
+                    } else {
+                        Fawe.debug("Invalid property " + type + " | " + charSequence);
+                    }
                     last = i + 1;
                     break;
                 }
