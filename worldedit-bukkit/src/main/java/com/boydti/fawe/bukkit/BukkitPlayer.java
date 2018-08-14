@@ -1,6 +1,7 @@
 package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.wrappers.PlayerWrapper;
@@ -92,7 +93,7 @@ public class BukkitPlayer extends FawePlayer<Player> {
 
     @Override
     public void sendMessage(final String message) {
-        this.parent.sendMessage(C.color(message));
+        this.parent.sendMessage(BBC.color(message));
     }
 
     @Override
