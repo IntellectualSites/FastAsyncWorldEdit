@@ -122,12 +122,81 @@ public class EntityTypes {
     private EntityTypes() {
     }
 
+    public static EntityType parse(String id) {
+        if (id.startsWith("minecraft:")) id = id.substring(10);
+        switch (id) {
+            case "FallingSand": return EntityTypes.FALLING_BLOCK;
+            case "FireworksRocketEntity": return EntityTypes.FIREWORK_ROCKET;
+            case "LavaSlime": return EntityTypes.MAGMA_CUBE;
+            case "MinecartChest": return EntityTypes.CHEST_MINECART;
+            case "MinecartCommandBlock": return EntityTypes.COMMAND_BLOCK_MINECART;
+            case "MinecartFurnace": return EntityTypes.FURNACE_MINECART;
+            case "MinecartHopper": return EntityTypes.HOPPER_MINECART;
+            case "MinecartRideable": return EntityTypes.MINECART;
+            case "MinecartSpawner": return EntityTypes.SPAWNER_MINECART;
+            case "MinecartTNT": return EntityTypes.TNT_MINECART;
+            case "MushroomCow": return EntityTypes.MOOSHROOM;
+            case "PigZombie": return EntityTypes.ZOMBIE_PIGMAN;
+            case "PrimedTnt": return EntityTypes.TNT;
+            case "SnowMan": return EntityTypes.SNOW_GOLEM;
+            case "ThrownEgg": return EntityTypes.EGG;
+            case "ThrownEnderpearl": return EntityTypes.ENDER_PEARL;
+            case "ThrownExpBottle": return EntityTypes.EXPERIENCE_BOTTLE;
+            case "ThrownPotion": return EntityTypes.POTION;
+            case "WitherBoss": return EntityTypes.WITHER;
+            case "XPOrb": return EntityTypes.EXPERIENCE_ORB;
+            default:
+                if (Character.isUpperCase(id.charAt(0))) {
+                    StringBuilder result = new StringBuilder();
+                    for (int i = 0; i < result.length(); i++) {
+                        char c = id.charAt(i);
+                        if (Character.isUpperCase(c)) {
+                            c = Character.toLowerCase(c);
+                            if (i != 0) result.append('_');
+                        }
+                        result.append(c);
+                    }
+                    return parse(result.toString());
+                }
+                switch (id.toLowerCase()) {
+                    case "xp_orb":
+                        return EntityTypes.EXPERIENCE_ORB;
+                    case "xp_bottle":
+                        return EntityTypes.EXPERIENCE_BOTTLE;
+                    case "eye_of_ender_signal":
+                        return EntityTypes.EYE_OF_ENDER;
+                    case "ender_crystal":
+                        return EntityTypes.END_CRYSTAL;
+                    case "fireworks_rocket":
+                        return EntityTypes.FIREWORK_ROCKET;
+                    case "commandblock_minecart":
+                        return EntityTypes.COMMAND_BLOCK_MINECART;
+                    case "snowman":
+                        return EntityTypes.SNOW_GOLEM;
+                    case "villager_golem":
+                        return EntityTypes.IRON_GOLEM;
+                    case "evocation_fangs":
+                        return EntityTypes.EVOKER_FANGS;
+                    case "evocation_illager":
+                        return EntityTypes.EVOKER;
+                    case "vindication_illager":
+                        return EntityTypes.VINDICATOR;
+                    case "illusion_illager":
+                        return EntityTypes.ILLUSIONER;
+                    default:
+                        return get(id);
+                }
+        }
+    }
+
     private static EntityType register(final String id) {
         return register(new EntityType(id));
     }
 
     public static EntityType register(final EntityType entityType) {
-        return EntityType.REGISTRY.register(entityType.getId(), entityType);
+        String id = entityType.getId();
+        if (id.startsWith("minecraft:")) EntityType.REGISTRY.register(id.substring(10), entityType);
+        return EntityType.REGISTRY.register(id, entityType);
     }
 
     public static @Nullable EntityType get(final String id) {

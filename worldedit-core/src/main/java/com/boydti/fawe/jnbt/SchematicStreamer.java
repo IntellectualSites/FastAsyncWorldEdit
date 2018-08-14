@@ -23,6 +23,7 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -148,46 +149,16 @@ public class SchematicStreamer extends NBTStreamer {
                 if (fc == null) {
                     setupClipboard(0);
                 }
-                String id = convertEntityId(compound.getString("id"));
+                String id = compound.getString("id");
                 if (id.isEmpty()) {
                     return;
                 }
                 ListTag positionTag = compound.getListTag("Pos");
                 ListTag directionTag = compound.getListTag("Rotation");
-                BaseEntity state = new BaseEntity(EntityTypes.get(id), compound);
+                BaseEntity state = new BaseEntity(EntityTypes.parse(id), compound);
                 fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
             }
         });
-    }
-
-    private String convertEntityId(String id) {
-        switch(id) {
-            case "xp_orb":
-                return "experience_orb";
-            case "xp_bottle":
-                return "experience_bottle";
-            case "eye_of_ender_signal":
-                return "eye_of_ender";
-            case "ender_crystal":
-                return "end_crystal";
-            case "fireworks_rocket":
-                return "firework_rocket";
-            case "commandblock_minecart":
-                return "command_block_minecart";
-            case "snowman":
-                return "snow_golem";
-            case "villager_golem":
-                return "iron_golem";
-            case "evocation_fangs":
-                return "evoker_fangs";
-            case "evocation_illager":
-                return "evoker";
-            case "vindication_illager":
-                return "vindicator";
-            case "illusion_illager":
-                return "illusioner";
-        }
-        return id;
     }
 
     @Override

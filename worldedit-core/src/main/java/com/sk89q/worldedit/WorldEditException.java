@@ -22,7 +22,7 @@ package com.sk89q.worldedit;
 /**
  * Parent for all WorldEdit exceptions.
  */
-public abstract class WorldEditException extends Exception {
+public abstract class WorldEditException extends RuntimeException {
 
     /**
      * Create a new exception.

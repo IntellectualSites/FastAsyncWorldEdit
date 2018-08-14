@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -150,8 +151,14 @@ public class LegacyMapper {
     }
 
     @Nullable
-    public Integer getLegacyFromItem(ItemType itemType) {
+    public Integer getLegacyCombined(ItemType itemType) {
         return itemMap.inverse().get(itemType);
+    }
+
+    @Nullable
+    public int[] getLegacyFromItem(ItemType itemType) {
+        Integer combinedId = getLegacyCombined(itemType);
+        return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
     }
 
     @Nullable
@@ -190,15 +197,21 @@ public class LegacyMapper {
     }
 
     @Nullable
-    public Integer getLegacyFromBlock(BlockState blockState) {
+    public Integer getLegacyCombined(BlockState blockState) {
         Integer result = blockStateToLegacyId4Data.get(blockState.getInternalId());
         if (result == null) result = blockStateToLegacyId4Data.get(blockState.getInternalBlockTypeId());
         return result;
     }
 
     @Nullable
-    public Integer getLegacyFromBlock(BlockType type) {
+    public Integer getLegacyCombined(BlockType type) {
         return blockStateToLegacyId4Data.get(type.getDefaultState());
+    }
+
+    @Deprecated
+    public int[] getLegacyFromBlock(BlockState blockState) {
+        Integer combinedId = getLegacyCombined(blockState);
+        return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
     }
 
     public static LegacyMapper getInstance() {

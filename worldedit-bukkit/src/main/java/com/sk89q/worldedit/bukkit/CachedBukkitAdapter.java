@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.bukkit;
 
+import com.bekvon.bukkit.residence.commands.material;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -25,11 +26,14 @@ public class CachedBukkitAdapter {
         blockTypes = new BlockTypes[materials.length];
         for (int i = 0; i < materials.length; i++) {
             Material material = materials[i];
-            if (material.isBlock() && !material.isLegacy()) {
-                NamespacedKey key = material.getKey();
-                blockTypes[i] = BlockTypes.get(key.getNamespace() + ":" + key.getKey());
-            } else if (material.isItem() && !material.isLegacy()) {
-                itemTypes[i] = ItemTypes.get(material.getKey().toString());
+            if (material.isLegacy()) continue;
+            NamespacedKey key = material.getKey();
+            String id = key.getNamespace() + ":" + key.getKey();
+            if (material.isBlock()) {
+                blockTypes[i] = BlockTypes.get(id);
+            }
+            if (material.isItem()) {
+                itemTypes[i] = ItemTypes.get(id);
             }
         }
     }

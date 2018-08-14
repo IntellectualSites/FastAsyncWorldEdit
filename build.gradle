@@ -77,7 +77,6 @@ subprojects {
         maven {url "https://mvnrepository.com/artifact/"}
         maven {url "http://repo.dmulloy2.net/content/groups/public/"}
         maven {url "https://repo.destroystokyo.com/repository/maven-public//"}
-        maven {url "http://ci.emc.gs/nexus/content/groups/aikar/" }
         maven {url "http://ci.athion.net/job/PlotSquared/ws/mvn/"}
         maven {url "http://empcraft.com/maven2"}
         maven {url "https://hub.spigotmc.org/nexus/content/groups/public/"}
@@ -86,6 +85,7 @@ subprojects {
         maven {url "http://repo.spongepowered.org/maven"}
         maven {url "https://repo.inventivetalent.org/content/groups/public/"}
         maven {url "http://dl.bintray.com/tastybento/maven-repo"}
+        maven {url "http://ci.emc.gs/nexus/content/groups/aikar/" }
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {

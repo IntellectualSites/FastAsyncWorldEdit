@@ -150,8 +150,15 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      */
     BlockMaterial getMaterial();
 
+    /**
+     * Gets the legacy ID. Needed for legacy reasons.
+     *
+     * DO NOT USE THIS.
+     *
+     * @return legacy id or 0, if unknown
+     */
     default int getLegacyCombinedId() {
-        Integer combinedId = LegacyMapper.getInstance().getLegacyFromBlock(this);
+        Integer combinedId = LegacyMapper.getInstance().getLegacyCombined(this);
         return combinedId == null ? 0 : combinedId;
     }
 
@@ -169,4 +176,14 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
 
     @Override
     int hashCode();
+
+    @Deprecated
+    default int getLegacyId() {
+        Integer id = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
+        if (id != null) {
+            return id >> 4;
+        } else {
+            return 0;
+        }
+    }
 }

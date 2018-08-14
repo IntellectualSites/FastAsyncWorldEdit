@@ -957,7 +957,8 @@ public enum ItemTypes implements ItemType {
 
     private static ItemTypes register(final String id) {
         // Get the enum name (remove namespace if minecraft:)
-        String typeName = id.substring(0, Math.max(id.indexOf('['), id.length()));
+        int propStart = id.indexOf('[');
+        String typeName = id.substring(0, propStart == -1 ? id.length() : propStart);
         String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase();
         // Check existing
         ItemTypes existing = valueOf(enumName.toUpperCase());
@@ -967,6 +968,7 @@ public enum ItemTypes implements ItemType {
             // Create it
             existing = ReflectionUtils.addEnum(ItemTypes.class, enumName, new Class[]{String.class}, new Object[]{id});
         }
+        if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
         $REGISTRY.put(typeName, existing);
         return existing;
     }
