@@ -2685,7 +2685,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     int count = stateCount[propId];
                     if (count != 0) {
                         BlockStateHolder state = type.withPropertyId(propId);
-                        System.out.println(type + " | " + state);
                         distribution.add(new Countable<>(state, count));
                     }
 

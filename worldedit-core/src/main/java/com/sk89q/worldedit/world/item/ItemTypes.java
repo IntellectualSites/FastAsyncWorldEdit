@@ -28,6 +28,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
@@ -914,10 +915,10 @@ public enum ItemTypes implements ItemType {
     }
 
     /*
-         -----------------------------------------------------
-                        Static Initializer
-         -----------------------------------------------------
-         */
+     -----------------------------------------------------
+                    Static Initializer
+     -----------------------------------------------------
+     */
     private static final Map<String, ItemTypes> $REGISTRY = new HashMap<>();
 
     public static final ItemTypes[] values;
@@ -961,7 +962,8 @@ public enum ItemTypes implements ItemType {
         String typeName = id.substring(0, propStart == -1 ? id.length() : propStart);
         String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase();
         // Check existing
-        ItemTypes existing = valueOf(enumName.toUpperCase());
+        ItemTypes existing = null;
+        try { existing = valueOf(enumName.toUpperCase()); } catch (IllegalArgumentException ignore) {}
         if (existing != null) {
             // TODO additional registration
         } else {

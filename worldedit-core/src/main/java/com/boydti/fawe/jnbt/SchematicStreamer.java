@@ -1,5 +1,6 @@
 package com.boydti.fawe.jnbt;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
@@ -12,6 +13,7 @@ import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.StringTag;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockMaterial;
@@ -22,6 +24,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -155,8 +158,14 @@ public class SchematicStreamer extends NBTStreamer {
                 }
                 ListTag positionTag = compound.getListTag("Pos");
                 ListTag directionTag = compound.getListTag("Rotation");
-                BaseEntity state = new BaseEntity(EntityTypes.parse(id), compound);
-                fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
+                EntityType type = EntityTypes.parse(id);
+                if (type != null) {
+                    compound.getValue().put("Id", new StringTag(type.getId()));
+                    BaseEntity state = new BaseEntity(type, compound);
+                    fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
+                } else {
+                    Fawe.debug("Invalid entity: " + id);
+                }
             }
         });
     }
@@ -262,14 +271,23 @@ public class SchematicStreamer extends NBTStreamer {
                         break;
                     default:
                         int group = group(type);
-                        if (group != -1) {
-                            BlockStateHolder set = block;
-                            if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
-                            if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
-                            if (set.getState(PropertyKey.SOUTH) == Boolean.FALSE && merge(group, x, y, z + 1)) set = set.with(PropertyKey.SOUTH, true);
-                            if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
-                            if (set != block) fc.setBlock(x, y, z, set);
+                        if (group == -1) return;
+                        BlockStateHolder set = block;
+
+                        if (set.getState(PropertyKey.NORTH) == Boolean.FALSE && merge(group, x, y, z - 1)) set = set.with(PropertyKey.NORTH, true);
+                        if (set.getState(PropertyKey.EAST) == Boolean.FALSE && merge(group, x + 1, y, z)) set = set.with(PropertyKey.EAST, true);
+                        if (set.getState(PropertyKey.SOUTH) == Boolean.FALSE && merge(group, x, y, z + 1)) set = set.with(PropertyKey.SOUTH, true);
+                        if (set.getState(PropertyKey.WEST) == Boolean.FALSE && merge(group, x - 1, y, z)) set = set.with(PropertyKey.WEST, true);
+
+                        if (group == 2) {
+                            int ns = ((Boolean) set.getState(PropertyKey.NORTH) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.SOUTH) ? 1 : 0);
+                            int ew = ((Boolean) set.getState(PropertyKey.EAST) ? 1 : 0) + ((Boolean) set.getState(PropertyKey.WEST) ? 1 : 0);
+                            if (Math.abs(ns - ew) != 2 || fc.getBlock(x, y + 1, z).getBlockType().getMaterial().isSolid()) {
+                                set = set.with(PropertyKey.UP, true);
+                            }
                         }
+
+                        if (set != block) fc.setBlock(x, y, z, set);
                         break;
                 }
             }

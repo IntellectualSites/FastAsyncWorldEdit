@@ -25,6 +25,8 @@ import com.sk89q.worldedit.world.entity.EntityType;
 
 import javax.annotation.Nullable;
 
+import java.util.HashMap;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**

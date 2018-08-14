@@ -21,6 +21,7 @@ package com.boydti.fawe.bukkit.adapter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -132,7 +133,11 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
      * @param tag the tag
      */
     private static void readTagIntoTileEntity(NBTTagCompound tag, TileEntity tileEntity) {
-        tileEntity.load(tag);
+        try {
+            tileEntity.load(tag);
+        } catch (Throwable e) {
+            Fawe.debug("Invalid tag " + tag + " | " + tileEntity);
+        }
     }
 
     /**
@@ -305,6 +310,7 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
             worldServer.addEntity(createdEntity, SpawnReason.CUSTOM);
             return createdEntity.getBukkitEntity();
         } else {
+            Fawe.debug("Invalid entity " + state.getType().getId());
             return null;
         }
     }

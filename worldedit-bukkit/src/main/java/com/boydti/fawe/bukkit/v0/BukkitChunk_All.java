@@ -145,7 +145,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                             float pitch = rotTag.getFloat(1);
                             Location loc = new Location(world, x, y, z, yaw, pitch);
                             Entity created = adapter.createEntity(loc, new BaseEntity(EntityTypes.get(id), tag));
-                            if (previous != null) {
+                            if (created != null) {
                                 UUID uuid = created.getUniqueId();
                                 Map<String, Tag> map = ReflectionUtils.getMap(tag.getValue());
                                 map.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
@@ -220,7 +220,6 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                 Location mutableLoc = new Location(world, 0, 0, 0);
 
                 if (!checkTime) {
-                    System.out.println("Set " + layer);
                     int index = 0;
                     for (int y = 0; y < 16; y++) {
                         int yy = (layer << 4) + y;
