@@ -77,7 +77,7 @@ import javax.annotation.Nullable;
 public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
 
     private static final Logger log = Logger.getLogger(WorldEditPlugin.class.getCanonicalName());
-    private static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
+    public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
 
     private BukkitImplAdapter bukkitAdapter;
