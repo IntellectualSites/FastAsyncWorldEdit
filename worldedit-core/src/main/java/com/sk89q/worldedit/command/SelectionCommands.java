@@ -289,7 +289,7 @@ public class SelectionCommands {
         player.giveItem(new BaseItemStack(we.getConfiguration().wandItem, 1));
         BBC.SELECTION_WAND.send(player);
         if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
-            BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND).send(player);
+            BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND, BBC.TIP_DISCORD).send(player);
     }
 
     @Command(

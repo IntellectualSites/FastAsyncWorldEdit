@@ -310,7 +310,7 @@ public class RegionCommands extends MethodCommands {
         int affected = editSession.replaceBlocks(region, from, to);
         BBC.VISITOR_BLOCK.send(player, affected);
         if (!player.hasPermission("fawe.tips"))
-            BBC.TIP_REPLACE_ID.or(BBC.TIP_REPLACE_LIGHT, BBC.TIP_REPLACE_MARKER, BBC.TIP_TAB_COMPLETE).send(player);
+            BBC.TIP_REPLACE_ID.or(BBC.TIP_REPLACE_LIGHT, BBC.TIP_REPLACE_MARKER, BBC.TIP_TAB_COMPLETE, BBC.TIP_REPLACE_REGEX, BBC.TIP_REPLACE_REGEX_2, BBC.TIP_REPLACE_REGEX_3, BBC.TIP_REPLACE_REGEX_4, BBC.TIP_REPLACE_REGEX_5).send(player);
     }
 
     // Compatibility for SKCompat

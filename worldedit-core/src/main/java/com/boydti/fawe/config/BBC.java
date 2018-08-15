@@ -302,6 +302,7 @@ public enum BBC {
     TIP_SELECT_CONNECTED("Tip: Select all connected blocks with //sel fuzzy", "Tips"),
     TIP_SET_POS1("Tip: Use pos1 as a pattern with &c//set pos1", "Tips"),
     TIP_FARWAND("Tip: Select distant points with &c//farwand", "Tips"),
+    TIP_DISCORD("Need help using FAWE? https://discord.gg/ngZCzbU", "Tips"),
 
     // cut
     TIP_LAZYCUT("&7Tip: It is safer to use &c//lazycut", "Tips"),
@@ -315,6 +316,12 @@ public enum BBC {
     TIP_SET_HAND("&7Tip: Use your current hand with &c//set hand", "Tips"),
 
     // replace
+    TIP_REPLACE_REGEX("&7Tip: Replace using regex:&c //replace .*_log <pattern>", "Tips"),
+    TIP_REPLACE_REGEX_2("&7Tip: Replace using regex:&c //replace .*stairs[facing=(north|south)] <pattern>", "Tips"),
+    TIP_REPLACE_REGEX_3("&7Tip: Replace using operators:&c //replace water[level>2] sand", "Tips"),
+    TIP_REPLACE_REGEX_4("&7Tip: Replace using operators:&c //replace true *[waterlogged=false]", "Tips"),
+    TIP_REPLACE_REGEX_5("&7Tip: Replace using operators:&c //replace true *[level-=1]", "Tips"),
+
     TIP_REPLACE_ID("&7Tip: Replace only the block id:&c //replace woodenstair #id[cobblestair]", "Tips"),
     TIP_REPLACE_LIGHT("Tip: Remove light sources with&c //replace #brightness[1][15] 0", "Tips"),
     TIP_TAB_COMPLETE("Tip: The replace command supports tab completion", "Tips"),
