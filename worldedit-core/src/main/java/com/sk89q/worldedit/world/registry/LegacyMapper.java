@@ -178,7 +178,11 @@ public class LegacyMapper {
 
     private BlockState getBlock(int combinedId) {
         if (combinedId < blockArr.length) {
-            return BlockState.get(blockArr[combinedId]);
+            try {
+                return BlockState.get(blockArr[combinedId]);
+            } catch (IndexOutOfBoundsException ignore) {
+                return null;
+            }
         }
         Integer extra = extraId4DataToStateId.get(combinedId);
         if (extra == null) {

@@ -163,4 +163,10 @@ public interface BlockMaterial {
      * @return If it has a container
      */
     boolean hasContainer();
+
+    /**
+     * Get the map color
+     * @return or 0
+     */
+    int getMapColor();
 }

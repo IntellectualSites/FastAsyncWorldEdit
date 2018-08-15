@@ -179,7 +179,10 @@ public class Fawe {
     }
 
     public static void debugPlain(String s) {
-        if (INSTANCE != null) {
+        Actor actor = Request.request().getActor();
+        if (actor != null) {
+            actor.print(BBC.color(s));
+        } else if (INSTANCE != null) {
             INSTANCE.IMP.debug(s);
         } else {
             System.out.println(BBC.stripColor(BBC.color(s)));

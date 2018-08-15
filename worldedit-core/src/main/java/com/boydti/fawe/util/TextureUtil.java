@@ -10,6 +10,8 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -533,6 +535,36 @@ public class TextureUtil implements TextureHolder{
         return colorDistance(red1, green1, blue1, c2);
     }
 
+    public static void main(String[] args) throws IOException {
+        File tf = new File("1.13.jar");
+        ZipFile zipFile = new ZipFile(tf);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        while (entries.hasMoreElements()) {
+            System.out.println(entries.nextElement().getName());
+        }
+//        TextureUtil tu = new TextureUtil(new File("."));
+//        tu.loadModTextures();
+    }
+
+    private BufferedImage readImage(ZipFile zipFile, String name) throws IOException {
+        ZipEntry entry = getEntry(zipFile, name);
+        if (entry != null) {
+            try (InputStream is = zipFile.getInputStream(entry)) {
+                return ImageIO.read(is);
+            }
+        }
+        return null;
+    }
+
+    private ZipEntry getEntry(ZipFile file, String path) {
+        ZipEntry entry = file.getEntry(path);
+        if (entry == null) {
+            path = path.replace("/", File.separator);
+            entry = file.getEntry(path);
+        }
+        return entry;
+    }
+
     public void loadModTextures() throws IOException {
         Int2ObjectOpenHashMap<Integer> colorMap = new Int2ObjectOpenHashMap<>();
         Int2ObjectOpenHashMap<Long> distanceMap = new Int2ObjectOpenHashMap<>();
@@ -545,224 +577,188 @@ public class TextureUtil implements TextureHolder{
                     return name.endsWith(".jar");
                 }
             });
-            if (files.length == 0) {
-                throw new FileNotFoundException("Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it." +
-                        "If the file exists, please make sure the server has read access to the directory");
-            }
-            for (File file : files) {
-                ZipFile zipFile = new ZipFile(file);
-
-                // Get all the groups in the current jar
-                // The vanilla textures are in `assets/minecraft`
-                // A jar may contain textures for multiple mods
-                Set<String> mods = new HashSet<String>();
-                {
-                    Enumeration<? extends ZipEntry> entries = zipFile.entries();
-                    while (entries.hasMoreElements()) {
-                        ZipEntry entry = entries.nextElement();
-                        String name = entry.getName();
-                        Path path = Paths.get(name);
-                        if (path.startsWith("assets" + File.separator)) {
-                            String[] split = path.toString().split(Pattern.quote(File.separator));
-                            if (split.length > 1) {
-                                String modId = split[1];
-                                mods.add(modId);
-                            }
-                        }
-                        continue;
-                    }
+            for (BlockType blockType : BlockTypes.values) {
+                BlockMaterial material = blockType.getMaterial();
+                if (!material.isSolid() || !material.isFullCube()) continue;
+                int color = material.getMapColor();
+                if (color != 0) {
+                    colorMap.put((int) blockType.getInternalId(), (Integer) color);
                 }
-                String modelsDir = "assets" + File.separator + "%1$s" + File.separator + "models" + File.separator + "block" + File.separator + "%2$s.json";
-                String texturesDir = "assets" + File.separator + "%1$s" + File.separator + "textures" + File.separator + "blocks" + File.separator + "%2$s.json";
+            }
+            if (files.length == 0) {
+                Fawe.debug("Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.13.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
+            } else {
+                for (File file : files) {
+                    ZipFile zipFile = new ZipFile(file);
 
-                Type typeToken = new TypeToken<Map<String, Object>>() {}.getType();
-
-                for (BlockType blockType : BlockTypes.values) {
-                    if (!blockType.getMaterial().isFullCube()) continue;
-
-                    String id = blockType.getId();
-                    String[] split = id.split(":", 2);
-                    String name = split.length == 1 ? id : split[1];
-                    String nameSpace = split.length == 1 ? "minecraft" : split[0];
-
-                    Map<String, String> texturesMap = new ConcurrentHashMap<>();
-                    { // Read models
-                        String modelFileName = String.format(modelsDir, nameSpace, name);
-                        ZipEntry entry = zipFile.getEntry(modelFileName);
-                        if (entry == null) continue;
-
-                        try (InputStream is = zipFile.getInputStream(entry)) { //Read from a file, or a HttpRequest, or whatever.
-                            JsonReader reader = new JsonReader(new InputStreamReader(is, "UTF-8"));
-                            Map<String, Object> root = gson.fromJson(reader, typeToken);
-                            Map<String, Object> textures = (Map) root.get("textures");
-
-                            if (textures == null) continue;
-                            Set<String> models = new HashSet<>();
-                            // Get models
-                            for (Map.Entry<String, Object> stringObjectEntry : textures.entrySet()) {
-                                Object value = stringObjectEntry.getValue();
-                                if (value instanceof String) {
-                                    models.add((String) value);
-                                } else if (value instanceof Map) {
-                                    value = ((Map) value).get("model");
-                                    if (value != null) models.add((String) value);
+                    // Get all the groups in the current jar
+                    // The vanilla textures are in `assets/minecraft`
+                    // A jar may contain textures for multiple mods
+                    Set<String> mods = new HashSet<String>();
+                    {
+                        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+                        while (entries.hasMoreElements()) {
+                            ZipEntry entry = entries.nextElement();
+                            String name = entry.getName();
+                            Path path = Paths.get(name);
+                            if (path.startsWith("assets" + File.separator)) {
+                                String[] split = path.toString().split(Pattern.quote(File.separator));
+                                if (split.length > 1) {
+                                    String modId = split[1];
+                                    mods.add(modId);
                                 }
                             }
-                            if (models.size() == 1) {
-                                // get textures
-                            }
-                            // If texturs size == 1
-                            // Put texture in map
+                            continue;
                         }
                     }
-//                    // Try to match the textures to a block
-//                    Int2ObjectOpenHashMap<String> idMap = new Int2ObjectOpenHashMap<>();
-//                    HashSet<Integer> map2 = new HashSet<>();
-//                    for (String id : bundled.stateMap.keySet()) {
-//                        if (id.startsWith(modId)) {
-//                            BlockType block = bundled.findByState(id);
-//                            BundledBlockData.BlockEntry state = bundled.findById(block.getId());
-//                            if (FaweCache.hasNBT(block.getId())) {
-//                                continue;
-//                            }
-//                            // Ignore non blocks
-//                            if (!state.material.isFullCube() && !state.material.isRenderedAsNormalBlock()) {
-//                                switch (block.getId()) {
-//                                    case 20:
-//                                    case 95:
-//                                        break;
-//                                    default:
-//                                        continue;
-//                                }
-//                            } else if (!state.material.isFullCube() || !state.material.isRenderedAsNormalBlock()) {
-//                                switch (block.getId()) {
-//                                    case 165:
-//                                    case 52:
-//                                        continue;
-//                                }
-//                            }
-//                            if (state.material.getLightValue() != 0) {
-//                                continue;
-//                            }
-//                            id = id.substring(modId.length() + 1).replaceAll(":", "_");
-//                            String texture = texturesMap.remove(id);
-//                            if (texture == null) {
-//                                texture = texturesMap.remove(alphabetize(id));
-//                            }
-//                            if (texture != null) {
-//                                int combined = block.getCombined();
-//                                switch (block.getId()) {
-//                                    case 17:
-//                                    case 162:
-//                                        combined += 12;
-//                                        break;
-//                                    case 43:
-//                                        combined += 8;
-//                                        break;
-//                                }
-//                                idMap.putIfAbsent(combined, texture);
-//                            }
-//                        }
-//                    }
-//                    { // Calculate the colors for each  block
-//                        for (Int2ObjectMap.Entry<String> entry : idMap.int2ObjectEntrySet()) {
-//                            int combined = entry.getIntKey();
-//                            String path = texturesDir + "/" + entry.getValue() + ".png";
-//                            ZipEntry textureEntry = zipFile.getEntry(path);
-//                            try (InputStream is = zipFile.getInputStream(textureEntry)) {
-//                                BufferedImage image = ImageIO.read(is);
-//                                int color = ImageUtil.getColor(image);
-//                                long distance = getDistance(image, color);
-//                                if (combined == BlockTypesMYCELIUM << 4) distance = Long.MAX_VALUE;
-//                                distanceMap.put((int) combined, (Long) distance);
-//                                colorMap.put((int) combined, (Integer) color);
-//                            }
-//                        }
-//                    }
+                    String modelsDir = "assets/%1$s/models/block/%2$s.json";
+                    String texturesDir = "assets/%1$s/textures/%2$s.png";
+
+                    Type typeToken = new TypeToken<Map<String, Object>>() {
+                    }.getType();
+
+                    for (BlockType blockType : BlockTypes.values) {
+                        if (!blockType.getMaterial().isFullCube()) continue;
+                        int combined = blockType.getInternalId();
+                        String id = blockType.getId();
+                        String[] split = id.split(":", 2);
+                        String name = split.length == 1 ? id : split[1];
+                        String nameSpace = split.length == 1 ? "minecraft" : split[0];
+
+                        Map<String, String> texturesMap = new ConcurrentHashMap<>();
+                        { // Read models
+                            String modelFileName = String.format(modelsDir, nameSpace, name);
+                            ZipEntry entry = getEntry(zipFile, modelFileName);
+                            if (entry == null) {
+                                System.out.println("Cannot find " + modelFileName + " in " + file);
+                                continue;
+                            }
+
+                            String textureFileName;
+                            try (InputStream is = zipFile.getInputStream(entry)) {
+                                JsonReader reader = new JsonReader(new InputStreamReader(is, "UTF-8"));
+                                Map<String, Object> root = gson.fromJson(reader, typeToken);
+                                Map<String, Object> textures = (Map) root.get("textures");
+
+                                if (textures == null) continue;
+                                Set<String> models = new HashSet<>();
+                                // Get models
+                                for (Map.Entry<String, Object> stringObjectEntry : textures.entrySet()) {
+                                    Object value = stringObjectEntry.getValue();
+                                    if (value instanceof String) {
+                                        models.add((String) value);
+                                    } else if (value instanceof Map) {
+                                        value = ((Map) value).get("model");
+                                        if (value != null) models.add((String) value);
+                                    }
+                                }
+                                if (models.size() != 1) continue;
+
+                                textureFileName = String.format(texturesDir, nameSpace, models.iterator().next());
+                            }
+
+                            BufferedImage image = readImage(zipFile, textureFileName);
+                            if (image == null) {
+                                System.out.println("Cannot find " + textureFileName);
+                                continue;
+                            }
+                            int color = ImageUtil.getColor(image);
+                            long distance = getDistance(image, color);
+                            distanceMap.put((int) combined, (Long) distance);
+                            colorMap.put((int) combined, (Integer) color);
+                        }
+                    }
+                    {
+                        Integer grass = null;
+                        {
+                            String grassFileName = String.format(texturesDir, "minecraft", "grass_block_top");
+                            BufferedImage image = readImage(zipFile, grassFileName);
+                            if (image != null) {
+                                grass = ImageUtil.getColor(image);
+                            }
+                        }
+                        if (grass != null) {
+                            // assets\minecraft\textures\colormap
+                            ZipEntry grassEntry = getEntry(zipFile, "assets/minecraft/textures/colormap/grass_block.png");
+                            if (grassEntry != null) {
+                                try (InputStream is = zipFile.getInputStream(grassEntry)) {
+                                    BufferedImage image = ImageIO.read(is);
+                                    // Update biome colors
+                                    for (int i = 0; i < biomes.length; i++) {
+                                        BiomeColor biome = biomes[i];
+                                        float adjTemp = MathMan.clamp(biome.temperature, 0.0f, 1.0f);
+                                        float adjRainfall = MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
+                                        int x = (int) (255 - adjTemp * 255);
+                                        int z = (int) (255 - adjRainfall * 255);
+                                        biome.grass = image.getRGB(x, z);
+                                    }
+                                }
+                                // swampland: perlin - avoid
+                                biomes[6].grass = 0;
+                                biomes[134].grass = 0;
+                                // roofed forest: averaged w/ 0x28340A
+                                biomes[29].grass = multiplyColor(biomes[29].grass, 0x28340A + (255 << 24));
+                                biomes[157].grass = multiplyColor(biomes[157].grass, 0x28340A + (255 << 24));
+                                // mesa : 0x90814D
+                                biomes[37].grass = 0x90814D + (255 << 24);
+                                biomes[38].grass = 0x90814D + (255 << 24);
+                                biomes[39].grass = 0x90814D + (255 << 24);
+                                biomes[165].grass = 0x90814D + (255 << 24);
+                                biomes[166].grass = 0x90814D + (255 << 24);
+                                biomes[167].grass = 0x90814D + (255 << 24);
+                                List<BiomeColor> valid = new ArrayList<>();
+                                for (int i = 0; i < biomes.length; i++) {
+                                    BiomeColor biome = biomes[i];
+//                                biome.grass = multiplyColor(biome.grass, grass);
+                                    if (biome.grass != 0 && !biome.name.equalsIgnoreCase("Unknown Biome")) {
+                                        valid.add(biome);
+                                    }
+                                    biome.grassCombined = multiplyColor(grass, biome.grass);
+                                }
+                                this.validBiomes = valid.toArray(new BiomeColor[valid.size()]);
+
+                                {
+                                    ArrayList<BiomeColor> uniqueColors = new ArrayList<>();
+                                    Set<Integer> uniqueBiomesColors = new IntArraySet();
+                                    for (BiomeColor color : validBiomes) {
+                                        if (uniqueBiomesColors.add(color.grass)) {
+                                            uniqueColors.add(color);
+                                        }
+                                    }
+                                    int count = 0;
+                                    int count2 = 0;
+                                    uniqueBiomesColors.clear();
+
+                                    LongArrayList layerIds = new LongArrayList();
+                                    LongArrayList layerColors = new LongArrayList();
+                                    for (int i = 0; i < uniqueColors.size(); i++) {
+                                        for (int j = i; j < uniqueColors.size(); j++) {
+                                            for (int k = j; k < uniqueColors.size(); k++) {
+                                                BiomeColor c1 = uniqueColors.get(i);
+                                                BiomeColor c2 = uniqueColors.get(j);
+                                                BiomeColor c3 = uniqueColors.get(k);
+                                                int average = averageColor(c1.grass, c2.grass, c3.grass);
+                                                if (uniqueBiomesColors.add(average)) {
+                                                    count++;
+                                                    layerColors.add((long) average);
+                                                    layerIds.add((long) ((c1.id) + (c2.id << 8) + (c3.id << 16)));
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    validMixBiomeColors = new int[layerColors.size()];
+                                    for (int i = 0; i < layerColors.size(); i++)
+                                        validMixBiomeColors[i] = (int) layerColors.getLong(i);
+                                    validMixBiomeIds = layerIds.toLongArray();
+                                }
+                            }
+
+                        }
+                    }
+//                 Close the file
+                    zipFile.close();
                 }
-//                {
-//                    Integer grass = colorMap.remove(FaweCache.getCombined(BlockTypesGRASS, 0));
-//                    if (grass != null) {
-//                        blockColors[FaweCache.getCombined(BlockTypesGRASS, 0)] = grass;
-//                        // assets\minecraft\textures\colormap
-//                        ZipEntry grassEntry = zipFile.getEntry("assets/minecraft/textures/colormap/grass.png");
-//                        if (grassEntry != null) {
-//                            try (InputStream is = zipFile.getInputStream(grassEntry)) {
-//                                BufferedImage image = ImageIO.read(is);
-//                                for (int i = 0; i < biomes.length; i++) {
-//                                    BiomeColor biome = biomes[i];
-//                                    float adjTemp = MathMan.clamp(biome.temperature, 0.0f, 1.0f);
-//                                    float adjRainfall = MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
-//                                    int x = (int) (255 - adjTemp * 255);
-//                                    int z = (int) (255 - adjRainfall * 255);
-//                                    int color = image.getRGB(x, z);
-//                                    biome.grass = color;
-//                                }
-//                            }
-//                            // swampland: perlin - avoid
-//                            biomes[6].grass = 0;
-//                            biomes[134].grass = 0;
-//                            // roofed forest: averaged w/ 0x28340A
-//                            biomes[29].grass = multiplyColor(biomes[29].grass, 0x28340A + (255 << 24));
-//                            biomes[157].grass = multiplyColor(biomes[157].grass, 0x28340A + (255 << 24));
-//                            // mesa : 0x90814D
-//                            biomes[37].grass = 0x90814D + (255 << 24);
-//                            biomes[38].grass = 0x90814D + (255 << 24);
-//                            biomes[39].grass = 0x90814D + (255 << 24);
-//                            biomes[165].grass = 0x90814D + (255 << 24);
-//                            biomes[166].grass = 0x90814D + (255 << 24);
-//                            biomes[167].grass = 0x90814D + (255 << 24);
-//                            List<BiomeColor> valid = new ArrayList<>();
-//                            for (int i = 0; i < biomes.length; i++) {
-//                                BiomeColor biome = biomes[i];
-////                                biome.grass = multiplyColor(biome.grass, grass);
-//                                if (biome.grass != 0 && !biome.name.equalsIgnoreCase("Unknown Biome")) {
-//                                    valid.add(biome);
-//                                }
-//                                biome.grassCombined = multiplyColor(grass, biome.grass);
-//                            }
-//                            this.validBiomes = valid.toArray(new BiomeColor[valid.size()]);
-//
-//                            {
-//                                ArrayList<BiomeColor> uniqueColors = new ArrayList<>();
-//                                Set<Integer> uniqueBiomesColors = new IntArraySet();
-//                                for (BiomeColor color : validBiomes) {
-//                                    if (uniqueBiomesColors.add(color.grass)) {
-//                                        uniqueColors.add(color);
-//                                    }
-//                                }
-//                                int count = 0;
-//                                int count2 = 0;
-//                                uniqueBiomesColors.clear();
-//
-//                                LongArrayList layerIds = new LongArrayList();
-//                                LongArrayList layerColors = new LongArrayList();
-//                                for (int i = 0; i < uniqueColors.size(); i++) {
-//                                    for (int j = i; j < uniqueColors.size(); j++) {
-//                                        for (int k = j; k < uniqueColors.size(); k++) {
-//                                            BiomeColor c1 = uniqueColors.get(i);
-//                                            BiomeColor c2 = uniqueColors.get(j);
-//                                            BiomeColor c3 = uniqueColors.get(k);
-//                                            int average = averageColor(c1.grass, c2.grass, c3.grass);
-//                                            if (uniqueBiomesColors.add(average)) {
-//                                                count++;
-//                                                layerColors.add((long) average);
-//                                                layerIds.add((long) ((c1.id) + (c2.id << 8) + (c3.id << 16)));
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//
-//                                validMixBiomeColors = new int[layerColors.size()];
-//                                for (int i = 0; i < layerColors.size(); i++) validMixBiomeColors[i] = (int) layerColors.getLong(i);
-//                                validMixBiomeIds = layerIds.toLongArray();
-//                            }
-//                        }
-//
-//                    }
-//                }
-                // Close the file
-                zipFile.close();
             }
         }
         // Convert the color map to a simple array

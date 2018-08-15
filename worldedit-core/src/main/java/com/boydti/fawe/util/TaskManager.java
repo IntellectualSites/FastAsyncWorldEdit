@@ -404,9 +404,9 @@ public abstract class TaskManager {
                     MainUtil.handleError(neverHappens);
                 } finally {
                     running.set(false);
-                }
-                synchronized (function) {
-                    function.notifyAll();
+                    synchronized (function) {
+                        function.notifyAll();
+                    }
                 }
             }
         };

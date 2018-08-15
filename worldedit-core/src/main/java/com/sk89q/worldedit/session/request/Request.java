@@ -21,6 +21,8 @@ package com.sk89q.worldedit.session.request;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 import javax.annotation.Nullable;
@@ -35,6 +37,9 @@ public final class Request {
     private
     @Nullable
     World world;
+    private
+    @Nullable
+    Actor actor;
     private
     @Nullable
     LocalSession session;
@@ -79,6 +84,15 @@ public final class Request {
         if (editSession != null) return editSession;
         if (world != null) return world;
         return null;
+    }
+
+    @Nullable
+    public Actor getActor() {
+        return actor;
+    }
+
+    public void setActor(@Nullable Actor actor) {
+        this.actor = actor;
     }
 
     /**

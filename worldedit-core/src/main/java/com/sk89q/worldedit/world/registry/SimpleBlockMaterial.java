@@ -43,6 +43,7 @@ class SimpleBlockMaterial implements BlockMaterial {
     private boolean hasContainer;
     private int lightOpacity;
     private boolean isAir;
+    private int mapColor;
 
     @Override
     public boolean isAir() {
@@ -51,6 +52,15 @@ class SimpleBlockMaterial implements BlockMaterial {
 
     public void setAir(boolean air) {
         isAir = air;
+    }
+
+    @Override
+    public int getMapColor() {
+        return mapColor;
+    }
+
+    public void setMapColor(int mapColor) {
+        this.mapColor = mapColor;
     }
 
     @Override

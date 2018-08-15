@@ -24,8 +24,11 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
+<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+=======
+>>>>>>> refs/remotes/sk89q/master
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.LazyBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -37,6 +40,13 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+<<<<<<< HEAD
+=======
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
+>>>>>>> refs/remotes/sk89q/master
 import com.sk89q.worldedit.world.weather.WeatherType;
 
 import java.util.Collections;

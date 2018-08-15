@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
@@ -50,8 +51,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         if (type == null) {
             type = Material.AIR;
         }
-        return materialMap.computeIfAbsent(type,
-                material -> new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), material));
+        return materialMap.computeIfAbsent(type, m -> new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), m));
     }
 
     @Nullable
@@ -70,6 +70,18 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         public BukkitBlockMaterial(@Nullable BlockMaterial material, Material bukkitMaterial) {
             super(material);
             this.material = bukkitMaterial;
+        }
+
+        @Override
+        public boolean isAir() {
+            switch (material) {
+                case AIR:
+                case CAVE_AIR:
+                case VOID_AIR:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         @Override

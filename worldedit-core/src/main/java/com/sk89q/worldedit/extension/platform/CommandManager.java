@@ -406,6 +406,7 @@ public final class CommandManager {
             // exceptions without writing a hook into every dispatcher, we need to unwrap these
             // exceptions and rethrow their converted form, if their is one.
             try {
+                Request.request().setActor(finalActor);
                 Object result = dispatcher.call(Joiner.on(" ").join(split), locals, new String[0]);
             } catch (Throwable t) {
                 // Use the exception converter to convert the exception if any of its causes

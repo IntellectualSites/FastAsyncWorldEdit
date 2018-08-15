@@ -20,14 +20,14 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.google.common.io.Resources;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -75,6 +75,18 @@ public class BundledBlockData {
     private void loadFromResource() throws IOException {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector.class, new VectorAdapter());
+        gsonBuilder.registerTypeAdapter(int.class, new JsonDeserializer<Integer>() {
+            @Override
+            public Integer deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                JsonPrimitive primitive = (JsonPrimitive) json;
+                if (primitive.isString()) {
+                    String value = primitive.getAsString();
+                    if (value.charAt(0) == '#') return Integer.parseInt(value.substring(1), 16);
+                    return Integer.parseInt(value);
+                }
+                return primitive.getAsInt();
+            }
+        });
         Gson gson = gsonBuilder.create();
         URL url = BundledBlockData.class.getResource("blocks.json");
         if (url == null) {

@@ -41,6 +41,15 @@ public class PassthroughBlockMaterial implements BlockMaterial {
     }
 
     @Override
+    public int getMapColor() {
+        if (blockMaterial == null) {
+            return 0;
+        } else {
+            return blockMaterial.getMapColor();
+        }
+    }
+
+    @Override
     public boolean isFullCube() {
         if (blockMaterial == null) {
             return true;
