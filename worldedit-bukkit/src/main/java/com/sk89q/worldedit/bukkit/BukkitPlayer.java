@@ -19,8 +19,11 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.util.TaskManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -37,9 +40,15 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import jdk.nashorn.internal.ir.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -82,7 +91,34 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void giveItem(BaseItemStack itemStack) {
-        player.getInventory().addItem(BukkitAdapter.adapt(itemStack));
+        final PlayerInventory inv = player.getInventory();
+        ItemStack newItem = BukkitAdapter.adapt(itemStack);
+        if (itemStack.getType() == WorldEdit.getInstance().getConfiguration().wandItem) {
+            inv.remove(newItem);
+        }
+        final ItemStack item = player.getItemInHand();
+        player.setItemInHand(newItem);
+        if (item != null) {
+            HashMap<Integer, ItemStack> overflow = inv.addItem(item);
+            if (overflow != null && !overflow.isEmpty()) {
+                TaskManager.IMP.sync(new RunnableVal<Object>() {
+                    @Override
+                    public void run(Object value) {
+                        for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
+                            ItemStack stack = entry.getValue();
+                            if (stack.getType() != Material.AIR && stack.getAmount() > 0) {
+                                Item dropped = player.getWorld().dropItem(player.getLocation(), stack);
+                                PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
+                                if (event.isCancelled()) {
+                                    dropped.remove();
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        player.updateInventory();
     }
 
     @Override
