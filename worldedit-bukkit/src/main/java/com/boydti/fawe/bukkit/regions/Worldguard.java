@@ -1,5 +1,6 @@
 package com.boydti.fawe.bukkit.regions;
 
+import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.filter.WorldGuardFilter;
 import com.boydti.fawe.object.FawePlayer;
@@ -13,13 +14,11 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -48,20 +47,21 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     }
 
     public ProtectedRegion getRegion(final com.sk89q.worldguard.LocalPlayer player, final Location loc) {
-        RegionManager manager = this.worldguard.getRegionManager(loc.getWorld());
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        if (container == null) {
+            System.out.println("Region capability is not enabled for WorldGuard.");
+            return null;
+        }
+        RegionManager manager = container.get(FaweAPI.getWorld(loc.getWorld().getName()));
         if (manager == null) {
-            if (this.worldguard.getGlobalStateManager().get(loc.getWorld()).useRegions) {
-                System.out.println("Region capability is not enabled for WorldGuard.");
-            } else {
-                System.out.println("WorldGuard is not enabled for that world.");
-            }
+            System.out.println("Region capability is not enabled for that world.");
             return null;
         }
         final ProtectedRegion global = manager.getRegion("__global__");
         if (global != null && isAllowed(player, global)) {
             return global;
         }
-        final ApplicableRegionSet regions = manager.getApplicableRegions(loc);
+        final ApplicableRegionSet regions = manager.getApplicableRegions(new Vector(loc.getX(), loc.getY(), loc.getZ()));
         for (final ProtectedRegion region : regions) {
             if (isAllowed(player, region)) {
                 return region;

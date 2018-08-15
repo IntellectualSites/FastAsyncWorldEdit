@@ -26,7 +26,8 @@ dependencies {
     compile 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
     compile 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
     compile 'com.wasteofplastic:askyblock:3.0.8.2'
-    compile 'com.sk89q:worldguard:6.0.0-SNAPSHOT'
+    compile 'com.sk89q:worldguard-core:latest'
+    compile 'com.sk89q:worldguard-legacy:latest'
     compile('org.inventivetalent:mapmanager:1.4.0-SNAPSHOT') {
         transitive = false
     }
