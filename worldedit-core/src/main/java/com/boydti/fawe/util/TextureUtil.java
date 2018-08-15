@@ -535,17 +535,6 @@ public class TextureUtil implements TextureHolder{
         return colorDistance(red1, green1, blue1, c2);
     }
 
-    public static void main(String[] args) throws IOException {
-        File tf = new File("1.13.jar");
-        ZipFile zipFile = new ZipFile(tf);
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-        while (entries.hasMoreElements()) {
-            System.out.println(entries.nextElement().getName());
-        }
-//        TextureUtil tu = new TextureUtil(new File("."));
-//        tu.loadModTextures();
-    }
-
     private BufferedImage readImage(ZipFile zipFile, String name) throws IOException {
         ZipEntry entry = getEntry(zipFile, name);
         if (entry != null) {

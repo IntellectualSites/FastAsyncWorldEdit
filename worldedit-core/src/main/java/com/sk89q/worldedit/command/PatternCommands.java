@@ -1,8 +1,5 @@
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DataAnglePattern;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
@@ -11,12 +8,8 @@ import com.boydti.fawe.object.pattern.*;
 import com.boydti.fawe.object.random.SimplexRandom;
 import com.boydti.fawe.util.ColorUtil;
 import com.boydti.fawe.util.TextureUtil;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -30,13 +23,11 @@ import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
-import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import java.awt.Color;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -58,9 +49,9 @@ public class PatternCommands extends MethodCommands {
     @Command(
             aliases = {"#existing", "#*", "*", ".*"},
             desc = "Use the block that is already there")
-    public Pattern existing(Extent extent) { // TODO FIXME , @Optional String properties
-        // TODO fixme apply properties
-        return new ExistingPattern(extent);
+    public Pattern existing(Extent extent, @Optional String properties) { // TODO FIXME , @Optional String properties
+        if (properties == null) return new ExistingPattern(extent);
+        return new PropertyPattern(extent).addRegex(".*[" + properties + "]");
     }
 
     @Command(
@@ -437,26 +428,4 @@ public class PatternCommands extends MethodCommands {
         exp.setEnvironment(env);
         return new ExpressionPattern(exp);
     }
-
-    @Command(
-            aliases = {"cs", "craftscript"},
-            desc = "CraftScript pattern",
-            usage = "<file>",
-            min = 1,
-            max = 1
-    )
-    public Pattern expression(Player player, LocalSession session, final CommandContext args) throws WorldEditException {
-        final String[] scriptArgs = args.getSlice(1);
-        final String name = args.getString(0);
-
-        if (!player.hasPermission("worldedit.scripting.execute." + name)) {
-            throw new InputParseException("You don't have permission to use that script.");
-        }
-
-        File file = new File(Fawe.imp().getDirectory(), Settings.IMP.PATHS.PATTERNS + File.separator + name);
-        Player unwrapped = LocationMaskedPlayerWrapper.unwrap(player);
-        return ScriptingCommands.runScript(unwrapped, file, scriptArgs);
-    }
-
-
 }
