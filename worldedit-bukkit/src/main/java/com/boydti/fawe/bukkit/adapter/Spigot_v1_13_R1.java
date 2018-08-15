@@ -399,7 +399,7 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
         } else if (foreign instanceof NBTTagString) {
             return new StringTag(foreign.b_()); // data
         } else if (foreign instanceof NBTTagEnd) {
-            return new EndTag();
+            return EndTag.INSTANCE;
         } else {
             throw new IllegalArgumentException("Don't know how to make native " + foreign.getClass().getCanonicalName());
         }

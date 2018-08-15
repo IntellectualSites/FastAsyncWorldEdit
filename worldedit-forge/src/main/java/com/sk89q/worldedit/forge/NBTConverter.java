@@ -217,7 +217,7 @@ final class NBTConverter {
     }
 
     public static EndTag fromNative(NBTTagEnd other) {
-        return new EndTag();
+        return EndTag.INSTANCE;
     }
 
     public static LongTag fromNative(NBTTagLong other) {
