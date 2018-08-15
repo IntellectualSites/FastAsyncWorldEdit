@@ -818,6 +818,7 @@ public class Vector extends Vector2D implements Comparable<Vector>, Serializable
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if (!(obj instanceof Vector)) {
             return false;
         }

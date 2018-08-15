@@ -21,11 +21,6 @@ buildscript {
     }
 }
 
-allprojects {
-    group = 'com.sk89q.worldedit'
-    version = '7.0.0-SNAPSHOT'
-}
-
 apply plugin: 'java'
 clean { delete "target" }
 
@@ -50,9 +45,10 @@ ext {
     }
 }
 
-version = date + revision + buildNumber
 if ( project.hasProperty("lzNoVersion") ) { // gradle build -PlzNoVersion
     version = "unknown"
+} else {
+    version = date + revision + buildNumber
 }
 description = """FastAsyncWorldEdit"""
 
@@ -68,7 +64,9 @@ subprojects {
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+
     version = rootProject.version
+    group = 'com.boydti.fawe'
 
     repositories {
         mavenCentral()

@@ -353,7 +353,7 @@ public class MathMan {
         return x;
     }
 
-    public static final boolean isInteger(String str) {
+    public static final boolean isInteger(CharSequence str) {
         if (str == null) {
             return false;
         }

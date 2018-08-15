@@ -56,7 +56,6 @@ public class YAMLConfiguration extends LocalConfiguration {
             logger.log(Level.WARNING, "Error loading WorldEdit configuration", e);
         }
 
-        // TODO FIXME use Config class with comments / bindings
         profile = config.getBoolean("debug", profile);
         wandItem = ItemTypes.parse(config.getString("wand-item", wandItem.getId()));
 

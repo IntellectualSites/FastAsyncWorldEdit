@@ -6,7 +6,6 @@ import com.boydti.fawe.bukkit.wrapper.state.AsyncSign;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BlockID;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;

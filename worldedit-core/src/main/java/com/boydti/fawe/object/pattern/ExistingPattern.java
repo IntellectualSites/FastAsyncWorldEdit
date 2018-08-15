@@ -6,6 +6,7 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class ExistingPattern extends AbstractExtentPattern {
     public ExistingPattern(Extent extent) {
@@ -19,7 +20,7 @@ public class ExistingPattern extends AbstractExtentPattern {
 
     @Override
     public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
-        if (set.getBlockX() == get.getBlockX() && set.getBlockZ() == get.getBlockZ() && set.getBlockY() == get.getBlockY()) {
+        if (set.equals(get)) {
             return false;
         }
         return extent.setBlock(set, extent.getBlock(get));

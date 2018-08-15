@@ -139,7 +139,6 @@ public class BlockMask extends AbstractExtentMask {
         if (other instanceof SingleBlockTypeMask) {
             return new BlockMaskBuilder(bitSets).filter(((SingleBlockTypeMask) other).getBlockType()).build(getExtent());
         }
-        // TODO FIXME BlockTypeMask
         return null;
     }
 
@@ -164,7 +163,6 @@ public class BlockMask extends AbstractExtentMask {
         if (other instanceof SingleBlockTypeMask) {
             return new BlockMaskBuilder(bitSets).add(((SingleBlockTypeMask) other).getBlockType()).build(getExtent());
         }
-        // TODO FIXME BlockTypeMask
         return null;
     }
 
