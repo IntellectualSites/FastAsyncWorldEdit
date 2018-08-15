@@ -82,6 +82,11 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         parent.spawnParticle(particle, receivers, source, x, y, z, count, offsetX, offsetY, offsetZ, extra, data);
     }
 
+    @Override
+    public <T> void spawnParticle(Particle particle, List<Player> list, Player player, double v, double v1, double v2, int i, double v3, double v4, double v5, double v6, T t, boolean b) {
+        parent.spawnParticle(particle, list, player, v, v1, v2, i, v3, v4, v5, v6, t, b);
+    }
+
     /**
      * @deprecated use {@link #wrap(World)} instead
      * @param parent Parent world
