@@ -192,8 +192,10 @@ public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
         {
             PluginDescriptionFile desc = getDescription();
             if (desc != null) {
-                desc = new PluginDescriptionFile("FastAsyncWorldEdit", desc.getVersion(), desc.getMain());
                 try {
+                    Field nameField = PluginDescriptionFile.class.getDeclaredField("name");
+                    nameField.setAccessible(true);
+                    nameField.set(desc, "FastAsyncWorldEdit");
                     Field descriptionField = JavaPlugin.class.getDeclaredField("description");
                     descriptionField.setAccessible(true);
                     descriptionField.set(this, desc);
