@@ -264,6 +264,35 @@ public enum ClipboardFormat {
         this.format = format;
     }
 
+    /**
+     * Returns the name of this format.
+     *
+     * @return The name of the format
+     */
+    public String getName() {
+        return name();
+    }
+
+    /**
+     * Get the file extension this format primarily uses.
+     *
+     * @return The primary file extension
+     */
+    public String getPrimaryFileExtension() {
+        return getExtension();
+    }
+
+    /**
+     * Get the file extensions this format is commonly known to use. This should
+     * include {@link #getPrimaryFileExtension()}.
+     *
+     * @return The file extensions this format might be known by
+     */
+    public Set<String> getFileExtensions() {
+        return Collections.singleton(getPrimaryFileExtension());
+    }
+
+
     public URL uploadPublic(final Clipboard clipboard, String category, String user) {
         // summary
         // blocks
@@ -528,7 +557,7 @@ public enum ClipboardFormat {
     @Nullable
     public static ClipboardFormat findByAlias(String alias) {
         checkNotNull(alias);
-        return aliasMap.get(alias.toLowerCase().trim());
+        return aliasMap.get(alias.toLowerCase(Locale.ENGLISH).trim());
     }
 
     /**
