@@ -24,6 +24,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class DefaultMaskParser extends FaweParser<Mask> {
     private final Dispatcher dispatcher;
@@ -115,18 +116,22 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                                 mask = parseFromInput(command.substring(1, end == -1 ? command.length() : end), context);
                             } else {
                                 List<String> entries = entry.getValue();
-                                BlockMaskBuilder builder = new BlockMaskBuilder().addRegex(pe.full);
-                                if (builder.isEmpty()) {
-                                    try {
-                                        context.setPreferringWildcard(true);
-                                        context.setRestricted(false);
-                                        BlockStateHolder block = worldEdit.getBlockFactory().parseFromInput(pe.full, context);
-                                        builder.add(block);
-                                    } catch (NoMatchException e) {
-                                        throw new NoMatchException(e.getMessage() + " See: //masks");
+                                try {
+                                    BlockMaskBuilder builder = new BlockMaskBuilder().addRegex(pe.full);
+                                    if (builder.isEmpty()) {
+                                        try {
+                                            context.setPreferringWildcard(true);
+                                            context.setRestricted(false);
+                                            BlockStateHolder block = worldEdit.getBlockFactory().parseFromInput(pe.full, context);
+                                            builder.add(block);
+                                        } catch (NoMatchException e) {
+                                            throw new NoMatchException(e.getMessage() + " See: //masks");
+                                        }
                                     }
+                                    mask = builder.build(extent);
+                                } catch (PatternSyntaxException regex) {
+                                    throw new InputParseException(regex.getMessage());
                                 }
-                                mask = builder.build(extent);
                             }
                         }
                     }
