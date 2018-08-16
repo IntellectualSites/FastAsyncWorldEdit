@@ -189,21 +189,21 @@ public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
     }
 
     private void rename() {
-        {
-            PluginDescriptionFile desc = getDescription();
-            if (desc != null) {
-                try {
-                    Field nameField = PluginDescriptionFile.class.getDeclaredField("name");
-                    nameField.setAccessible(true);
-                    nameField.set(desc, "FastAsyncWorldEdit");
-                    Field descriptionField = JavaPlugin.class.getDeclaredField("description");
-                    descriptionField.setAccessible(true);
-                    descriptionField.set(this, desc);
-                } catch (Throwable ignore) {
-                    ignore.printStackTrace();
-                }
-            }
-        }
+//        {
+//            PluginDescriptionFile desc = getDescription();
+//            if (desc != null) {
+//                try {
+//                    Field nameField = PluginDescriptionFile.class.getDeclaredField("name");
+//                    nameField.setAccessible(true);
+//                    nameField.set(desc, "FastAsyncWorldEdit");
+//                    Field descriptionField = JavaPlugin.class.getDeclaredField("description");
+//                    descriptionField.setAccessible(true);
+//                    descriptionField.set(this, desc);
+//                } catch (Throwable ignore) {
+//                    ignore.printStackTrace();
+//                }
+//            }
+//        }
         {
             File dir = getDataFolder();
             if (dir != null) {
