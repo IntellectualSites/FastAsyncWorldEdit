@@ -132,6 +132,10 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         return region.clone();
     }
 
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
     @Override
     public Vector getOrigin() {
         return origin;

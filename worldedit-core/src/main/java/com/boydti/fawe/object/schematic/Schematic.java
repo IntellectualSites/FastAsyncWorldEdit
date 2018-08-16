@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 
@@ -107,6 +108,10 @@ public class Schematic {
         }
     }
 
+    public EditSession paste(World world, Vector to, boolean allowUndo, boolean pasteAir, @Nullable Transform transform) {
+        return paste(world, to, allowUndo, pasteAir, true, transform);
+    }
+
     /**
      * Paste this schematic in a world
      *
@@ -117,7 +122,7 @@ public class Schematic {
      * @param transform
      * @return
      */
-    public EditSession paste(World world, Vector to, boolean allowUndo, boolean pasteAir, @Nullable Transform transform) {
+    public EditSession paste(World world, Vector to, boolean allowUndo, boolean pasteAir, boolean copyEntities, @Nullable Transform transform) {
         checkNotNull(world);
         checkNotNull(to);
         Region region = clipboard.getRegion();
@@ -145,6 +150,7 @@ public class Schematic {
         if (transform != null && !transform.isIdentity()) {
             copy.setTransform(transform);
         }
+        copy.setCopyEntities(copyEntities);
         if (sourceMask != null) {
             new MaskTraverser(sourceMask).reset(extent);
             copy.setSourceMask(sourceMask);

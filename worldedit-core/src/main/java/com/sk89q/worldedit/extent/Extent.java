@@ -23,7 +23,9 @@ import com.boydti.fawe.jnbt.anvil.generator.*;
 import com.boydti.fawe.object.PseudoRandom;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.Countable;
+import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -35,10 +37,9 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -295,6 +296,67 @@ public interface Extent extends InputExtent, OutputExtent {
         addOre(region, mask, BlockTypes.DIAMOND_ORE.getDefaultState(), 8, 1, 100, 0, 15);
         addOre(region, mask, BlockTypes.LAPIS_ORE.getDefaultState(), 7, 1, 100, 0, 15);
         addOre(region, mask, BlockTypes.EMERALD_ORE.getDefaultState(), 5, 1, 100, 4, 31);
+    }
+
+    /**
+     * Get the block distribution inside a region.
+     *
+     * @param region a region
+     * @return the results
+     */
+    default List<Countable<BlockType>> getBlockDistribution(final Region region) {
+        int[] counter = new int[BlockTypes.size()];
+
+        for (final Vector pt : region) {
+            BlockType type = getBlockType(pt);
+            counter[type.getInternalId()]++;
+        }
+        List<Countable<BlockType>> distribution = new ArrayList<>();
+        for (int i = 0; i < counter.length; i++) {
+            int count = counter[i];
+            if (count != 0) {
+                distribution.add(new Countable<>(BlockTypes.get(i), count));
+            }
+        }
+        Collections.sort(distribution);
+        return distribution;
+    }
+
+    /**
+     * Get the block distribution (with data values) inside a region.
+     *
+     * @param region a region
+     * @return the results
+     */
+    default List<Countable<BlockStateHolder>> getBlockDistributionWithData(final Region region) {
+        int[][] counter = new int[BlockTypes.size()][];
+
+        for (final Vector pt : region) {
+            BlockStateHolder blk = this.getBlock(pt);
+            BlockType type = blk.getBlockType();
+            int[] stateCounter = counter[type.getInternalId()];
+            if (stateCounter == null) {
+                counter[type.getInternalId()] = stateCounter = new int[type.getMaxStateId() + 1];
+            }
+            stateCounter[blk.getInternalPropertiesId()]++;
+        }
+        List<Countable<BlockStateHolder>> distribution = new ArrayList<>();
+        for (int typeId = 0; typeId < counter.length; typeId++) {
+            BlockType type = BlockTypes.get(typeId);
+            int[] stateCount = counter[typeId];
+            if (stateCount != null) {
+                for (int propId = 0; propId < stateCount.length; propId++) {
+                    int count = stateCount[propId];
+                    if (count != 0) {
+                        BlockStateHolder state = type.withPropertyId(propId);
+                        distribution.add(new Countable<>(state, count));
+                    }
+
+                }
+            }
+        }
+        // Collections.reverse(distribution);
+        return distribution;
     }
 
     @Nullable
