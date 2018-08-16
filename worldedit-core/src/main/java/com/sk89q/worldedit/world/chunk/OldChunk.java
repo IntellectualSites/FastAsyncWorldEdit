@@ -156,7 +156,7 @@ public class OldChunk implements Chunk {
 
     @Override
     public BlockState getBlock(Vector position) throws DataException {
-        if(position.getBlockY() >= 128) return BlockTypes.AIR.getDefaultState();
+        if(position.getBlockY() >= 128) return BlockTypes.VOID_AIR.getDefaultState();
         int id, dataVal;
 
         int x = position.getBlockX() - rootX * 16;

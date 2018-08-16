@@ -2424,6 +2424,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 if (dx2 + dz2 > radiusSq) {
                     continue;
                 }
+<<<<<<< HEAD
                 outer:
                 for (int y = maxY; y >= 1; --y) {
                     BlockType type = getBlockType(x, y, z);
@@ -2441,6 +2442,29 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                         case JUNGLE_LEAVES:
                         case OAK_LEAVES:
                         case SPRUCE_LEAVES:
+=======
+
+                for (int y = world.getMaxY(); y >= 1; --y) {
+                    Vector pt = new Vector(x, y, z);
+                    BlockType id = getBlock(pt).getBlockType();
+
+                    if (id.getMaterial().isAir()) {
+                        continue;
+                    }
+
+                    // Ice!
+                    if (id == BlockTypes.WATER) {
+                        if (setBlock(pt, ice)) {
+                            ++affected;
+                        }
+                        break;
+                    }
+
+                    // Snow should not cover these blocks
+                    if (id.getMaterial().isTranslucent()) {
+                        // Add snow on leaves
+                        if (!BlockCategories.LEAVES.contains(id)) {
+>>>>>>> refs/remotes/sk89q/master
                             break;
                         default:
                             if (type.getMaterial().isTranslucent()) {
@@ -2545,6 +2569,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of trees created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
+<<<<<<< HEAD
     public int makeForest(final Vector basePosition, final int size, final double density, TreeGenerator.TreeType treeType) {
         try {
             for (int x = basePosition.getBlockX() - size; x <= (basePosition.getBlockX() + size); ++x) {
@@ -2576,6 +2601,35 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                             default:
                                 break;
                         }
+=======
+    public int makeForest(Vector basePosition, int size, double density, TreeGenerator.TreeType treeType) throws MaxChangedBlocksException {
+        int affected = 0;
+
+        for (int x = basePosition.getBlockX() - size; x <= basePosition.getBlockX()
+                + size; ++x) {
+            for (int z = basePosition.getBlockZ() - size; z <= basePosition.getBlockZ()
+                    + size; ++z) {
+                // Don't want to be in the ground
+                if (!getBlock(new Vector(x, basePosition.getBlockY(), z)).getBlockType().getMaterial().isAir()) {
+                    continue;
+                }
+                // The gods don't want a tree here
+                if (Math.random() >= density) {
+                    continue;
+                } // def 0.05
+
+                for (int y = basePosition.getBlockY(); y >= basePosition.getBlockY() - 10; --y) {
+                    // Check if we hit the ground
+                    BlockType t = getBlock(new Vector(x, y, z)).getBlockType();
+                    if (t == BlockTypes.GRASS_BLOCK || t == BlockTypes.DIRT) {
+                        treeType.generate(this, new Vector(x, y + 1, z));
+                        ++affected;
+                        break;
+                    } else if (t == BlockTypes.SNOW) {
+                        setBlock(new Vector(x, y, z), BlockTypes.AIR.getDefaultState());
+                    } else if (!t.getMaterial().isAir()) { // Trees won't grow on this!
+                        break;
+>>>>>>> refs/remotes/sk89q/master
                     }
                 }
             }

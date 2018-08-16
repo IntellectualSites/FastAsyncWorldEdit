@@ -23,6 +23,7 @@ import com.sk89q.worldedit.blocks.BlockMaterial;
 
 class SimpleBlockMaterial implements BlockMaterial {
 
+    private boolean isAir;
     private boolean fullCube;
     private boolean opaque;
     private boolean powerSource;
@@ -70,6 +71,15 @@ class SimpleBlockMaterial implements BlockMaterial {
 
     public void setLightOpacity(int lightOpacity) {
         this.lightOpacity = lightOpacity;
+    }
+
+    @Override
+    public boolean isAir() {
+        return this.isAir;
+    }
+
+    public void setIsAir(boolean isAir) {
+        this.isAir = isAir;
     }
 
     @Override

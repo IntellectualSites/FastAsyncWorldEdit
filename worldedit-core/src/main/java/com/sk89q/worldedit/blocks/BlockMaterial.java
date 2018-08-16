@@ -25,8 +25,9 @@ package com.sk89q.worldedit.blocks;
 public interface BlockMaterial {
 
     /**
-     * Get if this block is air
-     * @return
+     * Gets if this block is a type of air.
+     *
+     * @return If it's air
      */
     boolean isAir();
 
