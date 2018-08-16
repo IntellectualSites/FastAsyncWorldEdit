@@ -53,7 +53,7 @@ public class ClipboardFormats {
     public static ClipboardFormat findByFile(File file) {
         checkNotNull(file);
 
-        for (ClipboardFormat format : ClipboardFormat.values()) {
+        for (ClipboardFormat format : ClipboardFormat.values) {
             if (format.isFormat(file)) {
                 return format;
             }
@@ -67,7 +67,7 @@ public class ClipboardFormats {
      */
     public static Multimap<String, ClipboardFormat> getFileExtensionMap() {
         HashMultimap<String, ClipboardFormat> map = HashMultimap.create();
-        for (ClipboardFormat format : ClipboardFormat.values()) {
+        for (ClipboardFormat format : ClipboardFormat.values) {
             for (String ext : format.getFileExtensions()) {
                 map.put(ext, format);
             }
@@ -76,7 +76,7 @@ public class ClipboardFormats {
     }
 
     public static Collection<ClipboardFormat> getAll() {
-        return Arrays.asList(ClipboardFormat.values());
+        return Arrays.asList(ClipboardFormat.values);
     }
 
     /**
@@ -86,7 +86,7 @@ public class ClipboardFormats {
     public static String[] getFileExtensionArray() {
         List<String> exts = new ArrayList<>();
         HashMultimap<String, ClipboardFormat> map = HashMultimap.create();
-        for (ClipboardFormat format : ClipboardFormat.values()) {
+        for (ClipboardFormat format : ClipboardFormat.values) {
             exts.addAll(format.getFileExtensions());
         }
         return exts.toArray(new String[exts.size()]);

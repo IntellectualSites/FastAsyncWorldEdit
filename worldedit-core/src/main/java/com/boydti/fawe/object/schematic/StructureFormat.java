@@ -91,17 +91,19 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
                 Map<String, Tag> map = compound.getValue();
                 String name = ((StringTag) map.get("Name")).getValue();
                 BlockType type = BlockTypes.get(name);
-                BlockState state = BlockState.get(type.getInternalId());
+                BlockState state = type.getDefaultState();
                 if (type == null) {
                     Fawe.debug("Unknown block: " + name);
                     continue;
                 }
                 CompoundTag properties = (CompoundTag) map.get("Properties");
-                for (Map.Entry<String, Tag> entry : properties.getValue().entrySet()) {
-                    String key = entry.getKey();
-                    String value = ((StringTag) entry.getValue()).getValue();
-                    Property property = type.getProperty(key);
-                    state = state.with(property, property.getValueFor(value));
+                if (properties != null) {
+                    for (Map.Entry<String, Tag> entry : properties.getValue().entrySet()) {
+                        String key = entry.getKey();
+                        String value = ((StringTag) entry.getValue()).getValue();
+                        Property property = type.getProperty(key);
+                        state = state.with(property, property.getValueFor(value));
+                    }
                 }
                 combinedArray[i] = state;
             }
@@ -140,7 +142,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
                 Map<String, Tag> entityEntryMap = entityEntry.getValue();
                 ListTag posTag = (ListTag) entityEntryMap.get("pos");
                 CompoundTag nbtTag = (CompoundTag) entityEntryMap.get("nbt");
-                String id = ((StringTag) entityEntryMap.get("Id")).getValue();
+                String id = nbtTag.getString("Id");
                 Location location = NBTConversions.toLocation(clipboard, posTag, nbtTag.getListTag("Rotation"));
                 if (!id.isEmpty()) {
                     BaseEntity state = new BaseEntity(EntityTypes.get(id), nbtTag);

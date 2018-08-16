@@ -48,6 +48,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -243,6 +244,8 @@ public enum ClipboardFormat {
 
     ;
 
+    public static final ClipboardFormat[] values;
+
     private static final Map<String, ClipboardFormat> aliasMap;
 
     static {
@@ -252,6 +255,7 @@ public enum ClipboardFormat {
                 aliasMap.put(alias, emum);
             }
         }
+        values = values();
     }
 
     private IClipboardFormat format;
@@ -560,6 +564,18 @@ public enum ClipboardFormat {
         return aliasMap.get(alias.toLowerCase(Locale.ENGLISH).trim());
     }
 
+    @Nullable
+    public static ClipboardFormat findByExtension(String extension) {
+        checkNotNull(extension);
+        extension = extension.toLowerCase();
+        for (ClipboardFormat format : values) {
+            if (format.getFileExtensions().contains(extension)) {
+                return format;
+            }
+        }
+        return null;
+    }
+
     /**
      * Detect the format given a file.
      *
@@ -583,6 +599,17 @@ public enum ClipboardFormat {
         newEnum.format = instance;
         for (String alias : newEnum.getAliases()) {
             aliasMap.put(alias, newEnum);
+        }
+
+        ArrayList<ClipboardFormat> newValues = new ArrayList<>(Arrays.asList(values));
+        newValues.add(newEnum);
+        ClipboardFormat[] newValuesArray = newValues.toArray(new ClipboardFormat[newValues.size()]);
+        try {
+            ReflectionUtils.setFailsafeFieldValue(ClipboardFormat.class.getDeclaredField("values"), null, newValuesArray);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
         return newEnum;
     }

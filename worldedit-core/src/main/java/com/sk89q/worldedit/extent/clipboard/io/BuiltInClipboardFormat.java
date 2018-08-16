@@ -31,7 +31,7 @@ public class BuiltInClipboardFormat {
 
     @Deprecated
     public static final ClipboardFormat[] values() {
-        return ClipboardFormat.values();
+        return ClipboardFormat.values;
     }
 
     @Deprecated
