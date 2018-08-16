@@ -668,6 +668,10 @@ public class MainUtil {
     }
 
     public static File copyFile(File jar, String resource, File output) {
+        return copyFile(jar, resource, output, resource);
+    }
+
+    public static File copyFile(File jar, String resource, File output, String fileName) {
         try {
             if (output == null) {
                 output = Fawe.imp().getDirectory();
@@ -675,11 +679,11 @@ public class MainUtil {
             if (!output.exists()) {
                 output.mkdirs();
             }
-            File newFile = new File(output, resource);
+            File newFile = new File(output, fileName);
             if (newFile.exists()) {
                 return newFile;
             }
-            try (InputStream stream = Fawe.imp().getClass().getResourceAsStream(resource.startsWith("/") ? resource : "/" + resource)) {
+            try (InputStream stream = Fawe.class.getResourceAsStream(resource.startsWith("/") ? resource : "/" + resource)) {
                 byte[] buffer = new byte[2048];
                 if (stream == null) {
                     try (ZipInputStream zis = new ZipInputStream(new FileInputStream(jar))) {
@@ -687,7 +691,6 @@ public class MainUtil {
                         while (ze != null) {
                             String name = ze.getName();
                             if (name.equals(resource)) {
-                                new File(newFile.getParent()).mkdirs();
                                 try (FileOutputStream fos = new FileOutputStream(newFile)) {
                                     int len;
                                     while ((len = zis.read(buffer)) > 0) {

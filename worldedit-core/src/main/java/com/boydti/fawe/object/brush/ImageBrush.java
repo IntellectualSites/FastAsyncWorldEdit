@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.object.collection.SummedColorTable;
+import com.boydti.fawe.object.mask.SurfaceMask;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -77,14 +78,14 @@ public class ImageBrush implements Brush {
         final int cx = position.getBlockX();
         final int cy = position.getBlockY();
         final int cz = position.getBlockZ();
-        final SolidBlockMask solid = new SolidBlockMask(editSession);
+        final Mask solid = new SurfaceMask(editSession);
 
         double scale = Math.max(width, height) / sizeDouble;
 
         Location loc = editSession.getPlayer().getPlayer().getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
-        AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();
+        AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();
 
         RecursiveVisitor visitor = new RecursiveVisitor(new Mask() {
             private final Vector mutable = new Vector();

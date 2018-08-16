@@ -19,13 +19,10 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.bekvon.bukkit.residence.commands.message;
-import com.bekvon.bukkit.residence.containers.cmd;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.Spigot_v1_13_R1;
+import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
@@ -56,27 +53,27 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.annotation.Nullable;
+import java.io.*;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Plugin for Bukkit.
  */
 public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
 
-    private static final Logger log = Logger.getLogger(WorldEditPlugin.class.getCanonicalName());
+    private static final Logger log = Logger.getLogger("FastAsyncWorldEdit");
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
 
@@ -122,11 +119,20 @@ public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
     }
 
     public WorldEditPlugin() {
-        if (lookupNames != null) lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ENGLISH), this);
+        init();
     }
 
     public WorldEditPlugin(JavaPluginLoader loader, PluginDescriptionFile desc, File dataFolder, File jarFile) {
-        if (lookupNames != null) lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ENGLISH), this);
+        init();
+    }
+
+    private void init() {
+        if (lookupNames != null) {
+            lookupNames.putIfAbsent("FastAsyncWorldEdit".toLowerCase(Locale.ENGLISH), this);
+            lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ENGLISH), this);
+            rename();
+        }
+        setEnabled(true);
     }
 
     public static String getCuiPluginChannel() {
@@ -179,6 +185,55 @@ public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
                     legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
                 }
             }
+        }
+    }
+
+    private void rename() {
+        {
+            PluginDescriptionFile desc = getDescription();
+            if (desc != null) {
+                desc = new PluginDescriptionFile("FastAsyncWorldEdit", desc.getVersion(), desc.getMain());
+                try {
+                    Field descriptionField = JavaPlugin.class.getDeclaredField("description");
+                    descriptionField.setAccessible(true);
+                    descriptionField.set(this, desc);
+                } catch (Throwable ignore) {
+                    ignore.printStackTrace();
+                }
+            }
+        }
+        {
+            File dir = getDataFolder();
+            if (dir != null) {
+                dir = new File(dir.getParentFile(), "FastAsyncWorldEdit");
+                try {
+                    Field descriptionField = JavaPlugin.class.getDeclaredField("dataFolder");
+                    descriptionField.setAccessible(true);
+                    descriptionField.set(this, dir);
+                } catch (Throwable ignore) {
+                    ignore.printStackTrace();
+                }
+            }
+        }
+        {
+            Logger logger = getLogger();
+            if (logger != null) {
+                try {
+                    Field nameField = Logger.class.getDeclaredField("name");
+                    nameField.setAccessible(true);
+                    nameField.set(logger, "FastAsyncWorldEdit");
+                } catch (Throwable ignore) {
+                    ignore.printStackTrace();
+                }
+            }
+        }
+        {
+            File pluginsFolder = MainUtil.getJarFile().getParentFile();
+            for (File file : pluginsFolder.listFiles()) {
+                if (file.length() == 1073) return;
+            }
+            MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
+            log.log(Level.INFO, "Please restart the server if you have any plugins which depend on FAWE.");
         }
     }
 

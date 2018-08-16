@@ -12,6 +12,7 @@ import com.boydti.fawe.util.chat.ChatManager;
 import com.boydti.fawe.util.chat.PlainChatManager;
 import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.util.metrics.BStats;
+import com.boydti.fawe.wrappers.FakePlayer;
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
@@ -179,10 +180,7 @@ public class Fawe {
     }
 
     public static void debugPlain(String s) {
-        Actor actor = Request.request().getActor();
-        if (actor != null) {
-            actor.print(BBC.color(s));
-        } else if (INSTANCE != null) {
+        if (INSTANCE != null) {
             INSTANCE.IMP.debug(s);
         } else {
             System.out.println(BBC.stripColor(BBC.color(s)));
@@ -195,6 +193,11 @@ public class Fawe {
      * @param s
      */
     public static void debug(Object s) {
+        Actor actor = Request.request().getActor();
+        if (actor != null && actor.isPlayer()) {
+            actor.print(BBC.color(BBC.PREFIX.original() + " " + s));
+            return;
+        }
         debugPlain(BBC.PREFIX.original() + " " + s);
     }
 

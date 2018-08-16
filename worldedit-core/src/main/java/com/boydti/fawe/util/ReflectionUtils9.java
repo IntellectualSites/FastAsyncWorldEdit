@@ -117,12 +117,8 @@ public class ReflectionUtils9 {
         }
 
         try {
-            System.out.println("Target " + target + " | " + field.getName());
             if (target == null) field.set(null, value);
             else field.set(target, value);
-
-//            FieldAccessor fa = ReflectionFactory.getReflectionFactory().newFieldAccessor(field, false);
-//            fa.set(target, value);
         } catch (NoSuchMethodError error) {
             field.set(target, value);
         }

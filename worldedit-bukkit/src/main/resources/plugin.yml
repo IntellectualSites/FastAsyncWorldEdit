@@ -1,4 +1,4 @@
-name: FastAsyncWorldEdit
+name: WorldEdit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 api-version: 1.13
