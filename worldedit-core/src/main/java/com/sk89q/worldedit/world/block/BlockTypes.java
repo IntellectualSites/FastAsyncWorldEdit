@@ -652,109 +652,111 @@ public enum BlockTypes implements BlockType {
                     Instance
      -----------------------------------------------------
      */
+    private final static class Settings {
+        private final int internalId;
+        private final ItemTypes itemType;
+        private final BlockState defaultState;
+        private final AbstractProperty[] propertiesMapArr;
+        private final AbstractProperty[] propertiesArr;
+        private final List<AbstractProperty> propertiesList;
+        private final Map<String, AbstractProperty> propertiesMap;
+        private final Set<AbstractProperty> propertiesSet;
+        private final BlockMaterial blockMaterial;
+        private final int permutations;
+        private BlockState[] states;
 
+        Settings(BlockTypes type, String id, int internalId) {
+            this.internalId = internalId;
+            String propertyString = null;
+            int propI = id.indexOf('[');
+            if (propI != -1) {
+                propertyString = id.substring(propI + 1, id.length() - 1);
+            }
 
-    private final ItemTypes itemType;
+            int maxInternalStateId = 0;
+            Map<String, ? extends Property> properties = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getProperties(type);
+            if (!properties.isEmpty()) {
+                // Ensure the properties are registered
+                int maxOrdinal = 0;
+                for (String key : properties.keySet()) {
+                    maxOrdinal = Math.max(PropertyKey.getOrCreate(key).ordinal(), maxOrdinal);
+                }
+                this.propertiesMapArr = new AbstractProperty[maxOrdinal + 1];
+                int prop_arr_i = 0;
+                this.propertiesArr = new AbstractProperty[properties.size()];
+                HashMap<String, AbstractProperty> propMap = new HashMap<>();
 
-    private final String id;
-    private final BlockState defaultState;
+                int bitOffset = 0;
+                for (Map.Entry<String, ? extends Property> entry : properties.entrySet()) {
+                    PropertyKey key = PropertyKey.getOrCreate(entry.getKey());
+                    AbstractProperty property = ((AbstractProperty) entry.getValue()).withOffset(bitOffset);
+                    this.propertiesMapArr[key.ordinal()] = property;
+                    this.propertiesArr[prop_arr_i++] = property;
+                    propMap.put(entry.getKey(), property);
+                    bitOffset += property.getNumBits();
 
-    private final AbstractProperty[] propertiesMapArr;
-    private final AbstractProperty[] propertiesArr;
+                    maxInternalStateId += (property.getValues().size() << bitOffset);
+                }
+                this.propertiesList = Arrays.asList(this.propertiesArr);
+                this.propertiesMap = Collections.unmodifiableMap(propMap);
+                this.propertiesSet = new LinkedHashSet<>(this.propertiesMap.values());
+            } else {
+                this.propertiesMapArr = new AbstractProperty[0];
+                this.propertiesArr = this.propertiesMapArr;
+                this.propertiesList = Collections.emptyList();
+                this.propertiesMap = Collections.emptyMap();
+                this.propertiesSet = Collections.emptySet();
+            }
+            this.permutations = maxInternalStateId;
 
-    private final List<AbstractProperty> propertiesList;
-    private final Map<String, AbstractProperty> propertiesMap;
-    private final Set<AbstractProperty> propertiesSet;
+            this.blockMaterial = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(type);
+            this.itemType = ItemTypes.get(type);
 
-    private final BlockMaterial blockMaterial;
-    private final int permutations;
+            if (propertyString != null) {
+                this.defaultState = new BlockState(parseProperties(propertyString, propertiesMap));
+            } else {
+                this.defaultState = new BlockState(internalId);
+            }
+        }
 
-    @Deprecated public static final int BIT_OFFSET; // Used internally
-    @Deprecated public static final int BIT_MASK; // Used internally
-
-    private BlockState[] states;
-
-    BlockTypes() {
-        id = "minecraft:" + name().toLowerCase();
-        itemType = null;
-        defaultState = null;
-        propertiesMapArr = null;
-        propertiesArr = null;
-        propertiesList = null;
-        propertiesMap = null;
-        propertiesSet = null;
-        blockMaterial = null;
-        permutations = 0;
+        private int parseProperties(String properties, Map<String, AbstractProperty> propertyMap) {
+            int id = internalId;
+            for (String keyPair : properties.split(",")) {
+                String[] split = keyPair.split("=");
+                String name = split[0];
+                String value = split[1];
+                AbstractProperty btp = propertyMap.get(name);
+                id = btp.modify(id, btp.getValueFor(value));
+            }
+            return id;
+        }
     }
 
-    BlockTypes(String id) {
-        if (id == null) id = "minecraft:" + name().toLowerCase();
-            // If it has no namespace, assume minecraft.
-        else if (!id.contains(":")) {
-            id = "minecraft:" + id;
-        }
-        String propertyString = null;
-        int propI = id.indexOf('[');
-        if (propI != -1) {
-            propertyString = id.substring(propI + 1, id.length() - 1);
-            id = id.substring(0, propI);
-        }
-        this.id = id;
+    private final String id;
+    private final Settings settings;
 
-        int maxInternalStateId = 0;
-        Map<String, ? extends Property> properties = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getProperties(this);
-        if (!properties.isEmpty()) {
-            // Ensure the properties are registered
-            int maxOrdinal = 0;
-            for (String key : properties.keySet()) {
-                maxOrdinal = Math.max(PropertyKey.getOrCreate(key).ordinal(), maxOrdinal);
-            }
-            this.propertiesMapArr = new AbstractProperty[maxOrdinal + 1];
-            int prop_arr_i = 0;
-            this.propertiesArr = new AbstractProperty[properties.size()];
-            HashMap<String, AbstractProperty> propMap = new HashMap<>();
+    BlockTypes() {
+        if (name().indexOf(':') == -1) id = "minecraft:" + name().toLowerCase();
+        else id = name().toLowerCase();
+        settings = null;
+    }
 
-            int bitOffset = 0;
-            for (Map.Entry<String, ? extends Property> entry : properties.entrySet()) {
-                PropertyKey key = PropertyKey.getOrCreate(entry.getKey());
-                AbstractProperty property = ((AbstractProperty) entry.getValue()).withOffset(bitOffset);
-                this.propertiesMapArr[key.ordinal()] = property;
-                this.propertiesArr[prop_arr_i++] = property;
-                propMap.put(entry.getKey(), property);
-                bitOffset += property.getNumBits();
-
-                maxInternalStateId += (property.getValues().size() << bitOffset);
-            }
-            this.propertiesList = Arrays.asList(this.propertiesArr);
-            this.propertiesMap = Collections.unmodifiableMap(propMap);
-            this.propertiesSet = new LinkedHashSet<>(this.propertiesMap.values());
-        } else {
-            this.propertiesMapArr = new AbstractProperty[0];
-            this.propertiesArr = this.propertiesMapArr;
-            this.propertiesList = Collections.emptyList();
-            this.propertiesMap = Collections.emptyMap();
-            this.propertiesSet = Collections.emptySet();
-        }
-        this.permutations = maxInternalStateId;
-
-        this.blockMaterial = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
-        this.itemType = ItemTypes.get(this);
-
-        if (propertyString != null) {
-            this.defaultState = new BlockState(parseProperties(propertyString));
-        } else {
-            this.defaultState = new BlockState(this.getInternalId());
+    private void init(String id, int internalId) {
+        try {
+            ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("settings"), this, new Settings(this, id, internalId));
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
     }
 
     public BlockState withPropertyId(int propertyId) {
-        if (propertiesArr.length == 0) return defaultState;
-        BlockState[] tmp = states;
+        if (settings.propertiesArr.length == 0) return settings.defaultState;
+        BlockState[] tmp = settings.states;
         if (tmp == null) {
             synchronized (this) {
-                if ((tmp = states) == null) {
-                    tmp = states = new BlockState[getMaxStateId() + 1];
-                    tmp[defaultState.getInternalPropertiesId()] = defaultState;
+                if ((tmp = settings.states) == null) {
+                    tmp = settings.states = new BlockState[getMaxStateId() + 1];
+                    tmp[settings.defaultState.getInternalPropertiesId()] = settings.defaultState;
                 }
             }
         }
@@ -771,12 +773,12 @@ public enum BlockTypes implements BlockType {
 
     @Deprecated
     public int getMaxStateId() {
-        return permutations;
+        return settings.permutations;
     }
 
     @Override
     public boolean apply(Extent extent, Vector get, Vector set) throws WorldEditException {
-        return extent.setBlock(set, this.defaultState);
+        return extent.setBlock(set, this.settings.defaultState);
     }
 
     public Mask toMask(Extent extent) {
@@ -817,7 +819,15 @@ public enum BlockTypes implements BlockType {
      * @return
      */
     public BlockState withProperties(String properties) {
-        return withStateId(parseProperties(properties));
+        int id = getInternalId();
+        for (String keyPair : properties.split(",")) {
+            String[] split = keyPair.split("=");
+            String name = split[0];
+            String value = split[1];
+            AbstractProperty btp = settings.propertiesMap.get(name);
+            id = btp.modify(id, btp.getValueFor(value));
+        }
+        return withStateId(id);
     }
 
     /**
@@ -827,7 +837,7 @@ public enum BlockTypes implements BlockType {
      */
     @Deprecated
     public Map<String, ? extends Property> getPropertyMap() {
-        return this.propertiesMap;
+        return this.settings.propertiesMap;
     }
 
     /**
@@ -837,12 +847,12 @@ public enum BlockTypes implements BlockType {
      */
     @Deprecated
     public List<? extends Property> getProperties() {
-        return this.propertiesList;
+        return this.settings.propertiesList;
     }
 
     @Deprecated
     public Set<? extends Property> getPropertiesSet() {
-        return this.propertiesSet;
+        return this.settings.propertiesSet;
     }
 
     /**
@@ -853,17 +863,17 @@ public enum BlockTypes implements BlockType {
      */
     @Deprecated
     public <V> Property<V> getProperty(String name) {
-        return this.propertiesMap.get(name);
+        return this.settings.propertiesMap.get(name);
     }
 
     public boolean hasProperty(PropertyKey key) {
         int ordinal = key.ordinal();
-        return this.propertiesMapArr.length > ordinal ? this.propertiesMapArr[ordinal] != null : false;
+        return this.settings.propertiesMapArr.length > ordinal ? this.settings.propertiesMapArr[ordinal] != null : false;
     }
 
     public <V> Property<V> getProperty(PropertyKey key) {
         try {
-            return this.propertiesMapArr[key.ordinal()];
+            return this.settings.propertiesMapArr[key.ordinal()];
         } catch (IndexOutOfBoundsException ignore) {
             return null;
         }
@@ -875,7 +885,7 @@ public enum BlockTypes implements BlockType {
      * @return The default state
      */
     public BlockState getDefaultState() {
-        return this.defaultState;
+        return this.settings.defaultState;
     }
 
     /**
@@ -894,7 +904,7 @@ public enum BlockTypes implements BlockType {
      */
     @Nullable
     public ItemType getItemType() {
-        return itemType;
+        return settings.itemType;
     }
 
     /**
@@ -903,19 +913,7 @@ public enum BlockTypes implements BlockType {
      * @return The material
      */
     public BlockMaterial getMaterial() {
-        return this.blockMaterial;
-    }
-
-    protected int parseProperties(String properties) {
-        int id = this.getInternalId();
-        for (String keyPair : properties.split(",")) {
-            String[] split = keyPair.split("=");
-            String name = split[0];
-            String value = split[1];
-            AbstractProperty btp = (AbstractProperty) getProperty(name);
-            id = btp.modify(id, btp.getValueFor(value));
-        }
-        return id;
+        return this.settings.blockMaterial;
     }
 
     /**
@@ -926,7 +924,7 @@ public enum BlockTypes implements BlockType {
      * @return internal id
      */
     public int getInternalId() {
-        return this.ordinal();
+        return this.settings.internalId;
     }
 
     @Override
@@ -935,11 +933,16 @@ public enum BlockTypes implements BlockType {
     }
 
     /*
-         -----------------------------------------------------
-                        Static Initializer
-         -----------------------------------------------------
-         */
+     -----------------------------------------------------
+                    Static Initializer
+     -----------------------------------------------------
+     */
+
+    @Deprecated public static final int BIT_OFFSET; // Used internally
+    @Deprecated public static final int BIT_MASK; // Used internally
+
     private static final Map<String, BlockTypes> $REGISTRY = new HashMap<>();
+    private static int $LENGTH;
     public static final BlockTypes[] values;
 
     static {
@@ -948,6 +951,7 @@ public enum BlockTypes implements BlockType {
             Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
 
             BlockTypes[] oldValues = BlockTypes.values();
+            $LENGTH = oldValues.length;
             int size = blockMap.size();
             for (BlockTypes type : oldValues) {
                 if (!blockMap.containsKey(type.getId())) size++;
@@ -959,12 +963,14 @@ public enum BlockTypes implements BlockType {
             BIT_OFFSET = MathMan.log2nlz(size);
             BIT_MASK = ((1 << BIT_OFFSET) - 1);
 
+            LinkedHashSet<BlockTypes> newValues = new LinkedHashSet<>(Arrays.asList(oldValues));
             for (BlockTypes type : oldValues) {
                 String block = blockMap.getOrDefault(type.getId(), type.getId());
-                register(block);
+                BlockTypes registered = register(block);
+                if (!newValues.contains(registered)) newValues.add(registered);
             }
             // Cache the values
-            values = values();
+            values = newValues.toArray(new BlockTypes[newValues.size()]);
         } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -995,17 +1001,14 @@ public enum BlockTypes implements BlockType {
         try {
             existing = valueOf(enumName.toUpperCase());
         } catch (IllegalArgumentException ignore) {}
-
-        Class[] paramTypes = new Class[]{String.class};
-        Object[] args = new Object[]{id};
-
-        if (existing != null) {
-            // Load values
-            ReflectionUtils.copyEnum(existing, enumName, paramTypes, args);
-        } else {
-            // Create it
-            existing = ReflectionUtils.addEnum(BlockTypes.class, enumName, paramTypes, args);
+        if (existing == null) {
+            existing = ReflectionUtils.addEnum(BlockTypes.class, enumName);
         }
+        int internalId = existing.ordinal();
+        if (internalId == 0 && existing != __RESERVED__) {
+            internalId = $LENGTH++;
+        }
+        existing.init(id, internalId);
         if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
         $REGISTRY.put(typeName, existing);
         return existing;

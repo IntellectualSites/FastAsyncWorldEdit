@@ -34,9 +34,7 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public enum ItemTypes implements ItemType {
     /*
@@ -45,6 +43,7 @@ public enum ItemTypes implements ItemType {
      -----------------------------------------------------
      */
 
+    __RESERVED__,
     ACACIA_BOAT,
     ACACIA_BUTTON,
     ACACIA_DOOR,
@@ -842,6 +841,7 @@ public enum ItemTypes implements ItemType {
     private BlockTypes blockType;
     private final String id;
     private final BaseItem defaultState;
+    private int internalId;
 
     ItemTypes() {
         this(null);
@@ -855,6 +855,7 @@ public enum ItemTypes implements ItemType {
         }
         this.id = id;
         this.defaultState = new BaseItemStack(this, 1);
+        this.internalId = ordinal();
     }
 
     private void setBlockType(BlockTypes type) {
@@ -872,7 +873,7 @@ public enum ItemTypes implements ItemType {
 
     @Deprecated
     public int getInternalId() {
-        return ordinal();
+        return this.internalId;
     }
 
     /**
@@ -920,19 +921,23 @@ public enum ItemTypes implements ItemType {
      -----------------------------------------------------
      */
     private static final Map<String, ItemTypes> $REGISTRY = new HashMap<>();
-
+    private static int $LENGTH;
     public static final ItemTypes[] values;
 
     static {
         try {
             Collection<String> items = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getItemRegistry().registerItems();
+            ItemTypes[] oldValues = values();
+            $LENGTH = oldValues.length;
+            LinkedHashSet<ItemTypes> newValues = new LinkedHashSet<>(Arrays.asList(oldValues));
             if (!items.isEmpty()) { // No types found - use defaults
                 for (String item : items) {
-                    register(item);
+                    ItemTypes registered = register(item);
+                    if (!newValues.contains(registered)) newValues.add(registered);
                 }
             }
             // Cache the values
-            values = values();
+            values = newValues.toArray(new ItemTypes[newValues.size()]);
         } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -964,11 +969,12 @@ public enum ItemTypes implements ItemType {
         // Check existing
         ItemTypes existing = null;
         try { existing = valueOf(enumName.toUpperCase()); } catch (IllegalArgumentException ignore) {}
-        if (existing != null) {
-            // TODO additional registration
-        } else {
-            // Create it
-            existing = ReflectionUtils.addEnum(ItemTypes.class, enumName, new Class[]{String.class}, new Object[]{id});
+        if (existing == null) {
+            existing = ReflectionUtils.addEnum(ItemTypes.class, enumName);
+        }
+        int internalId = existing.ordinal();
+        if (internalId == 0 && existing != __RESERVED__) {
+            existing.internalId = $LENGTH++;
         }
         if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
         $REGISTRY.put(typeName, existing);

@@ -6,11 +6,8 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.command.Dispatcher;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public abstract class FaweParser<T> extends InputParser<T> {
     protected FaweParser(WorldEdit worldEdit) {
@@ -98,6 +95,7 @@ public abstract class FaweParser<T> extends InputParser<T> {
                 args.add(arg);
                 command = full.substring(0, startPos);
             }
+            Collections.reverse(args);
             ParseEntry entry = new ParseEntry(full, command, i > 0 ? and.get(i - 1) : false);
             keys.add(new AbstractMap.SimpleEntry<>(entry, args));
         }

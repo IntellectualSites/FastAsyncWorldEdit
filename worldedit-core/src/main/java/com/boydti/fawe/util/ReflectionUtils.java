@@ -28,7 +28,11 @@ public class ReflectionUtils {
 
     @SuppressWarnings("unchecked")
     public static <T extends Enum<?>> T addEnum(Class<T> enumType, String enumName) {
-        return addEnum(enumType, enumName, new Class<?>[]{} , new Object[]{});
+        try {
+            return addEnum(enumType, enumName, new Class<?>[]{}, new Object[]{});
+        } catch (Throwable ignore) {
+            return ReflectionUtils9.addEnum(enumType, enumName);
+        }
     }
 
     public static <T extends Enum<?>> T addEnum(Class<T> enumType, String enumName, Class<?>[] additionalTypes, Object[] additionalValues) {
@@ -145,13 +149,15 @@ public class ReflectionUtils {
         // next we change the modifier in the Field instance to
         // not be final anymore, thus tricking reflection into
         // letting us modify the static final field
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        int modifiers = modifiersField.getInt(field);
+        if (Modifier.isFinal(field.getModifiers())) {
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            int modifiers = modifiersField.getInt(field);
 
-        // blank out the final bit in the modifiers int
-        modifiers &= ~Modifier.FINAL;
-        modifiersField.setInt(field, modifiers);
+            // blank out the final bit in the modifiers int
+            modifiers &= ~Modifier.FINAL;
+            modifiersField.setInt(field, modifiers);
+        }
 
         try {
             FieldAccessor fa = ReflectionFactory.getReflectionFactory().newFieldAccessor(field, false);

@@ -13,7 +13,7 @@ public class SolidBlockMask extends BlockTypeMask {
     public static boolean[] getTypes() {
         boolean[] types = new boolean[BlockTypes.size()];
         for (BlockTypes type : BlockTypes.values) {
-            types[type.ordinal()] = type.getMaterial().isSolid();
+            types[type.getInternalId()] = type.getMaterial().isSolid();
         }
         return types;
     }

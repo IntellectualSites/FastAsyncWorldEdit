@@ -32,4 +32,7 @@ public interface EntityType {
     default String getName() {
         return getId();
     }
+
+    @Deprecated
+    public int getInternalId();
 }

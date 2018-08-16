@@ -30,9 +30,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public enum EntityTypes implements EntityType {
     /*
@@ -40,6 +38,7 @@ public enum EntityTypes implements EntityType {
         Replaced at runtime by the entity registry
      -----------------------------------------------------
      */
+    __RESERVED__,
     AREA_EFFECT_CLOUD,
     ARMOR_STAND,
     ARROW,
@@ -139,6 +138,7 @@ public enum EntityTypes implements EntityType {
     ;
 
     private String id;
+    private int internalId;
 
     EntityTypes() {
         this(null);
@@ -151,6 +151,7 @@ public enum EntityTypes implements EntityType {
             id = "minecraft:" + id;
         }
         this.id = id;
+        this.internalId = ordinal();
     }
 
     @Override
@@ -161,6 +162,11 @@ public enum EntityTypes implements EntityType {
     @Override
     public String toString() {
         return getId();
+    }
+
+    @Override
+    public int getInternalId() {
+        return internalId;
     }
 
     /*
@@ -237,19 +243,23 @@ public enum EntityTypes implements EntityType {
     }
 
     private static final Map<String, EntityTypes> $REGISTRY = new HashMap<>();
-
+    private static int $LENGTH;
     public static final EntityTypes[] values;
 
     static {
         try {
             Collection<String> ents = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getEntityRegistry().registerEntities();
+            EntityTypes[] oldValues = values();
+            $LENGTH = oldValues.length;
+            LinkedHashSet<EntityTypes> newValues = new LinkedHashSet<>(Arrays.asList(oldValues));
             if (!ents.isEmpty()) { // No types found - use defaults
                 for (String ent : ents) {
-                    register(ent);
+                    EntityTypes registered = register(ent);
+                    if (!newValues.contains(registered)) newValues.add(registered);
                 }
             }
             // Cache the values
-            values = values();
+            values = newValues.toArray(new EntityTypes[newValues.size()]);
         } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -264,11 +274,12 @@ public enum EntityTypes implements EntityType {
         // Check existing
         EntityTypes existing = null;
         try { existing = valueOf(enumName.toUpperCase()); } catch (IllegalArgumentException ignore) {}
-        if (existing != null) {
-            // TODO additional registration
-        } else {
-            // Create it
-            existing = ReflectionUtils.addEnum(EntityTypes.class, enumName, new Class[]{String.class}, new Object[]{id});
+        if (existing == null) {
+            existing = ReflectionUtils.addEnum(EntityTypes.class, enumName);
+        }
+        int internalId = existing.ordinal();
+        if (internalId == 0 && existing != __RESERVED__) {
+            existing.internalId = $LENGTH++;
         }
         if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
         $REGISTRY.put(typeName, existing);

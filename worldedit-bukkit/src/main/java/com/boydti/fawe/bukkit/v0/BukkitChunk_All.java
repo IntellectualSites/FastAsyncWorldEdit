@@ -231,9 +231,8 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                 int xx = bx + x;
 
                                 BlockTypes type = BlockTypes.getFromStateId(combined);
+                                if (type == BlockTypes.__RESERVED__) continue;
                                 switch (type) {
-                                    case __RESERVED__:
-                                        continue;
                                     case AIR:
                                     case CAVE_AIR:
                                     case VOID_AIR:
@@ -280,9 +279,8 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                         int j = place ? index : 4095 - index;
                         int combined = newArray[j];
                         BlockTypes type = BlockTypes.getFromStateId(combined);
+                        if (type == BlockTypes.__RESERVED__) continue;
                         switch (type) {
-                            case __RESERVED__:
-                                continue;
                             case AIR:
                             case CAVE_AIR:
                             case VOID_AIR:
