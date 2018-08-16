@@ -130,6 +130,8 @@ public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
         if (lookupNames != null) {
             lookupNames.putIfAbsent("FastAsyncWorldEdit".toLowerCase(Locale.ENGLISH), this);
             lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ENGLISH), this);
+            lookupNames.putIfAbsent("FastAsyncWorldEdit", this);
+            lookupNames.putIfAbsent("WorldEdit", this);
             rename();
         }
         setEnabled(true);
