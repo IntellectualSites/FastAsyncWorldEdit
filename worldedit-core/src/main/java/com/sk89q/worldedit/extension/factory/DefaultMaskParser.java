@@ -147,6 +147,8 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                 }
                 masks.get(masks.size() - 1).add(mask);
             }
+        } catch (InputParseException ignore) {
+            throw ignore;
         } catch (Throwable e) {
             e.printStackTrace();
             throw new InputParseException(e.getMessage(), e);
