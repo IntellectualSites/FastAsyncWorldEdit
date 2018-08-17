@@ -34,6 +34,6 @@ public class MaskBinding extends FaweBinding {
 //            List<String> blocks = BundledBlockData.getInstance().getBlockNames(split2[0]);
 //            return MainUtil.prepend(start, blocks);
 //        }
-        return new ArrayList<>();
+        return super.getSuggestions(parameter, prefix);
     }
 }

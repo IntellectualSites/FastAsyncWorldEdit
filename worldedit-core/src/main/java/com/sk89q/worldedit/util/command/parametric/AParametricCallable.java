@@ -223,11 +223,13 @@ public abstract class AParametricCallable implements CommandCallable {
                         prefix = "";
                     }
 
+//                    System.out.println("(0) Return get binding suggestions " + parameter + " | " + prefix);
                     return parameter.getBinding().getSuggestions(parameter, prefix);
                 }
             }
 
             // This should not happen
+//            System.out.println("(1) This should not happen");
             return new ArrayList<String>();
         }
 
@@ -240,7 +242,6 @@ public abstract class AParametricCallable implements CommandCallable {
             if (parameter.getFlag() != null) {
                 continue; // We already handled flags
             }
-
             try {
                 scoped.mark();
                 parameter.getBinding().bind(parameter, scoped, true);
@@ -253,26 +254,32 @@ public abstract class AParametricCallable implements CommandCallable {
                 // For /command value1 |value2
                 // For /command |value1 value2
                 if (suggestable.forHangingValue()) {
+//                    System.out.println("(2) Return get binding dangling " + parameter + " | " + "");
                     return parameter.getBinding().getSuggestions(parameter, "");
                 } else {
                     // For /command value1| value2
                     if (lastConsumer != null) {
+//                        System.out.println("(3) Return get consumed " + lastConsumer + " | " + lastConsumed);
                         return lastConsumer.getBinding().getSuggestions(lastConsumer, lastConsumed);
                         // For /command| value1 value2
                         // This should never occur
                     } else {
+//                        System.out.println("(4) Invalid suggestion context");
                         throw new RuntimeException("Invalid suggestion context");
                     }
                 }
             } catch (ParameterException | InvocationTargetException e) {
                 SuggestInputParseException suggestion = SuggestInputParseException.get(e);
                 if (suggestion != null) {
+//                    System.out.println("(5) Has suggestion " + suggestion.getSuggestions());
                     return suggestion.getSuggestions();
                 }
                 if (suggestable.forHangingValue()) {
                     String name = getDescription().getParameters().get(consumerIndex).getName();
+//                    System.out.println("(6) Has dangling invalid " + name + " | " + e.getMessage());
                     throw new InvalidUsageException("For parameter '" + name + "': " + e.getMessage(), this);
                 } else {
+//                    System.out.println("(7) HGet binding suggestions " + parameter + " | " + lastConsumed);
                     return parameter.getBinding().getSuggestions(parameter, "");
                 }
             }
@@ -281,13 +288,16 @@ public abstract class AParametricCallable implements CommandCallable {
         if (suggestable.forHangingValue()) {
             // There's nothing that we can suggest because there's no more parameters
             // to add on, and we can't change the previous parameter
+//            System.out.println("(7.1) No more parameters");
             return new ArrayList<String>();
         } else {
             // For /command value1 value2|
             if (lastConsumer != null) {
+//                System.out.println("(8) Get binding suggestions " + lastConsumer + " | " + lastConsumed);
                 return lastConsumer.getBinding().getSuggestions(lastConsumer, lastConsumed);
                 // This should never occur
             } else {
+//                System.out.println("(9) Invalid suggestion context");
                 throw new RuntimeException("Invalid suggestion context");
             }
 

@@ -26,6 +26,7 @@ import com.sk89q.worldedit.util.command.binding.Text;
 
 import javax.xml.ws.Provider;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.concurrent.Callable;
@@ -117,6 +118,13 @@ public class ParameterData extends SimpleParameter {
      */
     public Annotation[] getModifiers() {
         return modifiers;
+    }
+
+    public  <T extends Annotation> T getModifier(Class<T> annotatedType) {
+        for (Annotation annotation : getModifiers()) {
+            if (annotation.getClass() == annotatedType) return (T) annotation;
+        }
+        return null;
     }
 
     /**

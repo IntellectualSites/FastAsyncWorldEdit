@@ -52,6 +52,13 @@ public class StringMan {
         return -1;
     }
 
+    public static String prettyFormat(double d) {
+        if (d == Double.MIN_VALUE) return "-∞";
+        if (d == Double.MAX_VALUE) return "∞";
+        if(d == (long) d) return String.format("%d",(long)d);
+        else return String.format("%s",d);
+    }
+
     public static boolean isBracketForwards(char c) {
         switch (c) {
             case '[':

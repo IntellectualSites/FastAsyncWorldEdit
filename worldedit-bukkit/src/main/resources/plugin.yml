@@ -10,7 +10,7 @@ database: false
 #softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
 commands:
   fcancel:
-    description: (FAWE) Cancel your edit
+    description: "Cancel your edit"
     aliases: [fawecancel,/fcancel,/cancel,/fawecancel]
 permissions:
   fawe.plotsquared:

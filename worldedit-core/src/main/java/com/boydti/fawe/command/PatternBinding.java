@@ -3,6 +3,7 @@ package com.boydti.fawe.command;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PatternBinding extends FaweBinding {
@@ -15,7 +16,7 @@ public class PatternBinding extends FaweBinding {
 
     @Override
     public List<String> getSuggestions(ParameterData parameter, String prefix) {
-        return new ArrayList<>();
+        return super.getSuggestions(parameter, prefix);
 //        int index = prefix.lastIndexOf(",|%");
 //        String start = index != -1 ? prefix.substring(0, index) : "";
 //        String current = index != -1 ? prefix.substring(index) : prefix;

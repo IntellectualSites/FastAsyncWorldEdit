@@ -19,13 +19,16 @@
 
 package com.sk89q.worldedit.util.command.parametric;
 
+import com.boydti.fawe.util.StringMan;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.util.command.binding.Range;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -184,6 +187,25 @@ public class BindingHelper implements Binding {
 
     @Override
     public List<String> getSuggestions(ParameterData parameter, String prefix) {
+        if (prefix.isEmpty()) {
+            char bracket = parameter.isOptional() ? '[' : '<';
+            char endBracket = StringMan.getMatchingBracket(bracket);
+            StringBuilder result = new StringBuilder();
+            result.append(bracket);
+            if (parameter.getFlag() != null) {
+                result.append('-').append(parameter.getFlag()).append(' ');
+            }
+            result.append(parameter.getName());
+            if (parameter.getDefaultValue() != null) {
+                result.append('=').append(StringMan.join(parameter.getDefaultValue(), " "));
+            }
+            Range range = parameter.getModifier(Range.class);
+            if (range != null) {
+                result.append('|').append(StringMan.prettyFormat(range.min())).append(",").append(StringMan.prettyFormat(range.max()));
+            }
+            result.append(endBracket);
+            return Collections.singletonList(result.toString());
+        }
         return new ArrayList<>();
     }
     
