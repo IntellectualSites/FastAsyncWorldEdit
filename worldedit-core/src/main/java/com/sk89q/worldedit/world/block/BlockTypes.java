@@ -25,6 +25,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -978,7 +979,7 @@ public enum BlockTypes implements BlockType {
         }
     }
 
-    public static BlockTypes parse(String input) {
+    public static BlockTypes parse(String input) throws InputParseException {
         input = input.toLowerCase();
 
         if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
@@ -987,10 +988,10 @@ public enum BlockTypes implements BlockType {
 
         try {
             BlockStateHolder block = LegacyMapper.getInstance().getBlockFromLegacy(input);
-            if (block != null) return (BlockTypes) block.getBlockType();
+            if (block != null) return block.getBlockType();
         } catch (NumberFormatException e) {
         } catch (IndexOutOfBoundsException e) {}
-        return null;
+        throw new InputParseException("Unkown block for " + input);
     }
 
     private static BlockTypes register(final String id) {
