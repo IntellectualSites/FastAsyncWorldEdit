@@ -1,9 +1,12 @@
 package com.boydti.fawe.util.image;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.command.FawePrimitiveBinding;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
+
+import javax.annotation.Nullable;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -154,6 +157,23 @@ public class ImageUtil {
         int blue = (int) (totalBlue / a);
         int alpha = (int) (totalAlpha / a);
         return (alpha << 24) + (red << 16) + (green << 8) + (blue << 0);
+    }
+
+    public static BufferedImage load(@Nullable FawePrimitiveBinding.ImageUri uri) throws ParameterException {
+        return uri == null ? null : uri.load();
+    }
+
+    public static BufferedImage load(URI uri) throws ParameterException {
+        try {
+            String uriStr = uri.toString();
+            if (uriStr.startsWith("file:/")) {
+                File file = new File(uri.getPath());
+                return MainUtil.readImage(file);
+            }
+            return MainUtil.readImage(new URL(uriStr));
+        } catch (IOException e) {
+            throw new ParameterException(e);
+        }
     }
 
     public static BufferedImage getImage(String arg) throws ParameterException {

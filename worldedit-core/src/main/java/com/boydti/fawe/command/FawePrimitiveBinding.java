@@ -77,20 +77,13 @@ public class FawePrimitiveBinding extends BindingHelper {
 
     public class ImageUri {
         public final URI uri;
+        private BufferedImage image;
         public ImageUri(URI uri) {
             this.uri = uri;
         }
         public BufferedImage load() throws ParameterException {
-            try {
-                String uriStr = uri.toString();
-                if (uriStr.startsWith("file:/")) {
-                    File file = new File(uri.getPath());
-                    return MainUtil.readImage(file);
-                }
-                return MainUtil.readImage(new URL(uriStr));
-            } catch (IOException e) {
-                throw new ParameterException(e);
-            }
+            if (image != null) return image;
+            return image = ImageUtil.load(uri);
         }
     }
 

@@ -260,6 +260,10 @@ public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
             log.log(Level.SEVERE, "Failed to load config.yml");
             e.printStackTrace();
         }
+        // Create schematics folder
+        WorldEdit worldEdit = WorldEdit.getInstance();
+        File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().saveDir);
+        dir.mkdirs();
     }
 
     private void loadAdapter() {
