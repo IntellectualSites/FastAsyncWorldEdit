@@ -745,6 +745,7 @@ public enum BlockTypes implements BlockType {
         try {
             ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("settings"), this, new Settings(this, id, internalId));
         } catch (Throwable e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -987,7 +988,8 @@ public enum BlockTypes implements BlockType {
         try {
             BlockStateHolder block = LegacyMapper.getInstance().getBlockFromLegacy(input);
             if (block != null) return (BlockTypes) block.getBlockType();
-        } catch (NumberFormatException e) {}
+        } catch (NumberFormatException e) {
+        } catch (IndexOutOfBoundsException e) {}
         return null;
     }
 

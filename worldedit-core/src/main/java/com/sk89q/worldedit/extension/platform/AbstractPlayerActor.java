@@ -23,6 +23,7 @@ import com.sk89q.worldedit.PlayerDirection;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -157,36 +158,47 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         final int z = pos.getBlockZ();
         final Extent world = pos.getExtent();
 
-        byte free = 0;
-        byte spots = 0;
+        int maxY = world.getMaxY();
+        if (y >= maxY) return false;
 
-        while (y <= world.getMaximumPoint().getY() + 2) {
-            if (!world.getBlock(new Vector(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
-                ++free;
-            } else {
-                free = 0;
-            }
+        BlockMaterial initialMaterial = world.getBlockType(new Vector(x, y, z)).getMaterial();
 
-            if (free == 2) {
-                ++spots;
-                if (spots == 2) {
-                    final Vector platform = new Vector(x, y - 2, z);
-                    final BlockStateHolder block = world.getBlock(platform);
-                    final com.sk89q.worldedit.world.block.BlockType type = block.getBlockType();
+        boolean lastState = initialMaterial.isMovementBlocker() && initialMaterial.isFullCube();
 
-                    // Don't get put in lava!
-                    if (type == BlockTypes.LAVA) {
-                        return false;
-                    }
+        double height = 1.85;
+        double freeStart = -1;
 
-                    setPosition(platform.add(0.5, BlockType.centralTopLimit(block), 0.5));
-                    return true;
+        for (int level = y + 1; level <= maxY + 2; level++) {
+            BlockState state;
+            if (level >= maxY) state = BlockTypes.VOID_AIR.getDefaultState();
+            else state = world.getBlock(new Vector(x, level, z));
+            BlockTypes type = state.getBlockType();
+            BlockMaterial material = type.getMaterial();
+
+            if (!material.isFullCube() || !material.isMovementBlocker()) {
+                if (!lastState) {
+                    lastState = BlockType.centralBottomLimit(state) != 1;
+                    continue;
                 }
+                if (freeStart == -1) {
+                    freeStart = level + BlockType.centralTopLimit(state);
+                } else {
+                    double bottomLimit = BlockType.centralBottomLimit(state);
+                    double space = level + bottomLimit - freeStart;
+                    if (space >= height) {
+                        setPosition(new Vector(x + 0.5, freeStart, z + 0.5));
+                        return true;
+                    }
+                    // Not enough room, reset the free position
+                    if (bottomLimit != 1) {
+                        freeStart = -1;
+                    }
+                }
+            } else {
+                freeStart = -1;
+                lastState = true;
             }
-
-            ++y;
         }
-
         return false;
     }
 
@@ -194,48 +206,52 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean descendLevel() {
         final Location pos = getBlockIn();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY() - 1);
+        int y = Math.max(0, pos.getBlockY());
         final int z = pos.getBlockZ();
         final Extent world = pos.getExtent();
 
-        byte free = 0;
+        BlockMaterial initialMaterial = world.getBlockType(new Vector(x, y, z)).getMaterial();
 
-        while (y >= 1) {
-            if (!world.getBlock(new Vector(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
-                ++free;
-            } else {
-                free = 0;
-            }
+        boolean lastState = initialMaterial.isMovementBlocker() && initialMaterial.isFullCube();
 
-            if (free == 2) {
-                // So we've found a spot, but we have to drop the player
-                // lightly and also check to see if there's something to
-                // stand upon
-                while (y >= 0) {
-                    final Vector platform = new Vector(x, y, z);
-                    final BlockStateHolder block = world.getBlock(platform);
-                    final com.sk89q.worldedit.world.block.BlockTypes type = block.getBlockType();
+        double height = 1.85;
+        double freeEnd = -1;
 
-                    // Don't want to end up in lava
-                    switch (type) {
-                        case AIR:
-                        case CAVE_AIR:
-                        case VOID_AIR:
-                        case LAVA:
-                            --y;
-                            continue;
-                        default:
-                            // Found a block!
-                            setPosition(platform.add(0.5, BlockType.centralTopLimit(block), 0.5));
-                            return true;
+        int maxY = world.getMaxY();
+        if (y <= 2) return false;
+
+        for (int level = y + 1; level > 0; level--) {
+            BlockState state;
+            if (level >= maxY) state = BlockTypes.VOID_AIR.getDefaultState();
+            else state = world.getBlock(new Vector(x, level, z));
+            BlockTypes type = state.getBlockType();
+            BlockMaterial material = type.getMaterial();
+
+            if (!material.isFullCube() || !material.isMovementBlocker()) {
+                if (!lastState) {
+                    lastState = BlockType.centralTopLimit(state) != 0;
+                    continue;
+                }
+                if (freeEnd == -1) {
+                    freeEnd = level + BlockType.centralBottomLimit(state);
+                } else {
+                    double topLimit = BlockType.centralTopLimit(state);
+                    double freeStart = level + topLimit;
+                    double space = freeEnd - freeStart;
+                    if (space >= height) {
+                        setPosition(new Vector(x + 0.5, freeStart, z + 0.5));
+                        return true;
+                    }
+                    // Not enough room, reset the free position
+                    if (topLimit != 0) {
+                        freeEnd = -1;
                     }
                 }
-                return false;
+            } else {
+                lastState = true;
+                freeEnd = -1;
             }
-
-            --y;
         }
-
         return false;
     }
 

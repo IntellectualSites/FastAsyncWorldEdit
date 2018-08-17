@@ -2519,6 +2519,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int makePumpkinPatches(final Vector position, final int apothem) {
+        return makePumpkinPatches(position, apothem, 0.02);
+    }
+
+    /**
+     * Makes pumpkin patches randomly in an area around the given position.
+     *
+     * @param position the base position
+     * @param apothem  the apothem of the (square) area
+     * @return number of patches created
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int makePumpkinPatches(final Vector position, final int apothem, double density) {
         // We want to generate pumpkins
         final GardenPatchGenerator generator = new GardenPatchGenerator(EditSession.this);
         generator.setPlant(GardenPatchGenerator.getPumpkinPattern());
@@ -2526,7 +2538,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         // In a region of the given radius
         final FlatRegion region = new CuboidRegion(EditSession.this.getWorld(), // Causes clamping of Y range
                 position.add(-apothem, -5, -apothem), position.add(apothem, 10, apothem));
-        final double density = 0.02;
 
         final GroundFunction ground = new GroundFunction(new ExistingBlockMask(EditSession.this), generator);
         final LayerVisitor visitor = new LayerVisitor(region, minimumBlockY(region), maximumBlockY(region), ground);

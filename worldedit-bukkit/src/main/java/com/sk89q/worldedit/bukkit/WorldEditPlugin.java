@@ -123,6 +123,7 @@ public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
     }
 
     public WorldEditPlugin(JavaPluginLoader loader, PluginDescriptionFile desc, File dataFolder, File jarFile) {
+        super(loader, desc, dataFolder, jarFile);
         init();
     }
 

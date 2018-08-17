@@ -21,7 +21,7 @@ package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.worldedit.blocks.BlockMaterial;
 
-class SimpleBlockMaterial implements BlockMaterial {
+public class SimpleBlockMaterial implements BlockMaterial {
 
     private boolean isAir;
     private boolean fullCube;

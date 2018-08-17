@@ -26,6 +26,7 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import jdk.nashorn.internal.ir.Block;
 
 import java.util.EnumMap;
@@ -45,8 +46,70 @@ public class BlockType {
         return centralTopLimit(type.getDefaultState());
     }
 
+    public static double centralBottomLimit(BlockStateHolder block) {
+        checkNotNull(block);
+        BlockTypes type = block.getBlockType();
+        switch (type) {
+            case CREEPER_WALL_HEAD:
+            case DRAGON_WALL_HEAD:
+            case PLAYER_WALL_HEAD:
+            case ZOMBIE_WALL_HEAD: return 0.25;
+            case ACACIA_SLAB:
+            case BIRCH_SLAB:
+            case BRICK_SLAB:
+            case COBBLESTONE_SLAB:
+            case DARK_OAK_SLAB:
+            case DARK_PRISMARINE_SLAB:
+            case JUNGLE_SLAB:
+            case NETHER_BRICK_SLAB:
+            case OAK_SLAB:
+            case PETRIFIED_OAK_SLAB:
+            case PRISMARINE_BRICK_SLAB:
+            case PRISMARINE_SLAB:
+            case PURPUR_SLAB:
+            case QUARTZ_SLAB:
+            case RED_SANDSTONE_SLAB:
+            case SANDSTONE_SLAB:
+            case SPRUCE_SLAB:
+            case STONE_BRICK_SLAB:
+            case STONE_SLAB: {
+                String state = (String) block.getState(PropertyKey.TYPE);
+                if (state == null) return 0;
+                switch (state) {
+                    case "double":
+                    case "bottom":
+                        return 0;
+                    case "top":
+                        return 0.5;
+                }
+            }
+            case ACACIA_TRAPDOOR:
+            case BIRCH_TRAPDOOR:
+            case DARK_OAK_TRAPDOOR:
+            case IRON_TRAPDOOR:
+            case JUNGLE_TRAPDOOR:
+            case OAK_TRAPDOOR:
+            case SPRUCE_TRAPDOOR:
+                if (block.getState(PropertyKey.OPEN) == Boolean.TRUE) {
+                    return 1;
+                } else if ("bottom".equals(block.getState(PropertyKey.HALF))) {
+                    return 0.8125;
+                } else {
+                    return 0;
+                }
+            case ACACIA_FENCE_GATE:
+            case BIRCH_FENCE_GATE:
+            case DARK_OAK_FENCE_GATE:
+            case JUNGLE_FENCE_GATE:
+            case OAK_FENCE_GATE:
+            case SPRUCE_FENCE_GATE: return block.getState(PropertyKey.OPEN) == Boolean.TRUE ? 1 : 0;
+            default:
+                if (type.getMaterial().isMovementBlocker()) return 0;
+                return 1;
+        }
+    }
+
     /**
-     * TODO FIXME use registry
      * Returns the y offset a player falls to when falling onto the top of a block at xp+0.5/zp+0.5.
      *
      * @param block the block
@@ -54,7 +117,8 @@ public class BlockType {
      */
     public static double centralTopLimit(BlockStateHolder block) {
         checkNotNull(block);
-        switch (block.getBlockType().getTypeEnum()) {
+        BlockTypes type = block.getBlockType();
+        switch (type) {
             case BLACK_BED:
             case BLUE_BED:
             case BROWN_BED:
@@ -111,7 +175,17 @@ public class BlockType {
             case SANDSTONE_SLAB:
             case SPRUCE_SLAB:
             case STONE_BRICK_SLAB:
-            case STONE_SLAB: return 0.5;
+            case STONE_SLAB: {
+                String state = (String) block.getState(PropertyKey.TYPE);
+                if (state == null) return 0.5;
+                switch (state) {
+                    case "bottom":
+                        return 0.5;
+                    case "top":
+                    case "double":
+                        return 1;
+                }
+            }
             case LILY_PAD: return 0.015625;
             case REPEATER: return 0.125;
             case SOUL_SAND: return 0.875;
@@ -142,7 +216,12 @@ public class BlockType {
             case OAK_FENCE_GATE:
             case SPRUCE_FENCE_GATE: return block.getState(PropertyKey.OPEN) == Boolean.TRUE ? 0 : 1.5;
             default:
-                return PropertyGroup.LEVEL.get(block);
+                if (type.hasProperty(PropertyKey.LAYERS)) {
+                    return PropertyGroup.LEVEL.get(block) * 0.0625;
+                }
+                if (!type.getMaterial().isMovementBlocker()) return 0;
+                return 1;
+
         }
     }
 }

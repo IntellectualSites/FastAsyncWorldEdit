@@ -49,7 +49,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
     public BlockMaterial getMaterial(BlockType blockType) {
         Material type = BukkitAdapter.adapt(blockType);
         if (type == null) {
-            type = Material.AIR;
+            return new PassthroughBlockMaterial(null);
         }
         return materialMap.computeIfAbsent(type, m -> new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), m));
     }

@@ -69,8 +69,13 @@ public abstract class FaweParser<T> extends InputParser<T> {
             switch (c) {
                 case ',':
                 case '&':
-                    inputs.add(toParse.substring(last, i));
-                    and.add(c == '&');
+                    String result = toParse.substring(last, i);
+                    if (!result.isEmpty()) {
+                        inputs.add(result);
+                        and.add(c == '&');
+                    } else {
+                        throw new InputParseException("Invalid dangling character " + c);
+                    }
                     last = i + 1;
                     continue outer;
                 default:

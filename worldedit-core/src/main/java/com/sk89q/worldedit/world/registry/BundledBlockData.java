@@ -144,9 +144,9 @@ public class BundledBlockData {
     }
 
     public static class BlockEntry {
-        private String id;
+        public String id;
         public String localizedName;
-        private SimpleBlockMaterial material = new SimpleBlockMaterial();
+        public SimpleBlockMaterial material = new SimpleBlockMaterial();
     }
 
 }
