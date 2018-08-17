@@ -1012,6 +1012,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     @Override
     public boolean setBlock(Vector position, BlockStateHolder block) throws MaxChangedBlocksException {
+        this.changes++;
         try {
             return this.extent.setBlock(position, block);
         } catch (MaxChangedBlocksException e) {

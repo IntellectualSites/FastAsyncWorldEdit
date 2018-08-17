@@ -121,7 +121,7 @@ public class ImageBrush implements Brush {
                     if (color != 0) {
                         BlockType block = texture.getNearestBlock(color);
                         if (block != null) {
-                            editSession.setBlock(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ(), block.getDefaultState());
+                            editSession.setBlock(vector, block.getDefaultState());
                         }
                     }
                     return true;

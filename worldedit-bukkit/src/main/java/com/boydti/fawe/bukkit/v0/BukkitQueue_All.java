@@ -1,5 +1,6 @@
 package com.boydti.fawe.bukkit.v0;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 import com.boydti.fawe.config.Settings;
@@ -21,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -65,7 +67,7 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
                     @Override
                     public void onLoad(Chunk chunk) {
                         try {
-                            ChunkSnapshot snapshot = chunk.getChunkSnapshot();
+                            ChunkSnapshot snapshot = tryGetSnasphot(chunk);
                             operation.run(snapshot);
                         } catch (Throwable e) {
                             PAPER = false;
@@ -302,8 +304,25 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
         return chunk.isLoaded() ? getAndCacheChunk(chunk) : null;
     }
 
+    private ChunkSnapshot tryGetSnasphot(Chunk chunk) {
+        try {
+            return chunk.getChunkSnapshot(false, true, false);
+        } catch (IllegalStateException ignore) {
+            return null;
+        }
+    }
+
     private ChunkSnapshot getAndCacheChunk(Chunk chunk) {
-        ChunkSnapshot snapshot = chunk.getChunkSnapshot(false, true, false);
+        ChunkSnapshot snapshot = tryGetSnasphot(chunk);
+        if (snapshot == null) {
+            snapshot = tryGetSnasphot(chunk);
+            if (snapshot == null) {
+                snapshot = TaskManager.IMP.sync(() -> tryGetSnasphot(chunk));
+                if (snapshot == null) {
+                    snapshot = chunk.getChunkSnapshot(false, true, false);
+                }
+            }
+        }
         chunkCache.put(MathMan.pairInt(chunk.getX(), chunk.getZ()), snapshot);
         return snapshot;
     }
