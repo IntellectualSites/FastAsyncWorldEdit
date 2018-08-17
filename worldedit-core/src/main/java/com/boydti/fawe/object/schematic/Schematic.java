@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.schematic;
 
-import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
@@ -11,7 +10,6 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.MutableBlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -37,7 +35,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 
@@ -150,7 +147,7 @@ public class Schematic {
         if (transform != null && !transform.isIdentity()) {
             copy.setTransform(transform);
         }
-        copy.setCopyEntities(copyEntities);
+        copy.setCopyingEntities(copyEntities);
         if (sourceMask != null) {
             new MaskTraverser(sourceMask).reset(extent);
             copy.setSourceMask(sourceMask);

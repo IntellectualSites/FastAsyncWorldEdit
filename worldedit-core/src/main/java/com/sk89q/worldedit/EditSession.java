@@ -1832,7 +1832,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final Vector size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
         final Vector to = region.getMinimumPoint();
         final ForwardExtentCopy copy = new ForwardExtentCopy(EditSession.this, region, EditSession.this, to);
-        copy.setCopyEntities(copyEntities);
+        copy.setCopyingEntities(copyEntities);
         copy.setCopyBiomes(copyBiomes);
         copy.setRepetitions(count);
         copy.setTransform(new AffineTransform().translate(dir.multiply(size)));
@@ -1890,7 +1890,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final BlockReplace remove = replacement instanceof ExistingPattern ? null : new BlockReplace(EditSession.this, replacement);
 
         copy.setCopyBiomes(copyBiomes);
-        copy.setCopyEntities(copyEntities);
+        copy.setCopyingEntities(copyEntities);
         copy.setSourceFunction(remove);
         copy.setRepetitions(1);
         Mask sourceMask = getSourceMask();

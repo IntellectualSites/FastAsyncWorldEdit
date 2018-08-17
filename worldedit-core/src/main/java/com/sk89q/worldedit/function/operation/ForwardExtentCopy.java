@@ -149,11 +149,11 @@ public class ForwardExtentCopy implements Operation {
         return sourceMask;
     }
 
-    public void setCopyEntities(boolean copyEntities) {
+    public void setCopyingEntities(boolean copyEntities) {
         this.copyEntities = copyEntities;
     }
 
-    public boolean isCopyEntities() {
+    public boolean isCopyingEntities() {
         return copyEntities;
     }
 
@@ -347,7 +347,7 @@ public class ForwardExtentCopy implements Operation {
             blockCopy = new RegionVisitor(region, copy, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
         }
 
-        List<? extends Entity> entities = isCopyEntities() ? source.getEntities(region) : new ArrayList<>();
+        List<? extends Entity> entities = isCopyingEntities() ? source.getEntities(region) : new ArrayList<>();
 
         for (int i = 0; i < repetitions; i++) {
             Operations.completeBlindly(blockCopy);
