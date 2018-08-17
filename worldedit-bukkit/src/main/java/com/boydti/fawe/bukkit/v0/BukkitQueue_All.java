@@ -307,8 +307,15 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
     private ChunkSnapshot tryGetSnasphot(Chunk chunk) {
         try {
             return chunk.getChunkSnapshot(false, true, false);
-        } catch (IllegalStateException ignore) {
-            return null;
+        } catch (Throwable ignore) {
+            Throwable cause = ignore;
+            while (cause.getCause() != null) {
+                cause = cause.getCause();
+            }
+            if (cause instanceof IllegalStateException) {
+                return null;
+            }
+            throw ignore;
         }
     }
 

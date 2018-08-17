@@ -11,6 +11,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 public class ImageUtil {
@@ -174,6 +176,33 @@ public class ImageUtil {
                 throw new ParameterException("Invalid image " + arg);
             }
         } catch (IOException e) {
+            throw new ParameterException(e);
+        }
+    }
+
+    public static URI getImageURI(String arg) throws ParameterException {
+        try {
+            if (arg.startsWith("http")) {
+                if (arg.contains("imgur.com") && !arg.contains("i.imgur.com")) {
+                    arg = "https://i.imgur.com/" + arg.split("imgur.com/")[1] + ".png";
+                }
+                return new URL(arg).toURI();
+            } else if (arg.startsWith("file:/")) {
+                arg = arg.replaceFirst("file:/+", "");
+                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(), com.boydti.fawe.config.Settings.IMP.PATHS.HEIGHTMAP), arg);
+                if (file.exists()) {
+                    throw new ParameterException("File not found " + file);
+                }
+                if (file.isDirectory()) {
+                    throw new ParameterException("File is a directory " + file);
+                }
+                return file.toURI();
+            } else {
+                throw new ParameterException("Invalid image " + arg);
+            }
+        } catch (IOException e) {
+            throw new ParameterException(e);
+        } catch (URISyntaxException e) {
             throw new ParameterException(e);
         }
     }

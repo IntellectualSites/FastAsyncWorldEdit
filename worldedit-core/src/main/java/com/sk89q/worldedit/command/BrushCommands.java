@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.command.FawePrimitiveBinding;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -52,6 +53,7 @@ import com.sk89q.worldedit.util.command.InvalidUsageException;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -376,7 +378,8 @@ public class BrushCommands extends BrushProcessor {
             max = -1
     )
     @CommandPermissions("worldedit.brush.stencil")
-    public BrushSettings imageBrush(Player player, EditSession editSession, LocalSession session, @Optional("5") double radius, BufferedImage image, @Optional("1") @Range(min=Double.MIN_NORMAL) final double yscale, @Switch('a') boolean alpha, @Switch('f') boolean fadeOut, CommandContext context) throws WorldEditException, IOException {
+    public BrushSettings imageBrush(Player player, EditSession editSession, LocalSession session, @Optional("5") double radius, FawePrimitiveBinding.ImageUri imageUri, @Optional("1") @Range(min=Double.MIN_NORMAL) final double yscale, @Switch('a') boolean alpha, @Switch('f') boolean fadeOut, CommandContext context) throws WorldEditException, IOException, ParameterException {
+        BufferedImage image = imageUri.load();
         getWorldEdit().checkMaxBrushRadius(radius);
         if (yscale != 1) {
             ImageUtil.scaleAlpha(image, yscale);

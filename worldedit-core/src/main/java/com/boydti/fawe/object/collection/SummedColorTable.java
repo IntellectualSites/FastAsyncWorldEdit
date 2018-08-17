@@ -24,7 +24,7 @@ public class SummedColorTable {
         this.hasAlpha = new int[raw.length];
         this.alpha = calculateAlpha ? new long[raw.length] : null;
         this.alphaInverse = calculateAlpha ? new float[256] : null;
-        this.areaInverses = new float[Character.MAX_VALUE];
+        this.areaInverses = new float[1024 * 1024]; // 1 MB should be enough to cover scaling
         for (int i = 0; i < areaInverses.length; i++) {
             areaInverses[i] = 1f / (i + 1);
         }

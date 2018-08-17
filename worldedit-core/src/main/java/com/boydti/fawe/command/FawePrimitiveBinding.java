@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.boydti.fawe.object.extent.ResettableExtent;
+import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
@@ -32,7 +33,11 @@ import com.sk89q.worldedit.util.command.parametric.BindingMatch;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.net.URI;
+import java.net.URL;
 import javax.annotation.Nullable;
 
 public class FawePrimitiveBinding extends BindingHelper {
@@ -69,14 +74,34 @@ public class FawePrimitiveBinding extends BindingHelper {
             }
         }
     }
+
+    public class ImageUri {
+        public final URI uri;
+        public ImageUri(URI uri) {
+            this.uri = uri;
+        }
+        public BufferedImage load() throws ParameterException {
+            try {
+                String uriStr = uri.toString();
+                if (uriStr.startsWith("file:/")) {
+                    File file = new File(uri.getPath());
+                    return MainUtil.readImage(file);
+                }
+                return MainUtil.readImage(new URL(uriStr));
+            } catch (IOException e) {
+                throw new ParameterException(e);
+            }
+        }
+    }
+
     @BindingMatch(
-            type = {BufferedImage.class},
+            type = {ImageUri.class},
             behavior = BindingBehavior.CONSUMES,
             consumedCount = 1,
             provideModifiers = true
     )
-    public BufferedImage getImage(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
-        return ImageUtil.getImage(context.next());
+    public ImageUri getImage(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
+        return new ImageUri(ImageUtil.getImageURI(context.next()));
     }
 
     @BindingMatch(
