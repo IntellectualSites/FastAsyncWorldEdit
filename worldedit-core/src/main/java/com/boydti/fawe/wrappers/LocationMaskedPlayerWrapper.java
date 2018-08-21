@@ -27,16 +27,6 @@ public class LocationMaskedPlayerWrapper extends PlayerWrapper {
     }
 
     @Override
-    public Location getBlockIn() {
-        return this.getLocation();
-    }
-
-    @Override
-    public Location getBlockOn() {
-        return this.getLocation();
-    }
-
-    @Override
     public Location getLocation() {
         return position;
     }
