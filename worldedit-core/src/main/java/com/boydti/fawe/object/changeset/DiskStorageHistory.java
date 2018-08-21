@@ -398,7 +398,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                     gis.close();
                     return summary;
                 }
-                byte[] buffer = new byte[9];
+                byte[] buffer = new byte[4];
                 int i = 0;
                 int amount = (Settings.IMP.HISTORY.BUFFER_SIZE - HEADER_SIZE) / 9;
                 while (!shallow && ++i < amount) {
@@ -407,11 +407,11 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                         gis.close();
                         return summary;
                     }
-                    int x = ((byte) buffer[0] & 0xFF) + ((byte) buffer[1] << 8) + ox;
-                    int z = ((byte) buffer[2] & 0xFF) + ((byte) buffer[3] << 8) + oz;
-                    int combined1 = buffer[7] & 0xFF;
-                    int combined2 = buffer[8] & 0xFF;
-                    summary.add(x, z, ((combined2 << 4) + (combined1 >> 4)));
+                    int x = (buffer[0] & 0xFF) + (buffer[1] << 8) + ox;
+                    int z = (buffer[2] & 0xFF) + (buffer[3] << 8) + oz;
+                    int from = gis.readVarInt();
+                    int to = gis.readVarInt();
+                    summary.add(x, z, to);
                 }
                 return summary;
             } catch (IOException e) {
