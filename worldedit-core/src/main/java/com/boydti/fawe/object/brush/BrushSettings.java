@@ -16,6 +16,10 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.internal.expression.runtime.Constant;
+import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.util.command.ProcessedCallable;
@@ -25,6 +29,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BrushSettings {
     public enum SettingType {
@@ -45,7 +51,7 @@ public class BrushSettings {
     private Mask sourceMask = null;
     private ResettableExtent transform = null;
     private Pattern material;
-    private double size = 1;
+    private Expression size = new Expression(1);
     private Set<String> permissions;
     private ScrollAction scrollAction;
     private String lastWorld;
@@ -78,7 +84,12 @@ public class BrushSettings {
             bs.permissions.addAll((Collection<? extends String>) settings.get(SettingType.PERMISSIONS.name()));
         }
         if (settings.containsKey(SettingType.SIZE.name())) {
-            bs.size = (double) settings.get(SettingType.SIZE.name());
+            try {
+                bs.size = Expression.compile((String) settings.getOrDefault(SettingType.SIZE.name(), -1));
+                bs.size.optimize();
+            } catch (ExpressionException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         ParserContext parserContext = new ParserContext();
@@ -140,7 +151,7 @@ public class BrushSettings {
         transform = null;
         material = null;
         scrollAction = null;
-        size = 1;
+        size = new Expression(1);
         permissions.clear();
         constructor.clear();
         return this;
@@ -184,14 +195,19 @@ public class BrushSettings {
         return this;
     }
 
-    public BrushSettings setSize(double size) {
+    public BrushSettings setSize(Expression size) {
+        checkNotNull(size);
         this.size = size;
-        if (size == -1) {
+        if (size.getRoot() instanceof Constant && ((Constant) size.getRoot()).getValue() == -1) {
             constructor.remove(SettingType.SIZE);
         } else {
-            constructor.put(SettingType.SIZE, size);
+            constructor.put(SettingType.SIZE, size.toString());
         }
         return this;
+    }
+
+    public BrushSettings setSize(double size) {
+        return setSize(new Expression(size));
     }
 
     public BrushSettings setScrollAction(ScrollAction scrollAction) {
@@ -245,7 +261,15 @@ public class BrushSettings {
     }
 
     public double getSize() {
-        return size;
+        try {
+            return size.evaluate();
+        } catch (EvaluationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Expression getSizeExpression() {
+        return this.size;
     }
 
     public Set<String> getPermissions() {

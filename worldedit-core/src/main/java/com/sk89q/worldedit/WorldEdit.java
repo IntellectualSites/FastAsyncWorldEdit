@@ -22,6 +22,9 @@ package com.sk89q.worldedit;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.internal.expression.runtime.Constant;
+import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.entity.Player;
@@ -335,6 +338,15 @@ public class WorldEdit {
     public void checkMaxBrushRadius(double radius) throws MaxBrushRadiusException {
         if (getConfiguration().maxBrushRadius > 0 && radius > getConfiguration().maxBrushRadius) {
             throw new MaxBrushRadiusException();
+        }
+    }
+
+    public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
+        if (getConfiguration().maxBrushRadius > 0) {
+            RValue r = radius.getRoot();
+            if (r instanceof Constant && ((Constant) r).getValue() > getConfiguration().maxBrushRadius) {
+                throw new MaxBrushRadiusException();
+            }
         }
     }
 

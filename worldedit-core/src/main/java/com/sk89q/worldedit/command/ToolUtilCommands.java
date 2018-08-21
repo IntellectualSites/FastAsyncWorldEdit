@@ -26,6 +26,7 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 
@@ -116,17 +117,14 @@ public class ToolUtilCommands {
 
     @Command(
         aliases = { "size" },
-        usage = "[pattern]",
+        usage = "[size]",
         desc = "Set the brush size",
         min = 1,
         max = 1
     )
     @CommandPermissions("worldedit.brush.options.size")
-    public void size(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-
-        int radius = args.getInteger(0);
+    public void size(Player player, LocalSession session, EditSession editSession, Expression radius) throws WorldEditException {
         we.checkMaxBrushRadius(radius);
-
         session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(radius);
         player.print("Brush size set.");
     }

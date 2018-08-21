@@ -23,6 +23,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -352,6 +353,15 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     /**
+     * Set the set brush size.
+     *
+     * @param radius a radius
+     */
+    public void setSize(Expression radius) {
+        this.getContext().setSize(radius);
+    }
+
+    /**
      * Get the set brush range.
      *
      * @return the range of the brush in blocks
@@ -476,7 +486,9 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         }
         try {
             new PatternTraverser(current).reset(editSession);
-            brush.build(editSession, target, current.getMaterial(), current.getSize());
+            double size = current.getSize();
+            WorldEdit.getInstance().checkMaxBrushRadius(size);
+            brush.build(editSession, target, current.getMaterial(), size);
         } catch (WorldEditException e) {
             player.printError("Max blocks change limit reached."); // Never happens
         } finally {

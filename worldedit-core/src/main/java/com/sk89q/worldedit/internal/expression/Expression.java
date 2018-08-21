@@ -80,6 +80,11 @@ public class Expression {
         return new Expression(expression, variableNames);
     }
 
+    public Expression(double constant) {
+        variableNames = null;
+        root = new Constant(0, constant);
+    }
+
     private Expression(String expression, String... variableNames) throws ExpressionException {
         this(Lexer.tokenize(expression), variableNames);
     }
@@ -106,6 +111,9 @@ public class Expression {
     }
 
     public double evaluate(double... values) throws EvaluationException {
+        if (root instanceof Constant) {
+            return root.getValue();
+        }
         for (int i = 0; i < values.length; i++) {
             Variable var = variableArray[i];
             var.value = values[i];
@@ -122,6 +130,10 @@ public class Expression {
 
     public void optimize() throws EvaluationException {
         root = root.optimize();
+    }
+
+    public RValue getRoot() {
+        return root;
     }
 
     @Override

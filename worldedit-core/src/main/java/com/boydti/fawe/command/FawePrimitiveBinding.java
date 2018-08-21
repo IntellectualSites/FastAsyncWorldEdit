@@ -194,6 +194,29 @@ public class FawePrimitiveBinding extends BindingHelper {
         return v;
     }
 
+    @BindingMatch(type = { Expression.class },
+            behavior = BindingBehavior.CONSUMES,
+            consumedCount = 1)
+    public Expression getExpression(ArgumentStack context) throws ParameterException, ExpressionException {
+        String input = context.next();
+        try {
+            return new Expression(Double.parseDouble(input));
+        } catch (NumberFormatException e1) {
+            try {
+                Expression expression = Expression.compile(input);
+                expression.optimize();
+                return expression;
+            } catch (EvaluationException e) {
+                throw new ParameterException(String.format(
+                        "Expected '%s' to be a valid number (or a valid mathematical expression)", input));
+            } catch (ExpressionException e) {
+                throw new ParameterException(String.format(
+                        "Expected '%s' to be a number or valid math expression (error: %s)", input, e.getMessage()));
+            }
+        }
+    }
+
+
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
