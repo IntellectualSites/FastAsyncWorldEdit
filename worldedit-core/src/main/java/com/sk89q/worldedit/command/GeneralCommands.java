@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.BBC;
 import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -169,26 +170,26 @@ public class GeneralCommands {
             actor.print(type.getId() + " (" + type.getName() + ")");
         } else {
             if (query.length() <= 2) {
-                actor.printError("Enter a longer search string (len > 2).");
+                actor.printError(BBC.getPrefix() + "Enter a longer search string (len > 2).");
                 return;
             }
 
             if (!blocksOnly && !itemsOnly) {
-                actor.print("Searching for: " + query);
+                actor.print(BBC.getPrefix() + "Searching for: " + query);
             } else if (blocksOnly && itemsOnly) {
-                actor.printError("You cannot use both the 'b' and 'i' flags simultaneously.");
+                actor.printError(BBC.getPrefix() + "You cannot use both the 'b' and 'i' flags simultaneously.");
                 return;
             } else if (blocksOnly) {
-                actor.print("Searching for blocks: " + query);
+                actor.print(BBC.getPrefix() + "Searching for blocks: " + query);
             } else {
-                actor.print("Searching for items: " + query);
+                actor.print(BBC.getPrefix() + "Searching for items: " + query);
             }
 
             int found = 0;
 
             for (ItemType searchType : ItemTypes.values) {
                 if (found >= 15) {
-                    actor.print("Too many results!");
+                    actor.print(BBC.getPrefix() + "Too many results!");
                     break;
                 }
 
@@ -210,7 +211,7 @@ public class GeneralCommands {
             }
 
             if (found == 0) {
-                actor.printError("No items found.");
+                actor.printError(BBC.getPrefix() + "No items found.");
             }
         }
     }
