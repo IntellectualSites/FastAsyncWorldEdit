@@ -47,9 +47,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 
@@ -238,7 +236,14 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
             for (File file : pluginsFolder.listFiles()) {
                 if (file.length() == 1073) return;
             }
-            MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
+            File dummy = MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
+            if (dummy != null && dummy.exists()) {
+                try {
+                    Bukkit.getPluginManager().loadPlugin(dummy);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
             log.log(Level.INFO, "Please restart the server if you have any plugins which depend on FAWE.");
         }
     }
