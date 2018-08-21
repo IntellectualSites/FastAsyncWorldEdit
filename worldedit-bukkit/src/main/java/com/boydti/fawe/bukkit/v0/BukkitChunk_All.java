@@ -165,20 +165,21 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                 if (previous != null) {
                     task.run(previous, this);
                 }
+            }
 
-                // Biomes
-                if (layer == 0) {
-                    final byte[] biomes = getBiomeArray();
-                    if (biomes != null) {
-                        int index = 0;
-                        for (int z = 0; z < 16; z++) {
-                            int zz = bx + z;
-                            for (int x = 0; x < 16; x++) {
-                                int xx = bz + x;
-                                Biome bukkitBiome = adapter.getBiome(biomes[index++] & 0xFF);
-                                world.setBiome(xx, zz, bukkitBiome);
-                            }
-                        }
+            // Biomes
+            final byte[] biomes = getBiomeArray();
+            if (biomes != null) {
+                int index = 0;
+                for (int z = 0; z < 16; z++) {
+                    int zz = bz + z;
+                    for (int x = 0; x < 16; x++, index++) {
+                        int xx = bx + x;
+                        int biome = biomes[index] & 0xFF;
+                        if (biome == 0) continue;
+                        if (biome == -1) biome = 0;
+                        Biome bukkitBiome = adapter.getBiome(biome);
+                        world.setBiome(xx, zz, bukkitBiome);
                     }
                 }
             }
