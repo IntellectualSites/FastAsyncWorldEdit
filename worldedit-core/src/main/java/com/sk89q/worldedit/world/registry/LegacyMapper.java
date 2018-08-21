@@ -179,7 +179,9 @@ public class LegacyMapper {
     private BlockState getBlock(int combinedId) {
         if (combinedId < blockArr.length) {
             try {
-                return BlockState.get(blockArr[combinedId]);
+                int internalId = blockArr[combinedId];
+                if (internalId == 0) return null;
+                return BlockState.get(internalId);
             } catch (IndexOutOfBoundsException ignore) {
                 return null;
             }
@@ -191,7 +193,7 @@ public class LegacyMapper {
         if (extra != null) {
             return BlockState.get(extra);
         }
-        return BlockTypes.AIR.getDefaultState();
+        return null;
     }
 
     public void register(int id, int data, BlockStateHolder state) {
