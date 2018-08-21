@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.function.mask;
 
+import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
@@ -15,7 +16,10 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class BlockMaskBuilder {
     private static final Operator GREATER = (a, b) -> a > b;
@@ -30,41 +34,51 @@ public class BlockMaskBuilder {
         boolean test(int left, int right);
     }
 
-    public BlockMaskBuilder filterRegex(BlockType blockType, PropertyKey key, String regex) {
+    private boolean filterRegex(BlockType blockType, PropertyKey key, String regex) {
         Property property = blockType.getProperty(key);
-        if (property == null) return this;
+        if (property == null) return false;
         List values = property.getValues();
+        boolean result = false;
         for (int i = 0; i < values.size(); i++) {
             Object value = values.get(i);
-            if (!value.toString().matches(regex)) {
+            if (!value.toString().matches(regex) && has(blockType, property, i)) {
                 filter(blockType, property, i);
+                result = true;
             }
         }
-        return this;
+        return result;
     }
 
-    private void filterOperator(BlockType blockType, PropertyKey key, Operator operator, CharSequence value) {
+    private boolean filterOperator(BlockType blockType, PropertyKey key, Operator operator, CharSequence value) {
         Property property = blockType.getProperty(key);
-        if (property == null) return;
+        if (property == null) return false;
         int index = property.getIndexFor(value);
         List values = property.getValues();
+        boolean result = false;
         for (int i = 0; i < values.size(); i++) {
-            if (!operator.test(index, i)) {
+            if (!operator.test(index, i) && has(blockType, property, i)) {
                 filter(blockType, property, i);
+                result = true;
             }
         }
+        return result;
     }
 
-    private void filterRegexOrOperator(BlockType type, PropertyKey key, Operator operator, CharSequence value) {
+    private boolean filterRegexOrOperator(BlockType type, PropertyKey key, Operator operator, CharSequence value) {
+        boolean result = false;
         if (!type.hasProperty(key)) {
-            if (operator == EQUAL) remove(type);
+            if (operator == EQUAL) {
+                result = bitSets[type.getInternalId()] != null;
+                remove(type);
+            }
         } else if (value.length() == 0) {
 
         } else if ((operator == EQUAL || operator == EQUAL_OR_NULL) && !StringMan.isAlphanumericUnd(value)) {
-            filterRegex(type, key, value.toString());
+            result = filterRegex(type, key, value.toString());
         } else {
-            filterOperator(type, key, operator, value);
+            result = filterOperator(type, key, operator, value);
         }
+        return result;
     }
 
     public BlockMaskBuilder addRegex(String input) throws InputParseException {
@@ -90,8 +104,13 @@ public class BlockMaskBuilder {
                         add(myType);
                     }
                 }
+                if (blockTypeList.isEmpty()) {
+                    throw new InputParseException("No block found for " + input);
+                }
                 if (blockTypeList.size() == 1) type = blockTypeList.get(0);
             }
+            // Empty string
+            charSequence.setSubstring(0, 0);
 
             PropertyKey key = null;
             int length = input.length();
@@ -109,13 +128,40 @@ public class BlockMaskBuilder {
                     case ']':
                     case ',': {
                         charSequence.setSubstring(last, i);
-                        char firstChar = input.charAt(last + 1);
-                        if (type != null) filterRegexOrOperator(type, key, operator, charSequence);
+                        if (key == null && PropertyKey.get(charSequence) == null) suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
+                        if (operator == null) throw new SuggestInputParseException("No operator for " + input, "", () -> Arrays.asList("=", "~", "!", "<", ">", "<=", ">="));
+                        boolean filtered = false;
+                        if (type != null) {
+                            filtered = filterRegexOrOperator(type, key, operator, charSequence);
+                        }
                         else {
                             for (BlockTypes myType : blockTypeList) {
-                                filterRegexOrOperator(myType, key, operator, charSequence);
+                                filtered |= filterRegexOrOperator(myType, key, operator, charSequence);
                             }
                         }
+                        if (!filtered) {
+                            String value = charSequence.toString();
+                            final PropertyKey fKey = key;
+                            Collection<BlockTypes> types = type != null ? Collections.singleton(type) : blockTypeList;
+                            throw new SuggestInputParseException("No value for " + input, input, () -> {
+                                HashSet<String> values = new HashSet<>();
+                                types.forEach(t -> {
+                                    if (t.hasProperty(fKey)) {
+                                        Property p = t.getProperty(fKey);
+                                        for (int j = 0; j < p.getValues().size(); j++) {
+                                            if (has(t, p, j)) {
+                                                String o = p.getValues().get(j).toString();
+                                                if (o.startsWith(value)) values.add(o);
+                                            }
+                                        }
+                                    }
+                                });
+                                return new ArrayList<>(values);
+                            });
+                        }
+                        // Reset state
+                        key = null;
+                        operator = null;
                         last = i + 1;
                         break;
                     }
@@ -144,7 +190,11 @@ public class BlockMaskBuilder {
                                 operator = extra ? GREATER_EQUAL : GREATER;
                                 break;
                         }
-                        if (charSequence.length() > 0) key = PropertyKey.get(charSequence);
+                        if (charSequence.length() > 0 || key == null) {
+                            key = PropertyKey.get(charSequence);
+                            if (key == null)
+                                suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
+                        }
                         last = i + 1;
                         break;
                     }
@@ -166,7 +216,24 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    ///// end test /////
+    private boolean has(BlockType type, Property property, int index) {
+        AbstractProperty prop = (AbstractProperty) property;
+        long[] states = bitSets[type.getInternalId()];
+        if (states == null) return false;
+        List values = prop.getValues();
+        int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
+        return (states == BlockMask.ALL || FastBitSet.get(states, localI));
+    }
+
+    private void suggest(String input, String property, Collection<BlockTypes> finalTypes) throws InputParseException {
+        throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
+            Set<PropertyKey> keys = new HashSet<>();
+            finalTypes.forEach(t -> t.getProperties().stream().forEach(p -> keys.add(p.getKey())));
+            return keys.stream().map(p -> p.getId()).filter(p -> p.startsWith(property)).collect(Collectors.toList());
+        });
+    }
+
+    ///// end internal /////
 
     private long[][] bitSets;
 
@@ -230,7 +297,9 @@ public class BlockMaskBuilder {
 
     public BlockMaskBuilder filter(BlockType type) {
         for (int i = 0; i < bitSets.length; i++) {
-            if (i != type.getInternalId()) bitSets[i] = null;
+            if (i != type.getInternalId()) {
+                bitSets[i] = null;
+            }
         }
         return this;
     }

@@ -62,7 +62,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"false"},
+            aliases = {"false", "#false"},
             desc = "Always false"
     )
     public Mask falseMask(Extent extent) {
@@ -70,7 +70,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"true"},
+            aliases = {"true", "#true"},
             desc = "Always true"
     )
     public Mask trueMask(Extent extent) {
@@ -262,7 +262,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"\\", "/", "#angle"},
+            aliases = {"\\", "/", "#angle", "#\\", "#/"},
             desc = "Restrict to specific terrain angle",
             help = "Restrict to specific terrain angle\n" +
                     "The -o flag will only overlay\n" +
@@ -289,7 +289,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"(", ")", "#roc"},
+            aliases = {"(", ")", "#roc", "#(", "#)"},
             desc = "Restrict to near specific terrain slope rate of change",
             help = "Restrict to near specific terrain slope rate of change\n" +
                     "The -o flag will only overlay\n" +
@@ -315,7 +315,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"^", "#extrema"},
+            aliases = {"^", "#extrema", "#^"},
             desc = "Restrict to near specific terrain extrema",
             help = "Restrict to near specific terrain extrema\n" +
                     "The -o flag will only overlay\n" +
@@ -342,7 +342,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"{"},
+            aliases = {"{", "#{"},
             desc = "Restricts blocks to within a specific radius range of the initial block",
             usage = "<min> <max>",
             min = 2,
@@ -353,7 +353,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"|"},
+            aliases = {"|", "#|", "#side"},
             desc = "sides with a specific number of other blocks",
             usage = "<mask> <min> <max>",
             min = 3,
@@ -364,7 +364,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"~"},
+            aliases = {"~", "#~", "#adjacent"},
             desc = "Adjacent to a specific number of other blocks",
             usage = "<mask> [min=1] [max=8]",
             min = 1,
@@ -382,7 +382,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"<"},
+            aliases = {"<", "#<", "#below"},
             desc = "below a specific block",
             usage = "<mask>",
             min = 1,
@@ -394,7 +394,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {">"},
+            aliases = {">", "#>", "#above"},
             desc = "above a specific block",
             usage = "<mask>",
             min = 1,
@@ -406,7 +406,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"$", "#biome"},
+            aliases = {"$", "#biome", "#$"},
             desc = "in a specific biome",
             help = "in a specific biome. For a list of biomes use //biomelist",
             usage = "<biome>",
@@ -418,7 +418,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"%"},
+            aliases = {"%", "#%", "#percent"},
             desc = "percentage chance",
             usage = "<chance>",
             min = 1,
@@ -430,7 +430,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"="},
+            aliases = {"=", "#=", "#expression"},
             desc = "expression mask",
             usage = "<expression>",
             min = 1,
@@ -444,7 +444,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"!", "#not", "#negate"},
+            aliases = {"!", "#not", "#negate", "#!"},
             desc = "Negate another mask",
             usage = "<mask>",
             min = 1,

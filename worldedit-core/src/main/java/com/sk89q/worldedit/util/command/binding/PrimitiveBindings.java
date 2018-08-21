@@ -86,8 +86,8 @@ public final class PrimitiveBindings extends BindingHelper {
      * @throws ParameterException on error
      */
     @BindingMatch(type = { Boolean.class, boolean.class },
-                  behavior = BindingBehavior.CONSUMES,
-                  consumedCount = 1)
+            behavior = BindingBehavior.CONSUMES,
+            consumedCount = 1)
     public Boolean getBoolean(ArgumentStack context) throws ParameterException {
         return context.nextBoolean();
     }
@@ -117,7 +117,6 @@ public final class PrimitiveBindings extends BindingHelper {
                 throw new ParameterException(String.format(
                         "Expected '%s' to be a number or valid math expression (error: %s)", input, e.getMessage()));
             }
-
         }
     }
 

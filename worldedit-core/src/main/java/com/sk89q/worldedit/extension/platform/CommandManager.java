@@ -48,8 +48,10 @@ import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Deform.Mode;
 import com.sk89q.worldedit.internal.command.*;
+import com.sk89q.worldedit.scripting.CommandScriptLoader;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.command.CallableProcessor;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.util.command.InvalidUsageException;
@@ -184,13 +186,13 @@ public final class CommandManager {
      * @param clazz   The class containing all the sub command methods
      * @param aliases The aliases to give the command
      */
-    public void registerCommands(Object clazz, Object processor, String... aliases) {
+    public void registerCommands(Object clazz, CallableProcessor processor, String... aliases) {
         if (platform != null) {
             if (aliases.length == 0) {
-                builder.registerMethodsAsCommands(dispatcher, clazz);
+                builder.registerMethodsAsCommands(dispatcher, clazz, processor);
             } else {
                 DispatcherNode graph = new CommandGraph().builder(builder).commands();
-                graph = graph.registerMethods(clazz);
+                graph = graph.registerMethods(clazz, processor);
                 dispatcher.registerCommand(graph.graph().getDispatcher(), aliases);
             }
             platform.registerCommands(dispatcher);
@@ -298,6 +300,13 @@ public final class CommandManager {
 
     public void register(Platform platform) {
         log.log(Level.FINE, "Registering commands with " + platform.getClass().getCanonicalName());
+        this.platform = null;
+
+        try {
+            new CommandScriptLoader().load();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
         LocalConfiguration config = platform.getConfiguration();
         boolean logging = config.logCommands;

@@ -146,7 +146,7 @@ public class StringArgumentStack implements ArgumentStack {
      */
     @Override
     public String reset() {
-        String value = context.getString(markedIndex, index - 1);
+        String value = (index - 1 > markedIndex) ? context.getString(markedIndex, index - 1) : "";
         index = markedIndex;
         return value;
     }

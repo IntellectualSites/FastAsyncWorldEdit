@@ -71,7 +71,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Plugin for Bukkit.
  */
-public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
+public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
+{
 
     private static final Logger log = Logger.getLogger("FastAsyncWorldEdit");
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
@@ -390,18 +391,20 @@ public class WorldEditPlugin extends JavaPlugin implements TabCompleter {
         return true;
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        // Add the command to the array because the underlying command handling
-        // code of WorldEdit expects it
-        String[] split = new String[args.length + 1];
-        System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = cmd.getName();
-
-        CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
-        getWorldEdit().getEventBus().post(event);
-        return event.getSuggestions();
-    }
+//    @Deprecated Using Async tab complete (rather than main thread)
+//    @Override
+//    public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+//        // Add the command to the array because the underlying command handling
+//        // code of WorldEdit expects it
+//        String[] split = new String[args.length + 1];
+//        System.arraycopy(args, 0, split, 1, args.length);
+//        split[0] = cmd.getName();
+//
+//        CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
+//        getWorldEdit().getEventBus().post(event);
+//
+//        return event.getSuggestions();
+//    }
 
     /**
      * Gets the session for the player.

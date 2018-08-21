@@ -3,10 +3,7 @@ package com.boydti.fawe.bukkit;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
 import com.boydti.fawe.bukkit.chat.BukkitChatManager;
-import com.boydti.fawe.bukkit.listener.BrushListener;
-import com.boydti.fawe.bukkit.listener.BukkitImageListener;
-import com.boydti.fawe.bukkit.listener.CFIPacketListener;
-import com.boydti.fawe.bukkit.listener.RenderListener;
+import com.boydti.fawe.bukkit.listener.*;
 import com.boydti.fawe.bukkit.regions.*;
 import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
@@ -32,7 +29,6 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.boydti.fawe.util.metrics.BStats;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.Bukkit;
@@ -122,6 +118,13 @@ public class FaweBukkit implements IFawe, Listener {
                     new ChunkListener_8();
                 } catch (ClassNotFoundException e) {
                     new ChunkListener_9();
+                }
+
+                try {
+                    new AsyncTabCompleteListener(WorldEditPlugin.getInstance());
+                } catch (Throwable ignore)
+                {
+                    Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
                 }
             }
         });

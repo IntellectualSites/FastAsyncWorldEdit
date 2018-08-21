@@ -1,14 +1,14 @@
 package com.sk89q.worldedit.util.command.parametric;
 
 import com.boydti.fawe.command.SuggestInputParseException;
+import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.util.chat.UsageMessage;
 import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.command.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AParametricCallable implements CommandCallable {
 //    private final ParametricBuilder builder;
@@ -206,101 +206,95 @@ public abstract class AParametricCallable implements CommandCallable {
     @Override
     public List<String> getSuggestions(String arguments, CommandLocals locals) throws CommandException {
         String[] split = ("ignored" + " " + arguments).split(" ", -1);
+
+        // &a<current> &f<next>
+        // &cerrors
+
         CommandContext context = new CommandContext(split, getValueFlags(), !arguments.endsWith(" "), locals);
         ContextArgumentStack scoped = new ContextArgumentStack(context);
         SuggestionContext suggestable = context.getSuggestionContext();
 
+        List<String> suggestions = new ArrayList<>(2);
+        ParameterData parameter = null;
+        ParameterData[] parameters = getParameters();
+        String consumed = "";
 
-        // For /command -f |
-        // For /command -f flag|
-        if (suggestable.forFlag()) {
-            for (int i = 0; i < getParameters().length; i++) {
-                ParameterData parameter = getParameters()[i];
+        boolean hasSuggestion = false;
+        int maxConsumedI = 0; // The maximum argument index
+        int minConsumedI = 0; // The minimum argument that has been consumed
+        // Collect parameters
+        try {
+            for (;maxConsumedI < parameters.length; maxConsumedI++) {
+                parameter = parameters[maxConsumedI];
+                if (parameter.getBinding().getBehavior(parameter) != BindingBehavior.PROVIDES) {
+                    // Parse the user input into a method argument
+                    ArgumentStack usedArguments = getScopedContext(parameter, scoped);
 
-                if (parameter.getFlag() == suggestable.getFlag()) {
-                    String prefix = context.getFlag(parameter.getFlag());
-                    if (prefix == null) {
-                        prefix = "";
-                    }
-
-//                    System.out.println("(0) Return get binding suggestions " + parameter + " | " + prefix);
-                    return parameter.getBinding().getSuggestions(parameter, prefix);
-                }
-            }
-
-            // This should not happen
-//            System.out.println("(1) This should not happen");
-            return new ArrayList<String>();
-        }
-
-        int consumerIndex = 0;
-        ParameterData lastConsumer = null;
-        String lastConsumed = null;
-
-        for (int i = 0; i < getParameters().length; i++) {
-            ParameterData parameter = getParameters()[i];
-            if (parameter.getFlag() != null) {
-                continue; // We already handled flags
-            }
-            try {
-                scoped.mark();
-                parameter.getBinding().bind(parameter, scoped, true);
-                if (scoped.wasConsumed()) {
-                    lastConsumer = parameter;
-                    lastConsumed = context.getString(scoped.position() - 1);
-                    consumerIndex++;
-                }
-            } catch (MissingParameterException e) {
-                // For /command value1 |value2
-                // For /command |value1 value2
-                if (suggestable.forHangingValue()) {
-//                    System.out.println("(2) Return get binding dangling " + parameter + " | " + "");
-                    return parameter.getBinding().getSuggestions(parameter, "");
-                } else {
-                    // For /command value1| value2
-                    if (lastConsumer != null) {
-//                        System.out.println("(3) Return get consumed " + lastConsumer + " | " + lastConsumed);
-                        return lastConsumer.getBinding().getSuggestions(lastConsumer, lastConsumed);
-                        // For /command| value1 value2
-                        // This should never occur
-                    } else {
-//                        System.out.println("(4) Invalid suggestion context");
-                        throw new RuntimeException("Invalid suggestion context");
+                    usedArguments.mark();
+                    try {
+                        parameter.getBinding().bind(parameter, usedArguments, false);
+                        minConsumedI = maxConsumedI + 1;
+                    } catch (Throwable e) {
+                        while (e.getCause() != null && !(e instanceof ParameterException || e instanceof InvocationTargetException)) e = e.getCause();
+                        consumed = usedArguments.reset();
+                        // Not optional? Then we can't execute this command
+                        if (!parameter.isOptional()) {
+                            if (!(e instanceof MissingParameterException)) minConsumedI = maxConsumedI;
+                            throw e;
+                        }
                     }
                 }
-            } catch (ParameterException | InvocationTargetException e) {
-                SuggestInputParseException suggestion = SuggestInputParseException.get(e);
-                if (suggestion != null) {
-//                    System.out.println("(5) Has suggestion " + suggestion.getSuggestions());
-                    return suggestion.getSuggestions();
-                }
-                if (suggestable.forHangingValue()) {
-                    String name = getDescription().getParameters().get(consumerIndex).getName();
-//                    System.out.println("(6) Has dangling invalid " + name + " | " + e.getMessage());
-                    throw new InvalidUsageException("For parameter '" + name + "': " + e.getMessage(), this);
-                } else {
-//                    System.out.println("(7) HGet binding suggestions " + parameter + " | " + lastConsumed);
-                    return parameter.getBinding().getSuggestions(parameter, "");
-                }
             }
-        }
-        // For /command value1 value2 |
-        if (suggestable.forHangingValue()) {
-            // There's nothing that we can suggest because there's no more parameters
-            // to add on, and we can't change the previous parameter
-//            System.out.println("(7.1) No more parameters");
-            return new ArrayList<String>();
-        } else {
-            // For /command value1 value2|
-            if (lastConsumer != null) {
-//                System.out.println("(8) Get binding suggestions " + lastConsumer + " | " + lastConsumed);
-                return lastConsumer.getBinding().getSuggestions(lastConsumer, lastConsumed);
-                // This should never occur
+            if (minConsumedI >= maxConsumedI && (parameter == null || parameter.getType() == CommandContext.class)) checkUnconsumed(scoped);
+        } catch (MissingParameterException ignore) {
+        } catch (UnconsumedParameterException e) {
+            suggestions.add(BBC.color("&cToo many parameters! Unused parameters: " + e.getUnconsumed()));
+        } catch (ParameterException e) {
+            String name = parameter.getName();
+            suggestions.add(BBC.color("&cFor parameter '" + name + "': " + e.getMessage()));
+        } catch (InvocationTargetException e) {
+            SuggestInputParseException suggestion = SuggestInputParseException.get(e);
+            if (suggestion != null && !suggestion.getSuggestions().isEmpty()) {
+                hasSuggestion = true;
+                suggestions.addAll(suggestion.getSuggestions());
             } else {
-//                System.out.println("(9) Invalid suggestion context");
-                throw new RuntimeException("Invalid suggestion context");
+                Throwable t = e;
+                while (t.getCause() != null) t = t.getCause();
+                String msg = t.getMessage();
+                String name = parameter.getName();
+                if (msg != null && !msg.isEmpty()) suggestions.add(BBC.color("&cFor parameter '" + name + "': " + msg));
             }
-
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw new WrappedCommandException(t);
         }
+        // If there's 1 or less suggestions already, then show parameter suggestion
+        if (!hasSuggestion && suggestions.size() <= 1) {
+            StringBuilder suggestion = new StringBuilder();
+            outer:
+            for (String prefix = ""; minConsumedI < parameters.length; minConsumedI++) {
+                parameter = parameters[minConsumedI];
+                if (parameter.getBinding().getBehavior(parameter) != BindingBehavior.PROVIDES) {
+                    suggestion.append(prefix);
+                    List<String> argSuggestions = parameter.getBinding().getSuggestions(parameter, consumed);
+                    switch (argSuggestions.size()) {
+                        case 0:
+                            break;
+                        case 1:
+                            suggestion.append(argSuggestions.iterator().next());
+                            break;
+                        default:
+                            suggestion.setLength(0);
+                            suggestions.addAll(argSuggestions);
+                            break outer;
+
+                    }
+                    consumed = "";
+                    prefix = " ";
+                }
+            }
+            if (suggestion.length() != 0) suggestions.add(suggestion.toString());
+        }
+        return suggestions;
     }
 }

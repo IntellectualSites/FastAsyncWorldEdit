@@ -334,7 +334,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public Location getBlockIn() {
-        return getLocation();
+        Location loc = getLocation();
+        return new Location(loc.getExtent(), loc.toBlockVector(), loc.getDirection());
     }
 
     @Override

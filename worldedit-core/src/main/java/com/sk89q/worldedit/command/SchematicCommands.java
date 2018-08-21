@@ -382,11 +382,11 @@ public class SchematicCommands extends MethodCommands {
 
     @Command(aliases = {"move", "m"}, usage = "<directory>", desc = "Move your loaded schematic", help = "Move your currently loaded schematics", min = 1, max = 1)
     @CommandPermissions({"worldedit.schematic.move", "worldedit.schematic.move.other"})
-    public void move(final Player player, final LocalSession session, final CommandContext args) throws WorldEditException {
+    public void move(final Player player, final LocalSession session, String directory) throws WorldEditException {
         final LocalConfiguration config = this.worldEdit.getConfiguration();
         final File working = this.worldEdit.getWorkingDirectoryFile(config.saveDir);
         final File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
-        File destDir = new File(dir, args.getString(0));
+        File destDir = new File(dir, directory);
         if (!MainUtil.isInSubDirectory(working, destDir)) {
             player.printError("Directory " + destDir + " does not exist!");
             return;

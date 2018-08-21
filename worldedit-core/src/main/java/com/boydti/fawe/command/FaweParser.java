@@ -25,21 +25,21 @@ public abstract class FaweParser<T> extends InputParser<T> {
 
     public abstract Dispatcher getDispatcher();
 
-    public List<String> suggestRemaining(String input, String... expected) throws InputParseException {
-        List<String> remainder = StringMan.split(input, ':');
-        int len = remainder.size();
-        if (len != expected.length - 1) {
-            if (len <= expected.length - 1 && len != 0) {
-                if (remainder.get(len - 1).endsWith(":")) {
-                    throw new SuggestInputParseException(null, StringMan.join(expected, ":"));
-                }
-                throw new SuggestInputParseException(null, expected[0] + ":" + input + ":" + StringMan.join(Arrays.copyOfRange(expected, len + 1, 3), ":"));
-            } else {
-                throw new SuggestInputParseException(null, StringMan.join(expected, ":"));
-            }
-        }
-        return remainder;
-    }
+//    public List<String> suggestRemaining(String input, String... expected) throws InputParseException {
+//        List<String> remainder = StringMan.split(input, ':');
+//        int len = remainder.size();
+//        if (len != expected.length - 1) {
+//            if (len <= expected.length - 1 && len != 0) {
+//                if (remainder.get(len - 1).endsWith(":")) {
+//                    throw new SuggestInputParseException(null, StringMan.join(expected, ":"));
+//                }
+//                throw new SuggestInputParseException(null, expected[0] + ":" + input + ":" + StringMan.join(Arrays.copyOfRange(expected, len + 1, 3), ":"));
+//            } else {
+//                throw new SuggestInputParseException(null, StringMan.join(expected, ":"));
+//            }
+//        }
+//        return remainder;
+//    }
 
     protected static class ParseEntry {
         public boolean and;
@@ -58,7 +58,7 @@ public abstract class FaweParser<T> extends InputParser<T> {
         }
     }
 
-    public List<Map.Entry<ParseEntry, List<String>>> parse(String toParse) throws InputParseException {
+    public static List<Map.Entry<ParseEntry, List<String>>> parse(String toParse) throws InputParseException {
         List<Map.Entry<ParseEntry, List<String>>> keys = new ArrayList<>();
         List<String> inputs = new ArrayList<>();
         List<Boolean> and = new ArrayList<>();
@@ -83,8 +83,11 @@ public abstract class FaweParser<T> extends InputParser<T> {
                         int next = StringMan.findMatchingBracket(toParse, i);
                         if (next != -1) {
                             i = next;
-                            continue outer;
+                        } else {
+                            toParse += "]";
+                            i = toParse.length();
                         }
+                        continue outer;
                     }
             }
         }
@@ -93,7 +96,7 @@ public abstract class FaweParser<T> extends InputParser<T> {
             String full = inputs.get(i);
             String command = full;
             List<String> args = new ArrayList<>();
-            while (command.charAt(command.length() - 1) == ']') {
+            while (!command.isEmpty() && command.charAt(command.length() - 1) == ']') {
                 int startPos = StringMan.findMatchingBracket(command, command.length() - 1);
                 if (startPos == -1) break;
                 String arg = command.substring(startPos + 1, command.length() - 1);

@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
 
 public class StringMan {
     public static String replaceFromMap(final String string, final Map<String, String> replacements) {
@@ -31,6 +33,13 @@ public class StringMan {
             }
         }
         return sb.toString();
+    }
+
+    public static boolean containsAny(CharSequence sequence, String any) {
+        for (int i = 0; i < sequence.length(); i++) {
+            if (any.indexOf(sequence.charAt(i)) != -1) return true;
+        }
+        return false;
     }
 
     public static int findMatchingBracket(CharSequence sequence, int index) {

@@ -1,12 +1,9 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import jdk.nashorn.internal.ir.Block;
 
 public class OffsetFaweClipboard extends AbstractDelegateFaweClipboard {
     private final int ox, oy, oz;

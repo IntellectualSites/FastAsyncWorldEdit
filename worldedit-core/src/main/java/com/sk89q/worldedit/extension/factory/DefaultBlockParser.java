@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory;
 
+import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
 import com.boydti.fawe.util.MathMan;
@@ -26,6 +27,7 @@ import com.boydti.fawe.util.StringMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.MobSpawnerBlock;
@@ -50,6 +52,11 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Parses block input strings.
@@ -283,8 +290,13 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
                         break;
                     }
                 }
-                if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
-                    throw new NoMatchException("Unknown mob type '" + mobName + "'");
+                Platform capability = worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS);
+                if (!capability.isValidMobType(mobName)) {
+                    final String finalMobName = mobName.toLowerCase();
+                    throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
+                    .map(m -> m.getName().toLowerCase())
+                    .filter(s -> s.startsWith(finalMobName))
+                    .collect(Collectors.toList()));
                 }
                 return new MobSpawnerBlock(state, mobName);
             } else {

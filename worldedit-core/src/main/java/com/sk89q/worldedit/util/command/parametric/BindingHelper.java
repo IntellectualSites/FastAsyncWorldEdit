@@ -191,9 +191,11 @@ public class BindingHelper implements Binding {
             char bracket = parameter.isOptional() ? '[' : '<';
             char endBracket = StringMan.getMatchingBracket(bracket);
             StringBuilder result = new StringBuilder();
+            result.append("\u00A75");
             result.append(bracket);
+            result.append("\u00A7r");
             if (parameter.getFlag() != null) {
-                result.append('-').append(parameter.getFlag()).append(' ');
+                result.append('-').append(parameter.getFlag()).append("\u00A75 \u00A7r");
             }
             result.append(parameter.getName());
             if (parameter.getDefaultValue() != null) {
@@ -203,7 +205,9 @@ public class BindingHelper implements Binding {
             if (range != null) {
                 result.append('|').append(StringMan.prettyFormat(range.min())).append(",").append(StringMan.prettyFormat(range.max()));
             }
+            result.append("\u00A75");
             result.append(endBracket);
+            result.append("\u00A7r");
             return Collections.singletonList(result.toString());
         }
         return new ArrayList<>();

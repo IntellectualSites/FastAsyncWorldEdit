@@ -135,18 +135,18 @@ public class AnvilCommands {
         }
     }
 
-//    @Command(
-//            aliases = {"replaceall", "rea", "repall"},
-//            usage = "<folder> [from-block] <to-block>",
-//            desc = "Replace all blocks in the selection with another",
-//            help = "Replace all blocks in the selection with another\n" +
-//                    "The -d flag disabled wildcard data matching\n",
-//            flags = "df",
-//            min = 2,
-//            max = 4
-//    )
-//    @CommandPermissions("worldedit.anvil.replaceall")
-//    public void replaceAll(Player player, String folder, @Optional String from, String to, @Switch('d') boolean useData) throws WorldEditException {
+    @Command(
+            aliases = {"replaceall", "rea", "repall"},
+            usage = "<folder> [from-block] <to-block>",
+            desc = "Replace all blocks in the selection with another",
+            help = "Replace all blocks in the selection with another\n" +
+                    "The -d flag disabled wildcard data matching\n",
+            flags = "df",
+            min = 2,
+            max = 4
+    )
+    @CommandPermissions("worldedit.anvil.replaceall")
+    public void replaceAll(Player player, String folder, @Optional String from, String to, @Switch('d') boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;
 //        if (from == null) {
 //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -160,7 +160,7 @@ public class AnvilCommands {
 //        ReplaceSimpleFilter filter = new ReplaceSimpleFilter(matchFrom, matchTo);
 //        ReplaceSimpleFilter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
-//    }
+    }
 
     @Command(
             aliases = {"remapall"},
@@ -333,16 +333,16 @@ public class AnvilCommands {
         if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
-//    @Command(
-//            aliases = {"replaceallpattern", "reap", "repallpat"},
-//            usage = "<folder> [from-block] <to-pattern>",
-//            desc = "Replace all blocks in the selection with another",
-//            flags = "dm",
-//            min = 2,
-//            max = 4
-//    )
-//    @CommandPermissions("worldedit.anvil.replaceall")
-//    public void replaceAllPattern(Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
+    @Command(
+            aliases = {"replaceallpattern", "reap", "repallpat"},
+            usage = "<folder> [from-block] <to-pattern>",
+            desc = "Replace all blocks in the selection with another",
+            flags = "dm",
+            min = 2,
+            max = 4
+    )
+    @CommandPermissions("worldedit.anvil.replaceall")
+    public void replaceAllPattern(Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
@@ -363,18 +363,18 @@ public class AnvilCommands {
 //        }
 //        MCAFilterCounter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
-//    }
+    }
 //
-//    @Command(
-//            aliases = {"countall"},
-//            usage = "<folder> [hasSky] <id>",
-//            desc = "Count all blocks in a world",
-//            flags = "d",
-//            min = 2,
-//            max = 3
-//    )
-//    @CommandPermissions("worldedit.anvil.countall")
-//    public void countAll(Player player, EditSession editSession, String folder, String arg, @Switch('d') boolean useData) throws WorldEditException {
+    @Command(
+            aliases = {"countall"},
+            usage = "<folder> [hasSky] <id>",
+            desc = "Count all blocks in a world",
+            flags = "d",
+            min = 2,
+            max = 3
+    )
+    @CommandPermissions("worldedit.anvil.countall")
+    public void countAll(Player player, EditSession editSession, String folder, String arg, @Switch('d') boolean useData) throws WorldEditException {
 //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);
 //        MCAFilterCounter filter;
 //        if (useData || arg.contains(":")) { // Optimize for both cases
@@ -388,7 +388,7 @@ public class AnvilCommands {
 //        }
 //        MCAFilterCounter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) player.print(BBC.getPrefix() + BBC.SELECTION_COUNT.format(result.getTotal()));
-//    }
+    }
 
     @Command(
             aliases = {"clear", "unset"},
@@ -440,16 +440,16 @@ public class AnvilCommands {
         if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
-//    @Command(
-//            aliases = {"count"},
-//            usage = "<ids>",
-//            desc = "Count blocks in a selection",
-//            flags = "d",
-//            min = 1,
-//            max = 2
-//    )
-//    @CommandPermissions("worldedit.anvil.count")
-//    public void count(Player player, EditSession editSession, @Selection Region selection, String arg, @Switch('d') boolean useData) throws WorldEditException {
+    @Command(
+            aliases = {"count"},
+            usage = "<ids>",
+            desc = "Count blocks in a selection",
+            flags = "d",
+            min = 1,
+            max = 2
+    )
+    @CommandPermissions("worldedit.anvil.count")
+    public void count(Player player, EditSession editSession, @Selection Region selection, String arg, @Switch('d') boolean useData) throws WorldEditException {
 //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);
 //        MCAFilterCounter filter;
 //        if (useData || arg.contains(":")) { // Optimize for both cases
@@ -463,14 +463,14 @@ public class AnvilCommands {
 //        }
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) player.print(BBC.getPrefix() + BBC.SELECTION_COUNT.format(result.getTotal()));
-//    }
+    }
 //
-//    @Command(
-//            aliases = {"distr"},
-//            desc = "Replace all blocks in the selection with another"
-//    )
-//    @CommandPermissions("worldedit.anvil.distr")
-//    public void distr(Player player, EditSession editSession, @Selection Region selection, @Switch('d') boolean useData) throws WorldEditException {
+    @Command(
+            aliases = {"distr"},
+            desc = "Replace all blocks in the selection with another"
+    )
+    @CommandPermissions("worldedit.anvil.distr")
+    public void distr(Player player, EditSession editSession, @Selection Region selection, @Switch('d') boolean useData) throws WorldEditException {
 //        long total = 0;
 //        long[] count;
 //        MCAFilter<long[]> counts;
@@ -540,15 +540,15 @@ public class AnvilCommands {
 //                player.print(BBC.getPrefix() + str);
 //            }
 //        }
-//    }
+    }
 //
-//    @Command(
-//            aliases = {"replace", "r"},
-//            usage = "[from-block] <to-block>",
-//            desc = "Replace all blocks in the selection with another"
-//    )
-//    @CommandPermissions("worldedit.anvil.replace")
-//    public void replace(Player player, EditSession editSession, @Selection Region selection, @Optional String from, String to, @Switch('d') boolean useData) throws WorldEditException {
+    @Command(
+            aliases = {"replace", "r"},
+            usage = "[from-block] <to-block>",
+            desc = "Replace all blocks in the selection with another"
+    )
+    @CommandPermissions("worldedit.anvil.replace")
+    public void replace(Player player, EditSession editSession, @Selection Region selection, @Optional String from, String to, @Switch('d') boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;
 //        if (from == null) {
 //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -561,16 +561,16 @@ public class AnvilCommands {
 //        if (result != null) {
 //            player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
 //        }
-//    }
+    }
 //
-//    @Command(
-//            aliases = {"replacepattern", "preplace", "rp"},
-//            usage = "[from-mask] <to-pattern>",
-//            desc = "Replace all blocks in the selection with a pattern"
-//    )
-//    @CommandPermissions("worldedit.anvil.replace")
-//    // Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap
-//    public void replacePattern(Player player, EditSession editSession, @Selection Region selection, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
+    @Command(
+            aliases = {"replacepattern", "preplace", "rp"},
+            usage = "[from-mask] <to-pattern>",
+            desc = "Replace all blocks in the selection with a pattern"
+    )
+    @CommandPermissions("worldedit.anvil.replace")
+    // Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap
+    public void replacePattern(Player player, EditSession editSession, @Selection Region selection, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
@@ -593,7 +593,7 @@ public class AnvilCommands {
 //        if (result != null) {
 //            player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
 //        }
-//    }
+    }
 
     @Command(
             aliases = {"set"},
@@ -651,17 +651,17 @@ public class AnvilCommands {
         BBC.COMMAND_COPY.send(player, selection.getArea());
     }
 
-//    @Command(
-//            aliases = {"paste"},
-//            desc = "Paste chunks from your anvil clipboard",
-//            help =
-//                    "Paste the chunks from your anvil clipboard.\n" +
-//                            "The -c flag will align the paste to the chunks.",
-//            flags = "c"
-//
-//    )
-//    @CommandPermissions("worldedit.anvil.pastechunks")
-//    public void paste(Player player, LocalSession session, EditSession editSession, @Switch('c') boolean alignChunk) throws WorldEditException, IOException {
+    @Command(
+            aliases = {"paste"},
+            desc = "Paste chunks from your anvil clipboard",
+            help =
+                    "Paste the chunks from your anvil clipboard.\n" +
+                            "The -c flag will align the paste to the chunks.",
+            flags = "c"
+
+    )
+    @CommandPermissions("worldedit.anvil.pastechunks")
+    public void paste(Player player, LocalSession session, EditSession editSession, @Switch('c') boolean alignChunk) throws WorldEditException, IOException {
 //        FawePlayer fp = FawePlayer.wrap(player);
 //        MCAClipboard clipboard = fp.getMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD);
 //        if (clipboard == null) {
@@ -689,5 +689,5 @@ public class AnvilCommands {
 //            } catch (IOException e) { throw new RuntimeException(e); }
 //        });
 //        BBC.COMMAND_PASTE.send(player, player.getPosition().toBlockVector());
-//    }
+    }
 }

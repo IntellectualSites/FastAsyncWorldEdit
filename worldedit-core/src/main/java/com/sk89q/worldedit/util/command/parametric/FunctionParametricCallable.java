@@ -31,27 +31,8 @@ public class FunctionParametricCallable extends AParametricCallable {
         this.function = function;
         this.group = group;
 
-        List<String> paramNames = new ArrayList<>();
-        List<String> typeStrings = new ArrayList<>();
-        List<Type> types = new ArrayList<>();
+        List<Object[]> paramParsables = new ArrayList<>();
         {
-            boolean checkType = false;
-            for (String argument : arguments) {
-                if (checkType) {
-                    typeStrings.set(typeStrings.size() - 1, argument);
-                } else {
-                    checkType = false;
-                    if (argument.equals("=")) {
-                        checkType = true;
-                    } else if (argument.length() == 1 && command.flags().contains(argument)) {
-                        typeStrings.add("java.lang.Boolean");
-                        paramNames.add(argument);
-                    } else {
-                        typeStrings.add("java.lang.String");
-                        paramNames.add(argument);
-                    }
-                }
-            }
             Map<Type, Binding> bindings = builder.getBindings();
             Map<String, Type> unqualified = new HashMap<>();
             for (Map.Entry<Type, Binding> entry : bindings.entrySet()) {
@@ -60,14 +41,46 @@ public class FunctionParametricCallable extends AParametricCallable {
                 unqualified.put(typeStr, type);
                 unqualified.put(typeStr.substring(typeStr.lastIndexOf('.') + 1), type);
             }
-            for (String typeStr : typeStrings) {
-                Type type = unqualified.get(typeStr);
-                if (type == null) type = unqualified.get("java.lang.String");
-                types.add(type);
+            {
+                Object[] param = null; // name | type | optional value
+                boolean checkEq = false;
+                int checkEqI = 0;
+                for (int i = 0; i < arguments.size(); i++) {
+                    String arg = arguments.get(i);
+                    if (arg.equals("=")) {
+                        checkEqI++;
+                        checkEq = true;
+                    } else if (param == null || !checkEq) {
+                        if (param != null) paramParsables.add(param);
+                        param = new Object[3];
+                        param[0] = arg;
+                        if (arg.length() == 1 && command.flags().contains(arg)) {
+                            param[1] = Boolean.class;
+                        } else {
+                            param[1] = String.class;
+                        }
+                        param[2] = null;
+                        checkEqI = 0;
+                        checkEq = false;
+                    } else {
+                        if (checkEqI == 1) {
+                            param[1] = unqualified.getOrDefault(arg, String.class);
+                            checkEq = false;
+                        }
+                        else if (checkEqI == 2) {
+                            char c = arg.charAt(0);
+                            if (c == '\'' || c == '"') arg = arg.substring(1, arg.length() - 1);
+                            param[2] = arg;
+                            checkEqI = 0;
+                            checkEq = false;
+                        }
+                    }
+                }
+                if (param != null) paramParsables.add(param);
             }
         }
 
-        parameters = new ParameterData[paramNames.size()];
+        parameters = new ParameterData[paramParsables.size()];
         List<Parameter> userParameters = new ArrayList<Parameter>();
 
         // This helps keep tracks of @Nullables that appear in the middle of a list
@@ -75,20 +88,25 @@ public class FunctionParametricCallable extends AParametricCallable {
         int numOptional = 0;
 //
         // Go through each parameter
-        for (int i = 0; i < types.size(); i++) {
-            Type type = types.get(i);
+        for (int i = 0; i < paramParsables.size(); i++) {
+            Object[] parsable = paramParsables.get(i);
+            String paramName = (String) parsable[0];
+            Type type = (Type) parsable[1];
+            String optional = (String) parsable[2];
 
             ParameterData parameter = new ParameterData();
             parameter.setType(type);
             parameter.setModifiers(new Annotation[0]);
 
-            String paramName = paramNames.get(i);
             boolean flag = paramName.length() == 1 && command.flags().contains(paramName);
             if (flag) {
                 parameter.setFlag(paramName.charAt(0), type != boolean.class && type != Boolean.class);
             }
 
-            // TODO switch / Optional  / Search for annotations /
+            if (optional != null) {
+                parameter.setOptional(true);
+                if (!optional.equalsIgnoreCase("null")) parameter.setDefaultValue(new String[]{optional});
+            }
 
             parameter.setName(paramName);
 
@@ -256,7 +274,6 @@ public class FunctionParametricCallable extends AParametricCallable {
 
             // postInvoke handlers
             {
-
             }
             return result;
         } catch (MissingParameterException e) {

@@ -1548,7 +1548,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         checkNotNull(region);
         checkNotNull(block);
         if (canBypassAll(region, false, true) && !block.hasNbtData()) {
-            return changes = queue.setBlocks((CuboidRegion) region, block.getInternalPropertiesId());
+            return changes = queue.setBlocks((CuboidRegion) region, block.getInternalId());
         }
         try {
             if (hasExtraExtents()) {
@@ -1584,8 +1584,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (pattern instanceof BlockPattern) {
             return setBlocks(region, ((BlockPattern) pattern).getBlock());
         }
-        if (pattern instanceof BaseBlock) {
-            return setBlocks(region, (BaseBlock) pattern);
+        if (pattern instanceof BlockStateHolder) {
+            return setBlocks(region, (BlockStateHolder) pattern);
         }
         final BlockReplace replace = new BlockReplace(EditSession.this, pattern);
         final RegionVisitor visitor = new RegionVisitor(region, replace, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);

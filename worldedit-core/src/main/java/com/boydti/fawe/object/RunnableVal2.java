@@ -1,6 +1,8 @@
 package com.boydti.fawe.object;
 
-public abstract class RunnableVal2<T, U> implements Runnable {
+import java.util.function.BiConsumer;
+
+public abstract class RunnableVal2<T, U> implements Runnable, BiConsumer<T, U> {
     public T value1;
     public U value2;
 
@@ -22,5 +24,10 @@ public abstract class RunnableVal2<T, U> implements Runnable {
     public RunnableVal2<T, U> runAndGet(T value1, U value2) {
         run(value1, value2);
         return this;
+    }
+
+    @Override
+    public void accept(T t, U u) {
+        run(t, u);
     }
 }

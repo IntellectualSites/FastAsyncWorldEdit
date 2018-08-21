@@ -30,7 +30,8 @@ public class Commands {
         }
     }
 
-    public static Command fromArgs(String[] aliases, String usage, String desc, int min, int max, String flags, String help) {
+    public static Command fromArgs(String[] aliases, String usage, String desc, int min, Integer max, String flags, String help) {
+        int finalMax = max == null ? -1 : max;
         return new Command() {
             @Override
             public Class<? extends Annotation> annotationType() {
@@ -54,7 +55,7 @@ public class Commands {
             }
             @Override
             public int max() {
-                return max;
+                return finalMax;
             }
             @Override
             public String flags() {

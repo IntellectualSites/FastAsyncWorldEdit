@@ -19,19 +19,12 @@
 
 package com.sk89q.worldedit.blocks;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.PlayerDirection;
 import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import jdk.nashorn.internal.ir.Block;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Block types.

@@ -28,7 +28,9 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.thoughtworks.paranamer;
+package com.sk89q.worldedit.util.command.parametric;
+
+import com.thoughtworks.paranamer.CachingParanamer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

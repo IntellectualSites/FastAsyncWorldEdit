@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import java.util.zip.*;
 import javax.imageio.ImageIO;
@@ -151,13 +152,13 @@ public class MainUtil {
         new Exception().printStackTrace();
     }
 
-    public static void traverse(Path path, final RunnableVal2<Path, BasicFileAttributes> onEach) {
+    public static void traverse(Path path, final BiConsumer<Path, BasicFileAttributes> onEach) {
         try {
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult
                 visitFile(Path file, BasicFileAttributes attrs) {
-                    onEach.run(file, attrs);
+                    onEach.accept(file, attrs);
                     return FileVisitResult.CONTINUE;
                 }
 

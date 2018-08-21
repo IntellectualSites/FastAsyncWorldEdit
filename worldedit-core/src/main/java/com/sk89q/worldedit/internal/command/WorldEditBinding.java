@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.internal.command;
 
 import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -355,18 +356,7 @@ public class WorldEditBinding extends BindingHelper {
     public BaseBiome getBiomeType(ArgumentStack context) throws ParameterException, WorldEditException {
         String input = context.next();
         if (input != null) {
-            Actor actor = context.getContext().getLocals().get(Actor.class);
-            World world;
-            if (actor instanceof Entity) {
-                Extent extent = ((Entity) actor).getExtent();
-                if (extent instanceof World) {
-                    world = (World) extent;
-                } else {
-                    throw new ParameterException("A world is required.");
-                }
-            } else {
-                throw new ParameterException("An entity is required.");
-            }
+            if (MathMan.isInteger(input)) return new BaseBiome(Integer.parseInt(input));
 
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();

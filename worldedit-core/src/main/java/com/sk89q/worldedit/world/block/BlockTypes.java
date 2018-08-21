@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.worldedit.Vector;
@@ -41,6 +42,7 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Stores a list of common Block String IDs.
@@ -946,6 +948,7 @@ public enum BlockTypes implements BlockType {
     private static final Map<String, BlockTypes> $REGISTRY = new HashMap<>();
     private static int $LENGTH;
     public static final BlockTypes[] values;
+    private static final Set<String> $NAMESPACES = new LinkedHashSet<String>();
 
     static {
         try {
@@ -979,8 +982,9 @@ public enum BlockTypes implements BlockType {
         }
     }
 
-    public static BlockTypes parse(String input) throws InputParseException {
-        input = input.toLowerCase();
+    public static BlockTypes parse(final String type) throws InputParseException {
+        final String inputLower = type.toLowerCase();
+        String input = inputLower;
 
         if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
         BlockTypes result = $REGISTRY.get(input);
@@ -991,7 +995,12 @@ public enum BlockTypes implements BlockType {
             if (block != null) return block.getBlockType();
         } catch (NumberFormatException e) {
         } catch (IndexOutOfBoundsException e) {}
-        throw new InputParseException("Unkown block for " + input);
+
+        throw new SuggestInputParseException("Unkown block for " + inputLower, inputLower, () -> Stream.of(BlockTypes.values)
+            .filter(b -> b.getId().contains(inputLower))
+            .map(e1 -> e1.getId())
+            .collect(Collectors.toList())
+        );
     }
 
     private static BlockTypes register(final String id) {
@@ -1014,7 +1023,13 @@ public enum BlockTypes implements BlockType {
         existing.init(id, internalId);
         if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
         $REGISTRY.put(typeName, existing);
+        String nameSpace = typeName.substring(0, typeName.indexOf(':'));
+        $NAMESPACES.add(nameSpace);
         return existing;
+    }
+
+    public static Set<String> getNameSpaces() {
+        return $NAMESPACES;
     }
 
     public static final @Nullable BlockTypes get(final String id) {

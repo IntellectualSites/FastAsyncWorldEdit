@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.extent.transform;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.ByteTag;
@@ -10,29 +9,23 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.helper.MCDirections;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
-import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.registry.BlockRegistry;
-import jdk.nashorn.internal.ir.Block;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transforms blocks themselves (but not their position) according to a

@@ -2,87 +2,73 @@ package com.boydti.fawe.command;
 
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SuggestInputParseException extends InputParseException {
 
-    private final String message;
+    private final InputParseException cause;
+    private final Supplier<List<String>> getSuggestions;
     private String prefix;
-    private ArrayList<String> suggestions = new ArrayList<>();
 
-    public SuggestInputParseException(String input, Collection<String> inputs) {
-        super("");
-        this.message = "Suggested input: " + StringMan.join(suggestions = getSuggestions(input, inputs), ", ");
-        this.prefix = "";
+    public SuggestInputParseException(String msg, String prefix, Supplier<List<String>> getSuggestions) {
+        this(new InputParseException(msg), prefix, getSuggestions);
     }
 
-    public SuggestInputParseException(String input, String... inputs) {
-        super("");
-        this.message = "Suggested input: " + StringMan.join(suggestions = getSuggestions(input, inputs), ", ");
-        this.prefix = "";
+    public static SuggestInputParseException of(Throwable other, String prefix, Supplier<List<String>> getSuggestions) {
+        if (other instanceof InputParseException) return of((InputParseException) other, prefix, getSuggestions);
+        return of(new InputParseException(other.getMessage()), prefix, getSuggestions);
+    }
+
+    public static SuggestInputParseException of(InputParseException other, String prefix, Supplier<List<String>> getSuggestions) {
+        if (other instanceof SuggestInputParseException) return (SuggestInputParseException) other;
+        return new SuggestInputParseException(other, prefix, getSuggestions);
+    }
+
+    public SuggestInputParseException(InputParseException other, String prefix, Supplier<List<String>> getSuggestions) {
+        super(other.getMessage());
+        checkNotNull(getSuggestions);
+        checkNotNull(other);
+        this.cause = other;
+        this.getSuggestions = getSuggestions;
+        this.prefix = prefix;
+    }
+
+    public static SuggestInputParseException get(InvocationTargetException e) {
+        Throwable t = e;
+        while (t.getCause() != null) {
+            t = t.getCause();
+            if (t instanceof SuggestInputParseException) return (SuggestInputParseException) t;
+        }
+        return null;
+    }
+
+    @Override
+    public synchronized Throwable getCause() {
+        return cause.getCause();
     }
 
     @Override
     public String getMessage() {
-        return message;
+        return cause.getMessage();
     }
 
+
     public List<String> getSuggestions() {
-        return MainUtil.prepend(prefix, suggestions);
+        return getSuggestions.get();
     }
 
     public SuggestInputParseException prepend(String input) {
         this.prefix = input + prefix;
         return this;
-    }
-
-    public static SuggestInputParseException get(Throwable e) {
-        if (e instanceof SuggestInputParseException) {
-            return (SuggestInputParseException) e;
-        }
-        Throwable cause = e.getCause();
-        if (cause == null) {
-            return null;
-        }
-        return get(cause);
-    }
-
-    private static ArrayList<String> getSuggestions(String input, Collection<String> inputs) {
-        ArrayList<String> suggestions = new ArrayList<>();
-        if (input != null) {
-            String tmp = input.toLowerCase();
-            for (String s : inputs) {
-                if (s.startsWith(tmp)) {
-                    suggestions.add(s);
-                }
-
-            }
-        }
-        if (suggestions.isEmpty()) {
-            suggestions.addAll(inputs);
-        }
-        return suggestions;
-    }
-
-    private static ArrayList<String> getSuggestions(String input, String... inputs) {
-        ArrayList<String> suggestions = new ArrayList<>();
-        if (input != null) {
-            String tmp = input.toLowerCase();
-            for (String s : inputs) {
-                if (s.startsWith(tmp)) {
-                    suggestions.add(s);
-                }
-
-            }
-        }
-        if (suggestions.isEmpty()) {
-            for (String s : inputs) {
-                suggestions.add(s);
-            }
-        }
-        return suggestions;
     }
 }

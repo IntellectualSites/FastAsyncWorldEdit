@@ -72,6 +72,7 @@ public class SimpleDispatcher implements Dispatcher {
                     continue;
                 } else {
                     Fawe.debug("Replacing commands is currently undefined behavior: " + StringMan.getString(alias));
+                    commands.put(lower, mapping);
                     continue;
                 }
             }

@@ -68,6 +68,8 @@ subprojects {
     version = rootProject.version
     group = 'com.boydti.fawe'
 
+    compileJava { options.compilerArgs += ["-parameters"] }
+
     repositories {
         mavenCentral()
         maven { url "http://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/" }

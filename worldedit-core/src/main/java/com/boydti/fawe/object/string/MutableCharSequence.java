@@ -56,6 +56,13 @@ public class MutableCharSequence implements CharSequence {
         return str.substring(start, start + length);
     }
 
+    public int indexOf(char c) {
+        for (int i = 0; i < length; i++) {
+            if (charAt(i) == c) return i;
+        }
+        return -1;
+    }
+
     @Override
     public boolean equals(Object obj) {
         CharSequence anotherString = (CharSequence) obj;

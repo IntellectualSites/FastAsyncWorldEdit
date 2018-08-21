@@ -21,6 +21,7 @@ package com.sk89q.worldedit.registry.state;
 
 import com.sk89q.worldedit.util.Direction;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -36,6 +37,7 @@ public class DirectionalProperty extends AbstractProperty<Direction> {
     public DirectionalProperty(final String name, final List<Direction> values, int bitOffset) {
         super(name, values, bitOffset);
         this.map = new int[Direction.values().length];
+        Arrays.fill(this.map, -1);
         for (int i = 0; i < values.size(); i++) {
             this.map[values.get(i).ordinal()] = i;
         }
@@ -53,7 +55,9 @@ public class DirectionalProperty extends AbstractProperty<Direction> {
 
     @Override
     public int getIndexFor(CharSequence string) throws IllegalArgumentException {
-        return getIndex(Direction.get(string));
+        Direction dir = Direction.get(string);
+        if (dir == null) return -1;
+        return getIndex(dir);
     }
 
     @Nullable

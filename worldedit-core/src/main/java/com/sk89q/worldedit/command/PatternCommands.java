@@ -418,7 +418,7 @@ public class PatternCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"="},
+            aliases = {"=", "#=", "#expression"},
             desc = "Expression pattern: http://wiki.sk89q.com/wiki/WorldEdit/Expression_syntax",
             usage = "<expression>",
             min = 1,

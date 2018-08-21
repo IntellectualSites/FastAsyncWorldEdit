@@ -76,8 +76,6 @@ public class Settings extends Config {
         @Comment({
                 "Put any minecraft or mod jars for FAWE to be aware of block textures",
         })
-        public String PATTERNS = "patterns";
-        public String MASKS = "masks";
         public String TEXTURES = "textures";
         public String HEIGHTMAP = "heightmap";
         public String HISTORY = "history";
@@ -88,6 +86,7 @@ public class Settings extends Config {
         public String CLIPBOARD = "clipboard";
         @Comment("Each player has their own sub directory for schematics")
         public boolean PER_PLAYER_SCHEMATICS = true;
+        public String COMMANDS = "commands";
     }
 
     @Comment("Region restriction settings")

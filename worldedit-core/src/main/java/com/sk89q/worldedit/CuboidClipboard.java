@@ -25,12 +25,14 @@ import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.command.ClipboardCommands;
+import com.sk89q.worldedit.command.FlattenedClipboardTransform;
 import com.sk89q.worldedit.command.SchematicCommands;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -84,7 +86,7 @@ public class CuboidClipboard {
         }
     }
 
-    private final BlockArrayClipboard clipboard;
+    private BlockArrayClipboard clipboard;
     private AffineTransform transform;
     public Vector size;
 
@@ -441,7 +443,14 @@ public class CuboidClipboard {
     @Deprecated
     public void saveSchematic(File path) throws IOException, DataException {
         checkNotNull(path);
-        SchematicFormat.MCEDIT.save(this, path);
+        if (transform != null && !transform.isIdentity()) {
+            final FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
+            BlockArrayClipboard target = new BlockArrayClipboard(result.getTransformedRegion(), UUID.randomUUID());
+            target.setOrigin(clipboard.getOrigin());
+            Operations.completeLegacy(result.copyTo(target));
+            this.clipboard = target;
+        }
+        new Schematic(clipboard).save(path, ClipboardFormat.SPONGE_SCHEMATIC);
     }
 
     /**

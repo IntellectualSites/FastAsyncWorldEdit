@@ -36,10 +36,8 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.extension.platform.*;
+
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
@@ -113,6 +111,7 @@ public class WorldEditCommands {
         we.getPlatformManager().queryCapability(Capability.CONFIGURATION).reload();
         we.getEventBus().post(new ConfigurationLoadEvent(we.getPlatformManager().queryCapability(Capability.CONFIGURATION).getConfiguration()));
         Fawe.get().setupConfigs();
+        CommandManager.getInstance().register(we.getPlatformManager().queryCapability(Capability.USER_COMMANDS));
         actor.print(BBC.getPrefix() + "Reloaded WorldEdit " + we.getVersion() + " and FAWE (" + Fawe.get().getVersion() + ")");
     }
 

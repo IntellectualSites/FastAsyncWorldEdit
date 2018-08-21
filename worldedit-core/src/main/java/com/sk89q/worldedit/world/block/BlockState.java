@@ -20,25 +20,27 @@
 package com.sk89q.worldedit.world.block;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.TileEntityBlock;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
-import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 
 import javax.annotation.Nullable;
 import java.util.*;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An immutable class that represents the state a block can be in.
@@ -60,7 +62,7 @@ public class BlockState implements BlockStateHolder<BlockState> {
      * @return BlockState
      */
     @Deprecated
-    public static BlockState get(int combinedId) {
+    public static BlockState get(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
     }
 
@@ -69,7 +71,7 @@ public class BlockState implements BlockStateHolder<BlockState> {
      * @param state String e.g. minecraft:water[level=4]
      * @return BlockState
      */
-    public static BlockState get(String state) {
+    public static BlockState get(String state) throws InputParseException {
         return get(null, state);
     }
 
@@ -80,7 +82,7 @@ public class BlockState implements BlockStateHolder<BlockState> {
      * @param state String e.g. minecraft:water[level=4]
      * @return BlockState
      */
-    public static BlockState get(@Nullable BlockType type, String state) {
+    public static BlockState get(@Nullable BlockType type, String state) throws InputParseException {
         return get(type, state, 0);
     }
 
@@ -91,7 +93,7 @@ public class BlockState implements BlockStateHolder<BlockState> {
      * @param state String e.g. minecraft:water[level=4]
      * @return BlockState
      */
-    public static BlockState get(@Nullable BlockType type, String state, int propId) {
+    public static BlockState get(@Nullable BlockType type, String state, int propId) throws InputParseException {
         int propStrStart = state.indexOf('[');
         if (type == null) {
             CharSequence key;
@@ -104,6 +106,14 @@ public class BlockState implements BlockStateHolder<BlockState> {
                 key = charSequence;
             }
             type = BlockTypes.get(key);
+            if (type == null) {
+                String input = key.toString();
+                throw new SuggestInputParseException("Unkown block for " + input, input, () -> Stream.of(BlockTypes.values)
+                        .filter(b -> b.getId().contains(input))
+                        .map(e1 -> e1.getId())
+                        .collect(Collectors.toList())
+                );
+            }
         }
         if (propStrStart == -1) {
             return type.getDefaultState();
@@ -111,6 +121,7 @@ public class BlockState implements BlockStateHolder<BlockState> {
 
         List<? extends Property> propList = type.getProperties();
 
+        if (state.charAt(state.length() - 1) != ']') state = state + "]";
         MutableCharSequence charSequence = MutableCharSequence.getTemporal();
         charSequence.setString(state);
 
@@ -133,13 +144,36 @@ public class BlockState implements BlockStateHolder<BlockState> {
             switch (c) {
                 case ']':
                 case ',': {
+                    charSequence.setSubstring(last, i);
                     if (property != null) {
-                        charSequence.setSubstring(last, i);
                         int index = property.getIndexFor(charSequence);
+                        if (index == -1) {
+                            String input = charSequence.toString();
+                            List<Object> values = property.getValues();
+                            throw new SuggestInputParseException("No value: " + input + " for " + type, input, () ->
+                                values.stream()
+                                .map(v -> v.toString())
+                                .filter(v -> v.startsWith(input))
+                                .collect(Collectors.toList()));
+                        }
                         stateId = property.modifyIndex(stateId, index);
                     } else {
-                        Fawe.debug("Invalid property " + type + " | " + charSequence);
+                        // suggest
+                        PropertyKey key = PropertyKey.get(charSequence);
+                        if (key == null || !type.hasProperty(key)) {
+                            // Suggest property
+                            String input = charSequence.toString();
+                            BlockType finalType = type;
+                            throw new SuggestInputParseException("Invalid property " + type + " | " + input, input, () ->
+                                finalType.getProperties().stream()
+                                .map(p -> p.getName())
+                                .filter(p -> p.startsWith(input))
+                                .collect(Collectors.toList()));
+                        } else {
+                            throw new SuggestInputParseException("No operator for " + state, "", () -> Arrays.asList("="));
+                        }
                     }
+                    property = null;
                     last = i + 1;
                     break;
                 }

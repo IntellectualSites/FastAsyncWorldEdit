@@ -504,7 +504,7 @@ public class TextureUtil implements TextureHolder{
     }
 
     public BiomeColor getNearestBiome(int color) {
-        int grass = blockColors[2 << 4];
+        int grass = blockColors[BlockTypes.GRASS_BLOCK.getInternalId()];
         if (grass == 0) {
             return null;
         }

@@ -51,7 +51,8 @@ public class EnumProperty extends AbstractProperty<String> {
 
     @Override
     public int getIndexFor(CharSequence string) throws IllegalArgumentException {
-        return offsets.get(string);
+        Integer value = offsets.get(string);
+        return value == null ? -1 : value;
     }
 
     @Nullable

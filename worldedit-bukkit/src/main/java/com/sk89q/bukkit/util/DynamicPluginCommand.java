@@ -78,14 +78,14 @@ public class DynamicPluginCommand extends org.bukkit.command.Command implements 
         return owningPlugin;
     }
 
-    @Override
-    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
-        if (registeredWith instanceof CommandInspector) {
-            return ((TabCompleter) owner).onTabComplete(sender, this, alias, args);
-        } else {
-            return super.tabComplete(sender, alias, args);
-        }
-    }
+//    @Override
+//    public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
+//        if (registeredWith instanceof CommandInspector) {
+//            return ((TabCompleter) owner).onTabComplete(sender, this, alias, args);
+//        } else {
+//            return super.tabComplete(sender, alias, args);
+//        }
+//    }
 
     @SuppressWarnings("unchecked")
     @Override
