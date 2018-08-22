@@ -13,6 +13,8 @@ import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.command.CallableProcessor;
+import com.sk89q.worldedit.util.command.CommandCallable;
+import com.sk89q.worldedit.util.command.parametric.AParametricCallable;
 
 public class BrushProcessor extends MethodCommands implements CallableProcessor<BrushSettings> {
     private final WorldEdit worldEdit;
@@ -55,7 +57,14 @@ public class BrushProcessor extends MethodCommands implements CallableProcessor<
             }
         }
 
-        bs.addPermissions(getPermissions());
+        CommandCallable callable = locals.get(CommandCallable.class);
+        String[] perms;
+        if (callable != null && callable instanceof AParametricCallable) {
+            perms = ((AParametricCallable) callable).getPermissions();
+        } else {
+            perms = getPermissions();
+        }
+        bs.addPermissions(perms);
 
         if (locals != null) {
             String args = (String) locals.get("arguments");

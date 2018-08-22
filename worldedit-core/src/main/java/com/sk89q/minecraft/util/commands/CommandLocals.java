@@ -47,4 +47,8 @@ public class CommandLocals {
         return locals.put(key, value);
     }
 
+    public Object putIfAbsent(Object key, Object value) {
+        return locals.putIfAbsent(key, value);
+    }
+
 }

@@ -211,6 +211,7 @@ public class FunctionParametricCallable extends AParametricCallable {
         if (!testPermission(locals)) {
             throw new CommandPermissionsException();
         }
+        locals.putIfAbsent(CommandCallable.class, this);
 
         String calledCommand = parentCommands.length > 0 ? parentCommands[parentCommands.length - 1] : "_";
         String[] split = (calledCommand + " " + stringArguments).split(" ", -1);
