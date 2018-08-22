@@ -467,6 +467,7 @@ public class FaweBukkit implements IFawe, Listener {
         if ((worldguardPlugin != null) && worldguardPlugin.isEnabled()) {
             try {
                 managers.add(new Worldguard(worldguardPlugin, this));
+                managers.add(new WorldguardFlag(worldguardPlugin, this));
                 Fawe.debug("Plugin 'WorldGuard' found. Using it now.");
             } catch (final Throwable e) {
                 MainUtil.handleError(e);
