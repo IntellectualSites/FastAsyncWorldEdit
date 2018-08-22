@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
@@ -237,7 +238,7 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
     @Override
     public int getCombinedId4Data(ChunkSnapshot chunk, int x, int y, int z) {
         if (chunk.isSectionEmpty(y >> 4)) {
-            return 0;
+            return BlockTypes.AIR.getInternalId();
         }
         BlockData blockData = chunk.getBlockData(x & 15, y, z & 15);
         return BukkitAdapter.adapt(blockData).getInternalId();

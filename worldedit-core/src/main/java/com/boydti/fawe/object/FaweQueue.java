@@ -455,7 +455,8 @@ public interface FaweQueue extends HasFaweQueue, Extent {
             session.debug(BBC.WORLDEDIT_FAILED_LOAD_CHUNK, x >> 4, z >> 4);
             return def;
         } catch (Throwable e) {
-            return 0;
+            e.printStackTrace();
+            return BlockTypes.AIR.getInternalId();
         }
     }
 

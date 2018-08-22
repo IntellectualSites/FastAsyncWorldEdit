@@ -52,12 +52,12 @@ public class AsyncChunk implements Chunk {
     }
 
     @Override
-    public World getWorld() {
+    public AsyncWorld getWorld() {
         return world;
     }
 
     @Override
-    public Block getBlock(int x, int y, int z) {
+    public AsyncBlock getBlock(int x, int y, int z) {
         return new AsyncBlock(world, queue, (this.x << 4) + x, y, (this.z << 4) + z);
     }
 

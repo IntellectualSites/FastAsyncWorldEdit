@@ -1,0 +1,24 @@
+repositories {
+    maven {url "http://vault.voxelmodpack.com/content/repositories/central/"}
+}
+
+dependencies {
+    compile project(':worldedit-bukkit')
+    compile 'com.martiansoftware:jsap:2.1'
+}
+
+processResources {
+    from('src/main/resources') {
+        include 'plugin.yml'
+        expand(
+                name: project.parent.name,
+                version: project.parent.version
+        )
+    }
+}
+
+jar.destinationDir = file '../target'
+jar.archiveName = "FastAsyncVoxelSniper-${project.name}-${parent.version}.jar"
+jar.doLast { task ->
+    ant.checksum file: task.archivePath
+}

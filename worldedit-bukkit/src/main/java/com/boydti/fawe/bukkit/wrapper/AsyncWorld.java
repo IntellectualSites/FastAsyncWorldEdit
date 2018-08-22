@@ -258,12 +258,12 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     }
 
     @Override
-    public Block getBlockAt(final int x, final int y, final int z) {
+    public AsyncBlock getBlockAt(final int x, final int y, final int z) {
         return new AsyncBlock(this, queue, x, y, z);
     }
 
     @Override
-    public Block getBlockAt(Location loc) {
+    public AsyncBlock getBlockAt(Location loc) {
         return getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 
@@ -283,28 +283,28 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     }
 
     @Override
-    public Block getHighestBlockAt(int x, int z) {
+    public AsyncBlock getHighestBlockAt(int x, int z) {
         int y = getHighestBlockYAt(x, z);
         return getBlockAt(x, y, z);
     }
 
     @Override
-    public Block getHighestBlockAt(Location loc) {
+    public AsyncBlock getHighestBlockAt(Location loc) {
         return getHighestBlockAt(loc.getBlockX(), loc.getBlockZ());
     }
 
     @Override
-    public Chunk getChunkAt(int x, int z) {
+    public AsyncChunk getChunkAt(int x, int z) {
         return new AsyncChunk(this, queue, x, z);
     }
 
     @Override
-    public Chunk getChunkAt(Location location) {
+    public AsyncChunk getChunkAt(Location location) {
         return getChunkAt(location.getBlockX(), location.getBlockZ());
     }
 
     @Override
-    public Chunk getChunkAt(Block block) {
+    public AsyncChunk getChunkAt(Block block) {
         return getChunkAt(block.getX(), block.getZ());
     }
 

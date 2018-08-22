@@ -48,18 +48,30 @@ public class AsyncBlock implements Block {
         return (byte) (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()) & 0xF);
     }
 
+    public int getPropertyId() {
+        return (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()) >> BlockTypes.BIT_OFFSET);
+    }
+
+    public int getCombinedId() {
+        return queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
+    }
+
+    public int getTypeId() {
+        return (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()) & BlockTypes.BIT_MASK);
+    }
+
     @Override
-    public Block getRelative(int modX, int modY, int modZ) {
+    public AsyncBlock getRelative(int modX, int modY, int modZ) {
         return new AsyncBlock(world, queue, x + modX, y + modY, z + modZ);
     }
 
     @Override
-    public Block getRelative(BlockFace face) {
+    public AsyncBlock getRelative(BlockFace face) {
         return this.getRelative(face.getModX(), face.getModY(), face.getModZ());
     }
 
     @Override
-    public Block getRelative(BlockFace face, int distance) {
+    public AsyncBlock getRelative(BlockFace face, int distance) {
         return this.getRelative(face.getModX() * distance, face.getModY() * distance, face.getModZ() * distance);
     }
 
@@ -71,6 +83,31 @@ public class AsyncBlock implements Block {
     @Override
     public BlockData getBlockData() {
         return BukkitAdapter.getBlockData(queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()));
+    }
+
+    @Deprecated
+    public boolean setTypeIdAndPropertyId(int id, int propertyId, boolean physics) {
+        return setTypeIdAndPropertyId(id, propertyId);
+    }
+
+    @Deprecated
+    public boolean setCombinedId(int combinedId) {
+        return queue.setBlock(x, y, z, combinedId);
+    }
+
+    @Deprecated
+    public boolean setTypeIdAndPropertyId(int id, int propertyId) {
+        return setCombinedId(id + (propertyId << BlockTypes.BIT_OFFSET));
+    }
+
+    @Deprecated
+    public boolean setTypeId(int typeId) {
+        return queue.setBlock(x, y, z, BlockTypes.get(typeId).getDefaultState());
+    }
+
+    @Deprecated
+    public boolean setPropertyId(int propertyId) {
+        return setTypeIdAndPropertyId(getTypeId(), propertyId);
     }
 
     @Override
@@ -89,7 +126,7 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public World getWorld() {
+    public AsyncWorld getWorld() {
         return world;
     }
 
@@ -125,7 +162,7 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public Chunk getChunk() {
+    public AsyncChunk getChunk() {
         return world.getChunkAt(x >> 4, z >> 4);
     }
 
@@ -170,7 +207,7 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public BlockState getState() {
+    public AsyncBlockState getState() {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
         BlockTypes type = BlockTypes.getFromStateId(combined);
         switch (type) {
@@ -182,7 +219,7 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public BlockState getState(boolean useSnapshot) {
+    public AsyncBlockState getState(boolean useSnapshot) {
         return getState();
     }
 

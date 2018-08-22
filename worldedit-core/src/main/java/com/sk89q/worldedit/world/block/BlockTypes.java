@@ -775,6 +775,24 @@ public enum BlockTypes implements BlockType {
         return state;
     }
 
+    /**
+     * Slow
+     * @return collection of states
+     */
+    @Deprecated
+    public Collection<BlockState> getStates() {
+        if (this.settings.states == null || this.settings.states.length <= 1) {
+            return Collections.singletonList(getDefaultState());
+        }
+        ArrayList<BlockState> states = new ArrayList<>();
+        for (BlockState state : settings.states) {
+            if (state != null) {
+                states.add(state);
+            }
+        }
+        return states;
+    }
+
     @Deprecated
     public int getMaxStateId() {
         return settings.permutations;

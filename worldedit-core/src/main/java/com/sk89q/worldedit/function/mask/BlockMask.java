@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -15,6 +16,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,31 @@ public class BlockMask extends AbstractExtentMask {
     protected BlockMask(Extent extent, long[][] bitSets) {
         super(extent);
         this.bitSets = bitSets;
+    }
+
+    public BlockMaskBuilder toBuilder() {
+        return new BlockMaskBuilder(this.bitSets);
+    }
+
+    @Override
+    public String toString() {
+        List<String> strings = new ArrayList<>();
+        for (int i = 0; i < bitSets.length; i++) {
+            if (bitSets[i] != null) {
+                long[] set = bitSets[i];
+                BlockTypes type = BlockTypes.get(i);
+                if (set == ALL) {
+                    strings.add(type.getId());
+                } else {
+                    for (BlockState state : type.getStates()) {
+                        if (test(state)) {
+                            strings.add(state.getAsString());
+                        }
+                    }
+                }
+            }
+        }
+        return StringMan.join(strings, ",");
     }
 
     @Override
@@ -177,6 +204,13 @@ public class BlockMask extends AbstractExtentMask {
             }
         }
         return this;
+    }
+
+    public boolean test(BlockState block) {
+        long[] bitSet = bitSets[block.getInternalBlockTypeId()];
+        if (bitSet == null) return false;
+        if (bitSet.length == 0) return true;
+        return FastBitSet.get(bitSet, block.getInternalPropertiesId());
     }
 
     @Override

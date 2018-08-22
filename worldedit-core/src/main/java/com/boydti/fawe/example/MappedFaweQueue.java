@@ -387,7 +387,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
         CHUNKSECTIONS sections = getSections(lastChunk);
         SECTION section = getCachedSection(sections, y >> 4);
         if (section == null) {
-            return 0;
+            return BlockTypes.AIR.getInternalId();
         }
         return getCombinedId4Data(lastSection, x, y, z);
     }
@@ -723,17 +723,17 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
                 lastSection = getCachedSection(lastChunkSections, cy);
             } else {
                 lastChunkSections = null;
-                return 0;
+                return BlockTypes.AIR.getInternalId();
             }
         } else if (cy != lastSectionY) {
             if (lastChunkSections != null) {
                 lastSection = getCachedSection(lastChunkSections, cy);
             } else {
-                return 0;
+                return BlockTypes.AIR.getInternalId();
             }
         }
         if (lastSection == null) {
-            return 0;
+            return BlockTypes.AIR.getInternalId();
         }
         return getCombinedId4Data(lastSection, x, y, z);
     }
@@ -752,17 +752,17 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
                 lastSection = getCachedSection(lastChunkSections, cy);
             } else {
                 lastChunkSections = null;
-                return 0;
+                return BlockTypes.AIR.getInternalId();
             }
         } else if (cy != lastSectionY) {
             if (lastChunkSections != null) {
                 lastSection = getCachedSection(lastChunkSections, cy);
             } else {
-                return 0;
+                return BlockTypes.AIR.getInternalId();
             }
         }
         if (lastSection == null) {
-            return 0;
+            return BlockTypes.AIR.getInternalId();
         }
         return getCombinedId4Data(lastSection, x, y, z);
     }

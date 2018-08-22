@@ -553,7 +553,7 @@ public class BlockMaskBuilder {
         return this.bitSets;
     }
 
-    public Mask build(Extent extent) {
+    public BlockMask build(Extent extent) {
         optimize();
         return new BlockMask(extent, bitSets);
     }

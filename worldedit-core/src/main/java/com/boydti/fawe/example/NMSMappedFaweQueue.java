@@ -141,10 +141,10 @@ public abstract class NMSMappedFaweQueue<WORLD, CHUNK, CHUNKSECTION, SECTION> ex
 
     public int getId(final char[][] sections, final int x, final int y, final int z) {
         if ((x < 0) || (x > 15) || (z < 0) || (z > 15)) {
-            return 1;
+            return BlockTypes.AIR.getInternalId();
         }
         if ((y < 0) || (y > maxY)) {
-            return 1;
+            return BlockTypes.AIR.getInternalId();
         }
         final int i = FaweCache.CACHE_I[y][z][x];
         final char[] section = sections[i];

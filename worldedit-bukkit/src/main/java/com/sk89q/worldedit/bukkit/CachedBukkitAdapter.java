@@ -36,6 +36,7 @@ public class CachedBukkitAdapter {
                 itemTypes[i] = ItemTypes.get(id);
             }
         }
+        blockDataCache[0] = new BlockData[] {Material.AIR.createBlockData()};
     }
 
     /**
