@@ -81,15 +81,14 @@ public class WorldEditBinding extends BindingHelper {
      * Gets a selection from a {@link ArgumentStack}.
      *
      * @param context the context
-     * @param selection the annotation
      * @return a selection
      * @throws IncompleteRegionException if no selection is available
      * @throws ParameterException on other error
      */
-    @BindingMatch(classifier = Selection.class,
+    @BindingMatch(
             type = Region.class,
             behavior = BindingBehavior.PROVIDES)
-    public Object getSelection(ArgumentStack context, Selection selection) throws IncompleteRegionException, ParameterException {
+    public Object getSelection(ArgumentStack context) throws IncompleteRegionException, ParameterException {
         Player sender = getPlayer(context);
         LocalSession session = worldEdit.getSessionManager().get(sender);
         return session.getSelection(FawePlayer.wrap(sender).getWorldForEditing());
