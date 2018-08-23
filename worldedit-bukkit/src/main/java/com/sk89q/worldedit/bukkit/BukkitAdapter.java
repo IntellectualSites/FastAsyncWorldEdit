@@ -349,9 +349,7 @@ public class BukkitAdapter {
      */
     public static BaseItemStack adapt(ItemStack itemStack) {
         checkNotNull(itemStack);
-
-
-        return new BaseItemStack(ItemTypes.get(itemStack.getType().getKey().toString()), itemStack.getAmount());
+        return new BukkitItemStack(itemStack);
     }
 
     /**
@@ -362,6 +360,7 @@ public class BukkitAdapter {
      */
     public static ItemStack adapt(BaseItemStack item) {
         checkNotNull(item);
+        if (item instanceof BukkitItemStack) return ((BukkitItemStack) item).getBukkitItemStack();
         return new ItemStack(adapt(item.getType()), item.getAmount());
     }
 

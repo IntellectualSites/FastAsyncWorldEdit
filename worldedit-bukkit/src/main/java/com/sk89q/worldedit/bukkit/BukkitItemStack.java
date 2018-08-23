@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 
 public class BukkitItemStack extends BaseItemStack {
     private ItemStack stack;
+    private Object nativeItem;
     private boolean loadedNBT;
 
     public BukkitItemStack(ItemStack stack) {
@@ -33,7 +34,23 @@ public class BukkitItemStack extends BaseItemStack {
     @Nullable
     @Override
     public Object getNativeItem() {
-        return super.getNativeItem();
+        ItemUtil util = Fawe.<FaweBukkit>imp().getItemUtil();
+        if (util != null && nativeItem == null) {
+            return nativeItem = util.getNMSItem(stack);
+        }
+        return nativeItem;
+    }
+
+    public ItemStack getBukkitItemStack() {
+        return stack;
+    }
+
+    @Override
+    public boolean hasNbtData() {
+        if (!loadedNBT) {
+            return stack.hasItemMeta();
+        }
+        return super.hasNbtData();
     }
 
     @Nullable
@@ -54,6 +71,7 @@ public class BukkitItemStack extends BaseItemStack {
         ItemUtil util = Fawe.<FaweBukkit>imp().getItemUtil();
         if (util != null) {
             stack = util.setNBT(stack, nbtData);
+            nativeItem = null;
         }
         super.setNbtData(nbtData);
     }

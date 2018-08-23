@@ -168,8 +168,8 @@ public class SchematicCommands extends MethodCommands {
 
     @Command(
             aliases = {"remap"},
-            help = "Remap a clipboard between MCPE/PC values\n",
-            desc = "Remap a clipboard between MCPE/PC values\n"
+            help = "Remap a clipboard between MCPE/PC values",
+            desc = "Remap a clipboard between MCPE/PC values"
     )
     @Deprecated
     @CommandPermissions({"worldedit.schematic.remap"})

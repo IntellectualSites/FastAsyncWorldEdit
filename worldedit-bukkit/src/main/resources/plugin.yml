@@ -1,6 +1,6 @@
 name: WorldEdit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
-version: "${version}"
+version: "${internalVersion}"
 api-version: 1.13
 description: Fast Async WorldEdit plugin
 authors: [Empire92]

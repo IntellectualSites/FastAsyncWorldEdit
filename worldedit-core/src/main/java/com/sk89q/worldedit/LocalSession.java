@@ -957,7 +957,7 @@ public class LocalSession implements TextureHolder {
     }
 
     public Tool getTool(BaseItem item, Player player) {
-        if (item.getNativeItem() != null && Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES) {
+        if (Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             BrushTool tool = BrushCache.getTool(player, this, item);
             if (tool != null) return tool;
         }
@@ -1034,7 +1034,7 @@ public class LocalSession implements TextureHolder {
             throw new InvalidToolBindException(type, "Already used for the navigation wand");
         }
         Tool previous;
-        if (player != null && (tool instanceof BrushTool || tool == null) && item.getNativeItem() != null && Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES) {
+        if (player != null && (tool instanceof BrushTool || tool == null) && Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             previous = BrushCache.getCachedTool(item);
             if (tool != null) {
                 BrushCache.setTool(item, (BrushTool) tool);

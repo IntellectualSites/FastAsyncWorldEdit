@@ -38,7 +38,9 @@ public final class BrushCache {
         BrushTool cached = brushCache.get(key);
         if (cached != null) return cached;
 
-        StringTag json = (StringTag) item.getNbtData().getValue().get("weBrushJson");
+        CompoundTag nbt = item.getNbtData();
+        if (nbt == null) return null;
+        StringTag json = (StringTag) nbt.getValue().get("weBrushJson");
         if (json != null) {
             try {
                 if (RECURSION.get() != null) return null;

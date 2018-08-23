@@ -35,14 +35,12 @@ dependencies {
 
 processResources {
     from (sourceSets.main.resources.srcDirs) {
-        expand 'version': project.internalVersion
+        expand 'internalVersion': project.internalVersion
         include 'plugin.yml'
-        include 'fawe.properties'
     }
 
     from (sourceSets.main.resources.srcDirs) {
         exclude 'plugin.yml'
-        exclude 'fawe.properties'
     }
 }
 
