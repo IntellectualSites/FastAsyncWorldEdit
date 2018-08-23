@@ -37,7 +37,7 @@ public abstract class AbstractLoggingExtent extends AbstractDelegateExtent {
      *
      * @param extent the extent
      */
-    protected AbstractLoggingExtent(Extent extent) {
+    public AbstractLoggingExtent(Extent extent) {
         super(extent);
     }
 

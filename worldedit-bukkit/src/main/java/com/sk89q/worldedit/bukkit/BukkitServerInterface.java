@@ -149,7 +149,7 @@ public class BukkitServerInterface implements MultiUserPlatform {
 
     @Override
     public String getPlatformName() {
-        return "Bukkit-Official";
+        return "bukkit";
     }
 
     @Override

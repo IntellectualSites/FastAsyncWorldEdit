@@ -65,9 +65,6 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
-    version = rootProject.version
-    group = 'com.boydti.fawe'
-
     compileJava { options.compilerArgs += ["-parameters"] }
 
     repositories {

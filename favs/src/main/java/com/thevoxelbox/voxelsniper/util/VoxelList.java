@@ -19,7 +19,7 @@ import java.util.List;
 public class VoxelList
 {
 
-    private BlockMask mask = new BlockMask(NullExtent.INSTANCE);
+    private BlockMask mask = new BlockMask();
 
     /**
      * Adds the specified id, data value pair to the VoxelList. A data value of -1 will operate on all data values of that id.

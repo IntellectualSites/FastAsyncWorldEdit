@@ -7,6 +7,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -38,6 +39,11 @@ public class BlockMask extends AbstractExtentMask {
         super(extent);
         MainUtil.warnDeprecated(BlockMaskBuilder.class);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
+    }
+
+    public BlockMask() {
+        super(NullExtent.INSTANCE);
+        this.bitSets = new long[BlockTypes.size()][];
     }
 
     protected BlockMask(Extent extent, long[][] bitSets) {

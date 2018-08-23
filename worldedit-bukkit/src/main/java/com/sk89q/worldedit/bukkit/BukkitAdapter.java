@@ -22,6 +22,7 @@ package com.sk89q.worldedit.bukkit;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.bekvon.bukkit.residence.commands.material;
+import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Entity;
@@ -336,7 +337,7 @@ public class BukkitAdapter {
         if (itemStack.getType().isBlock()) {
             return adapt(itemStack.getType().createBlockData());
         } else {
-            return BlockTypes.AIR.getDefaultState();
+            throw new NotABlockException();
         }
     }
 

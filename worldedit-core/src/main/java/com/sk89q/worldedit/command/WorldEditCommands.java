@@ -83,9 +83,7 @@ public class WorldEditCommands {
             }
             actor.printDebug("------------------------------------");
         }
-        actor.print(BBC.getPrefix() + "WorldEdit " + WorldEdit.getVersion() + " by sk89q");
         PlatformManager pm = we.getPlatformManager();
-        actor.printDebug("------------------------------------");
         actor.printDebug("Platforms:");
         for (Platform platform : pm.getPlatforms()) {
             actor.printDebug(String.format(" - %s (%s)", platform.getPlatformName(), platform.getPlatformVersion()));

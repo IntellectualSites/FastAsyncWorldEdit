@@ -112,7 +112,7 @@ public class VoxelSniper extends JavaPlugin
                 @Override
                 public boolean execute(FawePlayer fp, String... args) {
                     Player player = (Player) fp.parent;
-                    return (Bukkit.getPluginManager().getPlugin("VoxelSniper")).onCommand(player, new Command("p") {
+                    return onCommand(player, new Command("p") {
                         @Override
                         public boolean execute(CommandSender sender, String commandLabel, String[] args) {
                             return false;
@@ -125,7 +125,7 @@ public class VoxelSniper extends JavaPlugin
                 @Override
                 public boolean execute(FawePlayer fp, String... args) {
                     Player player = (Player) fp.parent;
-                    return (Bukkit.getPluginManager().getPlugin("VoxelSniper")).onCommand(player, new Command("d") {
+                    return onCommand(player, new Command("d") {
                         @Override
                         public boolean execute(CommandSender sender, String commandLabel, String[] args) {
                             return false;

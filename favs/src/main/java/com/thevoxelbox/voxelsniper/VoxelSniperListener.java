@@ -1,5 +1,9 @@
 package com.thevoxelbox.voxelsniper;
 
+import com.boydti.fawe.object.FawePlayer;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.util.command.parametric.ExceptionConverter;
 import com.thevoxelbox.voxelsniper.api.command.VoxelCommand;
 import com.thevoxelbox.voxelsniper.command.*;
 import org.bukkit.ChatColor;
@@ -11,6 +15,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * @author Voxel
@@ -72,7 +77,32 @@ public class VoxelSniperListener implements Listener
             return true;
         }
 
-        return found.onCommand(player, split);
+        FawePlayer fp = FawePlayer.wrap(player);
+        ExceptionConverter exceptionConverter = CommandManager.getInstance().getExceptionConverter();
+        try {
+            try {
+                return found.onCommand(player, split);
+            } catch (Throwable t) {
+                Throwable next = t;
+                exceptionConverter.convert(next);
+                while (next.getCause() != null) {
+                    next = next.getCause();
+                    exceptionConverter.convert(next);
+                }
+                throw next;
+            }
+        } catch (CommandException e) {
+            String message = e.getMessage();
+            if (message != null) {
+                fp.sendMessage(e.getMessage());
+                return true;
+            }
+            e.printStackTrace();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        fp.sendMessage("An unknown FAWE error has occurred! Please see console.");
+        return true;
     }
 
     private boolean hasPermission(final VoxelCommand command, final Player player)
