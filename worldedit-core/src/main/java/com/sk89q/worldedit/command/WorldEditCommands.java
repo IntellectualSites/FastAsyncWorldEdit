@@ -59,7 +59,8 @@ public class WorldEditCommands {
             usage = "",
             desc = "Get WorldEdit/FAWE version",
             min = 0,
-            max = 0
+            max = 0,
+            queued = false
     )
     public void version(Actor actor) throws WorldEditException {
         FaweVersion fVer = Fawe.get().getVersion();
@@ -196,7 +197,8 @@ public class WorldEditCommands {
             usage = "",
             desc = "Print all thread stacks",
             min = 0,
-            max = 0
+            max = 0,
+            queued = false
     )
     @CommandPermissions("worldedit.threads")
     public void threads(Actor actor) throws WorldEditException {
@@ -242,7 +244,8 @@ public class WorldEditCommands {
             usage = "[<command>]",
             desc = "Displays help for FAWE commands",
             min = 0,
-            max = -1
+            max = -1,
+            queued = false
     )
     public void help(Actor actor, CommandContext args) throws WorldEditException {
         UtilityCommands.help(args, we, actor);

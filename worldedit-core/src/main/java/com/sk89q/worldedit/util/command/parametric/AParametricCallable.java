@@ -28,6 +28,9 @@ public abstract class AParametricCallable implements CommandCallable {
     public abstract ParametricBuilder getBuilder();
     public abstract boolean anyFlags();
     public abstract Command getCommand();
+    public Command getDefinition() {
+        return getCommand();
+    }
     public abstract String getGroup();
     @Override
     public abstract String toString();

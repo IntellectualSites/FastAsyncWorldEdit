@@ -1,6 +1,5 @@
 package com.boydti.fawe;
 
-import com.boydti.fawe.command.Cancel;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.config.Settings;
@@ -187,7 +186,6 @@ public class Fawe {
                 ignore.printStackTrace();
             }
         }
-        this.setupCommands();
         /*
          * Instance independent stuff
          */
@@ -353,10 +351,6 @@ public class Fawe {
 
     public double getTPS() {
         return timer.getTPS();
-    }
-
-    private void setupCommands() {
-        this.IMP.setupCommand("fcancel", new Cancel());
     }
 
     public void setupConfigs() {

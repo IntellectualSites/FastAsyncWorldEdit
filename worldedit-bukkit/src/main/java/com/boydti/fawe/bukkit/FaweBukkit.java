@@ -222,12 +222,14 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public void setupCommand(final String label, final FaweCommand cmd) {
         if (plugin instanceof JavaPlugin) {
-            PluginCommand registered = ((JavaPlugin) plugin).getCommand(label);
-            if (registered == null) {
-                debug("Command not registered in plugin.yml: " + label);
-                return;
-            }
-            registered.setExecutor(new BukkitCommand(cmd));
+            TaskManager.IMP.task(() -> {
+                PluginCommand registered = ((JavaPlugin) plugin).getCommand(label);
+                if (registered == null) {
+                    debug("Command not registered in plugin.yml: " + label);
+                    return;
+                }
+                registered.setExecutor(new BukkitCommand(cmd));
+            });
         }
     }
 

@@ -2,6 +2,7 @@ package com.boydti.fawe.config;
 
 import com.boydti.fawe.configuration.ConfigurationSection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
+import com.boydti.fawe.util.StringMan;
 import com.sk89q.minecraft.util.commands.Command;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class Commands {
         }
     }
 
-    public static Command fromArgs(String[] aliases, String usage, String desc, int min, Integer max, String flags, String help) {
+    public static Command fromArgs(String[] aliases, String usage, String desc, int min, Integer max, String flags, String help, boolean queued) {
         int finalMax = max == null ? -1 : max;
         return new Command() {
             @Override
@@ -68,6 +69,11 @@ public class Commands {
             @Override
             public boolean anyFlags() {
                 return !(flags.isEmpty() || flags.matches("[a-z]+"));
+            }
+
+            @Override
+            public boolean queued() {
+                return queued;
             }
         };
     }
@@ -111,7 +117,7 @@ public class Commands {
             }
 
             HashMap<String, Object> options = new HashMap<>();
-            options.put("aliases", new ArrayList<String>(Arrays.asList(command.aliases())));
+            options.put("aliases", new ArrayList<>(Arrays.asList(command.aliases())));
             options.put("usage", command.usage());
             options.put("desc", command.desc());
             options.put("help", command.help());
@@ -138,7 +144,7 @@ public class Commands {
 
         @Override
         public Class<? extends Annotation> annotationType() {
-            return command.annotationType();
+            return this.command.annotationType();
         }
 
         @Override
@@ -158,17 +164,17 @@ public class Commands {
 
         @Override
         public int min() {
-            return command.min();
+            return this.command.min();
         }
 
         @Override
         public int max() {
-            return command.max();
+            return this.command.max();
         }
 
         @Override
         public String flags() {
-            return command.flags();
+            return this.command.flags();
         }
 
         @Override
@@ -178,7 +184,12 @@ public class Commands {
 
         @Override
         public boolean anyFlags() {
-            return command.anyFlags();
+            return this.command.anyFlags();
+        }
+
+        @Override
+        public boolean queued() {
+            return this.command.queued();
         }
     }
 }

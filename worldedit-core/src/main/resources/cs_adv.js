@@ -31,7 +31,8 @@
         {
             if (!f.hasOwnProperty('permission')) f.permission = "fawe.use";
             if (!f.hasOwnProperty('aliases')) f.aliases = [f.name];
-            var cmd = com.boydti.fawe.config.Commands.fromArgs(f.aliases, f.usage, f.desc, f.min, f.max, f.flags, f.help);
+            if (!f.hasOwnProperty('queued')) f.queued = true;
+            var cmd = com.boydti.fawe.config.Commands.fromArgs(f.aliases, f.usage, f.desc, f.min, f.max, f.flags, f.help, f.queued);
             var man = com.sk89q.worldedit.extension.platform.CommandManager.getInstance();
             var builder = man.getBuilder();
             var args = getParamNames(f);

@@ -51,16 +51,11 @@ import com.sk89q.worldedit.internal.command.*;
 import com.sk89q.worldedit.scripting.CommandScriptLoader;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.util.command.CallableProcessor;
-import com.sk89q.worldedit.util.command.CommandCallable;
-import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.InvalidUsageException;
+import com.sk89q.worldedit.util.command.*;
 import com.sk89q.worldedit.util.command.composition.ProvidedValue;
 import com.sk89q.worldedit.util.command.fluent.CommandGraph;
 import com.sk89q.worldedit.util.command.fluent.DispatcherNode;
-import com.sk89q.worldedit.util.command.parametric.ExceptionConverter;
-import com.sk89q.worldedit.util.command.parametric.LegacyCommandsHandler;
-import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
+import com.sk89q.worldedit.util.command.parametric.*;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
@@ -498,6 +493,16 @@ public final class CommandManager {
         TaskManager.IMP.taskNow(new Runnable() {
             @Override
             public void run() {
+                int space0 = args.indexOf(' ');
+                String arg0 = space0 == -1 ? args : args.substring(0, space0);
+                CommandMapping cmd = dispatcher.get(arg0);
+                if (cmd != null && cmd.getCallable() instanceof AParametricCallable) {
+                    Command info = ((AParametricCallable) cmd.getCallable()).getDefinition();
+                    if (!info.queued()) {
+                        handleCommandOnCurrentThread(finalEvent);
+                        return;
+                    }
+                }
                 if (!fp.runAction(new Runnable() {
                     @Override
                     public void run() {

@@ -102,7 +102,8 @@ public class UtilityCommands extends MethodCommands {
                     " - Use [brackets] for arguments\n" +
                     " - Use , to OR multiple\n" +
                     "e.g. #surfacespread[10][#existing],andesite\n" +
-                    "More Info: https://git.io/vSPmA"
+                    "More Info: https://git.io/vSPmA",
+            queued = false
     )
     public void patterns(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, HashTagPatternParser.class, args);
@@ -117,7 +118,8 @@ public class UtilityCommands extends MethodCommands {
                     " - Use , to OR multiple\n" +
                     " - Use & to AND multiple\n" +
                     "e.g. >[stone,dirt],#light[0][5],$jungle\n" +
-                    "More Info: https://git.io/v9r4K"
+                    "More Info: https://git.io/v9r4K",
+            queued = false
     )
     public void masks(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, DefaultMaskParser.class, args);
@@ -131,7 +133,8 @@ public class UtilityCommands extends MethodCommands {
                     " - Use [brackets] for arguments\n" +
                     " - Use , to OR multiple\n" +
                     " - Use & to AND multiple\n" +
-                    "More Info: https://git.io/v9KHO"
+                    "More Info: https://git.io/v9KHO",
+            queued = false
     )
     public void transforms(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, DefaultTransformParser.class, args);
@@ -158,6 +161,17 @@ public class UtilityCommands extends MethodCommands {
                 UtilityCommands.help(args, worldEdit, player, getCommand().aliases()[0] + " ", parser.getDispatcher());
             }
         }
+    }
+
+    @Command(
+            aliases = {"/cancel", "fcancel"},
+            desc = "Cancel your current command",
+            max = 0,
+            queued = false
+    )
+    public void cancel(FawePlayer player) {
+        int cancelled = player.cancel(false);
+        BBC.WORLDEDIT_CANCEL_COUNT.send(player, cancelled);
     }
 
     @Command(
@@ -589,7 +603,8 @@ public class UtilityCommands extends MethodCommands {
             usage = "[<command>]",
             desc = "Displays help for WorldEdit commands",
             min = 0,
-            max = -1
+            max = -1,
+            queued = false
     )
     public void help(Actor actor, CommandContext args) throws WorldEditException {
         help(args, worldEdit, actor);

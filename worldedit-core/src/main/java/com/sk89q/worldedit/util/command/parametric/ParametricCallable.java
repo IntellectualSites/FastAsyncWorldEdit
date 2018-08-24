@@ -60,6 +60,7 @@ public class ParametricCallable extends AParametricCallable {
     private final Set<Character> legacyFlags = new HashSet<Character>();
     private final SimpleDescription description = new SimpleDescription();
     private final CommandPermissions commandPermissions;
+    private final Command definition;
 
     /**
      * Create a new instance.
@@ -179,11 +180,17 @@ public class ParametricCallable extends AParametricCallable {
 
         // Get permissions annotation
         commandPermissions = method.getAnnotation(CommandPermissions.class);
+        this.definition = definition;
     }
 
     @Override
     public Command getCommand() {
         return object.getClass().getAnnotation(Command.class);
+    }
+
+    @Override
+    public Command getDefinition() {
+        return definition;
     }
 
     @Override

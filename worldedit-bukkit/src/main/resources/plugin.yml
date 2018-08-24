@@ -8,10 +8,6 @@ loadbefore: [WorldEdit,AsyncWorldEdit,AsyncWorldEditInjector,WorldGuard]
 load: STARTUP
 database: false
 #softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
-commands:
-  fcancel:
-    description: "Cancel your edit"
-    aliases: [fawecancel,/fcancel,/cancel,/fawecancel]
 permissions:
   fawe.plotsquared:
       default: true
