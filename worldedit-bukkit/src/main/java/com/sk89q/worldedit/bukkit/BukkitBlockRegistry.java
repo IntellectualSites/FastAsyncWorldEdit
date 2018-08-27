@@ -21,8 +21,10 @@ package com.sk89q.worldedit.bukkit;
 
 import com.bekvon.bukkit.residence.commands.material;
 import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.command.tool.BlockDataCyler;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -42,24 +44,49 @@ import javax.annotation.Nullable;
 
 public class BukkitBlockRegistry extends BundledBlockRegistry {
 
-    private Map<Material, BukkitBlockMaterial> materialMap = new EnumMap<>(Material.class);
+    private BukkitBlockMaterial[] materialMap;
 
     @Nullable
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            BlockMaterial result = adapter.getMaterial(blockType);
+            if (result != null) return result;
+        }
         Material type = BukkitAdapter.adapt(blockType);
         if (type == null) {
             if (blockType == BlockTypes.__RESERVED__) return new PassthroughBlockMaterial(super.getMaterial(BlockTypes.AIR));
             return new PassthroughBlockMaterial(null);
         }
-        return materialMap.computeIfAbsent(type, m -> new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), m));
+        if (materialMap == null) {
+            materialMap = new BukkitBlockMaterial[Material.values().length];
+        }
+        BukkitBlockMaterial result = materialMap[type.ordinal()];
+        if (result == null) {
+            result = new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), type);
+            materialMap[type.ordinal()] = result;
+        }
+        return result;
+    }
+
+    @Nullable
+    @Override
+    public BlockMaterial getMaterial(BlockState state) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            BlockMaterial result = adapter.getMaterial(state);
+            if (result != null) return result;
+        }
+        return super.getMaterial(state);
     }
 
     @Nullable
     @Override
     public Map<String, ? extends Property> getProperties(BlockType blockType) {
-        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
-            return WorldEditPlugin.getInstance().getBukkitImplAdapter().getProperties(blockType);
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.getProperties(blockType);
         }
         return super.getProperties(blockType);
     }

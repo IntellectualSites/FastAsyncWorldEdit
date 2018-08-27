@@ -21,6 +21,7 @@ package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 
 import java.util.Collection;
@@ -43,6 +44,11 @@ public interface BlockRegistry {
      */
     @Nullable
     BlockMaterial getMaterial(BlockType blockType);
+
+    @Nullable
+    default BlockMaterial getMaterial(BlockState state) {
+        return getMaterial(state.getBlockType());
+    }
 
     /**
      * Get an unmodifiable map of states for this block.

@@ -21,7 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.adapter.Spigot_v1_13_R1;
+import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -33,7 +33,6 @@ import com.sk89q.worldedit.bukkit.adapter.AdapterLoadException;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
 import com.sk89q.worldedit.event.platform.CommandEvent;
-import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -45,7 +44,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -277,7 +275,11 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
 
         // Attempt to load a Bukkit adapter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
-        adapterLoader.addClass(Spigot_v1_13_R1.class);
+        try {
+            adapterLoader.addClass(Spigot_v1_13_R2.class);
+        } catch (Throwable ignore) {
+            ignore.printStackTrace();
+        }
 
         try {
             adapterLoader.addFromPath(getClass().getClassLoader());
@@ -491,7 +493,7 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
         return new BukkitCommandSender(this, sender);
     }
 
-    BukkitServerInterface getInternalPlatform() {
+    public BukkitServerInterface getInternalPlatform() {
         return server;
     }
 

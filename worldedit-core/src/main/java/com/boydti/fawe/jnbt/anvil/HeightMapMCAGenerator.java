@@ -17,7 +17,6 @@ import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -32,7 +31,6 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -74,7 +72,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         protected boolean randomVariation = true;
         protected int biomePriority = 0;
         protected int waterId = BlockTypes.WATER.getInternalId();
-        protected byte bedrockId = 7;
+        protected int bedrockId = 7;
         protected boolean modifiedMain = false;
 
         @Override
@@ -338,7 +336,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void setBedrockId(int bedrockId) {
-        this.primtives.bedrockId = (byte) bedrockId;
+        this.primtives.bedrockId = bedrockId;
     }
 
     public void setFloorThickness(int floorThickness) {
@@ -354,7 +352,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void setWaterId(int waterId) {
-        this.primtives.waterId = (byte) waterId;
+        this.primtives.waterId = waterId;
     }
 
     public void setTextureRandomVariation(boolean randomVariation) {
@@ -1024,7 +1022,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public BlockState getFloor(int x, int z) {
         int index = z * getWidth() + x;
-        return BlockState.get(floor.getInt(index));
+        return BlockState.getFromInternalId(floor.getInt(index));
     }
 
     public int getHeight(int x, int z) {
@@ -1048,7 +1046,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return BlockState.get(getCombinedId4Data(x, y, z));
+        return BlockState.getFromInternalId(getCombinedId4Data(x, y, z));
     }
 
     @Override

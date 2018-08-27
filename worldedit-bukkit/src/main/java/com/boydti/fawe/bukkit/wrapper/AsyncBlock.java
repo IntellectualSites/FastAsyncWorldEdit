@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.wrapper;
 
-import com.bekvon.bukkit.residence.commands.tool;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.wrapper.state.AsyncSign;
 import com.boydti.fawe.object.FaweQueue;
@@ -8,18 +7,14 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.WorldEditException;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;

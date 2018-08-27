@@ -154,7 +154,7 @@ public class BlockTransformExtent extends ResettableExtent {
         int maskedId = internalId & mask;
         int newMaskedId = arr[maskedId];
         if (newMaskedId != -1) {
-            return BlockState.get(newMaskedId | (internalId & (~mask)));
+            return BlockState.getFromInternalId(newMaskedId | (internalId & (~mask)));
         }
         newMaskedId = state.getInternalId();
 
@@ -169,7 +169,7 @@ public class BlockTransformExtent extends ResettableExtent {
             }
         }
         arr[maskedId] = newMaskedId & mask;
-        return BlockState.get(newMaskedId);
+        return BlockState.getFromInternalId(newMaskedId);
     }
 
     public final BlockState transformFast(BlockState block) {

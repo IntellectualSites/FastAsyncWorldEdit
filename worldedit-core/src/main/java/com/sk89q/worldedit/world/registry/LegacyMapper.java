@@ -26,7 +26,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -142,7 +141,7 @@ public class LegacyMapper {
 
     public BlockState getBlockFromLegacy(String input) {
         if (input.startsWith("minecraft:")) input = input.substring(10);
-        return BlockState.get(blockArr[getCombinedId(input)]);
+        return BlockState.getFromInternalId(blockArr[getCombinedId(input)]);
     }
 
     @Nullable
@@ -181,7 +180,7 @@ public class LegacyMapper {
             try {
                 int internalId = blockArr[combinedId];
                 if (internalId == 0) return null;
-                return BlockState.get(internalId);
+                return BlockState.getFromInternalId(internalId);
             } catch (IndexOutOfBoundsException ignore) {
                 return null;
             }
@@ -191,7 +190,7 @@ public class LegacyMapper {
             extra = extraId4DataToStateId.get(combinedId & 0xFF0);
         }
         if (extra != null) {
-            return BlockState.get(extra);
+            return BlockState.getFromInternalId(extra);
         }
         return null;
     }

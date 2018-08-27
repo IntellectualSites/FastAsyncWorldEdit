@@ -1,7 +1,5 @@
 package com.boydti.fawe.bukkit.v0;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.NullRelighter;
@@ -22,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -32,7 +29,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 
 public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot, ChunkSnapshot> {

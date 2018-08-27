@@ -1,8 +1,6 @@
 package com.boydti.fawe.bukkit.wrapper;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
@@ -16,7 +14,6 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -270,9 +267,9 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     public int getHighestBlockYAt(int x, int z) {
         for (int y = getMaxHeight() - 1; y >= 0; y--) {
-            if (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()) != 0) {
-                return y;
-            }
+            int stateId = queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
+            BlockTypes type = BlockTypes.getFromStateId(stateId);
+            if (!type.getMaterial().isAir()) return y;
         }
         return 0;
     }
@@ -306,6 +303,11 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     public AsyncChunk getChunkAt(Block block) {
         return getChunkAt(block.getX(), block.getZ());
+    }
+
+    @Override
+    public boolean isChunkGenerated(int x, int z) {
+        return parent.isChunkGenerated(x, z);
     }
 
     @Override

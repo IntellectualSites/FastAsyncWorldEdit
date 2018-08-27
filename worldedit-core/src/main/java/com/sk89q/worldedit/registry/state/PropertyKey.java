@@ -1,7 +1,9 @@
 package com.sk89q.worldedit.registry.state;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.util.ReflectionUtil;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +66,7 @@ public enum PropertyKey {
     UP,
     WATERLOGGED,
     WEST,
+    UNSTABLE,
 
     ;
 
@@ -94,12 +97,18 @@ public enum PropertyKey {
      * @return PropertyKey enum
      */
     public static final PropertyKey getOrCreate(String id) {
-        String name = id.toUpperCase();
-        PropertyKey property;
-        try {
-            property = PropertyKey.valueOf(name);
-        } catch (IllegalArgumentException ignore) {
-            property = ReflectionUtils.addEnum(PropertyKey.class, name);
+        PropertyKey property = PropertyKey.get(id);
+        if (property == null) {
+            Fawe.debug("Registering property " + id);
+            property = ReflectionUtils.addEnum(PropertyKey.class, id.toUpperCase());
+            if (property.getId() == null) {
+                try {
+                    ReflectionUtils.setFailsafeFieldValue(PropertyKey.class.getDeclaredField("id"), property, property.name().toLowerCase());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            keys.put(property.name().toLowerCase(), property);
         }
         return property;
     }

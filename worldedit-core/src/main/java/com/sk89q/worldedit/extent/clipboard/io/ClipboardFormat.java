@@ -306,23 +306,6 @@ public enum ClipboardFormat {
         map.put("height", dimensions.getY());
         map.put("length", dimensions.getZ());
         map.put("creator", user);
-        if (clipboard instanceof BlockArrayClipboard) {
-            FaweClipboard fc = ((BlockArrayClipboard) clipboard).IMP;
-            final int[] ids = new int[BlockTypes.size()];
-            fc.streamCombinedIds(new NBTStreamer.ByteReader() {
-                @Override
-                public void run(int index, int byteValue) {
-                    ids[byteValue & BlockTypes.BIT_MASK]++;
-                }
-            });
-            Map<String, Integer> blocks = new HashMap<String, Integer>();
-            for (int i = 0; i < ids.length; i++) {
-                if (ids[i] != 0) {
-                    blocks.put(BlockTypes.get(i).getId(), ids[i]);
-                }
-            }
-            map.put("blocks", blocks);
-        }
         Gson gson = new Gson();
         String json = gson.toJson(map);
         return MainUtil.upload(Settings.IMP.WEB.ASSETS, false, json, category, null, new RunnableVal<OutputStream>() {

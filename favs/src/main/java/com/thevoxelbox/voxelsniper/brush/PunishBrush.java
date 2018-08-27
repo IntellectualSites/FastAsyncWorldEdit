@@ -9,7 +9,6 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -174,7 +173,7 @@ public class PunishBrush extends PerformBrush
                                 target = location.clone();
                                 target.add(x, y, z);
                                 Player plr = ((Player) entity);
-                                BlockData bd = BukkitAdapter.adapt(BlockState.get(v.getVoxelId() + (v.getPropertyId() << BlockTypes.BIT_OFFSET)));
+                                BlockData bd = BukkitAdapter.adapt(BlockState.getFromInternalId(v.getVoxelId() + (v.getPropertyId() << BlockTypes.BIT_OFFSET)));
                                 plr.sendBlockChange(target, bd);
                             }
                         }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -44,7 +45,9 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
      * @return
      */
     @Deprecated
-    BlockStateHolder withPropertyId(int propertyId);
+    default BlockStateHolder withPropertyId(int propertyId) {
+        return getBlockType().withPropertyId(propertyId);
+    }
 
     /**
      * Get combined id (legacy uses)
@@ -53,12 +56,21 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
     @Deprecated
     int getInternalId();
 
+    @Deprecated
+    int getOrdinal();
+
+    default BlockMaterial getMaterial() {
+        return getBlockType().getMaterial();
+    }
+
     /**
      * Get type id (legacy uses)
      * @return
      */
     @Deprecated
-    int getInternalBlockTypeId();
+    default int getInternalBlockTypeId() {
+        return getBlockType().getInternalId();
+    }
 
     /**
      * Get the block data (legacy uses)
@@ -129,9 +141,7 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
         if (getStates().isEmpty()) {
             return this.getBlockType().getId();
         } else {
-            String properties =
-                    getStates().entrySet().stream().map(entry -> entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase()).collect(Collectors.joining(
-                    ","));
+            String properties = getStates().entrySet().stream().map(entry -> entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase()).collect(Collectors.joining(","));
             return this.getBlockType().getId() + "[" + properties + "]";
         }
     }

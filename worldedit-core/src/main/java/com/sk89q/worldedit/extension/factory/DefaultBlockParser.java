@@ -240,7 +240,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
             if (nbt == null) nbt = state.getNbtData();
 
             if (stateString != null) {
-                state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state.getInternalPropertiesId());
+                state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state);
             }
         }
 

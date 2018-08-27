@@ -839,8 +839,8 @@ public enum ItemTypes implements ItemType {
      */
 
     private BlockTypes blockType;
-    private final String id;
-    private final BaseItem defaultState;
+    private String id;
+    private BaseItem defaultState;
     private int internalId;
 
     ItemTypes() {
@@ -848,8 +848,12 @@ public enum ItemTypes implements ItemType {
     }
 
     ItemTypes(String id) {
+        init(id);
+    }
+
+    private void init(String id) {
         if (id == null) id = "minecraft:" + name().toLowerCase();
-        // If it has no namespace, assume minecraft.
+            // If it has no namespace, assume minecraft.
         else if (!id.contains(":")) {
             id = "minecraft:" + id;
         }
@@ -973,6 +977,9 @@ public enum ItemTypes implements ItemType {
             existing = ReflectionUtils.addEnum(ItemTypes.class, enumName);
         }
         int internalId = existing.ordinal();
+        if (existing.id == null) {
+            existing.init(null);
+        }
         if (internalId == 0 && existing != __RESERVED__) {
             existing.internalId = $LENGTH++;
         }

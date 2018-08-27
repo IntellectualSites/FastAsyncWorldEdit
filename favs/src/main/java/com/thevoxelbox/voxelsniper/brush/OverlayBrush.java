@@ -72,7 +72,7 @@ public class OverlayBrush extends PerformBrush
     @SuppressWarnings("deprecation")
 	private boolean isIgnoredBlock(int materialId)
     {
-        BlockTypes type = BlockTypes.getFromStateId(materialId);
+        BlockTypes type = BlockTypes.get(materialId);
         switch (type) {
             case WATER:
             case LAVA:
@@ -86,7 +86,7 @@ public class OverlayBrush extends PerformBrush
     @SuppressWarnings("deprecation")
 	private boolean isOverrideableMaterial(int materialId)
     {
-        BlockMaterial mat = BlockTypes.getFromStateId(materialId).getMaterial();
+        BlockMaterial mat = BlockTypes.get(materialId).getMaterial();
         if (allBlocks && !(mat.isAir()))
         {
             return true;

@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.queue;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.jnbt.CompoundTag;
@@ -31,7 +30,7 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
 
     @Override
     public boolean setBlock(int x, int y, int z, int combinedId) {
-        return setBlock(x, y, z, BlockState.get(combinedId));
+        return setBlock(x, y, z, BlockState.getFromInternalId(combinedId));
     }
 
     @Override
@@ -39,7 +38,7 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
         if (nbt != null) {
             return setBlock(x, y, z, BaseBlock.getFromInternalId(combinedId, nbt));
         }
-        return setBlock(x, y, z, BlockState.get(combinedId));
+        return setBlock(x, y, z, BlockState.getFromInternalId(combinedId));
     }
 
     @Override

@@ -33,7 +33,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -392,7 +391,7 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
                 Location loc = new Location(world, bx + localX, y, bz + localZ);
                 for (int i = 0; i < players.length; i++) {
                     if (send[i]) {
-                        ((BukkitPlayer) players[i]).parent.sendBlockChange(loc, BukkitAdapter.adapt(BlockState.get(combined)));
+                        ((BukkitPlayer) players[i]).parent.sendBlockChange(loc, BukkitAdapter.adapt(BlockState.getFromInternalId(combined)));
                     }
                 }
             }

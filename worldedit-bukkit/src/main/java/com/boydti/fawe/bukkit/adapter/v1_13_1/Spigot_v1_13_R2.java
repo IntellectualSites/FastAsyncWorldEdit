@@ -17,80 +17,41 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.boydti.fawe.bukkit.adapter;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package com.boydti.fawe.bukkit.adapter.v1_13_1;
 
 import com.boydti.fawe.Fawe;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import com.sk89q.jnbt.ByteArrayTag;
-import com.sk89q.jnbt.ByteTag;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.EndTag;
-import com.sk89q.jnbt.FloatTag;
-import com.sk89q.jnbt.IntArrayTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.LongTag;
-import com.sk89q.jnbt.NBTConstants;
-import com.sk89q.jnbt.ShortTag;
-import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.*;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.internal.Constants;
-import com.sk89q.worldedit.registry.state.BooleanProperty;
-import com.sk89q.worldedit.registry.state.DirectionalProperty;
-import com.sk89q.worldedit.registry.state.EnumProperty;
-import com.sk89q.worldedit.registry.state.IntegerProperty;
-import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.registry.state.*;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import net.minecraft.server.v1_13_R1.BiomeBase;
-import net.minecraft.server.v1_13_R1.Block;
-import net.minecraft.server.v1_13_R1.BlockPosition;
-import net.minecraft.server.v1_13_R1.BlockStateBoolean;
-import net.minecraft.server.v1_13_R1.BlockStateDirection;
-import net.minecraft.server.v1_13_R1.BlockStateEnum;
-import net.minecraft.server.v1_13_R1.BlockStateInteger;
-import net.minecraft.server.v1_13_R1.BlockStateList;
-import net.minecraft.server.v1_13_R1.Entity;
-import net.minecraft.server.v1_13_R1.EntityTypes;
-import net.minecraft.server.v1_13_R1.IBlockData;
-import net.minecraft.server.v1_13_R1.IBlockState;
-import net.minecraft.server.v1_13_R1.INamable;
-import net.minecraft.server.v1_13_R1.MinecraftKey;
-import net.minecraft.server.v1_13_R1.NBTBase;
-import net.minecraft.server.v1_13_R1.NBTTagByte;
-import net.minecraft.server.v1_13_R1.NBTTagByteArray;
-import net.minecraft.server.v1_13_R1.NBTTagCompound;
-import net.minecraft.server.v1_13_R1.NBTTagDouble;
-import net.minecraft.server.v1_13_R1.NBTTagEnd;
-import net.minecraft.server.v1_13_R1.NBTTagFloat;
-import net.minecraft.server.v1_13_R1.NBTTagInt;
-import net.minecraft.server.v1_13_R1.NBTTagIntArray;
-import net.minecraft.server.v1_13_R1.NBTTagList;
-import net.minecraft.server.v1_13_R1.NBTTagLong;
-import net.minecraft.server.v1_13_R1.NBTTagShort;
-import net.minecraft.server.v1_13_R1.NBTTagString;
-import net.minecraft.server.v1_13_R1.TileEntity;
-import net.minecraft.server.v1_13_R1.World;
-import net.minecraft.server.v1_13_R1.WorldServer;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_13_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_13_R1.entity.CraftEntity;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
+import org.bukkit.craftbukkit.v1_13_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -98,25 +59,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
+public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
 
     private final Logger logger = Logger.getLogger(getClass().getCanonicalName());
 
     private final Field nbtListTagListField;
     private final Method nbtCreateTagMethod;
 
+    static {
+        // A simple test
+        if (!Bukkit.getServer().getClass().getName().endsWith("DummyServer")) CraftServer.class.cast(Bukkit.getServer());
+    }
+
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
 
-    public Spigot_v1_13_R1() throws NoSuchFieldException, NoSuchMethodException {
-        // A simple test
-        if (!Bukkit.getServer().getClass().getName().endsWith("DummyServer")) CraftServer.class.cast(Bukkit.getServer());
-        // test between 1.12 and 1.12.1 since md_5 didn't update revision numbers
-        TileEntity.class.getDeclaredMethod("load", NBTTagCompound.class);
-
+    public Spigot_v1_13_R2() throws NoSuchFieldException, NoSuchMethodException {
         // The list of tags on an NBTTagList
         nbtListTagListField = NBTTagList.class.getDeclaredField("list");
         nbtListTagListField.setAccessible(true);
@@ -194,6 +155,22 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
         entity.save(tag);
     }
 
+    @Override
+    public BlockMaterial getMaterial(BlockType blockType) {
+        return new BlockMaterial_1_13(getBlock(blockType));
+    }
+
+    @Override
+    public BlockMaterial getMaterial(BlockState state) {
+        BlockTypes type = state.getBlockType();
+        IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
+        return new BlockMaterial_1_13(bs.getBlock(), bs);
+    }
+
+    public Block getBlock(BlockType blockType) {
+        return IRegistry.BLOCK.getOrDefault(new MinecraftKey(blockType.getNamespace(), blockType.getResource()));
+    }
+
     // ------------------------------------------------------------------------
     // Code that is less likely to break
     // ------------------------------------------------------------------------
@@ -201,12 +178,12 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
     @Override
     public int getBiomeId(Biome biome) {
         BiomeBase mcBiome = CraftBlock.biomeToBiomeBase(biome);
-        return mcBiome != null ? BiomeBase.a(mcBiome) : 0;
+        return mcBiome != null ? IRegistry.BIOME.a(mcBiome) : 0;
     }
 
     @Override
     public Biome getBiome(int id) {
-        BiomeBase mcBiome = BiomeBase.getBiome(id);
+        BiomeBase mcBiome = IRegistry.BIOME.fromId(id);
         return CraftBlock.biomeBaseToBiome(mcBiome); // Defaults to ocean if it's an invalid ID
     }
 
@@ -236,32 +213,62 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
     }
 
     @Override
-    public boolean setBlock(Location location, BlockStateHolder state, boolean notifyAndLight) {
-        checkNotNull(location);
-        checkNotNull(state);
+    public boolean isChunkInUse(org.bukkit.Chunk chunk) {
+        CraftChunk craftChunk = (CraftChunk) chunk;
+        PlayerChunkMap chunkMap = ((WorldServer) craftChunk.getHandle().getWorld()).getPlayerChunkMap();
+        return chunkMap.isChunkInUse(chunk.getX(), chunk.getZ());
+    }
 
-        CraftWorld craftWorld = ((CraftWorld) location.getWorld());
-        int x = location.getBlockX();
-        int y = location.getBlockY();
-        int z = location.getBlockZ();
+    @Override
+    public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
+        CraftChunk craftChunk = (CraftChunk) chunk;
+        Chunk nmsChunk = craftChunk.getHandle();
+        World nmsWorld = nmsChunk.getWorld();
 
-        // Two pass update:
-        // Note, this will notify blocks BEFORE the tile entity is set
-        location.getBlock().setBlockData(BukkitAdapter.adapt(state), false);
+        IBlockData blockData = ((BlockMaterial_1_13) state.getMaterial()).getState();
+        ChunkSection[] sections = nmsChunk.getSections();
+        int y4 = y >> 4;
+        ChunkSection section = sections[y4];
 
-        // Copy NBT data for the block
-        CompoundTag nativeTag = state.getNbtData();
-        if (nativeTag != null) {
-            // We will assume that the tile entity was created for us,
-            // though we do not do this on the Forge version
-            TileEntity tileEntity = craftWorld.getHandle().getTileEntity(new BlockPosition(x, y, z));
-            if (tileEntity != null) {
-                NBTTagCompound tag = (NBTTagCompound) fromNative(nativeTag);
-                tag.set("x", new NBTTagInt(x));
-                tag.set("y", new NBTTagInt(y));
-                tag.set("z", new NBTTagInt(z));
-                readTagIntoTileEntity(tag, tileEntity); // Load data
+        IBlockData existing;
+        if (section == null) {
+            existing = ((BlockMaterial_1_13) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
+        } else {
+            existing = section.getType(x & 15, y & 15, z & 15);
+        }
+        BlockPosition pos = null;
+        if (existing instanceof TileEntityBlock || blockData instanceof TileEntityBlock) {
+            pos = new BlockPosition(x, y, z);
+            nmsWorld.setTypeAndData(pos, blockData, 0);
+            // remove tile
+            CompoundTag nativeTag = state.getNbtData();
+            if (nativeTag != null) {
+                // We will assume that the tile entity was created for us,
+                // though we do not do this on the Forge version
+                TileEntity tileEntity = nmsWorld.getTileEntity(pos);
+                if (tileEntity != null) {
+                    NBTTagCompound tag = (NBTTagCompound) fromNative(nativeTag);
+                    tag.set("x", new NBTTagInt(x));
+                    tag.set("y", new NBTTagInt(y));
+                    tag.set("z", new NBTTagInt(z));
+                    readTagIntoTileEntity(tag, tileEntity); // Load data
+                }
             }
+        } else {
+            if (existing == blockData) return true;
+            if (section == null) {
+                if (blockData.isAir()) return true;
+                sections[y4] = new ChunkSection(y4 << 4, nmsWorld.worldProvider.g());
+            }
+            if (existing.e() != blockData.e() || existing.getMaterial().f() != blockData.getMaterial().f()) {
+                nmsChunk.a(pos = new BlockPosition(x, y, z), blockData, false);
+            } else {
+                section.setType(x & 15, y & 15, z & 15, blockData);
+            }
+        }
+        if (update) {
+            if (pos == null) pos = new BlockPosition(x, y, z);
+            nmsWorld.getMinecraftWorld().notify(pos, existing, blockData, 0);
         }
         return true;
     }
@@ -320,8 +327,9 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
     public Map<String, ? extends Property> getProperties(BlockType blockType) {
         Block block;
         try {
-            block = Block.getByName(blockType.getId());
+            block = IRegistry.BLOCK.getOrDefault(new MinecraftKey(blockType.getNamespace(), blockType.getResource()));
         } catch (Throwable e) {
+            e.printStackTrace();
             return Collections.emptyMap();
         }
         if (block == null) {
@@ -484,4 +492,36 @@ public final class Spigot_v1_13_R1 implements BukkitImplAdapter<NBTBase> {
         }
     }
 
+    private int[] idbToStateOrdinal;
+
+    private boolean init() {
+        if (idbToStateOrdinal != null) return false;
+        idbToStateOrdinal = new int[Block.REGISTRY_ID.a()]; // size
+        for (int i = 0; i < idbToStateOrdinal.length; i++) {
+            BlockState state = BlockTypes.states[i];
+            BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
+            int id = Block.REGISTRY_ID.getId(material.getState());
+            idbToStateOrdinal[id] = state.getOrdinal();
+        }
+        return true;
+    }
+
+    @Override
+    public BlockState adapt(BlockData blockData) {
+        try {
+            CraftBlockData cbd = ((CraftBlockData) blockData);
+            IBlockData ibd = cbd.getState();
+            int id = Block.REGISTRY_ID.getId(ibd);
+            return BlockTypes.states[idbToStateOrdinal[id]];
+        } catch (NullPointerException e) {
+            if (init()) return adapt(blockData);
+            throw e;
+        }
+    }
+
+    @Override
+    public BlockData adapt(BlockStateHolder state) {
+        BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
+        return material.getCraftBlockData();
+    }
 }

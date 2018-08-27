@@ -445,7 +445,10 @@ public class BukkitWorld extends AbstractWorld {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             try {
-                return adapter.setBlock(BukkitAdapter.adapt(getWorld(), position), block, notifyAndLight);
+                int x = position.getBlockX();
+                int y = position.getBlockY();
+                int z = position.getBlockZ();
+                return adapter.setBlock(getWorld().getChunkAt(x >> 4, z >> 4), x, y, z, block, true);
             } catch (Exception e) {
                 if (block.getNbtData() != null) {
                     logger.warning("Tried to set a corrupt tile entity at " + position.toString());

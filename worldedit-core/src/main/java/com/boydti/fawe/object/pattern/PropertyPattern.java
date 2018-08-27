@@ -14,22 +14,27 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PropertyPattern extends AbstractExtentPattern {
+    private final int[] transformed;
+
     public PropertyPattern(Extent extent, String[] properties) {
-        super(extent);
+        this(extent);
         addRegex(".*[" + StringMan.join(properties, ",") + "]");
     }
 
     public PropertyPattern(Extent extent) {
         super(extent);
+        this.transformed = new int[BlockTypes.states.length];
+        for (int i = 0; i < transformed.length; i++) {
+            transformed[i] = i;
+        }
     }
-
-    private int[][] intSets = new int[BlockTypes.size()][];
 
     private static final Operator EQUAL = (length, value, index) -> value;
     private static final Operator PLUS = (length, value, index) -> index + value;
@@ -71,20 +76,14 @@ public class PropertyPattern extends AbstractExtentPattern {
         List values = property.getValues();
         int length = values.size();
 
-        int[] states = null;
         for (int i = 0; i < values.size(); i++) {
             int result = operator.apply(length, valueInt, i);
             if (wrap) result = MathMan.wrap(result, 0, length - 1);
             else result = Math.max(Math.min(result, length - 1), 0);
             if (result == i) continue;
 
-            if (states == null) {
-                states = intSets[type.getInternalId()];
-                if (states == null) {
-                    intSets[type.getInternalId()] = states = new int[type.getMaxStateId() + 1];
-                    for (int j = 0; j < states.length; j++) states[j] = j;
-                }
-            }
+            int internalId = valueInt + i;
+
             int state = property.modifyIndex(0, i);
             if (type.getProperties().size() > 1) {
                 ArrayList<Property> properties = new ArrayList<>(type.getProperties().size() - 1);
@@ -92,27 +91,30 @@ public class PropertyPattern extends AbstractExtentPattern {
                     if (current == property) continue;
                     properties.add(current);
                 }
-                applyRecursive(property, properties, 0, state, result, states);
+                applyRecursive(type, property, properties, 0, state, result);
             } else {
-                states[i] = result;
+                int ordinal = type.withStateId(internalId).getOrdinal();
+                transformed[ordinal] = type.withStateId(result).getOrdinal();
             }
         }
     }
 
-    private void applyRecursive(AbstractProperty property, List<Property> properties, int propertiesIndex, int state, int index, int[] states) {
+    private void applyRecursive(BlockType type, AbstractProperty property, List<Property> properties, int propertiesIndex, int stateId, int index) {
         AbstractProperty current = (AbstractProperty) properties.get(propertiesIndex);
         List values = current.getValues();
         if (propertiesIndex + 1 < properties.size()) {
             for (int i = 0; i < values.size(); i++) {
-                int newState = current.modifyIndex(state, i);
-                applyRecursive(property, properties, propertiesIndex + 1, newState, index, states);
+                int newState = current.modifyIndex(stateId, i);
+                applyRecursive(type, property, properties, propertiesIndex + 1, newState, index);
             }
         } else {
-            //set chest[waterlogged=north]
             for (int i = 0; i < values.size(); i++) {
-                int statesIndex = current.modifyIndex(state, i) >> BlockTypes.BIT_OFFSET;
-                int existing = states[statesIndex] << BlockTypes.BIT_OFFSET;
-                states[statesIndex] = property.modifyIndex(existing, index) >> BlockTypes.BIT_OFFSET;
+                int statesIndex = current.modifyIndex(stateId, i) >> BlockTypes.BIT_OFFSET;
+                BlockState state = BlockState.getFromInternalId(statesIndex);
+                int existingOrdinal = transformed[state.getOrdinal()];
+                int existing = BlockTypes.states[existingOrdinal].getInternalId();
+                        //states[statesIndex] << BlockTypes.BIT_OFFSET;
+                transformed[state.getOrdinal()] = property.modifyIndex(existing, index) >> BlockTypes.BIT_OFFSET;
             }
         }
     }
@@ -195,16 +197,14 @@ public class PropertyPattern extends AbstractExtentPattern {
     }
 
     public BlockState apply(BlockState block, BlockState orDefault) {
-        int typeId = block.getInternalBlockTypeId();
-        int[] states = intSets[typeId];
-        if (states == null) return orDefault;
-        int propertyId = block.getInternalPropertiesId();
-        int newPropertyId = states[propertyId];
-        if (newPropertyId == propertyId) return orDefault;
-        BlockState newState = block.withPropertyId(newPropertyId);
-        CompoundTag nbt = block.getNbtData();
-        if (nbt == null) return newState;
-        return new BaseBlock(newState, nbt);
+        int ordinal = block.getOrdinal();
+        int newOrdinal = transformed[ordinal];
+        if (newOrdinal != ordinal) {
+            CompoundTag nbt = block.getNbtData();
+            BlockState newState = BlockState.getFromOrdinal(newOrdinal);
+            return nbt != null ? new BaseBlock(newState, nbt) : newState;
+        }
+        return orDefault;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.database.DBHandler;
@@ -23,7 +22,6 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -95,7 +93,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
                         int index = value.getIndex();
                         long age = System.currentTimeMillis() - value.getBDFile().lastModified();
                         String ageFormatted = MainUtil.secToTime(age / 1000);
-                        BBC.TOOL_INSPECT_INFO.send(fp, name, BlockState.get(from).getAsString(), BlockState.get(to).getAsString(), ageFormatted);
+                        BBC.TOOL_INSPECT_INFO.send(fp, name, BlockState.getFromInternalId(from).getAsString(), BlockState.getFromInternalId(to).getAsString(), ageFormatted);
                         count.incrementAndGet();
                         return;
                     }

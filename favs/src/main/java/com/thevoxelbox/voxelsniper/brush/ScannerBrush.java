@@ -149,7 +149,7 @@ public class ScannerBrush extends Brush
 	@Override
     protected final void arrow(final SnipeData v)
     {
-        this.checkFor = BukkitAdapter.adapt(BlockTypes.getFromStateId(v.getVoxelId()));
+        this.checkFor = BukkitAdapter.adapt(BlockTypes.get(v.getVoxelId()));
         this.scan(v, this.getTargetBlock().getFace(this.getLastBlock()));
     }
 
@@ -157,7 +157,7 @@ public class ScannerBrush extends Brush
 	@Override
     protected final void powder(final SnipeData v)
     {
-        this.checkFor = BukkitAdapter.adapt(BlockTypes.getFromStateId(v.getVoxelId()));
+        this.checkFor = BukkitAdapter.adapt(BlockTypes.get(v.getVoxelId()));
         this.scan(v, this.getTargetBlock().getFace(this.getLastBlock()));
     }
 

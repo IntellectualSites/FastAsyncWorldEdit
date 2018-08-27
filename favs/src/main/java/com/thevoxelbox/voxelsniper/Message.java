@@ -91,7 +91,7 @@ public class Message
     @SuppressWarnings("deprecation")
     public void replace()
     {
-        snipeData.sendMessage(ChatColor.AQUA + "Replace Material: " + BlockTypes.getFromStateId(snipeData.getReplaceId()));
+        snipeData.sendMessage(ChatColor.AQUA + "Replace Material: " + BlockTypes.get(snipeData.getReplaceId()));
     }
 
     /**
@@ -144,7 +144,7 @@ public class Message
     @SuppressWarnings("deprecation")
     public void voxel()
     {
-        snipeData.sendMessage(ChatColor.GOLD + "Voxel: " + ChatColor.RED + BlockTypes.getFromStateId(snipeData.getVoxelId()));
+        snipeData.sendMessage(ChatColor.GOLD + "Voxel: " + ChatColor.RED + BlockTypes.get(snipeData.getVoxelId()));
     }
 
     /**

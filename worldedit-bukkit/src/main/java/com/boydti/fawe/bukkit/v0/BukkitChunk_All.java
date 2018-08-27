@@ -96,13 +96,13 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
         boolean more = true;
         final BukkitQueue_All parent = (BukkitQueue_All) getParent();
         BukkitImplAdapter adapter = BukkitQueue_0.getAdapter();
-
         final Chunk chunk = getChunk();
         Object[] disableResult = parent.disableLighting(chunk);
         final World world = chunk.getWorld();
         int[][] sections = getCombinedIdArrays();
         final int bx = getX() << 4;
         final int bz = getZ() << 4;
+        boolean update = adapter != null ? adapter.isChunkInUse(chunk) : true;
         if (layer == -1) {
             if (adapter != null)
             {
@@ -241,7 +241,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                             mutableLoc.setX(xx);
                                             mutableLoc.setY(yy);
                                             mutableLoc.setZ(zz);
-                                            setBlock(adapter, mutableLoc, combined);
+                                            setBlock(adapter, chunk, mutableLoc, combined, update);
                                         }
                                         continue;
                                     default:
@@ -249,25 +249,22 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                             if (type.getMaterial().hasContainer() && adapter != null) {
                                                 CompoundTag nbt = getTile(x, yy, z);
                                                 if (nbt != null) {
-                                                    mutableLoc.setX(xx);
-                                                    mutableLoc.setY(yy);
-                                                    mutableLoc.setZ(zz);
                                                     synchronized (BukkitChunk_All.this) {
                                                         BaseBlock state = BaseBlock.getFromInternalId(combined, nbt);
-                                                        adapter.setBlock(mutableLoc, state, false);
+                                                        adapter.setBlock(chunk, xx, yy, zz, state, update);
                                                     }
                                                     continue;
                                                 }
                                             }
                                             if (type.getMaterial().isTicksRandomly()) {
                                                 synchronized (BukkitChunk_All.this) {
-                                                    setBlock(adapter, mutableLoc, combined);
+                                                    setBlock(adapter, chunk, mutableLoc, combined, update);
                                                 }
                                             } else {
                                                 mutableLoc.setX(xx);
                                                 mutableLoc.setY(yy);
                                                 mutableLoc.setZ(zz);
-                                                setBlock(adapter, mutableLoc, combined);
+                                                setBlock(adapter, chunk, mutableLoc, combined, update);
                                             }
                                         }
                                         continue;
@@ -292,7 +289,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                     mutableLoc.setX(bx + x);
                                     mutableLoc.setY(y);
                                     mutableLoc.setZ(bz + z);
-                                    setBlock(adapter, mutableLoc, combined);
+                                    setBlock(adapter, chunk, mutableLoc, combined, update);
                                 }
                                 break;
                             default:
@@ -316,7 +313,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                     if (tile != null) {
                                         synchronized (BukkitChunk_All.this) {
                                             BaseBlock state = BaseBlock.getFromInternalId(combined, tile);
-                                            adapter.setBlock(new Location(world, bx + x, y, bz + z), state, false);
+                                            adapter.setBlock(chunk, bx + x, y, bz + z, state, update);
                                         }
                                         break;
                                     }
@@ -326,13 +323,13 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                         mutableLoc.setX(bx + x);
                                         mutableLoc.setY(y);
                                         mutableLoc.setZ(bz + z);
-                                        setBlock(adapter, mutableLoc, combined);
+                                        setBlock(adapter, chunk, mutableLoc, combined, update);
                                     }
                                 } else {
                                     mutableLoc.setX(bx + x);
                                     mutableLoc.setY(y);
                                     mutableLoc.setZ(bz + z);
-                                    setBlock(adapter, mutableLoc, combined);
+                                    setBlock(adapter, chunk, mutableLoc, combined, update);
                                 }
                                 if (light) {
                                     parent.disableLighting(disableResult);
@@ -357,20 +354,13 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
         return this;
     }
 
-    public void setBlock(BukkitImplAdapter adapter, Block block, BlockStateHolder state) {
+    public void setBlock(BukkitImplAdapter adapter, Chunk chunk, Location location, int combinedId, boolean update) {
+        com.sk89q.worldedit.world.block.BlockState state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId);
         if (adapter != null) {
-            adapter.setBlock(block.getLocation(), state, false);
-        } else {
-            block.setBlockData(BukkitAdapter.adapt(state), false);
-        }
-    }
-
-    public void setBlock(BukkitImplAdapter adapter, Location location, int combinedId) {
-        if (adapter != null) {
-            adapter.setBlock(location, com.sk89q.worldedit.world.block.BlockState.get(combinedId), false);
+            adapter.setBlock(chunk, (int) location.getX(), (int) location.getY(), (int) location.getZ(), state, update);
         } else {
             Block block = location.getWorld().getBlockAt(location);
-            block.setBlockData(BukkitAdapter.getBlockData(combinedId), false);
+            block.setBlockData(BukkitAdapter.adapt(state), false);
         }
     }
 }

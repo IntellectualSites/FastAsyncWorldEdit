@@ -86,7 +86,7 @@ public class Rollback extends FaweCommand {
                                 int id = entry.getKey();
                                 BlockStateHolder state = null;
                                 try {
-                                    state = BlockState.get(id);
+                                    state = BlockState.getFromInternalId(id);
                                 } catch (Throwable ignore) {};
                                 String itemName = state == null ? "#" + id : state.getAsString();
                                 percentString.append(prefix).append(entry.getValue()).append("% ").append(itemName);

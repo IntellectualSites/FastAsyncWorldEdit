@@ -21,13 +21,14 @@ package com.sk89q.worldedit.bukkit.adapter;
 
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.world.block.BlockType;
-import net.minecraft.server.v1_13_R1.NBTBase;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Entity;
@@ -39,7 +40,7 @@ import javax.annotation.Nullable;
 /**
  * An interface for adapters of various Bukkit implementations.
  */
-public interface BukkitImplAdapter<T> {
+public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     /**
      * Get the biome ID for the given biome.
@@ -69,15 +70,9 @@ public interface BukkitImplAdapter<T> {
      */
     BlockState getBlock(Location location);
 
-    /**
-     * Set the block at the given location.
-     *
-     * @param location the location
-     * @param state the block
-     * @param notifyAndLight notify and light if set
-     * @return true if a block was likely changed
-     */
-    boolean setBlock(Location location, BlockStateHolder state, boolean notifyAndLight);
+    boolean setBlock(Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update);
+
+    boolean isChunkInUse(Chunk chunk);
 
     /**
      * Get the state for the given entity.
@@ -105,6 +100,14 @@ public interface BukkitImplAdapter<T> {
      * @return The properties map
      */
     Map<String, ? extends Property> getProperties(BlockType blockType);
+
+    default BlockMaterial getMaterial(BlockType blockType) {
+        return null;
+    }
+
+    default BlockMaterial getMaterial(BlockState blockState) {
+        return null;
+    }
 
     default Tag toNative(T foreign) {
         return null;

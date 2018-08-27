@@ -19,24 +19,17 @@
 
 package com.sk89q.worldedit.blocks;
 
-import com.boydti.fawe.object.string.MutableCharSequence;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.registry.state.AbstractProperty;
-import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.util.command.parametric.Optional;
-import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Represents a "snapshot" of a block with NBT Data.
@@ -48,7 +41,7 @@ import javax.annotation.Nullable;
  * may be missing.</p>
  */
 public class BaseBlock extends BlockState {
-    private BlockState blockState;
+    private final BlockState blockState;
 
     @Nullable
     protected CompoundTag nbtData;
@@ -90,7 +83,7 @@ public class BaseBlock extends BlockState {
      * @param nbtData NBT data, which may be null
      */
     public BaseBlock(BlockStateHolder state, @Nullable CompoundTag nbtData) {
-        super(0);
+        super();
         this.blockState = state.toImmutableState();
         this.nbtData = nbtData;
     }
@@ -115,7 +108,7 @@ public class BaseBlock extends BlockState {
     }
 
     protected BaseBlock(int internalId, CompoundTag nbtData) {
-        this(BlockState.get(internalId), nbtData);
+        this(BlockState.getFromInternalId(internalId), nbtData);
     }
 
     @Deprecated
@@ -137,18 +130,6 @@ public class BaseBlock extends BlockState {
     public BlockState toFuzzy() {
         return blockState;
     }
-
-//    /**
-//     * Get the block's data value.
-//     *
-//     * Broken - do not use
-//     *
-//     * @return data value (0-15)
-//     */
-//    @Deprecated
-//    public int getData() {
-//        return 0;
-//    }
 
     @Override
     public String getNbtId() {
@@ -200,8 +181,23 @@ public class BaseBlock extends BlockState {
     }
 
     @Override
+    public BlockMaterial getMaterial() {
+        return blockState.getMaterial();
+    }
+
+    @Override
+    public BlockTypes getBlockType() {
+        return blockState.getBlockType();
+    }
+
+    @Override
+    public int getOrdinal() {
+        return blockState.getOrdinal();
+    }
+
+    @Override
     public int hashCode() {
-        return getInternalId();
+        return getOrdinal();
     }
 
     @Override

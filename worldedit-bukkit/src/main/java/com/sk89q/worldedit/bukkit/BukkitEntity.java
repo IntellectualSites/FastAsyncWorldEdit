@@ -36,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * An adapter to adapt a Bukkit entity into a WorldEdit one.
  */
-class BukkitEntity implements Entity {
+public class BukkitEntity implements Entity {
 
     private final WeakReference<org.bukkit.entity.Entity> entityRef;
 
@@ -45,7 +45,7 @@ class BukkitEntity implements Entity {
      *
      * @param entity the entity
      */
-    BukkitEntity(org.bukkit.entity.Entity entity) {
+    public BukkitEntity(org.bukkit.entity.Entity entity) {
         checkNotNull(entity);
         this.entityRef = new WeakReference<>(entity);
     }

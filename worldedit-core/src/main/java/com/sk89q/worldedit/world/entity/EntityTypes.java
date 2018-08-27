@@ -145,6 +145,10 @@ public enum EntityTypes implements EntityType {
     }
 
     EntityTypes(String id) {
+        init(id);
+    }
+
+    private void init(String id) {
         if (id == null) id = "minecraft:" + name().toLowerCase();
             // If it has no namespace, assume minecraft.
         else if (!id.contains(":")) {
@@ -278,6 +282,9 @@ public enum EntityTypes implements EntityType {
             existing = ReflectionUtils.addEnum(EntityTypes.class, enumName);
         }
         int internalId = existing.ordinal();
+        if (existing.id == null) {
+            existing.init(null);
+        }
         if (internalId == 0 && existing != __RESERVED__) {
             existing.internalId = $LENGTH++;
         }

@@ -19,9 +19,13 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
+import com.boydti.fawe.util.StringMan;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -38,10 +42,13 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import it.unimi.dsi.fastutil.ints.IntCollections;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -647,6 +654,11 @@ public enum BlockTypes implements BlockType {
     YELLOW_WOOL,
     ZOMBIE_HEAD,
     ZOMBIE_WALL_HEAD,
+    DEAD_BRAIN_CORAL,
+    DEAD_BUBBLE_CORAL,
+    DEAD_FIRE_CORAL,
+    DEAD_HORN_CORAL,
+    DEAD_TUBE_CORAL,
 
     ;
 
@@ -666,9 +678,9 @@ public enum BlockTypes implements BlockType {
         private final Set<AbstractProperty> propertiesSet;
         private final BlockMaterial blockMaterial;
         private final int permutations;
-        private BlockState[] states;
+        private int[] stateOrdinals;
 
-        Settings(BlockTypes type, String id, int internalId) {
+        Settings(BlockTypes type, String id, int internalId, List<BlockState> states) {
             this.internalId = internalId;
             String propertyString = null;
             int propI = id.indexOf('[');
@@ -715,10 +727,20 @@ public enum BlockTypes implements BlockType {
             this.blockMaterial = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(type);
             this.itemType = ItemTypes.get(type);
 
-            if (propertyString != null) {
-                this.defaultState = new BlockState(parseProperties(propertyString, propertiesMap));
+            if (!propertiesList.isEmpty()) {
+                this.stateOrdinals = generateStateOrdinals(internalId, states.size(), maxInternalStateId, propertiesList);
+                for (int propId = 0; propId < this.stateOrdinals.length; propId++) {
+                    int ordinal = this.stateOrdinals[propId];
+                    if (ordinal != -1) {
+                        int stateId = internalId + (propId << BlockTypes.BIT_OFFSET);
+                        states.add(new BlockStateImpl(type, stateId, ordinal));
+                    }
+                }
+                int defaultPropId = parseProperties(propertyString, propertiesMap) >> BlockTypes.BIT_OFFSET;
+                this.defaultState = states.get(this.stateOrdinals[defaultPropId]);
             } else {
-                this.defaultState = new BlockState(internalId);
+                this.defaultState = new BlockStateImpl(type, internalId, states.size());
+                states.add(this.defaultState);
             }
         }
 
@@ -744,9 +766,14 @@ public enum BlockTypes implements BlockType {
         settings = null;
     }
 
-    private void init(String id, int internalId) {
+    private void init(String id, int internalId, List<BlockState> states) {
         try {
-            ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("settings"), this, new Settings(this, id, internalId));
+            if (getId() == null) {
+                String name = (name().indexOf(':') == -1 ? "minecraft:" : "") + name().toLowerCase();
+                ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("id"), this, name);
+            }
+            Settings settings = new Settings(this, id, internalId, states);
+            ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("settings"), this, settings);
         } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -754,25 +781,38 @@ public enum BlockTypes implements BlockType {
     }
 
     public BlockState withPropertyId(int propertyId) {
-        if (settings.propertiesArr.length == 0) return settings.defaultState;
-        BlockState[] tmp = settings.states;
-        if (tmp == null) {
-            synchronized (this) {
-                if ((tmp = settings.states) == null) {
-                    tmp = settings.states = new BlockState[getMaxStateId() + 1];
-                    tmp[settings.defaultState.getInternalPropertiesId()] = settings.defaultState;
-                }
-            }
+        if (settings.stateOrdinals == null) return settings.defaultState;
+        return states[settings.stateOrdinals[propertyId]];
+    }
+
+    private static int[] generateStateOrdinals(int internalId, int ordinal, int maxStateId, List<AbstractProperty> props) {
+        if (props.isEmpty()) return null;
+        int[] result = new int[maxStateId + 1];
+        Arrays.fill(result, -1);
+        int[] state = new int[props.size()];
+        int[] sizes = new int[props.size()];
+        for (int i = 0; i < props.size(); i++) {
+            sizes[i] = props.get(i).getValues().size();
         }
-        BlockState state = tmp[propertyId];
-        if (state == null) {
-            synchronized (this) {
-                if ((state = tmp[propertyId]) == null) {
-                    state = tmp[propertyId] = new BlockState(getInternalId() + (propertyId << BIT_OFFSET));
-                }
+        int index = 0;
+        outer:
+        while (true) {
+            // Create the state
+            int stateId = internalId;
+            for (int i = 0; i < state.length; i++) {
+                stateId = props.get(i).modifyIndex(stateId, state[i]);
             }
+            // Map it to the ordinal
+            result[stateId >> BlockTypes.BIT_OFFSET] = ordinal++;
+            // Increment the state
+            while (++state[index] == sizes[index]) {
+                state[index] = 0;
+                index++;
+                if (index == state.length) break outer;
+            }
+            index = 0;
         }
-        return state;
+        return result;
     }
 
     /**
@@ -781,16 +821,8 @@ public enum BlockTypes implements BlockType {
      */
     @Deprecated
     public Collection<BlockState> getStates() {
-        if (this.settings.states == null || this.settings.states.length <= 1) {
-            return Collections.singletonList(getDefaultState());
-        }
-        ArrayList<BlockState> states = new ArrayList<>();
-        for (BlockState state : settings.states) {
-            if (state != null) {
-                states.add(state);
-            }
-        }
-        return states;
+        if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
+        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> states[i]).collect(Collectors.toList());
     }
 
     @Deprecated
@@ -965,7 +997,11 @@ public enum BlockTypes implements BlockType {
 
     private static final Map<String, BlockTypes> $REGISTRY = new HashMap<>();
     private static int $LENGTH;
+    private static int $STATE_INDEX;
+
     public static final BlockTypes[] values;
+    public static final BlockState[] states;
+
     private static final Set<String> $NAMESPACES = new LinkedHashSet<String>();
 
     static {
@@ -977,7 +1013,10 @@ public enum BlockTypes implements BlockType {
             $LENGTH = oldValues.length;
             int size = blockMap.size();
             for (BlockTypes type : oldValues) {
-                if (!blockMap.containsKey(type.getId())) size++;
+                if (!blockMap.containsKey(type.getId())) {
+                    Fawe.debug("Invalid block registered " + type.getId());
+                    size++;
+                }
                 if (type != __RESERVED__) {
                     $REGISTRY.put(type.name().toLowerCase(), type);
                 }
@@ -987,13 +1026,14 @@ public enum BlockTypes implements BlockType {
             BIT_MASK = ((1 << BIT_OFFSET) - 1);
 
             LinkedHashSet<BlockTypes> newValues = new LinkedHashSet<>(Arrays.asList(oldValues));
-            for (BlockTypes type : oldValues) {
-                String block = blockMap.getOrDefault(type.getId(), type.getId());
-                BlockTypes registered = register(block);
+            ArrayList<BlockState> stateList = new ArrayList<>();
+            for (String block : blocks) {
+                BlockTypes registered = register(block, stateList);
                 if (!newValues.contains(registered)) newValues.add(registered);
             }
             // Cache the values
             values = newValues.toArray(new BlockTypes[newValues.size()]);
+            states = stateList.toArray(new BlockState[stateList.size()]);
         } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -1021,7 +1061,7 @@ public enum BlockTypes implements BlockType {
         );
     }
 
-    private static BlockTypes register(final String id) {
+    private static BlockTypes register(final String id, List<BlockState> states) {
         // Get the enum name (remove namespace if minecraft:)
         int propStart = id.indexOf('[');
         String typeName = id.substring(0, propStart == -1 ? id.length() : propStart);
@@ -1032,13 +1072,15 @@ public enum BlockTypes implements BlockType {
             existing = valueOf(enumName.toUpperCase());
         } catch (IllegalArgumentException ignore) {}
         if (existing == null) {
+            Fawe.debug("Registering block " + enumName);
             existing = ReflectionUtils.addEnum(BlockTypes.class, enumName);
         }
         int internalId = existing.ordinal();
         if (internalId == 0 && existing != __RESERVED__) {
             internalId = $LENGTH++;
         }
-        existing.init(id, internalId);
+        existing.init(id, internalId, states);
+        // register states
         if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
         $REGISTRY.put(typeName, existing);
         String nameSpace = typeName.substring(0, typeName.indexOf(':'));
@@ -1066,6 +1108,11 @@ public enum BlockTypes implements BlockType {
     @Deprecated
     public static final BlockTypes getFromStateId(final int internalStateId) {
         return values[internalStateId & BIT_MASK];
+    }
+
+    @Deprecated
+    public static final BlockTypes getFromStateOrdinal(final int internalStateOrdinal) {
+        return states[internalStateOrdinal].getBlockType();
     }
 
     public static int size() {

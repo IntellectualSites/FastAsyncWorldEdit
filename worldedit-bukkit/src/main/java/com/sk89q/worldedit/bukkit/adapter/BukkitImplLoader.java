@@ -170,6 +170,7 @@ public class BukkitImplLoader {
                 log.log(Level.WARNING, "Failed to load the Bukkit adapter class '" + className +
                         "' that is not supposed to be raising this error", e);
             } catch (Throwable e) {
+                e.printStackTrace();
                 if (className.equals(customCandidate)) {
                     log.log(Level.WARNING, "Failed to load the Bukkit adapter class '" + className + "'", e);
                 }

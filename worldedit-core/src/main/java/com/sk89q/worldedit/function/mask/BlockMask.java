@@ -1,7 +1,5 @@
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
@@ -147,7 +145,7 @@ public class BlockMask extends AbstractExtentMask {
             single = single && numSet == 1;
         }
         if (single)
-            return new SingleBlockStateMask(getExtent(), BlockState.get(and));
+            return new SingleBlockStateMask(getExtent(), BlockState.getFromInternalId(and));
         return new SingleBlockStateBitMask(getExtent(), and);
     }
 

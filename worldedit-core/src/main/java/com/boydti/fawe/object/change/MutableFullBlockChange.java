@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.change;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.util.ExtentTraverser;
@@ -12,7 +11,6 @@ import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class MutableFullBlockChange implements Change {
@@ -68,14 +66,14 @@ public class MutableFullBlockChange implements Change {
             if (idFrom != idTo) {
                 if (allowFetch && from != 0) {
                     try {
-                        blockBag.fetchPlacedBlock(BlockState.get(from));
+                        blockBag.fetchPlacedBlock(BlockState.getFromInternalId(from));
                     } catch (BlockBagException e) {
                         return;
                     }
                 }
                 if (allowStore && to != 0) {
                     try {
-                        blockBag.storeDroppedBlock(BlockState.get(to));
+                        blockBag.storeDroppedBlock(BlockState.getFromInternalId(to));
                     } catch (BlockBagException ignored) {
                     }
                 }

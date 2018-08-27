@@ -1,6 +1,5 @@
 package com.boydti.fawe.object;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
@@ -126,7 +125,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
         } catch (Throwable e) {
             MainUtil.handleError(e);
         }
-        return BlockState.get(combined);
+        return BlockState.getFromInternalId(combined);
     }
 
     public int[][] getCombinedIdArrays() {

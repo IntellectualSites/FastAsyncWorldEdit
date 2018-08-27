@@ -1,21 +1,17 @@
 package com.boydti.fawe.object.clipboard;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.change.MutableBlockChange;
 import com.boydti.fawe.object.change.MutableTileChange;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Iterator;
 
@@ -74,7 +70,7 @@ public class ResizableClipboardBuilder extends MemoryOptimizedHistory {
                 Change change = iter.next();
                 if (change instanceof MutableBlockChange) {
                     MutableBlockChange blockChange = (MutableBlockChange) change;
-                    BlockStateHolder block = BlockState.get(blockChange.combinedId);
+                    BlockStateHolder block = BlockState.getFromInternalId(blockChange.combinedId);
                     clipboard.setBlock(blockChange.x, blockChange.y, blockChange.z, block);
                 } else if (change instanceof MutableTileChange) {
                     MutableTileChange tileChange = (MutableTileChange) change;

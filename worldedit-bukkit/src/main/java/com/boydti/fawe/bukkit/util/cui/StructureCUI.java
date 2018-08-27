@@ -22,6 +22,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -36,7 +38,7 @@ public class StructureCUI extends CUI {
 
     private Vector remove;
     private NbtCompound removeTag;
-    private int combined;
+    private BlockState state;
 
     public StructureCUI(FawePlayer player) {
         super(player);
@@ -151,7 +153,7 @@ public class StructureCUI extends CUI {
                 map.put("sizeX", NbtFactory.of("sizeX", 0));
                 sendNbt(remove, removeTag);
                 Location removeLoc = new Location(player.getWorld(), remove.getX(), remove.getY(), remove.getZ());
-                player.sendBlockChange(removeLoc, BukkitAdapter.getBlockData(combined));
+                player.sendBlockChange(removeLoc, BukkitAdapter.adapt(state));
             }
             remove = null;
         }
@@ -186,7 +188,7 @@ public class StructureCUI extends CUI {
 
         Block block = player.getWorld().getBlockAt(x, y, z);
         remove = new Vector(x, y, z);
-        combined = BukkitAdapter.adapt(block.getBlockData()).getInternalId();
+        state = BukkitAdapter.adapt(block.getBlockData());
         removeTag = compound;
 
         Location blockLoc = new Location(player.getWorld(), x, y, z);

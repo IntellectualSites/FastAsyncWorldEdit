@@ -20,7 +20,6 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -392,7 +391,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                     for (int z = 0; z < length; z++) {
                         for (int x = 0; x < width; x++, pos += 4) {
                             int combinedId = mbb.getInt(pos);
-                            BlockState state = BlockState.get(combinedId);
+                            BlockState state = BlockState.getFromInternalId(combinedId);
                             task.run(x, y, z, state);
                         }
                     }

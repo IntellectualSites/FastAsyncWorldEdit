@@ -333,7 +333,7 @@ public class Sniper {
                                     return true;
                                 } else {
                                     int originalData = snipeData.getReplaceData();
-                                    snipeData.setReplaceData(BlockTypes.AIR.getInternalId());
+                                    snipeData.setReplaceData(0);
 //                                    SniperReplaceMaterialChangedEvent event = new SniperReplaceMaterialChangedEvent(this, toolId, BukkitAdapter.adapt(BlockState.get((snipeData.getReplaceId() << BlockTypes.BIT_OFFSET) + originalData)), BukkitAdapter.adapt(BlockState.get((snipeData.getReplaceId() << BlockTypes.BIT_OFFSET) + snipeData.getReplaceData())));
 //                                    callEvent(event);
                                     snipeData.getVoxelMessage().replaceData();

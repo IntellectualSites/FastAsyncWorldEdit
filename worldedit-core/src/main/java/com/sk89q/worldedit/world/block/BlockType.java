@@ -29,13 +29,12 @@ import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface BlockType extends FawePattern, Comparable<BlockTypes> {
 
@@ -67,6 +66,17 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      */
     String getId();
 
+    default String getNamespace() {
+        String id = getId();
+        int i = id.indexOf(':');
+        return i == -1 ? "minecraft" : id.substring(0, i);
+    }
+
+    default String getResource() {
+        String id = getId();
+        return id.substring(id.indexOf(':') + 1);
+    }
+
     /**
      * Gets the name of this block, or the ID if the name cannot be found.
      *
@@ -84,7 +94,7 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
     @Deprecated
     default BlockState withPropertyId(int internalPropertiesId) {
         if (internalPropertiesId == 0) return getDefaultState();
-        return BlockState.get(getInternalId() + (internalPropertiesId << BlockTypes.BIT_OFFSET));
+        return BlockState.getFromInternalId(getInternalId() + (internalPropertiesId << BlockTypes.BIT_OFFSET));
     }
 
     /**
@@ -93,7 +103,18 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      * @return The properties map
      */
     @Deprecated
-    Map<String, ? extends Property> getPropertyMap();
+    default Map<String, ? extends Property> getPropertyMap() {
+        List<? extends Property> properties = getProperties();
+        if (properties.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Property> map = new HashMap<>(properties.size());
+        for (Property property : properties) {
+            map.put(property.getName(), property);
+        }
+        return map;
+    }
 
     /**
      * Gets the properties of this BlockType.
@@ -104,7 +125,9 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
     List<? extends Property> getProperties();
 
     @Deprecated
-    Set<? extends Property> getPropertiesSet();
+    default Set<? extends Property> getPropertiesSet() {
+        return new HashSet<>(getProperties());
+    }
 
     /**
      * Gets a property by name.
@@ -113,11 +136,17 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      * @return The property
      */
     @Deprecated
-    <V> Property<V> getProperty(String name);
+    default <V> Property<V> getProperty(String name) {
+        return getPropertyMap().get(name);
+    }
 
-    boolean hasProperty(PropertyKey key);
+    default boolean hasProperty(PropertyKey key) {
+        return getPropertyMap().containsKey(key.getId());
+    }
 
-    <V> Property<V> getProperty(PropertyKey key);
+    default <V> Property<V> getProperty(PropertyKey key) {
+        return getPropertyMap().get(key.getId());
+    }
 
     /**
      * Gets the default state of this block type.
@@ -141,7 +170,9 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      * @return The item representation
      */
     @Nullable
-    ItemType getItemType();
+    default ItemType getItemType() {
+        return ItemTypes.get(this.getTypeEnum());
+    }
 
     /**
      * Get the material for this BlockType.

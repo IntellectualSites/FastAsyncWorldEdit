@@ -54,5 +54,4 @@ public interface BiomeRegistry {
      */
     @Nullable
     BiomeData getData(BaseBiome biome);
-
 }

@@ -22,9 +22,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.File;
@@ -75,14 +73,15 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     @Override
     default BlockState getLazyBlock(int x, int y, int z) {
         int combinedId4Data = getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
-        // TODO FIXME optimize get block tiles
         try {
-            CompoundTag tile = getTileEntity(x, y, z);
-            if (tile != null) {
-                return BaseBlock.getFromInternalId(combinedId4Data, tile);
-            } else {
-                return BlockState.get(combinedId4Data);
+            BlockState state = BlockState.getFromInternalId(combinedId4Data);
+            if (state.getMaterial().hasContainer()) {
+                CompoundTag tile = getTileEntity(x, y, z);
+                if (tile != null) {
+                    return BaseBlock.getFromInternalId(combinedId4Data, tile);
+                }
             }
+            return state;
         } catch (Throwable e) {
             MainUtil.handleError(e);
             return BlockTypes.AIR.getDefaultState();
@@ -275,7 +274,8 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                 mutable.mutZ(zz);
                 for (int y = 0; y <= getMaxY(); y++) {
                     int combined = getCombinedId4Data(xx, y, zz);
-                    BlockType type = BlockTypes.getFromStateId(combined);
+                    BlockState state = BlockState.getFromInternalId(combined);
+                    BlockTypes type = state.getBlockType();
                     switch (type.getTypeEnum()) {
                         case AIR:
                         case VOID_AIR:
@@ -288,7 +288,6 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                         BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
                         onEach.run(mutable, block);
                     } else {
-                        BlockState state = type.withPropertyId(combined >> BlockTypes.BIT_OFFSET);
                         onEach.run(mutable, state);
                     }
                 }
