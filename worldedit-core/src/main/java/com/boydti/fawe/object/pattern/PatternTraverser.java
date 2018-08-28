@@ -34,7 +34,7 @@ public class PatternTraverser {
                     Field field = current.getDeclaredField("extent");
                     field.setAccessible(true);
                     field.set(pattern, newExtent);
-                } catch (NoSuchFieldException | IllegalAccessException ignore) {
+                } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignore) {
                 }
             }
             try {
@@ -42,7 +42,7 @@ public class PatternTraverser {
                 field.setAccessible(true);
                 Object next = field.get(pattern);
                 reset(next, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignore) {
             }
             try {
                 Field field = current.getDeclaredField("mask");
@@ -56,7 +56,7 @@ public class PatternTraverser {
                 field.setAccessible(true);
                 Pattern next = (Pattern) field.get(pattern);
                 reset(next, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignore) {
             }
             try {
                 Field field = current.getDeclaredField("patterns");
@@ -65,7 +65,7 @@ public class PatternTraverser {
                 for (Pattern next : patterns) {
                     reset(next, newExtent);
                 }
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException | ClassCastException ignore) {
             }
             current = current.getSuperclass();
         }

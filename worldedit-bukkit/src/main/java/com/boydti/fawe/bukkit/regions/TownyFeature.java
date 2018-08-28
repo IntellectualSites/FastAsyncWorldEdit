@@ -4,10 +4,7 @@ import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.object.FawePlayer;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
-import com.palmergames.bukkit.towny.object.PlayerCache;
-import com.palmergames.bukkit.towny.object.TownBlock;
-import com.palmergames.bukkit.towny.object.TownyUniverse;
-import com.palmergames.bukkit.towny.object.WorldCoord;
+import com.palmergames.bukkit.towny.object.*;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -28,18 +25,30 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
         if (block == null) {
             return false;
         }
+        Resident resident;
         try {
-            if (block.getResident().getName().equals(player.getName())) {
-                return true;
-            }
-        } catch (final Exception ignore) {}
-        if (player.hasPermission("fawe.towny.*")) {
-            return true;
-        } else try {
-            if (block.getTown().isMayor(TownyUniverse.getDataSource().getResident(player.getName()))) {
+            resident = TownyUniverse.getDataSource().getResident(player.getName());
+        try {
+            if (block.getResident().equals(resident)) {
                 return true;
             }
         } catch (NotRegisteredException ignore) {}
+            Town town = block.getTown();
+            if (town.isMayor(resident)) {
+                return true;
+            }
+            if (!town.hasResident(resident)) return false;
+            if (player.hasPermission("fawe.towny.*")) {
+                return true;
+            }
+            for (String rank : resident.getTownRanks()) {
+                if (player.hasPermission("fawe.towny." + rank)) {
+                    return true;
+                }
+            }
+        } catch (NotRegisteredException e) {
+            return false;
+        }
         return false;
     }
 
@@ -57,21 +66,7 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                 if (myplot == null) {
                     return null;
                 } else {
-                    boolean isMember = false;
-                    try {
-                        if (myplot.getResident().getName().equals(player.getName())) {
-                            isMember = true;
-                        }
-                    } catch (final Exception e) {
-
-                    }
-                    if (!isMember) {
-                        if (player.hasPermission("fawe.towny.*")) {
-                            isMember = true;
-                        } else if (myplot.getTown().isMayor(TownyUniverse.getDataSource().getResident(player.getName()))) {
-                            isMember = true;
-                        }
-                    }
+                    boolean isMember = isAllowed(player, myplot);
                     if (isMember) {
                         final Chunk chunk = location.getChunk();
                         final Location pos1 = new Location(location.getWorld(), chunk.getX() * 16, 0, chunk.getZ() * 16);

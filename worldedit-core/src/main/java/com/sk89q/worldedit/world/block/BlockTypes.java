@@ -1014,6 +1014,7 @@ public enum BlockTypes implements BlockType {
             int size = blockMap.size();
             for (BlockTypes type : oldValues) {
                 if (!blockMap.containsKey(type.getId())) {
+                    type.init(type.getId(), 0, new ArrayList<>());
                     Fawe.debug("Invalid block registered " + type.getId());
                     size++;
                 }
