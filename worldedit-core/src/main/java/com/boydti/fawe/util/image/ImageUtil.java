@@ -13,7 +13,9 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -165,12 +167,20 @@ public class ImageUtil {
 
     public static BufferedImage load(URI uri) throws ParameterException {
         try {
+            return MainUtil.readImage(getInputStream(uri));
+        } catch (IOException e) {
+            throw new ParameterException(e);
+        }
+    }
+
+    public static InputStream getInputStream(URI uri) throws ParameterException {
+        try {
             String uriStr = uri.toString();
             if (uriStr.startsWith("file:/")) {
                 File file = new File(uri.getPath());
-                return MainUtil.readImage(file);
+                return new FileInputStream(file);
             }
-            return MainUtil.readImage(new URL(uriStr));
+            return new URL(uriStr).openStream();
         } catch (IOException e) {
             throw new ParameterException(e);
         }
@@ -210,7 +220,7 @@ public class ImageUtil {
             } else if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
                 File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(), com.boydti.fawe.config.Settings.IMP.PATHS.HEIGHTMAP), arg);
-                if (file.exists()) {
+                if (!file.exists()) {
                     throw new ParameterException("File not found " + file);
                 }
                 if (file.isDirectory()) {
