@@ -19,16 +19,12 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.bekvon.bukkit.residence.commands.material;
-import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.SimpleBukkitAdapter;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -36,17 +32,12 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
-import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Adapts between Bukkit and WorldEdit equivalent objects.

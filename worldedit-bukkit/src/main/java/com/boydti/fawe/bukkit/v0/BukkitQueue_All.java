@@ -33,27 +33,18 @@ import org.bukkit.block.data.BlockData;
 
 public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot, ChunkSnapshot> {
 
-    public static int ALLOCATE;
     private ConcurrentMap<Long, ChunkSnapshot> chunkCache = new MapMaker()
             .weakValues()
             .makeMap();
 
     public BukkitQueue_All(com.sk89q.worldedit.world.World world) {
         super(world);
-        if (Settings.IMP.QUEUE.EXTRA_TIME_MS != Integer.MIN_VALUE) {
-            ALLOCATE = Settings.IMP.QUEUE.EXTRA_TIME_MS;
-            Settings.IMP.QUEUE.EXTRA_TIME_MS = Integer.MIN_VALUE;
-            Settings.IMP.QUEUE.PARALLEL_THREADS = 1;
-        }
+        Settings.IMP.QUEUE.PARALLEL_THREADS = 1;
     }
 
     public BukkitQueue_All(String world) {
         super(world);
-        if (Settings.IMP.QUEUE.EXTRA_TIME_MS != Integer.MIN_VALUE) {
-            ALLOCATE = Settings.IMP.QUEUE.EXTRA_TIME_MS;
-            Settings.IMP.QUEUE.EXTRA_TIME_MS = Integer.MIN_VALUE;
-            Settings.IMP.QUEUE.PARALLEL_THREADS = 1;
-        }
+        Settings.IMP.QUEUE.PARALLEL_THREADS = 1;
     }
 
     @Override

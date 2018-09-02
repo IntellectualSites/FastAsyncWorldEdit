@@ -5,6 +5,12 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class BlockTypeMask extends AbstractExtentMask {
     private final boolean[] types;
 
@@ -17,6 +23,55 @@ public class BlockTypeMask extends AbstractExtentMask {
         super(extent);
         this.types = new boolean[BlockTypes.size()];
         for (BlockType type : types) this.types[type.getInternalId()] = true;
+    }
+
+    /**
+     * Create a new block mask.
+     *
+     * @param extent the extent
+     * @param blocks a list of blocks to match
+     */
+    public BlockTypeMask(Extent extent, Collection<BlockType> blocks) {
+        this(extent, blocks.toArray(new BlockType[blocks.size()]));
+    }
+
+    /**
+     * Add the given blocks to the list of criteria.
+     *
+     * @param blocks a list of blocks
+     */
+    public void add(Collection<BlockType> blocks) {
+        checkNotNull(blocks);
+        for (BlockType type : blocks) {
+            add(type);
+        }
+        for (BlockType type : blocks) {
+            this.types[type.getInternalId()] = true;
+        }
+    }
+
+    /**
+     * Add the given blocks to the list of criteria.
+     *
+     * @param blocks an array of blocks
+     */
+    public void add(BlockType... blocks) {
+        for (BlockType type : blocks) {
+            this.types[type.getInternalId()] = true;
+        }
+    }
+
+    /**
+     * Get the list of blocks that are tested with.
+     *
+     * @return a list of blocks
+     */
+    public Collection<BlockType> getBlocks() {
+        Set<BlockType> blocks = new HashSet<>();
+        for (int i = 0; i < types.length; i++) {
+            if (types[i]) blocks.add(BlockTypes.get(i));
+        }
+        return blocks;
     }
 
     @Override

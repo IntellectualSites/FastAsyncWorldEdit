@@ -157,7 +157,7 @@ public class SetQueue {
                         return;
                     }
 
-                    long time = Settings.IMP.QUEUE.EXTRA_TIME_MS + currentAllocate - System.currentTimeMillis() + now;
+                    long time = (long) Settings.IMP.QUEUE.EXTRA_TIME_MS + currentAllocate - System.currentTimeMillis() + now;
                     // Disable the async catcher as it can't discern async vs parallel
                     boolean parallel = Settings.IMP.QUEUE.PARALLEL_THREADS > 1;
                     queue.startSet(parallel);

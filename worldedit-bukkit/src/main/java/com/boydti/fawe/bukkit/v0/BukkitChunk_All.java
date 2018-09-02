@@ -2,6 +2,7 @@ package com.boydti.fawe.bukkit.v0;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FaweQueue;
@@ -92,9 +93,9 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
     @Override
     public FaweChunk call() {
         long start = System.currentTimeMillis();
-        int recommended = 25 + BukkitQueue_All.ALLOCATE;
+        int recommended = 25 + Settings.IMP.QUEUE.EXTRA_TIME_MS;
         boolean more = true;
-        final BukkitQueue_All parent = (BukkitQueue_All) getParent();
+        final BukkitQueue_All parent = getParent();
         BukkitImplAdapter adapter = BukkitQueue_0.getAdapter();
         final Chunk chunk = getChunk();
         Object[] disableResult = parent.disableLighting(chunk);
@@ -183,8 +184,6 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                     }
                 }
             }
-
-
         } else if (index != 0) {
             if (place) {
                 layer--;
@@ -336,7 +335,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                 }
                                 break;
                         }
-                        if (checkTime && System.currentTimeMillis() - start > recommended) {
+                        if (System.currentTimeMillis() - start > recommended) {
                             index++;
                             break mainloop;
                         }

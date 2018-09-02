@@ -23,9 +23,9 @@ import java.util.Map;
 /**
  * A mask that checks whether blocks at the given positions are matched by
  * a block in a list.
- * <p>
- * <p>This mask checks for both an exact block ID and data value match, as well
- * for a block with the same ID but a data value of -1.</p>
+ *
+ * <p>This mask checks for both an exact block type and state value match,
+ * respecting fuzzy status of the BlockState.</p>
  */
 public class BlockMask extends AbstractExtentMask {
 

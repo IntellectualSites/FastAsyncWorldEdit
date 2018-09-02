@@ -15,7 +15,9 @@ dependencies {
     // Fawe depends
     compile 'org.yaml:snakeyaml:1.19'
     compile 'net.fabiozumbi12:redprotect:1.9.6'
-    compile group: "com.plotsquared", name: "plotsquared-api", version: "latest"
+    compile ("com.plotsquared:plotsquared-api:latest") {
+        transitive = false
+    }
 //    compile 'org.primesoft:BlocksHub:2.0'
     compile 'com.github.luben:zstd-jni:1.1.1'
     compile 'co.aikar:fastutil-lite:1.0'

@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -34,20 +31,16 @@ import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.NBTCompatibilityHandler;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockState;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads schematic files using the Sponge Schematic Specification.

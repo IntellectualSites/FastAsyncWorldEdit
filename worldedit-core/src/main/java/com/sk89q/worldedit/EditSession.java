@@ -44,6 +44,7 @@ import com.boydti.fawe.wrappers.WorldWrapper;
 import com.google.common.base.Supplier;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.function.mask.*;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -62,7 +63,6 @@ import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
-import com.sk89q.worldedit.function.mask.*;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -92,8 +92,24 @@ import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.SimpleWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.weather.WeatherType;
+import com.sk89q.worldedit.world.block.BlockCategories;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -1591,6 +1607,35 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final RegionVisitor visitor = new RegionVisitor(region, replace, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
         Operations.completeBlindly(visitor);
         return this.changes = visitor.getAffected();
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param replacement the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int replaceBlocks(Region region, Set<BlockStateHolder> filter, BlockStateHolder replacement) throws MaxChangedBlocksException {
+        return replaceBlocks(region, filter, new BlockPattern(replacement));
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int replaceBlocks(Region region, Set<BlockStateHolder> filter, Pattern pattern) throws MaxChangedBlocksException {
+        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMaskBuilder().addBlocks(filter).build(this);
+        return replaceBlocks(region, mask, pattern);
     }
 
     /**

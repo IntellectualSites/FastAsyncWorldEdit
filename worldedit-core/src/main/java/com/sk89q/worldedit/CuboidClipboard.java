@@ -19,10 +19,8 @@
 
 package com.sk89q.worldedit;
 
-import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.MainUtil;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.command.ClipboardCommands;
 import com.sk89q.worldedit.command.FlattenedClipboardTransform;
@@ -34,10 +32,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.DataException;
@@ -48,8 +44,9 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -100,6 +97,11 @@ public class CuboidClipboard {
         MainUtil.warnDeprecated(BlockArrayClipboard.class, ClipboardFormat.class);
         this.size = size;
         this.clipboard = this.init(Vector.ZERO, Vector.ZERO);
+    }
+
+    public CuboidClipboard(BlockArrayClipboard clipboard) {
+        this.clipboard = clipboard;
+        this.size = clipboard.getDimensions();
     }
 
     /**
@@ -327,25 +329,6 @@ public class CuboidClipboard {
     }
 
     /**
-     * Paste the stored entities to the given position.
-     *
-     * @param newOrigin the new origin
-     * @return a list of entities that were pasted
-     */
-    public LocalEntity[] pasteEntities(Vector newOrigin) {
-        return new LocalEntity[0];
-    }
-
-    /**
-     * Store an entity.
-     *
-     * @param entity the entity
-     */
-    public void storeEntity(LocalEntity entity) {
-
-    }
-
-    /**
      * Get the block at the given position.
      * <p>
      * <p>If the position is out of bounds, air will be returned.</p>
@@ -438,7 +421,7 @@ public class CuboidClipboard {
      * @param path the path to the file to save
      * @throws IOException   thrown on I/O error
      * @throws DataException thrown on error writing the data for other reasons
-     * @deprecated use {@link SchematicFormat#MCEDIT}
+     * @deprecated use {@link ClipboardFormat#SCHEMATIC}
      */
     @Deprecated
     public void saveSchematic(File path) throws IOException, DataException {
@@ -460,12 +443,12 @@ public class CuboidClipboard {
      * @return a clipboard
      * @throws IOException   thrown on I/O error
      * @throws DataException thrown on error writing the data for other reasons
-     * @deprecated use {@link SchematicFormat#MCEDIT}
+     * @deprecated use {@link ClipboardFormat#SCHEMATIC}
      */
     @Deprecated
     public static CuboidClipboard loadSchematic(File path) throws DataException, IOException {
         checkNotNull(path);
-        return SchematicFormat.MCEDIT.load(path);
+        return new CuboidClipboard((Vector) ClipboardFormat.SCHEMATIC.load(path).getClipboard());
     }
 
     /**
@@ -489,7 +472,6 @@ public class CuboidClipboard {
      *
      * @return a block distribution
      */
-    // TODO reduce code duplication
     public List<Countable<BaseBlock>> getBlockDistributionWithData() {
         List<Countable<BaseBlock>> distribution = new ArrayList<>();
         List<Countable<BlockStateHolder>> distr = clipboard.getBlockDistributionWithData(clipboard.getRegion());
@@ -497,18 +479,5 @@ public class CuboidClipboard {
             distribution.add(new Countable<>(new BaseBlock(item.getID()), item.getAmount()));
         }
         return distribution;
-    }
-
-    /**
-     * Stores a copied entity.
-     */
-    private class CopiedEntity {
-        private final LocalEntity entity;
-        private final Vector relativePosition;
-
-        private CopiedEntity(LocalEntity entity) {
-            this.entity = entity;
-            this.relativePosition = entity.getPosition().getPosition().subtract(getOrigin());
-        }
     }
 }

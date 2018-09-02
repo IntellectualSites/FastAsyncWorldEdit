@@ -28,7 +28,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.function.LayerFunction;
-import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;

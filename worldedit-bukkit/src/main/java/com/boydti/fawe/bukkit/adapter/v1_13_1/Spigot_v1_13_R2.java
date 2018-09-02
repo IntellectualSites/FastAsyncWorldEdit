@@ -55,6 +55,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -85,6 +86,20 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         // The method to create an NBTBase tag given its type ID
         nbtCreateTagMethod = NBTBase.class.getDeclaredMethod("createTag", byte.class);
         nbtCreateTagMethod.setAccessible(true);
+    }
+
+    private int[] idbToStateOrdinal;
+
+    private boolean init() {
+        if (idbToStateOrdinal != null) return false;
+        idbToStateOrdinal = new int[Block.REGISTRY_ID.a()]; // size
+        for (int i = 0; i < idbToStateOrdinal.length; i++) {
+            BlockState state = BlockTypes.states[i];
+            BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
+            int id = Block.REGISTRY_ID.getId(material.getState());
+            idbToStateOrdinal[id] = state.getOrdinal();
+        }
+        return true;
     }
 
     /**
@@ -490,20 +505,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         } else {
             throw new IllegalArgumentException("Don't know how to make NMS " + foreign.getClass().getCanonicalName());
         }
-    }
-
-    private int[] idbToStateOrdinal;
-
-    private boolean init() {
-        if (idbToStateOrdinal != null) return false;
-        idbToStateOrdinal = new int[Block.REGISTRY_ID.a()]; // size
-        for (int i = 0; i < idbToStateOrdinal.length; i++) {
-            BlockState state = BlockTypes.states[i];
-            BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
-            int id = Block.REGISTRY_ID.getId(material.getState());
-            idbToStateOrdinal[id] = state.getOrdinal();
-        }
-        return true;
     }
 
     @Override

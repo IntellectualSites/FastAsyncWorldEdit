@@ -428,7 +428,7 @@ public class RegionCommands extends MethodCommands {
     @Logging(REGION)
     public void walls(FawePlayer player, EditSession editSession, @Selection Region region, Pattern pattern, CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(getArguments(context), region);
-        int affected = editSession.makeCuboidWalls(region, pattern);
+        int affected = editSession.makeWalls(region, pattern);
         BBC.VISITOR_BLOCK.send(player, affected);
     }
 
