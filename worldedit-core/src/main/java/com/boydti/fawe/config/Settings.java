@@ -354,9 +354,16 @@ public class Settings extends Config {
 
         @Comment({
                 "[SAFE] Experimental scripting support for Java 9",
-                " - "
+                " - https://github.com/boy0001/FastAsyncWorldedit/wiki/JavaScript-API"
         })
         public boolean MODERN_CRAFTSCRIPTS = false;
+
+        @Comment({
+                "[SAFE] Experimental freebuild region restrictions",
+                " - PERM: fawe.freebuild",
+                " - PERM: fawe.freebuild.<plugin>"
+        })
+        public boolean FREEBUILD = false;
     }
 
     public static class WEB {
