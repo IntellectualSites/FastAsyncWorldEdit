@@ -56,4 +56,8 @@ public abstract class FaweMaskManager<T> {
     private boolean hasMemberPermission(FawePlayer fp) {
         return fp.hasPermission("fawe." + getKey() + ".member");
     }
+
+    public boolean isExclusive() {
+        return false;
+    }
 }

@@ -43,6 +43,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,6 +51,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -71,6 +73,8 @@ public class FaweBukkit implements IFawe, Listener {
     public VaultUtil getVault() {
         return this.vault;
     }
+
+    private List<org.bukkit.util.Vector> locations = Arrays.asList(new Vector(0, 5, 0));
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
@@ -547,6 +551,14 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new ASkyBlockHook(aSkyBlock, this));
                 Fawe.debug("Plugin 'ASkyBlock' found. Using it now.");
+            } catch (final Throwable e) {
+                MainUtil.handleError(e);
+            }
+        }
+        if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
+            try {
+                managers.add(new FreeBuildRegion());
+                Fawe.debug("Plugin '<internal.freebuild>' found. Using it now.");
             } catch (final Throwable e) {
                 MainUtil.handleError(e);
             }

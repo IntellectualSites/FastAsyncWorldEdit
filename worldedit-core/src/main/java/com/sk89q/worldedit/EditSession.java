@@ -1690,7 +1690,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     @SuppressWarnings("deprecation")
-    public int makeCuboidFaces(final Region region, final BaseBlock block) {
+    public int makeCuboidFaces(final Region region, final BlockStateHolder block) {
         return this.makeCuboidFaces(region, (Pattern) (block));
     }
 
@@ -1744,7 +1744,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     @SuppressWarnings("deprecation")
-    public int makeCuboidWalls(final Region region, final BaseBlock block) {
+    public int makeCuboidWalls(final Region region, final BlockStateHolder block) {
         return this.makeCuboidWalls(region, (Pattern) (block));
     }
 
@@ -1811,8 +1811,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    @SuppressWarnings("deprecation")
-    public int overlayCuboidBlocks(final Region region, final BaseBlock block) {
+    public int overlayCuboidBlocks(Region region, BlockStateHolder block) throws MaxChangedBlocksException {
         checkNotNull(block);
         return this.overlayCuboidBlocks(region, (Pattern) (block));
     }
@@ -1906,11 +1905,11 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int moveRegion(final Region region, final Vector dir, final int distance, final boolean copyAir, final BaseBlock replacement) {
+    public int moveRegion(final Region region, final Vector dir, final int distance, final boolean copyAir, final BlockStateHolder replacement) {
         return moveRegion(region, dir, distance, copyAir, true, false, replacement);
     }
 
-    public int moveRegion(final Region region, final Vector dir, final int distance, final boolean copyAir, final boolean copyEntities, final boolean copyBiomes, BaseBlock replacement) {
+    public int moveRegion(final Region region, final Vector dir, final int distance, final boolean copyAir, final boolean copyEntities, final boolean copyBiomes, BlockStateHolder replacement) {
         return moveRegion(region, dir, distance, copyAir, copyEntities, copyBiomes, (Pattern) replacement);
     }
 
@@ -1963,7 +1962,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int moveCuboidRegion(final Region region, final Vector dir, final int distance, final boolean copyAir, final BaseBlock replacement) {
+    public int moveCuboidRegion(final Region region, final Vector dir, final int distance, final boolean copyAir, final BlockStateHolder replacement) {
         return this.moveRegion(region, dir, distance, copyAir, replacement);
     }
 

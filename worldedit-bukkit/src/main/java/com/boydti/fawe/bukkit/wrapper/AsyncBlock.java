@@ -23,9 +23,9 @@ import org.bukkit.plugin.Plugin;
 
 public class AsyncBlock implements Block {
 
-    public final int z;
-    public final int y;
-    public final int x;
+    public int z;
+    public int y;
+    public int x;
     public final FaweQueue queue;
     public final AsyncWorld world;
 
@@ -34,6 +34,12 @@ public class AsyncBlock implements Block {
         this.queue = queue;
         this.x = x;
         this.y = Math.max(0, Math.min(255, y));
+        this.z = z;
+    }
+
+    public void setPosition(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
         this.z = z;
     }
 

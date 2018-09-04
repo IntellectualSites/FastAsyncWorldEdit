@@ -188,7 +188,7 @@ public abstract class TaskManager {
         if (r == null) {
             return;
         }
-        if (Thread.currentThread() == Fawe.get().getMainThread()) {
+        if (Fawe.isMainThread()) {
             r.run();
         } else {
             task(r);
@@ -336,7 +336,7 @@ public abstract class TaskManager {
      * @return
      */
     public <T> T syncWhenFree(final RunnableVal<T> function, int timeout) {
-        if (Fawe.get().getMainThread() == Thread.currentThread()) {
+        if (Fawe.isMainThread()) {
             function.run();
             return function.value;
         }
@@ -389,7 +389,7 @@ public abstract class TaskManager {
     }
 
     public <T> T sync(final Supplier<T> function, int timeout) {
-        if (Fawe.get().getMainThread() == Thread.currentThread()) {
+        if (Fawe.isMainThread()) {
             return function.get();
         }
         final AtomicBoolean running = new AtomicBoolean(true);

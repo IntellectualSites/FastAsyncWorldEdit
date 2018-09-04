@@ -222,6 +222,7 @@ public class SchematicCommands extends MethodCommands {
                 ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 in = Channels.newInputStream(rbc);
                 uri = url.toURI();
+                if (format == null) format = ClipboardFormat.SCHEMATIC;
             } else {
                 if (!player.hasPermission("worldedit.schematic.load") && !player.hasPermission("worldedit.clipboard.load")) {
                     BBC.NO_PERM.send(player, "worldedit.clipboard.load");

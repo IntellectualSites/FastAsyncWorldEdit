@@ -25,22 +25,6 @@ public abstract class FaweParser<T> extends InputParser<T> {
 
     public abstract Dispatcher getDispatcher();
 
-//    public List<String> suggestRemaining(String input, String... expected) throws InputParseException {
-//        List<String> remainder = StringMan.split(input, ':');
-//        int len = remainder.size();
-//        if (len != expected.length - 1) {
-//            if (len <= expected.length - 1 && len != 0) {
-//                if (remainder.get(len - 1).endsWith(":")) {
-//                    throw new SuggestInputParseException(null, StringMan.join(expected, ":"));
-//                }
-//                throw new SuggestInputParseException(null, expected[0] + ":" + input + ":" + StringMan.join(Arrays.copyOfRange(expected, len + 1, 3), ":"));
-//            } else {
-//                throw new SuggestInputParseException(null, StringMan.join(expected, ":"));
-//            }
-//        }
-//        return remainder;
-//    }
-
     protected static class ParseEntry {
         public boolean and;
         public String input;
@@ -79,7 +63,7 @@ public abstract class FaweParser<T> extends InputParser<T> {
                     last = i + 1;
                     continue outer;
                 default:
-                    if (StringMan.getMatchingBracket(c) != c) {
+                    if (c == '[' && StringMan.getMatchingBracket(c) != c) {
                         int next = StringMan.findMatchingBracket(toParse, i);
                         if (next != -1) {
                             i = next;

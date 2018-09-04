@@ -583,7 +583,7 @@ public class ClipboardCommands extends MethodCommands {
 
     @Deprecated // See SchematicCommands#clear
     @Command(
-            aliases = {"clearclipboard"},
+            aliases = {"clearclipboard", "/clearclipboard"},
             usage = "",
             desc = "Clear your clipboard",
             min = 0,

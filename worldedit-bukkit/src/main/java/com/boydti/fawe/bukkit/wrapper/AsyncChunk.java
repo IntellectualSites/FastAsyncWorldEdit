@@ -68,7 +68,7 @@ public class AsyncChunk implements Chunk {
 
     @Override
     public ChunkSnapshot getChunkSnapshot(boolean includeMaxblocky, boolean includeBiome, boolean includeBiomeTempRain) {
-        if (Thread.currentThread() == Fawe.get().getMainThread()) {
+        if (Fawe.isMainThread()) {
             return world.getChunkAt(x, z).getChunkSnapshot(includeMaxblocky, includeBiome, includeBiomeTempRain);
         }
         return whenLoaded(new RunnableVal<ChunkSnapshot>() {
@@ -80,7 +80,7 @@ public class AsyncChunk implements Chunk {
     }
 
     private <T> T whenLoaded(RunnableVal<T> task) {
-        if (Thread.currentThread() == Fawe.get().getMainThread()) {
+        if (Fawe.isMainThread()) {
             task.run();
             return task.value;
         }

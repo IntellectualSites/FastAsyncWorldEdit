@@ -586,7 +586,7 @@ public class MainUtil {
             long ratio = total / compressedSize;
             long saved = total - compressedSize;
 
-            if (ratio > 3 && Thread.currentThread() != Fawe.get().getMainThread() && actor != null) {
+            if (ratio > 3 && !Fawe.isMainThread() && actor != null) {
                 BBC.COMPRESSED.send(actor, saved, ratio);
             }
         } catch (Exception e) {

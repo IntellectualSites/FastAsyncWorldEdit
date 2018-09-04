@@ -9,6 +9,8 @@ import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BlockTypes;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -179,12 +181,12 @@ public class NullFaweQueue implements FaweQueue {
 
     @Override
     public int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return 0;
+        return BlockTypes.AIR.getInternalId();
     }
 
     @Override
     public int getCachedCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return 0;
+        return BlockTypes.AIR.getInternalId();
     }
 
     @Override

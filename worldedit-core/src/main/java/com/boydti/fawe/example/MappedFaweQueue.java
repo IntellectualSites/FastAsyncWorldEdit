@@ -399,7 +399,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
         if (chunk != null) {
             return chunk;
         }
-        boolean sync = Thread.currentThread() == Fawe.get().getMainThread();
+        boolean sync = Fawe.isMainThread();
         if (sync) {
             return loadChunk(getWorld(), cx, cz, true);
         } else if (getSettings().HISTORY.CHUNK_WAIT_MS > 0) {

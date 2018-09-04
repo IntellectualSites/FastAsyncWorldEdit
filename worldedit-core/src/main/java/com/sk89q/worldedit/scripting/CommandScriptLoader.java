@@ -4,29 +4,25 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.command.FaweParser;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Charsets;
-import com.google.common.base.Function;
 import com.google.common.io.CharStreams;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.BrushProcessor;
 import com.sk89q.worldedit.extension.factory.DefaultMaskParser;
 import com.sk89q.worldedit.extension.factory.HashTagPatternParser;
 import com.sk89q.worldedit.extension.platform.CommandManager;
-import com.sk89q.worldedit.util.command.CallableProcessor;
 import com.sk89q.worldedit.util.command.ProcessedCallable;
 import com.sk89q.worldedit.util.command.parametric.FunctionParametricCallable;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 public class CommandScriptLoader {
     private final NashornCraftScriptEngine engine;
