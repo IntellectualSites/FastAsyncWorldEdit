@@ -7,8 +7,10 @@ import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.File;
@@ -19,9 +21,15 @@ import javax.annotation.Nullable;
 
 public class NullFaweQueue implements FaweQueue {
     private final String worldName;
+    private final BlockState state;
 
     public NullFaweQueue(String worldName) {
+        this(worldName, BlockTypes.AIR.getDefaultState());
+    }
+
+    public NullFaweQueue(String worldName, BlockState state) {
         this.worldName = worldName;
+        this.state = state;
     }
 
     @Override
@@ -180,13 +188,18 @@ public class NullFaweQueue implements FaweQueue {
     }
 
     @Override
+    public BlockState getBlock(Vector position) {
+        return state;
+    }
+
+    @Override
     public int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return BlockTypes.AIR.getInternalId();
+        return state.getInternalId();
     }
 
     @Override
     public int getCachedCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return BlockTypes.AIR.getInternalId();
+        return state.getInternalId();
     }
 
     @Override
