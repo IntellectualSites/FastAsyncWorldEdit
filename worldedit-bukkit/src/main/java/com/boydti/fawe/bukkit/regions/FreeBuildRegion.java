@@ -92,6 +92,7 @@ public class FreeBuildRegion extends BukkitMaskManager {
                         try {
                             for (RegisteredListener listener : listeners) {
                                 listener.callEvent(event);
+                                if (event.isCancelled()) break;
                             }
                         } catch (EventException e) {
                             throw new RuntimeException(e);
