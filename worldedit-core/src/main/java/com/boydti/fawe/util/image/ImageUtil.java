@@ -32,14 +32,14 @@ public class ImageUtil {
         }
         int type = (img.getTransparency() == Transparency.OPAQUE) ?
                 BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-        BufferedImage ret = (BufferedImage)img;
+        BufferedImage ret = img;
         int w, h;
         if (higherQuality) {
             // Use multi-step technique: start with original size, then
             // scale down in multiple passes with drawImage()
             // until the target size is reached
-            w = img.getWidth();
-            h = img.getHeight();
+            w = ret.getWidth();
+            h = ret.getHeight();
         } else {
             // Use one-step technique: scale directly from original
             // size to target size with a single drawImage() call
@@ -53,14 +53,14 @@ public class ImageUtil {
                 if (w < targetWidth) {
                     w = targetWidth;
                 }
-            }
+            } else if (w < targetWidth) w = targetWidth;
 
             if (higherQuality && h > targetHeight) {
                 h /= 2;
                 if (h < targetHeight) {
                     h = targetHeight;
                 }
-            }
+            } else if (h < targetHeight) h = targetHeight;
 
             BufferedImage tmp = new BufferedImage(w, h, type);
             Graphics2D g2 = tmp.createGraphics();

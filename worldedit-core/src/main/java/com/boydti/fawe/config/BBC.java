@@ -77,7 +77,6 @@ public enum BBC {
 
     COMMAND_PASTE("The clipboard has been pasted at %s0", "WorldEdit.Paste"),
 
-
     COMMAND_ROTATE("The clipboard has been rotated", "WorldEdit.Rotate"),
 
     COMMAND_FLIPPED("The clipboard has been flipped", "WorldEdit.Flip"),
@@ -500,7 +499,7 @@ public enum BBC {
 
     public static String stripColor(String string) {
 
-        return StringMan.removeFromSet(string, replacements.keySet());
+        return StringMan.removeFromSet(string, replacements.values());
     }
 
     public String s() {

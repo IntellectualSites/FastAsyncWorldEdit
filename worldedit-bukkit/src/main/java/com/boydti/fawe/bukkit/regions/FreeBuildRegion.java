@@ -5,7 +5,6 @@ import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.queue.NullFaweQueue;
 import com.boydti.fawe.regions.FaweMask;
-import com.boydti.fawe.regions.FaweMaskManager;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -14,13 +13,10 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventException;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.RegisteredListener;
 
 import java.util.ArrayList;
@@ -81,9 +77,10 @@ public class FreeBuildRegion extends BukkitMaskManager {
             @Override
             public Region getRegion() {
                 return new CuboidRegion(vec1, vec2) {
+
                     @Override
                     public boolean contains(int x, int z) {
-                        return contains(x, 77, z);
+                        return contains(x, 127, z);
                     }
 
                     private int lastX = Integer.MIN_VALUE, lastZ = Integer.MIN_VALUE;

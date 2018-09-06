@@ -28,6 +28,7 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DelegateConsumer;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
@@ -35,6 +36,7 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.chat.UsageMessage;
 import com.boydti.fawe.util.gui.FormBuilder;
+import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
@@ -73,11 +75,17 @@ import com.sk89q.worldedit.util.command.parametric.ParameterData;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -161,6 +169,70 @@ public class UtilityCommands extends MethodCommands {
                 UtilityCommands.help(args, worldEdit, player, getCommand().aliases()[0] + " ", parser.getDispatcher());
             }
         }
+    }
+
+    @Command(
+            aliases = {"/heightmapinterface"},
+            desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap",
+            max = 0
+    )
+    public void heightmapInterface(FawePlayer player) throws IOException {
+        player.sendMessage("Please wait while we generate the minified heightmaps.");
+        File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
+
+        int min = 100;
+        int max = 200;
+
+        File webSrc = new File(Fawe.imp().getDirectory(), "web" + File.separator + "heightmap");
+        File minImages = new File(webSrc, "images" + File.separator + "min");
+        File maxImages = new File(webSrc, "images" + File.separator + "max");
+        final int sub = srcFolder.getAbsolutePath().length();
+        List<String> images = new ArrayList<>();
+        MainUtil.iterateFiles(srcFolder, new Consumer<File>() {
+            @Override
+            public void accept(File file) {
+                switch (file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase()) {
+                    case ".png":
+                    case ".jpeg":
+                        break;
+                    default:
+                        return;
+                }
+                try {
+                    String name = file.getAbsolutePath().substring(sub);
+                    if (name.startsWith(File.separator)) name = name.replaceFirst(java.util.regex.Pattern.quote(File.separator), "");
+                    BufferedImage img = MainUtil.readImage(file);
+                    BufferedImage minImg = ImageUtil.getScaledInstance(img, min, min, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+                    BufferedImage maxImg = ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+                    player.sendMessage("Writing " + name);
+                    File minFile = new File(minImages, name);
+                    File maxFile = new File(maxImages, name);
+                    minFile.getParentFile().mkdirs();
+                    maxFile.getParentFile().mkdirs();
+                    ImageIO.write(minImg, "png", minFile);
+                    ImageIO.write(maxImg, "png", maxFile);
+                    images.add(name);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        StringBuilder config = new StringBuilder();
+        config.append("var images = [\n");
+        for (String image : images) {
+            config.append('"' + image.replace(File.separator, "/") + "\",\n");
+        }
+        config.append("];\n");
+        config.append("// The low res images (they should all be the same size)\n");
+        config.append("var src_min = \"images/min/\";\n");
+        config.append("// The max resolution images (Use the same if there are no higher resolution ones available)\n");
+        config.append("var src_max = \"images/max/\";\n");
+        config.append("// The local source for the image (used in commands)\n");
+        config.append("var src_local = \"file://\";\n");
+        File configFile = new File(webSrc, "config.js");
+        player.sendMessage("Writing " + configFile);
+        Files.write(configFile.toPath(), config.toString().getBytes());
+        player.sendMessage("Done! See: `FastAsyncWorldEdit/web/heightmap`");
     }
 
     @Command(
