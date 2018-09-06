@@ -176,12 +176,9 @@ public class UtilityCommands extends MethodCommands {
             desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap",
             max = 0
     )
-    public void heightmapInterface(FawePlayer player) throws IOException {
+    public void heightmapInterface(FawePlayer player, @Optional("100") int min, @Optional("200") int max) throws IOException {
         player.sendMessage("Please wait while we generate the minified heightmaps.");
         File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
-
-        int min = 100;
-        int max = 200;
 
         File webSrc = new File(Fawe.imp().getDirectory(), "web" + File.separator + "heightmap");
         File minImages = new File(webSrc, "images" + File.separator + "min");
