@@ -328,7 +328,7 @@ public class Settings extends Config {
                 " - Requires Paper: ci.destroystokyo.com/job/PaperSpigot/",
                 " - Set your server view distance to 1 (spigot.yml, server.properties)",
                 " - Based on tps and player movement",
-                " - Please provide feedback",
+                " - Note: If entities become hidden, increase the server view distance to 3",
         })
         public int DYNAMIC_CHUNK_RENDERING = -1;
         @Comment({
