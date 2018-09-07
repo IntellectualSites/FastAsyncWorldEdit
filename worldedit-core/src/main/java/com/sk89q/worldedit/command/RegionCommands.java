@@ -288,7 +288,7 @@ public class RegionCommands extends MethodCommands {
             int blocksChanged = editSession.drawSpline(pattern, vectors, 0, 0, 0, 10, thickness, !shell);
 
             BBC.VISITOR_BLOCK.send(player, blocksChanged);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -307,7 +307,7 @@ public class RegionCommands extends MethodCommands {
             BBC.VISITOR_BLOCK.send(player, affected);
             if (!player.hasPermission("fawe.tips"))
                 BBC.TIP_REPLACE_ID.or(BBC.TIP_REPLACE_LIGHT, BBC.TIP_REPLACE_MARKER, BBC.TIP_TAB_COMPLETE, BBC.TIP_REPLACE_REGEX, BBC.TIP_REPLACE_REGEX_2, BBC.TIP_REPLACE_REGEX_3, BBC.TIP_REPLACE_REGEX_4, BBC.TIP_REPLACE_REGEX_5).send(player);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     // Compatibility for SKCompat
@@ -334,7 +334,7 @@ public class RegionCommands extends MethodCommands {
                 if (!player.hasPermission("fawe.tips"))
                     BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(player);
             }
-        }, getArguments(context), selection);
+        }, getArguments(context), selection, context);
     }
 
     @Command(
@@ -350,7 +350,7 @@ public class RegionCommands extends MethodCommands {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.overlayCuboidBlocks(region, pattern);
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -385,7 +385,7 @@ public class RegionCommands extends MethodCommands {
                 affected++;
             }
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -415,7 +415,7 @@ public class RegionCommands extends MethodCommands {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.naturalizeCuboidBlocks(region);
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -431,7 +431,7 @@ public class RegionCommands extends MethodCommands {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.makeWalls(region, pattern);
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -447,7 +447,7 @@ public class RegionCommands extends MethodCommands {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.makeCuboidFaces(region, pattern);
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -481,7 +481,7 @@ public class RegionCommands extends MethodCommands {
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -559,7 +559,7 @@ public class RegionCommands extends MethodCommands {
             }
 
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -583,7 +583,7 @@ public class RegionCommands extends MethodCommands {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.fall(region, !notFullHeight, replace);
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -629,7 +629,7 @@ public class RegionCommands extends MethodCommands {
             }
 
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region, count);
+        }, getArguments(context), region, count, context);
     }
 
     @Command(
@@ -681,7 +681,7 @@ public class RegionCommands extends MethodCommands {
             } catch (ExpressionException e) {
                 fp.sendMessage(BBC.getPrefix() + e.getMessage());
             }
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -697,19 +697,19 @@ public class RegionCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
-    public void regenerateChunk(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, CommandContext args) throws WorldEditException {
+    public void regenerateChunk(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             Mask mask = session.getMask();
             Mask sourceMask = session.getSourceMask();
             session.setMask((Mask) null);
             session.setSourceMask((Mask) null);
             BaseBiome biome = null;
-            if (args.argsLength() >= 1) {
+            if (context.argsLength() >= 1) {
                 BiomeRegistry biomeRegistry = worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
                 List<BaseBiome> knownBiomes = biomeRegistry.getBiomes();
-                biome = Biomes.findBiomeByName(knownBiomes, args.getString(0), biomeRegistry);
+                biome = Biomes.findBiomeByName(knownBiomes, context.getString(0), biomeRegistry);
             }
-            Long seed = args.argsLength() != 2 || !MathMan.isInteger(args.getString(1)) ? null : Long.parseLong(args.getString(1));
+            Long seed = context.argsLength() != 2 || !MathMan.isInteger(context.getString(1)) ? null : Long.parseLong(context.getString(1));
             editSession.regenerate(region, biome, seed);
             session.setMask(mask);
             session.setSourceMask(mask);
@@ -724,7 +724,7 @@ public class RegionCommands extends MethodCommands {
             } else {
                 BBC.COMMAND_REGEN_2.send(player);
             }
-        }, getArguments(args), region);
+        }, getArguments(context), region, context);
 
 
     }
@@ -750,7 +750,7 @@ public class RegionCommands extends MethodCommands {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.hollowOutRegion(region, thickness, pattern);
             BBC.VISITOR_BLOCK.send(player, affected);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -773,7 +773,7 @@ public class RegionCommands extends MethodCommands {
             Operations.completeLegacy(visitor);
 
             BBC.COMMAND_TREE.send(player, ground.getAffected());
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
 
     }
 
@@ -795,7 +795,7 @@ public class RegionCommands extends MethodCommands {
             Operations.completeLegacy(visitor);
 
             BBC.COMMAND_FLORA.send(player, ground.getAffected());
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
 

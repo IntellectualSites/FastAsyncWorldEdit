@@ -182,7 +182,7 @@ public class ClipboardCommands extends MethodCommands {
             if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) {
                 BBC.TIP_PASTE.or(BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(player);
             }
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -275,7 +275,7 @@ public class ClipboardCommands extends MethodCommands {
 
             BBC.COMMAND_CUT_SLOW.send(player, region.getArea());
             if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) BBC.TIP_LAZYCUT.send(player);
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
 
     }
 

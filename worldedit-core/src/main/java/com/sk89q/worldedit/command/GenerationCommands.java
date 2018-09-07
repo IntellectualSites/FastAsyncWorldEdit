@@ -92,7 +92,7 @@ public class GenerationCommands extends MethodCommands {
             CavesGen gen = new CavesGen(size, frequency, rarity, minY, maxY, systemFrequency, individualRarity, pocketChance, pocketMin, pocketMax);
             editSession.generate(region, gen);
             BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     // public void addOre(Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
@@ -110,7 +110,7 @@ public class GenerationCommands extends MethodCommands {
         player.checkConfirmationRegion(() -> {
             editSession.addOres(region, mask);
             BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -174,7 +174,7 @@ public class GenerationCommands extends MethodCommands {
         player.checkConfirmationRegion(() -> {
             editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
             BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -198,7 +198,7 @@ public class GenerationCommands extends MethodCommands {
         fp.checkConfirmationRadius(() -> {
             int affected = editSession.makeHollowCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), thickness - 1);
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max);
+        }, getArguments(context), (int) max, context);
     }
 
     @Command(
@@ -223,7 +223,7 @@ public class GenerationCommands extends MethodCommands {
         fp.checkConfirmationRadius(() -> {
             int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max);
+        }, getArguments(context), (int) max, context);
     }
 
     @Command(
@@ -268,7 +268,7 @@ public class GenerationCommands extends MethodCommands {
             int affected = editSession.makeSphere(finalPos, pattern, radius.getX(), radius.getY(), radius.getZ(), !hollow);
             player.findFreePosition();
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max);
+        }, getArguments(context), (int) max, context);
     }
 
     @Command(
@@ -331,7 +331,7 @@ public class GenerationCommands extends MethodCommands {
             int affected = editSession.makePyramid(pos, pattern, size, !hollow);
             player.findFreePosition();
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), size);
+        }, getArguments(context), size, context);
     }
 
     @Command(
@@ -399,7 +399,7 @@ public class GenerationCommands extends MethodCommands {
             } catch (ExpressionException e) {
                 fp.sendMessage(BBC.getPrefix() + e.getMessage());
             }
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 
     @Command(
@@ -466,6 +466,6 @@ public class GenerationCommands extends MethodCommands {
             } catch (ExpressionException e) {
                 fp.sendMessage(BBC.getPrefix() + e.getMessage());
             }
-        }, getArguments(context), region);
+        }, getArguments(context), region, context);
     }
 }

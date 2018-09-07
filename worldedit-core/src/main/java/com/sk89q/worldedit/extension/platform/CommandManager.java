@@ -27,6 +27,7 @@ import com.boydti.fawe.command.PatternBinding;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.chat.UsageMessage;
@@ -60,6 +61,7 @@ import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -67,6 +69,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -375,6 +378,8 @@ public final class CommandManager {
             throw new IllegalArgumentException("FAWE doesn't support: " + actor);
         }
         final Set<String> failedPermissions = new LinkedHashSet<>();
+        locals.put("failed_permissions", failedPermissions);
+        locals.put(LocalSession.class, session);
         if (actor instanceof Player) {
             Player player = (Player) actor;
             Player unwrapped = LocationMaskedPlayerWrapper.unwrap(player);
@@ -399,10 +404,28 @@ public final class CommandManager {
                 }
             };
         }
-        Request.reset();
         locals.put(Actor.class, actor);
         final Actor finalActor = actor;
         locals.put("arguments", args);
+
+        ThrowableSupplier<Throwable> task = new ThrowableSupplier<Throwable>() {
+            @Override
+            public Object get() throws Throwable {
+                return dispatcher.call(Joiner.on(" ").join(split), locals, new String[0]);
+            }
+        };
+
+        handleCommandTask(task, locals, actor, session, failedPermissions, fp);
+    }
+
+    public Object handleCommandTask(ThrowableSupplier<Throwable> task, CommandLocals locals) {
+        return handleCommandTask(task, locals, null, null, null, null);
+    }
+
+    private Object handleCommandTask(ThrowableSupplier<Throwable> task, CommandLocals locals, @Nullable Actor actor, @Nullable LocalSession session, @Nullable Set<String> failedPermissions, @Nullable FawePlayer fp) {
+        Request.reset();
+        if (actor == null) actor = locals.get(Actor.class);
+        if (session == null) session = locals.get(LocalSession.class);
         long start = System.currentTimeMillis();
         try {
             // This is a bit of a hack, since the call method can only throw CommandExceptions
@@ -410,8 +433,8 @@ public final class CommandManager {
             // exceptions without writing a hook into every dispatcher, we need to unwrap these
             // exceptions and rethrow their converted form, if their is one.
             try {
-                Request.request().setActor(finalActor);
-                Object result = dispatcher.call(Joiner.on(" ").join(split), locals, new String[0]);
+                Request.request().setActor(actor);
+                return task.get();
             } catch (Throwable t) {
                 // Use the exception converter to convert the exception if any of its causes
                 // can be converted, otherwise throw the original exception
@@ -424,28 +447,31 @@ public final class CommandManager {
                 throw next;
             }
         } catch (CommandPermissionsException e) {
-            BBC.NO_PERM.send(finalActor, StringMan.join(failedPermissions, " "));
+            if (failedPermissions == null) failedPermissions = (Set<String>) locals.get("failed_permissions");
+            if (failedPermissions != null) BBC.NO_PERM.send(actor, StringMan.join(failedPermissions, " "));
         } catch (InvalidUsageException e) {
             if (e.isFullHelpSuggested()) {
                 CommandCallable cmd = e.getCommand();
                 if (cmd instanceof Dispatcher) {
                     try {
-                        CommandContext context = new CommandContext(("ignoreThis " + Joiner.on(" ").join(split)).split(" "), new HashSet<>(), false, locals);
+                        String args = locals.get("arguments") + "";
+                        CommandContext context = new CommandContext(("ignoreThis " + args).split(" "), new HashSet<>(), false, locals);
                         UtilityCommands.help(context, worldEdit, actor);
                     } catch (CommandException e1) {
                         e1.printStackTrace();
                     }
                 } else {
+                    if (fp == null) fp = FawePlayer.wrap(actor);
                     new UsageMessage(cmd, e.getCommandUsed((WorldEdit.getInstance().getConfiguration().noDoubleSlash ? "" : "/"), ""), locals).send(fp);
                 }
                 String message = e.getMessage();
                 if (message != null) {
-                    finalActor.printError(message);
+                    actor.printError(message);
                 }
             } else {
                 String message = e.getMessage();
-                finalActor.printRaw(BBC.getPrefix() + (message != null ? message : "The command was not used properly (no more help available)."));
-                BBC.COMMAND_SYNTAX.send(finalActor, e.getSimpleUsageString("/"));
+                actor.printRaw(BBC.getPrefix() + (message != null ? message : "The command was not used properly (no more help available)."));
+                BBC.COMMAND_SYNTAX.send(actor, e.getSimpleUsageString("/"));
             }
         } catch (CommandException e) {
             String message = e.getMessage();
@@ -459,25 +485,26 @@ public final class CommandManager {
             Exception faweException = FaweException.get(e);
             String message = e.getMessage();
             if (faweException != null) {
-                BBC.WORLDEDIT_CANCEL_REASON.send(finalActor, faweException.getMessage());
+                BBC.WORLDEDIT_CANCEL_REASON.send(actor, faweException.getMessage());
             } else {
-                finalActor.printError("There was an error handling a FAWE command: [See console]");
-                finalActor.printRaw(e.getClass().getName() + ": " + e.getMessage());
+                actor.printError("There was an error handling a FAWE command: [See console]");
+                actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
                 log.log(Level.SEVERE, "An unexpected error occurred while handling a FAWE command", e);
             }
         } finally {
             final EditSession editSession = locals.get(EditSession.class);
             if (editSession != null) {
                 editSession.flushQueue();
-                worldEdit.flushBlockBag(finalActor, editSession);
+                worldEdit.flushBlockBag(locals.get(Actor.class), editSession);
                 session.remember(editSession);
                 final long time = System.currentTimeMillis() - start;
                 if (time > 1000) {
-                    BBC.ACTION_COMPLETE.send(finalActor, (time / 1000d));
+                    BBC.ACTION_COMPLETE.send(actor, (time / 1000d));
                 }
                 Request.reset();
             }
         }
+        return null;
     }
 
     @Subscribe

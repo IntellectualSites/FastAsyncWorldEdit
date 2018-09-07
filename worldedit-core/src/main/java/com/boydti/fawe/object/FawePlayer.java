@@ -9,11 +9,13 @@ import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
+import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.*;
 import com.boydti.fawe.wrappers.FakePlayer;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
+import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.BrushTool;
@@ -159,14 +161,30 @@ public abstract class FawePlayer<T> extends Metadatable {
         return cancelled;
     }
 
-    private void setConfirmTask(@Nullable Runnable task, String command) {
-        setMeta("cmdConfirm", task == null ? new CommandEvent(getPlayer(), command) : task);
+    private void setConfirmTask(@Nullable Runnable task, CommandContext context, String command) {
+        if (task != null) {
+            Runnable newTask = new Runnable() {
+                @Override
+                public void run() {
+                    CommandManager.getInstance().handleCommandTask(new ThrowableSupplier<Throwable>() {
+                        @Override
+                        public Object get() throws Throwable {
+                            task.run();
+                            return null;
+                        }
+                    }, context.getLocals());
+                }
+            };
+            setMeta("cmdConfirm", newTask);
+        } else {
+            setMeta("cmdConfirm", new CommandEvent(getPlayer(), command));
+        }
     }
 
-    public void checkConfirmation(@Nullable Runnable task, String command, int times, int limit) throws RegionOperationException {
+    public void checkConfirmation(@Nullable Runnable task, String command, int times, int limit, CommandContext context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (times > limit) {
-                setConfirmTask(task, command);
+                setConfirmTask(task, context, command);
                 String volume = "<unspecified>";
                 throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(0, times, command, volume));
             }
@@ -174,11 +192,11 @@ public abstract class FawePlayer<T> extends Metadatable {
         if (task != null) task.run();
     }
 
-    public void checkConfirmationRadius(@Nullable Runnable task, String command, int radius) throws RegionOperationException {
+    public void checkConfirmationRadius(@Nullable Runnable task, String command, int radius, CommandContext context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (radius > 0) {
                 if (radius > 448) {
-                    setConfirmTask(task, command);
+                    setConfirmTask(task, context, command);
                     long volume = (long) (Math.PI * ((double) radius * radius));
                     throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(0, radius, command, NumberFormat.getNumberInstance().format(volume)));
                 }
@@ -187,14 +205,14 @@ public abstract class FawePlayer<T> extends Metadatable {
         if (task != null) task.run();
     }
 
-    public void checkConfirmationStack(@Nullable Runnable task, String command, Region region, int times) throws RegionOperationException {
+    public void checkConfirmationStack(@Nullable Runnable task, String command, Region region, int times, CommandContext context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
                 Vector min = region.getMinimumPoint().toBlockVector();
                 Vector max = region.getMaximumPoint().toBlockVector();
                 long area = (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1)) * times;
                 if (area > 2 << 18) {
-                    setConfirmTask(task, command);
+                    setConfirmTask(task, context, command);
                     long volume = (long) max.subtract(min).add(Vector.ONE).volume() * times;
                     throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(min, max, command, NumberFormat.getNumberInstance().format(volume)));
                 }
@@ -203,14 +221,14 @@ public abstract class FawePlayer<T> extends Metadatable {
         if (task != null) task.run();
     }
 
-    public void checkConfirmationRegion(@Nullable Runnable task, String command, Region region) throws RegionOperationException {
+    public void checkConfirmationRegion(@Nullable Runnable task, String command, Region region, CommandContext context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
                 Vector min = region.getMinimumPoint().toBlockVector();
                 Vector max = region.getMaximumPoint().toBlockVector();
                 long area = (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1));
                 if (area > 2 << 18) {
-                    setConfirmTask(task, command);
+                    setConfirmTask(task, context, command);
                     long volume = (long) max.subtract(min).add(Vector.ONE).volume();
                     throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(min, max, command, NumberFormat.getNumberInstance().format(volume)));
                 }

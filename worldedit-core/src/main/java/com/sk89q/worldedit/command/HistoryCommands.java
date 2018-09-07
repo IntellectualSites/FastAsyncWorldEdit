@@ -247,7 +247,7 @@ public class HistoryCommands extends MethodCommands {
                     break;
                 }
             }
-        }, getArguments(context), times, 50);
+        }, getArguments(context), times, 50, context);
     }
 
     @Command(
