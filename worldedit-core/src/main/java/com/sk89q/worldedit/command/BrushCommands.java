@@ -354,7 +354,7 @@ public class BrushCommands extends BrushProcessor {
         InputStream stream = getHeightmapStream(image);
         HeightBrush brush;
         try {
-            brush = new StencilBrush(stream, rotation, yscale, onlyWhite, image.equalsIgnoreCase("#clipboard") ? session.getClipboard().getClipboard() : null);
+            brush = new StencilBrush(stream, rotation, yscale, onlyWhite, "#clipboard".equalsIgnoreCase(image) ? session.getClipboard().getClipboard() : null);
         } catch (EmptyClipboardException ignore) {
             brush = new StencilBrush(stream, rotation, yscale, onlyWhite, null);
         }
@@ -735,13 +735,13 @@ public class BrushCommands extends BrushProcessor {
         HeightBrush brush;
         if (flat) {
             try {
-                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth, image.equalsIgnoreCase("#clipboard") ? session.getClipboard().getClipboard() : null, shape);
+                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth, "#clipboard".equalsIgnoreCase(image) ? session.getClipboard().getClipboard() : null, shape);
             } catch (EmptyClipboardException ignore) {
                 brush = new FlattenBrush(stream, rotation, yscale, layers, smooth, null, shape);
             }
         } else {
             try {
-                brush = new HeightBrush(stream, rotation, yscale, layers, smooth, image.equalsIgnoreCase("#clipboard") ? session.getClipboard().getClipboard() : null);
+                brush = new HeightBrush(stream, rotation, yscale, layers, smooth, "#clipboard".equalsIgnoreCase(image) ? session.getClipboard().getClipboard() : null);
             } catch (EmptyClipboardException ignore) {
                 brush = new HeightBrush(stream, rotation, yscale, layers, smooth, null);
             }
@@ -755,6 +755,7 @@ public class BrushCommands extends BrushProcessor {
     }
 
     private InputStream getHeightmapStream(String filename) throws FileNotFoundException, ParameterException {
+        if (filename == null) return null;
         String filenamePng = (filename.endsWith(".png") ? filename : filename + ".png");
         File file = new File(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP + File.separator + filenamePng);
         if (file.exists()) return new FileInputStream(file);

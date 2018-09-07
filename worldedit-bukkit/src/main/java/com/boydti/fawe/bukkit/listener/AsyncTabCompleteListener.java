@@ -27,22 +27,4 @@ public class AsyncTabCompleteListener extends ATabCompleteListener {
             }
         }
     }
-
-    // Fix for the event being borked with paper
-    private List<String> completions = null;
-    private CommandSender sender;
-
-    @EventHandler
-    public void onTabComplete(TabCompleteEvent event) {
-        if (event.isCommand()) {
-            if (sender == event.getSender()) {
-                event.setCompletions(completions);
-                sender = null;
-            } else {
-                sender = event.getSender();
-                completions = event.getCompletions();
-                event.setCompletions(Collections.emptyList());
-            }
-        }
-    }
 }
