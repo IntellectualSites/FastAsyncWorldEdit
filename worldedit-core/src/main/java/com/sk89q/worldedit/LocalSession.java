@@ -1036,8 +1036,8 @@ public class LocalSession implements TextureHolder {
         Tool previous;
         if (player != null && (tool instanceof BrushTool || tool == null) && Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             previous = BrushCache.getCachedTool(item);
+            BrushCache.setTool(item, (BrushTool) tool);
             if (tool != null) {
-                BrushCache.setTool(item, (BrushTool) tool);
                 ((BrushTool) tool).setHolder(item);
             }
         } else {

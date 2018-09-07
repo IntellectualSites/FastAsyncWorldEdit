@@ -23,7 +23,7 @@ public class AsyncTabCompleteListener extends ATabCompleteListener {
             List<String> result = this.onTab(event.getBuffer(), event.getSender());
             if (result != null) {
                 event.setCompletions(result);
-                event.setHandled(true); // Doesn't work
+                event.setHandled(true);
             }
         }
     }
