@@ -219,6 +219,22 @@ public abstract class FawePlayer<T> extends Metadatable {
         if (task != null) task.run();
     }
 
+    public synchronized boolean confirm() {
+        Runnable confirm = deleteMeta("cmdConfirm");
+        if (!(confirm instanceof Runnable)) {
+            return false;
+        }
+        queueAction(() -> {
+            setMeta("cmdConfirmRunning", true);
+            try {
+                confirm.run();
+            } finally {
+                setMeta("cmdConfirmRunning", false);
+            }
+        });
+        return true;
+    }
+
     public void checkAllowedRegion(Region wrappedSelection) {
         Region[] allowed = WEManager.IMP.getMask(this, FaweMaskManager.MaskType.OWNER);
         HashSet<Region> allowedSet = new HashSet<>(Arrays.asList(allowed));
@@ -227,29 +243,6 @@ public abstract class FawePlayer<T> extends Metadatable {
         } else if (!WEManager.IMP.regionContains(wrappedSelection, allowedSet)) {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
         }
-    }
-
-    public synchronized boolean confirm() {
-        Object confirm = deleteMeta("cmdConfirm");
-        if (confirm == null) {
-            return false;
-        }
-        queueAction(() -> {
-            setMeta("cmdConfirmRunning", true);
-            try {
-                if (confirm instanceof String) {
-                    CommandEvent event = new CommandEvent(getPlayer(), (String) confirm);
-                    CommandManager.getInstance().handleCommandOnCurrentThread(event);
-                } else if (confirm instanceof Runnable) {
-                    ((Runnable) confirm).run();
-                } else {
-                    throw new RuntimeException("Invalid confirm action: " + confirm);
-                }
-            } finally {
-                setMeta("cmdConfirmRunning", false);
-            }
-        });
-        return true;
     }
 
     public boolean toggle(String perm) {

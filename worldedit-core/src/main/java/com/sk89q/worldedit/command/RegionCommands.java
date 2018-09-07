@@ -465,23 +465,23 @@ public class RegionCommands extends MethodCommands {
     @CommandPermissions("worldedit.region.smoothsnow")
     @Logging(REGION)
     public void smooth(FawePlayer player, EditSession editSession, @Selection Region region, @Optional("1") int iterations, @Switch('n') boolean affectNatural, @Switch('s') boolean snow, CommandContext context) throws WorldEditException {
-        try {
-            Vector min = region.getMinimumPoint();
-            Vector max = region.getMaximumPoint();
-            long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
-            FaweLimit limit = FawePlayer.wrap(player).getLimit();
-            if (volume >= limit.MAX_CHECKS) {
-                throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
-            }
-            player.checkConfirmationRegion(() -> {
+        Vector min = region.getMinimumPoint();
+        Vector max = region.getMaximumPoint();
+        long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
+        FaweLimit limit = FawePlayer.wrap(player).getLimit();
+        if (volume >= limit.MAX_CHECKS) {
+            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+        }
+        player.checkConfirmationRegion(() -> {
+            try {
                 HeightMap heightMap = new HeightMap(editSession, region, affectNatural, snow);
                 HeightMapFilter filter = (HeightMapFilter) HeightMapFilter.class.getConstructors()[0].newInstance(GaussianKernel.class.getConstructors()[0].newInstance(5, 1));
                 int affected = heightMap.applyFilter(filter, iterations);
                 BBC.VISITOR_BLOCK.send(player, affected);
-            }, getArguments(context), region);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }, getArguments(context), region);
     }
 
     @Command(
@@ -653,28 +653,27 @@ public class RegionCommands extends MethodCommands {
                        @Switch('r') boolean useRawCoords,
                        @Switch('o') boolean offset,
                        CommandContext context) throws WorldEditException {
+        final Vector zero;
+        Vector unit;
+
+        if (useRawCoords) {
+            zero = Vector.ZERO;
+            unit = Vector.ONE;
+        } else if (offset) {
+            zero = session.getPlacementPosition(player);
+            unit = Vector.ONE;
+        } else {
+            final Vector min = region.getMinimumPoint();
+            final Vector max = region.getMaximumPoint();
+
+            zero = max.add(min).multiply(0.5);
+            unit = max.subtract(zero);
+
+            if (unit.getX() == 0) unit.mutX(1);
+            if (unit.getY() == 0) unit.mutY(1);
+            if (unit.getZ() == 0) unit.mutZ(1);
+        }
         fp.checkConfirmationRegion(() -> {
-            final Vector zero;
-            Vector unit;
-
-            if (useRawCoords) {
-                zero = Vector.ZERO;
-                unit = Vector.ONE;
-            } else if (offset) {
-                zero = session.getPlacementPosition(player);
-                unit = Vector.ONE;
-            } else {
-                final Vector min = region.getMinimumPoint();
-                final Vector max = region.getMaximumPoint();
-
-                zero = max.add(min).multiply(0.5);
-                unit = max.subtract(zero);
-
-                if (unit.getX() == 0) unit.mutX(1);
-                if (unit.getY() == 0) unit.mutY(1);
-                if (unit.getZ() == 0) unit.mutZ(1);
-            }
-
             try {
                 final int affected = editSession.deformRegion(region, zero, unit, expression);
                 player.findFreePosition();

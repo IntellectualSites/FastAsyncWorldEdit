@@ -269,8 +269,6 @@ public class GenerationCommands extends MethodCommands {
             player.findFreePosition();
             BBC.VISITOR_BLOCK.send(fp, affected);
         }, getArguments(context), (int) max);
-
-
     }
 
     @Command(
@@ -366,34 +364,34 @@ public class GenerationCommands extends MethodCommands {
                          @Switch('o') boolean offset,
                          @Switch('c') boolean offsetCenter,
                          CommandContext context) throws WorldEditException, ParameterException {
+        final Vector zero;
+        Vector unit;
+
+        if (useRawCoords) {
+            zero = Vector.ZERO;
+            unit = Vector.ONE;
+        } else if (offset) {
+            zero = session.getPlacementPosition(player);
+            unit = Vector.ONE;
+        } else if (offsetCenter) {
+            final Vector min = region.getMinimumPoint();
+            final Vector max = region.getMaximumPoint();
+
+            zero = max.add(min).multiply(0.5);
+            unit = Vector.ONE;
+        } else {
+            final Vector min = region.getMinimumPoint();
+            final Vector max = region.getMaximumPoint();
+
+            zero = max.add(min).multiply(0.5);
+            unit = max.subtract(zero);
+
+            if (unit.getX() == 0) unit.mutX(1);
+            if (unit.getY() == 0) unit.mutY(1);
+            if (unit.getZ() == 0) unit.mutZ(1);
+        }
+
         fp.checkConfirmationRegion(() -> {
-            final Vector zero;
-            Vector unit;
-
-            if (useRawCoords) {
-                zero = Vector.ZERO;
-                unit = Vector.ONE;
-            } else if (offset) {
-                zero = session.getPlacementPosition(player);
-                unit = Vector.ONE;
-            } else if (offsetCenter) {
-                final Vector min = region.getMinimumPoint();
-                final Vector max = region.getMaximumPoint();
-
-                zero = max.add(min).multiply(0.5);
-                unit = Vector.ONE;
-            } else {
-                final Vector min = region.getMinimumPoint();
-                final Vector max = region.getMaximumPoint();
-
-                zero = max.add(min).multiply(0.5);
-                unit = max.subtract(zero);
-
-                if (unit.getX() == 0) unit.mutX(1);
-                if (unit.getY() == 0) unit.mutY(1);
-                if (unit.getZ() == 0) unit.mutZ(1);
-            }
-
             try {
                 final int affected = editSession.makeShape(region, zero, unit, pattern, expression, hollow);
                 player.findFreePosition();
@@ -434,34 +432,33 @@ public class GenerationCommands extends MethodCommands {
                               @Switch('o') boolean offset,
                               @Switch('c') boolean offsetCenter,
                               CommandContext context) throws WorldEditException, ParameterException {
+        final Vector zero;
+        Vector unit;
+
+        if (useRawCoords) {
+            zero = Vector.ZERO;
+            unit = Vector.ONE;
+        } else if (offset) {
+            zero = session.getPlacementPosition(player);
+            unit = Vector.ONE;
+        } else if (offsetCenter) {
+            final Vector min = region.getMinimumPoint();
+            final Vector max = region.getMaximumPoint();
+
+            zero = max.add(min).multiply(0.5);
+            unit = Vector.ONE;
+        } else {
+            final Vector min = region.getMinimumPoint();
+            final Vector max = region.getMaximumPoint();
+
+            zero = max.add(min).multiply(0.5);
+            unit = max.subtract(zero);
+
+            if (unit.getX() == 0) unit.mutX(1);
+            if (unit.getY() == 0) unit.mutY(1);
+            if (unit.getZ() == 0) unit.mutZ(1);
+        }
         fp.checkConfirmationRegion(() -> {
-            final Vector zero;
-            Vector unit;
-
-            if (useRawCoords) {
-                zero = Vector.ZERO;
-                unit = Vector.ONE;
-            } else if (offset) {
-                zero = session.getPlacementPosition(player);
-                unit = Vector.ONE;
-            } else if (offsetCenter) {
-                final Vector min = region.getMinimumPoint();
-                final Vector max = region.getMaximumPoint();
-
-                zero = max.add(min).multiply(0.5);
-                unit = Vector.ONE;
-            } else {
-                final Vector min = region.getMinimumPoint();
-                final Vector max = region.getMaximumPoint();
-
-                zero = max.add(min).multiply(0.5);
-                unit = max.subtract(zero);
-
-                if (unit.getX() == 0) unit.mutX(1);
-                if (unit.getY() == 0) unit.mutY(1);
-                if (unit.getZ() == 0) unit.mutZ(1);
-            }
-
             try {
                 final int affected = editSession.makeBiomeShape(region, zero, unit, target, expression, hollow);
                 player.findFreePosition();
