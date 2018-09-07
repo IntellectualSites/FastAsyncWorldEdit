@@ -151,35 +151,37 @@ public class ClipboardCommands extends MethodCommands {
     public void copy(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                      @Selection Region region, @Switch('e') boolean skipEntities,
                      @Switch('m') Mask mask, CommandContext context, @Switch('b') boolean copyBiomes) throws WorldEditException {
-        fp.checkConfirmationRegion(getArguments(context), region);
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
-        long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
-        FaweLimit limit = FawePlayer.wrap(player).getLimit();
-        if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
-        }
-        session.setClipboard(null);
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
-        session.setClipboard(new ClipboardHolder(clipboard));
+        fp.checkConfirmationRegion(() -> {
+            Vector min = region.getMinimumPoint();
+            Vector max = region.getMaximumPoint();
+            long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
+            FaweLimit limit = FawePlayer.wrap(player).getLimit();
+            if (volume >= limit.MAX_CHECKS) {
+                throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            }
+            session.setClipboard(null);
+            BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
+            session.setClipboard(new ClipboardHolder(clipboard));
 
-        clipboard.setOrigin(session.getPlacementPosition(player));
-        ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
-        copy.setCopyingEntities(!skipEntities);
-        copy.setCopyBiomes(copyBiomes);
-        Mask sourceMask = editSession.getSourceMask();
-        if (sourceMask != null) {
-            new MaskTraverser(sourceMask).reset(editSession);
-            copy.setSourceMask(sourceMask);
-            editSession.setSourceMask(null);
-        }
-        if (mask != null && mask != Masks.alwaysTrue()) {
-            copy.setSourceMask(mask);
-        }
-        Operations.completeLegacy(copy);
-        BBC.COMMAND_COPY.send(player, region.getArea());
-        if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
-            BBC.TIP_PASTE.or(BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(player);
+            clipboard.setOrigin(session.getPlacementPosition(player));
+            ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
+            copy.setCopyingEntities(!skipEntities);
+            copy.setCopyBiomes(copyBiomes);
+            Mask sourceMask = editSession.getSourceMask();
+            if (sourceMask != null) {
+                new MaskTraverser(sourceMask).reset(editSession);
+                copy.setSourceMask(sourceMask);
+                editSession.setSourceMask(null);
+            }
+            if (mask != null && mask != Masks.alwaysTrue()) {
+                copy.setSourceMask(mask);
+            }
+            Operations.completeLegacy(copy);
+            BBC.COMMAND_COPY.send(player, region.getArea());
+            if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) {
+                BBC.TIP_PASTE.or(BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(player);
+            }
+        }, getArguments(context), region);
     }
 
     @Command(
@@ -239,38 +241,40 @@ public class ClipboardCommands extends MethodCommands {
     public void cut(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                     @Selection Region region, @Optional("air") Pattern leavePattern, @Switch('e') boolean skipEntities,
                     @Switch('m') Mask mask, @Switch('b') boolean copyBiomes, CommandContext context) throws WorldEditException {
-        fp.checkConfirmationRegion(getArguments(context), region);
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
-        long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
-        FaweLimit limit = FawePlayer.wrap(player).getLimit();
-        if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
-        }
-        if (volume >= limit.MAX_CHANGES) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
-        }
-        session.setClipboard(null);
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
-        clipboard.setOrigin(session.getPlacementPosition(player));
-        ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
-        copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
-        copy.setCopyingEntities(!skipEntities);
-        copy.setCopyBiomes(copyBiomes);
-        Mask sourceMask = editSession.getSourceMask();
-        if (sourceMask != null) {
-            new MaskTraverser(sourceMask).reset(editSession);
-            copy.setSourceMask(sourceMask);
-            editSession.setSourceMask(null);
-        }
-        if (mask != null) {
-            copy.setSourceMask(mask);
-        }
-        Operations.completeLegacy(copy);
-        session.setClipboard(new ClipboardHolder(clipboard));
+        fp.checkConfirmationRegion(() -> {
+            Vector min = region.getMinimumPoint();
+            Vector max = region.getMaximumPoint();
+            long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
+            FaweLimit limit = FawePlayer.wrap(player).getLimit();
+            if (volume >= limit.MAX_CHECKS) {
+                throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            }
+            if (volume >= limit.MAX_CHANGES) {
+                throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
+            }
+            session.setClipboard(null);
+            BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
+            clipboard.setOrigin(session.getPlacementPosition(player));
+            ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
+            copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
+            copy.setCopyingEntities(!skipEntities);
+            copy.setCopyBiomes(copyBiomes);
+            Mask sourceMask = editSession.getSourceMask();
+            if (sourceMask != null) {
+                new MaskTraverser(sourceMask).reset(editSession);
+                copy.setSourceMask(sourceMask);
+                editSession.setSourceMask(null);
+            }
+            if (mask != null) {
+                copy.setSourceMask(mask);
+            }
+            Operations.completeLegacy(copy);
+            session.setClipboard(new ClipboardHolder(clipboard));
 
-        BBC.COMMAND_CUT_SLOW.send(player, region.getArea());
-        if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) BBC.TIP_LAZYCUT.send(player);
+            BBC.COMMAND_CUT_SLOW.send(player, region.getArea());
+            if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) BBC.TIP_LAZYCUT.send(player);
+        }, getArguments(context), region);
+
     }
 
     @Command(aliases = {"download"}, desc = "Downloads your clipboard through the configured web interface")

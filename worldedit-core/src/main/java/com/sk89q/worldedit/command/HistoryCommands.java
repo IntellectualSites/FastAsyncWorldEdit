@@ -225,30 +225,29 @@ public class HistoryCommands extends MethodCommands {
     @CommandPermissions("worldedit.history.undo")
     public void undo(Player player, LocalSession session, CommandContext context) throws WorldEditException {
         int times = Math.max(1, context.getInteger(0, 1));
-        if (times > 50) {
-            FawePlayer.wrap(player).checkConfirmation(getArguments(context), times, 50);
-        }
-        for (int i = 0; i < times; ++i) {
-            EditSession undone;
-            if (context.argsLength() < 2) {
-                undone = session.undo(session.getBlockBag(player), player);
-            } else {
-                player.checkPermission("worldedit.history.undo.other");
-                LocalSession sess = worldEdit.getSessionManager().findByName(context.getString(1));
-                if (sess == null) {
-                    BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, context.getString(1));
+        FawePlayer.wrap(player).checkConfirmation(() -> {
+            for (int i = 0; i < times; ++i) {
+                EditSession undone;
+                if (context.argsLength() < 2) {
+                    undone = session.undo(session.getBlockBag(player), player);
+                } else {
+                    player.checkPermission("worldedit.history.undo.other");
+                    LocalSession sess = worldEdit.getSessionManager().findByName(context.getString(1));
+                    if (sess == null) {
+                        BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, context.getString(1));
+                        break;
+                    }
+                    undone = sess.undo(session.getBlockBag(player), player);
+                }
+                if (undone != null) {
+                    BBC.COMMAND_UNDO_SUCCESS.send(player);
+                    worldEdit.flushBlockBag(player, undone);
+                } else {
+                    BBC.COMMAND_UNDO_ERROR.send(player);
                     break;
                 }
-                undone = sess.undo(session.getBlockBag(player), player);
             }
-            if (undone != null) {
-                BBC.COMMAND_UNDO_SUCCESS.send(player);
-                worldEdit.flushBlockBag(player, undone);
-            } else {
-                BBC.COMMAND_UNDO_ERROR.send(player);
-                break;
-            }
-        }
+        }, getArguments(context), times, 50);
     }
 
     @Command(

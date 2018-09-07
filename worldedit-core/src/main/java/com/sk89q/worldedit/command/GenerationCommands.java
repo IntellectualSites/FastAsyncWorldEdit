@@ -88,10 +88,11 @@ public class GenerationCommands extends MethodCommands {
     @CommandPermissions("worldedit.generation.caves")
     @Logging(PLACEMENT)
     public void caves(FawePlayer fp, LocalSession session, EditSession editSession, @Selection Region region, @Optional("8") int size, @Optional("40") int frequency, @Optional("7") int rarity, @Optional("8") int minY, @Optional("127") int maxY, @Optional("1") int systemFrequency, @Optional("25") int individualRarity, @Optional("0") int pocketChance, @Optional("0") int pocketMin, @Optional("3") int pocketMax, CommandContext context) throws WorldEditException, ParameterException {
-        fp.checkConfirmationRegion(getArguments(context), region);
-        CavesGen gen = new CavesGen(size, frequency, rarity, minY, maxY, systemFrequency, individualRarity, pocketChance, pocketMin, pocketMax);
-        editSession.generate(region, gen);
-        BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());
+        fp.checkConfirmationRegion(() -> {
+            CavesGen gen = new CavesGen(size, frequency, rarity, minY, maxY, systemFrequency, individualRarity, pocketChance, pocketMin, pocketMax);
+            editSession.generate(region, gen);
+            BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());
+        }, getArguments(context), region);
     }
 
     // public void addOre(Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
@@ -106,9 +107,10 @@ public class GenerationCommands extends MethodCommands {
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     public void ores(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, CommandContext context) throws WorldEditException, ParameterException {
-        player.checkConfirmationRegion(getArguments(context), region);
-        editSession.addOres(region, mask);
-        BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
+        player.checkConfirmationRegion(() -> {
+            editSession.addOres(region, mask);
+            BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
+        }, getArguments(context), region);
     }
 
     @Command(
@@ -169,9 +171,10 @@ public class GenerationCommands extends MethodCommands {
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     public void ore(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, Pattern material, @Range(min = 0) int size, int freq, @Range(min = 0, max = 100) int rarity, @Range(min = 0, max = 255) int minY, @Range(min = 0, max = 255) int maxY, CommandContext context) throws WorldEditException, ParameterException {
-        player.checkConfirmationRegion(getArguments(context), region);
-        editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
-        BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
+        player.checkConfirmationRegion(() -> {
+            editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
+            BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
+        }, getArguments(context), region);
     }
 
     @Command(
@@ -191,11 +194,11 @@ public class GenerationCommands extends MethodCommands {
     public void hcyl(FawePlayer fp, Player player, LocalSession session, EditSession editSession, Pattern pattern, Vector2D radius, @Optional("1") int height, @Range(min = 1) @Optional("1") double thickness, CommandContext context) throws WorldEditException, ParameterException {
         double max = MathMan.max(radius.getBlockX(), radius.getBlockZ());
         worldEdit.checkMaxRadius(max);
-        fp.checkConfirmationRadius(getArguments(context), (int) max);
-        height = Math.min(256, height);
         Vector pos = session.getPlacementPosition(player);
-        int affected = editSession.makeHollowCylinder(pos, pattern, radius.getX(), radius.getZ(), height, thickness - 1);
-        BBC.VISITOR_BLOCK.send(fp, affected);
+        fp.checkConfirmationRadius(() -> {
+            int affected = editSession.makeHollowCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), thickness - 1);
+            BBC.VISITOR_BLOCK.send(fp, affected);
+        }, getArguments(context), (int) max);
     }
 
     @Command(
@@ -216,11 +219,11 @@ public class GenerationCommands extends MethodCommands {
     public void cyl(FawePlayer fp, Player player, LocalSession session, EditSession editSession, Pattern pattern, Vector2D radius, @Optional("1") int height, @Switch('h') boolean hollow, CommandContext context) throws WorldEditException, ParameterException {
         double max = MathMan.max(radius.getBlockX(), radius.getBlockZ());
         worldEdit.checkMaxRadius(max);
-        fp.checkConfirmationRadius(getArguments(context), (int) max);
-        height = Math.min(256, height);
         Vector pos = session.getPlacementPosition(player);
-        int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), height, !hollow);
-        BBC.VISITOR_BLOCK.send(fp, affected);
+        fp.checkConfirmationRadius(() -> {
+            int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
+            BBC.VISITOR_BLOCK.send(fp, affected);
+        }, getArguments(context), (int) max);
     }
 
     @Command(
@@ -259,16 +262,15 @@ public class GenerationCommands extends MethodCommands {
     public void sphere(FawePlayer fp, Player player, LocalSession session, EditSession editSession, Pattern pattern, Vector radius, @Optional("false") boolean raised, @Switch('h') boolean hollow, CommandContext context) throws WorldEditException, ParameterException {
         double max = MathMan.max(radius.getBlockX(), radius.getBlockY(), radius.getBlockZ());
         worldEdit.checkMaxRadius(max);
-        fp.checkConfirmationRadius(getArguments(context), (int) max);
-
         Vector pos = session.getPlacementPosition(player);
-        if (raised) {
-            pos = pos.add(0, radius.getY(), 0);
-        }
+        Vector finalPos = raised ? pos.add(0, radius.getY(), 0) : pos;
+        fp.checkConfirmationRadius(() -> {
+            int affected = editSession.makeSphere(finalPos, pattern, radius.getX(), radius.getY(), radius.getZ(), !hollow);
+            player.findFreePosition();
+            BBC.VISITOR_BLOCK.send(fp, affected);
+        }, getArguments(context), (int) max);
 
-        int affected = editSession.makeSphere(pos, pattern, radius.getX(), radius.getY(), radius.getZ(), !hollow);
-        player.findFreePosition();
-        BBC.VISITOR_BLOCK.send(fp, affected);
+
     }
 
     @Command(
@@ -325,12 +327,13 @@ public class GenerationCommands extends MethodCommands {
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
     public void pyramid(FawePlayer fp, Player player, LocalSession session, EditSession editSession, Pattern pattern, @Range(min = 1) int size, @Switch('h') boolean hollow, CommandContext context) throws WorldEditException, ParameterException {
-        fp.checkConfirmationRadius(getArguments(context), size);
-        Vector pos = session.getPlacementPosition(player);
         worldEdit.checkMaxRadius(size);
-        int affected = editSession.makePyramid(pos, pattern, size, !hollow);
-        player.findFreePosition();
-        BBC.VISITOR_BLOCK.send(fp, affected);
+        Vector pos = session.getPlacementPosition(player);
+        fp.checkConfirmationRadius(() -> {
+            int affected = editSession.makePyramid(pos, pattern, size, !hollow);
+            player.findFreePosition();
+            BBC.VISITOR_BLOCK.send(fp, affected);
+        }, getArguments(context), size);
     }
 
     @Command(
@@ -363,41 +366,42 @@ public class GenerationCommands extends MethodCommands {
                          @Switch('o') boolean offset,
                          @Switch('c') boolean offsetCenter,
                          CommandContext context) throws WorldEditException, ParameterException {
-        fp.checkConfirmationRegion(getArguments(context), region);
-        final Vector zero;
-        Vector unit;
+        fp.checkConfirmationRegion(() -> {
+            final Vector zero;
+            Vector unit;
 
-        if (useRawCoords) {
-            zero = Vector.ZERO;
-            unit = Vector.ONE;
-        } else if (offset) {
-            zero = session.getPlacementPosition(player);
-            unit = Vector.ONE;
-        } else if (offsetCenter) {
-            final Vector min = region.getMinimumPoint();
-            final Vector max = region.getMaximumPoint();
+            if (useRawCoords) {
+                zero = Vector.ZERO;
+                unit = Vector.ONE;
+            } else if (offset) {
+                zero = session.getPlacementPosition(player);
+                unit = Vector.ONE;
+            } else if (offsetCenter) {
+                final Vector min = region.getMinimumPoint();
+                final Vector max = region.getMaximumPoint();
 
-            zero = max.add(min).multiply(0.5);
-            unit = Vector.ONE;
-        } else {
-            final Vector min = region.getMinimumPoint();
-            final Vector max = region.getMaximumPoint();
+                zero = max.add(min).multiply(0.5);
+                unit = Vector.ONE;
+            } else {
+                final Vector min = region.getMinimumPoint();
+                final Vector max = region.getMaximumPoint();
 
-            zero = max.add(min).multiply(0.5);
-            unit = max.subtract(zero);
+                zero = max.add(min).multiply(0.5);
+                unit = max.subtract(zero);
 
-            if (unit.getX() == 0) unit.mutX(1);
-            if (unit.getY() == 0) unit.mutY(1);
-            if (unit.getZ() == 0) unit.mutZ(1);
-        }
+                if (unit.getX() == 0) unit.mutX(1);
+                if (unit.getY() == 0) unit.mutY(1);
+                if (unit.getZ() == 0) unit.mutZ(1);
+            }
 
-        try {
-            final int affected = editSession.makeShape(region, zero, unit, pattern, expression, hollow);
-            player.findFreePosition();
-            BBC.VISITOR_BLOCK.send(fp, affected);
-        } catch (ExpressionException e) {
-            fp.sendMessage(BBC.getPrefix() + e.getMessage());
-        }
+            try {
+                final int affected = editSession.makeShape(region, zero, unit, pattern, expression, hollow);
+                player.findFreePosition();
+                BBC.VISITOR_BLOCK.send(fp, affected);
+            } catch (ExpressionException e) {
+                fp.sendMessage(BBC.getPrefix() + e.getMessage());
+            }
+        }, getArguments(context), region);
     }
 
     @Command(
@@ -430,40 +434,41 @@ public class GenerationCommands extends MethodCommands {
                               @Switch('o') boolean offset,
                               @Switch('c') boolean offsetCenter,
                               CommandContext context) throws WorldEditException, ParameterException {
-        fp.checkConfirmationRegion(getArguments(context), region);
-        final Vector zero;
-        Vector unit;
+        fp.checkConfirmationRegion(() -> {
+            final Vector zero;
+            Vector unit;
 
-        if (useRawCoords) {
-            zero = Vector.ZERO;
-            unit = Vector.ONE;
-        } else if (offset) {
-            zero = session.getPlacementPosition(player);
-            unit = Vector.ONE;
-        } else if (offsetCenter) {
-            final Vector min = region.getMinimumPoint();
-            final Vector max = region.getMaximumPoint();
+            if (useRawCoords) {
+                zero = Vector.ZERO;
+                unit = Vector.ONE;
+            } else if (offset) {
+                zero = session.getPlacementPosition(player);
+                unit = Vector.ONE;
+            } else if (offsetCenter) {
+                final Vector min = region.getMinimumPoint();
+                final Vector max = region.getMaximumPoint();
 
-            zero = max.add(min).multiply(0.5);
-            unit = Vector.ONE;
-        } else {
-            final Vector min = region.getMinimumPoint();
-            final Vector max = region.getMaximumPoint();
+                zero = max.add(min).multiply(0.5);
+                unit = Vector.ONE;
+            } else {
+                final Vector min = region.getMinimumPoint();
+                final Vector max = region.getMaximumPoint();
 
-            zero = max.add(min).multiply(0.5);
-            unit = max.subtract(zero);
+                zero = max.add(min).multiply(0.5);
+                unit = max.subtract(zero);
 
-            if (unit.getX() == 0) unit.mutX(1);
-            if (unit.getY() == 0) unit.mutY(1);
-            if (unit.getZ() == 0) unit.mutZ(1);
-        }
+                if (unit.getX() == 0) unit.mutX(1);
+                if (unit.getY() == 0) unit.mutY(1);
+                if (unit.getZ() == 0) unit.mutZ(1);
+            }
 
-        try {
-            final int affected = editSession.makeBiomeShape(region, zero, unit, target, expression, hollow);
-            player.findFreePosition();
-            BBC.VISITOR_FLAT.send(fp, affected);
-        } catch (ExpressionException e) {
-            fp.sendMessage(BBC.getPrefix() + e.getMessage());
-        }
+            try {
+                final int affected = editSession.makeBiomeShape(region, zero, unit, target, expression, hollow);
+                player.findFreePosition();
+                BBC.VISITOR_FLAT.send(fp, affected);
+            } catch (ExpressionException e) {
+                fp.sendMessage(BBC.getPrefix() + e.getMessage());
+            }
+        }, getArguments(context), region);
     }
 }

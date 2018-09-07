@@ -173,8 +173,7 @@ public class UtilityCommands extends MethodCommands {
 
     @Command(
             aliases = {"/heightmapinterface"},
-            desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap",
-            max = 0
+            desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
     )
     public void heightmapInterface(FawePlayer player, @Optional("100") int min, @Optional("200") int max) throws IOException {
         player.sendMessage("Please wait while we generate the minified heightmaps.");
@@ -200,7 +199,7 @@ public class UtilityCommands extends MethodCommands {
                     if (name.startsWith(File.separator)) name = name.replaceFirst(java.util.regex.Pattern.quote(File.separator), "");
                     BufferedImage img = MainUtil.readImage(file);
                     BufferedImage minImg = ImageUtil.getScaledInstance(img, min, min, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                    BufferedImage maxImg = ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+                    BufferedImage maxImg = max == -1 ? img : ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
                     player.sendMessage("Writing " + name);
                     File minFile = new File(minImages, name);
                     File maxFile = new File(maxImages, name);
