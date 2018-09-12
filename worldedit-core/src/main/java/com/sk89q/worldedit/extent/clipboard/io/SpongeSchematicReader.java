@@ -118,7 +118,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             int offsetZ = requireTag(metadata, "WEOffsetZ", IntTag.class).getValue();
             Vector offset = new Vector(offsetX, offsetY, offsetZ);
             origin = min.subtract(offset);
-            region = new CuboidRegion(origin, origin.add(width, height, length).subtract(Vector.ONE));
+            region = new CuboidRegion(min, min.add(width, height, length).subtract(Vector.ONE));
         } else {
             origin = min;
             region = new CuboidRegion(origin, origin.add(width, height, length).subtract(Vector.ONE));
@@ -153,7 +153,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 
             for (Map<String, Tag> tileEntity : tileEntityTags) {
                 int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
-                tileEntitiesMap.put(origin.add(new BlockVector(pos[0], pos[1], pos[2])).toBlockVector(), tileEntity);
+                tileEntitiesMap.put(new BlockVector(pos[0], pos[1], pos[2]), tileEntity);
             }
         } catch (Exception e) {
             throw new IOException("Failed to load Tile Entities: " + e.getMessage());
@@ -182,9 +182,9 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 i++;
             }
             // index = (y * length + z) * width + x
-            int y = origin.getBlockY() + index / (width * length);
-            int z = origin.getBlockZ() + (index % (width * length)) / width;
-            int x = origin.getBlockX() + (index % (width * length)) % width;
+            int y = index / (width * length);
+            int z = (index % (width * length)) / width;
+            int x = (index % (width * length)) % width;
             BlockState state = palette.get(value);
             BlockVector pt = new BlockVector(x, y, z);
             try {
@@ -201,9 +201,9 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                     values.put("id", values.get("Id"));
                     values.remove("Id");
                     values.remove("Pos");
-                    clipboard.setBlock(pt, new BaseBlock(state, new CompoundTag(values)));
+                    clipboard.setBlock(clipboard.getMinimumPoint().add(pt), new BaseBlock(state, new CompoundTag(values)));
                 } else {
-                    clipboard.setBlock(pt, state);
+                    clipboard.setBlock(clipboard.getMinimumPoint().add(pt), state);
                 }
             } catch (WorldEditException e) {
                 throw new IOException("Failed to load a block in the schematic");
