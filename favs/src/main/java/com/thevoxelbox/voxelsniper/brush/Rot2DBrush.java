@@ -1,6 +1,7 @@
 package com.thevoxelbox.voxelsniper.brush;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.util.BlockWrapper;
@@ -51,7 +52,7 @@ public class Rot2DBrush extends Brush
                     {
                         final AsyncBlock block = this.clampY(sx, sy, sz); // why is this not sx + x, sy + y sz + z?
                         this.snap[x][z][y] = new BlockWrapper(block);
-                        block.setTypeId(0);
+                        block.setTypeId(BlockTypes.AIR.getInternalId());
                         sy++;
                     }
                 }
@@ -92,7 +93,7 @@ public class Rot2DBrush extends Brush
                         final int yy = currentY - this.bSize;
                         final BlockWrapper block = this.snap[x][currentY][y];
 
-                        if (block.getId() == 0)
+                        if (BlockTypes.get(block.getId()).getMaterial().isAir())
                         {
                             continue;
                         }

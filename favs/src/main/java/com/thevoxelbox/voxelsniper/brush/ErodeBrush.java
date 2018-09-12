@@ -8,6 +8,7 @@ import com.martiansoftware.jsap.JSAPException;
 import com.martiansoftware.jsap.JSAPResult;
 import com.martiansoftware.jsap.UnflaggedOption;
 import com.martiansoftware.jsap.stringparsers.EnumeratedStringParser;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
@@ -105,7 +106,7 @@ public class ErodeBrush extends Brush
         for (final BlockWrapper blockWrapper : blockChangeTracker.getAll())
         {
             undo.put(blockWrapper.getBlock());
-            blockWrapper.getBlock().setTypeIdAndPropertyId(blockWrapper.getMaterial().getId(), blockWrapper.getPropertyId(), true);
+            blockWrapper.getBlock().setTypeIdAndPropertyId(BukkitAdapter.adapt(blockWrapper.getMaterial()).getInternalId(), blockWrapper.getPropertyId(), true);
         }
 
         v.owner().storeUndo(undo);

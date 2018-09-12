@@ -115,9 +115,9 @@ public class OverlayBrush extends PerformBrush
                     { // if haven't already found the surface in this column
                         if ((Math.pow(x, 2) + Math.pow(z, 2)) <= brushSizeSquared)
                         { // if inside of the column...
-                            if (this.getBlockIdAt(this.getTargetBlock().getX() + x, y - 1, this.getTargetBlock().getZ() + z) != 0)
+                            if (!this.getBlockAt(this.getTargetBlock().getX() + x, y - 1, this.getTargetBlock().getZ() + z).isEmpty())
                             { // if not a floating block (like one of Notch'world pools)
-                                if (this.getBlockIdAt(this.getTargetBlock().getX() + x, y + 1, this.getTargetBlock().getZ() + z) == 0)
+                                if (this.getBlockAt(this.getTargetBlock().getX() + x, y + 1, this.getTargetBlock().getZ() + z).isEmpty())
                                 { // must start at surface... this prevents it filling stuff in if
                                     // you click in a wall and it starts out below surface.
                                     if (!this.allBlocks)

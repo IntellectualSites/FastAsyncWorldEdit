@@ -1,6 +1,7 @@
 package com.thevoxelbox.voxelsniper.brush;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
@@ -126,7 +127,7 @@ public class FillDownBrush extends PerformBrush
             else if (par[i].equalsIgnoreCase("some"))
             {
                 this.fillLiquid = false;
-                v.setReplaceId(0);
+                v.setReplaceId(BlockTypes.AIR.getInternalId());
                 v.sendMessage(ChatColor.AQUA + "Now only filling air.");
             }
             else if (par[i].equalsIgnoreCase("-e"))

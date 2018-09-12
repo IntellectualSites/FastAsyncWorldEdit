@@ -141,7 +141,7 @@ public class SplatterOverlayBrush extends PerformBrush
                                         final int depth = randomizeHeight ? generator.nextInt(this.depth) : this.depth;
 
                                         for (int d = this.depth - 1; ((this.depth - d) <= depth); d--) {
-                                            if (this.clampY(this.getTargetBlock().getX() + x, y - d, this.getTargetBlock().getZ() + z).getTypeId() != 0) {
+                                            if (!this.clampY(this.getTargetBlock().getX() + x, y - d, this.getTargetBlock().getZ() + z).isEmpty()) {
                                                 // fills down as many layers as you specify in parameters
                                                 this.current.perform(this.clampY(this.getTargetBlock().getX() + x, y - d + yOffset, this.getTargetBlock().getZ() + z));
                                                 // stop it from checking any other blocks in this vertical 1x1 column.
@@ -158,7 +158,7 @@ public class SplatterOverlayBrush extends PerformBrush
                                     final int depth = randomizeHeight ? generator.nextInt(this.depth) : this.depth;
                                     for (int d = this.depth - 1; ((this.depth - d) <= depth); d--)
                                     {
-                                        if (this.clampY(this.getTargetBlock().getX() + x, y - d, this.getTargetBlock().getZ() + z).getTypeId() != 0)
+                                        if (!this.clampY(this.getTargetBlock().getX() + x, y - d, this.getTargetBlock().getZ() + z).isEmpty())
                                         {
                                             // fills down as many layers as you specify in parameters
                                             this.current.perform(this.clampY(this.getTargetBlock().getX() + x, y - d + yOffset, this.getTargetBlock().getZ() + z));
@@ -260,9 +260,9 @@ public class SplatterOverlayBrush extends PerformBrush
                     { // if haven't already found the surface in this column
                         if ((Math.pow(x, 2) + Math.pow(z, 2)) <= brushSizeSquared && splat[x + v.getBrushSize()][z + v.getBrushSize()] == 1)
                         { // if inside of the column...&& if to be splattered
-                            if (this.getBlockIdAt(this.getTargetBlock().getX() + x, y - 1, this.getTargetBlock().getZ() + z) != 0)
+                            if (!this.getBlockAt(this.getTargetBlock().getX() + x, y - 1, this.getTargetBlock().getZ() + z).isEmpty())
                             { // if not a floating block (like one of Notch'world pools)
-                                if (this.getBlockIdAt(this.getTargetBlock().getX() + x, y + 1, this.getTargetBlock().getZ() + z) == 0)
+                                if (this.getBlockAt(this.getTargetBlock().getX() + x, y + 1, this.getTargetBlock().getZ() + z).isEmpty())
                                 { // must start at surface... this prevents it filling stuff in if
                                     // you click in a wall and it starts out below surface.
                                     if (!this.allBlocks)

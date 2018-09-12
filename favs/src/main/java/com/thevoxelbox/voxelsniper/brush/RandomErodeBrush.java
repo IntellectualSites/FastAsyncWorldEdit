@@ -1,6 +1,7 @@
 package com.thevoxelbox.voxelsniper.brush;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
@@ -198,7 +199,7 @@ public class RandomErodeBrush extends Brush
                             {
                                 if (this.erode(x, y, z))
                                 {
-                                    this.snap[x][y][z].getNativeBlock().setTypeId(0);
+                                    this.snap[x][y][z].getNativeBlock().setTypeId(BlockTypes.AIR.getInternalId());
                                 }
                             }
                         }
@@ -311,7 +312,7 @@ public class RandomErodeBrush extends Brush
                             {
                                 if (this.erode(x, y, z))
                                 {
-                                    this.snap[x][y][z].getNativeBlock().setTypeId(0);
+                                    this.snap[x][y][z].getNativeBlock().setTypeId(BlockTypes.AIR.getInternalId());
                                 }
                             }
                         }

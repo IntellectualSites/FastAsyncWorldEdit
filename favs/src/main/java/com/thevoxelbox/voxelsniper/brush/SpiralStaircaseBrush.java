@@ -1,9 +1,14 @@
 package com.thevoxelbox.voxelsniper.brush;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 /**
@@ -296,48 +301,30 @@ public class SpiralStaircaseBrush extends Brush
                             {
                                 if (!((this.stairtype.equalsIgnoreCase("woodstair") || this.stairtype.equalsIgnoreCase("cobblestair")) && spiral[x][i + 1][z] == 1))
                                 {
-                                    if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != 0)
-                                    {
-                                        undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                    }
-                                    this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, 0);
+                                    this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, BlockTypes.AIR.getInternalId());
                                 }
 
                             }
                             else
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != 0)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, 0);
+                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, BlockTypes.AIR.getInternalId());
                             }
 
                             break;
                         case 1:
+                            switch (stairtype) {
+
+                            }
                             if (this.stairtype.equalsIgnoreCase("block"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != v.getVoxelId())
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
                                 this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, v.getVoxelId());
                             }
                             else if (this.stairtype.equalsIgnoreCase("step"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != 44)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, 44);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z).setPropertyId(v.getPropertyId());
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z, 44, v.getPropertyId());
                             }
                             else if (this.stairtype.equalsIgnoreCase("woodstair") || this.stairtype.equalsIgnoreCase("cobblestair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i - 1, blockPositionZ - v.getBrushSize() + z) != v.getVoxelId())
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i - 1, blockPositionZ - v.getBrushSize() + z));
-                                }
                                 this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i - 1, v.getVoxelId());
 
                             }
@@ -345,50 +332,25 @@ public class SpiralStaircaseBrush extends Brush
                         case 2:
                             if (this.stairtype.equalsIgnoreCase("step"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != 43)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, 43);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z).setPropertyId(v.getPropertyId());
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z, 43, v.getPropertyId());
                             }
                             else if (this.stairtype.equalsIgnoreCase("woodstair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != 53)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, 53);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z).setPropertyId( 0);
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z,  53, 0);
                             }
                             else if (this.stairtype.equalsIgnoreCase("cobblestair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != 67)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, 67);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z).setPropertyId( 0);
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z,  67, 0);
                             }
                             break;
                         default:
                             if (this.stairtype.equalsIgnoreCase("woodstair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != 53)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, 53);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z).setPropertyId((spiral[x][i][z] - 2));
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z, 53, (spiral[x][i][z] - 2));
                             }
                             else if (this.stairtype.equalsIgnoreCase("cobblestair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z) != 67)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, 67);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z).setPropertyId((spiral[x][i][z] - 2));
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z, 67, (spiral[x][i][z] - 2));
                             }
                             break;
                     }
@@ -672,86 +634,44 @@ public class SpiralStaircaseBrush extends Brush
                     switch (spiral[x][i][z])
                     {
                         case 0:
-                            if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != 0)
-                            {
-                                undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z));
-                            }
-                            this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, 0);
+                            this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, BlockTypes.AIR.getInternalId());
                             break;
                         case 1:
                             if (this.stairtype.equalsIgnoreCase("block"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != v.getVoxelId())
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z));
-                                }
                                 this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, v.getVoxelId());
                             }
                             else if (this.stairtype.equalsIgnoreCase("step"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != 44)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, 44);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z).setPropertyId(v.getPropertyId());
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z, 44, v.getPropertyId());
                             }
                             else if (this.stairtype.equalsIgnoreCase("woodstair") || this.stairtype.equalsIgnoreCase("cobblestair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != v.getVoxelId())
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z));
-                                }
                                 this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, v.getVoxelId());
                             }
                             break;
                         case 2:
                             if (this.stairtype.equalsIgnoreCase("step"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != 43)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, 43);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z).setPropertyId(v.getPropertyId());
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z, 43, v.getPropertyId());
                             }
                             else if (this.stairtype.equalsIgnoreCase("woodstair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != 53)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() - x, blockPositionY + i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, 53);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z).setPropertyId( 0);
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z,  53, 0);
                             }
                             else if (this.stairtype.equalsIgnoreCase("cobblestair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != 67)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, 67);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z).setPropertyId( 0);
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z, 67, 0);
                             }
                             break;
                         default:
                             if (this.stairtype.equalsIgnoreCase("woodstair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != 53)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, 53);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z).setPropertyId((spiral[x][i][z] - 2));
+                                this.setBlockLegacy(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z, 53, (spiral[x][i][z] - 2));
                             }
                             else if (this.stairtype.equalsIgnoreCase("cobblestair"))
                             {
-                                if (this.getBlockIdAt(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z) != 67)
-                                {
-                                    undo.put(this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z));
-                                }
-                                this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, 67);
-                                this.clampY(blockPositionX - v.getBrushSize() + x, blockPositionY - i, blockPositionZ - v.getBrushSize() + z).setPropertyId((spiral[x][i][z] - 2));
+                                this.setBlockLegacy(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY - i, 67, (spiral[x][i][z] - 2));
                             }
                             break;
                     }
@@ -792,7 +712,7 @@ public class SpiralStaircaseBrush extends Brush
         if (par[1].equalsIgnoreCase("info"))
         {
             v.sendMessage(ChatColor.GOLD + "Spiral Staircase Parameters:");
-            v.sendMessage(ChatColor.AQUA + "/b sstair 'block' (default) | 'step' | 'woodstair' | 'cobblestair' -- set the type of staircase");
+            v.sendMessage(ChatColor.AQUA + "/b sstair 'block' (default) | step' | 'woodstair' | 'cobblestair' -- set the type of staircase");
             v.sendMessage(ChatColor.AQUA + "/b sstair 'c' (default) | 'cc' -- set the turning direction of staircase");
             v.sendMessage(ChatColor.AQUA + "/b sstair 'n' (default) | 'e' | 's' | 'world' -- set the opening direction of staircase");
             return;
@@ -800,9 +720,22 @@ public class SpiralStaircaseBrush extends Brush
 
         for (int i = 1; i < par.length; i++)
         {
+            // stairs
+            // step/slab
+
+            try {
+                BlockTypes type = BlockTypes.parse(par[i]);
+                this.stairtype = par[i].toLowerCase().intern();
+                v.sendMessage(ChatColor.BLUE + "Staircase type: " + this.stairtype);
+                return;
+            } catch (InputParseException ignore) {}
+            switch (par[i].toLowerCase()) {
+                case "block":
+
+            }
             if (par[i].equalsIgnoreCase("block") || par[i].equalsIgnoreCase("step") || par[i].equalsIgnoreCase("woodstair") || par[i].equalsIgnoreCase("cobblestair"))
             {
-                this.stairtype = par[i];
+                this.stairtype = par[i].toLowerCase().intern();
                 v.sendMessage(ChatColor.BLUE + "Staircase type: " + this.stairtype);
             }
             else if (par[i].equalsIgnoreCase("c") || par[i].equalsIgnoreCase("cc"))

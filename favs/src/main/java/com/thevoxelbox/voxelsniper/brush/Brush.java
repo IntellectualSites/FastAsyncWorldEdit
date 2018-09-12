@@ -2,6 +2,7 @@ package com.thevoxelbox.voxelsniper.brush;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.RangeBlockHelper;
 import com.thevoxelbox.voxelsniper.SnipeAction;
@@ -304,8 +305,23 @@ public abstract class Brush implements IBrush
      * @param data The data value the block will be set to
      */
     @SuppressWarnings("deprecation")
-	protected final void setBlockIdAndDataAt(int x, int y, int z, int id, int data)
+    protected final void setBlockIdAndDataAt(int x, int y, int z, int id, int data)
     {
         this.getWorld().getBlockAt(x, y, z).setTypeIdAndPropertyId(id, data, true);
+    }
+
+    /**
+     * Sets the id and data value of the block at the passed coordinate.
+     *
+     * @param x    X coordinate
+     * @param y    Y coordinate
+     * @param z    Z coordinate
+     * @param id   The id the block will be set to
+     * @param data The data value the block will be set to
+     */
+    @SuppressWarnings("deprecation")
+    protected final void setBlockLegacy(int x, int y, int z, int id, int data)
+    {
+        this.getWorld().getBlockAt(x, y, z).setCombinedId(LegacyMapper.getInstance().getBlockFromLegacy(id, data).getInternalId());
     }
 }

@@ -1,6 +1,7 @@
 package com.thevoxelbox.voxelsniper.brush;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import org.bukkit.ChatColor;
@@ -101,7 +102,7 @@ public class PullBrush extends Brush
      */
     private boolean isSurface(final int x, final int y, final int z)
     {
-        return this.getBlockIdAt(x, y, z) != 0 && ((this.getBlockIdAt(x, y - 1, z) == 0) || (this.getBlockIdAt(x, y + 1, z) == 0) || (this.getBlockIdAt(x + 1, y, z) == 0) || (this.getBlockIdAt(x - 1, y, z) == 0) || (this.getBlockIdAt(x, y, z + 1) == 0) || (this.getBlockIdAt(x, y, z - 1) == 0));
+        return !this.getBlockAt(x, y, z).isEmpty() && ((this.getBlockAt(x, y - 1, z).isEmpty()) || (this.getBlockAt(x, y + 1, z).isEmpty()) || (this.getBlockAt(x + 1, y, z).isEmpty()) || (this.getBlockAt(x - 1, y, z).isEmpty()) || (this.getBlockAt(x, y, z + 1).isEmpty()) || (this.getBlockAt(x, y, z - 1).isEmpty()));
 
     }
 
@@ -109,13 +110,13 @@ public class PullBrush extends Brush
 	private void setBlock(final BlockWrapper block)
     {
         final AsyncBlock currentBlock = this.clampY(block.getX(), block.getY() + (int) (this.vh * block.getStr()), block.getZ());
-        if (this.getBlockIdAt(block.getX(), block.getY() - 1, block.getZ()) == 0)
+        if (this.getBlockAt(block.getX(), block.getY() - 1, block.getZ()).isEmpty())
         {
             currentBlock.setTypeId(block.getId());
             currentBlock.setPropertyId(block.getD());
             for (int y = block.getY(); y < currentBlock.getY(); y++)
             {
-                this.setBlockIdAt(block.getZ(), block.getX(), y, 0);
+                this.setBlockIdAt(block.getZ(), block.getX(), y, BlockTypes.AIR.getInternalId());
             }
         }
         else
@@ -139,7 +140,7 @@ public class PullBrush extends Brush
         currentBlock.setPropertyId(block.getD());
         for (int y = block.getY(); y > currentBlock.getY(); y--)
         {
-            this.setBlockIdAt(block.getZ(), block.getX(), y, 0);
+            this.setBlockIdAt(block.getZ(), block.getX(), y, BlockTypes.AIR.getInternalId());
         }
         // }
     }
