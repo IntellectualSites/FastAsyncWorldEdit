@@ -17,8 +17,12 @@ processResources {
     }
 }
 
-jar.destinationDir = file '../target'
-jar.archiveName = "FastAsyncVoxelSniper-${project.name}-${parent.version}.jar"
-jar.doLast { task ->
-    ant.checksum file: task.archivePath
+shadowJar {
+    dependencies {
+        include(dependency('com.martiansoftware:jsap:2.1'))
+    }
+    archiveName = "FastAsyncVoxelSniper-${project.name}-${parent.version}.jar"
+    destinationDir = file '../target'
 }
+
+build.dependsOn(shadowJar)
