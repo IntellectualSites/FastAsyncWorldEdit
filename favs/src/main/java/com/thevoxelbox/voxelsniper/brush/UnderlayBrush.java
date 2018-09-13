@@ -65,7 +65,7 @@ public class UnderlayBrush extends PerformBrush
                             {
                                 for (int d = 0; (d < this.depth); d++)
                                 {
-                                    if (!this.clampY(this.getTargetBlock().getX() + x, y + d, this.getTargetBlock().getZ() + z).isEmpty()
+                                    if (!this.clampY(this.getTargetBlock().getX() + x, y + d, this.getTargetBlock().getZ() + z).isEmpty())
                                     {
                                         this.current.perform(this.clampY(this.getTargetBlock().getX() + x, y + d, this.getTargetBlock().getZ() + z)); // fills down as many layers as you specify in
                                         // parameters

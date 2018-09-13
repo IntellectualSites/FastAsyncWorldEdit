@@ -23,7 +23,7 @@ public class Settings extends Config {
     @Final
     public String PLATFORM; // These values are set from FAWE before loading
 
-    @Comment({"Options: de, ru, tr",
+    @Comment({"Options: de, es, fr, nl, ru, tr",
             "Create a PR to contribute a translation: https://github.com/boy0001/FastAsyncWorldedit/new/master/core/src/main/resources",})
     public String LANGUAGE = "";
     @Comment({"Enable or disable automatic updates",

@@ -1785,21 +1785,16 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (region instanceof CuboidRegion) {
             return this.makeCuboidWalls(region, pattern);
         } else {
-            final int minY = region.getMinimumPoint().getBlockY();
-            final int maxY = region.getMaximumPoint().getBlockY();
-            final ArbitraryShape shape = new RegionShape(region) {
-                @Override
-                public BlockStateHolder getMaterial(final int x, final int y, final int z, final BlockStateHolder defaultMaterial) {
-                    if ((y > maxY) || (y < minY)) {
-                        // Put holes into the floor and ceiling by telling ArbitraryShape that the shape goes on outside the region
-                        return defaultMaterial;
-                    }
-
-                    return super.getMaterial(x, y, z, defaultMaterial);
+            for (BlockVector position : region) {
+                int x = position.getBlockX();
+                int y = position.getBlockY();
+                int z = position.getBlockZ();
+                if (!region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(x - 1, z)) {
+                    setBlock(position, pattern);
                 }
-            };
-            return shape.generate(this, pattern, true);
+            }
         }
+        return changes;
     }
 
     /**

@@ -64,7 +64,7 @@ public class FlatRegionIterator implements Iterator<Vector2D>  {
     }
 
     private void forward() {
-        while (hasNext() && !region.contains(new Vector(nextX, y, nextZ))) {
+        while (hasNext() && !region.contains(nextX, y, nextZ)) {
             forwardOne();
         }
     }

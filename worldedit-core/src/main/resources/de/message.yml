@@ -1,6 +1,6 @@
-#Adjusted and updated by NotMyFault
+#Updated by NotMyFault
 info:
-  prefix: '&4&lFAWE:&f&7'
+  prefix: '&8(&4&lFAWE&8)&r&7'
   schematic_pasting: '&7Die Schematic wird eingefügt. Dies kann nicht rückgängig gemacht
     werden.'
   updated_lighting_selection: '&7Das Licht wird in %s0 Chunks aktualisiert. (Es kann
@@ -163,9 +163,13 @@ worldedit:
     brush_target_mask_set: Zielmaske auf %s0 gesetzt
     brush_target_offset_set: Zielausrichtung auf %s0 gesetzt
     brush_equipped: Brush %s0 ausgerüstet
-    brush_line_primary: Punkt %s0 hinzugefügt, klicke auf eine andere Position um die Linie zu erstellen
+    brush_line_primary: Punkt %s0 hinzugefügt, klicke auf eine andere Position um
+      die Linie zu erstellen
     brush_line_secondary: Spline erstellt
-    brush_spline_primary_2: Position hinzugefügt, klicke auf die gleiche Postiion um zu beginnen!
+    brush_spline_primary_2: Position hinzugefügt, klicke auf die gleiche Position
+      um zu beginnen!
+    brush_catenary_direction: Punkt %s0 hinzugefügt, klicke in die Richtung in der
+      du die spline generieren willst
   rollback:
     rollback_element: annulliere %s0
   tool:
@@ -247,7 +251,8 @@ worldedit:
   navigation:
     navigation_wand_error: '&cNichts zu durchqueren'
   anvil:
-    world_is_loaded: Die Welt sollte nicht in Benutzung sein währen der Ausführung. Entlade die Welt, oder überschreibe diese mit -f (vorher speichern)
+    world_is_loaded: Die Welt sollte nicht in Benutzung sein währen der Ausführung.
+      Entlade die Welt, oder überschreibe diese mit -f (vorher speichern)
   help:
     command_clarifying_bracket: '&7Klammer für&c%s0 wurde hinzugefügt'
     help_suggest: '&7%s0 konnte nicht gefunden werden. Versuche &c%s1 &7'
@@ -274,10 +279,10 @@ cancel:
   worldedit_cancel_reason_no_region: Keine erlaubte Region (Ignorieren mit /wea)
   worldedit_failed_load_chunk: '&cÜberspringe das Laden von Chunk: &7%s0;%s1&c. Versuche
     chunk-wait zu erhöhen.'
-  worldedit_cancel_reason_confirm: '&7Deine Selektion ist zu groß (%s0 -> %s1). Benutze &c//confirm
-    &7um &c%s2 auszuführen'
+  worldedit_cancel_reason_confirm: '&7Deine Selektion ist zu groß (%s0 -> %s1). Benutze
+    &c//confirm &7um &c%s2 auszuführen'
   worldedit_cancel_reason_outside_level: Außerhalb der Welt
-  worldedit_cancel_reason_outside_region: Außerhalb erlaubter Region (Bypass mit /wea,
+  worldedit_cancel_reason_outside_region: Außerhalb erlaubter Region (Umgehe mit /wea,
     oder deaktiviere `region-restrictions` in der config.yml)
 history: {}
 navigation:
@@ -312,7 +317,7 @@ tips:
   tip_download: 'Tipp: Du kannst deine Zwischenablage mit `//download` herunterladen'
   tip_sel_list: 'Tipp: Liste die verschiedenen Selektoren auf mit &c//sel list'
   tip_select_connected: 'Tipp: Wähle alle verbundenen Blöcke mit //sel fuzzy'
-  tip_set_pos1: 'Tipp: Nutze pos1 als Muster &c//set pos1'
+  tip_set_pos1: 'Tipp: Nutze Position1 als Muster &c//set pos1'
   tip_farwand: 'Tipp: Markiere entferne Blöcke mit &c//farwand'
   tip_fast: '&7Tipp: Platziere schnell und ohne Undo-Historie &c//fast'
   tip_mask: '&7Tipp: Setze eine Globale Zielmaske mit &c/gmask'
@@ -338,5 +343,16 @@ tips:
   tip_lazycut: '&7Tipp: Es ist sicherer den Befehl &c//lazycut zu verwenden.'
   tip_regen_0: 'Tipp: Benutze ein Biom mit /regen [biome]'
   tip_regen_1: 'Tipp: Benutzte einen Seed mit /regen [biome] [seed]'
-  tip_biome_pattern: 'Tipp: Das &c#biome[forest]&7 Muster kann in jedem Befehl genutzt werden'
+  tip_biome_pattern: 'Tipp: Das &c#biome[forest]&7 Muster kann in jedem Befehl genutzt
+    werden'
   tip_biome_mask: 'Tipp: Beschränke ein Biom mit der `$jungle` Maske'
+  tip_discord: Du benötigst Hilfe mit FAWE? https://discord.gg/ngZCzbU
+  tip_replace_regex: '&7Tipp: Ersetze mit regex:&c //replace .*_log <pattern>'
+  tip_replace_regex_2: '&7Tipp: Ersetze mit regex:&c //replace .*stairs[facing=(north|south)]
+    <pattern>'
+  tip_replace_regex_3: '&7Tipp: Ersetze mit den folgenden Operatoren:&c //replace
+    water[level>2] sand'
+  tip_replace_regex_4: '&7Tipp: Ersetze mit den folgenden Operatoren:&c //replace
+    true *[waterlogged=false]'
+  tip_replace_regex_5: '&7Tipp: Ersetze mit den folgenden Operatoren:&c //replace
+    true *[level-=1]'

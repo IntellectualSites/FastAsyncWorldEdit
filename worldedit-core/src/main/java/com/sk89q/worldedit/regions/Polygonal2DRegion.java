@@ -294,6 +294,54 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
+    public boolean contains(int targetX, int targetZ) {
+        boolean inside = false;
+        int npoints = points.size();
+        int xNew, zNew;
+        int xOld, zOld;
+        int x1, z1;
+        int x2, z2;
+        long crossproduct;
+        int i;
+
+        xOld = points.get(npoints - 1).getBlockX();
+        zOld = points.get(npoints - 1).getBlockZ();
+
+        for (i = 0; i < npoints; ++i) {
+            xNew = points.get(i).getBlockX();
+            zNew = points.get(i).getBlockZ();
+            //Check for corner
+            if (xNew == targetX && zNew == targetZ) {
+                return true;
+            }
+            if (xNew > xOld) {
+                x1 = xOld;
+                x2 = xNew;
+                z1 = zOld;
+                z2 = zNew;
+            } else {
+                x1 = xNew;
+                x2 = xOld;
+                z1 = zNew;
+                z2 = zOld;
+            }
+            if (x1 <= targetX && targetX <= x2) {
+                crossproduct = ((long) targetZ - (long) z1) * (long) (x2 - x1)
+                        - ((long) z2 - (long) z1) * (long) (targetX - x1);
+                if (crossproduct == 0) {
+                    if ((z1 <= targetZ) == (targetZ <= z2)) return true; //on edge
+                } else if (crossproduct < 0 && (x1 != targetX)) {
+                    inside = !inside;
+                }
+            }
+            xOld = xNew;
+            zOld = zNew;
+        }
+
+        return inside;
+    }
+
+    @Override
     public boolean contains(Vector position) {
         return contains(points, minY, maxY, position);
     }

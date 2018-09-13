@@ -112,7 +112,7 @@ worldedit:
     selection_chunk: Chunk geselecteerd (%s0)
     selection_chunks: Chunks geselecteerd (%s0) - (%s1)
     selection_contract: Region contracted %s0 blokken.
-    selection_count:  %s0 Blokken geteld.
+    selection_count:  '%s0 Blokken geteld.'
     selection_distr: '# Totaal aantal blokken: %s0'
     selection_expand: Regio vergroot met %s0 blokken.
     selection_expand_vert: Regio vergroot met %s0 blokken (van boven naar beneden)
@@ -134,14 +134,14 @@ worldedit:
     brush_target_mode_set: Target mode gezet naar %s0
     brush_target_mask_set: Target mode gezet naar %s0
     brush_target_offset_set: Uitschietting van de target gezet tot %s0
-    brush_equipped: Brush in gebruik: %s0
+    brush_equipped: Brush in gebruik %s0
     brush_try_other: |-
       &cEr zijn betere brushes hier voor te gebruiken e.g.
       &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
-    brush_copy: Links klik de fundering van de constructie om te kopieëren, rechts klik om te plakken. verhoog
-    de brush Settings als dat mogelijk is.
+    brush_copy: Links klik de fundering van de constructie om te kopieëren, rechts klik om te plakken. Verhoog
+     de brush Settings als dat mogelijk is.
     brush_height_invalid: Onvalide hoogte map file (%s0)
-    brush_smooth: 'Note: Gebruik de blend brush om caves en hangende dingen glad te krijgen.'
+    brush_smooth: Gebruik de blend brush om caves en hangende dingen glad te krijgen.'
     brush_spline: Klik Om een bevestigingspunt te zetten, klik hetzelfde punt om het af te ronden.
     brush_line_primary: Punt %s0 toegevoegt, klik op een andere locatie om de lijn te creëeren.
     brush_catenary_direction: Punt %s0 toegevoegt, klik naar de directie waar je
@@ -160,7 +160,7 @@ worldedit:
     brush_transform: Brush transform gezet
     brush_material: Brush material gezet
   rollback:
-    rollback_element:  %s0 aan het ontdaan maken.
+   rollback_element: aan %s0 het ontdaan maken.
   tool:
     tool_inspect: Inspect tool gebonden aan %s0.
     tool_inspect_info: '&7%s0 veranderd %s1 to %s2 %s3 geleden'
@@ -191,7 +191,7 @@ worldedit:
     biome_list_header: 'Biomes (page %s0/%s1):'
     biome_changed: Biotopen zijn veranderd in %s0 columns.
   utility:
-    kill_success: %s0 entities zijn vermoord in een radius van %s1.
+    kill_success: entities %s0 zijn vermoord in een radius van %s1.
     nothing_confirmed: Je hebt geen acties die bevestigt moeten worden.
     page_footer: Gebruik %s0 om naar de volgende pagina te gaan
   schematic:
@@ -269,11 +269,11 @@ cancel:
     chunk-wait op te krikken.'
 navigation:
   ascend_fail: Geen vrije plekken boven je gesignaleerd.
-  ascended_plural: %s0 levels verlaagt.
+  ascended_plural: levels %s0 verlaagt.
   ascended_singular: Ascended a level.
   unstuck: There you go!
   descend_fail: geen vrije plekken onder je gesignaleerd.
-  descend_plural: %s0 levels gedaald.
+  descend_plural: levels %s0 gedaald.
   descend_singular: Een level gedaald.
   whoosh: Whoosh!
   poof: Poof!
@@ -308,9 +308,15 @@ tips:
   tip_set_linear: '&7Tip: Zet een blok lineaire met &c//set #l3d[wood,bedrock]'
   tip_surface_spread: '&7Tip: Verpsreid een oppervlakte met &c//set #surfacespread[5][0][5][#existing]'
   tip_set_hand: '&7Tip: Gebruik je huide hand met &c//set hand'
+  tip_replace_regex: '&7&7Tip: Vervang door regex:&c //replace .*_log <pattern>'
+  tip_replace_regex_2: '&7&7Tip: Vervang door regex:&c //replace .*stairs[facing=(north|south)]
+    <pattern>'
+  tip_replace_regex_3: '&7&7Tip: Vervang door operators:&c //replace water[level>2]
+    sand'
+  tip_replace_regex_4: '&7&7Tip: Vervang door operators:&c //replace true *[waterlogged=false]'
+  tip_replace_regex_5: '&7&7Tip: Vervang door operators:&c //replace true *[level-=1]'
   tip_replace_id: '&7Tip: Vervang alleen het blok id:&c//replace woodenstair #id[cobblestair]'
-  tip_replace_light: 'Tip: Verwijder licht met with&c//replace #brightness[1][15]
-  0
+  tip_replace_light: 'Tip: Verwijder licht met with&c//replace #brightness[1][15]'
   tip_tab_complete: 'Tip: The replace command supports tab completion'
   tip_flip: 'Tip: Mirror met &c//flip'
   tip_deform: 'Tip: Verander het van vorm met &c//deform'
@@ -321,11 +327,12 @@ tips:
   tip_replace_marker: 'Tip: verander een blok in je volle klipbord met &c//replace
     wool #fullcopy'
   tip_paste: 'Tip: Plaats met &c//paste'
-  tip_lazycopy: 'Tip: lazycopy is sneller'
-  tip_download: 'Tip: probeer &c//download'
-  tip_rotate: 'Tip: orïenteer met &c//rotate'
+  tip_lazycopy: 'Tip: Lazycopy is sneller'
+  tip_download: 'Tip: Probeer &c//download'
+  tip_rotate: 'Tip: Orïenteer met &c//rotate'
   tip_copy_pattern: 'Tip: Om een pattern te gebruiken, probeer &c#copy'
   tip_regen_0: 'Tip: Gebruik een biome met /regen [biome]'
-  tip_regen_1: 'Tip: gebruik een seed met /regen [biome] [seed]'
+  tip_regen_1: 'Tip: Gebruik een seed met /regen [biome] [seed]'
   tip_biome_pattern: 'Tip: Dee &c#biome[forest]&7 pattern kan ik elke opdracht gebruikt worden'
   tip_biome_mask: 'Tip: Er wordt een restrictie geplaatst op de biome met `$jungle` mask'
+  tip_discord: 'Heb je hulp nodig bij FAWE? https://discord.gg/ngZCzbU'

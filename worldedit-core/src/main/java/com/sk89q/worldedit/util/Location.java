@@ -339,11 +339,6 @@ public class Location extends Vector {
 
     @Override
     public int hashCode() {
-        int result = extent.hashCode();
-        result = 31 * result + this.hashCode();
-        result = 31 * result + Float.floatToIntBits(this.pitch);
-        result = 31 * result + Float.floatToIntBits(this.yaw);
-        return result;
+        return super.hashCode();
     }
-
 }
