@@ -266,8 +266,8 @@ public interface Extent extends InputExtent, OutputExtent {
                 if (random.nextInt(100) > rarity) {
                     continue;
                 }
-                int x = (chunkPos.getBlockX() << 4) + PseudoRandom.random.nextInt(16);
-                int z = (chunkPos.getBlockZ() << 4) + PseudoRandom.random.nextInt(16);
+                int x = (chunkPos.getBlockX() << 4) + random.nextInt(16);
+                int z = (chunkPos.getBlockZ() << 4) + random.nextInt(16);
                 gen.spawn(random, x, z);
             }
         }

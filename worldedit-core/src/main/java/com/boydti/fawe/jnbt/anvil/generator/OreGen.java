@@ -48,8 +48,8 @@ public class OreGen extends Resource {
         }
         double f = rand.nextDouble() * Math.PI;
 
-        int x8 = x + 8;
-        int z8 = z + 8;
+        int x8 = x;
+        int z8 = z;
         double so8 = maxSizeO8;
         double so16 = maxSizeO16;
         double sf = MathMan.sinInexact(f) * so8;
@@ -107,7 +107,7 @@ public class OreGen extends Resource {
                                 double dxyz2 = dxy2 + dz * dz;
                                 if ((dxyz2 < 1)) {
                                     if (mask.test(mutable))
-                                        extent.setBlock(xx, yy, zz, pattern.apply(mutable));
+                                        pattern.apply(extent, mutable, mutable);
                                 }
                             }
                         }
