@@ -8,7 +8,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MutableBlockVector2D;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -17,7 +17,6 @@ import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +28,13 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     private final boolean hasBiomes;
     private final boolean hasEntities;
     private MutableBlockVector2D mutableBlockVector2D = new MutableBlockVector2D();
-    public final EditSession editSession;
+    public final Extent extent;
 
-    public WorldCopyClipboard(EditSession editSession, Region region) {
+    public WorldCopyClipboard(Extent editSession, Region region) {
         this(editSession, region, true, false);
     }
 
-    public WorldCopyClipboard(EditSession editSession, Region region, boolean hasEntities, boolean hasBiomes) {
+    public WorldCopyClipboard(Extent editSession, Region region, boolean hasEntities, boolean hasBiomes) {
         super(region);
         this.hasBiomes = hasBiomes;
         this.hasEntities = hasEntities;
@@ -43,27 +42,27 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
         this.mx = origin.getBlockX();
         this.my = origin.getBlockY();
         this.mz = origin.getBlockZ();
-        this.editSession = editSession;
+        this.extent = editSession;
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return editSession.getLazyBlock(mx + x, my + y, mz + z);
+        return extent.getLazyBlock(mx + x, my + y, mz + z);
     }
 
     public BlockState getBlockAbs(int x, int y, int z) {
-        return editSession.getLazyBlock(x, y, z);
+        return extent.getLazyBlock(x, y, z);
     }
 
     @Override
     public BaseBiome getBiome(int x, int z) {
-        return editSession.getBiome(mutableBlockVector2D.setComponents(mx + x, mz + z));
+        return extent.getBiome(mutableBlockVector2D.setComponents(mx + x, mz + z));
     }
 
     @Override
     public List<? extends Entity> getEntities() {
         if (!hasEntities) return new ArrayList<>();
-        return editSession.getEntities(getRegion());
+        return extent.getEntities(getRegion());
     }
 
     @Override
@@ -96,7 +95,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                         task.run(x, y, z, block);
                         return true;
                     }
-                }, editSession);
+                }, extent instanceof EditSession ? (EditSession) extent : null);
                 Operations.completeBlindly(visitor);
             } else {
                 CuboidRegion cuboidEquivalent = new CuboidRegion(region.getMinimumPoint(), region.getMaximumPoint());
@@ -124,7 +123,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                         }
                         return true;
                     }
-                }, editSession);
+                }, extent instanceof EditSession ? (EditSession) extent : null);
                 Operations.completeBlindly(visitor);
             }
         } else {

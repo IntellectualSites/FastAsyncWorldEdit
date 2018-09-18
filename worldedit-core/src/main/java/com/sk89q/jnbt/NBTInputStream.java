@@ -44,7 +44,7 @@ import java.util.function.Function;
  */
 public final class NBTInputStream implements Closeable {
 
-    private final DataInput is;
+    private final DataInputStream is;
 
     /**
      * Creates a new {@code NBTInputStream}, which will source its data
@@ -61,8 +61,8 @@ public final class NBTInputStream implements Closeable {
         this.is = dis;
     }
 
-    public NBTInputStream(DataInput di) {
-        this.is = di;
+    public DataInputStream getInputStream() {
+        return is;
     }
 
     /**
@@ -178,7 +178,7 @@ public final class NBTInputStream implements Closeable {
                     NBTStreamer.ByteReader byteReader = (NBTStreamer.ByteReader) reader;
                     int i = 0;
                     if (is instanceof InputStream) {
-                        DataInputStream dis = (DataInputStream) is;
+                        DataInputStream dis = is;
                         if (length > 1024) {
                             if (buf == null) {
                                 buf = new byte[1024];
@@ -211,6 +211,8 @@ public final class NBTInputStream implements Closeable {
                             byteReader.run(i, is.readByte() & 0xFF);
                         }
                     }
+                } else if (reader instanceof NBTStreamer.LazyReader) {
+                    reader.accept(length, is);
                 } else {
                     for (int i = 0; i < length; i++) {
                         reader.accept(i, is.readByte());
@@ -273,6 +275,8 @@ public final class NBTInputStream implements Closeable {
                     for (int i = 0; i < length; i++) {
                         byteReader.run(i, is.readInt());
                     }
+                } else if (reader instanceof NBTStreamer.LazyReader) {
+                    reader.accept(length, is);
                 } else {
                     for (int i = 0; i < length; i++) {
                         reader.accept(i, is.readInt());
@@ -296,6 +300,8 @@ public final class NBTInputStream implements Closeable {
                     for (int i = 0; i < length; i++) {
                         longReader.run(i, is.readLong());
                     }
+                } else if (reader instanceof NBTStreamer.LazyReader) {
+                    reader.accept(length, is);
                 } else {
                     for (int i = 0; i < length; i++) {
                         reader.accept(i, is.readLong());

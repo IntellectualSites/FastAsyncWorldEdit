@@ -40,13 +40,7 @@ public class LazyClipboardHolder extends URIClipboardHolder {
                 try (InputStream in = source.openBufferedStream()) {
                     final ClipboardReader reader = format.getReader(in);
                     final Clipboard clipboard;
-                    if (reader instanceof SchematicReader) {
-                        this.clipboard = ((SchematicReader) reader).read(uuid);
-                    } else if (reader instanceof StructureFormat) {
-                        this.clipboard = ((StructureFormat) reader).read(uuid);
-                    } else {
-                        this.clipboard = reader.read();
-                    }
+                    this.clipboard = reader.read(uuid);
                 }
             } catch (Throwable e) {
                 e.printStackTrace();

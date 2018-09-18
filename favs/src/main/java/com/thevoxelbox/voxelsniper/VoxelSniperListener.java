@@ -1,5 +1,6 @@
 package com.thevoxelbox.voxelsniper;
 
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.extension.platform.CommandManager;
@@ -78,30 +79,38 @@ public class VoxelSniperListener implements Listener
         }
 
         FawePlayer fp = FawePlayer.wrap(player);
-        ExceptionConverter exceptionConverter = CommandManager.getInstance().getExceptionConverter();
-        try {
-            try {
-                return found.onCommand(player, split);
-            } catch (Throwable t) {
-                Throwable next = t;
-                exceptionConverter.convert(next);
-                while (next.getCause() != null) {
-                    next = next.getCause();
-                    exceptionConverter.convert(next);
+        if (!fp.runAction(new Runnable() {
+            @Override
+            public void run() {
+                ExceptionConverter exceptionConverter = CommandManager.getInstance().getExceptionConverter();
+                try {
+                    try {
+                        found.onCommand(player, split);
+                        return;
+                    } catch (Throwable t) {
+                        Throwable next = t;
+                        exceptionConverter.convert(next);
+                        while (next.getCause() != null) {
+                            next = next.getCause();
+                            exceptionConverter.convert(next);
+                        }
+                        throw next;
+                    }
+                } catch (CommandException e) {
+                    String message = e.getMessage();
+                    if (message != null) {
+                        fp.sendMessage(e.getMessage());
+                        return;
+                    }
+                    e.printStackTrace();
+                } catch (Throwable e) {
+                    e.printStackTrace();
                 }
-                throw next;
+                fp.sendMessage("An unknown FAWE error has occurred! Please see console.");
             }
-        } catch (CommandException e) {
-            String message = e.getMessage();
-            if (message != null) {
-                fp.sendMessage(e.getMessage());
-                return true;
-            }
-            e.printStackTrace();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        }, false, true)) {
+            BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
         }
-        fp.sendMessage("An unknown FAWE error has occurred! Please see console.");
         return true;
     }
 

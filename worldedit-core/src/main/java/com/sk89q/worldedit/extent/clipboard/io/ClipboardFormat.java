@@ -94,6 +94,7 @@ public enum ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
+            if (!file.getName().toLowerCase().endsWith(".schematic")) return false;
             DataInputStream str = null;
             try {
                 str = new DataInputStream(new GZIPInputStream(new FileInputStream(file)));
@@ -151,6 +152,7 @@ public enum ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
+            if (!file.getName().toLowerCase().endsWith(".schem")) return false;
             DataInputStream str = null;
             try {
                 str = new DataInputStream(new GZIPInputStream(new FileInputStream(file)));
@@ -496,13 +498,7 @@ public enum ClipboardFormat {
 
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
         session.setClipboard(null);
-        if (reader instanceof SchematicReader) {
-            clipboard = ((SchematicReader) reader).read(player.getUniqueId());
-        } else if (reader instanceof StructureFormat) {
-            clipboard = ((StructureFormat) reader).read(player.getUniqueId());
-        } else {
-            clipboard = reader.read();
-        }
+        clipboard = reader.read(player.getUniqueId());
         URIClipboardHolder holder = new URIClipboardHolder(uri, clipboard);
         session.setClipboard(holder);
         return holder;

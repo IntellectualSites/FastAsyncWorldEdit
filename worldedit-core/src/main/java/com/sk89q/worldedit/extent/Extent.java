@@ -21,8 +21,10 @@ package com.sk89q.worldedit.extent;
 
 import com.boydti.fawe.jnbt.anvil.generator.*;
 import com.boydti.fawe.object.PseudoRandom;
+import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.block.*;
@@ -357,6 +359,19 @@ public interface Extent extends InputExtent, OutputExtent {
         }
         // Collections.reverse(distribution);
         return distribution;
+    }
+
+    /**
+     * Lazily copy a region
+     *
+     * @param region
+     * @return
+     */
+    default BlockArrayClipboard lazyCopy(Region region) {
+        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(this, region);
+        BlockArrayClipboard weClipboard = new BlockArrayClipboard(region, faweClipboard);
+        weClipboard.setOrigin(region.getMinimumPoint());
+        return weClipboard;
     }
 
     @Nullable

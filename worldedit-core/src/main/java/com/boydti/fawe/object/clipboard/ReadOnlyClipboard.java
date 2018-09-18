@@ -23,11 +23,11 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
         this.region = region;
     }
 
-    public static ReadOnlyClipboard of(final EditSession editSession, final Region region) {
+    public static ReadOnlyClipboard of(final Extent editSession, final Region region) {
         return of(editSession, region, true, false);
     }
 
-    public static ReadOnlyClipboard of(final EditSession editSession, final Region region, boolean copyEntities, boolean copyBiomes) {
+    public static ReadOnlyClipboard of(final Extent editSession, final Region region, boolean copyEntities, boolean copyBiomes) {
         return new WorldCopyClipboard(editSession, region, copyEntities, copyBiomes);
     }
 

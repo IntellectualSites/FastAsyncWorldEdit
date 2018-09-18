@@ -201,7 +201,7 @@ public final class NBTOutputStream implements Closeable {
      * @param tag The tag.
      * @throws IOException if an I/O error occurs.
      */
-    private void writeTagPayload(Tag tag) throws IOException {
+    public void writeTagPayload(Tag tag) throws IOException {
         int type = NBTUtils.getTypeCode(tag.getClass());
         switch (type) {
             case NBTConstants.TYPE_END:
@@ -408,6 +408,4 @@ public final class NBTOutputStream implements Closeable {
     public void flush() throws IOException {
         if (os instanceof Flushable) ((Flushable) os).flush();
     }
-
-
 }

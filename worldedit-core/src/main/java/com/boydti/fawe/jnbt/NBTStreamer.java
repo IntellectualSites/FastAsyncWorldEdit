@@ -4,6 +4,9 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.jnbt.NBTInputStream;
+
+import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,6 +89,8 @@ public class NBTStreamer {
 
         public abstract void run(int index, int byteValue);
     }
+
+    public static abstract class LazyReader implements BiConsumer<Integer, DataInputStream> {}
 
     public static abstract class LongReader implements BiConsumer<Integer, Long> {
         @Override

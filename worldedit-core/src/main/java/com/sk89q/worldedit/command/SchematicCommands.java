@@ -294,7 +294,7 @@ public class SchematicCommands extends MethodCommands {
     @Command(aliases = {"save"}, usage = "[format] <filename>", desc = "Save a schematic into your clipboard")
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other"})
-    public void save(final Player player, final LocalSession session, @Optional("nbt") final String formatName, String filename, @Switch('g') boolean global) throws CommandException, WorldEditException {
+    public void save(final Player player, final LocalSession session, @Optional("schem") final String formatName, String filename, @Switch('g') boolean global) throws CommandException, WorldEditException {
         final LocalConfiguration config = this.worldEdit.getConfiguration();
         final ClipboardFormat format = ClipboardFormat.findByAlias(formatName);
         if (format == null) {

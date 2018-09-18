@@ -34,7 +34,7 @@ public final class IOUtil {
         out.write((v >>>  0) & 0xFF);
     }
 
-    public static void writeVarInt(OutputStream out, int i) throws IOException {
+    public static final void writeVarInt(final OutputStream out, int i) throws IOException {
         while((i & -128) != 0) {
             out.write(i & 127 | 128);
             i >>>= 7;
@@ -42,7 +42,7 @@ public final class IOUtil {
         out.write(i);
     }
 
-    public static int readVarInt(InputStream in) throws IOException {
+    public static final int readVarInt(InputStream in) throws IOException {
         int i = 0;
         int offset = 0;
         int b;
@@ -52,5 +52,40 @@ public final class IOUtil {
         }
         i |= b << offset;
         return i;
+    }
+
+    public static final void copy(InputStream in, OutputStream out) throws IOException {
+        byte[] buf = new byte[8192];
+        while (true) {
+            int r = in.read(buf);
+            if (r == -1) {
+                break;
+            }
+            out.write(buf, 0, r);
+        }
+    }
+
+    public static final int copy(InputStream in, OutputStream out, int len) throws IOException {
+        byte[] buf = new byte[8192];
+        while (len > 0) {
+            int r = in.read(buf, 0, Math.min(buf.length, len));
+            if (r == -1) {
+                break;
+            }
+            len -= r;
+            out.write(buf, 0, r);
+        }
+        return len;
+    }
+
+    public static final void copy(InputStream in, DataOutput out) throws IOException {
+        byte[] buf = new byte[8192];
+        while (true) {
+            int r = in.read(buf);
+            if (r == -1) {
+                break;
+            }
+            out.write(buf, 0, r);
+        }
     }
 }

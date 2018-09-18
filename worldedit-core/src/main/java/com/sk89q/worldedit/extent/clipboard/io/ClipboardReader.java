@@ -24,6 +24,7 @@ import com.sk89q.worldedit.world.registry.Registries;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Reads {@code Clipboard}s.
@@ -40,4 +41,7 @@ public interface ClipboardReader extends Closeable {
      */
     Clipboard read() throws IOException;
 
+    default Clipboard read(UUID uuid) throws IOException {
+        return read();
+    }
 }

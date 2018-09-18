@@ -273,7 +273,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             if (existing == blockData) return true;
             if (section == null) {
                 if (blockData.isAir()) return true;
-                sections[y4] = new ChunkSection(y4 << 4, nmsWorld.worldProvider.g());
+                sections[y4] = section = new ChunkSection(y4 << 4, nmsWorld.worldProvider.g());
             }
             if (existing.e() != blockData.e() || existing.getMaterial().f() != blockData.getMaterial().f()) {
                 nmsChunk.a(pos = new BlockPosition(x, y, z), blockData, false);

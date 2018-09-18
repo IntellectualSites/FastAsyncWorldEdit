@@ -299,47 +299,48 @@ public class AsyncBlock implements Block {
         return null;
     }
 
-    public Block getBukkitBlock() {
+    @Deprecated
+    private Block getUnsafeBlock() {
         return world.getBukkitWorld().getBlockAt(x, y, z);
     }
 
     @Override
     public boolean breakNaturally() {
-        return TaskManager.IMP.sync(() -> getBukkitBlock().breakNaturally());
+        return TaskManager.IMP.sync(() -> getUnsafeBlock().breakNaturally());
     }
 
     @Override
     public boolean breakNaturally(ItemStack tool) {
-        return TaskManager.IMP.sync(() -> getBukkitBlock().breakNaturally(tool));
+        return TaskManager.IMP.sync(() -> getUnsafeBlock().breakNaturally(tool));
     }
 
     @Override
     public Collection<ItemStack> getDrops() {
-        return TaskManager.IMP.sync(() -> getBukkitBlock().getDrops());
+        return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops());
     }
 
     @Override
     public Collection<ItemStack> getDrops(ItemStack tool) {
-        return TaskManager.IMP.sync(() -> getBukkitBlock().getDrops(tool));
+        return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops(tool));
     }
 
     @Override
     public void setMetadata(String metadataKey, MetadataValue newMetadataValue) {
-        this.getBukkitBlock().setMetadata(metadataKey, newMetadataValue);
+        this.getUnsafeBlock().setMetadata(metadataKey, newMetadataValue);
     }
 
     @Override
     public List<MetadataValue> getMetadata(String metadataKey) {
-        return this.getBukkitBlock().getMetadata(metadataKey);
+        return this.getUnsafeBlock().getMetadata(metadataKey);
     }
 
     @Override
     public boolean hasMetadata(String metadataKey) {
-        return this.getBukkitBlock().hasMetadata(metadataKey);
+        return this.getUnsafeBlock().hasMetadata(metadataKey);
     }
 
     @Override
     public void removeMetadata(String metadataKey, Plugin owningPlugin) {
-        this.getBukkitBlock().removeMetadata(metadataKey, owningPlugin);
+        this.getUnsafeBlock().removeMetadata(metadataKey, owningPlugin);
     }
 }
