@@ -229,7 +229,7 @@ public class SchematicStreamer extends NBTStreamer {
 
                         BlockStateHolder forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
                         BlockTypes forwardType = forwardBlock.getBlockType();
-                        if (forwardType.hasProperty(PropertyKey.SHAPE)) {
+                        if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
                             Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
                             if (forwardFacing == left) {
                                 BlockStateHolder rightBlock = fc.getBlock(x + right.getBlockX(), y + right.getBlockY(), z + right.getBlockZ());
@@ -250,7 +250,7 @@ public class SchematicStreamer extends NBTStreamer {
 
                         BlockStateHolder backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
                         BlockTypes backwardsType = backwardsBlock.getBlockType();
-                        if (backwardsType.hasProperty(PropertyKey.SHAPE)) {
+                        if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
                             Direction backwardsFacing = (Direction) backwardsBlock.getState(PropertyKey.FACING);
                             if (backwardsFacing == left) {
                                 BlockStateHolder rightBlock = fc.getBlock(x + right.getBlockX(), y + right.getBlockY(), z + right.getBlockZ());
