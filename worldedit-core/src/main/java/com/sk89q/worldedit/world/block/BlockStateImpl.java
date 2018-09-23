@@ -18,6 +18,9 @@ public class BlockStateImpl extends BlockState {
 
     public BlockMaterial getMaterial() {
         if (this.material == null) {
+            if (type == BlockTypes.__RESERVED__) {
+                return this.material = type.getMaterial();
+            }
             synchronized (this) {
                 if (this.material == null) {
                     this.material = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);

@@ -221,21 +221,21 @@ public interface Extent extends InputExtent, OutputExtent {
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
             block = getLazyBlock(x, y1, z);
-            if (!block.getBlockType().getMaterial().isMovementBlocker() != state && block != EditSession.nullBlock) return y1 - offset;
+            if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return y1 - offset;
             int y2 = y - d;
             block = getLazyBlock(x, y2, z);
-            if (!block.getBlockType().getMaterial().isMovementBlocker() != state && block != EditSession.nullBlock) return y2 + offset;
+            if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return y2 + offset;
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getLazyBlock(x, layer, z);
-                    if (!block.getBlockType().getMaterial().isMovementBlocker() != state && block != EditSession.nullBlock) return layer + offset;
+                    if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return layer + offset;
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
                     block = getLazyBlock(x, layer, z);
-                    if (!block.getBlockType().getMaterial().isMovementBlocker() != state && block != EditSession.nullBlock) return layer - offset;
+                    if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return layer - offset;
                 }
             }
         }
