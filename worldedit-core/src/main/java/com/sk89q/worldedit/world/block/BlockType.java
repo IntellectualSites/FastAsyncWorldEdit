@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BlockMaterial;
@@ -154,6 +155,13 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      * @return The default state
      */
     BlockState getDefaultState();
+
+    /**
+     * Gets a list of all possible states for this BlockType.
+     *
+     * @return All possible states
+     */
+    List<BlockState> getAllStates();
 
     /**
      * Gets whether this block type has an item representation.

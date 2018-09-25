@@ -29,6 +29,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.DataException;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.chunk.Chunk;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import com.sk89q.worldedit.world.storage.MissingChunkException;
@@ -149,8 +150,7 @@ public class SnapshotRestore {
                 // Now just copy blocks!
                 for (Vector pos : entry.getValue()) {
                     try {
-                        BlockState block = chunk.getBlock(pos);
-                        editSession.setBlock(pos, block);
+                        editSession.setBlock(pos, chunk.getBlock(pos));
                     } catch (DataException e) {
                         // this is a workaround: just ignore for now
                     }

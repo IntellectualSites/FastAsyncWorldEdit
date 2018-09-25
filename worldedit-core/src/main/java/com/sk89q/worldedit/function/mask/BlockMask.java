@@ -63,7 +63,7 @@ public class BlockMask extends AbstractExtentMask {
                 if (set == ALL) {
                     strings.add(type.getId());
                 } else {
-                    for (BlockState state : type.getStates()) {
+                    for (BlockState state : type.getAllStates()) {
                         if (test(state)) {
                             strings.add(state.getAsString());
                         }

@@ -81,6 +81,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     @Override
     public void add(int x, int y, int z, BlockStateHolder from, BlockStateHolder to) {
         check(from.getBlockType(), to.getBlockType());
+        super.add(x, y, z, from, to);
     }
 
     public void check(BlockType typeFrom, BlockType typeTo) {

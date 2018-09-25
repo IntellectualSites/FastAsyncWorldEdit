@@ -1522,6 +1522,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     public boolean canBypassAll(Region region, boolean get, boolean set) {
         if (wrapped) return false;
+        if (history != null) return false;
         FaweRegionExtent regionExtent = getRegionExtent();
         if (!(region instanceof CuboidRegion)) return false;
         if (regionExtent != null) {

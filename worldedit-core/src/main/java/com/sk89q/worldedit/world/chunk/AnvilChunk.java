@@ -28,20 +28,20 @@ import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 public class AnvilChunk implements Chunk {
 
@@ -53,8 +53,6 @@ public class AnvilChunk implements Chunk {
     private int rootZ;
 
     private Map<BlockVector, Map<String,Tag>> tileEntities;
-    @SuppressWarnings("unused")
-    private World world; // TODO: remove if stays unused.
 
     /**
      * Construct the chunk with a compound tag.
@@ -65,7 +63,6 @@ public class AnvilChunk implements Chunk {
      */
     public AnvilChunk(World world, CompoundTag tag) throws DataException {
         rootTag = tag;
-        this.world = world;
 
         rootX = NBTUtils.getChildTag(rootTag.getValue(), "xPos", IntTag.class).getValue();
         rootZ = NBTUtils.getChildTag(rootTag.getValue(), "zPos", IntTag.class).getValue();
@@ -257,14 +254,22 @@ public class AnvilChunk implements Chunk {
     }
 
     @Override
-    public BaseBlock getBlock(Vector position) throws DataException {
+    public BlockStateHolder getBlock(Vector position) throws DataException {
         int id = getBlockID(position);
         int data = getBlockData(position);
 
         BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
-        CompoundTag tileEntity = getBlockTileEntity(position);
-
-        return new BaseBlock(state, tileEntity);
+        if (state == null) {
+            WorldEdit.logger.warning("Unknown legacy block " + id + ":" + data + " found when loading legacy anvil chunk.");
+            return BlockTypes.AIR.getDefaultState();
+        }
+        if (state.getMaterial().hasContainer()) {
+            CompoundTag tileEntity = getBlockTileEntity(position);
+            if (tileEntity != null) {
+                return new BaseBlock(state, tileEntity);
+            }
+        }
+        return state;
     }
 
 }

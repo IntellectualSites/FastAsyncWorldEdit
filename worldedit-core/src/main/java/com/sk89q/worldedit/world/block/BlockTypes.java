@@ -820,7 +820,7 @@ public enum BlockTypes implements BlockType {
      * @return collection of states
      */
     @Deprecated
-    public Collection<BlockState> getStates() {
+    public List<BlockState> getAllStates() {
         if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
         return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> states[i]).collect(Collectors.toList());
     }

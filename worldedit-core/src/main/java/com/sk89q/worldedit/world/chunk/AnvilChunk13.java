@@ -32,6 +32,7 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
@@ -230,7 +231,7 @@ public class AnvilChunk13 implements Chunk {
     }
 
     @Override
-    public BlockState getBlock(Vector position) throws DataException {
+    public BlockStateHolder getBlock(Vector position) throws DataException {
         int x = position.getBlockX() - rootX * 16;
         int y = position.getBlockY();
         int z = position.getBlockZ() - rootZ * 16;

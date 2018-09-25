@@ -60,9 +60,9 @@ public class MutableFullBlockChange implements Change {
     }
 
     public void perform(FaweQueue queue) {
-        BlockTypes idFrom = BlockTypes.get(from);
+        BlockTypes idFrom = BlockTypes.getFromStateId(from);
         if (blockBag != null) {
-            BlockTypes idTo = BlockTypes.get(to);
+            BlockTypes idTo = BlockTypes.getFromStateId(to);
             if (idFrom != idTo) {
                 if (allowFetch && from != 0) {
                     try {
