@@ -189,6 +189,10 @@ public abstract class ChunkListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPhysics(BlockPhysicsEvent event) {
+        if (physicsFreeze) {
+            event.setCancelled(true);
+            return;
+        }
         if (physCancel) {
             Block block = event.getBlock();
             long pair = MathMan.pairInt(block.getX() >> 4, block.getZ() >> 4);
@@ -211,10 +215,6 @@ public abstract class ChunkListener implements Listener {
             } else if (System.currentTimeMillis() - physStart < Settings.IMP.TICK_LIMITER.PHYSICS_MS) {
                 return;
             }
-        }
-        if (physicsFreeze) {
-            event.setCancelled(true);
-            return;
         }
         switch (event.getChangedType()) {
             case AIR:
