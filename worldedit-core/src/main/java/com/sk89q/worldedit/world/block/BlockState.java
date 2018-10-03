@@ -108,7 +108,7 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
             type = BlockTypes.get(key);
             if (type == null) {
                 String input = key.toString();
-                throw new SuggestInputParseException("Unkown block for " + input, input, () -> Stream.of(BlockTypes.values)
+                throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(BlockTypes.values)
                         .filter(b -> b.getId().contains(input))
                         .map(e1 -> e1.getId())
                         .collect(Collectors.toList())
