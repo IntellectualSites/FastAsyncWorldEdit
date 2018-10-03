@@ -259,7 +259,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (actor != null) {
-                if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
+                if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().disallowedBlocks.contains(blockType)) {
                     throw new DisallowedUsageException("You are not allowed to use '" + input + "'");
                 }
                 if (nbt != null) {
