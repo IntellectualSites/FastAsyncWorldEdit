@@ -308,7 +308,7 @@ public class OptionsCommands {
             }
 
             if (found == 0) {
-                actor.printError("No item found.");
+                actor.printError("No items found.");
             }
         }
     }
