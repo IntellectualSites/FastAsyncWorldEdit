@@ -175,6 +175,7 @@ public class UtilityCommands extends MethodCommands {
             aliases = {"/heightmapinterface"},
             desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
     )
+    @CommandPermissions("fawe.admin")
     public void heightmapInterface(FawePlayer player, @Optional("100") int min, @Optional("200") int max) throws IOException {
         player.sendMessage("Please wait while we generate the minified heightmaps.");
         File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
