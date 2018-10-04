@@ -264,7 +264,7 @@ public class OptionsCommands {
         ItemType type = ItemTypes.get(query);
 
         if (type != null) {
-            actor.print(type.getId() + " (" + type.getName() + ")");
+            actor.print(BBC.getPrefix() + "#" + type.getId() + " (" + type.getName() + ")");
         } else {
             if (query.length() <= 2) {
                 actor.printError("Enter a longer search string (len > 2).");
@@ -272,21 +272,21 @@ public class OptionsCommands {
             }
 
             if (!blocksOnly && !itemsOnly) {
-                actor.print("Searching for: " + query);
+                actor.print(BBC.getPrefix() + "Searching for: " + query);
             } else if (blocksOnly && itemsOnly) {
                 actor.printError("You cannot use both the 'b' and 'i' flags simultaneously.");
                 return;
             } else if (blocksOnly) {
-                actor.print("Searching for blocks: " + query);
+                actor.print(BBC.getPrefix() + "Searching for blocks: " + query);
             } else {
-                actor.print("Searching for items: " + query);
+                actor.print(BBC.getPrefix() + "Searching for items: " + query);
             }
 
             int found = 0;
 
             for (ItemType searchType : ItemTypes.values) {
                 if (found >= 15) {
-                    actor.print("Too many results!");
+                    actor.print(BBC.getPrefix() + "Too many results!");
                     break;
                 }
 
@@ -300,7 +300,7 @@ public class OptionsCommands {
 
                 for (String alias : Sets.newHashSet(searchType.getId(), searchType.getName())) {
                     if (alias.contains(query)) {
-                        actor.print(searchType.getId() + " (" + searchType.getName() + ")");
+                        actor.print(BBC.getPrefix() + "#" + type.getId() + " (" + type.getName() + ")");
                         ++found;
                         break;
                     }

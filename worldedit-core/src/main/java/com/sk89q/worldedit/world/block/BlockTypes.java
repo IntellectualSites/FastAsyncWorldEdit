@@ -1055,7 +1055,7 @@ public enum BlockTypes implements BlockType {
         } catch (NumberFormatException e) {
         } catch (IndexOutOfBoundsException e) {}
 
-        throw new SuggestInputParseException("Unkown block for " + inputLower, inputLower, () -> Stream.of(BlockTypes.values)
+        throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(BlockTypes.values)
             .filter(b -> b.getId().contains(inputLower))
             .map(e1 -> e1.getId())
             .collect(Collectors.toList())

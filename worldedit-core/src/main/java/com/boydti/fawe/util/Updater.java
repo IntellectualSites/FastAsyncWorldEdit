@@ -46,7 +46,7 @@ public class Updater {
             Fawe.debug("Updated FAWE to " + versionString + " @ " + pendingFile);
             String url = "https://empcraft.com/fawe/cl?" + Integer.toHexString(Fawe.get().getVersion().hash);
             new Message().prefix().text("A FAWE update is available:")
-            .text("\n&8 - &a/fawe update &8 - &7Update the plugin")
+            .text("\n&8 - &a/fawe update &8 - &7Updates the plugin and restarts the server to apply the changes")
                 .cmdTip("fawe update")
             .text("\n&8 - &a/fawe changelog")
                     .cmdTip("fawe changelog")
