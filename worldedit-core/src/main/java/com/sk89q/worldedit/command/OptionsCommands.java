@@ -264,7 +264,7 @@ public class OptionsCommands {
         ItemType type = ItemTypes.get(query);
 
         if (type != null) {
-            actor.print(BBC.getPrefix() + "#" + type.getId() + " (" + type.getName() + ")");
+            actor.print(BBC.getPrefix() + type.getId() + " (" + type.getName() + ")");
         } else {
             if (query.length() <= 2) {
                 actor.printError("Enter a longer search string (len > 2).");
@@ -308,7 +308,7 @@ public class OptionsCommands {
             }
 
             if (found == 0) {
-                actor.printError("No items found.");
+                actor.printError("No item found.");
             }
         }
     }
