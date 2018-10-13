@@ -178,9 +178,11 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                         int xx = bx + x;
                         int biome = biomes[index] & 0xFF;
                         if (biome == 0) continue;
-                        if (biome == -1) biome = 0;
+                        if (biome == 255) biome = 0;
                         Biome bukkitBiome = adapter.getBiome(biome);
-                        world.setBiome(xx, zz, bukkitBiome);
+                        if (bukkitBiome != null) {
+                            world.setBiome(xx, zz, bukkitBiome);
+                        }
                     }
                 }
             }
