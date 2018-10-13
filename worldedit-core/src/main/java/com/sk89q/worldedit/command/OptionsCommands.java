@@ -264,7 +264,7 @@ public class OptionsCommands {
         ItemType type = ItemTypes.get(query);
 
         if (type != null) {
-            actor.print(BBC.getPrefix() + "#" + type.getId() + " (" + type.getName() + ")");
+            actor.print(BBC.getPrefix() + type.getId() + " (" + type.getName() + ")");
         } else {
             if (query.length() <= 2) {
                 actor.printError("Enter a longer search string (len > 2).");
