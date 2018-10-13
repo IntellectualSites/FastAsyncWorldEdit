@@ -101,7 +101,7 @@ public final class BrushCache {
             if (secondary == null) secondary = primary;
             if (primary != null) {
                 String name = primary == secondary ? primary.split(" ")[0] : primary.split(" ")[0] + " / " + secondary.split(" ")[0];
-                displayMap.put("Name", new StringTag(name));
+                displayMap.put("Name", new StringTag("{\"text\":\"" + name + "\"}"));
             }
         } else if (map.containsKey("weBrushJson")) {
             map.remove("weBrushJson");
