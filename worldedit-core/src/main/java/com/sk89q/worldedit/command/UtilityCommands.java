@@ -305,7 +305,7 @@ public class UtilityCommands extends MethodCommands {
     public void fixLava(Player player, LocalSession session, EditSession editSession, double radius) throws WorldEditException {
         worldEdit.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(
-                session.getPlacementPosition(player), radius, BlockTypes.LAVA.toMask(editSession));
+                session.getPlacementPosition(player), radius, BlockTypes.LAVA.toMask(editSession), BlockTypes.LAVA.getDefaultState());
         player.print(BBC.getPrefix() + affected + " block(s) have been changed.");
     }
 
@@ -321,7 +321,7 @@ public class UtilityCommands extends MethodCommands {
     public void fixWater(Player player, LocalSession session, EditSession editSession, double radius) throws WorldEditException {
         worldEdit.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(
-                session.getPlacementPosition(player), radius, BlockTypes.WATER.toMask(editSession));
+                session.getPlacementPosition(player), radius, BlockTypes.WATER.toMask(editSession), BlockTypes.WATER.getDefaultState());
         player.print(BBC.getPrefix() + affected + " block(s) have been changed.");
     }
 

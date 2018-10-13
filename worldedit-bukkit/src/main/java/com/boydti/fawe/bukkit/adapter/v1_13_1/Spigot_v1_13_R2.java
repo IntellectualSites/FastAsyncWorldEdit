@@ -252,11 +252,11 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             existing = section.getType(x & 15, y & 15, z & 15);
         }
         BlockPosition pos = null;
-        if (existing instanceof TileEntityBlock || blockData instanceof TileEntityBlock) {
+        CompoundTag nativeTag = state.getNbtData();
+        if (nativeTag != null || existing instanceof TileEntityBlock) {
             pos = new BlockPosition(x, y, z);
             nmsWorld.setTypeAndData(pos, blockData, 0);
             // remove tile
-            CompoundTag nativeTag = state.getNbtData();
             if (nativeTag != null) {
                 // We will assume that the tile entity was created for us,
                 // though we do not do this on the Forge version

@@ -2010,7 +2010,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int fixLiquid(final Vector origin, final double radius, Mask liquidMask) {
+    public int fixLiquid(final Vector origin, final double radius, Mask liquidMask, Pattern pattern) {
         checkNotNull(origin);
         checkArgument(radius >= 0, "radius >= 0 required");
 
@@ -2020,7 +2020,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 new RegionMask(new EllipsoidRegion(null, origin, new Vector(radius, radius, radius))),
                 liquidMask);
 
-        BlockReplace replace = new BlockReplace(this, BlockTypes.AIR.getDefaultState());
+        BlockReplace replace = new BlockReplace(this, pattern);
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace, (int) (radius * 2 + 1), this);
 
         // Around the origin in a 3x3 block
