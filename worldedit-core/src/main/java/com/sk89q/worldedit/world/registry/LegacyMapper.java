@@ -210,7 +210,7 @@ public class LegacyMapper {
 
     @Nullable
     public Integer getLegacyCombined(BlockType type) {
-        return blockStateToLegacyId4Data.get(type.getDefaultState());
+        return blockStateToLegacyId4Data.get(type.getDefaultState().getInternalId());
     }
 
     @Deprecated
