@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.composition;
 
+import com.boydti.fawe.config.BBC;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -79,7 +80,7 @@ public class ShapedBrushCommand extends SimpleCommand<Object> {
             WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter().convert(e);
         }
 
-        player.print("Set brush to " + factory);
+        player.print(BBC.getPrefix() + "Set brush to " + factory);
 
         return true;
     }

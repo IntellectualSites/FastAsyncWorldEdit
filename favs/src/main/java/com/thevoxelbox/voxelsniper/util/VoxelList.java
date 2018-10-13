@@ -33,7 +33,6 @@ public class VoxelList
 
     public void add(BlockMask mask)
     {
-
         this.mask = (BlockMask) mask.and(mask);
     }
 

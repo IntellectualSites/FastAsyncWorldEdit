@@ -48,6 +48,15 @@ public class MaskIntersection extends AbstractMask {
         formArray();
     }
 
+    /**
+     * Create a new intersection.
+     *
+     * @param mask a list of masks
+     */
+    public MaskIntersection(Mask... mask) {
+        this(Arrays.asList(checkNotNull(mask)));
+    }
+
     private void formArray() {
         if (masks.isEmpty()) {
             masksArray = new Mask[]{Masks.alwaysFalse()};
@@ -121,15 +130,6 @@ public class MaskIntersection extends AbstractMask {
             hasOptimized = true;
         }
         return hasOptimized;
-    }
-
-    /**
-     * Create a new intersection.
-     *
-     * @param mask a list of masks
-     */
-    public MaskIntersection(Mask... mask) {
-        this(Arrays.asList(checkNotNull(mask)));
     }
 
     /**

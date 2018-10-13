@@ -1043,6 +1043,15 @@ public class LocalSession implements TextureHolder {
         } else {
             previous = this.tools[type.getInternalId()];
             this.tools[type.getInternalId()] = tool;
+            if (tool != null) {
+                hasTool = true;
+            } else {
+                hasTool = false;
+                for (Tool i : this.tools) if (i != null) {
+                    hasTool = true;
+                    break;
+                }
+            }
         }
         if (previous != null && player != null && previous instanceof BrushTool) {
             BrushTool brushTool = (BrushTool) previous;

@@ -476,9 +476,9 @@ public final class CommandManager {
         } catch (CommandException e) {
             String message = e.getMessage();
             if (message != null) {
-                actor.printError(e.getMessage());
+                actor.printError(BBC.getPrefix() + e.getMessage());
             } else {
-                actor.printError("An unknown FAWE error has occurred! Please see console.");
+                actor.printError(BBC.getPrefix() + "An unknown FAWE error has occurred! Please see console.");
                 log.log(Level.SEVERE, "An unknown FAWE error occurred", e);
             }
         } catch (Throwable e) {
@@ -487,7 +487,7 @@ public final class CommandManager {
             if (faweException != null) {
                 BBC.WORLDEDIT_CANCEL_REASON.send(actor, faweException.getMessage());
             } else {
-                actor.printError("There was an error handling a FAWE command: [See console]");
+                actor.printError(BBC.getPrefix() + "There was an error handling a FAWE command: [See console]");
                 actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
                 log.log(Level.SEVERE, "An unexpected error occurred while handling a FAWE command", e);
             }

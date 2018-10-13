@@ -2018,7 +2018,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         MaskIntersection mask = new MaskIntersection(
                 new BoundedHeightMask(0, Math.min(origin.getBlockY(), getMaximumPoint().getBlockY())),
                 new RegionMask(new EllipsoidRegion(null, origin, new Vector(radius, radius, radius))),
-                liquidMask, new BlockTypeMask(this, BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR));
+                liquidMask);
 
         BlockReplace replace = new BlockReplace(this, BlockTypes.AIR.getDefaultState());
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace, (int) (radius * 2 + 1), this);
