@@ -354,11 +354,21 @@ public enum ClipboardFormat {
                     dir = new File(dir + "." + getExtension());
                 }
             }
+            if(!dir.exists()) {
+            	for(ClipboardFormat format : values) {
+            		if(new File(working, (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? (player.getUniqueId().toString() + File.separator) : "") + input + "." + format.getExtension()).exists()) {
+            			return format.loadAllFromInput(player, input, message);
+            		}
+            	}
+            }
             if (!dir.exists()) {
                 if (message) BBC.SCHEMATIC_NOT_FOUND.send(player, input);
                 return null;
             }
             if (!dir.isDirectory()) {
+            	if(!findByFile(dir).getExtension().equals(getExtension())) {
+            		return findByFile(dir).loadAllFromInput(player, input, message);
+            	}
                 ByteSource source = Files.asByteSource(dir);
                 URI uri = dir.toURI();
                 return new MultiClipboardHolder(uri, new LazyClipboardHolder(dir.toURI(), source, this, null));
