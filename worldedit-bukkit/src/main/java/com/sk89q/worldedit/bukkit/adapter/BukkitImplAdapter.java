@@ -27,6 +27,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -78,6 +79,15 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     boolean setBlock(Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update);
 
     boolean isChunkInUse(Chunk chunk);
+
+    /**
+     * Notifies the simulation that the block at the given location has
+     * been changed and it must be re-lighted (and issue other events).
+     *
+     * @param position position of the block
+     * @param previousType the type of the previous block that was there
+     */
+    void notifyAndLightBlock(Location position, BlockState previousType);
 
     /**
      * Get the state for the given entity.

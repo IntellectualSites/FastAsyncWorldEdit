@@ -254,4 +254,9 @@ public class WorldWrapper extends AbstractWorld {
     public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return parent.setBiome(position, biome);
     }
+
+	@Override
+	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+		return parent.notifyAndLightBlock(position, previousType);
+	}
 }

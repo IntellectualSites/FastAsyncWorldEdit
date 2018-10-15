@@ -377,6 +377,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         this(WorldEdit.getInstance().getEventBus(), world, maxBlocks, blockBag, new EditSessionEvent(world, null, maxBlocks, null));
     }
 
+    private Mask oldMask;
+
     /**
      * Construct the object with a maximum number of blocks and a block bag.
      *
@@ -3589,14 +3591,17 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
 	@Override
 	public void dropItem(Vector3 position, BaseItemStack item) {
-		// TODO Auto-generated method stub
-		
+		world.dropItem(position, item);
 	}
 
 	@Override
 	public boolean playEffect(Vector3 position, int type, int data) {
-		// TODO Auto-generated method stub
-		return false;
+		return world.playEffect(position, type, data);
+	}
+
+	@Override
+	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+		return world.notifyAndLightBlock(position, previousType);
 	}
 
 }
