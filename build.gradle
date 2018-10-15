@@ -78,7 +78,7 @@ subprojects {
         maven {url "http://repo.dmulloy2.net/content/groups/public/"}
         maven {url "https://repo.destroystokyo.com/repository/maven-public//"}
         maven {url "http://ci.athion.net/job/PlotSquared/ws/mvn/"}
-        maven {url "https://empcraft.com/maven2"}
+        maven {url "http://empcraft.com/maven2"}
         maven {url "https://hub.spigotmc.org/nexus/content/groups/public/"}
         maven {url "http://ci.frostcast.net/plugin/repository/everything"}
         maven {url "http://maven.sk89q.com/artifactory/repo"}
