@@ -167,7 +167,10 @@ public class NavigationCommands {
     @Command(
             aliases = {"jumpto", "j"},
             usage = "[world,x,y,z]",
-            desc = "Teleport to a location",
+            desc = "Teleport to a location" +
+                    "Flags:\n" +
+                    "  -f forces the specified position to be used",
+            flags = "f",
             min = 0,
             max = 1
     )
@@ -188,7 +191,7 @@ public class NavigationCommands {
             pos = player.getSolidBlockTrace(300);
         }
         if (pos != null) {
-            player.findFreePosition(pos);
+            if(args.hasFlag('f')) player.setPosition(pos); else player.findFreePosition(pos);
             BBC.POOF.send(player);
         } else {
             BBC.NO_BLOCK.send(player);
