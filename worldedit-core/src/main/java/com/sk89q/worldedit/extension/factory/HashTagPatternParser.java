@@ -80,7 +80,7 @@ public class HashTagPatternParser extends FaweParser<Pattern> {
                         return parseFromInput(char0 + "[" + input.substring(1) + "]", context);
                     }
                     if (char0 == '#') {
-                        throw new SuggestInputParseException(new NoMatchException("Unkown pattern: " + full + ", See: //patterns"), full,
+                        throw new SuggestInputParseException(new NoMatchException("Unknown pattern: " + full + ", See: //patterns"), full,
                                 () -> {
                                     if (full.length() == 1) return new ArrayList<>(dispatcher.getPrimaryAliases());
                                     return dispatcher.getAliases().stream().filter(
