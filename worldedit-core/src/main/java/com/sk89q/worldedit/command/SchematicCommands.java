@@ -603,6 +603,11 @@ public class SchematicCommands extends MethodCommands {
                 if (uriStr.startsWith("file:/")) {
                     File file = new File(uri.getPath());
                     name = file.getName();
+                    try {
+                        if (!MainUtil.isInSubDirectory(dir, file)) {
+                            throw new RuntimeException(new CommandException("Invalid path"));
+                        }
+                    } catch (IOException ignore) {}
                     if (file.isDirectory()) {
                         isDir = true;
                         color = "&6";
