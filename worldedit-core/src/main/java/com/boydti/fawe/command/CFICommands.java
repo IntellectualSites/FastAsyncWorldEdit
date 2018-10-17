@@ -501,7 +501,7 @@ public class CFICommands extends MethodCommands {
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
 
         World world = fp.getWorld();
-        MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(fp.getPlayer(), schematic, true);
+        MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(fp.getPlayer(), schematic, null, true);
         if (multi == null) {
             return;
         }

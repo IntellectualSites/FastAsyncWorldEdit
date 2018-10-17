@@ -458,7 +458,7 @@ public class BrushCommands extends BrushProcessor {
 
 
         try {
-            MultiClipboardHolder clipboards = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, clipboard, true);
+            MultiClipboardHolder clipboards = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, clipboard, null, true);
             if (clipboards == null) {
                 BBC.SCHEMATIC_NOT_FOUND.send(player, clipboard);
                 return null;

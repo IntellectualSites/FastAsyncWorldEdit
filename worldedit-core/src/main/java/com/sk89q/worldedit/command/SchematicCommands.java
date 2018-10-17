@@ -97,7 +97,7 @@ public class SchematicCommands extends MethodCommands {
             desc = "Load multiple clipboards (paste will randomly choose one)"
     )
     @Deprecated
-    @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.upload"})
+    @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.web", "worldedit.schematic.load.asset"})
     public void loadall(final Player player, final LocalSession session, @Optional("schematic") final String formatName, final String filename, @Switch('r') boolean randomRotate) throws FilenameException {
         final ClipboardFormat format = ClipboardFormat.findByAlias(formatName);
         if (format == null) {
@@ -105,7 +105,7 @@ public class SchematicCommands extends MethodCommands {
             return;
         }
         try {
-            MultiClipboardHolder all = format.loadAllFromInput(player, filename, true);
+            MultiClipboardHolder all = format.loadAllFromInput(player, filename, null, true);
             if (all != null) {
                 session.addClipboard(all);
                 BBC.SCHEMATIC_LOADED.send(player, filename);
@@ -187,24 +187,9 @@ public class SchematicCommands extends MethodCommands {
         player.print(BBC.getPrefix() + "Remapped schematic");
     }
 
-
-    private File resolve(File dir, String filename, @Nullable ClipboardFormat format) {
-        if (format != null) {
-            if (!filename.matches(".*\\.[\\w].*")) {
-                filename = filename + "." + format.getExtension();
-            }
-            return MainUtil.resolveRelative(new File(dir, filename));
-        }
-        for (ClipboardFormat f : ClipboardFormat.values) {
-            File file = MainUtil.resolveRelative(new File(dir, filename + "." + f.getExtension()));
-            if (file.exists()) return file;
-        }
-        return null;
-    }
-
     @Command(aliases = {"load"}, usage = "[<format>] <filename>", desc = "Load a schematic into your clipboard")
     @Deprecated
-    @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.upload", "worldedit.schematic.load.other"})
+    @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.asset", "worldedit.schematic.load.web", "worldedit.schematic.load.other"})
     public void load(final Player player, final LocalSession session, @Optional() final String formatName, String filename) throws FilenameException {
         final LocalConfiguration config = this.worldEdit.getConfiguration();
         ClipboardFormat format = formatName == null ? null : ClipboardFormat.findByAlias(formatName);
@@ -212,8 +197,8 @@ public class SchematicCommands extends MethodCommands {
         try {
             URI uri;
             if (filename.startsWith("url:")) {
-                if (!player.hasPermission("worldedit.schematic.upload")) {
-                    BBC.NO_PERM.send(player, "worldedit.schematic.upload");
+                if (!player.hasPermission("worldedit.schematic.load.web")) {
+                    BBC.NO_PERM.send(player, "worldedit.schematic.load.web");
                     return;
                 }
                 UUID uuid = UUID.fromString(filename.substring(4));
@@ -252,12 +237,12 @@ public class SchematicCommands extends MethodCommands {
                         String extension = filename.substring(filename.lastIndexOf('.') + 1, filename.length());
                         format = ClipboardFormat.findByExtension(extension);
                     }
-                    f = resolve(dir, filename, format);
+                    f = MainUtil.resolve(dir, filename, format, false);
                 }
                 if (f == null || !f.exists()) {
                     if (!filename.contains("../")) {
                         dir = this.worldEdit.getWorkingDirectoryFile(config.saveDir);
-                        f = resolve(dir, filename, format);
+                        f = MainUtil.resolve(dir, filename, format, false);
                     }
                 }
                 if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
@@ -383,7 +368,7 @@ public class SchematicCommands extends MethodCommands {
 
     @Command(aliases = {"move", "m"}, usage = "<directory>", desc = "Move your loaded schematic", help = "Move your currently loaded schematics", min = 1, max = 1)
     @CommandPermissions({"worldedit.schematic.move", "worldedit.schematic.move.other"})
-    public void move(final Player player, final LocalSession session, String directory) throws WorldEditException {
+    public void move(final Player player, final LocalSession session, String directory) throws WorldEditException, IOException {
         final LocalConfiguration config = this.worldEdit.getConfiguration();
         final File working = this.worldEdit.getWorkingDirectoryFile(config.saveDir);
         final File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
@@ -429,7 +414,7 @@ public class SchematicCommands extends MethodCommands {
 
     @Command(aliases = {"delete", "d"}, usage = "<filename|*>", desc = "Delete a saved schematic", help = "Delete a schematic from the schematic list", min = 1, max = 1)
     @CommandPermissions({"worldedit.schematic.delete", "worldedit.schematic.delete.other"})
-    public void delete(final Player player, final LocalSession session, final CommandContext args) throws WorldEditException {
+    public void delete(final Player player, final LocalSession session, final CommandContext args) throws WorldEditException, IOException {
         final LocalConfiguration config = this.worldEdit.getConfiguration();
         final File working = this.worldEdit.getWorkingDirectoryFile(config.saveDir);
         final File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;

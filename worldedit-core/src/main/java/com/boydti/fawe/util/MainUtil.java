@@ -11,6 +11,7 @@ import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
 import java.awt.Graphics2D;
@@ -35,6 +36,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.zip.*;
+import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import net.jpountz.lz4.*;
 
@@ -884,9 +886,29 @@ public class MainUtil {
         return res;
     }
 
-    public static boolean isInSubDirectory(File dir, File file) {
+    public static File resolve(File dir, String filename, @Nullable ClipboardFormat format, boolean allowDir) {
+        if (format != null) {
+            if (!filename.matches(".*\\.[\\w].*")) {
+                filename = filename + "." + format.getExtension();
+            }
+            return MainUtil.resolveRelative(new File(dir, filename));
+        }
+        if (allowDir) {
+            File file = MainUtil.resolveRelative(new File(dir, filename));
+            if (file.exists() && file.isDirectory()) return file;
+        }
+        for (ClipboardFormat f : ClipboardFormat.values) {
+            File file = MainUtil.resolveRelative(new File(dir, filename + "." + f.getExtension()));
+            if (file.exists()) return file;
+        }
+        return null;
+    }
+
+    public static boolean isInSubDirectory(File dir, File file) throws IOException {
         if (file == null) return false;
         if (file.equals(dir)) return true;
+        file = file.getCanonicalFile();
+        dir = dir.getCanonicalFile();
         return isInSubDirectory(dir, file.getParentFile());
     }
 

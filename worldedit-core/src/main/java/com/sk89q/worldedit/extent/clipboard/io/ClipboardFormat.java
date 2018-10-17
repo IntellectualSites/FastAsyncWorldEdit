@@ -56,6 +56,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -318,16 +319,24 @@ public enum ClipboardFormat {
         });
     }
 
-    public MultiClipboardHolder loadAllFromInput(Actor player, String input, boolean message) throws IOException {
+    public static MultiClipboardHolder loadAllFromInput(Actor player, String input, ClipboardFormat format, boolean message) throws IOException {
         checkNotNull(player);
         checkNotNull(input);
         WorldEdit worldEdit = WorldEdit.getInstance();
         LocalConfiguration config = worldEdit.getConfiguration();
         if (input.startsWith("url:")) {
+            if (!player.hasPermission("worldedit.schematic.load.web")) {
+                if (message) BBC.NO_PERM.send(player, "worldedit.schematic.load.web");
+                return null;
+            }
             URL base = new URL(Settings.IMP.WEB.URL);
             input = new URL(base, "uploads/" + input.substring(4) + ".schematic").toString();
         }
         if (input.startsWith("http")) {
+            if (!player.hasPermission("worldedit.schematic.load.asset")) {
+                if (message) BBC.NO_PERM.send(player, "worldedit.schematic.load.asset");
+                return null;
+            }
             URL url = new URL(input);
             URL webInterface = new URL(Settings.IMP.WEB.ASSETS);
             if (!url.getHost().equalsIgnoreCase(webInterface.getHost())) {
@@ -337,68 +346,89 @@ public enum ClipboardFormat {
             MultiClipboardHolder clipboards = loadAllFromUrl(url);
             return clipboards;
         } else {
-            if (input.contains("../") && !player.hasPermission("worldedit.schematic.load.other")) {
-                if (message) BBC.NO_PERM.send(player, "worldedit.schematic.load.other");
+            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
+                BBC.NO_PERM.send(player, "worldedit.schematic.load.other");
                 return null;
             }
             File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
-            File dir = new File(working, (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? (player.getUniqueId().toString() + File.separator) : "") + input);
-            if (!dir.exists()) {
-                dir = new File(dir + "." + getExtension());
-            }
-            if (!dir.exists()) {
-                if ((!input.contains("/") && !input.contains("\\")) || player.hasPermission("worldedit.schematic.load.other")) {
-                    dir = new File(worldEdit.getWorkingDirectoryFile(config.saveDir), input);
+            File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
+            File f;
+            if (input.startsWith("#")) {
+                String[] extensions;
+                if (format != null) {
+                    extensions = format.getFileExtensions().toArray(new String[0]);
+                } else {
+                    extensions = ClipboardFormats.getFileExtensionArray();
                 }
-                if (!dir.exists()) {
-                    dir = new File(dir + "." + getExtension());
+                f = player.openFileOpenDialog(extensions);
+                if (f == null || !f.exists()) {
+                    if (message) player.printError("Schematic " + input + " does not exist! (" + f + ")");
+                    return null;
+                }
+            } else {
+                if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find() && !player.hasPermission("worldedit.schematic.load.other")) {
+                    if (message) BBC.NO_PERM.send(player, "worldedit.schematic.load.other");
+                    return null;
+                }
+                if (format == null && input.matches(".*\\.[\\w].*")) {
+                    String extension = input.substring(input.lastIndexOf('.') + 1, input.length());
+                    format = ClipboardFormat.findByExtension(extension);
+                }
+                f = MainUtil.resolve(dir, input, format, true);
+            }
+            if (f == null || !f.exists()) {
+                if (!input.contains("../")) {
+                    dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+                    f = MainUtil.resolve(dir, input, format, true);
                 }
             }
-            if(!dir.exists()) {
-            	for(ClipboardFormat format : values) {
-            		if(new File(working, (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? (player.getUniqueId().toString() + File.separator) : "") + input + "." + format.getExtension()).exists()) {
-            			return format.loadAllFromInput(player, input, message);
-            		}
-            	}
+            if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
+                if (message) player.printError("Schematic " + input + " does not exist! (" + ((f == null) ? false : f.exists()) + "|" + f + "|" + (f == null ? false : !MainUtil.isInSubDirectory(working, f)) + ")");
+                return null;
             }
-            if (!dir.exists()) {
+            if (format == null && f.isFile()) {
+                format = ClipboardFormat.findByFile(f);
+                if (format == null) {
+                    BBC.CLIPBOARD_INVALID_FORMAT.send(player, f.getName());
+                    return null;
+                }
+            }
+            if (!f.exists()) {
                 if (message) BBC.SCHEMATIC_NOT_FOUND.send(player, input);
                 return null;
             }
-            if (!dir.isDirectory()) {
-            	if(!findByFile(dir).getExtension().equals(getExtension())) {
-            		return findByFile(dir).loadAllFromInput(player, input, message);
-            	}
-                ByteSource source = Files.asByteSource(dir);
-                URI uri = dir.toURI();
-                return new MultiClipboardHolder(uri, new LazyClipboardHolder(dir.toURI(), source, this, null));
+            if (!f.isDirectory()) {
+                ByteSource source = Files.asByteSource(f);
+                URI uri = f.toURI();
+                return new MultiClipboardHolder(uri, new LazyClipboardHolder(f.toURI(), source, format, null));
             }
-            URIClipboardHolder[] clipboards = loadAllFromDirectory(dir);
+            URIClipboardHolder[] clipboards = loadAllFromDirectory(f);
             if (clipboards.length < 1) {
                 if (message) BBC.SCHEMATIC_NOT_FOUND.send(player, input);
                 return null;
             }
-            return new MultiClipboardHolder(dir.toURI(), clipboards);
+            return new MultiClipboardHolder(f.toURI(), clipboards);
         }
     }
 
-    public URIClipboardHolder[] loadAllFromDirectory(File dir) {
-        File[] files = dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().endsWith(".schematic");
-            }
+    public static URIClipboardHolder[] loadAllFromDirectory(File dir) {
+        HashSet<String> extensions = new HashSet<>(Arrays.asList(ClipboardFormats.getFileExtensionArray()));
+        File[] files = dir.listFiles(pathname -> {
+            String input = pathname.getName();
+            String extension = input.substring(input.lastIndexOf('.') + 1, input.length());
+            return (extensions.contains(extension.toLowerCase()));
         });
         LazyClipboardHolder[] clipboards = new LazyClipboardHolder[files.length];
         for (int i = 0; i < files.length; i++) {
             File file = files[i];
             ByteSource source = Files.asByteSource(file);
-            clipboards[i] = new LazyClipboardHolder(file.toURI(), source, this, null);
+            ClipboardFormat format = ClipboardFormat.findByFile(file);
+            clipboards[i] = new LazyClipboardHolder(file.toURI(), source, format, null);
         }
         return clipboards;
     }
 
-    public MultiClipboardHolder loadAllFromUrl(URL url) throws IOException {
+    public static MultiClipboardHolder loadAllFromUrl(URL url) throws IOException {
         List<LazyClipboardHolder> clipboards = new ArrayList<>();
         try (ReadableByteChannel rbc = Channels.newChannel(url.openStream())) {
             try (InputStream in = Channels.newInputStream(rbc)) {
@@ -406,7 +436,10 @@ public enum ClipboardFormat {
                     ZipEntry entry;
                     byte[] buffer = new byte[8192];
                     while ((entry = zip.getNextEntry()) != null) {
-                        if (entry.getName().endsWith(".schematic")) {
+                        String filename = entry.getName();
+                        String extension = filename.substring(filename.lastIndexOf('.') + 1, filename.length());
+                        ClipboardFormat format = findByExtension(filename);
+                        if (format != null) {
                             FastByteArrayOutputStream out = new FastByteArrayOutputStream();
                             int len = 0;
                             while ((len = zip.read(buffer)) > 0) {
@@ -414,7 +447,7 @@ public enum ClipboardFormat {
                             }
                             byte[] array = out.toByteArray();
                             ByteSource source = ByteSource.wrap(array);
-                            LazyClipboardHolder clipboard = new LazyClipboardHolder(url.toURI(), source, this, null);
+                            LazyClipboardHolder clipboard = new LazyClipboardHolder(url.toURI(), source, format, null);
                             clipboards.add(clipboard);
                         }
                     }

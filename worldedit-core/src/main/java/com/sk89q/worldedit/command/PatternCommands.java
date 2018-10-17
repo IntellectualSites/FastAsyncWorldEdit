@@ -190,7 +190,7 @@ public class PatternCommands extends MethodCommands {
                 clipboards = Collections.singletonList(clipboard);
                 break;
             default:
-                MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, location, true);
+                MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, location, null, true);
                 clipboards = multi != null ? multi.getHolders() : null;
                 break;
         }

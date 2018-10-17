@@ -34,7 +34,7 @@ public abstract class ScrollAction implements ScrollTool {
                 }
                 String filename = split[1];
                 try {
-                    MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, filename, message);
+                    MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, filename, null, message);
                     if (multi == null) {
                         return null;
                     }
