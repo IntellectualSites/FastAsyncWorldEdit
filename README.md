@@ -14,7 +14,7 @@ It is available for Bukkit, Forge, Sponge and Nukkit.
 ## Releases
 
 ### - [**`> Download <`**](https://empcraft.com/fawe/download/)
-### - [**`> Jenkins <`**](https://ci.athion.net/job/FastAsyncWorldEdit/)
+### - [**`> Jenkins <`**](https://ci.athion.net/job/FAWE-1.13/)
 
 ## Building
 FAWE uses gradle to build
