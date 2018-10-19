@@ -93,10 +93,6 @@ public class RepeatingExtentPattern extends AbstractPattern {
         int x = base.getBlockX() % size.getBlockX();
         int y = base.getBlockY() % size.getBlockY();
         int z = base.getBlockZ() % size.getBlockZ();
-//<<<<<<< HEAD
-//        return extent.getBlock(new Vector(x, y, z));
-//=======
-        return extent.getFullBlock(new BlockVector3(x, y, z));
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        return extent.getFullBlock(BlockVector3.at(x, y, z));
     }
 }

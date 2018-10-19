@@ -259,7 +259,7 @@ public class Schematic {
                     if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
                         mpos2d.setComponents(xx, zz);
 //                        extent.setBiome(mpos2d, clipboard.getBiome(mpos2d_2.setComponents(mutable.getBlockX(), mutable.getBlockZ())));
-                        extent.setBiome(mpos2d.toBlockVector2(), clipboard.getBiome(new BlockVector2(mutable.getBlockX(), mutable.getBlockZ())));
+                        extent.setBiome(mpos2d.toBlockVector2(), clipboard.getBiome(BlockVector2.at(mutable.getBlockX(), mutable.getBlockZ())));
                     }
                     if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                         return false;

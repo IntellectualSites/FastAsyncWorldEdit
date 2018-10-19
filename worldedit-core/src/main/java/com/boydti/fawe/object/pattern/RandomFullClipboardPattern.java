@@ -44,7 +44,7 @@ public class RandomFullClipboardPattern extends AbstractPattern {
             holder.setTransform(new AffineTransform().rotateY(PseudoRandom.random.random(4) * 90));
         }
         if (randomFlip) {
-            transform = transform.scale(new Vector3(1, 0, 0).multiply(-2).add(1, 1, 1));
+            transform = transform.scale(Vector3.at(1, 0, 0).multiply(-2).add(1, 1, 1));
         }
         if (!transform.isIdentity()) {
             holder.setTransform(transform);

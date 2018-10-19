@@ -349,10 +349,17 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 };
             }
 
+//<<<<<<< HEAD
             @Override
             public int size() {
                 return size;
             }
+//=======
+//        for (int x = min.getBlockX() >> ChunkStore.CHUNK_SHIFTS; x <= max.getBlockX() >> ChunkStore.CHUNK_SHIFTS; ++x) {
+//            for (int z = min.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; z <= max.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; ++z) {
+//                chunks.add(BlockVector2.at(x, z));
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
+
 
             @Override
             public boolean contains(Object o) {
@@ -381,7 +388,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         for (int x = min.getBlockX() >> ChunkStore.CHUNK_SHIFTS; x <= max.getBlockX() >> ChunkStore.CHUNK_SHIFTS; ++x) {
             for (int z = min.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; z <= max.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; ++z) {
                 for (int y = min.getBlockY() >> ChunkStore.CHUNK_SHIFTS; y <= max.getBlockY() >> ChunkStore.CHUNK_SHIFTS; ++y) {
-                    chunks.add(new BlockVector3(x, y, z));
+                    chunks.add(BlockVector3.at(x, y, z));
                 }
             }
         }
@@ -463,6 +470,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public BlockVector3 next() {
+//<<<<<<< HEAD
                 mutable.mutX(x);
                 mutable.mutY(y);
                 mutable.mutZ(z);
@@ -498,6 +506,16 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         } else {
                             x = cbx;
                             z = cbz;
+//=======
+//                if (!hasNext()) throw new NoSuchElementException();
+//                BlockVector3 answer = BlockVector3.at(nextX, nextY, nextZ);
+//                if (++nextX > max.getBlockX()) {
+//                    nextX = min.getBlockX();
+//                    if (++nextY > max.getBlockY()) {
+//                        nextY = min.getBlockY();
+//                        if (++nextZ > max.getBlockZ()) {
+//                            nextX = Integer.MIN_VALUE;
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                         }
                     } else {
                         x = cbx;
@@ -525,10 +543,16 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             }
 
             @Override
+//<<<<<<< HEAD
             public BlockVector3 next() {
                 mutable.mutX(nextX);
                 mutable.mutY(nextY);
                 mutable.mutZ(nextZ);
+//=======
+//            public BlockVector2 next() {
+//                if (!hasNext()) throw new NoSuchElementException();
+//                BlockVector2 answer = BlockVector2.at(nextX, nextZ);
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                 if (++nextX > max.getBlockX()) {
                     nextX = min.getBlockX();
                     if (++nextZ > max.getBlockZ()) {
@@ -575,7 +599,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                     public BlockVector2 next() {
                         if (!hasNext()) throw new java.util.NoSuchElementException();
 //                        BlockVector2 answer = mutable.setComponents(nextX, nextZ);
-                        BlockVector2 answer = new BlockVector2(nextX, nextZ);
+                        BlockVector2 answer = BlockVector2.at(nextX, nextZ);
                         if (++nextX > max.getBlockX()) {
                             nextX = min.getBlockX();
                             if (++nextZ > max.getBlockZ()) {

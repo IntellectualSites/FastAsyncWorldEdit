@@ -163,12 +163,16 @@ public class ExtentEntityCopy implements EntityFunction {
             boolean hasFacing = tag.containsKey("Facing");
 
             if (hasTilePosition) {
+<<<<<<< HEAD
 //<<<<<<< HEAD
                 changed = true;
 //                Vector tilePosition = new Vector(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
 //                Vector newTilePosition = transform.apply(tilePosition.subtract(from)).add(to);
 //=======
                 Vector3 tilePosition = new Vector3(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
+=======
+                Vector3 tilePosition = Vector3.at(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
+>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                 BlockVector3 newTilePosition = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
 //>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 

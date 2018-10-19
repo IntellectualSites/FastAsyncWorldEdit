@@ -77,7 +77,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         int length = size.getInt(2);
 
         // Init clipboard
-        BlockVector3 origin = new BlockVector3(0, 0, 0);
+        BlockVector3 origin = BlockVector3.at(0, 0, 0);
         CuboidRegion region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region, clipboardId);
         // Blocks

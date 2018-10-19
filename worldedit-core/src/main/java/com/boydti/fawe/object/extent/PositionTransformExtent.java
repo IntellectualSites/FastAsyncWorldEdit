@@ -51,7 +51,7 @@ public class PositionTransformExtent extends ResettableExtent {
 
     private BlockVector3 getPos(int x, int y, int z) {
         if (min == null) {
-            min = new BlockVector3(x, y, z);
+            min = BlockVector3.at(x, y, z);
         }
         mutable.mutX(((x - min.getX())));
         mutable.mutY(((y - min.getY())));

@@ -26,7 +26,7 @@ public class CircleBrush implements Brush {
     private Vector3 any90Rotate(Vector3 normal) {
         normal = normal.normalize();
         if (normal.getX() == 1 || normal.getY() == 1 || normal.getZ() == 1) {
-            return new Vector3(normal.getZ(), normal.getX(), normal.getY());
+            return Vector3.at(normal.getZ(), normal.getX(), normal.getY());
         }
         AffineTransform affine = new AffineTransform();
         affine = affine.rotateX(90);

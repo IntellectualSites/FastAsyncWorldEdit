@@ -126,7 +126,7 @@ public final class MathUtils {
      * @return midpoint Vector3
      */
     public static Vector3 midpoint(Vector3 v1, Vector3 v2) {
-        return new Vector3(
+        return Vector3.at(
                 (v1.getX() + v2.getX()) / 2,
                 (v1.getY() + v2.getY()) / 2,
                 (v1.getZ() + v2.getZ()) / 2
@@ -141,7 +141,7 @@ public final class MathUtils {
      * @return midpoint BlockVector3
      */
     public static BlockVector3 midpoint(BlockVector3 v1, BlockVector3 v2) {
-        return new BlockVector3(
+        return BlockVector3.at(
                 (v1.getBlockX() + v2.getBlockX()) / 2,
                 (v1.getBlockY() + v2.getBlockY()) / 2,
                 (v1.getBlockZ() + v2.getBlockZ()) / 2

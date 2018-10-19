@@ -35,7 +35,7 @@ public class SurfaceSpline implements Brush {
             int max = editSession.getNearestSurfaceTerrainBlock(pos.getBlockX(), pos.getBlockZ(), pos.getBlockY(), 0, editSession.getMaxY());
             if (max == -1) return;
 //            pos.mutY(max);
-            path.add(new Vector3(pos.getBlockX(), max, pos.getBlockZ()));
+            path.add(Vector3.at(pos.getBlockX(), max, pos.getBlockZ()));
             editSession.getPlayer().sendMessage(BBC.getPrefix() + BBC.BRUSH_SPLINE_PRIMARY_2.s());
             if (!vis) return;
         }

@@ -268,19 +268,19 @@ public class CorruptSchematicStreamer {
 
     private BlockVector3 guessDimensions(int volume, int width, int height, int length) {
         if (volume == 0) {
-            return new BlockVector3(width, height, length);
+            return BlockVector3.at(width, height, length);
         }
         if (volume == width * height * length) {
-            return new BlockVector3(width, height, length);
+            return BlockVector3.at(width, height, length);
         }
         if (width == 0 && height != 0 && length != 0 && volume % (height * length) == 0 && height * length <= volume) {
-            return new BlockVector3(volume / (height * length), height, length);
+            return BlockVector3.at(volume / (height * length), height, length);
         }
         if (height == 0 && width != 0 && length != 0 && volume % (width * length) == 0 && width * length <= volume) {
-            return new BlockVector3(width, volume / (width * length), length);
+            return BlockVector3.at(width, volume / (width * length), length);
         }
         if (length == 0 && height != 0 && width != 0 && volume % (height * width) == 0 && height * width <= volume) {
-            return new BlockVector3(width, height, volume / (width * height));
+            return BlockVector3.at(width, height, volume / (width * height));
         }
         List<Integer> factors = new ArrayList<>();
         for (int i = (int) Math.sqrt(volume); i > 0; i--) {
@@ -308,7 +308,7 @@ public class CorruptSchematicStreamer {
                 }
             }
         }
-        return new BlockVector3(vx, vz, vy);
+        return BlockVector3.at(vx, vz, vy);
     }
 
     public interface CorruptReader {

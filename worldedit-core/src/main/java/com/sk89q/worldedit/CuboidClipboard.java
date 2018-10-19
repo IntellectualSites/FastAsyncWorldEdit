@@ -249,7 +249,7 @@ public class CuboidClipboard {
         for (int x = 0; x < size.getBlockX(); ++x) {
             for (int y = 0; y < size.getBlockY(); ++y) {
                 for (int z = 0; z < size.getBlockZ(); ++z) {
-                    setBlock(x, y, z, editSession.getBlock(new BlockVector3(x, y, z).add(getOrigin())));
+                    setBlock(x, y, z, editSession.getBlock(BlockVector3.at(x, y, z).add(getOrigin())));
                 }
             }
         }
@@ -265,7 +265,7 @@ public class CuboidClipboard {
         for (int x = 0; x < size.getBlockX(); ++x) {
             for (int y = 0; y < size.getBlockY(); ++y) {
                 for (int z = 0; z < size.getBlockZ(); ++z) {
-                    final BlockVector3 pt = new BlockVector3(x, y, z).add(getOrigin());
+                    final BlockVector3 pt = BlockVector3.at(x, y, z).add(getOrigin());
                     if (region.contains(pt)) {
                         setBlock(x, y, z, editSession.getBlock(pt));
                     } else {

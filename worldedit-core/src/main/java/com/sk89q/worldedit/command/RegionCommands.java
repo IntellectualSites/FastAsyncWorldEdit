@@ -120,7 +120,7 @@ public class RegionCommands extends MethodCommands {
         if (selection == null) {
             final int cx = loc.x >> 4;
             final int cz = loc.z >> 4;
-            selection = new CuboidRegion(new BlockVector3(cx - 8, 0, cz - 8).multiply(16), new BlockVector3(cx + 8, 0, cz + 8).multiply(16));
+            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
         int count = FaweAPI.fixLighting(loc.world, selection, FaweQueue.RelightMode.ALL);
         BBC.LIGHTING_PROPOGATE_SELECTION.send(fp, count);
@@ -154,7 +154,7 @@ public class RegionCommands extends MethodCommands {
         if (selection == null) {
             final int cx = loc.x >> 4;
             final int cz = loc.z >> 4;
-            selection = new CuboidRegion(new BlockVector3(cx - 8, 0, cz - 8).multiply(16), new BlockVector3(cx + 8, 0, cz + 8).multiply(16));
+            selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
         int count = FaweAPI.fixLighting(loc.world, selection, FaweQueue.RelightMode.NONE);
         BBC.UPDATED_LIGHTING_SELECTION.send(fp, count);
@@ -624,7 +624,7 @@ public class RegionCommands extends MethodCommands {
             if (moveSelection) {
                 try {
                     final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-                    BlockVector3 shiftVector = new BlockVector3(direction.getX() * size.getX() * count, direction.getY() * size.getY() * count, direction.getZ() * size.getZ() * count);
+                    BlockVector3 shiftVector = BlockVector3.at(direction.getX() * size.getX() * count, direction.getY() * size.getY() * count, direction.getZ() * size.getZ() * count);
                     region.shift(shiftVector);
 
                     session.getRegionSelector(player.getWorld()).learnChanges();

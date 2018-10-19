@@ -35,8 +35,8 @@ public class GriefPreventionFilter extends CuboidRegionFilter {
             org.bukkit.Location bot = claim.getGreaterBoundaryCorner();
             if (world.equals(bot.getWorld())) {
                 org.bukkit.Location top = claim.getGreaterBoundaryCorner();
-                BlockVector2 pos1 = new BlockVector2(bot.getBlockX(), bot.getBlockZ());
-                BlockVector2 pos2 = new BlockVector2(top.getBlockX(), top.getBlockZ());
+                BlockVector2 pos1 = BlockVector2.at(bot.getBlockX(), bot.getBlockZ());
+                BlockVector2 pos2 = BlockVector2.at(top.getBlockX(), top.getBlockZ());
                 add(pos1, pos2);
             }
         }

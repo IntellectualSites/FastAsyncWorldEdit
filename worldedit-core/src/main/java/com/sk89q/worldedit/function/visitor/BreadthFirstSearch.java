@@ -44,18 +44,18 @@ public abstract class BreadthFirstSearch implements Operation {
     public static final BlockVector3[] DIAGONAL_DIRECTIONS;
 
     static {
-        DEFAULT_DIRECTIONS[0] = (new BlockVector3(0, -1, 0));
-        DEFAULT_DIRECTIONS[1] = (new BlockVector3(0, 1, 0));
-        DEFAULT_DIRECTIONS[2] = (new BlockVector3(-1, 0, 0));
-        DEFAULT_DIRECTIONS[3] = (new BlockVector3(1, 0, 0));
-        DEFAULT_DIRECTIONS[4] = (new BlockVector3(0, 0, -1));
-        DEFAULT_DIRECTIONS[5] = (new BlockVector3(0, 0, 1));
+        DEFAULT_DIRECTIONS[0] = (BlockVector3.at(0, -1, 0));
+        DEFAULT_DIRECTIONS[1] = (BlockVector3.at(0, 1, 0));
+        DEFAULT_DIRECTIONS[2] = (BlockVector3.at(-1, 0, 0));
+        DEFAULT_DIRECTIONS[3] = (BlockVector3.at(1, 0, 0));
+        DEFAULT_DIRECTIONS[4] = (BlockVector3.at(0, 0, -1));
+        DEFAULT_DIRECTIONS[5] = (BlockVector3.at(0, 0, 1));
         List<BlockVector3> list = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
                     if (x != 0 || y != 0 || z != 0) {
-                    	BlockVector3 pos = new BlockVector3(x, y, z);
+                    	BlockVector3 pos = BlockVector3.at(x, y, z);
                         if (!list.contains(pos)) {
                             list.add(pos);
                         }
@@ -100,10 +100,6 @@ public abstract class BreadthFirstSearch implements Operation {
         this.maxDepth = maxDepth;
     }
 
-    public Collection<BlockVector3> getDirections() {
-        return this.directions;
-    }
-
     public void setDirections(List<BlockVector3> directions) {
         this.directions = directions;
     }
@@ -115,6 +111,44 @@ public abstract class BreadthFirstSearch implements Operation {
             array[i] = new IntegerTrio(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
         }
         return array;
+    }
+    
+    /**
+     * Get the list of directions will be visited.
+     *
+     * <p>Directions are {@link BlockVector3}s that determine
+     * what adjacent points area available. Vectors should not be
+     * unit vectors. An example of a valid direction is
+     * {@code BlockVector3.at(1, 0, 1)}.</p>
+     *
+     * <p>The list of directions can be cleared.</p>
+     *
+     * @return the list of directions
+     */
+    protected Collection<BlockVector3> getDirections() {
+        return directions;
+    }
+
+    /**
+     * Add the directions along the axes as directions to visit.
+     */
+    protected void addAxes() {
+        directions.add(BlockVector3.at(0, -1, 0));
+        directions.add(BlockVector3.at(0, 1, 0));
+        directions.add(BlockVector3.at(-1, 0, 0));
+        directions.add(BlockVector3.at(1, 0, 0));
+        directions.add(BlockVector3.at(0, 0, -1));
+        directions.add(BlockVector3.at(0, 0, 1));
+    }
+
+    /**
+     * Add the diagonal directions as directions to visit.
+     */
+    protected void addDiagonal() {
+        directions.add(BlockVector3.at(1, 0, 1));
+        directions.add(BlockVector3.at(-1, 0, -1));
+        directions.add(BlockVector3.at(1, 0, -1));
+        directions.add(BlockVector3.at(-1, 0, 1));
     }
 
     public void visit(final BlockVector3 pos) {
@@ -223,7 +257,7 @@ public abstract class BreadthFirstSearch implements Operation {
                     int x = from.getBlockX() + direction.x;
                     int z = from.getBlockZ() + direction.z;
                     if (!visited.contains(x, y, z)) {
-                        if (isVisitable(from, new BlockVector3(x, y, z))) {
+                        if (isVisitable(from, BlockVector3.at(x, y, z))) {
                             j++;
                             visited.add(x, y, z);
                             tempQueue.add(x, y, z);

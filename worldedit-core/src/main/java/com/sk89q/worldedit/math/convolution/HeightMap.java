@@ -200,19 +200,20 @@ public class HeightMap {
                         } else {
                             existing = PropertyGroup.LEVEL.set(existing, 15);
                             session.setBlock(xr, newBlock, zr, existing);
+
 //=======
-//                    BlockState existing = session.getBlock(new BlockVector3(xr, curHeight, zr));
+//                    BlockState existing = session.getBlock(BlockVector3.at(xr, curHeight, zr));
 //
 //                    // Skip water/lava
 //                    if (existing.getBlockType() != BlockTypes.WATER && existing.getBlockType() != BlockTypes.LAVA) {
-//                        session.setBlock(new BlockVector3(xr, newHeight, zr), existing);
+//                        session.setBlock(BlockVector3.at(xr, newHeight, zr), existing);
 //                        ++blocksChanged;
 //
 //                        // Grow -- start from 1 below top replacing airblocks
 //                        for (int y = newHeight - 1 - originY; y >= 0; --y) {
 //                            int copyFrom = (int) (y * scale);
-//                            session.setBlock(new BlockVector3(xr, originY + y, zr), session.getBlock(new BlockVector3(xr, originY + copyFrom, zr)));
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//                            session.setBlock(BlockVector3.at(xr, originY + y, zr), session.getBlock(BlockVector3.at(xr, originY + copyFrom, zr)));
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                             ++blocksChanged;
                         }
                     }
@@ -225,8 +226,8 @@ public class HeightMap {
 //                    // Shrink -- start from bottom
 //                    for (int y = 0; y < newHeight - originY; ++y) {
 //                        int copyFrom = (int) (y * scale);
-//                        session.setBlock(new BlockVector3(xr, originY + y, zr), session.getBlock(new BlockVector3(xr, originY + copyFrom, zr)));
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//                        session.setBlock(BlockVector3.at(xr, originY + y, zr), session.getBlock(BlockVector3.at(xr, originY + copyFrom, zr)));
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                         ++blocksChanged;
                     }
                     // Set the top block of the column to be the same type
@@ -294,12 +295,12 @@ public class HeightMap {
                 } else if (curHeight > newHeight) {
                     // Set the top block of the column to be the same type
                     // (this could otherwise go wrong with rounding)
-                    session.setBlock(xr, newHeight, zr, session.getBlock(xr, curHeight, zr));
+                    session.setBlock(BlockVector3.at(xr, newHeight, zr), session.getBlock(BlockVector3.at(xr, curHeight, zr)));
                     ++blocksChanged;
 
                     // Fill rest with air
                     for (int y = newHeight + 1; y <= curHeight; ++y) {
-                        session.setBlock(xr, y, zr, fillerAir);
+                        session.setBlock(BlockVector3.at(xr, y, zr), fillerAir);
                         ++blocksChanged;
                     }
                 }

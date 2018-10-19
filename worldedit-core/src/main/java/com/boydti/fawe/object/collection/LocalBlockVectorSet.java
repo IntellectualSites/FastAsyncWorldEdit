@@ -179,7 +179,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             int x = offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21);
             int y = b1;
             int z = offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21);
-            array[i] = (T) new BlockVector3(x, y, z);
+            array[i] = (T) BlockVector3.at(x, y, z);
             index++;
         }
         return array;

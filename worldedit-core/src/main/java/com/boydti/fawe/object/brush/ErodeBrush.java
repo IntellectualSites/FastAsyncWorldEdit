@@ -23,7 +23,7 @@ public class ErodeBrush implements Brush {
 
     private PseudoRandom rand = new PseudoRandom();
 
-    private static final BlockVector3[] FACES_TO_CHECK = {new BlockVector3(0, 0, 1), new BlockVector3(0, 0, -1), new BlockVector3(0, 1, 0), new BlockVector3(0, -1, 0), new BlockVector3(1, 0, 0), new BlockVector3(-1, 0, 0)};
+    private static final BlockVector3[] FACES_TO_CHECK = {BlockVector3.at(0, 0, 1), BlockVector3.at(0, 0, -1), BlockVector3.at(0, 1, 0), BlockVector3.at(0, -1, 0), BlockVector3.at(1, 0, 0), BlockVector3.at(-1, 0, 0)};
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {

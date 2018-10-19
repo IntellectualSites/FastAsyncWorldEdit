@@ -84,7 +84,7 @@ public class SplineBrush implements Brush, ResettableTool {
                     for (int y = -1; y <= 1; y++) {
                         for (int z = -1; z <= 1; z++) {
                             if (x != 0 || y != 0 || z != 0) {
-                            	BlockVector3 pos = new BlockVector3(x, y, z);
+                            	BlockVector3 pos = BlockVector3.at(x, y, z);
                                 if (!directions.contains(pos)) {
                                     directions.add(pos);
                                 }
@@ -206,15 +206,15 @@ public class SplineBrush implements Brush, ResettableTool {
         if (det_max == det_x) {
             double a = (xz * yz - xy * zz) / det_x;
             double b = (xy * yz - xz * yy) / det_x;
-            dir = new BlockVector3(1.0, a, b);
+            dir = BlockVector3.at(1.0, a, b);
         } else if (det_max == det_y) {
             double a = (yz * xz - xy * zz) / det_y;
             double b = (xy * xz - yz * xx) / det_y;
-            dir = new BlockVector3(a, 1.0, b);
+            dir = BlockVector3.at(a, 1.0, b);
         } else {
             double a = (yz * xy - xz * yy) / det_z;
             double b = (xz * xy - yz * xx) / det_z;
-            dir = new BlockVector3(a, b, 1.0);
+            dir = BlockVector3.at(a, b, 1.0);
         }
         ;
         return dir.normalize();

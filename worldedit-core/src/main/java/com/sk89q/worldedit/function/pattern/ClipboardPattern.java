@@ -45,7 +45,7 @@ public class ClipboardPattern extends AbstractPattern {
         if (xp < 0) xp += sx;
         if (yp < 0) yp += sy;
         if (zp < 0) zp += sz;
-        return clipboard.getBlock(new BlockVector3(min.getX() + xp, min.getY() + yp, min.getZ() + zp));
+        return clipboard.getBlock(BlockVector3.at(min.getX() + xp, min.getY() + yp, min.getZ() + zp));
 //=======
 //    public BlockStateHolder apply(BlockVector3 position) {
 //        int xp = Math.abs(position.getBlockX()) % size.getBlockX();

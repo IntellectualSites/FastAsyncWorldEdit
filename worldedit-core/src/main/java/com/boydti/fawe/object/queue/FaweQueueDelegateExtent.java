@@ -58,7 +58,7 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
 
     @Override
     public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
-        return parentExtent.getBiome(new BlockVector2(x, z)).getId();
+        return parentExtent.getBiome(BlockVector2.at(x, z)).getId();
     }
 
     @Override

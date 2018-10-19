@@ -139,7 +139,7 @@ public class CFIPacketListener implements Listener {
                     int ocx = origin.getBlockX() >> 4;
                     int ocz = origin.getBlockZ() >> 4;
 
-                    if (gen.contains(new BlockVector3((cx - ocx) << 4, 0, (cz - ocz) << 4))) {
+                    if (gen.contains(BlockVector3.at((cx - ocx) << 4, 0, (cz - ocz) << 4))) {
                         event.setCancelled(true);
 
                         Player plr = event.getPlayer();
@@ -166,7 +166,7 @@ public class CFIPacketListener implements Listener {
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
                 	BlockVector3 origin = gen.getOrigin().toBlockPoint();
-                	BlockVector3 pt = new BlockVector3(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                	BlockVector3 pt = BlockVector3.at(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
 
                     StructureModifier<Integer> ints = event.getPacket().getIntegers();
                     int id = ints.read(0);
@@ -191,11 +191,11 @@ public class CFIPacketListener implements Listener {
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
                 	BlockVector3 origin = gen.getOrigin().toBlockPoint();
-                	BlockVector3 from = new BlockVector3(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                	BlockVector3 from = BlockVector3.at(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
 
                     PacketContainer packet = event.getPacket();
                     StructureModifier<Double> doubles = packet.getDoubles();
-                    BlockVector3 to = new BlockVector3(doubles.read(0), doubles.read(1), doubles.read(2));
+                    BlockVector3 to = BlockVector3.at(doubles.read(0), doubles.read(1), doubles.read(2));
                     if (gen.contains(to.subtract(origin)) && from.distanceSq(to) < 8) {
                         int id = packet.getIntegers().read(0);
                         PacketContainer reply = new PacketContainer(PacketType.Play.Client.TELEPORT_ACCEPT);
@@ -225,7 +225,7 @@ public class CFIPacketListener implements Listener {
                     BlockVector3 origin = gen.getOrigin().toBlockPoint();
                     int cx = chunk.getChunkX() - (origin.getBlockX() >> 4);
                     int cz = chunk.getChunkZ() - (origin.getBlockX() >> 4);
-                    if (gen.contains(new BlockVector3(cx << 4, 0, cz << 4))) {
+                    if (gen.contains(BlockVector3.at(cx << 4, 0, cz << 4))) {
                         event.setCancelled(true);
                     }
                 }
@@ -288,7 +288,7 @@ public class CFIPacketListener implements Listener {
         BlockPosition loc = position.readSafely(0);
         if (loc == null) return null;
         BlockVector3 origin = generator.getOrigin().toBlockPoint();
-        BlockVector3 pt = new BlockVector3(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
+        BlockVector3 pt = BlockVector3.at(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
         return pt;
     }
 

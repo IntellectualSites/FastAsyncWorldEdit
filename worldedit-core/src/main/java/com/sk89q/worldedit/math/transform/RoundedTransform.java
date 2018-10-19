@@ -22,7 +22,7 @@ public class RoundedTransform implements Transform{
 //        mutable.mutX((int) Math.floor(val.getX() + 0.5));
 //        mutable.mutY((int) Math.floor(val.getY() + 0.5));
 //        mutable.mutZ((int) Math.floor(val.getZ() + 0.5));
-        return new Vector3(Math.floor(val.getX() + 0.5), Math.floor(val.getY() + 0.5), Math.floor(val.getY() + 0.5));
+        return Vector3.at(Math.floor(val.getX() + 0.5), Math.floor(val.getY() + 0.5), Math.floor(val.getY() + 0.5));
     }
 
     @Override

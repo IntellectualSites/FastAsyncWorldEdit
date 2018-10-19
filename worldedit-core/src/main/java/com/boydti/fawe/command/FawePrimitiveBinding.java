@@ -279,7 +279,7 @@ public class FawePrimitiveBinding extends BindingHelper {
             default:
                 throw new ParameterException("You must either specify 1 or 3 radius values.");
         }
-        return new Vector3(radiusX, radiusY, radiusZ);
+        return Vector3.at(radiusX, radiusY, radiusZ);
     }
 
 
@@ -311,7 +311,7 @@ public class FawePrimitiveBinding extends BindingHelper {
             default:
                 throw new ParameterException("You must either specify 1 or 2 radius values.");
         }
-        return new Vector2(radiusX, radiusZ);
+        return Vector2.at(radiusX, radiusZ);
     }
 
     /**

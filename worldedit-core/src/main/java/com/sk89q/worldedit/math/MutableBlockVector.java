@@ -580,15 +580,15 @@ public class MutableBlockVector implements Serializable {
      * @return a new {@link BlockVector2}
      */
     public BlockVector2 toBlockVector2() {
-        return new BlockVector2(x, z);
+        return BlockVector2.at(x, z);
     }
 
     public Vector3 toVector3() {
-        return new Vector3(x, y, z);
+        return Vector3.at(x, y, z);
     }
     
     public BlockVector3 toBlockVector3() {
-    	return new BlockVector3(x, y, z);
+    	return BlockVector3.at(x, y, z);
     }
 
     @Override

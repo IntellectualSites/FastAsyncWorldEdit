@@ -78,7 +78,7 @@ public class ChunkCommands {
         player.print(BBC.getPrefix() + "Chunk: " + chunkX + ", " + chunkZ);
         player.print(BBC.getPrefix() + "Old format: " + folder1 + "/" + folder2 + "/" + filename);
         player.print(BBC.getPrefix() + "McRegion: region/" + McRegionChunkStore.getFilename(
-                new BlockVector2(chunkX, chunkZ)));
+                BlockVector2.at(chunkX, chunkZ)));
     }
 
     @Command(

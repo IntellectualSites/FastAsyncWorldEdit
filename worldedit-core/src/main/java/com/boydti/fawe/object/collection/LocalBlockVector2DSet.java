@@ -154,7 +154,7 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
             index = set.nextSetBit(index);
             int x = MathMan.unpairSearchCoordsX(index);
             int y = MathMan.unpairSearchCoordsY(index);
-            array[i] = (T) new BlockVector2(x, y);
+            array[i] = (T) BlockVector2.at(x, y);
             index++;
         }
         return array;

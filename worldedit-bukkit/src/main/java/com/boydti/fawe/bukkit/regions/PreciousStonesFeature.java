@@ -41,8 +41,8 @@ public class PreciousStonesFeature extends BukkitMaskManager implements Listener
         boolean member = fp.hasPermission("fawe.preciousstones.member");
         for (final Field myField : fields) {
             if (isAllowed(player, myField, type, member)) {
-                BlockVector3 pos1 = new BlockVector3(myField.getMinx(), myField.getMiny(), myField.getMinz());
-                BlockVector3 pos2 = new BlockVector3(myField.getMaxx(), myField.getMaxy(), myField.getMaxz());
+                BlockVector3 pos1 = BlockVector3.at(myField.getMinx(), myField.getMiny(), myField.getMinz());
+                BlockVector3 pos2 = BlockVector3.at(myField.getMaxx(), myField.getMaxy(), myField.getMaxz());
                 return new FaweMask(pos1, pos2, "FIELD: " + myField) {
                     @Override
                     public boolean isValid(FawePlayer player, MaskType type) {

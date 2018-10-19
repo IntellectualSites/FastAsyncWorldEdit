@@ -61,7 +61,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         if (global != null && isAllowed(player, global)) {
             return global;
         }
-        final ApplicableRegionSet regions = manager.getApplicableRegions(new BlockVector3(loc.getX(), loc.getY(), loc.getZ()));
+        final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()));
         for (final ProtectedRegion region : regions) {
             if (isAllowed(player, region)) {
                 return region;

@@ -126,7 +126,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
 
     @Override
     public BlockVector3 getDimensions() {
-        return new BlockVector3(width, height, length);
+        return BlockVector3.at(width, height, length);
     }
 
     private int ylast;

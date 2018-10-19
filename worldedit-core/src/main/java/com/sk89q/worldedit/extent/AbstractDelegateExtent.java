@@ -129,7 +129,7 @@ public class AbstractDelegateExtent implements LightingExtent {
 //        mutable.mutX(x);
 //        mutable.mutY(y);
 //        mutable.mutZ(z);
-        return extent.getLazyBlock(new BlockVector3(x, y, z));
+        return extent.getLazyBlock(BlockVector3.at(x, y, z));
     }
 
     @Override
@@ -142,7 +142,7 @@ public class AbstractDelegateExtent implements LightingExtent {
 //        mutable.mutX(x);
 //        mutable.mutY(y);
 //        mutable.mutZ(z);
-        return setBlock(new BlockVector3(x, y, z), block);
+        return setBlock(BlockVector3.at(x, y, z), block);
     }
     
     public BlockState getBlock(BlockVector3 position) {

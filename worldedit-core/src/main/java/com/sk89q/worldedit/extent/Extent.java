@@ -127,15 +127,15 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default BlockState getLazyBlock(int x, int y, int z) {
-        return getLazyBlock(new BlockVector3(x, y, z));
+        return getLazyBlock(BlockVector3.at(x, y, z));
     }
 
     default boolean setBlock(int x, int y, int z, BlockStateHolder state) throws WorldEditException {
-        return setBlock(new BlockVector3(x, y, z), state);
+        return setBlock(BlockVector3.at(x, y, z), state);
     }
 
     default boolean setBiome(int x, int y, int z, BaseBiome biome) {
-        return setBiome(new BlockVector2(x, z), biome);
+        return setBiome(BlockVector2.at(x, z), biome);
     }
 
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {

@@ -91,7 +91,7 @@ public class FlattenedClipboardTransform {
                 maximum.withZ(minimum.getZ()) };
 
         for (int i = 0; i < corners.length; i++) {
-            corners[i] = transformAround.apply(new Vector3(corners[i]));
+            corners[i] = transformAround.apply(corners[i]);
         }
 
         MutableVector newMinimum = new MutableVector(corners[0]);
@@ -109,7 +109,7 @@ public class FlattenedClipboardTransform {
         newMinimum.mutY(Math.ceil(Math.floor(newMinimum.getY())));
         newMinimum.mutZ(Math.ceil(Math.floor(newMinimum.getZ())));
 
-        return new CuboidRegion(new BlockVector3(newMinimum.getX(), newMinimum.getY(), newMinimum.getZ()), new BlockVector3(newMaximum.getX(), newMaximum.getY(), newMaximum.getZ()));
+        return new CuboidRegion(BlockVector3.at(newMinimum.getX(), newMinimum.getY(), newMinimum.getZ()), BlockVector3.at(newMaximum.getX(), newMaximum.getY(), newMaximum.getZ()));
     }
 
     /**

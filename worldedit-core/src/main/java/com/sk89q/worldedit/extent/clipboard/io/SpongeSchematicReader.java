@@ -122,14 +122,28 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     private FaweClipboard setupClipboard(int size, UUID uuid) {
         if (fc != null) {
             if (fc.getDimensions().getX() == 0) {
-                fc.setDimensions(new BlockVector3(size, 1, 1));
+                fc.setDimensions(BlockVector3.at(size, 1, 1));
             }
             return fc;
         }
+//<<<<<<< HEAD
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             return fc = new DiskOptimizedClipboard(size, 1, 1, uuid);
         } else if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL == 0) {
             return fc = new CPUOptimizedClipboard(size, 1, 1);
+//=======
+//
+//        BlockVector3 min = BlockVector3.at(offsetParts[0], offsetParts[1], offsetParts[2]);
+//
+//        if (metadata.containsKey("WEOffsetX")) {
+//            // We appear to have WorldEdit Metadata
+//            int offsetX = requireTag(metadata, "WEOffsetX", IntTag.class).getValue();
+//            int offsetY = requireTag(metadata, "WEOffsetY", IntTag.class).getValue();
+//            int offsetZ = requireTag(metadata, "WEOffsetZ", IntTag.class).getValue();
+//            BlockVector3 offset = BlockVector3.at(offsetX, offsetY, offsetZ);
+//            origin = min.subtract(offset);
+//            region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
         } else {
             return fc = new MemoryOptimizedClipboard(size, 1, 1);
         }
@@ -310,7 +324,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     private Clipboard readVersion1(UUID uuid) throws IOException {
         width = height = length = offsetX = offsetY = offsetZ = Integer.MIN_VALUE;
 
-        final BlockArrayClipboard clipboard = new BlockArrayClipboard(new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(0, 0, 0)), fc);
+        final BlockArrayClipboard clipboard = new BlockArrayClipboard(new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(0, 0, 0)), fc);
         FastByteArrayOutputStream blocksOut = new FastByteArrayOutputStream();
         FastByteArrayOutputStream biomesOut = new FastByteArrayOutputStream();
 
@@ -318,7 +332,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         streamer.addReader("Schematic.Width", (BiConsumer<Integer, Short>) (i, v) -> width = v);
         streamer.addReader("Schematic.Height", (BiConsumer<Integer, Short>) (i, v) -> height = v);
         streamer.addReader("Schematic.Length", (BiConsumer<Integer, Short>) (i, v) -> length = v);
-        streamer.addReader("Schematic.Offset", (BiConsumer<Integer, int[]>) (i, v) -> min = new BlockVector3(v[0], v[1], v[2]));
+        streamer.addReader("Schematic.Offset", (BiConsumer<Integer, int[]>) (i, v) -> min = BlockVector3.at(v[0], v[1], v[2]));
         streamer.addReader("Schematic.Metadata.WEOffsetX", (BiConsumer<Integer, Integer>) (i, v) -> offsetX = v);
         streamer.addReader("Schematic.Metadata.WEOffsetY", (BiConsumer<Integer, Integer>) (i, v) -> offsetY = v);
         streamer.addReader("Schematic.Metadata.WEOffsetZ", (BiConsumer<Integer, Integer>) (i, v) -> offsetZ = v);
@@ -329,6 +343,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 int index = ((IntTag) entry.getValue()).getValue();
                 palette[index] = (char) state.getOrdinal();
             }
+//<<<<<<< HEAD
         });
         streamer.addReader("Schematic.BlockData.#", new NBTStreamer.LazyReader() {
             @Override
@@ -338,6 +353,23 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+//=======
+//            palette.put(id, state);
+//        }
+//
+//        byte[] blocks = requireTag(schematic, "BlockData", ByteArrayTag.class).getValue();
+//
+//        Map<BlockVector3, Map<String, Tag>> tileEntitiesMap = new HashMap<>();
+//        try {
+//            List<Map<String, Tag>> tileEntityTags = requireTag(schematic, "TileEntities", ListTag.class).getValue().stream()
+//                    .map(tag -> (CompoundTag) tag)
+//                    .map(CompoundTag::getValue)
+//                    .collect(Collectors.toList());
+//
+//            for (Map<String, Tag> tileEntity : tileEntityTags) {
+//                int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
+//                tileEntitiesMap.put(BlockVector3.at(pos[0], pos[1], pos[2]), tileEntity);
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
             }
         });
         streamer.addReader("Schematic.Biomes.#", new NBTStreamer.LazyReader() {
@@ -362,6 +394,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 int z = pos[2];
                 fc.setTile(x, y, z, value);
             }
+//<<<<<<< HEAD
         });
         streamer.addReader("Schematic.Entities.#", new BiConsumer<Integer, CompoundTag>() {
             @Override
@@ -390,7 +423,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         BlockVector3 origin = min;
         CuboidRegion region;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
-            origin = origin.subtract(new BlockVector3(offsetX, offsetY, offsetZ));
+            origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
             region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
         } else {
             region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
@@ -402,6 +435,21 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                     for (int index = 0; index < volume; index++) {
                         BlockState state = BlockTypes.states[palette[fis.read()]];
                         fc.setBlock(index, state);
+//=======
+//            // index = (y * length + z) * width + x
+//            int y = index / (width * length);
+//            int z = (index % (width * length)) / width;
+//            int x = (index % (width * length)) % width;
+//            BlockState state = palette.get(value);
+//            BlockVector3 pt = BlockVector3.at(x, y, z);
+//            try {
+//                if (tileEntitiesMap.containsKey(pt)) {
+//                    Map<String, Tag> values = Maps.newHashMap(tileEntitiesMap.get(pt));
+//                    for (NBTCompatibilityHandler handler : COMPATIBILITY_HANDLERS) {
+//                        if (handler.isAffectedBlock(state)) {
+//                            handler.updateNBT(state, values);
+//                        }
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                     }
                 } else {
                     for (int index = 0; index < volume; index++) {
@@ -419,7 +467,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
             }
         }
-        fc.setDimensions(new BlockVector3(width, height, length));
+        fc.setDimensions(BlockVector3.at(width, height, length));
         clipboard.init(region, fc);
         clipboard.setOrigin(origin);
         return clipboard;

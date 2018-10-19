@@ -133,14 +133,14 @@ public class HeightBrush implements Brush {
             }
 
             if (smooth) {
-            	BlockVector2 min = new BlockVector2(Math.max(0, bx - size), Math.max(0, bz - size));
-            	BlockVector2 max = new BlockVector2(Math.min(hmmg.getWidth() - 1, bx + size), Math.min(hmmg.getLength() - 1, bz + size));
+            	BlockVector2 min = BlockVector2.at(Math.max(0, bx - size), Math.max(0, bz - size));
+            	BlockVector2 max = BlockVector2.at(Math.min(hmmg.getWidth() - 1, bx + size), Math.min(hmmg.getLength() - 1, bz + size));
                 hmmg.smooth(min, max, 8, 1);
 
                 if (size > 20) {
                     int smoothSize = size + 8;
-                    min = new BlockVector2(Math.max(0, bx - smoothSize), Math.max(0, bz - smoothSize));
-                    max = new BlockVector2(Math.min(hmmg.getWidth() - 1, bx + smoothSize), Math.min(hmmg.getLength() - 1, bz + smoothSize));
+                    min = BlockVector2.at(Math.max(0, bx - smoothSize), Math.max(0, bz - smoothSize));
+                    max = BlockVector2.at(Math.min(hmmg.getWidth() - 1, bx + smoothSize), Math.min(hmmg.getLength() - 1, bz + smoothSize));
                     hmmg.smooth(min, max, 1, 1);
                 }
             }

@@ -99,12 +99,12 @@ public class NullExtent extends FaweRegionExtent {
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return new BlockVector3(0, 0, 0);
+        return BlockVector3.at(0, 0, 0);
     }
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return new BlockVector3(0, 0, 0);
+        return BlockVector3.at(0, 0, 0);
     }
 
     @Override

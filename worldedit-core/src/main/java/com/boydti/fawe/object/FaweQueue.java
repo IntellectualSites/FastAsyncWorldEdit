@@ -62,12 +62,12 @@ public interface FaweQueue extends HasFaweQueue, Extent {
 
     @Override
     default BlockVector3 getMinimumPoint() {
-        return new BlockVector3(-30000000, 0, -30000000);
+        return BlockVector3.at(-30000000, 0, -30000000);
     }
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return new BlockVector3(30000000, getMaxY(), 30000000);
+        return BlockVector3.at(30000000, getMaxY(), 30000000);
     }
 
     @Override

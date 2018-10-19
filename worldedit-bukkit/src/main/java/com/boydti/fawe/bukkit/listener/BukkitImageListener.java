@@ -253,7 +253,7 @@ public class BukkitImageListener implements Listener {
                     fp.runAction(new Runnable() {
                         @Override
                         public void run() {
-                            BlockVector3 wPos = new BlockVector3(worldX, 0, worldZ);
+                            BlockVector3 wPos = BlockVector3.at(worldX, 0, worldZ);
                             viewer.refresh();
                             int topY = generator.getNearestSurfaceTerrainBlock(wPos.getBlockX(), wPos.getBlockZ(), 255, 0, 255);
                             wPos = wPos.withY(topY);

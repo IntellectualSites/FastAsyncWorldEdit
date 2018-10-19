@@ -51,7 +51,7 @@ public class ScaleTransform extends ResettableExtent {
 
     private BlockVector3 getPos(int x, int y, int z) {
         if (min == null) {
-            min = new BlockVector3(x, y, z);
+            min = BlockVector3.at(x, y, z);
         }
         mutable.mutX((min.getX() + (x - min.getX()) * dx));
         mutable.mutY((min.getY() + (y - min.getY()) * dy));

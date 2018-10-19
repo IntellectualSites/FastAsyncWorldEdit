@@ -235,13 +235,13 @@ public class PlayerWrapper extends AbstractPlayerActor {
         Extent world = getLocation().getExtent();
 
         // No free space above
-        if (!world.getBlock(new BlockVector3(x, y, z)).getBlockType().getMaterial().isAir()) {
+        if (!world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isAir()) {
             return false;
         }
 
         while (y <= world.getMaximumPoint().getY()) {
             // Found a ceiling!
-            if (world.getBlock(new BlockVector3(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
                 floatAt(x, platformY + 1, z, alwaysGlass);
                 return true;
@@ -269,7 +269,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
         final Extent world = getLocation().getExtent();
 
         while (y <= world.getMaximumPoint().getY() + 2) {
-            if (world.getBlock(new BlockVector3(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 break; // Hit something
             } else if (y > maxY + 1) {
                 break;
@@ -289,7 +289,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
         RuntimeException caught = null;
         try {
             EditSession edit = new EditSessionBuilder(parent.getWorld()).player(FawePlayer.wrap(this)).build();
-            edit.setBlock(new BlockVector3(x, y - 1, z), BlockTypes.GLASS);
+            edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
             edit.flushQueue();
             LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);
             if (session != null) {
@@ -301,7 +301,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
-                setPosition(new Vector3(x + 0.5, y, z + 0.5));
+                setPosition(Vector3.at(x + 0.5, y, z + 0.5));
             }
         });
         if (caught != null) {
@@ -361,7 +361,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
                 boolean inFree = false;
 
                 while ((block = hitBlox.getNextBlock()) != null) {
-                    boolean free = !world.getBlock(new BlockVector3(block.getBlockX(), block.getBlockY(), block.getBlockZ())).getBlockType().getMaterial().isMovementBlocker();
+                    boolean free = !world.getBlock(BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ())).getBlockType().getMaterial().isMovementBlocker();
 
                     if (firstBlock) {
                         firstBlock = false;

@@ -312,11 +312,11 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
 
     @Override
     public int getOpacity(int x, int y, int z) {
-        return getBlock(new BlockVector3(x, y, z)).getBlockType().getMaterial().getLightOpacity();
+        return getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().getLightOpacity();
     }
 
     @Override
     public int getBrightness(int x, int y, int z) {
-        return getBlock(new BlockVector3(x, y, z)).getBlockType().getMaterial().getLightValue();
+        return getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().getLightValue();
     }
 }

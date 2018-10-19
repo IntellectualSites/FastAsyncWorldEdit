@@ -204,7 +204,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
 //                } else {
 //                    submask = new ExistingBlockMask(extent);
 //                }
-//                OffsetMask offsetMask = new OffsetMask(submask, new BlockVector3(0, firstChar == '>' ? -1 : 1, 0));
+//                OffsetMask offsetMask = new OffsetMask(submask, BlockVector3.at(0, firstChar == '>' ? -1 : 1, 0));
 //                return new MaskIntersection(offsetMask, Masks.negate(submask));
 //
 //            case '$':
@@ -217,7 +217,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
 //                    BaseBiome biome = Biomes.findBiomeByName(knownBiomes, biomeName, biomeRegistry);
 //                    if (biome == null) {
 //                        throw new InputParseException("Unknown biome '" + biomeName + '\'');
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                     }
                 }
 //<<<<<<< HEAD

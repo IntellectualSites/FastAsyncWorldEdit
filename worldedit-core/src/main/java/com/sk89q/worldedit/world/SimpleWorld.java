@@ -108,12 +108,12 @@ public interface SimpleWorld extends World {
 
     @Override
     default BlockVector3 getMinimumPoint() {
-        return new BlockVector3(-30000000, 0, -30000000);
+        return BlockVector3.at(-30000000, 0, -30000000);
     }
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return new BlockVector3(30000000, 255, 30000000);
+        return BlockVector3.at(30000000, 255, 30000000);
     }
 
     @Override

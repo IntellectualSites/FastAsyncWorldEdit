@@ -453,7 +453,7 @@ public final class MutableBlockVector2D implements Serializable {
      * @return a new vector
      */
     public Vector2 toVector2() {
-        return new Vector2(x, z);
+        return Vector2.at(x, z);
     }
 
     /**
@@ -472,7 +472,7 @@ public final class MutableBlockVector2D implements Serializable {
      * @return a new vector
      */
     public Vector3 toVector3(double y) {
-        return new Vector3(x, y, z);
+        return Vector3.at(x, y, z);
     }
 
     /**
@@ -491,7 +491,7 @@ public final class MutableBlockVector2D implements Serializable {
      * @return a new vector
      */
     public BlockVector3 toBlockVector3(int y) {
-        return new BlockVector3(x, y, z);
+        return BlockVector3.at(x, y, z);
     }
     
     /**
@@ -500,7 +500,7 @@ public final class MutableBlockVector2D implements Serializable {
      * @return a new vector
      */
     public BlockVector2 toBlockVector2() {
-    	return new BlockVector2(x, z);
+    	return BlockVector2.at(x, z);
     }
 
     @Override

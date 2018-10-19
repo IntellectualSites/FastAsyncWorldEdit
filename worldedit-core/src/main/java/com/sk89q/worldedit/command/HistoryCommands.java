@@ -114,7 +114,7 @@ public class HistoryCommands extends MethodCommands {
                                         RollbackOptimizedHistory rollback = new RollbackOptimizedHistory(world, uuid, Integer.parseInt(name.substring(0, name.length() - 3)));
                                         DiskStorageHistory.DiskStorageSummary summary = rollback.summarize(RegionWrapper.GLOBAL(), false);
                                         if (summary != null) {
-                                            rollback.setDimensions(new BlockVector3(summary.minX, 0, summary.minZ), new BlockVector3(summary.maxX, 255, summary.maxZ));
+                                            rollback.setDimensions(BlockVector3.at(summary.minX, 0, summary.minZ), BlockVector3.at(summary.maxX, 255, summary.maxZ));
                                             rollback.setTime(historyFile.lastModified());
                                             RollbackDatabase db = DBHandler.IMP.getDatabase(world);
                                             db.logEdit(rollback);

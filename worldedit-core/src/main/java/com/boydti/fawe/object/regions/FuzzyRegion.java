@@ -53,7 +53,7 @@ public class FuzzyRegion extends AbstractRegion {
             }
         }, 256, extent instanceof HasFaweQueue ? (HasFaweQueue) extent : null);
         search.setVisited(set);
-        search.visit(new BlockVector3(x, y, z));
+        search.visit(BlockVector3.at(x, y, z));
         Operations.completeBlindly(search);
     }
 
@@ -94,12 +94,12 @@ public class FuzzyRegion extends AbstractRegion {
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return new BlockVector3(minX, minY, minZ);
+        return BlockVector3.at(minX, minY, minZ);
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return new BlockVector3(maxX, maxY, maxZ);
+        return BlockVector3.at(maxX, maxY, maxZ);
     }
 
     @Override

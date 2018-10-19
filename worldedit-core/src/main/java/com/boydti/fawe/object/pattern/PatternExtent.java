@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 public class PatternExtent extends AbstractPattern implements Extent {
     private final Pattern pattern;
     private transient BlockStateHolder block;
-    private transient BlockVector3 target = new BlockVector3(0, 0, 0);
+    private transient BlockVector3 target = BlockVector3.at(0, 0, 0);
 
     public PatternExtent(Pattern pattern) {
         this.pattern = pattern;
@@ -32,17 +32,17 @@ public class PatternExtent extends AbstractPattern implements Extent {
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        target = new BlockVector3(0, 0, 0);
+        target = BlockVector3.at(0, 0, 0);
     }
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return new BlockVector3(Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
+        return BlockVector3.at(Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return new BlockVector3(Integer.MAX_VALUE, 255, Integer.MAX_VALUE);
+        return BlockVector3.at(Integer.MAX_VALUE, 255, Integer.MAX_VALUE);
     }
 
     @Override

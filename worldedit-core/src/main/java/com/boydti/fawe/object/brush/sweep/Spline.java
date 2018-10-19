@@ -21,7 +21,7 @@ import java.util.List;
  */
 public abstract class Spline {
 
-    private BlockVector2 direction = new BlockVector2(1, 0);
+    private BlockVector2 direction = BlockVector2.at(1, 0);
     private final int nodeCount;
 
     protected EditSession editSession;
@@ -134,7 +134,7 @@ public abstract class Spline {
         // Calculate rotation from spline
 
         Vector3 deriv = interpolation.get1stDerivative(position);
-        Vector2 deriv2D = new Vector2(deriv.getX(), deriv.getZ()).normalize();
+        Vector2 deriv2D = Vector2.at(deriv.getX(), deriv.getZ()).normalize();
         double angle = Math.toDegrees(
                 Math.atan2(direction.getZ(), direction.getX()) - Math.atan2(deriv2D.getZ(), deriv2D.getX())
         );

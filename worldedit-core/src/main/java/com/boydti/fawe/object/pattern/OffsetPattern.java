@@ -31,7 +31,7 @@ public class OffsetPattern extends AbstractPattern {
 //        mutable.mutY((position.getY() + dy));
 //        mutable.mutZ((position.getZ() + dz));
 //        return pattern.apply(mutable);
-    	return pattern.apply(new BlockVector3(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
+    	return pattern.apply(BlockVector3.at(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class OffsetPattern extends AbstractPattern {
 //        mutable.mutY((get.getY() + dy));
 //        mutable.mutZ((get.getZ() + dz));
 //        return pattern.apply(extent, set, mutable);
-    	return pattern.apply(extent, set, new BlockVector3(get.getX() + dx, get.getY() + dy, get.getZ() + dz));
+    	return pattern.apply(extent, set, BlockVector3.at(get.getX() + dx, get.getY() + dy, get.getZ() + dz));
     }
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {

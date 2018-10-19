@@ -338,7 +338,7 @@ public class MutableVector implements Serializable {
      * @return the cross product of this and the other vector
      */
     public Vector3 cross(MutableVector other) {
-        return new Vector3(
+        return Vector3.at(
             y * other.z - z * other.y,
             z * other.x - x * other.z,
             x * other.y - y * other.x
@@ -518,7 +518,7 @@ public class MutableVector implements Serializable {
      * @return a new {@code BlockVector}
      */
     public static BlockVector3 toBlockPoint(double x, double y, double z) {
-        return new BlockVector3(x, y, z);
+        return BlockVector3.at(x, y, z);
     }
 
     /**
@@ -536,11 +536,11 @@ public class MutableVector implements Serializable {
      * @return a new {@link Vector2}
      */
     public Vector2 toVector2() {
-        return new Vector2(x, z);
+        return Vector2.at(x, z);
     }
     
     public Vector3 toVector3() {
-    	return new Vector3(x, y, z);
+    	return Vector3.at(x, y, z);
     }
 
     @Override

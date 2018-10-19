@@ -117,7 +117,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBiome(int x, int y, int z, BaseBiome newBiome) {
-        BaseBiome oldBiome = this.getBiome(new BlockVector2(x, z));
+        BaseBiome oldBiome = this.getBiome(BlockVector2.at(x, z));
         if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(x, z, oldBiome, newBiome);
             return getExtent().setBiome(x, y, z, newBiome);

@@ -49,8 +49,8 @@ public class WorldGuardFilter extends CuboidRegionFilter {
     @Override
     public boolean containsChunk(int chunkX, int chunkZ) {
         if (!large) return super.containsChunk(chunkX, chunkZ);
-        BlockVector3 pos1 = new BlockVector3(chunkX << 4, 0, chunkZ << 4);
-        BlockVector3 pos2 = new BlockVector3(pos1.getBlockX() + 15, 255, pos1.getBlockZ() + 15);
+        BlockVector3 pos1 = BlockVector3.at(chunkX << 4, 0, chunkZ << 4);
+        BlockVector3 pos2 = BlockVector3.at(pos1.getBlockX() + 15, 255, pos1.getBlockZ() + 15);
         ProtectedCuboidRegion chunkRegion = new ProtectedCuboidRegion("unimportant", pos1, pos2);
         ApplicableRegionSet set = manager.getApplicableRegions(chunkRegion);
         return set.size() > 0 && !set.getRegions().iterator().next().getId().equals("__global__");
@@ -59,8 +59,8 @@ public class WorldGuardFilter extends CuboidRegionFilter {
     @Override
     public boolean containsRegion(int mcaX, int mcaZ) {
         if (!large) return super.containsRegion(mcaX, mcaZ);
-        BlockVector3 pos1 = new BlockVector3(mcaX << 9, 0, mcaZ << 9);
-        BlockVector3 pos2 = new BlockVector3(pos1.getBlockX() + 511, 255, pos1.getBlockZ() + 511);
+        BlockVector3 pos1 = BlockVector3.at(mcaX << 9, 0, mcaZ << 9);
+        BlockVector3 pos2 = BlockVector3.at(pos1.getBlockX() + 511, 255, pos1.getBlockZ() + 511);
         ProtectedCuboidRegion regionRegion = new ProtectedCuboidRegion("unimportant", pos1, pos2);
         ApplicableRegionSet set = manager.getApplicableRegions(regionRegion);
         return set.size() > 0 && !set.getRegions().iterator().next().getId().equals("__global__");

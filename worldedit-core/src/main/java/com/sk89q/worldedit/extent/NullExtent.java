@@ -52,7 +52,7 @@ import java.util.List;
  */
 public class NullExtent implements Extent {
 
-    private final BlockVector3 nullPoint = new BlockVector3(0, 0, 0);
+    private final BlockVector3 nullPoint = BlockVector3.at(0, 0, 0);
 
     public static final NullExtent INSTANCE = new NullExtent();
 

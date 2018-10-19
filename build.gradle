@@ -69,7 +69,7 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven { url "http://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/" }
+        //maven { url "http://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/" }
         maven { url "http://repo.bukkit.org/content/groups/public" }
         maven { url "http://maven.sk89q.com/repo/" }
         maven { url "http://repo.maven.apache.org/maven2" }

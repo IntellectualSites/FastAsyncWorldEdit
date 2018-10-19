@@ -24,7 +24,7 @@ public class PlotRegionFilter extends CuboidRegionFilter {
         for (Plot plot : plots) {
             Location pos1 = plot.getBottom();
             Location pos2 = plot.getTop();
-            add(new BlockVector2(pos1.getX(), pos1.getZ()), new BlockVector2(pos2.getX(), pos2.getZ()));
+            add(BlockVector2.at(pos1.getX(), pos1.getZ()), BlockVector2.at(pos2.getX(), pos2.getZ()));
         }
     }
 }

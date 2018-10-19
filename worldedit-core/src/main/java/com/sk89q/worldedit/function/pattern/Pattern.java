@@ -46,7 +46,7 @@ public interface Pattern extends com.sk89q.worldedit.patterns.Pattern{
 
     @Override
     default BaseBlock next(int x, int y, int z) {
-        return new BaseBlock(apply(new BlockVector3(x, y, z)));
+        return new BaseBlock(apply(BlockVector3.at(x, y, z)));
     }
 
     /**

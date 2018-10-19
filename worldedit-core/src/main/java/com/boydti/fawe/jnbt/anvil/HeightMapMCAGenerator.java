@@ -234,7 +234,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public Vector3 getOrigin() {
-        return new Vector3(chunkOffset.getBlockX() << 4, 0, chunkOffset.getBlockZ() << 4);
+        return Vector3.at(chunkOffset.getBlockX() << 4, 0, chunkOffset.getBlockZ() << 4);
     }
 
     public boolean hasPacketViewer() {
@@ -245,7 +245,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         this.player = player;
         if (player != null) {
             FaweLocation pos = player.getLocation();
-            this.chunkOffset = new BlockVector2(1 + (pos.x >> 4), 1 + (pos.z >> 4));
+            this.chunkOffset = BlockVector2.at(1 + (pos.x >> 4), 1 + (pos.z >> 4));
         }
     }
 
@@ -554,13 +554,13 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void addCaves() throws WorldEditException {
-        CuboidRegion region = new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(getWidth() -1, 255, getLength() -1));
+        CuboidRegion region = new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(getWidth() -1, 255, getLength() -1));
         addCaves(region);
     }
 
     @Deprecated
     public void addSchems(Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
-        CuboidRegion region = new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(getWidth() -1, 255, getLength() -1));
+        CuboidRegion region = new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(getWidth() -1, 255, getLength() -1));
         addSchems(region, mask, clipboards, rarity, rotate);
     }
 
@@ -665,17 +665,17 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void addOre(Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
-        CuboidRegion region = new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(getWidth() -1, 255, getLength() -1));
+        CuboidRegion region = new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(getWidth() -1, 255, getLength() -1));
         addOre(region, mask, material, size, frequency, rarity, minY, maxY);
     }
 
     public void addDefaultOres(Mask mask) throws WorldEditException {
-        addOres(new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(getWidth() -1, 255, getLength() -1)), mask);
+        addOres(new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(getWidth() -1, 255, getLength() -1)), mask);
     }
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return new BlockVector3(0, 0, 0);
+        return BlockVector3.at(0, 0, 0);
     }
 
     @Override
@@ -685,7 +685,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return new BlockVector3(getWidth() - 1, 255, getLength() - 1);
+        return BlockVector3.at(getWidth() - 1, 255, getLength() - 1);
     }
 
     @Override

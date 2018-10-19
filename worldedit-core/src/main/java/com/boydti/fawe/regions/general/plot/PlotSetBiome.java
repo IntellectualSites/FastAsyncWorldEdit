@@ -84,7 +84,7 @@ public class PlotSetBiome extends Command {
                                 .build();
                         long seed = PseudoRandom.random.nextLong();
                         for (RegionWrapper region : regions) {
-                            CuboidRegion cuboid = new CuboidRegion(new BlockVector3(region.minX, 0, region.minZ), new BlockVector3(region.maxX, 256, region.maxZ));
+                            CuboidRegion cuboid = new CuboidRegion(BlockVector3.at(region.minX, 0, region.minZ), BlockVector3.at(region.maxX, 256, region.maxZ));
                             session.regenerate(cuboid, biome, seed);
                         }
                         session.flushQueue();

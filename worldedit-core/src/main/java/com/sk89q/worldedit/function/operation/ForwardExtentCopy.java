@@ -48,7 +48,6 @@ import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
@@ -322,7 +321,7 @@ public class ForwardExtentCopy implements Operation {
                     int z = translation.getBlockZ();
 
                     maskFunc = position -> {
-                        BlockVector3 bv = new BlockVector3(position.getBlockX() + x, position.getBlockY() + y, position.getBlockZ() + z);
+                        BlockVector3 bv = BlockVector3.at(position.getBlockX() + x, position.getBlockY() + y, position.getBlockZ() + z);
                         if (region.contains(bv)) {
                             return sourceFunction.apply(bv);
                         }
@@ -330,7 +329,7 @@ public class ForwardExtentCopy implements Operation {
                     };
 
                     copySrcFunc = position -> {
-                        BlockVector3 bv = new BlockVector3(position.getBlockX() - x, position.getBlockY() - y, position.getBlockZ() - z);
+                        BlockVector3 bv = BlockVector3.at(position.getBlockX() - x, position.getBlockY() - y, position.getBlockZ() - z);
                         if (!region.contains(bv)) {
                             return sourceFunction.apply(position);
                         }

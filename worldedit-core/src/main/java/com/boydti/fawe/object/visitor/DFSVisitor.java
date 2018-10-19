@@ -38,12 +38,12 @@ public abstract class DFSVisitor implements Operation {
         this.hashQueue = new LinkedHashSet<>();
         this.visited = new LinkedHashMap<>();
         this.function = function;
-        this.directions.add(new BlockVector3(0, -1, 0));
-        this.directions.add(new BlockVector3(0, 1, 0));
-        this.directions.add(new BlockVector3(-1, 0, 0));
-        this.directions.add(new BlockVector3(1, 0, 0));
-        this.directions.add(new BlockVector3(0, 0, -1));
-        this.directions.add(new BlockVector3(0, 0, 1));
+        this.directions.add(BlockVector3.at(0, -1, 0));
+        this.directions.add(BlockVector3.at(0, 1, 0));
+        this.directions.add(BlockVector3.at(-1, 0, 0));
+        this.directions.add(BlockVector3.at(1, 0, 0));
+        this.directions.add(BlockVector3.at(0, 0, -1));
+        this.directions.add(BlockVector3.at(0, 0, 1));
         this.maxDepth = maxDepth;
         this.maxBranch = maxBranching;
     }
@@ -92,7 +92,7 @@ public abstract class DFSVisitor implements Operation {
 //            mutable.mutX(from.getX());
 //            mutable.mutY(from.getY());
 //            mutable.mutZ(from.getZ());
-            BlockVector3 bv = new BlockVector3(from.getX(), from.getY(), from.getZ());
+            BlockVector3 bv = BlockVector3.at(from.getX(), from.getY(), from.getZ());
             function.apply(bv);
             countAdd = 0;
             countAttempt = 0;
@@ -100,7 +100,7 @@ public abstract class DFSVisitor implements Operation {
 //                mutable2.mutX(from.getX() + direction.x);
 //                mutable2.mutY(from.getY() + direction.y);
 //                mutable2.mutZ(from.getZ() + direction.z);
-            	BlockVector3 bv2 = new BlockVector3(from.getX() + direction.x, from.getY() + direction.y, from.getZ() + direction.z);
+            	BlockVector3 bv2 = BlockVector3.at(from.getX() + direction.x, from.getY() + direction.y, from.getZ() + direction.z);
                 if (isVisitable(bv, bv2)) {
                     adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
                     if ((current.from == null || !adjacent.equals(current.from))) {

@@ -12,6 +12,6 @@ public class BukkitMask extends FaweMask {
     }
 
     public BukkitMask(Location pos1, Location pos2, String name) {
-        super(new BlockVector3(pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ()), new BlockVector3(pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ()), name);
+        super(BlockVector3.at(pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ()), BlockVector3.at(pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ()), name);
     }
 }

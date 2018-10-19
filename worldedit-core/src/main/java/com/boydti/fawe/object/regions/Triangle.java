@@ -45,9 +45,9 @@ public class Triangle {
 
     public Edge getEdge(int index) {
         if (index == this.verts.length - 1) {
-            return new Edge(new Vector3(this.verts[index][0], this.verts[index][1],this.verts[index][2]), new Vector3(this.verts[0][0], this.verts[0][1], this.verts[0][2]));
+            return new Edge(Vector3.at(this.verts[index][0], this.verts[index][1],this.verts[index][2]), Vector3.at(this.verts[0][0], this.verts[0][1], this.verts[0][2]));
         } else {
-            return new Edge(new Vector3(this.verts[index][0], this.verts[index][1],this.verts[index][2]), new Vector3(this.verts[index + 1][0], this.verts[index + 1][1], this.verts[index + 1][2]));
+            return new Edge(Vector3.at(this.verts[index][0], this.verts[index][1],this.verts[index][2]), Vector3.at(this.verts[index + 1][0], this.verts[index + 1][1], this.verts[index + 1][2]));
         }
     }
 
@@ -57,7 +57,7 @@ public class Triangle {
     }
 
     public Vector3 getVertex(int index) {
-        return new Vector3(verts[index][0], verts[index][1], verts[index][2]);
+        return Vector3.at(verts[index][0], verts[index][1], verts[index][2]);
     }
 
     public boolean contains(BlockVector3 pos) {

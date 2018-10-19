@@ -80,12 +80,12 @@ public class SchemVis extends ImmutableVirtualWorld {
         // Set the origin to somewhere around where the player currently is
         FaweLocation pos = player.getLocation();
         this.origin = player.getPlayer().getLocation();
-        this.chunkOffset = new BlockVector2(pos.x >> 4,pos.z >> 4);
+        this.chunkOffset = BlockVector2.at(pos.x >> 4,pos.z >> 4);
     }
 
     private Set<File> getFiles(BlockVector2 chunkPosA, BlockVector2 chunkPosB) {
-        BlockVector2 pos1 = new BlockVector2(Math.min(chunkPosA.getBlockX(), chunkPosB.getBlockX()), Math.min(chunkPosA.getBlockZ(), chunkPosB.getBlockZ()));
-        BlockVector2 pos2 = new BlockVector2(Math.max(chunkPosA.getBlockX(), chunkPosB.getBlockX()), Math.max(chunkPosA.getBlockZ(), chunkPosB.getBlockZ()));
+        BlockVector2 pos1 = BlockVector2.at(Math.min(chunkPosA.getBlockX(), chunkPosB.getBlockX()), Math.min(chunkPosA.getBlockZ(), chunkPosB.getBlockZ()));
+        BlockVector2 pos2 = BlockVector2.at(Math.max(chunkPosA.getBlockX(), chunkPosB.getBlockX()), Math.max(chunkPosA.getBlockZ(), chunkPosB.getBlockZ()));
         Set<File> contained = new HashSet<>();
         for (Long2ObjectMap.Entry<Map.Entry<File, Long>> entry : files.long2ObjectEntrySet()) {
             long key = entry.getLongKey();
@@ -121,7 +121,7 @@ public class SchemVis extends ImmutableVirtualWorld {
                 synchronized (this) {
                     try {
                         BlockVector2 tmpLastPosition = lastPosition;
-                        lastPosition = new BlockVector2(chunkX, chunkZ);
+                        lastPosition = BlockVector2.at(chunkX, chunkZ);
 
                         boolean sneaking = this.player.isSneaking();
                         if (event.getInputType() == InputType.PRIMARY && !sneaking) {
@@ -256,7 +256,7 @@ public class SchemVis extends ImmutableVirtualWorld {
      */
     @Override
     public Vector3 getOrigin() {
-        return new Vector3(chunkOffset.getBlockX() << 4, 0, chunkOffset.getBlockZ() << 4);
+        return Vector3.at(chunkOffset.getBlockX() << 4, 0, chunkOffset.getBlockZ() << 4);
     }
 
     /**
@@ -371,13 +371,13 @@ public class SchemVis extends ImmutableVirtualWorld {
         if (dimensionPair != null) {
             int width = (char) MathMan.unpairX(dimensionPair);
             int length = (char) MathMan.unpairY(dimensionPair);
-            BlockVector2 dimensions = new BlockVector2(width, length);
+            BlockVector2 dimensions = BlockVector2.at(width, length);
             BlockVector2 offset = registerAndGetChunkOffset(dimensions, cached);
             return;
         }
         if (cached.exists() && file.lastModified() <= cached.lastModified()) {
             try (InputStream fis = new BufferedInputStream(new FileInputStream(cached), 4)) {
-                BlockVector2 dimensions = new BlockVector2(IOUtil.readVarInt(fis), IOUtil.readVarInt(fis));
+                BlockVector2 dimensions = BlockVector2.at(IOUtil.readVarInt(fis), IOUtil.readVarInt(fis));
                 DIMENSION_CACHE.put(file, MathMan.pair((short) dimensions.getBlockX(), (short) dimensions.getBlockZ()));
                 BlockVector2 offset = registerAndGetChunkOffset(dimensions, cached);
             }
@@ -472,7 +472,7 @@ public class SchemVis extends ImmutableVirtualWorld {
                     int OCZ = MathMan.unpairIntY(origin);
                     try {
                         try (FileInputStream fis = new FileInputStream(cached)) {
-                            BlockVector2 dimensions = new BlockVector2(IOUtil.readVarInt(fis), IOUtil.readVarInt(fis));
+                            BlockVector2 dimensions = BlockVector2.at(IOUtil.readVarInt(fis), IOUtil.readVarInt(fis));
                             try (FaweInputStream in = MainUtil.getCompressedIS(fis)) {
                                 NonCloseableInputStream nonCloseable = new NonCloseableInputStream(in);
                                 try (NBTInputStream nis = new NBTInputStream(nonCloseable)) {

@@ -136,7 +136,7 @@ public class EllipsoidRegion extends AbstractRegion {
     public void contract(BlockVector3... changes) throws RegionOperationException {
         center = center.subtract(calculateDiff(changes));
         Vector3 newRadius = radius.subtract(calculateChanges(changes).toVector3());
-        setRadius(new Vector3(1.5, 1.5, 1.5).getMaximum(newRadius));
+        setRadius(Vector3.at(1.5, 1.5, 1.5).getMaximum(newRadius));
     }
 
     @Override
@@ -199,11 +199,11 @@ public class EllipsoidRegion extends AbstractRegion {
 
         for (int x = min.getBlockX(); x <= max.getBlockX(); ++x) {
             for (int z = min.getBlockZ(); z <= max.getBlockZ(); ++z) {
-                if (!contains(new BlockVector3(x, centerY, z))) {
+                if (!contains(BlockVector3.at(x, centerY, z))) {
                     continue;
                 }
 
-                chunks.add(new BlockVector2(
+                chunks.add(BlockVector2.at(
                     x >> ChunkStore.CHUNK_SHIFTS,
                     z >> ChunkStore.CHUNK_SHIFTS
                 ));

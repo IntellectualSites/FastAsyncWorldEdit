@@ -23,7 +23,7 @@ public class RegionWrapper extends CuboidRegion {
     }
 
     public RegionWrapper(final int minX, final int maxX, final int minY, final int maxY, final int minZ, final int maxZ) {
-        this(new BlockVector3(minX, 0, minZ), new BlockVector3(maxX, 255, maxZ));
+        this(BlockVector3.at(minX, 0, minZ), BlockVector3.at(maxX, 255, maxZ));
     }
 
     public RegionWrapper(final BlockVector3 pos1, final BlockVector3 pos2) {

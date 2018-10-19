@@ -214,7 +214,7 @@ public class YAMLNode {
             return null;
         }
 
-        return new Vector3(x, y, z);
+        return Vector3.at(x, y, z);
     }
 
     /**
@@ -238,7 +238,7 @@ public class YAMLNode {
             return null;
         }
 
-        return new Vector2(x, z);
+        return Vector2.at(x, z);
     }
 
     /**
@@ -570,7 +570,7 @@ public class YAMLNode {
                 continue;
             }
 
-            list.add(new Vector3(x, y, z));
+            list.add(Vector3.at(x, y, z));
         }
 
         return list;
@@ -600,7 +600,7 @@ public class YAMLNode {
                 continue;
             }
 
-            list.add(new Vector2(x, z));
+            list.add(Vector2.at(x, z));
         }
 
         return list;
@@ -630,7 +630,7 @@ public class YAMLNode {
                 continue;
             }
 
-            list.add(new BlockVector2(x, z));
+            list.add(BlockVector2.at(x, z));
         }
 
         return list;

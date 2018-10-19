@@ -57,7 +57,7 @@ public class StructureCUI extends CUI {
             int x = Integer.parseInt(param[1]);
             int y = Integer.parseInt(param[2]);
             int z = Integer.parseInt(param[3]);
-            BlockVector3 pos = new BlockVector3(x, y, z);
+            BlockVector3 pos = BlockVector3.at(x, y, z);
             if (id == 0) {
                 pos1 = pos;
             } else {
@@ -188,7 +188,7 @@ public class StructureCUI extends CUI {
         NbtCompound compound = constructStructureNbt(x, y, z, posX, posY, posZ, sizeX, sizeY, sizeZ);
 
         Block block = player.getWorld().getBlockAt(x, y, z);
-        remove = new BlockVector3(x, y, z);
+        remove = BlockVector3.at(x, y, z);
         state = BukkitAdapter.adapt(block.getBlockData());
         removeTag = compound;
 

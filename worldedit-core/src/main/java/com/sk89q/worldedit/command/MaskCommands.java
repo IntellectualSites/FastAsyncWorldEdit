@@ -130,7 +130,7 @@ public class MaskCommands extends MethodCommands {
             max = 4
     )
     public Mask offset(double x, double y, double z, Mask mask) {
-        return new OffsetMask(mask, new BlockVector3(x, y, z));
+        return new OffsetMask(mask, BlockVector3.at(x, y, z));
     }
 
     @Command(
@@ -390,7 +390,7 @@ public class MaskCommands extends MethodCommands {
             max = 1
     )
     public Mask below(Mask mask) throws ExpressionException {
-        OffsetMask offsetMask = new OffsetMask(mask, new BlockVector3(0, 1, 0));
+        OffsetMask offsetMask = new OffsetMask(mask, BlockVector3.at(0, 1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(mask));
     }
 
@@ -402,7 +402,7 @@ public class MaskCommands extends MethodCommands {
             max = 1
     )
     public Mask above(Mask mask) throws ExpressionException {
-        OffsetMask offsetMask = new OffsetMask(mask, new BlockVector3(0, -1, 0));
+        OffsetMask offsetMask = new OffsetMask(mask, BlockVector3.at(0, -1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(mask));
     }
 

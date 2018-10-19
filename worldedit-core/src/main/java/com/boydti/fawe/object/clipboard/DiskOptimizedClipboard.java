@@ -167,17 +167,17 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
 
     @Override
     public BlockVector3 getDimensions() {
-        return new BlockVector3(width, height, length);
+        return BlockVector3.at(width, height, length);
     }
 
     public BlockArrayClipboard toClipboard() {
         try {
-            CuboidRegion region = new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(width - 1, height - 1, length - 1));
+            CuboidRegion region = new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(width - 1, height - 1, length - 1));
             int ox = mbb.getShort(8);
             int oy = mbb.getShort(10);
             int oz = mbb.getShort(12);
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, this);
-            clipboard.setOrigin(new BlockVector3(ox, oy, oz));
+            clipboard.setOrigin(BlockVector3.at(ox, oy, oz));
             return clipboard;
         } catch (Throwable e) {
             MainUtil.handleError(e);

@@ -53,7 +53,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                 Location[] corners = MainUtil.getCorners(world, regions);
                 Location pos1 = corners[0];
                 Location pos2 = corners[1];
-                final CuboidRegion region = new CuboidRegion(new BlockVector3(pos1.getX(), pos1.getY(), pos1.getZ()), new BlockVector3(pos2.getX(), pos2.getY(), pos2.getZ()));
+                final CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
                 final EditSession editSession = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
 
                 final int mx = pos1.getX();

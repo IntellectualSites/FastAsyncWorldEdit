@@ -49,7 +49,7 @@ public class SchematicStreamer extends NBTStreamer {
     public SchematicStreamer(NBTInputStream stream, UUID uuid) {
         super(stream);
         this.uuid = uuid;
-        clipboard = new BlockArrayClipboard(new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(0, 0, 0)), fc);
+        clipboard = new BlockArrayClipboard(new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(0, 0, 0)), fc);
     }
 
     public void addBlockReaders() throws IOException {
@@ -419,7 +419,7 @@ public class SchematicStreamer extends NBTStreamer {
     private FaweClipboard setupClipboard(int size) {
         if (fc != null) {
             if (fc.getDimensions().getX() == 0) {
-                fc.setDimensions(new BlockVector3(size, 1, 1));
+                fc.setDimensions(BlockVector3.at(size, 1, 1));
             }
             return fc;
         }
@@ -433,15 +433,15 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     public BlockVector3 getOrigin() {
-        return new BlockVector3(originX, originY, originZ);
+        return BlockVector3.at(originX, originY, originZ);
     }
 
     public BlockVector3 getOffset() {
-        return new BlockVector3(offsetX, offsetY, offsetZ);
+        return BlockVector3.at(offsetX, offsetY, offsetZ);
     }
 
     public BlockVector3 getDimensions() {
-        return new BlockVector3(width, height, length);
+        return BlockVector3.at(width, height, length);
     }
 
     public void setClipboard(FaweClipboard clipboard) {
@@ -453,10 +453,10 @@ public class SchematicStreamer extends NBTStreamer {
             addDimensionReaders();
             addBlockReaders();
             readFully();
-            BlockVector3 min = new BlockVector3(originX, originY, originZ);
-            BlockVector3 offset = new BlockVector3(offsetX, offsetY, offsetZ);
+            BlockVector3 min = BlockVector3.at(originX, originY, originZ);
+            BlockVector3 offset = BlockVector3.at(offsetX, offsetY, offsetZ);
             BlockVector3 origin = min.subtract(offset);
-            BlockVector3 dimensions = new BlockVector3(width, height, length);
+            BlockVector3 dimensions = BlockVector3.at(width, height, length);
             fc.setDimensions(dimensions);
             fixStates();
             CuboidRegion region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
