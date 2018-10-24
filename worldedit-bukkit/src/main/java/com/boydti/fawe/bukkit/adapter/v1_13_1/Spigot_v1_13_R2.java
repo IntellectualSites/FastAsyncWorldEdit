@@ -53,6 +53,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Consumer;
@@ -68,6 +69,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     private final Field nbtListTagListField;
     private final Method nbtCreateTagMethod;
+    private Method chunkSetTypeMethod;
 
     static {
         // A simple test
@@ -86,6 +88,13 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         // The method to create an NBTBase tag given its type ID
         nbtCreateTagMethod = NBTBase.class.getDeclaredMethod("createTag", byte.class);
         nbtCreateTagMethod.setAccessible(true);
+        
+        // 1.13.2 Adaptation to find the a/setType method
+        try {
+        	chunkSetTypeMethod = Chunk.class.getMethod("setType", BlockPosition.class, IBlockData.class, boolean.class);
+        }catch(NoSuchMethodException e) {
+        	chunkSetTypeMethod = Chunk.class.getMethod("a", BlockPosition.class, IBlockData.class, boolean.class);
+        }
     }
 
     private int[] idbToStateOrdinal;
@@ -276,7 +285,12 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
                 sections[y4] = section = new ChunkSection(y4 << 4, nmsWorld.worldProvider.g());
             }
             if (existing.e() != blockData.e() || existing.getMaterial().f() != blockData.getMaterial().f()) {
-                nmsChunk.a(pos = new BlockPosition(x, y, z), blockData, false);
+            	try {
+					chunkSetTypeMethod.invoke(pos = new BlockPosition(x, y, z), blockData, false);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					logger.warning("Error when setting block!");
+					e.printStackTrace();
+				}
             } else {
                 section.setType(x & 15, y & 15, z & 15, blockData);
             }
