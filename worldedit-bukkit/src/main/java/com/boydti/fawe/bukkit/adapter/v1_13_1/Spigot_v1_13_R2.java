@@ -286,7 +286,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             }
             if (existing.e() != blockData.e() || existing.getMaterial().f() != blockData.getMaterial().f()) {
             	try {
-					chunkSetTypeMethod.invoke(pos = new BlockPosition(x, y, z), blockData, false);
+					chunkSetTypeMethod.invoke(nmsChunk, pos = new BlockPosition(x, y, z), blockData, false);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					logger.warning("Error when setting block!");
 					e.printStackTrace();
