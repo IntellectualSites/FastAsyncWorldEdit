@@ -278,7 +278,12 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
     public void sendChunk(int x, int z, int bitMask) {}
 
     @Override
-    public void refreshChunk(FaweChunk fs) {}
+    public void refreshChunk(FaweChunk fs) {
+    	World world = getWorld();
+    	if(world != null) {
+    		world.refreshChunk(fs.getX(), fs.getZ());
+    	}
+    }
 
     @Override
     public boolean regenerateChunk(World world, int x, int z, BaseBiome biome, Long seed) {
