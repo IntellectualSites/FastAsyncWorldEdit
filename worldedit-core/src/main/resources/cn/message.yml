@@ -1,0 +1,306 @@
+#BY：Green_Chennai
+#MCBBS ID：ww2498010071
+#来源第#1217号编译文件
+#2018年10月14日 08:44:53进行过第7次更新
+info:
+  prefix: '&8(&4&lFAWE&8)&r&7'
+  file_deleted: '%s0 已被删除.'
+  schematic_pasting: '&7原理图粘贴. 这不能被撤消.'
+  lighting_propogate_selection: '&7照明已经传播 %s0 个区块.(注意：去除光线使用//removelight)'
+  updated_lighting_selection: '&7照明已更新 %s0 个区块. (它可能会为数据包发送一秒钟)'
+  set_region: '&7选择设置为您当前允许的区域'
+  worldedit_command_limit: '&7请等待您当前的操作完成'
+  worldedit_delayed: '&7我们处理您的FAWE操作请稍候...'
+  worldedit_run: '&7:为延误道歉 现在执行 %s'
+  worldedit_complete: '&7编辑完成.'
+  require_selection_in_mask: '&7%s 你的选择不在你的圈内. 您只能在允许的地区进行修改.'
+  worldedit_volume: '&7你不能选择%current%的块.最大你可以修改是 %max%.'
+  worldedit_iterations: '&7您不能重复%current%次. 允许的最大的次数是 %max%.'
+  worldedit_unsafe: '&7访问该命令已被阻止'
+  worldedit_dangerous_worldedit: '&c已处理不安全编辑 %s0 一共 %s1'
+  worldedit_toggle_tips_on: '&7已禁用FAWE提示.'
+  worldedit_toggle_tips_off: '&7已启用FAWE提示.'
+  worldedit_bypassed: '&7FAWE启用提示.'
+  worldedit_unmasked: '&6FAWE的版本更新已经开启.'
+  worldedit_restricted: '&6您的FAWE版本更新已关闭.'
+  worldedit_oom_admin: |-
+    &c可以选择的选项:
+    &8 - &7//fast
+    &8 - &7做小编辑
+    &8 - &7分配更多内存
+    &8 - &7禁用 `max-memory-percent`
+  compressed: 修改历史压缩保存 %s0b (%s1x小)
+  action_complete: '保存完成,耗时 %s0 秒 '
+error:
+  worldedit_extend: '&c你的WorldEdit编辑超出了允许的范围.'
+  web_unauthorized: :只允许从配置的Web主机的链接 %s0
+  command_syntax: '&c用法: &7%s0'
+  no_perm: '&c您缺少权限: %s0'
+  setting_disable: '&c缺乏设置: %s0'
+  brush_not_found: '&c可用刷子: %s0'
+  brush_incompatible: '&c刷子不兼容此版本'
+  schematic_not_found: '&c没有找到原理图: &7%s0'
+  no_region: '&c你没有当前区域的修改权限'
+  no_mask: '&c你没有当前的掩码集'
+  not_player: '&c你必须是执行此操作的玩家!'
+  player_not_found: '&c玩家未找到:&7 %s0'
+  oom: |-
+    &8[&c系统提示&8] &c检测到可用内存 < 1%. 系统将采取以下行动:
+    &8 - &7结束方块的WE定位
+    &8 - &7删除WE的历史记录
+    &8 - &7预卸不需要的区块
+    &8 - &7杀死实体
+    &8 - &7运行系统内存垃圾收集器
+    &c如果您尝试使服务器崩溃，请忽略此项
+    &7注意：内存不足可能（但不一定）由WE引起
+  worldedit_some_fails: '&c%s0 无法放置方块,因为你没有该区域的权限'
+  worldedit_some_fails_blockbag: '&c缺少方块: %s0'
+web:
+  generating_link: '上传中%s请稍候...'
+  generating_link_failed: '&c无法生成下载链接!'
+  download_link: '%s'
+worldedit:
+  general:
+    mask_disabled: 全局掩码禁用
+    mask: 全局掩码集
+    source_mask_disabled: 全局源掩码禁用
+    source_mask: 全局源掩码集
+    transform_disabled: 全局变换被禁用
+    transform: 全局变换集
+    fast_enabled: 启用快速模式,这不会保存操作,并取消放置限制.
+    fast_disabled: 快速模式禁用
+    place_enabled: '现在放在位置 #1.'
+    place_disabled: 现在,在你站的位置开始放置方块.
+  copy:
+    command_copy: '%s0 块被复制.'
+  cut:
+    command_cut_slow: '%s0 个方块被复制.'
+    command_cut_lazy: '%s0 个方块被剪切'
+  paste:
+    command_paste: 拷贝方块已粘贴在 %s0
+  rotate:
+    command_rotate: 拷贝方块已被旋转
+  flip:
+    command_flipped: 拷贝方块已被翻转
+  regen:
+    command_regen_0: |-
+      区域再生.
+      生物群落 /regen [biome]
+    command_regen_1: |-
+      区域再生.
+      使用种子 /regen [biome] [seed]
+    command_regen_2: 区域再生.
+  tree:
+    command_tree: '%s0 创建树.'
+    command_pumpkin: '%s0 创建南瓜.'
+  flora:
+    command_flora: '%s0 植物创建.'
+  history:
+    command_history_clear: 历史记录清除
+    command_redo_error: 无复原. (查看使用/inspect` 和 `/frb`)
+    command_history_other_error: 无法找到会话 %s0.
+    command_redo_success: 复原成功.
+    command_undo_error: 无撤销. (查看使用/inspect` 和 `/frb`)
+    command_undo_success: 撤消成功.
+  operation:
+    operation: 放置方块 (%s0)
+  selection:
+    selection_wand: ' 左键单击:选择点 #1; 右键单击:选择点 #2'
+    selection_wand_disable: 小木斧禁用
+    selection_wand_enable: 小木斧启用
+    selection_chunk: 选中了块 (%s0)
+    selection_chunks: 块被选中 (%s0) - (%s1)
+    selection_contract: 选中区域共 %s0 块.
+    selection_count: 算 %s0 块.
+    selection_distr: '#总块数: %s0'
+    selection_expand: 地区扩大%s0 块
+    selection_expand_vert: 地区扩大 %s0 快 (从上到下)
+    selection_inset: 区域插图
+    selection_outset: 区域开始
+    selection_shift: 地区转移
+    selection_cleared: 选择区域清除
+  navigation:
+    navigation_wand_error: '&c什么都没有'
+  anvil:
+    world_is_loaded: 执行时不应该使用世界.卸载世界，或使用-f来覆盖 (请先保存)
+  brush:
+    brush_reset: 重置你的画笔
+    brush_none: 你没有拿着画笔!
+    brush_scroll_action_set: 将滚动操作设置为 %s0
+    brush_scroll_action_unset: 去除了扫荡动作
+    brush_visual_mode_set: 设置视觉模式 %s0
+    brush_target_mode_set: 将目标模式设置为 %s0
+    brush_target_mask_set: 将目标掩码设置为 %s0
+    brush_target_offset_set: 设置目的地偏移量 %s0
+    brush_equipped: 装备刷 %s0
+    brush_try_other: |-
+      &c还有其他更合适的画笔，例如.
+      &8 - &7//br height [半径=5] [#剪贴板|文件=null] [旋转=0] [yscale=1.00]
+    brush_copy: 左键单击要复制的对象的基础.右键单击粘贴.如果需要.可以增加刷子半径.
+    brush_height_invalid: 无效的高度图文件 (%s0)
+    brush_smooth: 注意:如果要平滑悬垂或洞穴，请使用混合刷.
+    brush_spline: 点击添加点，点击相同的地方完成
+    brush_line_primary: 添加点%s0，单击另一个位置创建行
+    brush_line_secondary: 创造的pline
+    brush_spline_primary_2: 添加位置，点击相同的地方加入!
+    brush_spline_secondary_error: 设置不够的位置!
+    brush_spline_secondary: 创建一个凹槽
+    brush_size: 刷子尺寸设置
+    brush_range: 刷子尺寸设置
+    brush_mask_disabled: 刷子遮罩禁用
+    brush_mask: 刷子套装
+    brush_source_mask_disabled: 画笔源掩码禁用
+    brush_source_mask: 画笔源掩码启用
+    brush_transform_disabled: 刷子变换禁用
+    brush_transform: 刷子变换集
+    brush_material: 刷子材料集
+  rollback:
+    rollback_element: 撤消 %s0
+  tool:
+    tool_inspect: 检查工具绑定到 %s0.
+    tool_inspect_info: '&7%s0 变 %s1 到 %s2 %s3 前'
+    tool_inspect_info_footer: '&6总: &7%s0变化'
+    tool_none: 工具与您当前的项目未绑定.
+    tool_info: 信息工具绑定到 %s0.
+    tool_tree: 树工具绑定到  %s0.
+    tool_tree_error: 树型 %s0 是未知数.
+    tool_repl: 块替代工具绑定到 %s0.
+    tool_cycler: 阻止数据循环仪工具绑定到 %s0.
+    tool_flood_fill: 封闭洪水填充工具绑定到 %s0.
+    tool_range_error: '最大范围: %s0.'
+    tool_radius_error: '最大允许刷半径: %s0.'
+    tool_deltree: 浮动清除工具绑定到 %s0.
+    tool_farwand: 远棒工具绑定到 %s0.
+    tool_lrbuild_bound: 远程建筑工具绑定 %s0.
+    tool_lrbuild_info: 左键单击设置为 %s0; 右键单击设置 %s1.
+    superpickaxe_enabled: 超级镐启用.
+    superpickaxe_disabled: 超级镐禁用.
+    superpickaxe_area_enabled: 模式已更改.左键单击一个镐. // to disable.
+  snapshot:
+    snapshot_loaded: '%s0 装;现在恢复...'
+    snapshot_set: '快照设置为: %s0'
+    snapshot_newest: 现在使用最新的快照.
+    snapshot_list_header: '世界快照 (%s0):'
+    snapshot_list_footer: 使用 /snap use [快照] 或者 /snap use latest.
+  biome:
+    biome_list_header: '生物群系 (页 %s0/%s1):'
+    biome_changed: 生物改变了 %s0 列.
+  utility:
+    kill_success: '%s0 半径的实体 %s1.'
+    nothing_confirmed: 你没有任何行动等待确认.
+    page_footer: 使用 %s0 去下一页
+  schematic:
+    schematic_format: 可用格式 (名称:查找名称)
+    schematic_loaded: '%s0 加载.粘贴它 //paste'
+    schematic_saved: '%s0 保存.'
+    schematic_page: 页必须 %s
+    schematic_none: 找不到文件.
+    schematic_list: '可用文件 (文件名:格式) [%s0/%s1]:'
+    schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
+  clipboard:
+    clipboard_cleared: 剪贴板已清除
+    clipboard_invalid_format: '未知的剪贴板格式: %s0'
+    clipboard_uri_not_found: 你没有加载 %s0
+  visitor:
+    visitor_block: '%s0 受影响的区块'
+    visitor_entity: '%s0 受影响的实体'
+    visitor_flat: '%s0 受影响的列'
+  selector:
+    selector_fuzzy_pos1: 区域设置和扩展 %s0 %s1.
+    selector_fuzzy_pos2: 增加扩充 %s0 %s1.
+    selector_invalid_coordinates: 坐标无效 %s0
+    selector_already_set: 位置已经确立.
+    selector_set_default: 现在是默认的区域选择器 %s0.
+    selector_pos: '&a设置点 &b[&f%s0&b] &f为坐标 &b%s1 &a选择的方块&c[%s2]&a个'
+    selector_center: 中心确定为 &8%s0 (%s1).
+    selector_radius: 无线设置为 &8%s0 (%s1).
+    selector_expanded: 扩大区域为 &(%s0 (%s1)
+  timezone:
+    timezone_set: '为此会话设置的时区: %s0'
+    timezone_display: '该时区当前的时间是:  %s0'
+  command:
+    command_invalid_syntax: 该命令未正确使用 (没有更多的帮助可用).
+  help:
+    command_clarifying_bracket: '&7添加支架 &c%s0'
+    help_suggest: '&7没找到 %s0.也许尝试其中之一  &c%s1 &7?'
+    help_header_categories: 命令类型
+    help_header_subcommands: 子命令
+    help_header_command: '&chelp: &7%s0'
+    help_item_allowed: '&a%s0&8 - &7%s1'
+    help_item_denied: '&c%s0&8 - &7%s1'
+    help_header: '帮助: 页数 %s0/%s1'
+    help_footer: '&7维基Wiki: https://git.io/vSKE5'
+progress:
+  progress_message: '%s1/%s0 (%s2%) @%s3cps %s4s之后完成'
+  progress_finished: '[ 完成! ]'
+cancel:
+  worldedit_cancel_count: '&c取消 %s0 编辑.'
+  worldedit_cancel_reason_confirm: '&7你的选择区域很大(%s0 -> %s1)使用 &c//confirm&7确定执行 &c%s2'
+  worldedit_cancel_reason: '&c您的WorldEdit操作已取消:&7 %s0&c.'
+  worldedit_cancel_reason_manual: '已手动取消'
+  worldedit_cancel_reason_low_memory: '磁盘空间不足'
+  worldedit_cancel_reason_max_changes: '太多方块更改了'
+  worldedit_cancel_reason_max_checks: '块检查太多'
+  worldedit_cancel_reason_max_tiles: '封锁太多了'
+  worldedit_cancel_reason_max_entities: '实体太多'
+  worldedit_cancel_reason_max_iterations: '最大重复次数'
+  worldedit_cancel_reason_no_region: 使用 /wea来解除限制, 或设置`region-restrictions`选项为false在config.yml内
+  worldedit_failed_load_chunk: '&4忽略方块的变化: &7%s0;%s1&c. 尝试增加方块的队列.'
+  worldedit_cancel_reason_outside_level: '外界'
+  worldedit_cancel_reason_outside_region: 使用 /wea来解除限制, 或设置`region-restrictions`选项为false在config.yml内
+navigation:
+  ascend_fail: 没有找到你上方的空位.
+  ascended_plural: 上升 %s0 格.
+  ascended_singular: 向上移动一格.
+  unstuck: 现在应该会更好
+  descend_fail: 没有你找到的免费地点.
+  descend_plural: 下降 %s0 水平.
+  descend_singular: 降低了一个水平.
+  whoosh: 嗖!
+  poof: 噗!
+  thru_fail: 没有找到可以放下你的空位.
+  no_block: 没有方块目标或者是太远了
+  up_fail: 你会碰到方块.
+selection:
+  sel_cuboid: Cuboid:左键点 1, 右键点 2
+  sel_cuboid_extend: Cuboid:左键单击起始点,右键单击扩展
+  sel_2d_polygon: 2D多边形选择器：左/右点击添加一个点.
+  sel_ellipsiod: 椭圆选择器：左键=中心，右键单击扩展
+  sel_sphere: 球体选择器：左击=中心，右键单击设置半径
+  sel_cylindrical: 圆柱选择器：左击=中心，右键单击扩展.
+  sel_max: '%s0 最高点数.'
+  sel_fuzzy: 模糊选择器:左键单击以选择所有或有块，右键单击添加.要选择一个空气腔，请使用 //pos1.
+  sel_convex_polyhedral: 凸多边形选择器：左键=第一个顶点，右键单击以添加更多.
+  sel_list: 有关选择类型的列表使用:&c //sel list
+  sel_modes: '选择以下模式之一:'
+tips:
+  tip_sel_list: 提示:请参阅不同的选择模式 &c//sel list
+  tip_select_connected: 提示:选择所有连接的块 //sel fuzzy
+  tip_set_pos1: '提示: 使用pos1作为模式 &c//set pos1'
+  tip_farwand: '提示: 选择不同的点 &c//farwand'
+  tip_lazycut: '&7提示: 使用更安全 &c//lazycut'
+  tip_fast: '&7提示: 快速设置，不使用撤消 &c//fast'
+  tip_cancel: '&7提示: 您可以 &c//cancel &7正在进行编辑'
+  tip_mask: '&7提示: 设置全局目标掩码 &c/gmask'
+  tip_mask_angle: '提示: 更换向上的斜坡在 3-20 块使用&c //replace /[-20][-3]bedrock'
+  tip_set_linear: '&7提示: 设置块线性&c //set #l3d[wood,bedrock]'
+  tip_surface_spread: '&7提示: 用平面展开&c //set #surfacespread[5][0][5][#existing]'
+  tip_set_hand: '&7提示: 用你当前的手 &c//set hand'
+  tip_replace_id: '&7提示: 只替换块ID:&c //replace woodenstair #id[cobblestair]'
+  tip_replace_light: '提示: 用光源去除&c //replace #brightness[1][15]0'
+  tip_tab_complete: '提示: 替换命令支持选项卡完成'
+  tip_flip: '提示: 镜子与 &c//flip'
+  tip_deform: '提示: 重塑与 &c//deform'
+  tip_transform: '提示: 设置转换 &c//gtransform'
+  tip_copypaste: '提示: 粘贴点击 &c//br copypaste'
+  tip_source_mask: '提示: 设置源掩码 &c/gsmask <mask>&7'
+  tip_replace_marker: '提示: 使用完整的剪贴板替换一个块 &c//replace wool #fullcopy'
+  tip_paste: '提示: 与地方 &c//paste'
+  tip_lazycopy: '提示: lazycopy更快'
+  tip_download: '提示: 试用 &c//download'
+  tip_rotate: '提示: 定位与 &c//rotate'
+  tip_copy_pattern: '提示: 用作模式尝试 &c#copy'
+  tip_regen_0: '提示: 使用生物群 /regen [biome]'
+  tip_regen_1: '提示: 用一个种子 /regen [biome] [seed]'
+  tip_biome_pattern: '提示: 这个 &c#biome:forest&7 模式可以在任何命令中使用'
+  tip_biome_mask: '提示: 限制一个生物群 `$jungle` 面具'
