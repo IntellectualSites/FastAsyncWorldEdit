@@ -74,6 +74,8 @@ worldedit:
     fast_disabled: Modo rápido inhabilitado.
     place_enabled: 'Ahora colocando en pos #1.'
     place_disabled: Ahora colocando en el bloque en el que estás.
+    texture_disabled: Reinicio de texturizado
+    texture_set: Establecer texturizado en %s1
   copy:
     command_copy: Se copiaron %s0 bloques.
   cut:
@@ -158,6 +160,7 @@ worldedit:
     brush_transform_disabled: Transformación de pincel desactivada
     brush_transform: Conjunto de transformación de pincel
     brush_material: Brush material set
+    brush_catenary_direction: Punto añadido %s0, Haga clic en la dirección que desee a la spline
   rollback:
     rollback_element: Deshacer %s0
   tool:
@@ -202,10 +205,19 @@ worldedit:
     schematic_none: No se han encontrado archivos.
     schematic_list: 'Archivos disponibles (Filename: Format) [%s0/%s1]:'
     schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
+    schematic_prompt_clear: '&7Es posible que desee utilizar &c%s0 &7para borrar su actual primera'
+    schematic_show: |-
+      &7Mostrando &a%s0&7 esquemas de &a%s1&7:
+      &8 - &aClick izquierdo &7Una estructura para configurar tu portapapeles
+      &8 - &aBotón derecho del ratón &7para agregar una estructura a tu multipartículas
+      &8 - &7Utilizar &a%s2&7 para volver al mundo
+    schematic_move_exists: '&c%s0 ya existe'
+    schematic_move_success: '&a%s0 -> %s1'
+    schematic_move_failed: '&a%s0 no movido: %s1'
   clipboard:
     clipboard_cleared: Portapapeles despejado
     clipboard_invalid_format: 'Formato del portapapeles desconocido:  %s0'
-    clipboard_uri_not_found: You do not have %s0 loaded
+    clipboard_uri_not_found: Usted no tiene %s0 cargado
   visitor:
     visitor_block: '%s0 bloques afectados'
     visitor_entity: '%s0 entidades afectadas'

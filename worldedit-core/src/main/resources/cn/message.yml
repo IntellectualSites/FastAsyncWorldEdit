@@ -56,7 +56,7 @@ error:
   worldedit_some_fails: '&c%s0 无法放置方块,因为你没有该区域的权限'
   worldedit_some_fails_blockbag: '&c缺少方块: %s0'
 web:
-  generating_link: '上传中%s请稍候...'
+  generating_link: 上传中%s请稍候...
   generating_link_failed: '&c无法生成下载链接!'
   download_link: '%s'
 worldedit:
@@ -71,6 +71,8 @@ worldedit:
     fast_disabled: 快速模式禁用
     place_enabled: '现在放在位置 #1.'
     place_disabled: 现在,在你站的位置开始放置方块.
+    texture_disabled: 纹理重置
+    texture_set: 将纹理设置为 %s1
   copy:
     command_copy: '%s0 块被复制.'
   cut:
@@ -154,6 +156,7 @@ worldedit:
     brush_transform_disabled: 刷子变换禁用
     brush_transform: 刷子变换集
     brush_material: 刷子材料集
+    brush_catenary_direction: 添加点 %s0, 单击要创建样条线的方向
   rollback:
     rollback_element: 撤消 %s0
   tool:
@@ -197,6 +200,15 @@ worldedit:
     schematic_none: 找不到文件.
     schematic_list: '可用文件 (文件名:格式) [%s0/%s1]:'
     schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
+    schematic_prompt_clear: '&7你可能想用 &c%s0 &7先清除当前的剪贴板'
+    schematic_show: |-
+      &7显示 &a%s0&7 原理图来自 &a%s1&7:
+      &8 - &a左键单击 &7用于设置剪贴板的结构
+      &8 - &a右键点击&7将结构添加到多剪贴板
+      &8 - &7使用 &a%s2&7 回到世界
+    schematic_move_exists: '&c%s0 已经存在'
+    schematic_move_success: '&a%s0 -> %s1'
+    schematic_move_failed: '&a%s0 没动: %s1'
   clipboard:
     clipboard_cleared: 剪贴板已清除
     clipboard_invalid_format: '未知的剪贴板格式: %s0'
@@ -237,16 +249,16 @@ cancel:
   worldedit_cancel_count: '&c取消 %s0 编辑.'
   worldedit_cancel_reason_confirm: '&7你的选择区域很大(%s0 -> %s1)使用 &c//confirm&7确定执行 &c%s2'
   worldedit_cancel_reason: '&c您的WorldEdit操作已取消:&7 %s0&c.'
-  worldedit_cancel_reason_manual: '已手动取消'
-  worldedit_cancel_reason_low_memory: '磁盘空间不足'
-  worldedit_cancel_reason_max_changes: '太多方块更改了'
-  worldedit_cancel_reason_max_checks: '块检查太多'
-  worldedit_cancel_reason_max_tiles: '封锁太多了'
-  worldedit_cancel_reason_max_entities: '实体太多'
-  worldedit_cancel_reason_max_iterations: '最大重复次数'
+  worldedit_cancel_reason_manual: 已手动取消
+  worldedit_cancel_reason_low_memory: 磁盘空间不足
+  worldedit_cancel_reason_max_changes: 太多方块更改了
+  worldedit_cancel_reason_max_checks: 块检查太多
+  worldedit_cancel_reason_max_tiles: 封锁太多了
+  worldedit_cancel_reason_max_entities: 实体太多
+  worldedit_cancel_reason_max_iterations: 最大重复次数
   worldedit_cancel_reason_no_region: 使用 /wea来解除限制, 或设置`region-restrictions`选项为false在config.yml内
   worldedit_failed_load_chunk: '&4忽略方块的变化: &7%s0;%s1&c. 尝试增加方块的队列.'
-  worldedit_cancel_reason_outside_level: '外界'
+  worldedit_cancel_reason_outside_level: 外界
   worldedit_cancel_reason_outside_region: 使用 /wea来解除限制, 或设置`region-restrictions`选项为false在config.yml内
 navigation:
   ascend_fail: 没有找到你上方的空位.
