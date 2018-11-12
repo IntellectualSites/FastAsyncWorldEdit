@@ -38,7 +38,7 @@ public abstract class LocalConfiguration {
     protected static final String[] defaultDisallowedBlocks = new String[] {};
 
     public boolean profile = false;
-    public Set<BlockType> disallowedBlocks = new HashSet<>();
+    public Set<String> disallowedBlocks = new HashSet<>();
     public int defaultChangeLimit = -1;
     public int maxChangeLimit = -1;
     public int defaultMaxPolygonalPoints = -1;
@@ -65,7 +65,7 @@ public abstract class LocalConfiguration {
     public String navigationWand = ItemTypes.COMPASS.getId();
     public int navigationWandMaxDistance = 50;
     public int scriptTimeout = 3000;
-    public Set<BlockType> allowedDataCycleBlocks = new HashSet<>();
+    public Set<String> allowedDataCycleBlocks = new HashSet<>();
     public String saveDir = "schematics";
     public String scriptsDir = "craftscripts";
     public boolean showHelpInfo = true;

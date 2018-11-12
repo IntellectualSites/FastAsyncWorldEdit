@@ -81,11 +81,9 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
         disallowedBlocks =
-                new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(defaultDisallowedBlocks)))
-                .stream().map(e -> BlockTypes.parse(e)).collect(Collectors.toSet());
+                new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(defaultDisallowedBlocks)));
         allowedDataCycleBlocks =
-                new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null))
-                .stream().map(e -> BlockTypes.parse(e)).collect(Collectors.toSet());
+                new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
 
         registerHelp = config.getBoolean("register-help", true);
         logCommands = config.getBoolean("logging.log-commands", logCommands);

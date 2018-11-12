@@ -81,11 +81,9 @@ public class PropertiesConfiguration extends LocalConfiguration {
         profile = getBool("profile", profile);
 
         disallowedBlocks =
-            new HashSet<>(getStringSet("limits.disallowed-blocks", defaultDisallowedBlocks))
-            .stream().map(e -> BlockTypes.parse(e)).collect(Collectors.toSet());
+            new HashSet<>(getStringSet("limits.disallowed-blocks", defaultDisallowedBlocks));
         allowedDataCycleBlocks =
-                new HashSet<>(getStringSet("limits.allowed-data-cycle-blocks", null))
-                .stream().map(e -> BlockTypes.parse(e)).collect(Collectors.toSet());
+                new HashSet<>(getStringSet("limits.allowed-data-cycle-blocks", null));
         defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
         maxChangeLimit = getInt("max-changed-blocks", maxChangeLimit);
         defaultMaxPolygonalPoints = getInt("default-max-polygon-points", defaultMaxPolygonalPoints);

@@ -55,7 +55,7 @@ public class VoxelVoxelCommand extends VoxelCommand {
             Material blockType = block.getType();
 
             BlockType weType = BukkitAdapter.adapt(blockType);
-            if(!player.hasPermission("voxelsniper.ignorelimitations") && WorldEdit.getInstance().getConfiguration().disallowedBlocks.contains(weType)) {
+            if(!player.hasPermission("voxelsniper.ignorelimitations") && WorldEdit.getInstance().getConfiguration().disallowedBlocks.contains(weType.getId())) {
                 player.sendMessage("You are not allowed to use " + blockType.name() + ". (WorldEdit config.yml)");
                 return true;
             }
@@ -68,7 +68,7 @@ public class VoxelVoxelCommand extends VoxelCommand {
         } else {
             BlockType weType = BlockTypes.parse(args[0]);
             if(weType != null) {
-                if(!player.hasPermission("voxelsniper.ignorelimitations") && WorldEdit.getInstance().getConfiguration().disallowedBlocks.contains(weType)) {
+                if(!player.hasPermission("voxelsniper.ignorelimitations") && WorldEdit.getInstance().getConfiguration().disallowedBlocks.contains(weType.getId())) {
                     player.sendMessage("You are not allowed to use " + weType + ".");
                     return true;
                 } else {

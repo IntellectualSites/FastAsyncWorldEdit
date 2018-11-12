@@ -18,6 +18,7 @@ import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
@@ -342,7 +343,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public PlayerDirection getCardinalDirection() {
+    public Direction getCardinalDirection() {
         return parent.getCardinalDirection();
     }
 

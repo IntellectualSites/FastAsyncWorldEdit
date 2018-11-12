@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.entity;
 
 import javax.annotation.Nullable;
-
-import com.sk89q.worldedit.PlayerDirection;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -30,6 +28,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
@@ -61,7 +60,7 @@ public interface Player extends Entity, Actor {
      *
      * @return the direction
      */
-    PlayerDirection getCardinalDirection(int yawOffset);
+    Direction getCardinalDirection(int yawOffset);
 
     /**
      * Get the item that the player is holding.
@@ -241,7 +240,7 @@ public interface Player extends Entity, Actor {
      *
      * @return the direction
      */
-    PlayerDirection getCardinalDirection();
+    Direction getCardinalDirection();
 
     /**
      * Pass through the wall that you are looking at.

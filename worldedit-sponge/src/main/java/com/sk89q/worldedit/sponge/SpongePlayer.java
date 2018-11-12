@@ -31,6 +31,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemTypes;
@@ -186,8 +187,6 @@ public class SpongePlayer extends AbstractPlayerActor {
     }
 
     @Override
-<<<<<<< HEAD
-=======
     public void sendFakeBlock(BlockVector3 pos, BlockStateHolder block) {
         org.spongepowered.api.world.Location<World> loc = player.getWorld().getLocation(pos.getX(), pos.getY(), pos.getZ());
         if (block == null) {
@@ -205,7 +204,6 @@ public class SpongePlayer extends AbstractPlayerActor {
     }
 
     @Override
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     public SessionKey getSessionKey() {
         return new SessionKeyImpl(player.getUniqueId(), player.getName());
     }

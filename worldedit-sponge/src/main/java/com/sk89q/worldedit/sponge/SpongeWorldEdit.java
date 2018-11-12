@@ -211,7 +211,7 @@ public class SpongeWorldEdit {
 
         BlockType interactedType = targetBlock.getState().getType();
         if (event instanceof InteractBlockEvent.Primary) {
-            if (!interactedType.getMaterial().isAir()) {
+            if (interactedType != BlockTypes.AIR) {
                 if (!optLoc.isPresent()) {
                     return;
                 }
@@ -233,7 +233,7 @@ public class SpongeWorldEdit {
                 }
             }
         } else if (event instanceof InteractBlockEvent.Secondary) {
-        if (!interactedType.getMaterial().isAir()) {
+        if (interactedType != BlockTypes.AIR) {
                 if (!optLoc.isPresent()) {
                     return;
                 }

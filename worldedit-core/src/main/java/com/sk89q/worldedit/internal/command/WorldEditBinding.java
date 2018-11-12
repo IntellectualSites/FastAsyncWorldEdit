@@ -24,7 +24,6 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.PlayerDirection;
 import com.sk89q.worldedit.UnknownDirectionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -313,7 +312,11 @@ public class WorldEditBinding extends BindingHelper {
     public BlockVector3 getDirection(ArgumentStack context, Direction direction) 
             throws ParameterException, UnknownDirectionException {
         Player sender = getPlayer(context);
-        return worldEdit.getDirection(sender, context.next());
+        if (direction.includeDiagonals()) {
+            return worldEdit.getDiagonalDirection(sender, context.next());
+        } else {
+            return worldEdit.getDirection(sender, context.next());
+        }
     }
 
     /**
