@@ -8,10 +8,15 @@ import com.intellectualcrafters.jnbt.CompoundTag;
 import com.intellectualcrafters.plot.object.PlotBlock;
 import com.intellectualcrafters.plot.util.StringMan;
 import com.intellectualcrafters.plot.util.block.LocalBlockQueue;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.biome.Biomes;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
+
 import java.util.List;
 
 // TODO FIXME
@@ -61,15 +66,14 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public boolean setBlock(int x, int y, int z, int id, int data) {
-        return false;
-//        return IMP.setBlock(x, y, z, (short) id, (byte) data);
+    	return IMP.setBlock(x, y, z, LegacyMapper.getInstance().getBlockFromLegacy(id, data));
     }
 
     @Override
     public PlotBlock getBlock(int x, int y, int z) {
-//        int combined = IMP.getCombinedId4Data(x, y, z);
-//        return PlotBlock.get(FaweCache.getId(combined), FaweCache.getData(combined));
-        return null;
+        int combined = IMP.getCombinedId4Data(x, y, z);
+        com.sk89q.worldedit.world.block.BlockState state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combined);
+        return PlotBlock.get(state.getInternalBlockTypeId(), state.getInternalPropertiesId());
     }
 
     private BaseBiome biome;
@@ -78,15 +82,14 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public boolean setBiome(int x, int z, String biome) {
-//        if (!StringMan.isEqual(biome, lastBiome)) {
-//            if (reg == null) {
-//                World weWorld = IMP.getWEWorld();
-//                reg = weWorld.getWorldData().getBiomeRegistry();
-//            }
-//            List<BaseBiome> biomes = reg.getBiomes();
-//            lastBiome = biome;
-//            this.biome = Biomes.findBiomeByName(biomes, biome, reg);
-//        }
+        if (!StringMan.isEqual(biome, lastBiome)) {
+            if (reg == null) {
+                reg = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.USER_COMMANDS).getRegistries().getBiomeRegistry();
+            }
+            List<BaseBiome> biomes = reg.getBiomes();
+            lastBiome = biome;
+            this.biome = Biomes.findBiomeByName(biomes, biome, reg);
+        }
         return IMP.setBiome(x, z, this.biome);
     }
 

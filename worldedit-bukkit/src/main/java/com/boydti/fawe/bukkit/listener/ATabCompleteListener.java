@@ -6,6 +6,7 @@ import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.util.command.CommandMapping;
 import com.sk89q.worldedit.util.command.Dispatcher;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 
@@ -23,11 +24,12 @@ public class ATabCompleteListener implements Listener {
         MutableCharSequence mBuffer = MutableCharSequence.getTemporal();
         mBuffer.setString(buffer);
         mBuffer.setSubstring(0, firstSpace);
-        String label = buffer.substring(mBuffer.indexOf(':') + 1, firstSpace);
+        int index;
+        String label = buffer.substring(index = (mBuffer.indexOf(':') == -1 ? 1 : mBuffer.indexOf(':') + 1), firstSpace);
         Dispatcher dispatcher = CommandManager.getInstance().getDispatcher();
         CommandMapping weCommand = dispatcher.get(label);
         if (weCommand != null) {
-            CommandSuggestionEvent event = new CommandSuggestionEvent(worldEdit.wrapCommandSender(sender), buffer);
+            CommandSuggestionEvent event = new CommandSuggestionEvent(worldEdit.wrapCommandSender(sender), buffer.substring(index, buffer.length()));
             worldEdit.getWorldEdit().getEventBus().post(event);
             List<String> suggestions = event.getSuggestions();
             if (suggestions != null) {

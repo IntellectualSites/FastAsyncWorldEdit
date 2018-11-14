@@ -86,7 +86,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                     if (charMask && input.charAt(0) == '=') {
                         return parseFromInput(char0 + "[" + input.substring(1) + "]", context);
                     }
-                    if (char0 == '#') {
+                    if (char0 == '#' || char0 == '?') {
                         throw new SuggestInputParseException(new NoMatchException("Unknown mask: " + full + ", See: //masks"), full,
                                 () -> {
                                     if (full.length() == 1) return new ArrayList<>(dispatcher.getPrimaryAliases());
