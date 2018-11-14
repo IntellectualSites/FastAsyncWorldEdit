@@ -1,5 +1,5 @@
 info:
-  prefix: '&7'
+  prefix: '&8(&4&lFAWE&8)&r&7'
   file_deleted: '%s0 был удален.'
   schematic_pasting: '&7Вставка схематического файла. Это не может быть отменено.'
   lighting_propogate_selection: '&7Освещение было распространено в %s0 чанках. (Примечание:
@@ -21,7 +21,6 @@ info:
   worldedit_unsafe: '&7Доступ к этой команде был заблокирован!'
   worldedit_dangerous_worldedit: '&cFAWE обрабатывает небезопасный WorldEdit в %s0
     на %s1'
-  worldedit_bypass: '&7&oЧтобы обойти ваши ограничения используйте &c/wea'
   worldedit_toggle_tips_on: '&7Советы WorldEdit &cвключены&7.'
   worldedit_toggle_tips_off: '&7Советы WorldEdit &cвключены&7.'
   worldedit_bypassed: '&7Обход ограничений WorldEdit &cвключен&7.'
@@ -59,6 +58,8 @@ error:
     пределами вашего региона.'
   worldedit_some_fails_blockbag: '&cНедостающие блоки: %s0'
   web_unauthorized: 'Разрешены только ссылки с настроенного веб-хостинга: %s0'
+  brush_not_found: '&cДоступные кисти: %s0'
+  brush_incompatible: '&cКисть не совместима с этой версией'
 web:
   generating_link: Загрузка %s, пожалуйста подождите...
   generating_link_failed: '&cНе удалось создать ссылку!'
@@ -75,6 +76,8 @@ worldedit:
     fast_disabled: Быстрый режим отключен
     place_enabled: 'Теперь размещение в позиции #1.'
     place_disabled: Теперь размещение в блоке, на котором вы стоите.
+    texture_disabled: Сброс текстуры
+    texture_set: Установите текстурирование на %s1
   copy:
     command_copy: '%s0 блок(ов) скопировано.'
   cut:
@@ -129,27 +132,16 @@ worldedit:
     selection_cleared: Выделение очищено
   brush:
     brush_none: Вы не держите кисть!
-    brush_butcher: Кисть мясника сформирована (%s0)
-    brush_clipboard: Форма кисти буфера обемна сформирована
-    brush_cylinder: Цилиндрическая форма кисти сформирована (%s0 по %s1).
-    brush_extinguisher: Форма кисти огнерушения сформирована (%s0).
-    brush_gravity: Кисть гравитации сформирована (%s0)
-    brush_height: Кисть высоты сформирована (%s0)
     brush_try_other: |-
       &cFAWE добавляет другие, более подходящие кисти, например,
       &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
-    brush_copy: Кисть копирования сформирована (%s0). ПКМ по обьекту для копирования, ПКМ для вставки. При необходимости увеличьте радиус кисти.
-    brush_command: Командная кисть сформирована (%s0)
+    brush_copy: Кисть копирования сформирована (%s0). ПКМ по обьекту для копирования,
+      ПКМ для вставки. При необходимости увеличьте радиус кисти.
     brush_height_invalid: Неверная высота файла карты (%s0)
     brush_smooth: Кисть сглаживания сформирована (%s0 x %s1 используя %s2).
-    brush_sphere: Форма сферической кисти сформирована (%s0).
-    brush_line: Форма кисти линий сформирована (%s0).
     brush_spline: Форма кисти линий сформирована (%s0). ПКМ по концу, чтобы добавить форму
     brush_spline_secondary_error: Не хватает установленных позиций!
     brush_spline_secondary: Склеивание создано
-    brush_blend_ball: Кисть смеси шара сформирована (%s0).
-    brush_erode: Кисть разрушения сформирована (%s0).
-    brush_recursive: Кисть рекурсии сформирована (%s0).
     brush_size: Размер кисти установлен
     brush_range: Размер кисти установлен
     brush_mask_disabled: Маска кисти отключена
@@ -163,10 +155,14 @@ worldedit:
     brush_visual_mode_set: Установлен визуальный режим для %s0
     brush_target_mode_set: Установлен целевой режим для %s0
     brush_spline_primary_2: Добавлена ​​позиция, Нажмите на том же месте, чтобы присоединиться!
-    brush_circle: Кисть создания круга оборудована (%s0). Щелкните правой кнопкой мыши, чтобы создать круг.
-    brush_shatter: Форма разрешающей кисти сформирована (%s0, %s1).
-    brush_stencil: Форма кисти по шаблону сформирована (%s0).
-    brush_scatter: Форма кисти рассеивания сформирована (%s0, %s1).
+    brush_reset: Сбросьте кисть. (SHIFT + Click)
+    brush_scroll_action_unset: Удалено действие прокрутки
+    brush_target_mask_set: Установите целевую маску на %s0
+    brush_target_offset_set: Установите смещение цели на %s0
+    brush_equipped: Оборудованная кисть %s0
+    brush_line_primary: Добавленная точка %s0, нажмите другую позицию, чтобы создать линию
+    brush_catenary_direction: Добавленная точка %s0, нажмите другую позицию, чтобы создать сплайн
+    brush_line_secondary: Созданный сплайн
   rollback:
     rollback_element: Отмена %s0
   tool:
@@ -196,9 +192,20 @@ worldedit:
     schematic_page: Страница должна быть %s
     schematic_none: Схематических фалов не найдено.
     schematic_list: 'Доступные схематические файлы (Имя файла: Формат) [%s0/%s1]:'
+    schematic_prompt_clear: '&7Вы можете использовать &c%s0 &7очистить свой первый'
+    schematic_show: |-
+      &7Отображение &a%s0&7 схемы из &a%s1&7:
+      &8 - &aЩелчок левой кнопкой мыши &7структура для настройки вашего буфера обмена
+      &8 - &aЩелкните правойt кнопкой мыши &7добавить структуру в ваш мультибуфер
+      &8 - &7использование &a%s2&7 вернуться в мир
+    schematic_move_exists: '&c%s0 уже существует'
+    schematic_move_success: '&a%s0 -> %s1'
+    schematic_move_failed: '&a%s0 нет перемещенных: %s1'
+    schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
   clipboard:
     clipboard_cleared: Буфер обмена очищен
     clipboard_invalid_format: 'Неизвестный формат буфера обмена:  %s0'
+    clipboard_uri_not_found: У тебя нет %s0 нагруженный
   visitor:
     visitor_block: '%s0 блок(ов) затронуто'
     visitor_entity: '%s0 энтити затронуто'
@@ -206,11 +213,13 @@ worldedit:
   selector:
     selector_fuzzy_pos1: Регион установлен и расширен %s0 %s1.
     selector_fuzzy_pos2: Добавлено расширение %s0 %s1.
-    selector_cuboid_pos1: Первая точка установлена на %s0 %s1.
-    selector_cuboid_pos2: Вторая точка установлена на %s0 %s1.
     selector_invalid_coordinates: Неверные координаты %s0
     selector_already_set: Позиция уже установлена.
     selector_set_default: Ваш выбранный регион по умолчанию теперь %s0.
+    selector_pos: pos%s0 установлен в %s1 (%s2).
+    selector_center: Центр установлен на %s0 (%s1).
+    selector_radius: Радиус, установленный для %s0 (%s1).
+    selector_expanded: Расширенная область для %s0 (%s1)
   command:
     command_invalid_syntax: Команда не используется должным образом (нет больше помощи).
   snapshot:
@@ -224,9 +233,25 @@ worldedit:
     biome_changed: Биом был изменен в %s0 колонн.
   utility:
     kill_success: Убито %s0 энтити в радиусе %s1.
+    nothing_confirmed: У вас нет действий в ожидании подтверждения.
+    page_footer: использование %s0 to go to the next page
   timezone:
     timezone_set: 'Часовой пояс для этой сессии: %s0'
     timezone_display: 'Текущее время в этом часовом поясе:  %s0'
+  navigation:
+    navigation_wand_error: '&cНичто не может пройти'
+  anvil:
+    world_is_loaded: Мир не должен использоваться во время исполнения. Выгрузить или использовать -f переопределить (сохранить сначала)
+  help:
+    command_clarifying_bracket: '&7Added clarifying bracket for &c%s0'
+    help_suggest: '&7не мог найти %s0. Возможно, попробуйте один из &c%s1 &7?'
+    help_header_categories: Типы команд
+    help_header_subcommands: Подкоманды
+    help_header_command: '&cПомогите за: &7%s0'
+    help_item_allowed: '&a%s0&8 - &7%s1'
+    help_item_denied: '&c%s0&8 - &7%s1'
+    help_header: 'Помогите: страница %s0/%s1'
+    help_footer: '&7Wiki: https://git.io/vSKE5'
 progress:
   progress_message: '[ Очередь: %s0 | Отправляется: %s1 ]'
   progress_finished: '[ Готово! ]'
@@ -240,10 +265,11 @@ cancel:
   worldedit_cancel_reason_max_tiles: Слишком много blockstates
   worldedit_cancel_reason_max_entities: Слишком много энтити
   worldedit_cancel_reason_max_iterations: Максимальное количество итераций
-  worldedit_cancel_reason_max_fails: Вне разрешенного региона (обход, используя /wea, или выключите `region-restrictions` в config.yml)
   worldedit_cancel_reason_no_region: Нет разрешенного региона (обход, используя /wea, или выключите `region-restrictions` в config.yml)
-  worldedit_failed_load_chunk: '&cПропущенные загруженные чанки: &7%s0;%s1&c. Попробуйте
-    увеличить ожидание чанка.'
+  worldedit_failed_load_chunk: '&cПропущенные загруженные чанки: &7%s0;%s1&c. Попробуйте увеличить ожидание чанка.'
+  worldedit_cancel_reason_confirm: '&7Ваш выбор большой (&c%s0 &7-> &c%s1&7, содержащий &c%s3&7 блоки). использование &c//confirm &7выполнить &c%s2'
+  worldedit_cancel_reason_outside_level: внешний мир
+  worldedit_cancel_reason_outside_region: Вне допустимой области (обход с /wea, или отключить `region-restrictions` в config.yml)
 history: {}
 navigation:
   ascend_fail: Свободного места над вами не найдено.
@@ -266,10 +292,8 @@ selection:
   sel_sphere: 'Сферическое выделение: ЛКМ - центр, ПКМ для установки радиуса'
   sel_cylindrical: 'Цилиндрическое выделение: ЛКМ - центр, ПКМ для расширения'
   sel_max: '%s0 максимум точек.'
-  sel_fuzzy: 'Нечеткое выделение: ЛКМ, чтобы выбрать все условные блоки, ПКМ, чтобы
-    добавить'
-  sel_convex_polyhedral: 'Выпуклое многогранное выделение: ЛКМ - первая вершина, ПКМ
-    для добавления больше.'
+  sel_fuzzy: 'Нечеткое выделение: ЛКМ, чтобы выбрать все условные блоки, ПКМ, чтобы добавить'
+  sel_convex_polyhedral: 'Выпуклое многогранное выделение: ЛКМ - первая вершина, ПКМ для добавления больше.'
   sel_list: Для получения списка типов выделения используйте:&c //sel list
   sel_modes: 'Выберите один из перечисленных режимов ниже:'
 tips:
@@ -280,37 +304,26 @@ tips:
   tip_fast: '&7Совет: Установить быстро и без отмены, используя &c//fast'
   tip_cancel: '&7Совет: Вы можете &c//cancel &7от изменений в процессе'
   tip_mask: '&7Совет: Задайте маску глобального назначения - &c/gmask'
-  tip_mask_angle: 'Совет: Заменить верхний слой 3-20 блоков -&c //replace /-20:-3
-    bedrock'
+  tip_mask_angle: 'Совет: Заменить верхний слой 3-20 блоков -&c //replace /-20:-3 bedrock'
   tip_set_linear: '&7Совет: Установка блоков -&c //set #l3d:wood,bedrock'
   tip_surface_spread: '&7Совет: Распространение плоской поверхности -&c //set #surfacespread:5:0:5:#existing'
   tip_set_hand: '&7Совет: Используйте свою текущую руку - &c//set hand'
   tip_replace_id: '&7Совет: Заменить только ID блока -&c //replace woodenstair #id:cobblestair'
-  tip_replace_light: 'Совет: Удалить источники света -&c //replace #brightness:1:15
-    0'
+  tip_replace_light: 'Совет: Удалить источники света -&c //replace #brightness:1:15 0'
   tip_tab_complete: 'Совет: Команда replace поддерживает автозаполение'
   tip_flip: 'Совет: Отобразить - &c//flip'
   tip_deform: 'Совет: Изменить - &c//deform'
   tip_transform: 'Совет: Установка преобразования - &c//gtransform'
   tip_copypaste: 'Совет: Вставка по клику - &c//br copypaste'
   tip_source_mask: 'Совет: Установить маску источника - &c/gsmask <mask>&7'
-  tip_replace_marker: 'Совет: Замените блок с помощью полного буфера обмена - &c//replace
-    wool #fullcopy'
+  tip_replace_marker: 'Совет: Замените блок с помощью полного буфера обмена - &c//replace wool #fullcopy'
   tip_paste: 'Совет: Вставить - &c//paste'
   tip_lazycopy: 'Совет: lazycopy быстрее'
   tip_download: 'Совет: Попробовать - &c//download'
   tip_rotate: 'Совет: Ориентация - &c//rotate'
   tip_copy_pattern: 'Совет: Для использования шаблона используйте &c#copy'
-  tip_brush_spline: '&7Совет: Команда &c//brush &7соединяет несколько фигур вместе'
-  tip_brush_height: '&7Совет: Команда &c//brush &7плавно повышает или понижает ландшафт'
-  tip_brush_copy: '&7Совет: Команда &c//brush &7позволяет легко копировать и вставлять
-    объекты'
-  tip_brush_mask: '&7Совет: Задайте маску назначения кисти - &c/mask'
-  tip_brush_mask_source: '&7Совет: Задайте маску источника кисти - &c/smask'
-  tip_brush_transform: '&7Совет: Установите кисть преобразования - &c/transform'
-  tip_brush_relative: '&7Совет: Используйте шаблон относительного буфера обмена -
-    //br sphere #~:#copy'
-  tip_brush_command: '&7Совет: Попробуйте командную кисть - &c//br cmd <radius> <cmd1;cmd2>'
   tip_lazycut: '&7Совет: Это безопаснее использовать &c//lazycut'
   tip_regen_0: 'Совет: Используйте биом - &c/regen [biome]'
   tip_regen_1: 'Совет: Используйте сид - &c/regen [biome] [seed]'
+  tip_biome_pattern: 'Tip: The &c#biome[forest]&7 pattern can be used in any command'
+  tip_biome_mask: 'Tip: Restrict to a biome with the `$jungle` mask'
