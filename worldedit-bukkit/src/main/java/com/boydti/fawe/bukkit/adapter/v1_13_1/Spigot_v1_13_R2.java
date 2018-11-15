@@ -549,4 +549,10 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void notifyAndLightBlock(Location position, BlockState previousType) {
+		// TODO Auto-generated method stub
+		
+	}
 }

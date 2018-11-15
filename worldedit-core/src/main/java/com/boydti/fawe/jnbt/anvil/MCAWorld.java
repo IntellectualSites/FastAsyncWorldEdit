@@ -121,4 +121,10 @@ public class MCAWorld implements SimpleWorld {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

@@ -2280,4 +2280,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

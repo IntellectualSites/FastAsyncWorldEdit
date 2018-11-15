@@ -33,6 +33,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -630,6 +631,12 @@ public class SchemVis extends ImmutableVirtualWorld {
 
 	@Override
 	public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
 		// TODO Auto-generated method stub
 		return false;
 	}
