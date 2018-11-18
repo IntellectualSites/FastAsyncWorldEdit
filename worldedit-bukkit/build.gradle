@@ -13,7 +13,7 @@ dependencies {
     compile 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
     compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
-    compile 'net.milkbowl.vault:VaultAPI:1.5.6'
+    compile 'net.milkbowl.vault:VaultAPI:1.7'
     compile 'com.massivecraft:factions:2.8.0'
     compile 'com.drtshock:factions:1.6.9.5'
     compile 'com.factionsone:FactionsOne:1.2.2'
