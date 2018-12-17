@@ -4,7 +4,6 @@ apply plugin: 'maven'
 
 repositories {
     maven { url "https://hub.spigotmc.org/nexus/content/groups/public" }
-    mavenLocal()
 }
 
 dependencies {
