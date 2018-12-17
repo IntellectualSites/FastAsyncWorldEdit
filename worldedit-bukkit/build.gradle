@@ -4,6 +4,7 @@ apply plugin: 'maven'
 
 repositories {
     maven { url "https://hub.spigotmc.org/nexus/content/groups/public" }
+    mavenLocal()
 }
 
 dependencies {
@@ -28,7 +29,7 @@ dependencies {
     compile 'com.wasteofplastic:askyblock:3.0.8.2'
     compile 'com.sk89q:worldguard-core:latest'
     compile 'com.sk89q:worldguard-legacy:latest'
-    compile('org.inventivetalent:mapmanager:1.4.0-SNAPSHOT') {
+    compile('org.inventivetalent:mapmanager:1.7.1-SNAPSHOT') {
         transitive = false
     }
 }
