@@ -160,7 +160,7 @@ public class InstallerFrame extends JFrame {
             } catch (Throwable ignore) {
                 ignore.printStackTrace();
             }
-            URL chat = new URL("http://webchat.esper.net/?nick=&channels=IntellectualCrafters&fg_color=000&fg_sec_color=000&bg_color=FFF");
+            URL chat = new URL("https://discord.gg/ngZCzbU");
             URLButton chatButton = new URLButton(chat, "Chat");
             bottomBar.add(chatButton);
             URL wiki = new URL("https://github.com/boy0001/FastAsyncWorldedit/wiki");

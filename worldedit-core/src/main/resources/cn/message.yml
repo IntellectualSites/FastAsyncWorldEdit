@@ -5,7 +5,7 @@
 # 请其他译者勿使用机器翻译。谢谢！
 
 info:
-  prefix: '&8(&4&l快异创世&8)&r&7'
+  prefix: '&8(&4&lFAWE&8)&r&7'
   file_deleted: '%s0 已被删除。'
   schematic_pasting: '&7正在粘贴布局。此操作无法撤销。'
   lighting_propogate_selection: '&7光照已在 %s0 个区块内传播。（注：您可使用 //removelight 移除）'
