@@ -24,6 +24,7 @@ import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.session.SessionManager;
+import com.sk89q.worldedit.util.report.Unreported;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
@@ -40,8 +41,8 @@ import java.util.stream.Collectors;
  */
 public class YAMLConfiguration extends LocalConfiguration {
 
-    protected final YAMLProcessor config;
-    protected final Logger logger;
+    @Unreported protected final YAMLProcessor config;
+    @Unreported protected final Logger logger;
 
     public YAMLConfiguration(YAMLProcessor config, Logger logger) {
         this.config = config;
