@@ -100,6 +100,11 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
+    public String getDisplayName() {
+        return basePlayer.getDisplayName();
+    }
+
+    @Override
     public BaseEntity getState() {
         throw new UnsupportedOperationException("Can't withPropertyId() on a player");
     }
