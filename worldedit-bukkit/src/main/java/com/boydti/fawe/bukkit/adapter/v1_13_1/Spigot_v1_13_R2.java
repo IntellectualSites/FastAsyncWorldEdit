@@ -411,15 +411,15 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             }
             return new CompoundTag(values);
         } else if (foreign instanceof NBTTagByte) {
-            return new ByteTag(((NBTTagByte) foreign).g()); // getByte
+            return new ByteTag(((NBTTagByte) foreign).asByte()); // getByte
         } else if (foreign instanceof NBTTagByteArray) {
             return new ByteArrayTag(((NBTTagByteArray) foreign).c()); // data
         } else if (foreign instanceof NBTTagDouble) {
             return new DoubleTag(((NBTTagDouble) foreign).asDouble()); // getDouble
         } else if (foreign instanceof NBTTagFloat) {
-            return new FloatTag(((NBTTagFloat) foreign).i()); // getFloat
+            return new FloatTag(((NBTTagFloat) foreign).asFloat()); // getFloat
         } else if (foreign instanceof NBTTagInt) {
-            return new IntTag(((NBTTagInt) foreign).e()); // getInt
+            return new IntTag(((NBTTagInt) foreign).asInt()); // getInt
         } else if (foreign instanceof NBTTagIntArray) {
             return new IntArrayTag(((NBTTagIntArray) foreign).d()); // data
         } else if (foreign instanceof NBTTagList) {
@@ -430,11 +430,11 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
                 return new ListTag(ByteTag.class, new ArrayList<ByteTag>());
             }
         } else if (foreign instanceof NBTTagLong) {
-            return new LongTag(((NBTTagLong) foreign).d()); // getLong
+            return new LongTag(((NBTTagLong) foreign).asLong()); // getLong
         } else if (foreign instanceof NBTTagShort) {
-            return new ShortTag(((NBTTagShort) foreign).f()); // getShort
+            return new ShortTag(((NBTTagShort) foreign).asShort()); // getShort
         } else if (foreign instanceof NBTTagString) {
-            return new StringTag(foreign.b_()); // data
+            return new StringTag(foreign.asString()); // data
         } else if (foreign instanceof NBTTagEnd) {
             return EndTag.INSTANCE;
         } else {
