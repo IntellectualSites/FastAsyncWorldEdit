@@ -19,10 +19,10 @@
 
 package com.sk89q.jnbt;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helps create compound tags.
@@ -145,14 +145,14 @@ public class CompoundTagBuilder {
         return put(key, new LongArrayTag(value));
     }
 
-        /**
-         * Put the given key and value into the compound tag as a
-         * {@code LongTag}.
-         *
-         * @param key they key
-         * @param value the value
-         * @return this object
-         */
+    /**
+     * Put the given key and value into the compound tag as a
+     * {@code LongTag}.
+     *
+     * @param key they key
+     * @param value the value
+     * @return this object
+     */
     public CompoundTagBuilder putLong(String key, long value) {
         return put(key, new LongTag(value));
     }
@@ -212,6 +212,5 @@ public class CompoundTagBuilder {
     public static CompoundTagBuilder create() {
         return new CompoundTagBuilder();
     }
-
 
 }

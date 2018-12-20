@@ -80,7 +80,7 @@ public class Vector2D implements Serializable {
 
     /**
      * Construct a new instance with X and Z coordinates set to 0.
-     * <p>
+     *
      * <p>One can also refer to a static {@link #ZERO}.</p>
      */
     public Vector2D() {
@@ -511,7 +511,7 @@ public class Vector2D implements Serializable {
 
     /**
      * Rounds all components to the closest integer.
-     * <p>
+     *
      * <p>Components &lt; 0.5 are rounded down, otherwise up.</p>
      *
      * @return a new vector
@@ -533,9 +533,9 @@ public class Vector2D implements Serializable {
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle      in degrees
-     * @param aboutX     about which x coordinate to rotate
-     * @param aboutZ     about which z coordinate to rotate
+     * @param angle in degrees
+     * @param aboutX about which x coordinate to rotate
+     * @param aboutZ about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
@@ -548,8 +548,8 @@ public class Vector2D implements Serializable {
         double x2 = x * Math.cos(angle) - z * Math.sin(angle);
         double z2 = x * Math.sin(angle) + z * Math.cos(angle);
         return new Vector2D(
-                x2 + aboutX + translateX,
-                z2 + aboutZ + translateZ
+            x2 + aboutX + translateX,
+            z2 + aboutZ + translateZ
         );
     }
 
@@ -648,8 +648,8 @@ public class Vector2D implements Serializable {
      */
     public static Vector2D getMinimum(Vector2D v1, Vector2D v2) {
         return new Vector2D(
-                Math.min(v1.getX(), v2.getX()),
-                Math.min(v1.getZ(), v2.getZ())
+            Math.min(v1.getX(), v2.getX()),
+            Math.min(v1.getZ(), v2.getZ())
         );
     }
 
@@ -662,8 +662,8 @@ public class Vector2D implements Serializable {
      */
     public static Vector2D getMaximum(Vector2D v1, Vector2D v2) {
         return new Vector2D(
-                Math.max(v1.getX(), v2.getX()),
-                Math.max(v1.getZ(), v2.getZ())
+            Math.max(v1.getX(), v2.getX()),
+            Math.max(v1.getZ(), v2.getZ())
         );
     }
 

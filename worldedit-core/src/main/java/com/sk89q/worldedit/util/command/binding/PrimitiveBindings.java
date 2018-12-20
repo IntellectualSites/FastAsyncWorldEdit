@@ -28,8 +28,9 @@ import com.sk89q.worldedit.util.command.parametric.BindingHelper;
 import com.sk89q.worldedit.util.command.parametric.BindingMatch;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 
-import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
+
+import javax.annotation.Nullable;
 
 /**
  * Handles basic Java types such as {@link String}s, {@link Byte}s, etc.
@@ -86,8 +87,8 @@ public final class PrimitiveBindings extends BindingHelper {
      * @throws ParameterException on error
      */
     @BindingMatch(type = { Boolean.class, boolean.class },
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1)
     public Boolean getBoolean(ArgumentStack context) throws ParameterException {
         return context.nextBoolean();
     }
@@ -117,6 +118,7 @@ public final class PrimitiveBindings extends BindingHelper {
                 throw new ParameterException(String.format(
                         "Expected '%s' to be a number or valid math expression (error: %s)", input, e.getMessage()));
             }
+
         }
     }
 

@@ -36,4 +36,5 @@ public interface Chunk {
      * @throws DataException thrown on data error
      */
     BlockStateHolder getBlock(Vector position) throws DataException;
+
 }
