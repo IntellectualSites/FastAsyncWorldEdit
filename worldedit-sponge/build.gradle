@@ -1,0 +1,50 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+        jcenter()
+    }
+}
+
+plugins {
+    id 'signing'
+    id 'org.spongepowered.plugin' version '0.8.1'
+}
+
+dependencies {
+    compile project(':worldedit-core')
+    compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
+    testCompile group: 'org.mockito', name: 'mockito-core', version:'1.9.0-rc1'
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+sponge {
+    plugin {
+        id = 'worldedit'
+    }
+}
+
+jar {
+    manifest {
+        attributes("Class-Path": "truezip.jar WorldEdit/truezip.jar js.jar WorldEdit/js.jar",
+                "WorldEdit-Version": version)
+    }
+}
+
+shadowJar {
+    dependencies {
+        include(dependency(':worldedit-core'))
+    }
+}
+
+artifacts {
+    archives shadowJar
+}
+
+signing {
+    required false
+    sign shadowJar
+}

@@ -1,0 +1,87 @@
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+repositories {
+    maven {url "http://ci.athion.net/job/PlotSquared/ws/mvn/"}
+}
+dependencies {
+    compile 'de.schlichtherle:truezip:6.8.3'
+    compile 'rhino:js:1.7R2'
+    compile 'com.google.guava:guava:21.0'
+    compile 'com.sk89q:jchronic:0.2.4a'
+    compile 'com.google.code.findbugs:jsr305:1.3.9'
+    compile 'com.thoughtworks.paranamer:paranamer:2.6'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.sk89q.lib:jlibnoise:1.0.0'
+    testCompile 'org.mockito:mockito-core:1.9.0-rc1'
+
+    // Fawe depends
+    compile 'org.yaml:snakeyaml:1.19'
+    compile 'net.fabiozumbi12:redprotect:1.9.6'
+    compile ("com.plotsquared:plotsquared-api:latest") {
+        transitive = false
+    }
+//    compile 'org.primesoft:BlocksHub:2.0'
+    compile 'com.github.luben:zstd-jni:1.1.1'
+    compile 'co.aikar:fastutil-lite:1.0'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir 'src/legacy/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+processResources {
+    from('src/main/resources') {
+        include 'fawe.properties'
+        expand(
+                internalVersion: "${project.parent.version}",
+                name: project.parent.name,
+        )
+    }
+}
+
+jar.archiveName="fawe-api-${project.parent.version}.jar"
+jar.destinationDir = file '../mvn/com/boydti/fawe-api/' + project.parent.version
+task createPom << {
+    pom {
+        project {
+            groupId 'com.boydti'
+            artifactId 'fawe-api'
+            version project.parent.version
+        }
+    }
+    .getEffectivePom()
+            .setDependencies(new ArrayList<>())
+            .writeTo("../mvn/com/boydti/fawe-api/${project.parent.version}/fawe-api-${project.parent.version}.pom")
+    pom {
+        project {
+            groupId 'com.boydti'
+            artifactId 'fawe-api'
+            version 'latest'
+        }
+    }
+    .getEffectivePom()
+            .setDependencies(new ArrayList<>())
+            .writeTo("../mvn/com/boydti/fawe-api/latest/fawe-api-latest.pom")
+}
+task copyFiles {
+    doLast {
+        copy {
+            from "../mvn/com/boydti/fawe-api/${project.parent.version}/"
+            into '../mvn/com/boydti/fawe-api/latest/'
+            include('*.jar')
+            rename ("fawe-api-${project.parent.version}.jar", 'fawe-api-latest.jar')
+        }
+    }
+}
+
+build.dependsOn(shadowJar)
+build.finalizedBy(copyFiles)
+copyFiles.dependsOn(createPom)

@@ -1,0 +1,92 @@
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+repositories {
+    maven { url "https://hub.spigotmc.org/nexus/content/groups/public" }
+}
+
+dependencies {
+    compile project(':worldedit-core')
+    compile 'com.sk89q:dummypermscompat:1.8'
+    compile 'com.destroystokyo.paper:paper-api:1.13-R0.1-SNAPSHOT'
+    compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
+    testCompile 'org.mockito:mockito-core:1.9.0-rc1'
+    compile 'net.milkbowl.vault:VaultAPI:1.5.6'
+    compile 'com.massivecraft:factions:2.8.0'
+    compile 'com.drtshock:factions:1.6.9.5'
+    compile 'com.factionsone:FactionsOne:1.2.2'
+    compile 'me.ryanhamshire:GriefPrevention:11.5.2'
+    compile 'com.massivecraft:mcore:7.0.1'
+    compile 'net.sacredlabyrinth.Phaed:PreciousStones:10.0.4-SNAPSHOT'
+    compile 'net.jzx7:regios:5.9.9'
+    compile 'com.bekvon.bukkit.residence:Residence:4.5._13.1'
+    compile 'com.palmergames.bukkit:towny:0.84.0.9'
+    compile 'com.worldcretornica:plotme_core:0.16.3'
+    compile 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
+    compile 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
+    compile 'com.wasteofplastic:askyblock:3.0.8.2'
+    compile 'com.sk89q:worldguard-core:latest'
+    compile 'com.sk89q:worldguard-legacy:latest'
+    compile('org.inventivetalent:mapmanager:1.7.1-SNAPSHOT') {
+        transitive = false
+    }
+}
+
+processResources {
+    from (sourceSets.main.resources.srcDirs) {
+        expand 'internalVersion': project.internalVersion
+        include 'plugin.yml'
+    }
+
+    from (sourceSets.main.resources.srcDirs) {
+        exclude 'plugin.yml'
+    }
+}
+
+jar.archiveName="fawe-bukkit-${project.parent.version}.jar"
+jar.destinationDir = file '../mvn/com/boydti/fawe-bukkit/' + project.parent.version
+task createPom << {
+    pom {
+        project {
+            groupId 'com.boydti'
+            artifactId 'fawe-bukkit'
+            version project.parent.version
+        }
+    }
+    .getEffectivePom()
+            .setDependencies(new ArrayList<>())
+            .writeTo("../mvn/com/boydti/fawe-bukkit/${project.parent.version}/fawe-bukkit-${project.parent.version}.pom")
+    pom {
+        project {
+            groupId 'com.boydti'
+            artifactId 'fawe-bukkit'
+            version 'latest'
+        }
+    }
+    .getEffectivePom()
+            .setDependencies(new ArrayList<>())
+            .writeTo("../mvn/com/boydti/fawe-bukkit/latest/fawe-bukkit-latest.pom")
+}
+task copyFiles {
+    doLast {
+        copy {
+            from "../mvn/com/boydti/fawe-bukkit/${project.parent.version}/"
+            into '../mvn/com/boydti/fawe-bukkit/latest/'
+            include('*.jar')
+            rename ("fawe-bukkit-${project.parent.version}.jar", 'fawe-bukkit-latest.jar')
+        }
+    }
+}
+
+shadowJar {
+    dependencies {
+        include(dependency(':worldedit-core'))
+    }
+    archiveName = "${parent.name}-${project.name.replaceAll("worldedit-", "")}-${parent.version}.jar"
+    destinationDir = file '../target'
+}
+
+build.dependsOn(shadowJar)
+build.finalizedBy(copyFiles)
+copyFiles.dependsOn(createPom)

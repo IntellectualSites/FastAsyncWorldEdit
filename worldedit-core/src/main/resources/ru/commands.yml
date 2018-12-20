@@ -1,0 +1,1345 @@
+#----------------------------------------------
+#Rus by MrBogdan2402 https://vk.com/b_o_d_ik
+#----------------------------------------------
+/replaceall:
+  help: ''
+  aliases:
+  - /replaceall
+  - /rea
+  - /repall
+  usage: <папка> [из-блока] <в-блок>
+  desc: Заменить все блоки в выделении на другие
+/replaceallpattern:
+  help: ''
+  aliases:
+  - /replaceallpattern
+  - /reap
+  - /repallpat
+  usage: <папка> [из-блока] <в-блок>
+  desc: Заменить все блоки в выделении на другие
+/countall:
+  help: ''
+  aliases:
+  - /countall
+  usage: <папка> [hasSky] <id>
+  desc: Количество всех блоков в мире
+/setbiome:
+  help: |-
+    Установить биом региона.
+    По умолчанию используются все блоки, содержащиеся в вашем выделении.
+    -p Используется блок, на котором вы находитесь
+  aliases:
+  - /setbiome
+  usage: <биом>
+  desc: Установить биом текущего блока игрока или региона.
+biomelist:
+  help: ''
+  aliases:
+  - biomelist
+  - biomels
+  usage: '[стр]'
+  desc: Спосок всех биомов.
+biomeinfo:
+  help: |-
+    Получить биом блока.
+    По умолчанию используются все блоки, содержащиеся в вашем выделении.
+    -t Используется блок, на который вы смотрите.
+    -p Используется блок, на котором вы находитесь
+  aliases:
+  - biomeinfo
+  usage: ''
+  desc: Получить биом целевого блока.
+chunkinfo:
+  help: ''
+  aliases:
+  - chunkinfo
+  usage: ''
+  desc: Получить информацию о чанке, в котором вы находитесь
+listchunks:
+  help: ''
+  aliases:
+  - listchunks
+  usage: ''
+  desc: Список чанков, которые ваше выделение включает в себя
+delchunks:
+  help: ''
+  aliases:
+  - delchunks
+  usage: ''
+  desc: Удалите чанки, которые содержит ваше выделение.
+/load:
+  help: ''
+  aliases:
+  - /load
+  usage: <имя-файла>
+  desc: Загрузка схематический файл в буфер обмена
+/save:
+  help: ''
+  aliases:
+  - /save
+  usage: <имя-файла>
+  desc: Сохранить схематический файл из буфера обмена
+/copy:
+  help: |-
+    Скопировать выделение в буфер обмена
+    Флаги:
+      -e контролирует, копируются ли сущности
+      -m задать маску, исключающую блоки воздуха
+    ПРЕДУПРЕЖДЕНИЕ: Вставка сущностей не может быть отменена!
+  aliases:
+  - /copy
+  usage: ''
+  desc: Скопировать выделение в буфер обмена
+/flip:
+  help: |
+    Переворачивает содержимое буфера обмена через точку, из которой было скопировано.
+  aliases:
+  - /flip
+  usage: '[<направление>]'
+  desc: Перевернуть содержимое буфера обмена
+/rotate:
+  help: |
+    Неразрушающий поворот содержимого буфера обмена.
+    Углы представлены в градусах, а положительный угол приведет к вращению по часовой стрелке. Несколько поворотов могут быть сложены. Интерполяция не выполняется, поэтому углы должны быть кратны 90 градусам.
+  aliases:
+  - /rotate
+  usage: <ось-y> [<ось-x>] [<ось-z>]
+  desc: Поворот содержимого буфера обмена
+/lazycopy:
+  help: |-
+    Ленивое копирование выделения в буфер обмена
+    Флаги:
+      -e контролирует, копируются ли сущности
+      -m задать маску, исключающую блоки воздуха
+    ПРЕДУПРЕЖДЕНИЕ: Вставка сущностей не может быть отменена!
+  aliases:
+  - /lazycopy
+  usage: ''
+  desc: Ленивое копирование выделения в буфер обмена
+/lazycut:
+  help: |-
+    Ленивое вырезание выделение в буфер обмена
+    Флаги:
+      -e контролирует, копируются ли сущности
+      -m задать маску, исключающую блоки воздуха
+    ПРЕДУПРЕЖДЕНИЕ: Вставка сущностей не может быть отменена!
+  aliases:
+  - /lazycut
+  usage: ''
+  desc: Ленивое вырезание выделение в буфер обмена
+/cut:
+  help: |-
+    Вырезать выделение в буфер обмена
+    Флаги:
+      -e контролирует, копируются ли сущности
+      -m задать маску, исключающую блоки воздуха
+    ПРЕДУПРЕЖДЕНИЕ: Вставка сущностей не может быть отменена!
+  aliases:
+  - /cut
+  usage: '[leave-id]'
+  desc: Вырезать выделение в буфер обмена
+/paste:
+  help: |-
+    Вставить содержимое буфера обмена.
+    Флаги:
+      -a пропустить блоки воздуха
+      -o вставить в исходном положении
+      -s выбирать регион после вставки
+  aliases:
+  - /paste
+  usage: ''
+  desc: Вставляет содержимое буфера обмена
+download:
+  help: ''
+  aliases:
+  - download
+  usage: ''
+  desc: Загрузить буфер обмена
+/place:
+  help: |-
+    Поместить содержимое буфера обмена без применения преобразований (например Вращение).
+    Флаги:
+      -a пропустить блоки воздуха
+      -o вставить в исходном положении
+      -s выбирать регион после вставки
+  aliases:
+  - /place
+  usage: ''
+  desc: Поместить содержимое буфера обмена без применения преобразований (например Вращение)
+clearclipboard:
+  help: ''
+  aliases:
+  - clearclipboard
+  usage: ''
+  desc: Очистить буфер обмена
+/limit:
+  help: ''
+  aliases:
+  - /limit
+  usage: <лимит>
+  desc: Изменить лимит изменения блоков
+/tips:
+  help: ''
+  aliases:
+  - /tips
+  - tips
+  usage: ''
+  desc: Переключить советы WorldEdit
+/gmask:
+  help: ''
+  aliases:
+  - /gmask
+  - gmask
+  - globalmask
+  - /globalmask
+  usage: '[mask]'
+  desc: Установить глобальную маску
+/gsmask:
+  help: ''
+  aliases:
+  - /gsmask
+  - gsmask
+  - globalsourcemask
+  - /globalsourcemask
+  usage: '[mask]'
+  desc: Установить глобальную исходную маску
+/fast:
+  help: ''
+  aliases:
+  - /fast
+  usage: '[on|off]'
+  desc: Переключить быстрый режим
+/gtransform:
+  help: ''
+  aliases:
+  - /gtransform
+  - gtransform
+  usage: '[transform]'
+  desc: Установить глобальное преобразование
+/toggleplace:
+  help: ''
+  aliases:
+  - /toggleplace
+  - toggleplace
+  usage: ''
+  desc: Переключение между вашей позицией и pos1 для размещения
+/searchitem:
+  help: |-
+    Поиск предмета.
+    Флаги:
+      -b только поиск блоков
+      -i только поиск предметов
+  aliases:
+  - /searchitem
+  - /l
+  - /search
+  - searchitem
+  usage: <запрос>
+  desc: Поиск предмета
+/generate:
+  help: |-
+    Создает форму в соответствии с формулой, которая, как ожидается, будет
+    возвращать положительные числа (true), если точка находится внутри формы
+    При желании установите тип/данные желаемого блока.
+    Флаги:
+      -h создания полой формы
+      -r использовать необработанные координаты Minecraft
+      -o как и -r, за исключением смещение от размещения.
+      -c как и -r, за исключением смещения выбранного центра.
+    Если не заданы ни -r и -o, выбор будет отображен в -1..1
+    Смотрите также tinyurl.com/wesyntax.
+  aliases:
+  - /generate
+  - /gen
+  - /g
+  usage: <блок> <выражение>
+  desc: Создает форму по формуле.
+/hcyl:
+  help: |-
+    Создать полый цилиндр.
+    Указав 2 радиуса, разделенных запятой, 
+    вы можете создать эллиптические цилиндры.
+    Первый радиус - север/юг, второй - восток/запад.
+  aliases:
+  - /hcyl
+  usage: <шаблон> <радиус>[,<радиус>] [высота]
+  desc: Создать полый цилиндр.
+/cyl:
+  help: |-
+    Создать цилиндр.
+    Указав 2 радиуса, разделенных запятой, 
+    вы можете создать эллиптические цилиндры.
+    Первый радиус - north/south, второй - east/west.
+  aliases:
+  - /cyl
+  usage: <блок> <радиус>[,<радиус>] [высота]
+  desc: Создать цилиндр.
+/hsphere:
+  help: |-
+    Создать полую сферу.
+    Задав 3 радиуса, разделенных запятыми, вы можете 
+    сгенерировать эллипсоид. Порядок радиусов 
+    эллипсоида - north/south, up/down, east/west.
+  aliases:
+  - /hsphere
+  usage: <блок> <радиус>[,<радиус>,<радиус>] [поднятие?]
+  desc: Создать полую сферу.
+/sphere:
+  help: |-
+    Создать заполненную сферу.
+    Задав 3 радиуса, разделенных запятыми, вы можете 
+    сгенерировать эллипсоид. Порядок радиусов 
+    эллипсоида - north/south, up/down, east/west.
+  aliases:
+  - /sphere
+  usage: <блок> <радиус>[,<радиус>,<радиус>] [поднятие?]
+  desc: Создает заполненную сферу.
+pumpkins:
+  help: ''
+  aliases:
+  - pumpkins
+  usage: '[размер]'
+  desc: Создать тыквы
+/pyramid:
+  help: ''
+  aliases:
+  - /pyramid
+  usage: <блок> <размер>
+  desc: Создать заполненную пирамиду
+forestgen:
+  help: ''
+  aliases:
+  - forestgen
+  usage: '[размер] [тип] [плотность]'
+  desc: Создать лес
+/hpyramid:
+  help: ''
+  aliases:
+  - /hpyramid
+  usage: <блок> <размер>
+  desc: Создать полую пирамиду
+/generatebiome:
+  help: |-
+    Создает биом в соответствии с формулой, которая, как ожидается, будет
+    возвращать положительные числа (true), если точка находится внутри формы
+    При желании установите тип/данные желаемого блока.
+    Флаги:
+      -h создания полой формы
+      -r использовать необработанные координаты Minecraft
+      -o как и -r, за исключением смещение от размещения.
+      -c как и -r, за исключением смещения выбранного центра.
+    Если не заданы ни -r и -o, выбор будет отображен в -1..1
+    Смотрите также tinyurl.com/wesyntax.
+  aliases:
+  - /generatebiome
+  - /genbiome
+  - /gb
+  usage: <биом> <выражение>
+  desc: Установить биом по формуле.
+/undo:
+  help: ''
+  aliases:
+  - /undo
+  - undo
+  usage: '[раз] [игрок]'
+  desc: Отменить последнее действие
+/redo:
+  help: ''
+  aliases:
+  - /redo
+  - redo
+  usage: '[раз] [игрок]'
+  desc: Вернуть последнее действие (из истории)
+/clearhistory:
+  help: ''
+  aliases:
+  - /clearhistory
+  - clearhistory
+  usage: ''
+  desc: Очистить вашу историю
+/frb:
+  help: ''
+  aliases:
+  - /frb
+  - frb
+  - fawerollback
+  - /fawerollback
+  usage: <игрок> <радиус> <время>
+  desc: Отменить изменения в радиусе
+ceil:
+  help: ''
+  aliases:
+  - ceil
+  usage: '[clearance]'
+  desc: Go to the celing
+up:
+  help: ''
+  aliases:
+  - up
+  usage: <блок>
+  desc: Пойти вверх на некоторое расстояние
+unstuck:
+  help: ''
+  aliases:
+  - unstuck
+  - '!'
+  usage: ''
+  desc: Вылезти из блока
+thru:
+  help: ''
+  aliases:
+  - thru
+  usage: ''
+  desc: Построить стены
+jumpto:
+  help: ''
+  aliases:
+  - jumpto
+  - j
+  usage: '[world,x,y,z]'
+  desc: Телепортироваться на координаты
+descend:
+  help: ''
+  aliases:
+  - descend
+  - desc
+  usage: '[# of floors]'
+  desc: Спустится вниз
+ascend:
+  help: ''
+  aliases:
+  - ascend
+  - asc
+  usage: '[# of levels]'
+  desc: Поднятся вверх
+/replace:
+  help: ''
+  aliases:
+  - /replace
+  - /re
+  - /rep
+  usage: '[из-блока] <в-блок>'
+  desc: Заменить все блоки в выделенной области другим
+/stack:
+  help: |-
+    Повторить содержимое выделения.
+    Флаги:
+      -s сдвинуть выделение на последнюю скопированную копию
+      -a пропустить блоки воздуха
+  aliases:
+  - /stack
+  usage: '[количество] [направление]'
+  desc: Повторить содержимое выделения
+/set:
+  help: ''
+  aliases:
+  - /set
+  usage: '[шаблон]'
+  desc: Установить все блоки в пределах выделения
+/move:
+  help: |-
+    Переместить содержимое выделения.
+    Флаг -s переводит выделение в целевое местоположение.
+    При желании можно заполнить старое местоположение <выходной-id>.
+  aliases:
+  - /move
+  usage: '[количество] [направление] [выходной-id]'
+  desc: Переместить содержимое выделения
+/regen:
+  help: |-
+    Регенерировать содержимое текущего выделения.
+    Эта команда может влиять на объекты вне выделения, если они
+    находятся в пределах одного и того же чанка.
+  aliases:
+  - /regen
+  usage: '[биом] [сид]'
+  desc: Восстановить содержимое выделения
+/overlay:
+  help: ''
+  aliases:
+  - /overlay
+  usage: <блок>
+  desc: Установить блок над блоками в регионе
+/center:
+  help: ''
+  aliases:
+  - /center
+  - /middle
+  usage: <блок>
+  desc: Установить центральный(е) блок(и)
+/line:
+  help: |-
+    Рисовать отрезок между углами выделения прямоугольников.
+    Может использоваться только с кубическими выделениями.
+    Флаги:
+      -h генерировать только оболочку
+  aliases:
+  - /line
+  usage: <блок> [толщина]
+  desc: Рисовать отрезок между углами выделения прямоугольников
+/curve:
+  help: |-
+    Рисовать сплайн через выбранные точки.
+    Можно использовать только с выпуклыми многогранными выделениями.
+    Флаги:
+      -h генрировать только оболочку
+  aliases:
+  - /curve
+  usage: <блок> [толщина]
+  desc: Рисовать сплайн через выбранные точки
+/walls:
+  help: ''
+  aliases:
+  - /walls
+  usage: <блок>
+  desc: Создать четыре стороны выделения
+/deform:
+  help: |-
+    Деформировать выбранную область с выражением
+    Выражение выполняется для каждого блока и ожидается
+    изменение переменных x, y и z, чтобы указать на новый блок
+    для выборки. Смотрите также tinyurl.com/wesyntax.
+  aliases:
+  - /deform
+  usage: <выражение>
+  desc: Деформировать выбранную область с выражением
+/flora:
+  help: ''
+  aliases:
+  - /flora
+  usage: '[плотность]'
+  desc: Сделать флору в регионе
+/smooth:
+  help: |-
+    Сгладить высоту выделения.
+    Флаг -n позволяет рассматривать только естественные блоки.
+  aliases:
+  - /smooth
+  usage: '[повторение]'
+  desc: Сгладить высоту выделения
+/hollow:
+  help: |-
+    Выделяет объект, содержащийся в этом выделении.
+    При желании заполняет выдолбленную часть заданным блоком.
+    Толщина измеряется на манхэттенском расстоянии.
+  aliases:
+  - /hollow
+  usage: '[<толщина>[ <блок>]]'
+  desc: Выделяет объект, содержащийся в этом выделении
+/forest:
+  help: ''
+  aliases:
+  - /forest
+  usage: '[тип] [плотнось]'
+  desc: Создать лес в регионе
+/fall:
+  help: |-
+    Создать блоки в падении выбора
+    Флаг -m будет находиться только в пределах вертикального выделения.
+  aliases:
+  - /fall
+  usage: '[заменить]'
+  desc: Создать блоки в падении выбора
+/faces:
+  help: ''
+  aliases:
+  - /faces
+  - /outline
+  usage: <блок>
+  desc: Строить стены, потолок и пол в выделении
+/fixlighting:
+  help: ''
+  aliases:
+  - /fixlighting
+  usage: ''
+  desc: Получить освещение в позиции
+/getlighting:
+  help: ''
+  aliases:
+  - /getlighting
+  usage: ''
+  desc: Получить освещение в позиции
+/removelight:
+  help: ''
+  aliases:
+  - /removelight
+  - /removelighting
+  usage: ''
+  desc: Удаление освещения в выделенной области
+/setblocklight:
+  help: ''
+  aliases:
+  - /setblocklight
+  - /setlight
+  usage: ''
+  desc: Задать освещение блока в выделенной области
+/setskylight:
+  help: ''
+  aliases:
+  - /setskylight
+  usage: ''
+  desc: Задать освещение в небе в выделенной области
+/mapreplace:
+  help: ''
+  aliases:
+  - /mapreplace
+  - /mr
+  - /maprep
+  usage: <из-блока-1,из-блока-2> <в-блок-1,в-блок-2>
+  desc: 'Замените все блоки в выделении 1: 1 на '
+/naturalize:
+  help: ''
+  aliases:
+  - /naturalize
+  usage: ''
+  desc: 3 слоя грязи сверху
+cs:
+  help: ''
+  aliases:
+  - cs
+  usage: <имя-файла> [аргументы...]
+  desc: Выполнить CraftScript
+s:
+  help: ''
+  aliases:
+  - .s
+  usage: '[аргументы...]'
+  desc: Выполнить последний CraftScript
+/count:
+  help: ''
+  aliases:
+  - /count
+  usage: <блок>
+  desc: Подсчитывает количество определенного типа блока
+/size:
+  help: ''
+  aliases:
+  - /size
+  usage: ''
+  desc: Получить информацию о выделении
+/expand:
+  help: ''
+  aliases:
+  - /expand
+  usage: <количество> [обратное-количество] <направление>
+  desc: Расширить область выделения
+/shift:
+  help: ''
+  aliases:
+  - /shift
+  usage: <количество> [направление]
+  desc: Shift the selection area
+/pos1:
+  help: ''
+  aliases:
+  - /pos1
+  - posa
+  usage: '[координаты]'
+  desc: Установить позицию 1
+/pos2:
+  help: ''
+  aliases:
+  - /pos2
+  - posb
+  usage: '[координаты]'
+  desc: Установить позицию 2
+/chunk:
+  help: |-
+    Установите выделение в чанке, в котором вы сейчас находитесь.
+    С флагом -s ваше текущее выделение будет расширено,
+    чтобы охватить все чанки, которые являются его частью.
+
+    Указание координат будет использовать их вместо вашей
+    текущей позиции. Используйте -c для указания координат 
+    чанка, иначе будут подразумеваться полные координаты.
+    (Например, координаты 5,5 такие же, как -c 0,0)
+  aliases:
+  - /chunk
+  usage: '[x,z координаты]'
+  desc: Установите выбор в ваш текущем чанке.
+/sel:
+  help: ''
+  aliases:
+  - /sel
+  - ;
+  - /desel
+  - /deselect
+  usage: '[cuboid|extend|poly|ellipsoid|sphere|cyl|convex]'
+  desc: Выбрать регион
+/inset:
+  help: |
+    Заключение выделение, указанное во всех направлениях.
+    Флаги:
+      -h только заключение по горизонтали
+      -v только заключение по вертикали
+  aliases:
+  - /inset
+  usage: <количество>
+  desc: Вставка выделенной области
+/contract:
+  help: ''
+  aliases:
+  - /contract
+  usage: <количество> [обратное-количество] [направление]
+  desc: Заключить область выделения
+/hpos1:
+  help: ''
+  aliases:
+  - /hpos1
+  usage: ''
+  desc: Установить позицию 1 в целевой блок
+/hpos2:
+  help: ''
+  aliases:
+  - /hpos2
+  usage: ''
+  desc: Установить позицию 2 в целевой блок
+/wand:
+  help: ''
+  aliases:
+  - /wand
+  usage: ''
+  desc: Получить топол выделения
+/outset:
+  help: |
+    Расширяет выделение на заданную величину во всех направлениях.
+    Флаги:
+      -h только расширяются горизонтально
+      -v только расширяться вертикально
+  aliases:
+  - /outset
+  usage: <количество>
+  desc: Выделить область выделения
+/distr:
+  help: |-
+    Получить распределение блоков в выделенной области.
+    Флаг -c получает распределение вашего буфера обмена.
+    Флаг -d разделяет блоки по данным
+  aliases:
+  - /distr
+  usage: ''
+  desc: Получить распределение блоков в выделенной области
+toggleeditwand:
+  help: ''
+  aliases:
+  - toggleeditwand
+  usage: ''
+  desc: Переключить функциональность топорика редактирования
+restore:
+  help: ''
+  aliases:
+  - restore
+  - /restore
+  usage: '[snapshot]'
+  desc: Восстановить выбор из снапшота
+size:
+  help: ''
+  aliases:
+  - size
+  usage: '[шаблон]'
+  desc: Установить размер кисти
+mask:
+  help: ''
+  aliases:
+  - mask
+  - /mask
+  usage: '[маска]'
+  desc: Установить маску кисти
+range:
+  help: ''
+  aliases:
+  - range
+  usage: '[шаблон]'
+  desc: Установите диапазон кисти
+mat:
+  help: ''
+  aliases:
+  - mat
+  - material
+  usage: '[шаблон]'
+  desc: Установить материал кисти
+transform:
+  help: ''
+  aliases:
+  - transform
+  usage: '[преобразование]'
+  desc: Установить кисть преобразование
+smask:
+  help: ''
+  aliases:
+  - smask
+  - /smask
+  - /sourcemask
+  - sourcemask
+  usage: '[маска]'
+  desc: Установить маску кисти
+/:
+  help: ''
+  aliases:
+  - /
+  - ','
+  usage: '[on|off]'
+  desc: Переключить функцию Супер Кирки
+tree:
+  help: ''
+  aliases:
+  - tree
+  usage: '[тип]'
+  desc: Инструмент генератора деревьев
+repl:
+  help: ''
+  aliases:
+  - repl
+  usage: <блок>
+  desc: Инструмент замены блоков
+info:
+  help: ''
+  aliases:
+  - info
+  usage: ''
+  desc: Инструмент информации о блоках
+none:
+  help: ''
+  aliases:
+  - none
+  usage: ''
+  desc: Отвязать связанный инструмент от текущего предмета
+cycler:
+  help: ''
+  aliases:
+  - cycler
+  usage: ''
+  desc: Инструмент циклических данных блоков
+deltree:
+  help: ''
+  aliases:
+  - deltree
+  usage: ''
+  desc: Инструмент для удаления летающих деревьев
+farwand:
+  help: ''
+  aliases:
+  - farwand
+  usage: ''
+  desc: Инструмент топорик на расстоянии
+inspect:
+  help: Выбрать проверяемую кисть
+  aliases:
+  - inspect
+  usage: ''
+  desc: Осмотреть изменения в радиусе
+floodfill:
+  help: ''
+  aliases:
+  - floodfill
+  - flood
+  usage: <шаблон> <диапазон>
+  desc: Инструмент заполнения
+lrbuild:
+  help: ''
+  aliases:
+  - lrbuild
+  - /lrbuild
+  usage: <leftclick block> <rightclick block>
+  desc: Инструмент для строительства на больших расстояния
+remove:
+  help: ''
+  aliases:
+  - remove
+  - rem
+  - rement
+  usage: <тип> <радиус>
+  desc: Удалить все сущности типа
+/fill:
+  help: ''
+  aliases:
+  - /fill
+  usage: <блок> <радиус> [глубина]
+  desc: Заполнить отверстие
+/help:
+  help: ''
+  aliases:
+  - /help
+  usage: '[<команда>]'
+  desc: Показать справку для команд WorldEdit
+/drain:
+  help: ''
+  aliases:
+  - /drain
+  usage: <радиус>
+  desc: Истощить бассейн
+/snow:
+  help: ''
+  aliases:
+  - /snow
+  - snow
+  usage: '[радиус]'
+  desc: Симулировать снег
+/ex:
+  help: ''
+  aliases:
+  - /ex
+  - /ext
+  - /extinguish
+  - ex
+  - ext
+  - extinguish
+  usage: '[радиус]'
+  desc: Погасить ближайший огонь
+/green:
+  help: ''
+  aliases:
+  - /green
+  - green
+  usage: '[радиус]'
+  desc: Озленить область
+/thaw:
+  help: ''
+  aliases:
+  - /thaw
+  - thaw
+  usage: '[радиус]'
+  desc: Разморозить область
+/fillr:
+  help: ''
+  aliases:
+  - /fillr
+  usage: <блок> <радиус> [глубина]
+  desc: Заполнить отверстие рекурсивно
+/fixlava:
+  help: ''
+  aliases:
+  - /fixlava
+  - fixlava
+  usage: <радиус>
+  desc: Исправить лаву
+/fixwater:
+  help: ''
+  aliases:
+  - /fixwater
+  - fixwater
+  usage: <радиус>
+  desc: Исправить воду
+/calc:
+  help: ''
+  aliases:
+  - /calc
+  - /calculate
+  - /eval
+  - /evaluate
+  - /solve
+  usage: <выражение>
+  desc: Вычислить математическое выражение
+butcher:
+  help: |-
+    Убивает ближайших мобов, основанных на радиусе, если ни один не указан, используется по умолчанию в конфигурации.
+    Флаги:
+      -p также убивает домашних животных.
+      -n также убивает NPC.
+      -g также убивает големов.
+      -а также убивает животных.
+      -b также убивает окружающих мобов.
+      -t также убивает мобов с именами.
+      -f объединяет все предыдущие флаги.
+      -r также уничтожает доспехи.
+      -l сейчас ничего не делает.
+  aliases:
+  - butcher
+  usage: '[радиус]'
+  desc: Убить всех или находящихся поблизости мобов
+/removeabove:
+  help: ''
+  aliases:
+  - /removeabove
+  - removeabove
+  usage: '[размер] [высота]'
+  desc: Удалите блоки над головой.
+/removebelow:
+  help: ''
+  aliases:
+  - /removebelow
+  - removebelow
+  usage: '[размер] [высота]'
+  desc: Удалите блоки ниже вас.
+/removenear:
+  help: ''
+  aliases:
+  - /removenear
+  - removenear
+  usage: <блок> [размер]
+  desc: Удалите блоки рядом с вами.
+/replacenear:
+  help: ''
+  aliases:
+  - /replacenear
+  - replacenear
+  usage: <размер> <из-id> <в-id>
+  desc: Заменить соседние блоки
+version:
+  help: ''
+  aliases:
+  - version
+  - ver
+  usage: ''
+  desc: Получить версию WorldEdit
+help:
+  help: ''
+  aliases:
+  - help
+  usage: '[<команда>]'
+  desc: Отобразить справку для команд WorldEdit
+reload:
+  help: ''
+  aliases:
+  - reload
+  usage: ''
+  desc: Перезагрузить конфигурацию
+tz:
+  help: ''
+  aliases:
+  - tz
+  usage: '[timezone]'
+  desc: Установите часовой пояс для моментальных снимков
+cui:
+  help: ''
+  aliases:
+  - cui
+  usage: ''
+  desc: Полное рукопожатие CUI (внутреннее использование)
+load:
+  help: ''
+  aliases:
+  - load
+  usage: '[<формат>] <имя-файла>'
+  desc: Загрузить схематические файлы в буфер обмена
+delete:
+  help: Удалить схематический файл из списка
+  aliases:
+  - delete
+  - d
+  usage: <имя-файла>
+  desc: Удаление сохраненной схематического файла
+list:
+  help: |
+    Перечислить все схемы в каталоге схем
+     -d сортировать по дате, сначала старые
+     -n сортировать по дате, сначала новые
+     -p <стр> печатает запрошенную страницу
+  aliases:
+  - list
+  - all
+  - ls
+  usage: ''
+  desc: Список сохраненных схематический файлов
+save:
+  help: ''
+  aliases:
+  - save
+  usage: '[<формат>] <имя-файла>'
+  desc: Сохранить схематический файл в буфер обмена
+formats:
+  help: ''
+  aliases:
+  - formats
+  - listformats
+  - f
+  usage: ''
+  desc: Список доступных форматов
+after:
+  help: ''
+  aliases:
+  - after
+  usage: <date>
+  desc: Выберите ближайший снимок после даты
+before:
+  help: ''
+  aliases:
+  - before
+  usage: <date>
+  desc: Выберите ближайший снимок перед датой
+use:
+  help: ''
+  aliases:
+  - use
+  usage: <snapshot>
+  desc: Выберите снимок для использования
+sel:
+  help: ''
+  aliases:
+  - sel
+  usage: <индекс>
+  desc: Выберите моментальный снимок, основанный на идентификаторе списка
+copypaste:
+  help: |-
+    Щелкните левой кнопкой мыши по базе объекта для копирования.
+    Щелкните правой кнопкой мыши, чтобы вставить
+  aliases:
+  - copypaste
+  - copy
+  - paste
+  - cp
+  - copypasta
+  usage: '[глубина]'
+  desc: Копировать Вставить кисть
+command:
+  help: |
+    Правый щелчок выполняет команду в позиции.
+  aliases:
+  - command
+  - cmd
+  usage: <радиус> [cmd1;cmd2...]
+  desc: Командная кисть
+blendball:
+  help: Выбор кисти для смешивания шаров
+  aliases:
+  - blendball
+  - bb
+  usage: '[радиус]'
+  desc: Выберите кисть для смешивания шаров
+erode:
+  help: Выбрать эродированную кисть
+  aliases:
+  - erode
+  - e
+  usage: '[радиус]'
+  desc: Выберите эродированную кисть
+recursive:
+  help: |-
+    Выбирает рекурсивную кисть
+    Флаг -d будет применяться в глубину первого порядка
+  aliases:
+  - recursive
+  - recurse
+  - r
+  usage: <шаблон-к> [радиус]
+  desc: Выберите рекурсивную кисть
+line:
+  help: |-
+    Выбирает линию кисти.
+    Флаг -h создает только оболочку
+    Флаг -s выбирает точку щелчка после рисования
+    Флаг -f создает плоскую линию
+  aliases:
+  - line
+  - l
+  usage: <шаблон> [радиус]
+  desc: Выберите линию кисти
+spline:
+  help: Выбирает сплайн-кисть
+  aliases:
+  - spline
+  - spl
+  usage: <шаблон>
+  desc: Выберите сплайн-кисть
+sphere:
+  help: |-
+    Выбирает кисть сферы.
+    Флаг -h создает пустоты вместо.
+  aliases:
+  - sphere
+  - s
+  usage: <шаблон> [радиус]
+  desc: Выберите сферу кисти
+cylinder:
+  help: |-
+    Выбирает цилиндрическую кисть.
+    Флаг -h создает пустотелые цилиндры вместо.
+  aliases:
+  - cylinder
+  - cyl
+  - c
+  usage: <блок> [радиус] [высота]
+  desc: Выберите цилиндрическую кисть
+clipboard:
+  help: |-
+    Выбор кисти буфера обмена.
+    Флаг -a заставляет его не вставлять воздух.
+    Без флага -p паста будет отображаться по центру в целевом местоположении. С флагом паста будет отображаться относительно места, где вы стояли относительно скопированной области, когда вы ее скопировали.
+  aliases:
+  - clipboard
+  usage: ''
+  desc: Choose the clipboard brush
+smooth:
+  help: |-
+    Выбирает кисть умягчителя ландшафта.
+    Флаг -n позволяет рассматривать только естественные блоки.
+  aliases:
+  - smooth
+  usage: '[размер] [повторение]'
+  desc: Выберите кисть умягчителя ландшафта
+ex:
+  help: ''
+  aliases:
+  - ex
+  - extinguish
+  usage: '[радиус]'
+  desc: Shortcut fire extinguisher brush
+gravity:
+  help: |-
+    Эта кисть имитирует воздействие гравитации.
+    Флаг -h заставляет его воздействовать на блоки, начинающиеся с максимума y в мире, вместо y + радиуса щелкнутого блока.
+  aliases:
+  - gravity
+  - grav
+  usage: '[радиус]'
+  desc: Гравитационная кисть
+height:
+  help: |
+    Эта кисть поднимает землю.
+  aliases:
+  - height
+  - heightmap
+  usage: '[радиус] [file|#clipboard|null] [вращение] [yscale]'
+  desc: Высота кисти
+recur:
+  help: ''
+  aliases:
+  - recur
+  - recursive
+  usage: <радиус>
+  desc: Включить рекурсивный режим кирка-пикировки
+single:
+  help: ''
+  aliases:
+  - single
+  usage: ''
+  desc: Включить режим суперконтакта с одним блоком
+area:
+  help: ''
+  aliases:
+  - area
+  usage: <радиус>
+  desc: Включить режим кирка для супер-кирки
+/nbtinfo:
+  help: ''
+  aliases:
+  - /nbtinfo
+  - /nbt
+  usage: ''
+  desc: Просмотр NBT данные для этого блока
+flatten:
+  help: |
+    Эта кисть поднимает и опускает землю в направлении точки щелчка
+  aliases:
+  - flatten
+  - flatmap
+  - flat
+  usage: '[радиус] [file|#clipboard|null] [вращение] [yscale]'
+  desc: Сглаженная кисть
+asset:
+  help: Сохраняет буфер обмена в веб-интерфейсе ресурса
+  aliases:
+  - asset
+  - createasset
+  - makeasset
+  usage: '[категория]'
+  desc: Создание актива
+target:
+  help: ''
+  aliases:
+  - target
+  - tar
+  usage: '[режим]'
+  desc: Переключение между различными режимами цели
+secondary:
+  help: Настроить левую кнопку мыши
+  aliases:
+  - secondary
+  usage: '[аргументы кисти]'
+  desc: Настроить левую кнопку мыши
+primary:
+  help: Установите кисть правой кнопки мыши
+  aliases:
+  - primary
+  usage: '[аргументы кисти]'
+  desc: Установите кисть правой кнопки мыши
+visualize:
+  help: ''
+  aliases:
+  - visualize
+  - visual
+  - vis
+  usage: '[режим]'
+  desc: Переключение между различными режимами визуализации
+scroll:
+  help: ''
+  aliases:
+  - scroll
+  usage: '[none|clipboard|mask|pattern|range|size|visual|target]'
+  desc: Переключение между различными режимами цели
+pull:
+  help: Выбирает кисть поднятия
+  aliases:
+  - pull
+  usage: '[радиус]'
+  desc: Выберите кисть поднятия
+circle:
+  help: Выбирает круглую кисть.
+  aliases:
+  - circle
+  usage: <шаблон> [радиус]
+  desc: Выберите круглую кисть
+cliff:
+  help: |
+    Эта кисть сглаживает рельеф и создает скалы.
+  aliases:
+  - cliff
+  - flatcylinder
+  usage: '[радиус] [file|#clipboard|null] [вращение] [yscale]'
+  desc: Клиффская кисть
+shatter:
+  help: Выбрать кисть рассеяния
+  aliases:
+  - shatter
+  - partition
+  - split
+  usage: <шаблон> [радиус] [количество]
+  desc: Creates random lines to break the terrain into pieces
+stencil:
+  help: |-
+    Выбирать кисть трафарета.
+    Флаг -w будет применяться только при максимальной насыщенности
+  aliases:
+  - stencil
+  - color
+  usage: <шаблон> [радиус] [глубина] [file|#clipboard|null] [вращение] [yscale]
+  desc: Использование высоты карты для рисования поверхности
+scmd:
+  help: Выбор кисти команды рассеяния.
+  aliases:
+  - scmd
+  - scattercmd
+  - scattercommand
+  - scommand
+  usage: <радиус-рассеянивая> <поинты> <радиус-cmd=1> <cmd1;cmd2...>
+  desc: Команды рассеивания на поверхности
+scatter:
+  help: |-
+    Выбрать рассеянную кисть.
+     Флаг -o будет перекрывать блок
+  aliases:
+  - scatter
+  - scat
+  usage: <шаблон> [радиус=5] [поинты=5] [дистанция=1]
+  desc: Блоки рассеяния на поверхности
+splatter:
+  help: Выбрать кисть рассеяния.
+  aliases:
+  - splatter
+  - splat
+  usage: <шаблон> [радиус=5] [сид=1] [рекурсия=5] [твердый=true]
+  desc: Рассеяние блоков на поверхности
+/lay:
+  help: ''
+  aliases:
+  - /lay
+  usage: <блок>
+  desc: Установить верхний блок в регионе
+sspl:
+  help: Выбирать кисть для поверхностных сплайнов
+  aliases:
+  - sspl
+  - sspline
+  - surfacespline
+  usage: <шаблон> [размер] [напряжение] [смещение] [непрерывность] [качество]
+  desc: Рисовать сплайн на поверхности

@@ -1,0 +1,125 @@
+print new File('splash.txt').text
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+        jcenter()
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'com.google.guava:guava:21.0'
+            force 'org.ow2.asm:asm:6.0_BETA'
+        }
+    }
+
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.3.0'
+        classpath 'org.ajoberstar:gradle-git:1.5.1'
+    }
+}
+
+apply plugin: 'java'
+clean { delete "target" }
+
+group = 'com.boydti.fawe'
+def revision = ""
+def buildNumber = ""
+def date = ""
+ext {
+    try {
+        git = org.ajoberstar.grgit.Grgit.open(file(".git"))
+        date = git.head().date.format("yy.MM.dd")
+        revision = "-${git.head().abbreviatedId}"
+        index = 0;  // Offset to match CI
+        parents = git.head().parentIds;
+        for (; parents != null && !parents.isEmpty(); index++) {
+            commit = git.getResolve().toCommit(parents.get(0));
+            parents = commit.getParentIds()
+        }
+        buildNumber = "-${index}"
+    } catch (Throwable ignore) {
+        revision = "-unknown"
+    }
+}
+
+if ( project.hasProperty("lzNoVersion") ) { // gradle build -PlzNoVersion
+    version = "unknown"
+} else {
+    version = date + revision + buildNumber
+}
+description = """FastAsyncWorldEdit"""
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    ext.internalVersion = version
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    compileJava { options.compilerArgs += ["-parameters"] }
+
+    repositories {
+        mavenCentral()
+        maven { url "http://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/" }
+        maven { url "http://maven.sk89q.com/repo/" }
+        maven { url "http://repo.maven.apache.org/maven2" }
+        // Fawe
+        maven {url "https://mvnrepository.com/artifact/"}
+        maven {url "http://repo.dmulloy2.net/content/groups/public/"}
+        maven {url "https://repo.destroystokyo.com/repository/maven-public//"}
+        maven {url "http://ci.athion.net/job/PlotSquared/ws/mvn/"}
+        mavenLocal()
+        maven {url "http://empcraft.com/maven2"}
+        maven {url "https://hub.spigotmc.org/nexus/content/groups/public/"}
+        maven {url "http://ci.frostcast.net/plugin/repository/everything"}
+        maven {url "http://maven.sk89q.com/artifactory/repo"}
+        maven {url "http://repo.spongepowered.org/maven"}
+        maven {url "http://dl.bintray.com/tastybento/maven-repo"}
+        maven {url "http://ci.emc.gs/nexus/content/groups/aikar/" }
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives jar
+    }
+
+    if (!(name.equals('worldedit-forge') || name.equals('worldedit-sponge'))) {
+        task sourcesJar(type: Jar, dependsOn: classes) {
+            classifier = 'sources'
+            from sourceSets.main.allSource
+        }
+
+        artifacts {
+            archives sourcesJar
+        }
+        build.dependsOn(sourcesJar)
+    }
+
+    shadowJar {
+        classifier 'dist'
+        dependencies {
+            include(dependency('com.sk89q:jchronic:0.2.4a'))
+            include(dependency('com.thoughtworks.paranamer:paranamer:2.6'))
+            include(dependency('com.sk89q.lib:jlibnoise:1.0.0'))
+            include(dependency('com.github.luben:zstd-jni:1.1.1'))
+            include(dependency('co.aikar:fastutil-lite:1.0'))
+        }
+        exclude 'GradleStart**'
+        exclude '.cache'
+        exclude 'LICENSE*'
+    }
+}
