@@ -141,7 +141,7 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Construct the object.
-     * <p>
+     *
      * <p>{@link #setConfiguration(LocalConfiguration)} should be called
      * later with configuration.</p>
      */
@@ -495,7 +495,7 @@ public class LocalSession implements TextureHolder {
      * Performs an undo.
      *
      * @param newBlockBag a new block bag
-     * @param player      the player
+     * @param player the player
      * @return whether anything was undone
      */
     public EditSession undo(@Nullable BlockBag newBlockBag, Player player) {
@@ -531,7 +531,7 @@ public class LocalSession implements TextureHolder {
      * Performs a redo
      *
      * @param newBlockBag a new block bag
-     * @param player      the player
+     * @param player the player
      * @return whether anything was redone
      */
     public EditSession redo(@Nullable BlockBag newBlockBag, Player player) {
@@ -620,7 +620,7 @@ public class LocalSession implements TextureHolder {
     /**
      * Set the region selector.
      *
-     * @param world    the world
+     * @param world the world
      * @param selector the selector
      */
     public void setRegionSelector(World world, RegionSelector selector) {
@@ -777,7 +777,7 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Sets the clipboard.
-     * <p>
+     *
      * <p>Pass {@code null} to clear the clipboard.</p>
      *
      * @param clipboard the clipboard, or null if the clipboard is to be cleared
@@ -969,7 +969,7 @@ public class LocalSession implements TextureHolder {
      * or the tool is not assigned, the slot will be replaced with the
      * brush tool.
      *
-     * @param item the item type ID
+     * @param item the item type
      * @return the tool, or {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
      */
@@ -1010,7 +1010,7 @@ public class LocalSession implements TextureHolder {
     /**
      * Set the tool.
      *
-     * @param item the item type ID
+     * @param item the item type
      * @param tool the tool to set, which can be {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
      */

@@ -34,7 +34,7 @@ public final class StringUtil {
 
     /**
      * Trim a string if it is longer than a certain length.
-     *
+     *  
      * @param str the stirng
      * @param len the length to trim to
      * @return a new string
@@ -49,7 +49,7 @@ public final class StringUtil {
 
     /**
      * Join an array of strings into a string.
-     *
+     * 
      * @param str the string array
      * @param delimiter the delimiter
      * @param initialIndex the initial index to start form
@@ -68,7 +68,7 @@ public final class StringUtil {
 
     /**
      * Join an array of strings into a string.
-     *
+     * 
      * @param str the string array
      * @param delimiter the delimiter
      * @param initialIndex the initial index to start form
@@ -76,7 +76,7 @@ public final class StringUtil {
      * @return a new string
      */
     public static String joinQuotedString(String[] str, String delimiter,
-                                          int initialIndex, String quote) {
+            int initialIndex, String quote) {
         if (str.length == 0) {
             return "";
         }
@@ -92,7 +92,7 @@ public final class StringUtil {
 
     /**
      * Join an array of strings into a string.
-     *
+     * 
      * @param str the string array
      * @param delimiter the delimiter
      * @return a new string
@@ -103,7 +103,7 @@ public final class StringUtil {
 
     /**
      * Join an array of strings into a string.
-     *
+     * 
      * @param str an array of objects
      * @param delimiter the delimiter
      * @param initialIndex the initial index to start form
@@ -122,7 +122,7 @@ public final class StringUtil {
 
     /**
      * Join an array of strings into a string.
-     *
+     * 
      * @param str a list of integers
      * @param delimiter the delimiter
      * @param initialIndex the initial index to start form
@@ -219,7 +219,7 @@ public final class StringUtil {
          * calculated). (Note that the arrays aren't really copied anymore, just
          * switched...this is clearly much better than cloning an array or doing
          * a System.arraycopy() each time through the outer loop.)
-         *
+         * 
          * Effectively, the difference between the two implementations is this
          * one does not cause an out of memory condition when calculating the LD
          * over two very large strings.

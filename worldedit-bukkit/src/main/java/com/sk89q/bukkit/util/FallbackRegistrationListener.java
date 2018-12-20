@@ -38,4 +38,5 @@ public class FallbackRegistrationListener implements Listener {
             event.setCancelled(true);
         }
     }
+
 }
