@@ -1,5 +1,3 @@
-print new File('splash.txt').text
-
 buildscript {
     repositories {
         mavenLocal()
@@ -16,14 +14,20 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.3.0'
-        classpath 'org.ajoberstar:gradle-git:1.5.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.7.5'
+        classpath 'org.ajoberstar:gradle-git:1.7.2'
     }
+}
+
+plugins {
+    id 'net.minecrell.licenser' version '0.4.1' apply false
 }
 
 apply plugin: 'java'
 clean { delete "target" }
+
+print new File('splash.txt').text
 
 group = 'com.boydti.fawe'
 def revision = ""
@@ -57,9 +61,8 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'com.github.johnrengelman.shadow'
-
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    // Enable this requires putting license header files in many, many FAWE files
+    //apply plugin: 'net.minecrell.licenser'
 
     ext.internalVersion = version
 
@@ -70,10 +73,11 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven { url "http://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/" }
+        maven { url "http://repo.bukkit.org/content/groups/public" }
         maven { url "http://maven.sk89q.com/repo/" }
         maven { url "http://repo.maven.apache.org/maven2" }
         // Fawe
+        maven {url "http://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/"}
         maven {url "https://mvnrepository.com/artifact/"}
         maven {url "http://repo.dmulloy2.net/content/groups/public/"}
         maven {url "https://repo.destroystokyo.com/repository/maven-public//"}
@@ -88,6 +92,13 @@ subprojects {
         maven {url "http://ci.emc.gs/nexus/content/groups/aikar/" }
     }
 
+    if (JavaVersion.current().isJava8Compatible()) {
+        // Java 8 turns on doclint which we fail
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+
     task javadocJar(type: Jar, dependsOn: javadoc) {
         classifier = 'javadoc'
         from javadoc.destinationDir
@@ -95,6 +106,7 @@ subprojects {
 
     artifacts {
         archives jar
+        archives javadocJar
     }
 
     if (!(name.equals('worldedit-forge') || name.equals('worldedit-sponge'))) {
@@ -122,4 +134,10 @@ subprojects {
         exclude '.cache'
         exclude 'LICENSE*'
     }
+
+    // Enable this requires putting license header files in many, many FAWE files
+    //license {
+    //    header = rootProject.file("HEADER.txt")
+    //    include '**/*.java'
+    //}
 }

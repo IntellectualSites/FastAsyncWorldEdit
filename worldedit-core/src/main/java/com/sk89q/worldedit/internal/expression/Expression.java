@@ -40,7 +40,7 @@ import java.util.Map;
  * <p>Supported operators:</p>
  * <p>
  * <ul>
- * <li>Logical: &&, ||, ! (unary)</li>
+ * <li>Logical: &amp;&amp;, ||, ! (unary)</li>
  * <li>Bitwise: ~ (unary), &gt;&gt;, &lt;&lt;</li>
  * <li>Arithmetic: +, -, *, /, % (modulo), ^ (power), - (unary), --, ++ (prefix only)</li>
  * <li>Comparison: &lt;=, &gt;=, &gt;, &lt;, ==, !=, ~= (near)</li>
