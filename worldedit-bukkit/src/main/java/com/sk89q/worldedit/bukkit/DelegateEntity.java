@@ -44,4 +44,9 @@ public class DelegateEntity implements Entity {
     public <T> T getFacet(Class<? extends T> cls) {
         return parent.getFacet(cls);
     }
+
+	@Override
+	public boolean setLocation(Location location) {
+		return parent.setLocation(location);
+	}
 }

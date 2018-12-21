@@ -2286,4 +2286,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public BlockVector3 getSpawnPosition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

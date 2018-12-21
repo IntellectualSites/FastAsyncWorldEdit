@@ -203,7 +203,7 @@ public class WorldEditCommands {
     @CommandPermissions("worldedit.debugpaste")
     public void debugpaste(Actor actor) throws WorldEditException, IOException {
 //        BBC.DOWNLOAD_LINK.send(actor, HastebinUtility.debugPaste());
-    	ActorCallbackPaste.pastebin(we.getSupervisor(), actor, null, "FastAsyncWorldEdit report: " + BBC.DOWNLOAD_LINK);
+    	ActorCallbackPaste.pastebin(we.getSupervisor(), actor, null, "FastAsyncWorldEdit report: " + BBC.DOWNLOAD_LINK, WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter());
     }
 
     @Command(

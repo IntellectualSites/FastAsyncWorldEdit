@@ -163,5 +163,10 @@ public class HistoryExtent extends AbstractDelegateExtent {
         public <T> T getFacet(final Class<? extends T> cls) {
             return this.entity.getFacet(cls);
         }
+
+		@Override
+		public boolean setLocation(Location location) {
+			return this.entity.setLocation(location);
+		}
     }
 }

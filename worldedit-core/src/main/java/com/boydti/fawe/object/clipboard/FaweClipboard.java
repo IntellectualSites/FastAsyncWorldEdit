@@ -161,5 +161,11 @@ public abstract class FaweClipboard {
         public Extent getExtent() {
             return world;
         }
+
+		@Override
+		public boolean setLocation(Location location) {
+			//Should not be teleporting this entity
+			return false;
+		}
     }
 }

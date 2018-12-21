@@ -304,4 +304,10 @@ public class FakePlayer extends AbstractPlayerActor {
             return true;
         }
     }
+
+	@Override
+	public boolean setLocation(Location location) {
+		this.pos = location;
+		return true;
+	}
 }

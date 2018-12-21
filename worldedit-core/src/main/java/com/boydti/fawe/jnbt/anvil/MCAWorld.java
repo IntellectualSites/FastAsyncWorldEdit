@@ -127,4 +127,9 @@ public class MCAWorld implements SimpleWorld {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public BlockVector3 getSpawnPosition() {
+		return queue.getWEWorld().getSpawnPosition();
+	}
 }

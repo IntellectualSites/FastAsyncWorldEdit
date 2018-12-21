@@ -3604,4 +3604,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 		return world.notifyAndLightBlock(position, previousType);
 	}
 
+	@Override
+	public BlockVector3 getSpawnPosition() {
+		return world.getSpawnPosition();
+	}
+
 }

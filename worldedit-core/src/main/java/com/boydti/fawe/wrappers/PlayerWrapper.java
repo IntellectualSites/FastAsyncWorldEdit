@@ -420,4 +420,9 @@ public class PlayerWrapper extends AbstractPlayerActor {
     public File openFileSaveDialog(String[] extensions) {
         return parent.openFileSaveDialog(extensions);
     }
+
+	@Override
+	public boolean setLocation(Location location) {
+		return parent.setLocation(location);
+	}
 }

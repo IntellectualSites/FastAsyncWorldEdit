@@ -259,4 +259,9 @@ public class WorldWrapper extends AbstractWorld {
 	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
 		return parent.notifyAndLightBlock(position, previousType);
 	}
+
+	@Override
+	public BlockVector3 getSpawnPosition() {
+		return parent.getSpawnPosition();
+	}
 }
