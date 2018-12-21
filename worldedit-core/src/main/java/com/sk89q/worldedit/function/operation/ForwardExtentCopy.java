@@ -50,7 +50,7 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -347,7 +347,18 @@ public class ForwardExtentCopy implements Operation {
             blockCopy = new RegionVisitor(region, copy, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
         }
 
-        List<? extends Entity> entities = isCopyingEntities() ? source.getEntities(region) : new ArrayList<>();
+        List<? extends Entity> entities;
+        if (isCopyingEntities()) {
+            // filter players since they can't be copied
+            entities = source.getEntities()
+                    .stream()
+                    .filter(entity -> entity.getState() != null &&
+                            entity.getState().getType().getId().equals("minecraft:player"))
+                    .collect(Collectors.toList());
+        } else {
+            entities = new ArrayList<>();
+        }
+
 
         for (int i = 0; i < repetitions; i++) {
             Operations.completeBlindly(blockCopy);
