@@ -1,5 +1,5 @@
 repositories {
-    maven {url "http://vault.voxelmodpack.com/content/repositories/central/"}
+    maven {url "https://ci.athion.net/job/FAWE-WorldGuard-1.13/lastSuccessfulBuild/artifact/mvn"}
 }
 
 dependencies {
