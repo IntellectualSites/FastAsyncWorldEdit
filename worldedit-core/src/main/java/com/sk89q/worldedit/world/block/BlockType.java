@@ -99,7 +99,7 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
     }
 
     /**
-     * Gets the properties of this BlockType in a key->property mapping.
+     * Gets the properties of this BlockType in a {@code key->property} mapping.
      *
      * @return The properties map
      */
