@@ -1969,7 +1969,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param dir the direction
      * @param distance the distance to move
      * @param copyAir true to copy air blocks
-     * @param replacement the replacement block to fill in after moving, or null to use air
+     * @param replacement the replacement pattern to fill in after moving, or null to use air
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -2026,12 +2026,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param dir the direction
      * @param distance the distance to move
      * @param copyAir true to copy air blocks
-     * @param replacement the replacement block to fill in after moving, or null to use air
+     * @param replacement the replacement pattern to fill in after moving, or null to use air
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int moveCuboidRegion(final Region region, final BlockVector3 dir, final int distance, final boolean copyAir, final BlockStateHolder replacement) {
-        return this.moveRegion(region, dir, distance, copyAir, replacement);
+    public int moveCuboidRegion(final Region region, final BlockVector3 dir, final int distance, final boolean copyAir, final Pattern replacement) {
+        return this.moveRegion(region, dir, distance, copyAir, true, false, replacement);
     }
 
     /**
