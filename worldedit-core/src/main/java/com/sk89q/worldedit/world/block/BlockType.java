@@ -118,11 +118,11 @@ public class BlockType implements FawePattern {
      * @return The name, or ID
      */
     public String getName() {
-        BundledBlockData.BlockEntry entry = BundledBlockData.getInstance().findById(this.getId());
-        if (entry == null) {
+        String name = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getName(this);
+        if (name == null) {
             return getId();
         } else {
-            return entry.localizedName;
+            return name;
         }
     }
 
