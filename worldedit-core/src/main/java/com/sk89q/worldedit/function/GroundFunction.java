@@ -19,9 +19,15 @@
 
 package com.sk89q.worldedit.function;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -77,12 +83,12 @@ public class GroundFunction implements LayerFunction {
     }
 
     @Override
-    public boolean isGround(Vector position) {
+    public boolean isGround(BlockVector3 position) {
         return mask.test(position);
     }
 
     @Override
-    public boolean apply(Vector position, int depth) throws WorldEditException {
+    public boolean apply(BlockVector3 position, int depth) throws WorldEditException {
         if (depth == 0) {
             if (function.apply(position)) {
                 affected++;

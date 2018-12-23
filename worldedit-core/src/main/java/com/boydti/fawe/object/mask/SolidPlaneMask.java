@@ -1,10 +1,11 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
+
 import javax.annotation.Nullable;
 
 /**
@@ -22,7 +23,7 @@ public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         switch (mode) {
             case -1:
                 if (!super.test(vector)) {

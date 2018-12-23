@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+<<<<<<< HEAD
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
@@ -40,6 +41,19 @@ import com.boydti.fawe.util.gui.FormBuilder;
 import com.boydti.fawe.wrappers.FakePlayer;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.*;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
+
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.Logging;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -55,6 +69,8 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.Selection;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
@@ -465,9 +481,14 @@ public class ClipboardCommands extends MethodCommands {
         }
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
+<<<<<<< HEAD
         Vector to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
         checkPaste(player, editSession, to, holder, clipboard);
 
+=======
+
+        BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         Operation operation = holder
                 .createPaste(editSession)
                 .to(to)
@@ -478,10 +499,17 @@ public class ClipboardCommands extends MethodCommands {
         Operations.completeLegacy(operation);
 
         if (selectPasted) {
+<<<<<<< HEAD
             Vector clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
             Vector realTo = to.add(new Vector(holder.getTransform().apply(clipboardOffset)));
             Vector max = realTo.add(new Vector(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()))));
             RegionSelector selector = new CuboidRegionSelector(player.getWorld(), realTo, max);
+=======
+            BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+            Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
+            Vector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
+            RegionSelector selector = new CuboidRegionSelector(player.getWorld(), realTo.toBlockPoint(), max.toBlockPoint());
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             session.setRegionSelector(player.getWorld(), selector);
             selector.learnChanges();
             selector.explainRegionAdjust(player, session);
@@ -577,14 +605,24 @@ public class ClipboardCommands extends MethodCommands {
             max = 1
     )
     @CommandPermissions("worldedit.clipboard.flip")
+<<<<<<< HEAD
     public void flip(Player player, LocalSession session,
                      @Optional(Direction.AIM) @Direction Vector direction) throws WorldEditException {
+=======
+    public void flip(Player player, LocalSession session, EditSession editSession,
+                     @Optional(Direction.AIM) @Direction BlockVector3 direction) throws WorldEditException {
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         ClipboardHolder holder = session.getClipboard();
-        Clipboard clipboard = holder.getClipboard();
         AffineTransform transform = new AffineTransform();
+<<<<<<< HEAD
         transform = transform.scale(direction.positive().multiply(-2).add(1, 1, 1));
         holder.setTransform(transform.combine(holder.getTransform()));
         BBC.COMMAND_FLIPPED.send(player);
+=======
+        transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());
+        holder.setTransform(holder.getTransform().combine(transform));
+        player.print("The clipboard copy has been flipped.");
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Deprecated // See SchematicCommands#clear

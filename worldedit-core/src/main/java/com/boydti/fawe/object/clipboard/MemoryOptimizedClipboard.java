@@ -10,12 +10,12 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -159,7 +159,7 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public void setDimensions(Vector dimensions) {
+    public void setDimensions(BlockVector3 dimensions) {
         width = dimensions.getBlockX();
         height = dimensions.getBlockY();
         length = dimensions.getBlockZ();
@@ -174,8 +174,8 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public Vector getDimensions() {
-        return new Vector(width, height, length);
+    public BlockVector3 getDimensions() {
+        return new BlockVector3(width, height, length);
     }
 
     private int lastI;

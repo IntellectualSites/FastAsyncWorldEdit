@@ -14,6 +14,9 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Iterator;
@@ -246,14 +249,14 @@ public class BukkitImageListener implements Listener {
 
                     if (worldX < 0 || worldX > width || worldZ < 0 || worldZ > length) return;
 
-                    Vector wPos = new Vector(worldX, 0, worldZ);
 
                     fp.runAction(new Runnable() {
                         @Override
                         public void run() {
+                            BlockVector3 wPos = new BlockVector3(worldX, 0, worldZ);
                             viewer.refresh();
                             int topY = generator.getNearestSurfaceTerrainBlock(wPos.getBlockX(), wPos.getBlockZ(), 255, 0, 255);
-                            wPos.mutY(topY);
+                            wPos = wPos.withY(topY);
 
                             EditSession es = new EditSessionBuilder(fp.getWorld()).player(fp).combineStages(false).autoQueue(false).blockBag(null).limitUnlimited().build();
                             ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();

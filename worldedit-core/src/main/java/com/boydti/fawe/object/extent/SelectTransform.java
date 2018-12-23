@@ -1,7 +1,5 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -10,6 +8,8 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -25,11 +25,11 @@ public abstract class SelectTransform extends ResettableExtent {
 
     public abstract AbstractDelegateExtent getExtent(int x, int z);
 
-    public Extent getExtent(Vector pos) {
+    public Extent getExtent(BlockVector3 pos) {
         return getExtent(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
     }
 
-    public Extent getExtent(Vector2D pos) {
+    public Extent getExtent(BlockVector2 pos) {
         return getExtent(pos.getBlockX(), pos.getBlockZ());
     }
 
@@ -39,7 +39,7 @@ public abstract class SelectTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         return getExtent(position).setBlock(position, block);
     }
 
@@ -50,7 +50,7 @@ public abstract class SelectTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return getExtent(position).setBiome(position, biome);
     }
 }

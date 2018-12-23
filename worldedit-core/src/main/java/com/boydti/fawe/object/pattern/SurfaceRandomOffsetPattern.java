@@ -2,13 +2,13 @@ package com.boydti.fawe.object.pattern;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.PseudoRandom;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -38,17 +38,17 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BlockStateHolder apply(BlockVector3 position) {
         return pattern.apply(travel(position));
     }
 
-    private Vector travel(Vector pos) {
+    private BlockVector3 travel(BlockVector3 pos) {
         cur.setComponents(pos);
         for (int move = 0; move < moves; move++) {
             int index = 0;
             for (int i = 0; i < allowed.length; i++) {
                 next = buffer[i];
-                Vector dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
+                BlockVector3 dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
                 next.setComponents(cur.getBlockX() + dir.getBlockX(), cur.getBlockY() + dir.getBlockY(), cur.getBlockZ() + dir.getBlockZ());
                 if (allowed(next)) {
                     allowed[index++] = next;
@@ -63,7 +63,8 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         return cur;
     }
 
-    private boolean allowed(Vector v) {
+    private boolean allowed(BlockVector3 bv) {
+    	MutableBlockVector v = new MutableBlockVector(bv);
         BlockStateHolder block = pattern.apply(v);
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return false;
@@ -107,7 +108,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         return false;
     }
 
-    private boolean canPassthrough(Vector v) {
+    private boolean canPassthrough(BlockVector3 v) {
         BlockStateHolder block = pattern.apply(v);
         return !block.getBlockType().getMaterial().isMovementBlocker();
     }

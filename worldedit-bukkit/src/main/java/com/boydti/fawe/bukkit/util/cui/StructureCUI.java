@@ -13,11 +13,12 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.nbt.NbtBase;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.internal.cui.SelectionPointEvent;
 import com.sk89q.worldedit.internal.cui.SelectionShapeEvent;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,10 +34,10 @@ import org.bukkit.entity.Player;
 public class StructureCUI extends CUI {
     private boolean cuboid = true;
 
-    private Vector pos1;
-    private Vector pos2;
+    private BlockVector3 pos1;
+    private BlockVector3 pos2;
 
-    private Vector remove;
+    private BlockVector3 remove;
     private NbtCompound removeTag;
     private BlockState state;
 
@@ -56,7 +57,7 @@ public class StructureCUI extends CUI {
             int x = Integer.parseInt(param[1]);
             int y = Integer.parseInt(param[2]);
             int z = Integer.parseInt(param[3]);
-            Vector pos = new Vector(x, y, z);
+            BlockVector3 pos = new BlockVector3(x, y, z);
             if (id == 0) {
                 pos1 = pos;
             } else {
@@ -123,7 +124,7 @@ public class StructureCUI extends CUI {
         }
     }
 
-    private void sendNbt(Vector pos, NbtCompound compound) {
+    private void sendNbt(BlockVector3 pos, NbtCompound compound) {
         Player player = this.<Player>getPlayer().parent;
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 
@@ -158,8 +159,8 @@ public class StructureCUI extends CUI {
             remove = null;
         }
         if (pos1 == null || pos2 == null) return;
-        Vector min = Vector.getMinimum(pos1, pos2);
-        Vector max = Vector.getMaximum(pos1, pos2);
+        BlockVector3 min = pos1.getMinimum(pos2);
+        BlockVector3 max = pos1.getMaximum(pos2);
 
         // Position
         double rotX = playerLoc.getYaw();
@@ -187,7 +188,7 @@ public class StructureCUI extends CUI {
         NbtCompound compound = constructStructureNbt(x, y, z, posX, posY, posZ, sizeX, sizeY, sizeZ);
 
         Block block = player.getWorld().getBlockAt(x, y, z);
-        remove = new Vector(x, y, z);
+        remove = new BlockVector3(x, y, z);
         state = BukkitAdapter.adapt(block.getBlockData());
         removeTag = compound;
 

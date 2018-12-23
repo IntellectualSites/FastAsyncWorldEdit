@@ -7,8 +7,6 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Entity;
@@ -24,6 +22,8 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2D;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -73,7 +73,7 @@ public class Schematic {
      * @param to
      * @return
      */
-    public EditSession paste(World world, Vector to) {
+    public EditSession paste(World world, BlockVector3 to) {
         return paste(world, to, true, true, null);
     }
 
@@ -105,7 +105,7 @@ public class Schematic {
         }
     }
 
-    public EditSession paste(World world, Vector to, boolean allowUndo, boolean pasteAir, @Nullable Transform transform) {
+    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, @Nullable Transform transform) {
         return paste(world, to, allowUndo, pasteAir, true, transform);
     }
 
@@ -119,7 +119,7 @@ public class Schematic {
      * @param transform
      * @return
      */
-    public EditSession paste(World world, Vector to, boolean allowUndo, boolean pasteAir, boolean copyEntities, @Nullable Transform transform) {
+    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, boolean copyEntities, @Nullable Transform transform) {
         checkNotNull(world);
         checkNotNull(to);
         Region region = clipboard.getRegion();
@@ -165,7 +165,7 @@ public class Schematic {
         return editSession;
     }
 
-    public void paste(Extent extent, Vector to, boolean pasteAir, Transform transform) {
+    public void paste(Extent extent, BlockVector3 to, boolean pasteAir, Transform transform) {
         checkNotNull(transform);
         Region region = clipboard.getRegion();
         Extent source = clipboard;
@@ -192,11 +192,11 @@ public class Schematic {
         Operations.completeBlindly(copy);
     }
 
-    public void paste(Extent extent, Vector to, final boolean pasteAir) {
+    public void paste(Extent extent, BlockVector3 to, final boolean pasteAir) {
         Region region = clipboard.getRegion().clone();
         final int maxY = extent.getMaximumPoint().getBlockY();
-        final Vector bot = clipboard.getMinimumPoint();
-        final Vector origin = clipboard.getOrigin();
+        final BlockVector3 bot = clipboard.getMinimumPoint();
+        final BlockVector3 origin = clipboard.getOrigin();
 
         final boolean copyBiomes = !(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP.hasBiomes();
 
@@ -251,7 +251,7 @@ public class Schematic {
                     mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
                 }
                 @Override
-                public boolean apply(Vector mutable) throws WorldEditException {
+                public boolean apply(BlockVector3 mutable) throws WorldEditException {
                     BlockStateHolder block = clipboard.getBlock(mutable);
                     int xx = mutable.getBlockX() + relx;
                     int zz = mutable.getBlockZ() + relz;

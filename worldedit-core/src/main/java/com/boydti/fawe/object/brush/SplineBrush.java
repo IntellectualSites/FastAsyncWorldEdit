@@ -8,7 +8,6 @@ import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
@@ -17,6 +16,9 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableVector;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Node;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,12 +29,12 @@ import java.util.List;
 public class SplineBrush implements Brush, ResettableTool {
 
     public static int MAX_POINTS = 15;
-    private ArrayList<ArrayList<Vector>> positionSets;
+    private ArrayList<ArrayList<BlockVector3>> positionSets;
     private int numSplines;
 
     private final LocalSession session;
     private final Player player;
-    private Vector position;
+    private BlockVector3 position;
 
     public SplineBrush(Player player, LocalSession session) {
         this.session = session;
@@ -50,7 +52,7 @@ public class SplineBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, final Vector position, Pattern pattern, double size) throws WorldEditException {
+    public void build(EditSession editSession, final BlockVector3 position, Pattern pattern, double size) throws WorldEditException {
         Mask mask = editSession.getMask();
         if (mask == null) {
             mask = new IdMask(editSession);
@@ -68,21 +70,21 @@ public class SplineBrush implements Brush, ResettableTool {
             if (positionSets.size() >= MAX_POINTS) {
                 throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
             }
-            final ArrayList<Vector> points = new ArrayList<>();
+            final ArrayList<BlockVector3> points = new ArrayList<>();
             if (size > 0) {
                 DFSRecursiveVisitor visitor = new DFSRecursiveVisitor(mask, new RegionFunction() {
                     @Override
-                    public boolean apply(Vector p) {
-                        points.add(new Vector(p));
+                    public boolean apply(BlockVector3 p) {
+                        points.add(p);
                         return true;
                     }
                 }, (int) size, 1);
-                List<Vector> directions = visitor.getDirections();
+                List<BlockVector3> directions = visitor.getDirections();
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
                         for (int z = -1; z <= 1; z++) {
                             if (x != 0 || y != 0 || z != 0) {
-                                Vector pos = new Vector(x, y, z);
+                            	BlockVector3 pos = new BlockVector3(x, y, z);
                                 if (!directions.contains(pos)) {
                                     directions.add(pos);
                                 }
@@ -109,8 +111,8 @@ public class SplineBrush implements Brush, ResettableTool {
             player.print(BBC.getPrefix() + BBC.BRUSH_SPLINE_SECONDARY_ERROR.s());
             return;
         }
-        List<Vector> centroids = new ArrayList<>();
-        for (List<Vector> points : positionSets) {
+        List<Vector3> centroids = new ArrayList<>();
+        for (List<BlockVector3> points : positionSets) {
             centroids.add(getCentroid(points));
         }
 
@@ -121,7 +123,7 @@ public class SplineBrush implements Brush, ResettableTool {
 
         final List<Node> nodes = new ArrayList<Node>(centroids.size());
 
-        for (final Vector nodevector : centroids) {
+        for (final Vector3 nodevector : centroids) {
             final Node n = new Node(nodevector);
             n.setTension(tension);
             n.setBias(bias);
@@ -130,8 +132,8 @@ public class SplineBrush implements Brush, ResettableTool {
         }
         int samples = numSplines;
         for (int i = 0; i < numSplines; i++) {
-            List<Vector> currentSpline = new ArrayList<>();
-            for (ArrayList<Vector> points : positionSets) {
+            List<BlockVector3> currentSpline = new ArrayList<>();
+            for (ArrayList<BlockVector3> points : positionSets) {
                 int listSize = points.size();
                 int index = (int) (i * listSize / (double) (numSplines));
                 currentSpline.add(points.get(index));
@@ -148,9 +150,9 @@ public class SplineBrush implements Brush, ResettableTool {
         }
     }
 
-    private Vector getCentroid(Collection<Vector> points) {
-        Vector sum = new Vector();
-        for (Vector p : points) {
+    private Vector3 getCentroid(Collection<BlockVector3> points) {
+    	MutableVector sum = new MutableVector();
+        for (BlockVector3 p : points) {
             sum.mutX(sum.getX() + p.getX());
             sum.mutY(sum.getY() + p.getY());
             sum.mutZ(sum.getZ() + p.getZ());
@@ -158,7 +160,7 @@ public class SplineBrush implements Brush, ResettableTool {
         return sum.multiply(1.0 / points.size());
     }
 
-    private Vector normal(Collection<Vector> points, Vector centroid) {
+    private BlockVector3 normal(Collection<BlockVector3> points, BlockVector3 centroid) {
         int n = points.size();
         switch (n) {
             case 1: {
@@ -177,8 +179,8 @@ public class SplineBrush implements Brush, ResettableTool {
         double yz = 0.0;
         double zz = 0.0;
 
-        Vector r = new Vector();
-        for (Vector p : points) {
+        MutableVector r = new MutableVector();
+        for (BlockVector3 p : points) {
             r.mutX((p.getX() - centroid.getX()));
             r.mutY((p.getY() - centroid.getY()));
             r.mutZ((p.getZ() - centroid.getZ()));
@@ -200,19 +202,19 @@ public class SplineBrush implements Brush, ResettableTool {
         }
 
         // Pick path with best conditioning:
-        Vector dir;
+        BlockVector3 dir;
         if (det_max == det_x) {
             double a = (xz * yz - xy * zz) / det_x;
             double b = (xy * yz - xz * yy) / det_x;
-            dir = new Vector(1.0, a, b);
+            dir = new BlockVector3(1.0, a, b);
         } else if (det_max == det_y) {
             double a = (yz * xz - xy * zz) / det_y;
             double b = (xy * xz - yz * xx) / det_y;
-            dir = new Vector(a, 1.0, b);
+            dir = new BlockVector3(a, 1.0, b);
         } else {
             double a = (yz * xy - xz * yy) / det_z;
             double b = (xz * xy - yz * xx) / det_z;
-            dir = new Vector(a, b, 1.0);
+            dir = new BlockVector3(a, b, 1.0);
         }
         ;
         return dir.normalize();

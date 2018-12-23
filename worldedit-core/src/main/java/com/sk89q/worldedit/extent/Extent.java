@@ -35,8 +35,11 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
 
@@ -63,7 +66,7 @@ public interface Extent extends InputExtent, OutputExtent {
      *
      * @return the minimum point
      */
-    Vector getMinimumPoint();
+    BlockVector3 getMinimumPoint();
 
     /**
      * Get the maximum point in the extent.
@@ -73,7 +76,7 @@ public interface Extent extends InputExtent, OutputExtent {
      *
      * @return the maximum point
      */
-    Vector getMaximumPoint();
+    BlockVector3 getMaximumPoint();
 
     /**
      * Get a list of all entities within the given region.
@@ -114,25 +117,25 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     @Override
-    default BlockState getBlock(Vector position) {
+    default BlockState getBlock(BlockVector3 position) {
         return getFullBlock(position);
     }
 
     @Override
-    default BlockState getLazyBlock(Vector position) {
+    default BlockState getLazyBlock(BlockVector3 position) {
         return getFullBlock(position);
     }
 
     default BlockState getLazyBlock(int x, int y, int z) {
-        return getLazyBlock(MutableBlockVector.get(x, y, z));
+        return getLazyBlock(new BlockVector3(x, y, z));
     }
 
     default boolean setBlock(int x, int y, int z, BlockStateHolder state) throws WorldEditException {
-        return setBlock(MutableBlockVector.get(x, y, z), state);
+        return setBlock(new BlockVector3(x, y, z), state);
     }
 
     default boolean setBiome(int x, int y, int z, BaseBiome biome) {
-        return setBiome(MutableBlockVector2D.get(x, z), biome);
+        return setBiome(new BlockVector2(x, z), biome);
     }
 
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
@@ -252,7 +255,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default void generate(Region region, GenBase gen) throws WorldEditException {
-        for (Vector2D chunkPos : region.getChunks()) {
+        for (BlockVector2 chunkPos : region.getChunks()) {
             gen.generate(chunkPos, this);
         }
     }
@@ -263,7 +266,7 @@ public interface Extent extends InputExtent, OutputExtent {
 
     default void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        for (Vector2D chunkPos : region.getChunks()) {
+        for (BlockVector2 chunkPos : region.getChunks()) {
             for (int i = 0; i < frequency; i++) {
                 if (random.nextInt(100) > rarity) {
                     continue;
@@ -275,9 +278,9 @@ public interface Extent extends InputExtent, OutputExtent {
         }
     }
 
-    default boolean contains(Vector pt) {
-        Vector min = getMinimumPoint();
-        Vector max = getMaximumPoint();
+    default boolean contains(BlockVector3 pt) {
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
         return (pt.containedWithin(min, max));
     }
 
@@ -309,7 +312,7 @@ public interface Extent extends InputExtent, OutputExtent {
     default List<Countable<BlockType>> getBlockDistribution(final Region region) {
         int[] counter = new int[BlockTypes.size()];
 
-        for (final Vector pt : region) {
+        for (final BlockVector3 pt : region) {
             BlockType type = getBlockType(pt);
             counter[type.getInternalId()]++;
         }
@@ -333,7 +336,7 @@ public interface Extent extends InputExtent, OutputExtent {
     default List<Countable<BlockStateHolder>> getBlockDistributionWithData(final Region region) {
         int[][] counter = new int[BlockTypes.size()][];
 
-        for (final Vector pt : region) {
+        for (final BlockVector3 pt : region) {
             BlockStateHolder blk = this.getBlock(pt);
             BlockType type = blk.getBlockType();
             int[] stateCounter = counter[type.getInternalId()];

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.util.chat.Message;
@@ -28,9 +29,16 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.SelectionCommands;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.cui.CUIRegion;
 import com.sk89q.worldedit.internal.cui.SelectionPointEvent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
@@ -49,9 +57,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CuboidRegionSelector implements RegionSelector, CUIRegion {
 
+<<<<<<< HEAD
     public transient BlockVector position1;
     public transient BlockVector position2;
     public transient CuboidRegion region;
+=======
+    protected transient BlockVector3 position1;
+    protected transient BlockVector3 position2;
+    protected transient CuboidRegion region;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     /**
      * Create a new region selector with a {@code null} world.
@@ -66,7 +80,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
      * @param world the world, which may be {@code null}
      */
     public CuboidRegionSelector(@Nullable World world) {
-        region = new CuboidRegion(world, new Vector(), new Vector());
+        region = new CuboidRegion(world, BlockVector3.ZERO, BlockVector3.ZERO);
     }
 
     /**
@@ -90,8 +104,8 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
                 return;
             }
 
-            position1 = oldRegion.getMinimumPoint().toBlockVector();
-            position2 = oldRegion.getMaximumPoint().toBlockVector();
+            position1 = oldRegion.getMinimumPoint();
+            position2 = oldRegion.getMaximumPoint();
         }
         region.setPos1(position1);
         region.setPos2(position2);
@@ -104,12 +118,12 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
      * @param position1 position 1
      * @param position2 position 2
      */
-    public CuboidRegionSelector(@Nullable World world, Vector position1, Vector position2) {
+    public CuboidRegionSelector(@Nullable World world, BlockVector3 position1, BlockVector3 position2) {
         this(world);
         checkNotNull(position1);
         checkNotNull(position2);
-        this.position1 = position1.toBlockVector();
-        this.position2 = position2.toBlockVector();
+        this.position1 = position1;
+        this.position2 = position2;
         region.setPos1(position1);
         region.setPos2(position2);
     }
@@ -131,33 +145,33 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public boolean selectPrimary(Vector position, SelectorLimits limits) {
+    public boolean selectPrimary(BlockVector3 position, SelectorLimits limits) {
         checkNotNull(position);
 
-        if (position1 != null && (position.compareTo(position1) == 0)) {
+        if (position1 != null && position1.equals(position)) {
             return false;
         }
 
-        position1 = position.toBlockVector();
+        position1 = position;
         region.setPos1(position1);
         return true;
     }
 
     @Override
-    public boolean selectSecondary(Vector position, SelectorLimits limits) {
+    public boolean selectSecondary(BlockVector3 position, SelectorLimits limits) {
         checkNotNull(position);
 
-        if (position2 != null && (position.compareTo(position2)) == 0) {
+        if (position2 != null && position2.equals(position)) {
             return false;
         }
 
-        position2 = position.toBlockVector();
+        position2 = position;
         region.setPos2(position2);
         return true;
     }
 
     @Override
-    public void explainPrimarySelection(Actor player, LocalSession session, Vector pos) {
+    public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
         checkNotNull(player);
         checkNotNull(session);
         checkNotNull(pos);
@@ -176,7 +190,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public void explainSecondarySelection(Actor player, LocalSession session, Vector pos) {
+    public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
         checkNotNull(player);
         checkNotNull(session);
         checkNotNull(pos);
@@ -209,7 +223,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public BlockVector getPrimaryPosition() throws IncompleteRegionException {
+    public BlockVector3 getPrimaryPosition() throws IncompleteRegionException {
         if (position1 == null) {
             throw new IncompleteRegionException();
         }
@@ -238,8 +252,8 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void learnChanges() {
-        position1 = region.getPos1().toBlockVector();
-        position2 = region.getPos2().toBlockVector();
+        position1 = region.getPos1();
+        position2 = region.getPos2();
     }
 
     @Override

@@ -1,10 +1,11 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
 import com.sk89q.worldedit.NotABlockException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.*;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -96,7 +97,7 @@ public interface IBukkitAdapter {
      */
     default Location adapt(org.bukkit.Location location) {
         checkNotNull(location);
-        Vector position = asVector(location);
+        Vector3 position = asVector(location);
         return new com.sk89q.worldedit.util.Location(
                 adapt(location.getWorld()),
                 position,
@@ -112,7 +113,7 @@ public interface IBukkitAdapter {
      */
     default org.bukkit.Location adapt(Location location) {
         checkNotNull(location);
-        Vector position = location.toVector();
+        Vector3 position = location.toVector();
         return new org.bukkit.Location(
                 adapt((World) location.getExtent()),
                 position.getX(), position.getY(), position.getZ(),
@@ -127,12 +128,16 @@ public interface IBukkitAdapter {
      * @param position the WorldEdit position
      * @return a Bukkit location
      */
-    default org.bukkit.Location adapt(org.bukkit.World world, Vector position) {
+    default org.bukkit.Location adapt(org.bukkit.World world, Vector3 position) {
         checkNotNull(world);
         checkNotNull(position);
         return new org.bukkit.Location(
                 world,
                 position.getX(), position.getY(), position.getZ());
+    }
+    
+    default org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position){
+    	return adapt(world, position.toVector3());
     }
 
     /**
@@ -158,9 +163,20 @@ public interface IBukkitAdapter {
      * @param location The Bukkit location
      * @return a WorldEdit vector
      */
-    default Vector asVector(org.bukkit.Location location) {
+    default Vector3 asVector(org.bukkit.Location location) {
         checkNotNull(location);
-        return new Vector(location.getX(), location.getY(), location.getZ());
+        return new Vector3(location.getX(), location.getY(), location.getZ());
+    }
+    
+    /**
+     * Create a WorldEdit BlockVector from a Bukkit location.
+     *
+     * @param location The Bukkit location
+     * @return a WorldEdit vector
+     */
+    default BlockVector3 asBlockVector(org.bukkit.Location location) {
+        checkNotNull(location);
+        return new BlockVector3(location.getX(), location.getY(), location.getZ());
     }
 
     /**

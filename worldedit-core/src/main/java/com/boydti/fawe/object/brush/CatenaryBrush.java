@@ -2,12 +2,15 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MathUtils;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 
 import java.util.Arrays;
@@ -18,9 +21,9 @@ public class CatenaryBrush implements Brush, ResettableTool {
     private final boolean shell, select, direction;
     private final double slack;
 
-    private Vector pos1;
-    private Vector pos2;
-    private Vector vertex;
+    private BlockVector3 pos1;
+    private BlockVector3 pos2;
+    private BlockVector3 vertex;
 
     public CatenaryBrush(boolean shell, boolean select, boolean direction, double lengthFactor) {
         this.shell = shell;
@@ -30,7 +33,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, Vector pos2, final Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 pos2, final Pattern pattern, double size) throws MaxChangedBlocksException {
         boolean visual = (editSession.getExtent() instanceof VisualExtent);
         if (pos1 == null || pos2.equals(pos1)) {
             if (!visual) {
@@ -47,12 +50,12 @@ public class CatenaryBrush implements Brush, ResettableTool {
             }
         } else if (this.direction) {
             Location loc = editSession.getPlayer().getPlayer().getLocation();
-            Vector facing = loc.getDirection().normalize();
-            Vector midpoint = pos1.add(pos2).divide(2);
-            Vector offset = midpoint.subtract(vertex);
-            vertex = midpoint.add(facing.multiply(offset.length()));
+            Vector3 facing = loc.getDirection().normalize();
+            BlockVector3 midpoint = pos1.add(pos2).divide(2);
+            BlockVector3 offset = midpoint.subtract(vertex);
+            vertex = midpoint.add(facing.multiply(offset.length()).toBlockPoint());
         }
-        List<Vector> nodes = Arrays.asList(pos1, vertex, pos2);
+        List<BlockVector3> nodes = Arrays.asList(pos1, vertex, pos2);
         vertex = null;
         try {
             editSession.drawSpline(pattern, nodes, 0, 0, 0, 10, size, !shell);
@@ -76,8 +79,8 @@ public class CatenaryBrush implements Brush, ResettableTool {
         return true;
     }
 
-    public static Vector getVertex(Vector pos1, Vector pos2, double lenPercent) {
-        if (lenPercent <= 1) return Vector.getMidpoint(pos1, pos2);
+    public static BlockVector3 getVertex(BlockVector3 pos1, BlockVector3 pos2, double lenPercent) {
+        if (lenPercent <= 1) return MathUtils.midpoint(pos1, pos2);
         double curveLen = pos1.distance(pos2) * lenPercent;
         double dy = pos2.getY() - pos1.getY();
         double dx = pos2.getX() - pos1.getX();
@@ -90,6 +93,6 @@ public class CatenaryBrush implements Brush, ResettableTool {
         double z = (dh/2)/a;
         double oY = (dy - curveLen * (Math.cosh(z) / Math.sinh(z))) / 2;
         double vertY = a * 1 + oY;
-        return pos1.add(pos2.subtract(pos1).multiply(vertX / dh).add(0, vertY, 0)).round();
+        return pos1.add(pos2.subtract(pos1).multiply(MathMan.roundInt(vertX / dh)).add(0, MathMan.roundInt(vertY), 0)).round();
     }
 }

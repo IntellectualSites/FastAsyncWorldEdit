@@ -4,14 +4,14 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 
 public class LineBrush implements Brush, ResettableTool {
 
     private final boolean shell, select, flat;
-    private Vector pos1;
+    private BlockVector3 pos1;
 
     public LineBrush(boolean shell, boolean select, boolean flat) {
         this.shell = shell;
@@ -20,7 +20,7 @@ public class LineBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, final Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, final Pattern pattern, double size) throws MaxChangedBlocksException {
         boolean visual = (editSession.getExtent() instanceof VisualExtent);
         if (pos1 == null) {
             if (!visual) {

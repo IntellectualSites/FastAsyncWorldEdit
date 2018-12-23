@@ -26,11 +26,15 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
+=======
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.storage.LegacyChunkStore;
@@ -75,10 +79,17 @@ public class ChunkCommands {
         String filename = "c." + Integer.toString(chunkX, 36)
                 + "." + Integer.toString(chunkZ, 36) + ".dat";
 
+<<<<<<< HEAD
         player.print(BBC.getPrefix() + "Chunk: " + chunkX + ", " + chunkZ);
         player.print(BBC.getPrefix() + "Old format: " + folder1 + "/" + folder2 + "/" + filename);
         player.print(BBC.getPrefix() + "McRegion: region/" + McRegionChunkStore.getFilename(
                 new Vector2D(chunkX, chunkZ)));
+=======
+        player.print("Chunk: " + chunkX + ", " + chunkZ);
+        player.print("Old format: " + folder1 + "/" + folder2 + "/" + filename);
+        player.print("McRegion: region/" + McRegionChunkStore.getFilename(
+                new BlockVector2(chunkX, chunkZ)));
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Command(
@@ -89,11 +100,19 @@ public class ChunkCommands {
             max = 0
     )
     @CommandPermissions("worldedit.listchunks")
+<<<<<<< HEAD
     public void listChunks(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         Set<Vector2D> chunks = session.getSelection(player.getWorld()).getChunks();
 
         for (Vector2D chunk : chunks) {
             player.print(BBC.getPrefix() + LegacyChunkStore.getFilename(chunk));
+=======
+    public void listChunks(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+        Set<BlockVector2> chunks = session.getSelection(player.getWorld()).getChunks();
+
+        for (BlockVector2 chunk : chunks) {
+            player.print(LegacyChunkStore.getFilename(chunk));
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         }
     }
 
@@ -110,7 +129,7 @@ public class ChunkCommands {
         player.print(BBC.getPrefix() + "Note that this command does not yet support the mcregion format.");
         LocalConfiguration config = worldEdit.getConfiguration();
 
-        Set<Vector2D> chunks = session.getSelection(player.getWorld()).getChunks();
+        Set<BlockVector2> chunks = session.getSelection(player.getWorld()).getChunks();
         FileOutputStream out = null;
 
         if (config.shellSaveType == null) {
@@ -127,7 +146,7 @@ public class ChunkCommands {
                 writer.write("ECHO.\r\n");
                 writer.write("PAUSE\r\n");
 
-                for (Vector2D chunk : chunks) {
+                for (BlockVector2 chunk : chunks) {
                     String filename = LegacyChunkStore.getFilename(chunk);
                     writer.write("ECHO " + filename + "\r\n");
                     writer.write("DEL \"world/" + filename + "\"\r\n");
@@ -159,7 +178,7 @@ public class ChunkCommands {
                 writer.write("echo\n");
                 writer.write("read -p \"Press any key to continue...\"\n");
 
-                for (Vector2D chunk : chunks) {
+                for (BlockVector2 chunk : chunks) {
                     String filename = LegacyChunkStore.getFilename(chunk);
                     writer.write("echo " + filename + "\n");
                     writer.write("rm \"world/" + filename + "\"\n");

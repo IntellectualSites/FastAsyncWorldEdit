@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 
 /**
  * Just an optimized version of the Adjacent Mask for single adjacency
@@ -28,7 +28,7 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(Vector v) {
+    public boolean test(BlockVector3 v) {
         int x = v.getBlockX();
         int y = v.getBlockY();
         int z = v.getBlockZ();
@@ -53,7 +53,7 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
         return false;
     }
 
-    public Vector direction(Vector v) {
+    public BlockVector3 direction(BlockVector3 v) {
         int x = v.getBlockX();
         int y = v.getBlockY();
         int z = v.getBlockZ();

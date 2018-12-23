@@ -1,10 +1,18 @@
 package com.sk89q.worldedit.extent.inventory;
 
+<<<<<<< HEAD
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+=======
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockState;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -82,9 +90,15 @@ public class BlockBagExtent extends AbstractDelegateExtent {
     }
 
     @Override
+<<<<<<< HEAD
     public boolean setBlock(Vector pos, BlockStateHolder block) throws WorldEditException {
         return setBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), block);
     }
+=======
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+        if (blockBag != null) {
+            BlockState existing = getExtent().getBlock(position);
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {

@@ -34,9 +34,16 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
+<<<<<<< HEAD
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+=======
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.GroundFunction;
@@ -51,6 +58,8 @@ import com.sk89q.worldedit.function.visitor.LayerVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.convolution.GaussianKernel;
 import com.sk89q.worldedit.math.convolution.HeightMap;
 import com.sk89q.worldedit.math.convolution.HeightMapFilter;
@@ -247,8 +256,8 @@ public class RegionCommands extends MethodCommands {
         }
 
         CuboidRegion cuboidregion = (CuboidRegion) region;
-        Vector pos1 = cuboidregion.getPos1();
-        Vector pos2 = cuboidregion.getPos2();
+        BlockVector3 pos1 = cuboidregion.getPos1();
+        BlockVector3 pos2 = cuboidregion.getPos2();
         int blocksChanged = editSession.drawLine(pattern, pos1, pos2, thickness, !shell);
 
         BBC.VISITOR_BLOCK.send(player, blocksChanged);
@@ -281,9 +290,14 @@ public class RegionCommands extends MethodCommands {
         }
         worldEdit.checkMaxRadius(thickness);
 
+<<<<<<< HEAD
         player.checkConfirmationRegion(() -> {
             ConvexPolyhedralRegion cpregion = (ConvexPolyhedralRegion) region;
             List<Vector> vectors = new ArrayList<Vector>(cpregion.getVertices());
+=======
+        ConvexPolyhedralRegion cpregion = (ConvexPolyhedralRegion) region;
+        List<BlockVector3> vectors = new ArrayList<>(cpregion.getVertices());
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
             int blocksChanged = editSession.drawSpline(pattern, vectors, 0, 0, 0, 10, thickness, !shell);
 
@@ -537,6 +551,7 @@ public class RegionCommands extends MethodCommands {
     public void move(FawePlayer player, LocalSession session, EditSession editSession,
                      @Selection Region region,
                      @Optional("1") @Range(min = 1) int count,
+<<<<<<< HEAD
                      @Optional(Direction.AIM) @Direction Vector direction,
                      @Optional("air") Pattern replace,
                      @Switch('b') boolean copyBiomes,
@@ -556,6 +571,22 @@ public class RegionCommands extends MethodCommands {
                 } catch (RegionOperationException e) {
                     player.sendMessage(BBC.getPrefix() + e.getMessage());
                 }
+=======
+                     @Optional(Direction.AIM) @Direction BlockVector3 direction,
+                     @Optional("air") BlockStateHolder replace,
+                     @Switch('s') boolean moveSelection) throws WorldEditException {
+
+        int affected = editSession.moveRegion(region, direction, count, true, replace);
+
+        if (moveSelection) {
+            try {
+                region.shift(direction.multiply(count));
+
+                session.getRegionSelector(player.getWorld()).learnChanges();
+                session.getRegionSelector(player.getWorld()).explainRegionAdjust(player, session);
+            } catch (RegionOperationException e) {
+                player.printError(e.getMessage());
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
 
             BBC.VISITOR_BLOCK.send(player, affected);
@@ -604,8 +635,9 @@ public class RegionCommands extends MethodCommands {
     public void stack(FawePlayer player, LocalSession session, EditSession editSession,
                       @Selection Region region,
                       @Optional("1") @Range(min = 1) int count,
-                      @Optional(Direction.AIM) @Direction Vector direction,
+                      @Optional(Direction.AIM) @Direction BlockVector3 direction,
                       @Switch('s') boolean moveSelection,
+<<<<<<< HEAD
                       @Switch('b') boolean copyBiomes,
                       @Switch('e') boolean skipEntities,
                       @Switch('a') boolean ignoreAirBlocks, @Switch('m') Mask sourceMask, CommandContext context) throws WorldEditException {
@@ -626,6 +658,22 @@ public class RegionCommands extends MethodCommands {
                 } catch (RegionOperationException e) {
                     player.sendMessage(BBC.getPrefix() + e.getMessage());
                 }
+=======
+                      @Switch('a') boolean ignoreAirBlocks) throws WorldEditException {
+        int affected = editSession.stackCuboidRegion(region, direction, count, !ignoreAirBlocks);
+
+        if (moveSelection) {
+            try {
+                final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint());
+
+                final BlockVector3 shiftVector = direction.toVector3().multiply(count * (Math.abs(direction.dot(size)) + 1)).toBlockPoint();
+                region.shift(shiftVector);
+
+                session.getRegionSelector(player.getWorld()).learnChanges();
+                session.getRegionSelector(player.getWorld()).explainRegionAdjust(player, session);
+            } catch (RegionOperationException e) {
+                player.printError(e.getMessage());
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
 
             BBC.VISITOR_BLOCK.send(player, affected);
@@ -651,27 +699,39 @@ public class RegionCommands extends MethodCommands {
                        @Selection Region region,
                        @Text String expression,
                        @Switch('r') boolean useRawCoords,
+<<<<<<< HEAD
                        @Switch('o') boolean offset,
                        CommandContext context) throws WorldEditException {
         final Vector zero;
         Vector unit;
+=======
+                       @Switch('o') boolean offset) throws WorldEditException {
+        final Vector3 zero;
+        Vector3 unit;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         if (useRawCoords) {
-            zero = Vector.ZERO;
-            unit = Vector.ONE;
+            zero = Vector3.ZERO;
+            unit = Vector3.ONE;
         } else if (offset) {
-            zero = session.getPlacementPosition(player);
-            unit = Vector.ONE;
+            zero = session.getPlacementPosition(player).toVector3();
+            unit = Vector3.ONE;
         } else {
-            final Vector min = region.getMinimumPoint();
-            final Vector max = region.getMaximumPoint();
+            final Vector3 min = region.getMinimumPoint().toVector3();
+            final Vector3 max = region.getMaximumPoint().toVector3();
 
-            zero = max.add(min).multiply(0.5);
+            zero = max.add(min).divide(2);
             unit = max.subtract(zero);
 
+<<<<<<< HEAD
             if (unit.getX() == 0) unit.mutX(1);
             if (unit.getY() == 0) unit.mutY(1);
             if (unit.getZ() == 0) unit.mutZ(1);
+=======
+            if (unit.getX() == 0) unit = unit.withX(1.0);
+            if (unit.getY() == 0) unit = unit.withY(1.0);
+            if (unit.getZ() == 0) unit = unit.withZ(1.0);
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         }
         fp.checkConfirmationRegion(() -> {
             try {

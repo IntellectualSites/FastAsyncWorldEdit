@@ -28,6 +28,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -55,7 +56,24 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         Location pos = getTargetFace(player);
         if (pos == null) return false;
+<<<<<<< HEAD
         EditSession eS = session.createEditSession(player);
+=======
+        try (EditSession eS = session.createEditSession(player)) {
+            eS.disableBuffering();
+            BlockVector3 blockPoint = pos.toVector().toBlockPoint();
+            BlockStateHolder applied = secondary.apply(blockPoint);
+            if (applied.getBlockType().getMaterial().isAir()) {
+                eS.setBlock(blockPoint, secondary);
+            } else {
+                eS.setBlock(pos.getDirection().toBlockPoint(), secondary);
+            }
+            return true;
+        } catch (MaxChangedBlocksException e) {
+            // one block? eat it
+        }
+        return false;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         BlockStateHolder applied = secondary.apply(pos.toVector());
         if (applied.getBlockType().getMaterial().isAir()) {
@@ -70,12 +88,27 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
         Location pos = getTargetFace(player);
         if (pos == null) return false;
+<<<<<<< HEAD
         EditSession eS = session.createEditSession(player);
         BlockStateHolder applied = primary.apply(pos.toVector());
         if (applied.getBlockType().getMaterial().isAir()) {
             eS.setBlock(pos.toVector(), primary);
         } else {
             eS.setBlock(pos.add(pos.getDirection()), primary);
+=======
+        try (EditSession eS = session.createEditSession(player)) {
+            eS.disableBuffering();
+            BlockVector3 blockPoint = pos.toVector().toBlockPoint();
+            BlockStateHolder applied = primary.apply(blockPoint);
+            if (applied.getBlockType().getMaterial().isAir()) {
+                eS.setBlock(blockPoint, primary);
+            } else {
+                eS.setBlock(pos.getDirection().toBlockPoint(), primary);
+            }
+            return true;
+        } catch (MaxChangedBlocksException e) {
+            // one block? eat it
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         }
         return true;
     }

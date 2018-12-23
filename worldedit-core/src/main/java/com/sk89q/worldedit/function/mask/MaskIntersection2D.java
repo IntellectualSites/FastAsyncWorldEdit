@@ -19,7 +19,13 @@
 
 package com.sk89q.worldedit.function.mask;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector2D;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.BlockVector2;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -83,7 +89,7 @@ public class MaskIntersection2D implements Mask2D {
     }
 
     @Override
-    public boolean test(Vector2D vector) {
+    public boolean test(BlockVector2 vector) {
         if (masks.isEmpty()) {
             return false;
         }

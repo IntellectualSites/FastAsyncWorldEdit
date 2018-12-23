@@ -19,11 +19,15 @@
 
 package com.sk89q.worldedit.internal.expression.runtime;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+=======
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.runtime.Function.Dynamic;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.noise.PerlinNoise;
 import com.sk89q.worldedit.math.noise.RidgedMultiFractalNoise;
 import com.sk89q.worldedit.math.noise.VoronoiNoise;
@@ -397,7 +401,7 @@ public final class Functions {
         } catch (IllegalArgumentException e) {
             throw new EvaluationException(0, "Perlin noise error: " + e.getMessage());
         }
-        return perlin.noise(new Vector(x.getValue(), y.getValue(), z.getValue()));
+        return perlin.noise(new Vector3(x.getValue(), y.getValue(), z.getValue()));
     }
 
     private static final ThreadLocal<VoronoiNoise> localVoronoi = ThreadLocal.withInitial(VoronoiNoise::new);
@@ -410,7 +414,7 @@ public final class Functions {
         } catch (IllegalArgumentException e) {
             throw new EvaluationException(0, "Voronoi error: " + e.getMessage());
         }
-        return voronoi.noise(new Vector(x.getValue(), y.getValue(), z.getValue()));
+        return voronoi.noise(new Vector3(x.getValue(), y.getValue(), z.getValue()));
     }
 
     private static final ThreadLocal<RidgedMultiFractalNoise> localRidgedMulti = ThreadLocal.withInitial(RidgedMultiFractalNoise::new);
@@ -424,7 +428,7 @@ public final class Functions {
         } catch (IllegalArgumentException e) {
             throw new EvaluationException(0, "Ridged multi error: " + e.getMessage());
         }
-        return ridgedMulti.noise(new Vector(x.getValue(), y.getValue(), z.getValue()));
+        return ridgedMulti.noise(new Vector3(x.getValue(), y.getValue(), z.getValue()));
     }
 
     private static double queryInternal(RValue type, RValue data, double typeId, double dataValue) throws EvaluationException {

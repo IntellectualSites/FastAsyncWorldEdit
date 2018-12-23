@@ -42,8 +42,12 @@ import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+<<<<<<< HEAD
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
+=======
+import com.sk89q.worldedit.WorldEdit;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -51,6 +55,7 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.NBTCompatibilityHandler;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -103,10 +108,18 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         return read(UUID.randomUUID());
     }
 
+<<<<<<< HEAD
     @Override
     public Clipboard read(UUID uuid) throws IOException {
         return readVersion1(uuid);
     }
+=======
+    private Clipboard readVersion1(Map<String, Tag> schematic) throws IOException {
+        BlockVector3 origin;
+        Region region;
+
+        Map<String, Tag> metadata = requireTag(schematic, "Metadata", CompoundTag.class).getValue();
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     private int width, height, length;
     private int offsetX, offsetY, offsetZ;
@@ -121,12 +134,35 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             }
             return fc;
         }
+<<<<<<< HEAD
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             return fc = new DiskOptimizedClipboard(size, 1, 1, uuid);
         } else if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL == 0) {
             return fc = new CPUOptimizedClipboard(size, 1, 1);
         } else {
             return fc = new MemoryOptimizedClipboard(size, 1, 1);
+=======
+
+        BlockVector3 min = new BlockVector3(offsetParts[0], offsetParts[1], offsetParts[2]);
+
+        if (metadata.containsKey("WEOffsetX")) {
+            // We appear to have WorldEdit Metadata
+            int offsetX = requireTag(metadata, "WEOffsetX", IntTag.class).getValue();
+            int offsetY = requireTag(metadata, "WEOffsetY", IntTag.class).getValue();
+            int offsetZ = requireTag(metadata, "WEOffsetZ", IntTag.class).getValue();
+            BlockVector3 offset = new BlockVector3(offsetX, offsetY, offsetZ);
+            origin = min.subtract(offset);
+            region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
+        } else {
+            origin = min;
+            region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
+        }
+
+        int paletteMax = requireTag(schematic, "PaletteMax", IntTag.class).getValue();
+        Map<String, Tag> paletteObject = requireTag(schematic, "Palette", CompoundTag.class).getValue();
+        if (paletteObject.size() != paletteMax) {
+            throw new IOException("Differing given palette size to actual size");
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         }
     }
 
@@ -152,6 +188,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 int index = ((IntTag) entry.getValue()).getValue();
                 palette[index] = (char) state.getOrdinal();
             }
+<<<<<<< HEAD
         });
         streamer.addReader("Schematic.BlockData.#", new NBTStreamer.LazyReader() {
             @Override
@@ -161,6 +198,23 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+=======
+            palette.put(id, state);
+        }
+
+        byte[] blocks = requireTag(schematic, "BlockData", ByteArrayTag.class).getValue();
+
+        Map<BlockVector3, Map<String, Tag>> tileEntitiesMap = new HashMap<>();
+        try {
+            List<Map<String, Tag>> tileEntityTags = requireTag(schematic, "TileEntities", ListTag.class).getValue().stream()
+                    .map(tag -> (CompoundTag) tag)
+                    .map(CompoundTag::getValue)
+                    .collect(Collectors.toList());
+
+            for (Map<String, Tag> tileEntity : tileEntityTags) {
+                int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
+                tileEntitiesMap.put(new BlockVector3(pos[0], pos[1], pos[2]), tileEntity);
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
         });
         streamer.addReader("Schematic.Biomes.#", new NBTStreamer.LazyReader() {
@@ -207,6 +261,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                     Fawe.debug("Invalid entity: " + id);
                 }
             }
+<<<<<<< HEAD
         });
         streamer.readFully();
         if (fc == null) setupClipboard(length * width * height, uuid);
@@ -225,6 +280,21 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                     for (int index = 0; index < volume; index++) {
                         BlockState state = BlockTypes.states[palette[fis.read()]];
                         fc.setBlock(index, state);
+=======
+            // index = (y * length + z) * width + x
+            int y = index / (width * length);
+            int z = (index % (width * length)) / width;
+            int x = (index % (width * length)) % width;
+            BlockState state = palette.get(value);
+            BlockVector3 pt = new BlockVector3(x, y, z);
+            try {
+                if (tileEntitiesMap.containsKey(pt)) {
+                    Map<String, Tag> values = Maps.newHashMap(tileEntitiesMap.get(pt));
+                    for (NBTCompatibilityHandler handler : COMPATIBILITY_HANDLERS) {
+                        if (handler.isAffectedBlock(state)) {
+                            handler.updateNBT(state, values);
+                        }
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 } else {
                     for (int index = 0; index < volume; index++) {

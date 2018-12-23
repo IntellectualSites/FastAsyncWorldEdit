@@ -1,11 +1,11 @@
 package com.boydti.fawe.object.function;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector;
 
 public class SurfaceRegionFunction implements FlatRegionFunction {
     private final Extent extent;
@@ -24,7 +24,7 @@ public class SurfaceRegionFunction implements FlatRegionFunction {
     }
 
     @Override
-    public boolean apply(Vector2D position) throws WorldEditException {
+    public boolean apply(BlockVector2 position) throws WorldEditException {
         int x = position.getBlockX();
         int z = position.getBlockZ();
         int layer = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY, false);

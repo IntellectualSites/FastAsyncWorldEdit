@@ -5,8 +5,6 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -14,6 +12,9 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -38,7 +39,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
         super(region);
         this.hasBiomes = hasBiomes;
         this.hasEntities = hasEntities;
-        final Vector origin = region.getMinimumPoint();
+        final BlockVector3 origin = region.getMinimumPoint();
         this.mx = origin.getBlockX();
         this.my = origin.getBlockY();
         this.mz = origin.getBlockZ();
@@ -72,15 +73,15 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     @Override
     public void forEach(BlockReader task, boolean air) {
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
-        final Vector pos = new Vector();
+    	BlockVector3 min = region.getMinimumPoint();
+    	BlockVector3 max = region.getMaximumPoint();
+        MutableBlockVector pos = new MutableBlockVector();
         if (region instanceof CuboidRegion) {
             if (air) {
                 ((CuboidRegion) region).setUseOldIterator(true);
                 RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
                     @Override
-                    public boolean apply(Vector pos) throws WorldEditException {
+                    public boolean apply(BlockVector3 pos) throws WorldEditException {
                         BlockState block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
                         int x = pos.getBlockX() - mx;
                         int y = pos.getBlockY() - my;
@@ -102,7 +103,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                 cuboidEquivalent.setUseOldIterator(true);
                 RegionVisitor visitor = new RegionVisitor(cuboidEquivalent, new RegionFunction() {
                     @Override
-                    public boolean apply(Vector pos) throws WorldEditException {
+                    public boolean apply(BlockVector3 pos) throws WorldEditException {
                         int x = pos.getBlockX() - mx;
                         int y = pos.getBlockY() - my;
                         int z = pos.getBlockZ() - mz;

@@ -4,11 +4,11 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.DataAnglePattern;
 import com.boydti.fawe.util.TextureHolder;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
@@ -32,7 +32,7 @@ public class AngleColorPattern extends DataAnglePattern {
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BlockStateHolder apply(BlockVector3 position) {
         BlockStateHolder block = extent.getBlock(position);
         int slope = getSlope(block, position);
         if (slope == -1) return block;
@@ -43,7 +43,7 @@ public class AngleColorPattern extends DataAnglePattern {
     }
 
     @Override
-    public int getSlope(BlockStateHolder block, Vector vector) {
+    public int getSlope(BlockStateHolder block, BlockVector3 vector) {
         int slope = super.getSlope(block, vector);
         if (slope != -1) {
             int x = vector.getBlockX();
@@ -61,7 +61,7 @@ public class AngleColorPattern extends DataAnglePattern {
     }
 
     @Override
-    public boolean apply(Extent extent, Vector setPosition, Vector getPosition) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
         BlockStateHolder block = extent.getBlock(getPosition);
         int slope = getSlope(block, getPosition);
         if (slope == -1) return false;

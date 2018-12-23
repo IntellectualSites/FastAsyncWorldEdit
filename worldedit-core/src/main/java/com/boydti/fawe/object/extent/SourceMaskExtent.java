@@ -1,12 +1,12 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 
@@ -43,7 +43,7 @@ public class SourceMaskExtent extends TemporalExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         set(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
         return mask.test(location) && super.setBlock(location, block);
     }

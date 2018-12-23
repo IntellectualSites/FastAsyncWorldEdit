@@ -2,12 +2,12 @@ package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -87,12 +87,12 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public void setOrigin(Vector offset) {
+    public void setOrigin(BlockVector3 offset) {
         parent.setOrigin(offset);
     }
 
     @Override
-    public void setDimensions(Vector dimensions) {
+    public void setDimensions(BlockVector3 dimensions) {
         parent.setDimensions(dimensions);
     }
 
@@ -107,7 +107,7 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public Vector getDimensions() {
+    public BlockVector3 getDimensions() {
         return parent.getDimensions();
     }
 

@@ -1,7 +1,14 @@
 package com.sk89q.worldedit.function.mask;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.MutableBlockVector;
 import com.sk89q.worldedit.Vector;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.BlockVector3;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import javax.annotation.Nullable;
 
 
@@ -14,8 +21,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class OffsetMask extends AbstractMask {
 
     private Mask mask;
+<<<<<<< HEAD
     private Vector offset;
     private MutableBlockVector mutable = new MutableBlockVector();
+=======
+    private BlockVector3 offset;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     /**
      * Create a new instance.
@@ -23,7 +34,7 @@ public class OffsetMask extends AbstractMask {
      * @param mask   the mask
      * @param offset the offset
      */
-    public OffsetMask(Mask mask, Vector offset) {
+    public OffsetMask(Mask mask, BlockVector3 offset) {
         checkNotNull(mask);
         checkNotNull(offset);
         this.mask = mask;
@@ -54,7 +65,7 @@ public class OffsetMask extends AbstractMask {
      *
      * @return the offset
      */
-    public Vector getOffset() {
+    public BlockVector3 getOffset() {
         return offset;
     }
 
@@ -63,17 +74,22 @@ public class OffsetMask extends AbstractMask {
      *
      * @param offset the offset
      */
-    public void setOffset(Vector offset) {
+    public void setOffset(BlockVector3 offset) {
         checkNotNull(offset);
         this.offset = offset;
     }
 
     @Override
+<<<<<<< HEAD
     public boolean test(Vector vector) {
         mutable.mutX((vector.getX() + offset.getX()));
         mutable.mutY((vector.getY() + offset.getY()));
         mutable.mutZ((vector.getZ() + offset.getZ()));
         return getMask().test(mutable);
+=======
+    public boolean test(BlockVector3 vector) {
+        return getMask().test(vector.add(offset));
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Nullable
@@ -81,7 +97,7 @@ public class OffsetMask extends AbstractMask {
     public Mask2D toMask2D() {
         Mask2D childMask = getMask().toMask2D();
         if (childMask != null) {
-            return new OffsetMask2D(childMask, getOffset().toVector2D());
+            return new OffsetMask2D(childMask, getOffset().toBlockVector2());
         } else {
             return null;
         }

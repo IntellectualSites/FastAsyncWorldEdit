@@ -20,8 +20,13 @@
 package com.sk89q.worldedit.function.generator;
 
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
+<<<<<<< HEAD
+=======
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.TreeGenerator;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -49,7 +54,7 @@ public class ForestGenerator implements RegionFunction {
     }
 
     @Override
-    public boolean apply(Vector position) throws WorldEditException {
+    public boolean apply(BlockVector3 position) throws WorldEditException {
         BlockStateHolder block = editSession.getBlock(position);
         BlockType t = block.getBlockType();
 

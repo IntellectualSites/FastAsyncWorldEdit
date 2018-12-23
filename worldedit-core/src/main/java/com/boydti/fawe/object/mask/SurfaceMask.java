@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class SurfaceMask extends AdjacentAnyMask {
@@ -22,7 +22,7 @@ public class SurfaceMask extends AdjacentAnyMask {
     }
 
     @Override
-    public boolean test(Vector v) {
+    public boolean test(BlockVector3 v) {
         return !getParentMask().test(v.getBlockX(), v.getBlockY(), v.getBlockZ()) && super.test(v);
     }
 }

@@ -1,13 +1,13 @@
 package com.boydti.fawe.object.pattern;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class OffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BlockStateHolder apply(BlockVector3 position) {
         mutable.mutX((position.getX() + dx));
         mutable.mutY((position.getY() + dy));
         mutable.mutZ((position.getZ() + dz));
@@ -34,7 +34,7 @@ public class OffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
         mutable.mutX((get.getX() + dx));
         mutable.mutY((get.getY() + dy));
         mutable.mutZ((get.getZ() + dz));

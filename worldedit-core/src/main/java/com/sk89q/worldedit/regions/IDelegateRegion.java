@@ -1,6 +1,10 @@
 package com.sk89q.worldedit.regions;
 
 import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector2;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import java.util.Iterator;
 import java.util.List;
@@ -12,22 +16,22 @@ public interface IDelegateRegion extends Region {
     public Region getRegion();
 
     @Override
-    default Iterator<BlockVector> iterator() {
+    default Iterator<BlockVector3> iterator() {
         return getRegion().iterator();
     }
 
     @Override
-    default Vector getMinimumPoint() {
+    default BlockVector3 getMinimumPoint() {
         return getRegion().getMinimumPoint();
     }
 
     @Override
-    default Vector getMaximumPoint() {
+    default BlockVector3 getMaximumPoint() {
         return getRegion().getMaximumPoint();
     }
 
     @Override
-    default Vector getCenter() {
+    default Vector3 getCenter() {
         return getRegion().getCenter();
     }
 
@@ -52,32 +56,32 @@ public interface IDelegateRegion extends Region {
     }
 
     @Override
-    default void expand(Vector... changes) throws RegionOperationException {
+    default void expand(BlockVector3... changes) throws RegionOperationException {
         getRegion().expand(changes);
     }
 
     @Override
-    default void contract(Vector... changes) throws RegionOperationException {
+    default void contract(BlockVector3... changes) throws RegionOperationException {
         getRegion().contract(changes);
     }
 
     @Override
-    default void shift(Vector change) throws RegionOperationException {
+    default void shift(BlockVector3 change) throws RegionOperationException {
         getRegion().shift(change);
     }
 
     @Override
-    default boolean contains(Vector position) {
+    default boolean contains(BlockVector3 position) {
         return getRegion().contains(position);
     }
 
     @Override
-    default Set<Vector2D> getChunks() {
+    default Set<BlockVector2> getChunks() {
         return getRegion().getChunks();
     }
 
     @Override
-    default Set<Vector> getChunkCubes() {
+    default Set<BlockVector3> getChunkCubes() {
         return getRegion().getChunkCubes();
     }
 
@@ -98,7 +102,7 @@ public interface IDelegateRegion extends Region {
     }
 
     @Override
-    default List<BlockVector2D> polygonize(int maxPoints) {
+    default List<BlockVector2> polygonize(int maxPoints) {
         return getRegion().polygonize(maxPoints);
     }
 }

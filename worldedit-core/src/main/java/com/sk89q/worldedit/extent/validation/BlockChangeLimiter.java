@@ -20,14 +20,18 @@
 package com.sk89q.worldedit.extent.validation;
 
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+<<<<<<< HEAD
 
 import static com.google.common.base.Preconditions.checkArgument;
+=======
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 /**
  * Limits the number of blocks that can be changed before a
@@ -78,7 +82,7 @@ public class BlockChangeLimiter extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         if (limit >= 0) {
             if (count >= limit) {
                 throw new MaxChangedBlocksException(limit);

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory;
 
+<<<<<<< HEAD
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
@@ -30,6 +31,13 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
+=======
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.NotABlockException;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.blocks.MobSpawnerBlock;
 import com.sk89q.worldedit.blocks.SignBlock;
 import com.sk89q.worldedit.blocks.SkullBlock;
@@ -44,6 +52,11 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
+<<<<<<< HEAD
+=======
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.state.Property;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -198,7 +211,11 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
                 int index = Integer.parseInt(typeString.replaceAll("[a-z]+", ""));
                 // Get the block type from the "primary position"
                 final World world = context.requireWorld();
+<<<<<<< HEAD
                 final Vector primaryPosition;
+=======
+                final BlockVector3 primaryPosition;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 try {
                     primaryPosition = context.requireSession().getRegionSelector(world).getVerticies().get(index - 1);
                 } catch (IncompleteRegionException e) {

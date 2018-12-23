@@ -19,14 +19,10 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.LazyBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockType;
 
@@ -49,9 +45,9 @@ public interface InputExtent {
      * @param position position of the block
      * @return the block
      */
-    BlockState getBlock(Vector position);
+    BlockState getBlock(BlockVector3 position);
 
-    default BlockType getBlockType(Vector position) {
+    default BlockType getBlockType(BlockVector3 position) {
         return getBlock(position).getBlockType();
     }
 
@@ -76,7 +72,7 @@ public interface InputExtent {
      * @param position position of the block
      * @return the block
      */
-    BlockState getLazyBlock(Vector position);
+    BlockState getLazyBlock(BlockVector3 position);
 
     /**
      * Get a immutable snapshot of the block at the given location.
@@ -84,7 +80,7 @@ public interface InputExtent {
      * @param position position of the block
      * @return the block
      */
-    BlockState getFullBlock(Vector position);
+    BlockState getFullBlock(BlockVector3 position);
 
     /**
      * Get the biome at the given location.
@@ -95,6 +91,6 @@ public interface InputExtent {
      * @param position the (x, z) location to check the biome at
      * @return the biome at the location
      */
-    BaseBiome getBiome(Vector2D position);
+    BaseBiome getBiome(BlockVector2 position);
 
 }

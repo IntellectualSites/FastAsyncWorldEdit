@@ -1,13 +1,13 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -24,7 +24,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         mutable.mutX((location.getX() + dx));
         mutable.mutY((location.getY() + dy));
         mutable.mutZ((location.getZ() + dz));
@@ -40,7 +40,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return super.setBiome(position.add(dx, dz), biome);
     }
 
@@ -50,17 +50,17 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return super.getBiome(position.add(dx, dz));
     }
 
     @Override
-    public BlockState getBlock(Vector location) {
+    public BlockState getBlock(BlockVector3 location) {
         return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override
-    public BlockState getLazyBlock(Vector location) {
+    public BlockState getLazyBlock(BlockVector3 location) {
         return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 

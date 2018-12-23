@@ -19,13 +19,17 @@
 
 package com.sk89q.worldedit.world.snapshot;
 
-import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+=======
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.DataException;
@@ -46,11 +50,11 @@ import java.util.Map;
  */
 public class SnapshotRestore {
 
-    private final Map<BlockVector2D, ArrayList<Vector>> neededChunks = new LinkedHashMap<>();
+    private final Map<BlockVector2, ArrayList<BlockVector3>> neededChunks = new LinkedHashMap<>();
     private final ChunkStore chunkStore;
     private final EditSession editSession;
-    private ArrayList<Vector2D> missingChunks;
-    private ArrayList<Vector2D> errorChunks;
+    private ArrayList<BlockVector2> missingChunks;
+    private ArrayList<BlockVector2> errorChunks;
     private String lastErrorMessage;
 
     /**
@@ -77,15 +81,15 @@ public class SnapshotRestore {
      * @param region The {@link Region} to iterate
      */
     private void findNeededCuboidChunks(Region region) {
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
 
         // First, we need to group points by chunk so that we only need
         // to keep one chunk in memory at any given moment
         for (int x = min.getBlockX(); x <= max.getBlockX(); ++x) {
             for (int y = min.getBlockY(); y <= max.getBlockY(); ++y) {
                 for (int z = min.getBlockZ(); z <= max.getBlockZ(); ++z) {
-                    Vector pos = new Vector(x, y, z);
+                    BlockVector3 pos = new BlockVector3(x, y, z);
                     checkAndAddBlock(pos);
                 }
             }
@@ -100,16 +104,16 @@ public class SnapshotRestore {
     private void findNeededChunks(Region region) {
         // First, we need to group points by chunk so that we only need
         // to keep one chunk in memory at any given moment
-        for (Vector pos : region) {
+        for (BlockVector3 pos : region) {
             checkAndAddBlock(pos);
         }
     }
 
-    private void checkAndAddBlock(Vector pos) {
+    private void checkAndAddBlock(BlockVector3 pos) {
         if (editSession.getMask() != null && !editSession.getMask().test(pos))
             return;
 
-        BlockVector2D chunkPos = ChunkStore.toChunk(pos);
+        BlockVector2 chunkPos = ChunkStore.toChunk(pos);
 
         // Unidentified chunk
         if (!neededChunks.containsKey(chunkPos)) {
@@ -139,8 +143,8 @@ public class SnapshotRestore {
         errorChunks = new ArrayList<>();
 
         // Now let's start restoring!
-        for (Map.Entry<BlockVector2D, ArrayList<Vector>> entry : neededChunks.entrySet()) {
-            BlockVector2D chunkPos = entry.getKey();
+        for (Map.Entry<BlockVector2, ArrayList<BlockVector3>> entry : neededChunks.entrySet()) {
+            BlockVector2 chunkPos = entry.getKey();
             Chunk chunk;
 
             try {
@@ -148,7 +152,7 @@ public class SnapshotRestore {
                 // Good, the chunk could be at least loaded
 
                 // Now just copy blocks!
-                for (Vector pos : entry.getValue()) {
+                for (BlockVector3 pos : entry.getValue()) {
                     try {
                         editSession.setBlock(pos, chunk.getBlock(pos));
                     } catch (DataException e) {
@@ -170,7 +174,7 @@ public class SnapshotRestore {
      *
      * @return a list of coordinates
      */
-    public List<Vector2D> getMissingChunks() {
+    public List<BlockVector2> getMissingChunks() {
         return missingChunks;
     }
 
@@ -180,7 +184,7 @@ public class SnapshotRestore {
      *
      * @return a list of coordinates
      */
-    public List<Vector2D> getErrorChunks() {
+    public List<BlockVector2> getErrorChunks() {
         return errorChunks;
     }
 

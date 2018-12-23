@@ -5,7 +5,7 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -33,14 +33,14 @@ public class WorldGuardFilter extends CuboidRegionFilter {
             public void run(Object value) {
                 WorldGuardFilter.this.manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(FaweAPI.getWorld(world.getName()));
                 for (ProtectedRegion region : manager.getRegions().values()) {
-                    BlockVector min = region.getMinimumPoint();
-                    BlockVector max = region.getMaximumPoint();
+                	BlockVector3 min = region.getMinimumPoint();
+                	BlockVector3 max = region.getMaximumPoint();
                     if (max.getBlockX() - min.getBlockX() > 1024 || max.getBlockZ() - min.getBlockZ() > 1024) {
                         Fawe.debug("Large or complex region shapes cannot be optimized. Filtering will be slower");
                         large = true;
                         break;
                     }
-                    add(min.toVector2D(), max.toVector2D());
+                    add(min.toBlockVector2(), max.toBlockVector2());
                 }
             }
         });
@@ -49,8 +49,8 @@ public class WorldGuardFilter extends CuboidRegionFilter {
     @Override
     public boolean containsChunk(int chunkX, int chunkZ) {
         if (!large) return super.containsChunk(chunkX, chunkZ);
-        BlockVector pos1 = new BlockVector(chunkX << 4, 0, chunkZ << 4);
-        BlockVector pos2 = new BlockVector(pos1.getBlockX() + 15, 255, pos1.getBlockZ() + 15);
+        BlockVector3 pos1 = new BlockVector3(chunkX << 4, 0, chunkZ << 4);
+        BlockVector3 pos2 = new BlockVector3(pos1.getBlockX() + 15, 255, pos1.getBlockZ() + 15);
         ProtectedCuboidRegion chunkRegion = new ProtectedCuboidRegion("unimportant", pos1, pos2);
         ApplicableRegionSet set = manager.getApplicableRegions(chunkRegion);
         return set.size() > 0 && !set.getRegions().iterator().next().getId().equals("__global__");
@@ -59,8 +59,8 @@ public class WorldGuardFilter extends CuboidRegionFilter {
     @Override
     public boolean containsRegion(int mcaX, int mcaZ) {
         if (!large) return super.containsRegion(mcaX, mcaZ);
-        BlockVector pos1 = new BlockVector(mcaX << 9, 0, mcaZ << 9);
-        BlockVector pos2 = new BlockVector(pos1.getBlockX() + 511, 255, pos1.getBlockZ() + 511);
+        BlockVector3 pos1 = new BlockVector3(mcaX << 9, 0, mcaZ << 9);
+        BlockVector3 pos2 = new BlockVector3(pos1.getBlockX() + 511, 255, pos1.getBlockZ() + 511);
         ProtectedCuboidRegion regionRegion = new ProtectedCuboidRegion("unimportant", pos1, pos2);
         ApplicableRegionSet set = manager.getApplicableRegions(regionRegion);
         return set.size() > 0 && !set.getRegions().iterator().next().getId().equals("__global__");

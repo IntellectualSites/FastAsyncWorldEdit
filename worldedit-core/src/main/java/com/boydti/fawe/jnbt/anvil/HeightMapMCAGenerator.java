@@ -16,13 +16,17 @@ import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.Vector2;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -194,7 +198,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     // These three variables should be set together
 //    private FaweQueue packetQueue;
     private FawePlayer player;
-    private Vector2D chunkOffset = Vector2D.ZERO;
+    private BlockVector2 chunkOffset = BlockVector2.ZERO;
     private EditSession editSession;
     // end
 
@@ -229,8 +233,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public Vector getOrigin() {
-        return new BlockVector(chunkOffset.getBlockX() << 4, 0, chunkOffset.getBlockZ() << 4);
+    public Vector3 getOrigin() {
+        return new Vector3(chunkOffset.getBlockX() << 4, 0, chunkOffset.getBlockZ() << 4);
     }
 
     public boolean hasPacketViewer() {
@@ -241,7 +245,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         this.player = player;
         if (player != null) {
             FaweLocation pos = player.getLocation();
-            this.chunkOffset = new Vector2D(1 + (pos.x >> 4), 1 + (pos.z >> 4));
+            this.chunkOffset = new BlockVector2(1 + (pos.x >> 4), 1 + (pos.z >> 4));
         }
     }
 
@@ -375,7 +379,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         smooth(null, mask, false, radius, iterations);
     }
 
-    public void smooth(Vector2D min, Vector2D max, int radius, int iterations) {
+    public void smooth(BlockVector2 min, BlockVector2 max, int radius, int iterations) {
         int snowLayer = BlockTypes.SNOW.getInternalId();
         int snowBlock = BlockTypes.SNOW_BLOCK.getInternalId();
 
@@ -550,13 +554,13 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void addCaves() throws WorldEditException {
-        CuboidRegion region = new CuboidRegion(new Vector(0, 0, 0), new Vector(getWidth() -1, 255, getLength() -1));
+        CuboidRegion region = new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(getWidth() -1, 255, getLength() -1));
         addCaves(region);
     }
 
     @Deprecated
     public void addSchems(Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
-        CuboidRegion region = new CuboidRegion(new Vector(0, 0, 0), new Vector(getWidth() -1, 255, getLength() -1));
+        CuboidRegion region = new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(getWidth() -1, 255, getLength() -1));
         addSchems(region, mask, clipboards, rarity, rotate);
     }
 
@@ -661,17 +665,17 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public void addOre(Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
-        CuboidRegion region = new CuboidRegion(new Vector(0, 0, 0), new Vector(getWidth() -1, 255, getLength() -1));
+        CuboidRegion region = new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(getWidth() -1, 255, getLength() -1));
         addOre(region, mask, material, size, frequency, rarity, minY, maxY);
     }
 
     public void addDefaultOres(Mask mask) throws WorldEditException {
-        addOres(new CuboidRegion(new Vector(0, 0, 0), new Vector(getWidth() -1, 255, getLength() -1)), mask);
+        addOres(new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(getWidth() -1, 255, getLength() -1)), mask);
     }
 
     @Override
-    public Vector getMinimumPoint() {
-        return new Vector(0, 0, 0);
+    public BlockVector3 getMinimumPoint() {
+        return new BlockVector3(0, 0, 0);
     }
 
     @Override
@@ -680,17 +684,17 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public Vector getMaximumPoint() {
-        return new Vector(getWidth() - 1, 255, getLength() - 1);
+    public BlockVector3 getMaximumPoint() {
+        return new BlockVector3(getWidth() - 1, 255, getLength() - 1);
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         return setBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return this.setBiome(position.getBlockX(), position.getBlockZ(), biome);
     }
 
@@ -1011,12 +1015,12 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return FaweCache.CACHE_BIOME[getBiomeId(position.getBlockX(), position.getBlockZ())];
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         return getLazyBlock(position);
     }
 
@@ -1040,7 +1044,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public BlockState getLazyBlock(Vector position) {
+    public BlockState getLazyBlock(BlockVector3 position) {
         return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
@@ -2240,24 +2244,19 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
         return setBlock(position, block);
     }
 
     // These aren't implemented yet...
     @Override
-    public int getBlockLightLevel(Vector position) {
+    public int getBlockLightLevel(BlockVector3 position) {
         return 0;
     }
 
     @Override
-    public boolean clearContainerBlockContents(Vector position) {
+    public boolean clearContainerBlockContents(BlockVector3 position) {
         return false;
-    }
-
-    @Override
-    public void dropItem(Vector position, BaseItemStack item) {
-
     }
 
     @Override
@@ -2266,7 +2265,19 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, Vector position) throws MaxChangedBlocksException {
+    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
         return false;
     }
+
+	@Override
+	public void dropItem(Vector3 position, BaseItemStack item) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean playEffect(Vector3 position, int type, int data) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

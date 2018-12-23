@@ -5,11 +5,11 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.extent.inventory.UnplaceableBlockException;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -71,7 +71,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     }
 
     @Override
-    public void add(Vector loc, BlockStateHolder from, BlockStateHolder to) {
+    public void add(BlockVector3 loc, BlockStateHolder from, BlockStateHolder to) {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();

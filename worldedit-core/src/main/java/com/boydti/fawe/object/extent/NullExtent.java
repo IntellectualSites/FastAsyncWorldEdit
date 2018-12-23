@@ -3,8 +3,6 @@ package com.boydti.fawe.object.extent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -12,6 +10,8 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -48,27 +48,27 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public BaseBiome getBiome(final Vector2D arg0) {
+    public BaseBiome getBiome(final BlockVector2 arg0) {
         throw new FaweException(reason);
     }
 
     @Override
-    public BaseBlock getBlock(final Vector arg0) {
+    public BaseBlock getBlock(final BlockVector3 arg0) {
         throw new FaweException(reason);
     }
 
     @Override
-    public BaseBlock getLazyBlock(final Vector arg0) {
+    public BaseBlock getLazyBlock(final BlockVector3 arg0) {
         throw new FaweException(reason);
     }
 
     @Override
-    public boolean setBiome(final Vector2D arg0, final BaseBiome arg1) {
+    public boolean setBiome(final BlockVector2 arg0, final BaseBiome arg1) {
         throw new FaweException(reason);
     }
 
     @Override
-    public boolean setBlock(final Vector arg0, final BlockStateHolder arg1) throws WorldEditException {
+    public boolean setBlock(final BlockVector3 arg0, final BlockStateHolder arg1) throws WorldEditException {
         throw new FaweException(reason);
     }
 
@@ -98,13 +98,13 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public Vector getMaximumPoint() {
-        return new Vector(0, 0, 0);
+    public BlockVector3 getMaximumPoint() {
+        return new BlockVector3(0, 0, 0);
     }
 
     @Override
-    public Vector getMinimumPoint() {
-        return new Vector(0, 0, 0);
+    public BlockVector3 getMinimumPoint() {
+        return new BlockVector3(0, 0, 0);
     }
 
     @Override

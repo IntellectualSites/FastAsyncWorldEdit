@@ -19,14 +19,20 @@
 
 package com.sk89q.worldedit.function;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Passes calls to {@link #apply(com.sk89q.worldedit.Vector)} to the
+ * Passes calls to {@link #apply(BlockVector3)} to the
  * delegate {@link com.sk89q.worldedit.function.RegionFunction} if they
  * match the given mask.
  */
@@ -49,7 +55,7 @@ public class RegionMaskingFilter implements RegionFunction {
     }
 
     @Override
-    public boolean apply(Vector position) throws WorldEditException {
+    public boolean apply(BlockVector3 position) throws WorldEditException {
         return mask.test(position) && function.apply(position);
     }
 

@@ -26,7 +26,6 @@ import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BlockMaterial;

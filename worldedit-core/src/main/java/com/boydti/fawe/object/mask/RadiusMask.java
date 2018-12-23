@@ -1,14 +1,14 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask2D;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import javax.annotation.Nullable;
 
 public class RadiusMask extends AbstractMask implements ResettableMask {
 
-    private transient Vector pos;
+    private transient BlockVector3 pos;
     private final int minSqr, maxSqr;
 
     public RadiusMask(int min, int max) {
@@ -22,9 +22,9 @@ public class RadiusMask extends AbstractMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(Vector to) {
+    public boolean test(BlockVector3 to) {
         if (pos == null) {
-            pos = new MutableBlockVector(to);
+            pos = to;
         }
         int dx = pos.getBlockX() - to.getBlockX();
         int d = dx * dx;

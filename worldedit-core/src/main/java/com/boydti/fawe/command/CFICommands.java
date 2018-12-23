@@ -41,6 +41,8 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
@@ -421,7 +423,7 @@ public class CFICommands extends MethodCommands {
                 ClipboardHolder holder = fp.getSession().getClipboard();
                 Clipboard clipboard = holder.getClipboard();
                 boolean[] ids = new boolean[BlockTypes.size()];
-                for (Vector pt : clipboard.getRegion()) {
+                for (BlockVector3 pt : clipboard.getRegion()) {
                     ids[clipboard.getBlock(pt).getInternalBlockTypeId()] = true;
                 }
                 blocks = new HashSet<>();
@@ -447,7 +449,7 @@ public class CFICommands extends MethodCommands {
                     BlockType type = BlockTypes.get(typeId);
                     BlockStateHolder block = type.getDefaultState();
                     pattern.setBlock(block);
-                    if (mask.test(Vector.ZERO)) blocks.add(type);
+                    if (mask.test(BlockVector3.ZERO)) blocks.add(type);
                 }
                 break;
             }
@@ -663,7 +665,7 @@ public class CFICommands extends MethodCommands {
     public void tp(FawePlayer fp) throws ParameterException, WorldEditException {
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         msg("Teleporting...").send(fp);
-        Vector origin = gen.getOrigin();
+        Vector3 origin = gen.getOrigin();
         Player player = fp.getPlayer();
         player.setPosition(origin.subtract(16, 0, 16));
         player.findFreePosition();

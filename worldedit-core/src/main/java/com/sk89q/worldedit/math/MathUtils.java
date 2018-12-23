@@ -117,4 +117,34 @@ public final class MathUtils {
     public static double roundHalfUp(double value) {
         return Math.signum(value) * Math.round(Math.abs(value));
     }
+    
+    /**
+     * Returns the midpoint Vector3 of the two given Vector3's.
+     * 
+     * @param first Vector3
+     * @param second Vector3
+     * @return midpoint Vector3
+     */
+    public static Vector3 midpoint(Vector3 v1, Vector3 v2) {
+        return new Vector3(
+                (v1.getX() + v2.getX()) / 2,
+                (v1.getY() + v2.getY()) / 2,
+                (v1.getZ() + v2.getZ()) / 2
+        );
+    }
+    
+    /**
+     * Returns the midpoint BlockVector3 of the two given BlockVector3's.
+     * 
+     * @param first BlockVector3
+     * @param second BlockVector3
+     * @return midpoint BlockVector3
+     */
+    public static BlockVector3 midpoint(BlockVector3 v1, BlockVector3 v2) {
+        return new BlockVector3(
+                (v1.getBlockX() + v2.getBlockX()) / 2,
+                (v1.getBlockY() + v2.getBlockY()) / 2,
+                (v1.getBlockZ() + v2.getBlockZ()) / 2
+        );
+    }
 }

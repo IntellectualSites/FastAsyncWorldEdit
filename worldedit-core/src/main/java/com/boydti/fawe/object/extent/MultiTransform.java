@@ -1,13 +1,13 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -40,14 +40,14 @@ public class MultiTransform extends RandomTransform {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         boolean result = false;
         for (AbstractDelegateExtent extent : extents) result |= extent.setBlock(location, block);
         return result;
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         boolean result = false;
         for (AbstractDelegateExtent extent : extents) result |= extent.setBiome(position, biome);
         return result;

@@ -6,14 +6,14 @@ import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.*;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
@@ -106,17 +106,17 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     }
 
     @Override
-    public BaseBiome getBiome(final Vector2D position) {
+    public BaseBiome getBiome(final BlockVector2 position) {
         return FaweCache.CACHE_BIOME[queue.getBiomeId(position.getBlockX(), position.getBlockZ())];
     }
 
     @Override
-    public boolean setBlock(final Vector location, final BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(final BlockVector3 location, final BlockStateHolder block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
     @Override
-    public BlockState getLazyBlock(Vector location) {
+    public BlockState getLazyBlock(BlockVector3 location) {
         return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
@@ -145,12 +145,12 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     }
 
     @Override
-    public BlockState getBlock(final Vector position) {
+    public BlockState getBlock(final BlockVector3 position) {
         return this.getLazyBlock(position);
     }
 
     @Override
-    public boolean setBiome(final Vector2D position, final BaseBiome biome) {
+    public boolean setBiome(final BlockVector2 position, final BaseBiome biome) {
         queue.setBiome(position.getBlockX(), position.getBlockZ(), biome);
         return true;
     }

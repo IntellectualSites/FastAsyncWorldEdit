@@ -19,10 +19,17 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+<<<<<<< HEAD
 import com.boydti.fawe.object.HasFaweQueue;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
+=======
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import java.util.Collection;
 
 /**
@@ -38,18 +45,23 @@ public class NonRisingVisitor extends RecursiveVisitor {
      */
 
     public NonRisingVisitor(Mask mask, RegionFunction function) {
+<<<<<<< HEAD
         this(mask, function, Integer.MAX_VALUE, null);
     }
 
     public NonRisingVisitor(Mask mask, RegionFunction function, int depth, HasFaweQueue hasFaweQueue) {
         super(mask, function, depth, hasFaweQueue);
         final Collection<Vector> directions = this.getDirections();
+=======
+        super(mask, function);
+        Collection<BlockVector3> directions = getDirections();
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         directions.clear();
-        directions.add(new Vector(1, 0, 0));
-        directions.add(new Vector(-1, 0, 0));
-        directions.add(new Vector(0, 0, 1));
-        directions.add(new Vector(0, 0, -1));
-        directions.add(new Vector(0, -1, 0));
+        directions.add(new BlockVector3(1, 0, 0));
+        directions.add(new BlockVector3(-1, 0, 0));
+        directions.add(new BlockVector3(0, 0, 1));
+        directions.add(new BlockVector3(0, 0, -1));
+        directions.add(new BlockVector3(0, -1, 0));
     }
 
 

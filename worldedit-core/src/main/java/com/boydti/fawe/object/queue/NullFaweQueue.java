@@ -7,7 +7,7 @@ import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -188,7 +188,7 @@ public class NullFaweQueue implements FaweQueue {
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         return state;
     }
 

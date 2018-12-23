@@ -19,7 +19,14 @@
 
 package com.sk89q.worldedit.util;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
+=======
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import com.sk89q.worldedit.math.Vector3;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.World;
 import org.junit.Test;
 
@@ -54,7 +61,7 @@ public class LocationTest {
     @Test
     public void testToVector() throws Exception {
         World world = mock(World.class);
-        Vector position = new Vector(1, 1, 1);
+        Vector3 position = new Vector3(1, 1, 1);
         Location location = new Location(world, position);
         assertEquals(position, location.toVector());
     }
@@ -62,21 +69,21 @@ public class LocationTest {
     @Test
     public void testGetX() throws Exception {
         World world = mock(World.class);
-        Location location = new Location(world, new Vector(TEST_VALUE, 0, 0));
+        Location location = new Location(world, new Vector3(TEST_VALUE, 0, 0));
         assertEquals(TEST_VALUE, location.getX(), EPSILON);
     }
 
     @Test
     public void testGetBlockX() throws Exception {
         World world = mock(World.class);
-        Location location = new Location(world, new Vector(TEST_VALUE, 0, 0));
+        Location location = new Location(world, new Vector3(TEST_VALUE, 0, 0));
         assertEquals(TEST_VALUE, location.getBlockX());
     }
 
     @Test
     public void testSetX() throws Exception {
         World world = mock(World.class);
-        Location location1 = new Location(world, new Vector());
+        Location location1 = new Location(world, Vector3.ZERO);
         Location location2 = location1.setX(TEST_VALUE);
         assertEquals(0, location1.getX(), EPSILON);
         assertEquals(TEST_VALUE, location2.getX(), EPSILON);
@@ -87,21 +94,21 @@ public class LocationTest {
     @Test
     public void testGetY() throws Exception {
         World world = mock(World.class);
-        Location location = new Location(world, new Vector(0, TEST_VALUE, 0));
+        Location location = new Location(world, new Vector3(0, TEST_VALUE, 0));
         assertEquals(TEST_VALUE, location.getY(), EPSILON);
     }
 
     @Test
     public void testGetBlockY() throws Exception {
         World world = mock(World.class);
-        Location location = new Location(world, new Vector(0, TEST_VALUE, 0));
+        Location location = new Location(world, new Vector3(0, TEST_VALUE, 0));
         assertEquals(TEST_VALUE, location.getBlockY());
     }
 
     @Test
     public void testSetY() throws Exception {
         World world = mock(World.class);
-        Location location1 = new Location(world, new Vector());
+        Location location1 = new Location(world, Vector3.ZERO);
         Location location2 = location1.setY(TEST_VALUE);
         assertEquals(0, location1.getY(), EPSILON);
         assertEquals(0, location2.getX(), EPSILON);
@@ -112,21 +119,21 @@ public class LocationTest {
     @Test
     public void testGetZ() throws Exception {
         World world = mock(World.class);
-        Location location = new Location(world, new Vector(0, 0, TEST_VALUE));
+        Location location = new Location(world, new Vector3(0, 0, TEST_VALUE));
         assertEquals(TEST_VALUE, location.getZ(), EPSILON);
     }
 
     @Test
     public void testGetBlockZ() throws Exception {
         World world = mock(World.class);
-        Location location = new Location(world, new Vector(0, 0, TEST_VALUE));
+        Location location = new Location(world, new Vector3(0, 0, TEST_VALUE));
         assertEquals(TEST_VALUE, location.getBlockZ());
     }
 
     @Test
     public void testSetZ() throws Exception {
         World world = mock(World.class);
-        Location location1 = new Location(world, new Vector());
+        Location location1 = new Location(world, Vector3.ZERO);
         Location location2 = location1.setZ(TEST_VALUE);
         assertEquals(0, location1.getZ(), EPSILON);
         assertEquals(0, location2.getX(), EPSILON);

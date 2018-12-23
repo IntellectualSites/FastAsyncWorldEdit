@@ -2,6 +2,7 @@ package com.sk89q.worldedit.patterns;
 
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 
 /**
@@ -17,7 +18,7 @@ public interface Pattern {
      * @param position the position where a block is needed
      * @return a block
      */
-    public BaseBlock next(Vector position);
+    public BaseBlock next(BlockVector3 position);
 
     /**
      * Get a block for a position. This return value of this method does

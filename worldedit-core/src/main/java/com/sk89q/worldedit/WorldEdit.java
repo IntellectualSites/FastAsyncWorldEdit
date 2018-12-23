@@ -38,6 +38,8 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.runtime.Constant;
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
+import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
 import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
@@ -378,7 +380,7 @@ public class WorldEdit {
      * @return a direction vector
      * @throws UnknownDirectionException thrown if the direction is not known
      */
-    public Vector getDirection(Player player, String dirStr) throws UnknownDirectionException {
+    public BlockVector3 getDirection(Player player, String dirStr) throws UnknownDirectionException {
         dirStr = dirStr.toLowerCase();
 
         final PlayerDirection dir = getPlayerDirection(player, dirStr);
@@ -390,7 +392,7 @@ public class WorldEdit {
         case NORTH:
         case UP:
         case DOWN:
-            return dir.vector();
+            return dir.vector().toBlockPoint();
 
         default:
             throw new UnknownDirectionException(dir.name());

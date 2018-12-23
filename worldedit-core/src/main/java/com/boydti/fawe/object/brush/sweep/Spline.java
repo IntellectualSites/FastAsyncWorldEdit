@@ -3,8 +3,10 @@ package com.boydti.fawe.object.brush.sweep;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector2;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.List;
  */
 public abstract class Spline {
 
-    private Vector2D direction = new Vector2D(1, 0);
+    private BlockVector2 direction = new BlockVector2(1, 0);
     private final int nodeCount;
 
     protected EditSession editSession;
@@ -77,7 +79,7 @@ public abstract class Spline {
      * The default direction is a (1;0) vector (pointing in the positive x-direction).
      * @param direction A normalized vector representing the horizontal forward direction of the clipboard content
      */
-    public void setDirection(Vector2D direction) {
+    public void setDirection(BlockVector2 direction) {
         this.direction = direction;
     }
 
@@ -91,7 +93,7 @@ public abstract class Spline {
      * The default direction is a (1;0) vector (pointing in the positive x-direction).
      * @return A vector representing the horizontal forward direction of the clipboard content
      */
-    public Vector2D getDirection() {
+    public BlockVector2 getDirection() {
         return direction;
     }
 
@@ -125,14 +127,14 @@ public abstract class Spline {
         Preconditions.checkArgument(position <= 1);
 
         // Calculate position from spline
-        Vector target = interpolation.getPosition(position);
-        Vector offset = target.subtract(target.round());
+        BlockVector3 target = interpolation.getPosition(position).toBlockPoint();
+        BlockVector3 offset = target.subtract(target.round());
         target = target.subtract(offset);
 
         // Calculate rotation from spline
 
-        Vector deriv = interpolation.get1stDerivative(position);
-        Vector2D deriv2D = new Vector2D(deriv.getX(), deriv.getZ()).normalize();
+        Vector3 deriv = interpolation.get1stDerivative(position);
+        Vector2 deriv2D = new Vector2(deriv.getX(), deriv.getZ()).normalize();
         double angle = Math.toDegrees(
                 Math.atan2(direction.getZ(), direction.getX()) - Math.atan2(deriv2D.getZ(), deriv2D.getX())
         );
@@ -140,7 +142,7 @@ public abstract class Spline {
         return pasteBlocks(target, offset, angle);
     }
 
-    protected abstract int pasteBlocks(Vector target, Vector offset, double angle) throws MaxChangedBlocksException;
+    protected abstract int pasteBlocks(BlockVector3 target, BlockVector3 offset, double angle) throws MaxChangedBlocksException;
 
     private void initSections() {
         int sectionCount = nodeCount - 1;

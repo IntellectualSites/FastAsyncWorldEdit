@@ -13,8 +13,6 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -23,6 +21,8 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -51,12 +51,12 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default Vector getMinimumPoint() {
+    default BlockVector3 getMinimumPoint() {
         return getQueue().getMinimumPoint();
     }
 
     @Override
-    default Vector getMaximumPoint() {
+    default BlockVector3 getMaximumPoint() {
         return getQueue().getMaximumPoint();
     }
 
@@ -71,22 +71,22 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default BlockState getBlock(Vector position) {
+    default BlockState getBlock(BlockVector3 position) {
         return getQueue().getBlock(position);
     }
 
     @Override
-    default BaseBiome getBiome(Vector2D position) {
+    default BaseBiome getBiome(BlockVector2 position) {
         return getQueue().getBiome(position);
     }
 
     @Override
-    default boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    default boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         return getQueue().setBlock(position, block);
     }
 
     @Override
-    default boolean setBiome(Vector2D position, BaseBiome biome) {
+    default boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return getQueue().setBiome(position, biome);
     }
 
@@ -261,12 +261,12 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default void forEachBlockInChunk(int cx, int cz, RunnableVal2<Vector, BlockState> onEach) {
+    default void forEachBlockInChunk(int cx, int cz, RunnableVal2<BlockVector3, BlockState> onEach) {
         getQueue().forEachBlockInChunk(cx, cz, onEach);
     }
 
     @Override
-    default void forEachTileInChunk(int cx, int cz, RunnableVal2<Vector, BlockState> onEach) {
+    default void forEachTileInChunk(int cx, int cz, RunnableVal2<BlockVector3, BlockState> onEach) {
         getQueue().forEachTileInChunk(cx, cz, onEach);
     }
 
@@ -459,7 +459,7 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default BlockState getLazyBlock(Vector position) {
+    default BlockState getLazyBlock(BlockVector3 position) {
         return getQueue().getLazyBlock(position);
     }
 

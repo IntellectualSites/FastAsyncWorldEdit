@@ -20,10 +20,11 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.object.HasFaweQueue;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import java.util.Collection;
 
 
@@ -38,30 +39,30 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class DirectionalVisitor extends RecursiveVisitor {
 
-    private final Vector origin;
-    private final Vector dirVec;
+    private final BlockVector3 origin;
+    private final BlockVector3 dirVec;
 
-    public DirectionalVisitor(Mask mask, RegionFunction function, Vector origin, Vector direction) {
+    public DirectionalVisitor(Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction) {
         this(mask, function, origin, direction, Integer.MAX_VALUE, null);
     }
 
-    public DirectionalVisitor(Mask mask, RegionFunction function, Vector origin, Vector direction, int distance, HasFaweQueue hasFaweQueue) {
+    public DirectionalVisitor(Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction, int distance, HasFaweQueue hasFaweQueue) {
         super(mask, function, distance, hasFaweQueue);
         checkNotNull(mask);
         this.origin = origin;
         this.dirVec = new MutableBlockVector(direction);
-        final Collection<Vector> directions = this.getDirections();
+        final Collection<BlockVector3> directions = this.getDirections();
         directions.clear();
-        directions.add(new Vector(1, 0, 0));
-        directions.add(new Vector(-1, 0, 0));
-        directions.add(new Vector(0, 0, 1));
-        directions.add(new Vector(0, 0, -1));
-        directions.add(new Vector(0, -1, 0));
-        directions.add(new Vector(0, 1, 0));
+        directions.add(new BlockVector3(1, 0, 0));
+        directions.add(new BlockVector3(-1, 0, 0));
+        directions.add(new BlockVector3(0, 0, 1));
+        directions.add(new BlockVector3(0, 0, -1));
+        directions.add(new BlockVector3(0, -1, 0));
+        directions.add(new BlockVector3(0, 1, 0));
     }
 
     @Override
-    public boolean isVisitable(final Vector from, final Vector to) {
+    public boolean isVisitable(final BlockVector3 from, final BlockVector3 to) {
         int dx = to.getBlockX() - from.getBlockX();
         int dz = to.getBlockZ() - from.getBlockZ();
         int dy = to.getBlockY() - from.getBlockY();

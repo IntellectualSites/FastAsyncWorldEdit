@@ -2,12 +2,12 @@ package com.boydti.fawe.object;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.extent.ExtentHeightCacher;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -24,7 +24,7 @@ public class DataAnglePattern extends AbstractPattern {
         this.FACTOR = (1D / distance) * (1D / 255);
     }
 
-    public int getSlope(BlockStateHolder block, Vector vector) {
+    public int getSlope(BlockStateHolder block, BlockVector3 vector) {
         int x = vector.getBlockX();
         int y = vector.getBlockY();
         int z = vector.getBlockZ();
@@ -41,7 +41,7 @@ public class DataAnglePattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BlockStateHolder apply(BlockVector3 position) {
         BlockStateHolder block = extent.getBlock(position);
         int slope = getSlope(block, position);
         if (slope == -1) return block;
@@ -50,7 +50,7 @@ public class DataAnglePattern extends AbstractPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, Vector setPosition, Vector getPosition) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
         BlockStateHolder block = extent.getBlock(getPosition);
         int slope = getSlope(block, getPosition);
         if (slope == -1) return false;

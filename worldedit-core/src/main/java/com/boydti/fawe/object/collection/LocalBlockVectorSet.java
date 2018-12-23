@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -13,7 +13,7 @@ import java.util.Set;
  * - All vectors must be in a 2048 * 2048 area centered around the first entry
  * - This will use 8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
  */
-public class LocalBlockVectorSet implements Set<Vector> {
+public class LocalBlockVectorSet implements Set<BlockVector3> {
     private int offsetX, offsetZ;
     private final SparseBitSet set;
 
@@ -48,8 +48,8 @@ public class LocalBlockVectorSet implements Set<Vector> {
 
     @Override
     public boolean contains(Object o) {
-        if (o instanceof Vector) {
-            Vector v = (Vector) o;
+        if (o instanceof BlockVector3) {
+        	BlockVector3 v = (BlockVector3) o;
             return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;
@@ -100,7 +100,7 @@ public class LocalBlockVectorSet implements Set<Vector> {
         this.offsetZ = z;
     }
 
-    public Vector getIndex(int getIndex) {
+    public BlockVector3 getIndex(int getIndex) {
         int size = size();
         if (getIndex > size) {
             return null;
@@ -123,8 +123,8 @@ public class LocalBlockVectorSet implements Set<Vector> {
     }
 
     @Override
-    public Iterator<Vector> iterator() {
-        return new Iterator<Vector>() {
+    public Iterator<BlockVector3> iterator() {
+        return new Iterator<BlockVector3>() {
             int index = set.nextSetBit(0);
             int previous = -1;
             MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
@@ -140,7 +140,7 @@ public class LocalBlockVectorSet implements Set<Vector> {
             }
 
             @Override
-            public BlockVector next() {
+            public BlockVector3 next() {
                 if (index != -1) {
                     int b1 = (index & 0xFF);
                     int b2 = ((byte) (index >> 8)) & 0x7F;
@@ -167,7 +167,7 @@ public class LocalBlockVectorSet implements Set<Vector> {
     public <T> T[] toArray(T[] array) {
         int size = size();
         if (array == null || array.length < size) {
-            array = (T[]) new BlockVector[size];
+            array = (T[]) new BlockVector3[size];
         }
         int index = 0;
         for (int i = 0; i < size; i++) {
@@ -179,7 +179,7 @@ public class LocalBlockVectorSet implements Set<Vector> {
             int x = offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21);
             int y = b1;
             int z = offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21);
-            array[i] = (T) new BlockVector(x, y, z);
+            array[i] = (T) new BlockVector3(x, y, z);
             index++;
         }
         return array;
@@ -223,11 +223,11 @@ public class LocalBlockVectorSet implements Set<Vector> {
     }
 
     @Override
-    public boolean add(Vector vector) {
+    public boolean add(BlockVector3 vector) {
         return add(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
     }
 
-    private int getIndex(Vector vector) {
+    private int getIndex(BlockVector3 vector) {
         return MathMan.tripleSearchCoords(vector.getBlockX() - offsetX, vector.getBlockY(), vector.getBlockZ() - offsetZ);
     }
 
@@ -249,8 +249,8 @@ public class LocalBlockVectorSet implements Set<Vector> {
 
     @Override
     public boolean remove(Object o) {
-        if (o instanceof Vector) {
-            Vector v = (Vector) o;
+        if (o instanceof BlockVector3) {
+        	BlockVector3 v = (BlockVector3) o;
             return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;
@@ -267,9 +267,9 @@ public class LocalBlockVectorSet implements Set<Vector> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends Vector> c) {
+    public boolean addAll(Collection<? extends BlockVector3> c) {
         boolean result = false;
-        for (Vector v : c) {
+        for (BlockVector3 v : c) {
             result |= add(v);
         }
         return result;
@@ -280,7 +280,7 @@ public class LocalBlockVectorSet implements Set<Vector> {
         boolean result = false;
         int size = size();
         int index = -1;
-        Vector mVec = MutableBlockVector.get(0, 0, 0);
+        MutableBlockVector mVec = MutableBlockVector.get(0, 0, 0);
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index + 1);
             int b1 = (index & 0xFF);
@@ -310,7 +310,7 @@ public class LocalBlockVectorSet implements Set<Vector> {
     public void forEach(BlockVectorSetVisitor visitor) {
         int size = size();
         int index = -1;
-        Vector mVec = MutableBlockVector.get(0, 0, 0);
+        BlockVector3 mVec = MutableBlockVector.get(0, 0, 0);
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index + 1);
             int b1 = (index & 0xFF);

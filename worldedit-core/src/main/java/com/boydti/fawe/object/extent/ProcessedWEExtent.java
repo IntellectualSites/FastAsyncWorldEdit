@@ -5,8 +5,6 @@ import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.util.WEManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -14,6 +12,8 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -48,7 +48,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BaseBiome getBiome(final Vector2D position) {
+    public BaseBiome getBiome(final BlockVector2 position) {
         return super.getBiome(position);
     }
 
@@ -73,12 +73,12 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(final Vector location, final BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(final BlockVector3 location, final BlockStateHolder block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
     @Override
-    public BlockState getLazyBlock(Vector location) {
+    public BlockState getLazyBlock(BlockVector3 location) {
         return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
@@ -106,7 +106,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(final Vector2D position, final BaseBiome biome) {
+    public boolean setBiome(final BlockVector2 position, final BaseBiome biome) {
         if (!limit.MAX_CHANGES()) {
             WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
             return false;

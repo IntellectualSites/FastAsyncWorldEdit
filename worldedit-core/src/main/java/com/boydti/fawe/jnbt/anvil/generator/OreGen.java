@@ -2,11 +2,11 @@ package com.boydti.fawe.jnbt.anvil.generator;
 
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.MutableBlockVector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.MutableBlockVector;
 
 import java.util.Random;
 

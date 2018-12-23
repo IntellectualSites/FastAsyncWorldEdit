@@ -1,11 +1,11 @@
 package com.boydti.fawe.object.pattern;
 
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2D;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import java.io.IOException;
 
@@ -19,12 +19,12 @@ public class BiomePattern extends ExistingPattern {
     }
 
     @Override
-    public BaseBlock apply(Vector position) {
+    public BaseBlock apply(BlockVector3 position) {
         throw new BiomePatternException();
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector getPosition) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 getPosition) throws WorldEditException {
         return extent.setBiome(set.getBlockX(), set.getBlockY(), set.getBlockZ(), biome);
     }
 

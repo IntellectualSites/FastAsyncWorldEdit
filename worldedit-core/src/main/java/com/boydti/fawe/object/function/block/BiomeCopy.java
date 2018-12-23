@@ -1,10 +1,10 @@
 package com.boydti.fawe.object.function.block;
 
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2D;
 
 public class BiomeCopy implements RegionFunction {
     protected final Extent source;
@@ -19,7 +19,7 @@ public class BiomeCopy implements RegionFunction {
     }
 
     @Override
-    public boolean apply(Vector position) throws WorldEditException {
+    public boolean apply(BlockVector3 position) throws WorldEditException {
         int x = position.getBlockX();
         int z = position.getBlockZ();
         if (x != mPos2d.getBlockX() || z != mPos2d.getBlockZ()) {

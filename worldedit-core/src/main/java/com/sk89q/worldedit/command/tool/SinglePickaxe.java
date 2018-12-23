@@ -25,6 +25,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -42,6 +43,7 @@ public class SinglePickaxe implements BlockTool {
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
         World world = (World) clicked.getExtent();
+<<<<<<< HEAD
         final BlockType blockType = world.getLazyBlock(clicked.toVector()).getBlockType();
         if (blockType == BlockTypes.BEDROCK && !player.canDestroyBedrock()) {
             return true;
@@ -49,6 +51,21 @@ public class SinglePickaxe implements BlockTool {
 
         EditSession editSession = session.createEditSession(player);
         editSession.getSurvivalExtent().setToolUse(config.superPickaxeDrop);
+=======
+        BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
+        final BlockType blockType = world.getBlock(blockPoint).getBlockType();
+        if (blockType == BlockTypes.BEDROCK
+                && !player.canDestroyBedrock()) {
+            return true;
+        }
+
+        try (EditSession editSession = session.createEditSession(player)) {
+            editSession.getSurvivalExtent().setToolUse(config.superPickaxeDrop);
+            editSession.setBlock(blockPoint, BlockTypes.AIR.getDefaultState());
+        } catch (MaxChangedBlocksException e) {
+            player.printError("Max blocks change limit reached.");
+        }
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         try {
             if (editSession.setBlock(clicked.getBlockX(), clicked.getBlockY(), clicked.getBlockZ(), EditSession.nullBlock)) {

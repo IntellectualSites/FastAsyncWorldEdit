@@ -19,9 +19,15 @@
 
 package com.sk89q.worldedit.function.util;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector2D;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.FlatRegionFunction;
+import com.sk89q.worldedit.math.BlockVector2;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FlatRegionOffset implements FlatRegionFunction {
 
-    private Vector2D offset;
+    private BlockVector2 offset;
     private final FlatRegionFunction function;
 
     /**
@@ -39,7 +45,7 @@ public class FlatRegionOffset implements FlatRegionFunction {
      * @param offset the offset
      * @param function the function that is called with the offset position
      */
-    public FlatRegionOffset(Vector2D offset, FlatRegionFunction function) {
+    public FlatRegionOffset(BlockVector2 offset, FlatRegionFunction function) {
         checkNotNull(function);
         setOffset(offset);
         this.function = function;
@@ -50,7 +56,7 @@ public class FlatRegionOffset implements FlatRegionFunction {
      *
      * @return the offset
      */
-    public Vector2D getOffset() {
+    public BlockVector2 getOffset() {
         return offset;
     }
 
@@ -59,13 +65,13 @@ public class FlatRegionOffset implements FlatRegionFunction {
      *
      * @param offset the offset
      */
-    public void setOffset(Vector2D offset) {
+    public void setOffset(BlockVector2 offset) {
         checkNotNull(offset);
         this.offset = offset;
     }
 
     @Override
-    public boolean apply(Vector2D position) throws WorldEditException {
+    public boolean apply(BlockVector2 position) throws WorldEditException {
         return function.apply(position.add(offset));
     }
 }

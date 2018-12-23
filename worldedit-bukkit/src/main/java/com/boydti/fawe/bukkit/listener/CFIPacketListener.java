@@ -22,7 +22,6 @@ import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -31,6 +30,9 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -62,12 +64,12 @@ public class CFIPacketListener implements Listener {
         this.protocolmanager = ProtocolLibrary.getProtocolManager();
 
         // Direct digging to the virtual world
-        registerBlockEvent(PacketType.Play.Client.BLOCK_DIG, false, new RunnableVal3<PacketEvent, VirtualWorld, Vector>() {
+        registerBlockEvent(PacketType.Play.Client.BLOCK_DIG, false, new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
             @Override
-            public void run(PacketEvent event, VirtualWorld gen, Vector pt) {
+            public void run(PacketEvent event, VirtualWorld gen, BlockVector3 pt) {
                 try {
                     Player plr = event.getPlayer();
-                    Vector realPos = pt.add(gen.getOrigin());
+                    BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
                     if (!sendBlockChange(plr, gen, pt, Interaction.HIT)) {
                         gen.setBlock(pt, EditSession.nullBlock);
                     }
@@ -78,9 +80,9 @@ public class CFIPacketListener implements Listener {
         });
 
         // Direct placing to the virtual world
-        RunnableVal3<PacketEvent, VirtualWorld, Vector> placeTask = new RunnableVal3<PacketEvent, VirtualWorld, Vector>() {
+        RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> placeTask = new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
             @Override
-            public void run(PacketEvent event, VirtualWorld gen, Vector pt) {
+            public void run(PacketEvent event, VirtualWorld gen, BlockVector3 pt) {
                 try {
                     Player plr = event.getPlayer();
                     List<EnumWrappers.Hand> hands = event.getPacket().getHands().getValues();
@@ -113,9 +115,9 @@ public class CFIPacketListener implements Listener {
         registerBlockEvent(PacketType.Play.Client.USE_ITEM, true, placeTask);
 
         // Cancel block change packets where the real world overlaps with the virtual one
-        registerBlockEvent(PacketType.Play.Server.BLOCK_CHANGE, false, new RunnableVal3<PacketEvent, VirtualWorld, Vector>() {
+        registerBlockEvent(PacketType.Play.Server.BLOCK_CHANGE, false, new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
             @Override
-            public void run(PacketEvent event, VirtualWorld gen, Vector pt) {
+            public void run(PacketEvent event, VirtualWorld gen, BlockVector3 pt) {
                 // Do nothing
             }
         });
@@ -128,7 +130,7 @@ public class CFIPacketListener implements Listener {
 
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
-                    Vector origin = gen.getOrigin();
+                	BlockVector3 origin = gen.getOrigin().toBlockPoint();
                     PacketContainer packet = event.getPacket();
                     StructureModifier<Integer> ints = packet.getIntegers();
                     int cx = ints.read(0);
@@ -137,7 +139,7 @@ public class CFIPacketListener implements Listener {
                     int ocx = origin.getBlockX() >> 4;
                     int ocz = origin.getBlockZ() >> 4;
 
-                    if (gen.contains(new Vector((cx - ocx) << 4, 0, (cz - ocz) << 4))) {
+                    if (gen.contains(new BlockVector3((cx - ocx) << 4, 0, (cz - ocz) << 4))) {
                         event.setCancelled(true);
 
                         Player plr = event.getPlayer();
@@ -163,8 +165,8 @@ public class CFIPacketListener implements Listener {
                 Location pos = player.getLocation();
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
-                    Vector origin = gen.getOrigin();
-                    Vector pt = new Vector(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                	BlockVector3 origin = gen.getOrigin().toBlockPoint();
+                	BlockVector3 pt = new BlockVector3(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
 
                     StructureModifier<Integer> ints = event.getPacket().getIntegers();
                     int id = ints.read(0);
@@ -188,12 +190,12 @@ public class CFIPacketListener implements Listener {
                 Location pos = player.getLocation();
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
-                    Vector origin = gen.getOrigin();
-                    Vector from = new Vector(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                	BlockVector3 origin = gen.getOrigin().toBlockPoint();
+                	BlockVector3 from = new BlockVector3(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
 
                     PacketContainer packet = event.getPacket();
                     StructureModifier<Double> doubles = packet.getDoubles();
-                    Vector to = new Vector(doubles.read(0), doubles.read(1), doubles.read(2));
+                    BlockVector3 to = new BlockVector3(doubles.read(0), doubles.read(1), doubles.read(2));
                     if (gen.contains(to.subtract(origin)) && from.distanceSq(to) < 8) {
                         int id = packet.getIntegers().read(0);
                         PacketContainer reply = new PacketContainer(PacketType.Play.Client.TELEPORT_ACCEPT);
@@ -220,10 +222,10 @@ public class CFIPacketListener implements Listener {
                 if (gen != null) {
                     PacketContainer packet = event.getPacket();
                     ChunkCoordIntPair chunk = packet.getChunkCoordIntPairs().read(0);
-                    Vector origin = gen.getOrigin();
+                    BlockVector3 origin = gen.getOrigin().toBlockPoint();
                     int cx = chunk.getChunkX() - (origin.getBlockX() >> 4);
                     int cz = chunk.getChunkZ() - (origin.getBlockX() >> 4);
-                    if (gen.contains(new Vector(cx << 4, 0, cz << 4))) {
+                    if (gen.contains(new BlockVector3(cx << 4, 0, cz << 4))) {
                         event.setCancelled(true);
                     }
                 }
@@ -246,14 +248,14 @@ public class CFIPacketListener implements Listener {
         }
     }
 
-    private boolean sendBlockChange(Player plr, VirtualWorld gen, Vector pt, Interaction action) {
+    private boolean sendBlockChange(Player plr, VirtualWorld gen, BlockVector3 pt, Interaction action) {
         PlatformManager platform = WorldEdit.getInstance().getPlatformManager();
         com.sk89q.worldedit.entity.Player actor = FawePlayer.wrap(plr).getPlayer();
-        com.sk89q.worldedit.util.Location location = new com.sk89q.worldedit.util.Location(actor.getWorld(), pt);
+        com.sk89q.worldedit.util.Location location = new com.sk89q.worldedit.util.Location(actor.getWorld(), pt.toVector3());
         BlockInteractEvent toCall = new BlockInteractEvent(actor, location, action);
         platform.handleBlockInteract(toCall);
         if (toCall.isCancelled() || action == Interaction.OPEN) {
-            Vector realPos = pt.add(gen.getOrigin());
+        	BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
             BlockStateHolder block = gen.getBlock(pt);
             sendBlockChange(plr, realPos, block);
             return true;
@@ -261,7 +263,7 @@ public class CFIPacketListener implements Listener {
         return false;
     }
 
-    private void sendBlockChange(Player plr, Vector pt, BlockStateHolder block) {
+    private void sendBlockChange(Player plr, BlockVector3 pt, BlockStateHolder block) {
         plr.sendBlockChange(new Location(plr.getWorld(), pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()), BukkitAdapter.adapt(block));
     }
 
@@ -280,20 +282,20 @@ public class CFIPacketListener implements Listener {
         return null;
     }
 
-    private Vector getRelPos(PacketEvent event, VirtualWorld generator) {
+    private BlockVector3 getRelPos(PacketEvent event, VirtualWorld generator) {
         PacketContainer packet = event.getPacket();
         StructureModifier<BlockPosition> position = packet.getBlockPositionModifier();
         BlockPosition loc = position.readSafely(0);
         if (loc == null) return null;
-        Vector origin = generator.getOrigin();
-        Vector pt = new Vector(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
+        BlockVector3 origin = generator.getOrigin().toBlockPoint();
+        BlockVector3 pt = new BlockVector3(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
         return pt;
     }
 
-    private void handleBlockEvent(PacketEvent event, boolean relative, RunnableVal3<PacketEvent, VirtualWorld, Vector> task) {
+    private void handleBlockEvent(PacketEvent event, boolean relative, RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> task) {
         VirtualWorld gen = getGenerator(event);
         if (gen != null) {
-            Vector pt = getRelPos(event, gen);
+        	BlockVector3 pt = getRelPos(event, gen);
             if (pt != null) {
                 if (relative) pt = getRelative(event, pt);
                 if (gen.contains(pt)) {
@@ -304,7 +306,7 @@ public class CFIPacketListener implements Listener {
         }
     }
 
-    private void registerBlockEvent(PacketType type, boolean relative, RunnableVal3<PacketEvent, VirtualWorld, Vector> task) {
+    private void registerBlockEvent(PacketType type, boolean relative, RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> task) {
         protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, type) {
             @Override
             public void onPacketReceiving(final PacketEvent event) {
@@ -318,7 +320,7 @@ public class CFIPacketListener implements Listener {
         });
     }
 
-    private Vector getRelative(PacketEvent container, Vector pt) {
+    private BlockVector3 getRelative(PacketEvent container, BlockVector3 pt) {
         PacketContainer packet = container.getPacket();
         StructureModifier<EnumWrappers.Direction> dirs = packet.getDirections();
         EnumWrappers.Direction dir = dirs.readSafely(0);

@@ -1,8 +1,9 @@
 package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -20,7 +21,7 @@ import java.util.Set;
  * - All BlockVectors must be a valid world coordinate: y=[0,255],x=[-30000000,30000000],z=[-30000000,30000000]
  * - This will use ~8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
  */
-public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Vector> {
+public class BlockVectorSet extends AbstractCollection<BlockVector3> implements Set<BlockVector3> {
     private Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
 
     @Override
@@ -32,7 +33,7 @@ public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Ve
         return size;
     }
 
-    public Vector get(int index) {
+    public BlockVector3 get(int index) {
         int count = 0;
         ObjectIterator<Int2ObjectMap.Entry<LocalBlockVectorSet>> iter = localSets.int2ObjectEntrySet().iterator();
         while (iter.hasNext()) {
@@ -42,7 +43,7 @@ public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Ve
             int newSize = count + size;
             if (newSize > index) {
                 int localIndex = index - count;
-                Vector pos = set.getIndex(localIndex);
+                MutableBlockVector pos = new MutableBlockVector(set.getIndex(localIndex));
                 if (pos != null) {
                     int pair = entry.getIntKey();
                     int cx = MathMan.unpairX(pair);
@@ -75,22 +76,22 @@ public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Ve
 
     @Override
     public boolean contains(Object o) {
-        if (o instanceof Vector) {
-            Vector v = (Vector) o;
+        if (o instanceof BlockVector3) {
+        	BlockVector3 v = (BlockVector3) o;
             return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;
     }
 
     @Override
-    public Iterator<Vector> iterator() {
+    public Iterator<BlockVector3> iterator() {
         final ObjectIterator<Int2ObjectMap.Entry<LocalBlockVectorSet>> entries = localSets.int2ObjectEntrySet().iterator();
         if (!entries.hasNext()) {
-            return new ArrayList<Vector>().iterator();
+            return new ArrayList<BlockVector3>().iterator();
         }
-        return new Iterator<Vector>() {
+        return new Iterator<BlockVector3>() {
             Int2ObjectMap.Entry<LocalBlockVectorSet> entry = entries.next();
-            Iterator<Vector> entryIter = entry.getValue().iterator();
+            Iterator<BlockVector3> entryIter = entry.getValue().iterator();
             MutableBlockVector mutable = new MutableBlockVector();
 
             @Override
@@ -104,7 +105,7 @@ public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Ve
             }
 
             @Override
-            public Vector next() {
+            public BlockVector3 next() {
                 while (!entryIter.hasNext()) {
                     if (!entries.hasNext()) {
                         throw new NoSuchElementException("End of iterator");
@@ -112,7 +113,7 @@ public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Ve
                     entry = entries.next();
                     entryIter = entry.getValue().iterator();
                 }
-                Vector localPos = entryIter.next();
+                BlockVector3 localPos = entryIter.next();
                 int pair = entry.getIntKey();
                 int cx = MathMan.unpairX(pair);
                 int cz = MathMan.unpairY(pair);
@@ -122,7 +123,7 @@ public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Ve
     }
 
     @Override
-    public boolean add(Vector vector) {
+    public boolean add(BlockVector3 vector) {
         return add(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
     }
 
@@ -154,8 +155,8 @@ public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Ve
 
     @Override
     public boolean remove(Object o) {
-        if (o instanceof Vector) {
-            Vector v = (Vector) o;
+        if (o instanceof BlockVector3) {
+        	BlockVector3 v = (BlockVector3) o;
             return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;
@@ -172,9 +173,9 @@ public class BlockVectorSet extends AbstractCollection<Vector> implements Set<Ve
     }
 
     @Override
-    public boolean addAll(Collection<? extends Vector> c) {
+    public boolean addAll(Collection<? extends BlockVector3> c) {
         boolean result = false;
-        for (Vector v : c) {
+        for (BlockVector3 v : c) {
             result |= add(v);
         }
         return result;

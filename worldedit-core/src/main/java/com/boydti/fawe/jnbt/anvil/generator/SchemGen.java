@@ -2,7 +2,7 @@ package com.boydti.fawe.jnbt.anvil.generator;
 
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.schematic.Schematic;
-import com.sk89q.worldedit.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;

@@ -3,10 +3,11 @@ package com.boydti.fawe.object.brush.heightmap;
 import com.boydti.fawe.object.IntegerPair;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.awt.image.BufferedImage;
@@ -60,7 +61,7 @@ public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap
     }
 
     public static ScalableHeightMap fromClipboard(Clipboard clipboard) {
-        Vector dim = clipboard.getDimensions();
+        BlockVector3 dim = clipboard.getDimensions();
         byte[][] heightArray = new byte[dim.getBlockX()][dim.getBlockZ()];
         int minX = clipboard.getMinimumPoint().getBlockX();
         int minZ = clipboard.getMinimumPoint().getBlockZ();
@@ -68,7 +69,7 @@ public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap
         int maxY = clipboard.getMaximumPoint().getBlockY();
         int clipHeight = maxY - minY + 1;
         HashSet<IntegerPair> visited = new HashSet<>();
-        for (Vector pos : clipboard.getRegion()) {
+        for (BlockVector3 pos : clipboard.getRegion()) {
             IntegerPair pair = new IntegerPair(pos.getBlockX(), pos.getBlockZ());
             if (visited.contains(pair)) {
                 continue;
@@ -77,9 +78,10 @@ public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap
             int xx = pos.getBlockX();
             int zz = pos.getBlockZ();
             int highestY = minY;
+            MutableBlockVector bv = new MutableBlockVector(pos);
             for (int y = minY; y <= maxY; y++) {
-                pos.mutY(y);
-                BlockStateHolder block = clipboard.getBlock(pos);
+                bv.mutY(y);
+                BlockStateHolder block = clipboard.getBlock(bv);
                 if (!block.getBlockType().getMaterial().isAir()) {
                     highestY = y + 1;
                 }

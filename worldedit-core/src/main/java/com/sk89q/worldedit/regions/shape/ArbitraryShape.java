@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.regions.shape;
 
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 
 /**
@@ -66,7 +66,7 @@ public abstract class ArbitraryShape {
     public int generate(EditSession editSession, Pattern pattern, boolean hollow) throws MaxChangedBlocksException {
         int affected = 0;
 
-        for (BlockVector position : getExtent()) {
+        for (BlockVector3 position : getExtent()) {
             int x = position.getBlockX();
             int y = position.getBlockY();
             int z = position.getBlockZ();

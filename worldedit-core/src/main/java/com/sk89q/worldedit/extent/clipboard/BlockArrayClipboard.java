@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+<<<<<<< HEAD
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
@@ -32,12 +33,24 @@ import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.WorldEditException;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+<<<<<<< HEAD
+=======
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import java.io.Closeable;
@@ -56,6 +69,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable {
 
+<<<<<<< HEAD
     private Region region;
     public FaweClipboard IMP;
     private Vector size;
@@ -75,6 +89,12 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.my = origin.getBlockY();
         this.mz = origin.getBlockZ();
     }
+=======
+    private final Region region;
+    private BlockVector3 origin;
+    private final BlockStateHolder[][][] blocks;
+    private final List<ClipboardEntity> entities = new ArrayList<>();
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     /**
      * Create a new instance.
@@ -94,6 +114,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.mz = origin.getBlockZ();
     }
 
+<<<<<<< HEAD
     public BlockArrayClipboard(Region region, FaweClipboard clipboard) {
         checkNotNull(region);
         this.region = region.clone();
@@ -125,6 +146,10 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     @Override
     public void close() {
         IMP.close();
+=======
+        BlockVector3 dimensions = getDimensions();
+        blocks = new BlockStateHolder[dimensions.getBlockX()][dimensions.getBlockY()][dimensions.getBlockZ()];
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Override
@@ -137,36 +162,42 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    public Vector getOrigin() {
+    public BlockVector3 getOrigin() {
         return origin;
     }
 
     @Override
-    public void setOrigin(Vector origin) {
+    public void setOrigin(BlockVector3 origin) {
         this.origin = origin;
         IMP.setOrigin(origin.subtract(region.getMinimumPoint()));
     }
 
     @Override
-    public Vector getDimensions() {
+    public BlockVector3 getDimensions() {
         return region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
     }
 
     @Override
-    public Vector getMinimumPoint() {
+    public BlockVector3 getMinimumPoint() {
         return region.getMinimumPoint();
     }
 
     @Override
-    public Vector getMaximumPoint() {
+    public BlockVector3 getMaximumPoint() {
         return region.getMaximumPoint();
     }
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
+<<<<<<< HEAD
         List<Entity> filtered = new ArrayList<Entity>();
         for (Entity entity : getEntities()) {
             if (region.contains(entity.getLocation().toVector())) {
+=======
+        List<Entity> filtered = new ArrayList<>();
+        for (Entity entity : entities) {
+            if (region.contains(entity.getLocation().toVector().toBlockPoint())) {
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 filtered.add(entity);
             }
         }
@@ -185,12 +216,20 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         if (region.contains(position)) {
+<<<<<<< HEAD
             int x = position.getBlockX() - mx;
             int y = position.getBlockY() - my;
             int z = position.getBlockZ() - mz;
             return IMP.getBlock(x, y, z);
+=======
+            BlockVector3 v = position.subtract(region.getMinimumPoint());
+            BlockStateHolder block = blocks[v.getBlockX()][v.getBlockY()][v.getBlockZ()];
+            if (block != null) {
+                return block.toImmutableState();
+            }
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         }
         return EditSession.nullBlock;
     }
@@ -200,9 +239,20 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
+<<<<<<< HEAD
     public BlockState getLazyBlock(Vector position) {
         return getBlock(position);
     }
+=======
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        if (region.contains(position)) {
+            BlockVector3 v = position.subtract(region.getMinimumPoint());
+            BlockStateHolder block = blocks[v.getBlockX()][v.getBlockY()][v.getBlockZ()];
+            if (block != null) {
+                return block.toBaseBlock();
+            }
+        }
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     @Override
     public BlockState getFullBlock(Vector position) {
@@ -210,12 +260,22 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
+<<<<<<< HEAD
     public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
         if (region.contains(location)) {
             final int x = location.getBlockX();
             final int y = location.getBlockY();
             final int z = location.getBlockZ();
             return setBlock(x, y, z, block);
+=======
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+        if (region.contains(position)) {
+            BlockVector3 v = position.subtract(region.getMinimumPoint());
+            blocks[v.getBlockX()][v.getBlockY()][v.getBlockZ()] = block;
+            return true;
+        } else {
+            return false;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         }
         return false;
     }
@@ -236,6 +296,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
+<<<<<<< HEAD
     public BaseBiome getBiome(Vector2D position) {
         int x = position.getBlockX() - mx;
         int z = position.getBlockZ() - mz;
@@ -248,6 +309,15 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         int z = position.getBlockZ() - mz;
         IMP.setBiome(x, z, biome.getId());
         return true;
+=======
+    public BaseBiome getBiome(BlockVector2 position) {
+        return new BaseBiome(0);
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+        return false;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Nullable

@@ -3,11 +3,11 @@ package com.boydti.fawe.jnbt.anvil.generator;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -42,11 +42,11 @@ public class CavesGen extends GenBase {
         this.caveSystemPocketMaxSize = caveSystemPocketMaxSize;
     }
 
-    protected void generateLargeCaveNode(long seed, Vector2D pos, Extent chunk, double x, double y, double z) throws WorldEditException {
+    protected void generateLargeCaveNode(long seed, BlockVector2 pos, Extent chunk, double x, double y, double z) throws WorldEditException {
         generateCaveNode(seed, pos, chunk, x, y, z, 1.0F + PseudoRandom.random.nextDouble() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
     }
 
-    protected void generateCaveNode(long seed, Vector2D chunkPos, Extent chunk, double x, double y, double z, double paramdouble1, double paramdouble2, double paramdouble3, int angle, int maxAngle, double paramDouble4) throws WorldEditException {
+    protected void generateCaveNode(long seed, BlockVector2 chunkPos, Extent chunk, double x, double y, double z, double paramdouble1, double paramdouble2, double paramdouble3, int angle, int maxAngle, double paramDouble4) throws WorldEditException {
         int bx = (chunkPos.getBlockX() << 4);
         int bz = (chunkPos.getBlockZ() << 4);
         double real_x = bx + 7;
@@ -220,7 +220,7 @@ public class CavesGen extends GenBase {
     }
 
     @Override
-    public void generateChunk(Vector2D adjacentChunk, Vector2D originChunk, Extent chunk) throws WorldEditException {
+    public void generateChunk(int chunkX, int chunkZ, BlockVector2 originChunk, Extent chunk) throws WorldEditException {
         PseudoRandom random = getRandom();
         int i = random.nextInt(random.nextInt(random.nextInt(this.caveFrequency) + 1) + 1);
         if (this.evenCaveDistribution)
@@ -229,7 +229,7 @@ public class CavesGen extends GenBase {
             i = 0;
 
         for (int j = 0; j < i; j++) {
-            double x = (adjacentChunk.getBlockX() << 4) + random.nextInt(16);
+            double x = (chunkX << 4) + random.nextInt(16);
 
             double y;
 
@@ -238,7 +238,7 @@ public class CavesGen extends GenBase {
             else
                 y = random.nextInt(random.nextInt(this.caveMaxAltitude - this.caveMinAltitude + 1) + 1) + this.caveMinAltitude;
 
-            double z = (adjacentChunk.getBlockZ() << 4) + random.nextInt(16);
+            double z = (chunkZ << 4) + random.nextInt(16);
 
             int count = this.caveSystemFrequency;
             boolean largeCaveSpawned = false;

@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.util;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -30,30 +30,30 @@ import java.util.HashMap;
  */
 public enum Direction {
 
-    NORTH(new Vector(0, 0, -1), Flag.CARDINAL, 3, 1),
-    EAST(new Vector(1, 0, 0), Flag.CARDINAL, 0, 2),
-    SOUTH(new Vector(0, 0, 1), Flag.CARDINAL, 1, 3),
-    WEST(new Vector(-1, 0, 0), Flag.CARDINAL, 2, 0),
+    NORTH(new Vector3(0, 0, -1), Flag.CARDINAL, 3, 1),
+    EAST(new Vector3(1, 0, 0), Flag.CARDINAL, 0, 2),
+    SOUTH(new Vector3(0, 0, 1), Flag.CARDINAL, 1, 3),
+    WEST(new Vector3(-1, 0, 0), Flag.CARDINAL, 2, 0),
 
-    UP(new Vector(0, 1, 0), Flag.UPRIGHT, -1, -1),
-    DOWN(new Vector(0, -1, 0), Flag.UPRIGHT, -1, -1),
+    UP(new Vector3(0, 1, 0), Flag.UPRIGHT, -1, -1),
+    DOWN(new Vector3(0, -1, 0), Flag.UPRIGHT, -1, -1),
 
-    NORTHEAST(new Vector(1, 0, -1), Flag.ORDINAL, 7, 8),
-    NORTHWEST(new Vector(-1, 0, -1), Flag.ORDINAL, 9, 6),
-    SOUTHEAST(new Vector(1, 0, 1), Flag.ORDINAL, 6, 9),
-    SOUTHWEST(new Vector(-1, 0, 1), Flag.ORDINAL, 8, 7),
+    NORTHEAST(new Vector3(1, 0, -1), Flag.ORDINAL, 7, 8),
+    NORTHWEST(new Vector3(-1, 0, -1), Flag.ORDINAL, 9, 6),
+    SOUTHEAST(new Vector3(1, 0, 1), Flag.ORDINAL, 6, 9),
+    SOUTHWEST(new Vector3(-1, 0, 1), Flag.ORDINAL, 8, 7),
 
-    WEST_NORTHWEST(new Vector(-Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 9, 6),
-    WEST_SOUTHWEST(new Vector(-Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 8, 7),
-    NORTH_NORTHWEST(new Vector(-Math.sin(Math.PI / 8), 0, -Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 9, 6),
-    NORTH_NORTHEAST(new Vector(Math.sin(Math.PI / 8), 0, -Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 7, 8),
-    EAST_NORTHEAST(new Vector(Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 7, 8),
-    EAST_SOUTHEAST(new Vector(Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 6, 9),
-    SOUTH_SOUTHEAST(new Vector(Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 6, 9),
-    SOUTH_SOUTHWEST(new Vector(-Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 8, 7);
+    WEST_NORTHWEST(new Vector3(-Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 9, 6),
+    WEST_SOUTHWEST(new Vector3(-Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 8, 7),
+    NORTH_NORTHWEST(new Vector3(-Math.sin(Math.PI / 8), 0, -Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 9, 6),
+    NORTH_NORTHEAST(new Vector3(Math.sin(Math.PI / 8), 0, -Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 7, 8),
+    EAST_NORTHEAST(new Vector3(Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 7, 8),
+    EAST_SOUTHEAST(new Vector3(Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 6, 9),
+    SOUTH_SOUTHEAST(new Vector3(Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 6, 9),
+    SOUTH_SOUTHWEST(new Vector3(-Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 8, 7);
 
-    private final Vector direction;
-    private final BlockVector blockVector;
+    private final Vector3 direction;
+    private final BlockVector3 blockVector;
     private final int flags, left, right;
 
 
@@ -68,9 +68,9 @@ public enum Direction {
         }
     }
 
-    private Direction(Vector vector, int flags, int left, int right) {
+    private Direction(Vector3 vector, int flags, int left, int right) {
         this.direction = vector.normalize();
-        this.blockVector = new BlockVector(Math.signum(vector.getX()), Math.signum(vector.getY()), Math.signum(vector.getZ()));
+        this.blockVector = new BlockVector3(Math.signum(vector.getX()), Math.signum(vector.getY()), Math.signum(vector.getZ()));
         this.flags = flags;
         this.left = left;
         this.right = right;
@@ -159,17 +159,22 @@ public enum Direction {
      *
      * @return the vector
      */
-    public Vector toVector() {
+    public Vector3 toVector() {
         return direction;
-    }
-
-    public BlockVector toBlockVector() {
-        return this.blockVector;
     }
 
     @Override
     public String toString() {
         return name().toLowerCase();
+    }
+
+    /**
+     * Get the vector.
+     *
+     * @return the vector
+     */
+    public BlockVector3 toBlockVector() {
+        return direction.toBlockPoint();
     }
 
     /**
@@ -180,9 +185,9 @@ public enum Direction {
      * @return the closest direction, or null if no direction can be returned
      */
     @Nullable
-    public static Direction findClosest(Vector vector, int flags) {
+    public static Direction findClosest(Vector3 vector, int flags) {
         if ((flags & Flag.UPRIGHT) == 0) {
-            vector = vector.setY(0);
+            vector = vector.withY(0);
         }
         vector = vector.normalize();
 
@@ -204,7 +209,7 @@ public enum Direction {
     }
 
     /**
-     * Flags to use with {@link #findClosest(Vector, int)}.
+     * Flags to use with {@link #findClosest(Vector3, int)}.
      */
     public static final class Flag {
         public static int CARDINAL = 0x1;

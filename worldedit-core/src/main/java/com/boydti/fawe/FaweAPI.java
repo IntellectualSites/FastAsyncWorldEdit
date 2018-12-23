@@ -19,13 +19,7 @@ import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.sk89q.jnbt.ByteArrayTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.ShortTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.factory.DefaultMaskParser;
@@ -39,27 +33,22 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.zip.GZIPInputStream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -468,8 +457,8 @@ public class FaweAPI {
      * @return
      */
     public static int fixLighting(World world, Region selection, @Nullable FaweQueue queue, final FaweQueue.RelightMode mode) {
-        final Vector bot = selection.getMinimumPoint();
-        final Vector top = selection.getMaximumPoint();
+        final BlockVector3 bot = selection.getMinimumPoint();
+        final BlockVector3 top = selection.getMaximumPoint();
 
         final int minX = bot.getBlockX() >> 4;
         final int minZ = bot.getBlockZ() >> 4;

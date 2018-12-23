@@ -19,8 +19,13 @@
 
 package com.sk89q.worldedit.function.mask;
 
+<<<<<<< HEAD
 import com.google.common.base.Function;
 import com.sk89q.worldedit.Vector;
+=======
+import com.sk89q.worldedit.math.BlockVector3;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -53,9 +58,14 @@ public class MaskUnion extends MaskIntersection {
     }
 
     @Override
+<<<<<<< HEAD
     public Function<Map.Entry<Mask, Mask>, Mask> pairingFunction() {
         return input -> input.getKey().or(input.getValue());
     }
+=======
+    public boolean test(BlockVector3 vector) {
+        Collection<Mask> masks = getMasks();
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     @Override
     public boolean test(Vector vector) {

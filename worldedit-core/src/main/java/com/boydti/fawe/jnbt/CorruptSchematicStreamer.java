@@ -9,10 +9,11 @@ import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -81,7 +82,7 @@ public class CorruptSchematicStreamer {
         if (fc != null) {
             return fc;
         }
-        Vector dimensions = guessDimensions(volume.get(), width.get(), height.get(), length.get());
+        BlockVector3 dimensions = guessDimensions(volume.get(), width.get(), height.get(), length.get());
         if (width.get() == 0 || height.get() == 0 || length.get() == 0) {
             Fawe.debug("No dimensions found! Estimating based on factors:" + dimensions);
         }
@@ -265,21 +266,21 @@ public class CorruptSchematicStreamer {
 //        }
     }
 
-    private Vector guessDimensions(int volume, int width, int height, int length) {
+    private BlockVector3 guessDimensions(int volume, int width, int height, int length) {
         if (volume == 0) {
-            return new Vector(width, height, length);
+            return new BlockVector3(width, height, length);
         }
         if (volume == width * height * length) {
-            return new Vector(width, height, length);
+            return new BlockVector3(width, height, length);
         }
         if (width == 0 && height != 0 && length != 0 && volume % (height * length) == 0 && height * length <= volume) {
-            return new Vector(volume / (height * length), height, length);
+            return new BlockVector3(volume / (height * length), height, length);
         }
         if (height == 0 && width != 0 && length != 0 && volume % (width * length) == 0 && width * length <= volume) {
-            return new Vector(width, volume / (width * length), length);
+            return new BlockVector3(width, volume / (width * length), length);
         }
         if (length == 0 && height != 0 && width != 0 && volume % (height * width) == 0 && height * width <= volume) {
-            return new Vector(width, height, volume / (width * height));
+            return new BlockVector3(width, height, volume / (width * height));
         }
         List<Integer> factors = new ArrayList<>();
         for (int i = (int) Math.sqrt(volume); i > 0; i--) {
@@ -289,7 +290,7 @@ public class CorruptSchematicStreamer {
             }
         }
         int min = Integer.MAX_VALUE;
-        Vector dimensions = new Vector();
+        int vx = 0, vy = 0, vz = 0;
         for (int x = 0; x < factors.size(); x++) {
             int xValue = factors.get(x);
             for (int y = 0; y < factors.size(); y++) {
@@ -300,12 +301,14 @@ public class CorruptSchematicStreamer {
                     int max = Math.max(Math.max(xValue, yValue), z);
                     if (max < min) {
                         min = max;
-                        dimensions = new Vector(xValue, z, yValue);
+                        vx = xValue;
+                        vz = z;
+                        vy = yValue;
                     }
                 }
             }
         }
-        return dimensions;
+        return new BlockVector3(vx, vz, vy);
     }
 
     public interface CorruptReader {

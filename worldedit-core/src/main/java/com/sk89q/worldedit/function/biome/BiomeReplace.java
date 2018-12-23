@@ -19,10 +19,16 @@
 
 package com.sk89q.worldedit.function.biome;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector2D;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,7 +55,7 @@ public class BiomeReplace implements FlatRegionFunction {
     }
 
     @Override
-    public boolean apply(Vector2D position) throws WorldEditException {
+    public boolean apply(BlockVector2 position) throws WorldEditException {
         return extent.setBiome(position, biome);
     }
 

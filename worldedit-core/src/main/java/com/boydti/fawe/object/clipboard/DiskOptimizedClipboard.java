@@ -11,13 +11,13 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -166,18 +166,18 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public Vector getDimensions() {
-        return new Vector(width, height, length);
+    public BlockVector3 getDimensions() {
+        return new BlockVector3(width, height, length);
     }
 
     public BlockArrayClipboard toClipboard() {
         try {
-            CuboidRegion region = new CuboidRegion(new Vector(0, 0, 0), new Vector(width - 1, height - 1, length - 1));
+            CuboidRegion region = new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(width - 1, height - 1, length - 1));
             int ox = mbb.getShort(8);
             int oy = mbb.getShort(10);
             int oz = mbb.getShort(12);
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, this);
-            clipboard.setOrigin(new Vector(ox, oy, oz));
+            clipboard.setOrigin(new BlockVector3(ox, oy, oz));
             return clipboard;
         } catch (Throwable e) {
             MainUtil.handleError(e);
@@ -223,7 +223,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public void setOrigin(Vector offset) {
+    public void setOrigin(BlockVector3 offset) {
         try {
             mbb.putShort(8, (short) offset.getBlockX());
             mbb.putShort(10, (short) offset.getBlockY());
@@ -234,7 +234,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public void setDimensions(Vector dimensions) {
+    public void setDimensions(BlockVector3 dimensions) {
         try {
             width = dimensions.getBlockX();
             height = dimensions.getBlockY();

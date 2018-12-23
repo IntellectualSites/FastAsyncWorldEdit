@@ -19,17 +19,23 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.sk89q.worldedit.Vector2D;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.operation.RunContext;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.FlatRegion;
 import java.util.List;
 
@@ -78,6 +84,7 @@ public class FlatRegionVisitor implements Operation {
     }
 
     @Override
+<<<<<<< HEAD
     public Operation resume(final RunContext run) throws WorldEditException {
         if (this.queue != null) {
             for (final Vector2D pt : new Fast2DIterator(this.iterator, queue)) {
@@ -86,6 +93,12 @@ public class FlatRegionVisitor implements Operation {
         } else {
             for (final Vector2D pt : this.iterator) {
                 if (this.function.apply(pt)) affected++;
+=======
+    public Operation resume(RunContext run) throws WorldEditException {
+        for (BlockVector2 pt : flatRegion.asFlatRegion()) {
+            if (function.apply(pt)) {
+                affected++;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
         }
         return null;

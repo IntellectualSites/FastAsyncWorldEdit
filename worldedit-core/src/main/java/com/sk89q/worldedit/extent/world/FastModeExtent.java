@@ -19,14 +19,21 @@
 
 package com.sk89q.worldedit.extent.world;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.BlockVector2D;
 import com.sk89q.worldedit.Vector;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 
 import java.util.HashSet;
@@ -41,7 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FastModeExtent extends AbstractDelegateExtent {
 
     private final World world;
-    private final Set<BlockVector2D> dirtyChunks = new HashSet<>();
+    private final Set<BlockVector2> dirtyChunks = new HashSet<>();
     private boolean enabled = true;
 
     /**
@@ -85,9 +92,9 @@ public class FastModeExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         if (enabled) {
-            dirtyChunks.add(new BlockVector2D(location.getBlockX() >> 4, location.getBlockZ() >> 4));
+            dirtyChunks.add(new BlockVector2(location.getBlockX() >> 4, location.getBlockZ() >> 4));
             return world.setBlock(location, block, false);
         } else {
             return world.setBlock(location, block, true);

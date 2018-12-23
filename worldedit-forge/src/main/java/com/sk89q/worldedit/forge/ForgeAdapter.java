@@ -19,7 +19,18 @@
 
 package com.sk89q.worldedit.forge;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
+=======
+import com.google.common.collect.ImmutableList;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.registry.state.BooleanProperty;
+import com.sk89q.worldedit.registry.state.DirectionalProperty;
+import com.sk89q.worldedit.registry.state.EnumProperty;
+import com.sk89q.worldedit.registry.state.IntegerProperty;
+import com.sk89q.worldedit.registry.state.Property;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.World;
 import net.minecraft.util.EnumFacing;
@@ -35,15 +46,15 @@ final class ForgeAdapter {
         return new ForgeWorld(world);
     }
 
-    public static Vector adapt(Vec3d vector) {
-        return new Vector(vector.x, vector.y, vector.z);
+    public static Vector3 adapt(Vec3d vector) {
+        return new Vector3(vector.x, vector.y, vector.z);
     }
 
-    public static Vector adapt(BlockPos pos) {
-        return new Vector(pos.getX(), pos.getY(), pos.getZ());
+    public static Vector3 adapt(BlockPos pos) {
+        return new Vector3(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public static Vec3d toVec3(Vector vector) {
+    public static Vec3d toVec3(BlockVector3 vector) {
         return new Vec3d(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
     }
 
@@ -60,7 +71,24 @@ final class ForgeAdapter {
         }
     }
 
+<<<<<<< HEAD
     public static BlockPos toBlockPos(Vector vector) {
+=======
+    public static Direction adaptEnumFacing(EnumFacing face) {
+        switch (face) {
+            case NORTH: return Direction.NORTH;
+            case SOUTH: return Direction.SOUTH;
+            case WEST: return Direction.WEST;
+            case EAST: return Direction.EAST;
+            case DOWN: return Direction.DOWN;
+            case UP:
+            default:
+                return Direction.UP;
+        }
+    }
+
+    public static BlockPos toBlockPos(BlockVector3 vector) {
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         return new BlockPos(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
     }
 

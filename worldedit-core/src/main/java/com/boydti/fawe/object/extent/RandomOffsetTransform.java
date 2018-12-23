@@ -1,12 +1,12 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2D;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -27,14 +27,14 @@ public class RandomOffsetTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(Vector2D pos, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 pos, BaseBiome biome) {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
         return getExtent().setBiome(mutable.setComponents(x, z), biome);
     }
 
     @Override
-    public boolean setBlock(Vector pos, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 pos, BlockStateHolder block) throws WorldEditException {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int y = pos.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;

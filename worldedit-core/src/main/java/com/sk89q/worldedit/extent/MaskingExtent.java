@@ -19,14 +19,23 @@
 
 package com.sk89q.worldedit.extent;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.MutableBlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.mask.Mask;
+<<<<<<< HEAD
 import com.sk89q.worldedit.world.biome.BaseBiome;
+=======
+import com.sk89q.worldedit.math.BlockVector3;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 
@@ -72,7 +81,7 @@ public class MaskingExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         return mask.test(location) && super.setBlock(location, block);
     }
 

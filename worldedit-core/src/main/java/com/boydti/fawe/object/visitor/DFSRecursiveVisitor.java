@@ -1,10 +1,9 @@
 package com.boydti.fawe.object.visitor;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
-
+import com.sk89q.worldedit.math.BlockVector3;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,7 +32,7 @@ public class DFSRecursiveVisitor extends DFSVisitor {
     }
 
     @Override
-    public boolean isVisitable(final Vector from, final Vector to) {
+    public boolean isVisitable(final BlockVector3 from, final BlockVector3 to) {
         return this.mask.test(to);
     }
 }

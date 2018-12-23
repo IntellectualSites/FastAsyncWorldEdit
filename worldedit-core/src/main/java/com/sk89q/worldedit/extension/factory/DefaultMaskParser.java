@@ -1,11 +1,15 @@
 package com.sk89q.worldedit.extension.factory;
 
+<<<<<<< HEAD
 import com.boydti.fawe.command.FaweParser;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
+=======
+import com.sk89q.worldedit.IncompleteRegionException;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.MaskCommands;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -16,9 +20,24 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
+<<<<<<< HEAD
 import com.sk89q.worldedit.function.mask.MaskUnion;
 import com.sk89q.worldedit.internal.command.ActorAuthorizer;
 import com.sk89q.worldedit.internal.command.WorldEditBinding;
+=======
+import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.NoiseFilter;
+import com.sk89q.worldedit.function.mask.OffsetMask;
+import com.sk89q.worldedit.function.mask.RegionMask;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
+import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.math.noise.RandomNoise;
+import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.util.command.SimpleDispatcher;
@@ -150,6 +169,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                         }
                     }
                 } else {
+<<<<<<< HEAD
                     List<String> args = entry.getValue();
                     String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                     try {
@@ -178,10 +198,55 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                                 throw new InputParseException(e2.getMessage());
                             }
                         });
+=======
+                    throw new NoMatchException("Unrecognized mask '" + component + '\'');
+                }
+
+            case '>':
+            case '<':
+                Mask submask;
+                if (component.length() > 1) {
+                    submask = getBlockMaskComponent(masks, component.substring(1), context);
+                } else {
+                    submask = new ExistingBlockMask(extent);
+                }
+                OffsetMask offsetMask = new OffsetMask(submask, new BlockVector3(0, firstChar == '>' ? -1 : 1, 0));
+                return new MaskIntersection(offsetMask, Masks.negate(submask));
+
+            case '$':
+                Set<BaseBiome> biomes = new HashSet<>();
+                String[] biomesList = component.substring(1).split(",");
+                BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
+                        .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
+                List<BaseBiome> knownBiomes = biomeRegistry.getBiomes();
+                for (String biomeName : biomesList) {
+                    BaseBiome biome = Biomes.findBiomeByName(knownBiomes, biomeName, biomeRegistry);
+                    if (biome == null) {
+                        throw new InputParseException("Unknown biome '" + biomeName + '\'');
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 }
+<<<<<<< HEAD
                 if (pe.and) {
                     masks.add(new ArrayList<>());
+=======
+
+                return Masks.asMask(new BiomeMask2D(context.requireExtent(), biomes));
+
+            case '%':
+                int i = Integer.parseInt(component.substring(1));
+                return new NoiseFilter(new RandomNoise(), ((double) i) / 100);
+
+            case '=':
+                try {
+                    Expression exp = Expression.compile(component.substring(1), "x", "y", "z");
+                    WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(
+                            Request.request().getEditSession(), Vector3.ONE, Vector3.ZERO);
+                    exp.setEnvironment(env);
+                    return new ExpressionMask(exp);
+                } catch (ExpressionException e) {
+                    throw new InputParseException("Invalid expression: " + e.getMessage());
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 }
                 masks.get(masks.size() - 1).add(mask);
             }

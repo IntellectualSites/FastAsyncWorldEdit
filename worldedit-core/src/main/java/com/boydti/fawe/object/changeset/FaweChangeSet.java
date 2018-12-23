@@ -13,9 +13,7 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -24,6 +22,7 @@ import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -197,7 +196,7 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public void add(BlockChange change) {
         try {
-            BlockVector loc = change.getPosition();
+            BlockVector3 loc = change.getPosition();
             BlockStateHolder from = change.getPrevious();
             BlockStateHolder to = change.getCurrent();
             add(loc, from, to);
@@ -206,7 +205,7 @@ public abstract class FaweChangeSet implements ChangeSet {
         }
     }
 
-    public void add(Vector loc, BlockStateHolder from, BlockStateHolder to) {
+    public void add(BlockVector3 loc, BlockStateHolder from, BlockStateHolder to) {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();

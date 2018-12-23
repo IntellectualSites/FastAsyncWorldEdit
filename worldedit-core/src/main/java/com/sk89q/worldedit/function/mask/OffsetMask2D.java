@@ -19,7 +19,13 @@
 
 package com.sk89q.worldedit.function.mask;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector2D;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.BlockVector2;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class OffsetMask2D extends AbstractMask2D {
 
     private Mask2D mask;
-    private Vector2D offset;
+    private BlockVector2 offset;
 
     /**
      * Create a new instance.
@@ -38,7 +44,7 @@ public class OffsetMask2D extends AbstractMask2D {
      * @param mask the mask
      * @param offset the offset
      */
-    public OffsetMask2D(Mask2D mask, Vector2D offset) {
+    public OffsetMask2D(Mask2D mask, BlockVector2 offset) {
         checkNotNull(mask);
         checkNotNull(offset);
         this.mask = mask;
@@ -69,7 +75,7 @@ public class OffsetMask2D extends AbstractMask2D {
      *
      * @return the offset
      */
-    public Vector2D getOffset() {
+    public BlockVector2 getOffset() {
         return offset;
     }
 
@@ -78,13 +84,13 @@ public class OffsetMask2D extends AbstractMask2D {
      *
      * @param offset the offset
      */
-    public void setOffset(Vector2D offset) {
+    public void setOffset(BlockVector2 offset) {
         checkNotNull(offset);
         this.offset = offset;
     }
 
     @Override
-    public boolean test(Vector2D vector) {
+    public boolean test(BlockVector2 vector) {
         return getMask().test(vector.add(offset));
     }
 

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
@@ -31,9 +32,23 @@ import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.*;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.tool.BlockTool;
+import com.sk89q.worldedit.command.tool.DoubleActionBlockTool;
+import com.sk89q.worldedit.command.tool.DoubleActionTraceTool;
+import com.sk89q.worldedit.command.tool.Tool;
+import com.sk89q.worldedit.command.tool.TraceTool;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.*;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
@@ -290,6 +305,7 @@ public class PlatformManager {
     public void handleBlockInteract(BlockInteractEvent event) {
         // Create a proxy actor with a potentially different world for
         // making changes to the world
+<<<<<<< HEAD
         Request.reset();
         final Actor actor = createProxyActor(event.getCause());
         try {
@@ -306,6 +322,12 @@ public class PlatformManager {
                     virtual.handleBlockInteract(playerActor, vector, event);
                     if (event.isCancelled()) return;
                 }
+=======
+        Actor actor = createProxyActor(event.getCause());
+
+        Location location = event.getLocation();
+        Vector3 vector = location.toVector();
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
                 if (event.getType() == Interaction.HIT) {
                     if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().wandItem)) {
@@ -342,6 +364,7 @@ public class PlatformManager {
                             return;
                         }
                     }
+<<<<<<< HEAD
                     final Tool tool = session.getTool(playerActor);
                     if (tool != null && tool instanceof DoubleActionBlockTool) {
                         if (tool.canUse(playerActor)) {
@@ -356,6 +379,14 @@ public class PlatformManager {
                             event.setCancelled(true);
                             return;
                         }
+=======
+
+                    RegionSelector selector = session.getRegionSelector(player.getWorld());
+
+                    BlockVector3 blockPoint = vector.toBlockPoint();
+                    if (selector.selectPrimary(blockPoint, ActorSelectorLimits.forActor(player))) {
+                        selector.explainPrimarySelection(actor, session, blockPoint);
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 } else if (event.getType() == Interaction.OPEN) {
                     if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().wandItem)) {
@@ -379,6 +410,7 @@ public class PlatformManager {
                         return;
                     }
 
+<<<<<<< HEAD
                     final Tool tool = session.getTool(playerActor);
                     if (tool != null && tool instanceof BlockTool) {
                         if (tool.canUse(playerActor)) {
@@ -399,6 +431,23 @@ public class PlatformManager {
                                 return;
                             }
                         }
+=======
+                    RegionSelector selector = session.getRegionSelector(player.getWorld());
+                    BlockVector3 blockPoint = vector.toBlockPoint();
+                    if (selector.selectSecondary(blockPoint, ActorSelectorLimits.forActor(player))) {
+                        selector.explainSecondarySelection(actor, session, blockPoint);
+                    }
+
+                    event.setCancelled(true);
+                    return;
+                }
+
+                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                if (tool instanceof BlockTool) {
+                    if (tool.canUse(player)) {
+                        ((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
+                        event.setCancelled(true);
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 }
             }

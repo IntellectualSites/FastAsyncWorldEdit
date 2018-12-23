@@ -1,10 +1,11 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
+
 import java.util.Arrays;
 import javax.annotation.Nullable;
 
@@ -112,7 +113,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         }
     }
 
-    public boolean adjacentAir(Vector v) {
+    public boolean adjacentAir(BlockVector3 v) {
         int x = v.getBlockX();
         int y = v.getBlockY();
         int z = v.getBlockZ();
@@ -138,7 +139,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         int x = vector.getBlockX();
         int y = vector.getBlockY();
         int z = vector.getBlockZ();

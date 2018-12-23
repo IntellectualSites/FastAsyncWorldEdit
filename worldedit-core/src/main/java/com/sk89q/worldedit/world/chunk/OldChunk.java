@@ -25,10 +25,12 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
+<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseBlock;
+=======
+import com.sk89q.worldedit.math.BlockVector3;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -52,7 +54,7 @@ public class OldChunk implements Chunk {
     private int rootX;
     private int rootZ;
 
-    private Map<BlockVector, Map<String,Tag>> tileEntities;
+    private Map<BlockVector3, Map<String,Tag>> tileEntities;
 
     /**
      * Construct the chunk with a compound tag.
@@ -128,7 +130,7 @@ public class OldChunk implements Chunk {
                 values.put(entry.getKey(), entry.getValue());
             }
 
-            BlockVector vec = new BlockVector(x, y, z);
+            BlockVector3 vec = new BlockVector3(x, y, z);
             tileEntities.put(vec, values);
         }
     }
@@ -142,12 +144,12 @@ public class OldChunk implements Chunk {
      * @return a tag
      * @throws DataException
      */
-    private CompoundTag getBlockTileEntity(Vector position) throws DataException {
+    private CompoundTag getBlockTileEntity(BlockVector3 position) throws DataException {
         if (tileEntities == null) {
             populateTileEntities();
         }
 
-        Map<String, Tag> values = tileEntities.get(new BlockVector(position));
+        Map<String, Tag> values = tileEntities.get(position);
         if (values == null) {
             return null;
         }
@@ -155,13 +157,18 @@ public class OldChunk implements Chunk {
     }
 
     @Override
+<<<<<<< HEAD
     public BlockStateHolder getBlock(Vector position) throws DataException {
         if(position.getBlockY() >= 128) return BlockTypes.VOID_AIR.getDefaultState();
+=======
+    public BlockStateHolder getBlock(BlockVector3 position) throws DataException {
+        if(position.getY() >= 128) return BlockTypes.VOID_AIR.getDefaultState().toBaseBlock();
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         int id, dataVal;
 
-        int x = position.getBlockX() - rootX * 16;
-        int y = position.getBlockY();
-        int z = position.getBlockZ() - rootZ * 16;
+        int x = position.getX() - rootX * 16;
+        int y = position.getY();
+        int z = position.getZ() - rootZ * 16;
         int index = y + (z * 128 + (x * 128 * 16));
         try {
             id = blocks[index];

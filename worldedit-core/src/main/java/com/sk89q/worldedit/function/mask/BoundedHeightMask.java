@@ -19,7 +19,13 @@
 
 package com.sk89q.worldedit.function.mask;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
+=======
+import static com.google.common.base.Preconditions.checkArgument;
+
+import com.sk89q.worldedit.math.BlockVector3;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import javax.annotation.Nullable;
 
@@ -47,7 +53,7 @@ public class BoundedHeightMask extends AbstractMask {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         return vector.getY() >= minY && vector.getY() <= maxY;
     }
 

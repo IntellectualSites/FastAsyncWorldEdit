@@ -6,8 +6,6 @@ import com.boydti.fawe.object.mask.AdjacentAnyMask;
 import com.boydti.fawe.object.mask.RadiusMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
@@ -17,6 +15,8 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -34,7 +34,7 @@ public class LayerBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern ignore, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern ignore, double size) throws MaxChangedBlocksException {
         final FaweQueue queue = editSession.getQueue();
         final AdjacentAnyMask adjacent = new AdjacentAnyMask(new BlockTypeMask(editSession, BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR));
         final SolidBlockMask solid = new SolidBlockMask(editSession);
@@ -51,7 +51,7 @@ public class LayerBrush implements Brush {
                 boolean found = false;
                 int previous = layers[depth - 1].getInternalId();
                 int previous2 = layers[depth - 2].getInternalId();
-                for (Vector dir : BreadthFirstSearch.DEFAULT_DIRECTIONS) {
+                for (BlockVector3 dir : BreadthFirstSearch.DEFAULT_DIRECTIONS) {
                     mutable.setComponents(pos.getBlockX() + dir.getBlockX(), pos.getBlockY() + dir.getBlockY(), pos.getBlockZ() + dir.getBlockZ());
                     if (visitor.isVisited(mutable) && queue.getCachedCombinedId4Data(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous) {
                         mutable.setComponents(pos.getBlockX() + dir.getBlockX() * 2, pos.getBlockY() + dir.getBlockY() * 2, pos.getBlockZ() + dir.getBlockZ() * 2);
@@ -73,7 +73,7 @@ public class LayerBrush implements Brush {
             BlockStateHolder currentPattern = layers[depth];
             return editSession.setBlock(pos, currentPattern);
         }, layers.length - 1, editSession);
-        for (Vector pos : visited) {
+        for (BlockVector3 pos : visited) {
             visitor.visit(pos);
         }
         Operations.completeBlindly(visitor);

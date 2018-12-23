@@ -3,7 +3,6 @@ package com.boydti.fawe.object.extent;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -11,6 +10,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -34,7 +34,7 @@ public class StripNBTExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         return super.setBlock(location, stripNBT(block));
     }
 

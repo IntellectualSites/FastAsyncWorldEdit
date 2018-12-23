@@ -9,8 +9,6 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
@@ -22,6 +20,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
+import com.sk89q.worldedit.math.Vector2;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Text;
@@ -257,11 +257,11 @@ public class FawePrimitiveBinding extends BindingHelper {
      * @return the requested type
      * @throws ParameterException on error
      */
-    @BindingMatch(type = Vector.class,
+    @BindingMatch(type = Vector3.class,
             behavior = BindingBehavior.CONSUMES,
             consumedCount = 1,
             provideModifiers = true)
-    public Vector getVector(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
+    public Vector3 getVector(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         String radiusString = context.next();
         String[] radii = radiusString.split(",");
         final double radiusX, radiusY, radiusZ;
@@ -279,7 +279,7 @@ public class FawePrimitiveBinding extends BindingHelper {
             default:
                 throw new ParameterException("You must either specify 1 or 3 radius values.");
         }
-        return new Vector(radiusX, radiusY, radiusZ);
+        return new Vector3(radiusX, radiusY, radiusZ);
     }
 
 
@@ -290,11 +290,11 @@ public class FawePrimitiveBinding extends BindingHelper {
      * @return the requested type
      * @throws ParameterException on error
      */
-    @BindingMatch(type = Vector2D.class,
+    @BindingMatch(type = Vector2.class,
             behavior = BindingBehavior.CONSUMES,
             consumedCount = 1,
             provideModifiers = true)
-    public Vector2D getVector2D(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
+    public Vector2 getVector2D(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         String radiusString = context.next();
         String[] radii = radiusString.split(",");
         final double radiusX, radiusZ;
@@ -311,7 +311,7 @@ public class FawePrimitiveBinding extends BindingHelper {
             default:
                 throw new ParameterException("You must either specify 1 or 2 radius values.");
         }
-        return new Vector2D(radiusX, radiusZ);
+        return new Vector2(radiusX, radiusZ);
     }
 
     /**

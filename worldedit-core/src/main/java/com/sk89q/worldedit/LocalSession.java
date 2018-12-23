@@ -55,6 +55,8 @@ import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.internal.cui.CUIRegion;
 import com.sk89q.worldedit.internal.cui.SelectionShapeEvent;
+import com.sk89q.worldedit.internal.cui.ServerCUIHandler;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
@@ -128,12 +130,12 @@ public class LocalSession implements TextureHolder {
     private transient TextureUtil texture;
     private transient ResettableExtent transform = null;
     private transient TimeZone timezone = TimeZone.getDefault();
-
     private transient World currentWorld;
     private transient UUID uuid;
     private transient volatile long historySize = 0;
 
     private transient VirtualWorld virtual;
+    private transient BlockVector3 cuiTemporaryBlock;
 
     // Saved properties
     private String lastScript;
@@ -870,10 +872,10 @@ public class LocalSession implements TextureHolder {
      * @return the position to use
      * @throws IncompleteRegionException thrown if a region is not fully selected
      */
-    public Vector getPlacementPosition(Player player) throws IncompleteRegionException {
+    public BlockVector3 getPlacementPosition(Player player) throws IncompleteRegionException {
         checkNotNull(player);
         if (!placeAtPos1) {
-            return player.getBlockIn();
+            return player.getBlockIn().toVector().toBlockPoint();
         }
 
         return selector.getPrimaryPosition();
@@ -1103,6 +1105,60 @@ public class LocalSession implements TextureHolder {
      * @param player the player
      */
     public void tellVersion(Actor player) {
+    }
+
+
+    public boolean shouldUseServerCUI() {
+        return this.useServerCUI;
+    }
+
+    public void setUseServerCUI(boolean useServerCUI) {
+        this.useServerCUI = useServerCUI;
+        setDirty();
+    }
+
+    /**
+     * Update server-side WorldEdit CUI.
+     *
+     * @param actor The player
+     */
+    public void updateServerCUI(Actor actor) {
+        if (!actor.isPlayer()) {
+            return; // This is for players only.
+        }
+
+        if (!config.serverSideCUI) {
+            return; // Disabled in config.
+        }
+
+        Player player = (Player) actor;
+
+        if (!useServerCUI || hasCUISupport) {
+            if (cuiTemporaryBlock != null) {
+                player.sendFakeBlock(cuiTemporaryBlock, null);
+                cuiTemporaryBlock = null;
+            }
+            return; // If it's not enabled, ignore this.
+        }
+
+        // Remove the old block.
+        if (cuiTemporaryBlock != null) {
+            player.sendFakeBlock(cuiTemporaryBlock, null);
+            cuiTemporaryBlock = null;
+        }
+
+        BaseBlock block = ServerCUIHandler.createStructureBlock(player);
+        if (block != null) {
+            // If it's null, we don't need to do anything. The old was already removed.
+            Map<String, Tag> tags = block.getNbtData().getValue();
+            cuiTemporaryBlock = new BlockVector3(
+                    ((IntTag) tags.get("x")).getValue(),
+                    ((IntTag) tags.get("y")).getValue(),
+                    ((IntTag) tags.get("z")).getValue()
+            );
+
+            player.sendFakeBlock(cuiTemporaryBlock, block);
+        }
     }
 
     /**

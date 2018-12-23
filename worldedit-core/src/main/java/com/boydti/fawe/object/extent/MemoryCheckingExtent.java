@@ -5,12 +5,12 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.Perm;
 import com.boydti.fawe.util.WEManager;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class MemoryCheckingExtent extends AbstractDelegateExtent {
@@ -22,7 +22,7 @@ public class MemoryCheckingExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(final Vector location, final BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(final BlockVector3 location, final BlockStateHolder block) throws WorldEditException {
         if (super.setBlock(location, block)) {
             if (MemUtil.isMemoryLimited()) {
                 if (this.player != null) {

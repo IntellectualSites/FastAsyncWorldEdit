@@ -11,13 +11,15 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -68,7 +70,7 @@ public class HeightBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
         int size = (int) sizeDouble;
         HeightMap map = getHeightMap();
         map.setSize(size);
@@ -83,7 +85,7 @@ public class HeightBrush implements Brush {
                 hmmg.getMetaData().setMeta("PRECISION_HEIGHT", metaHeight = new byte[hmmg.getArea()]);
             }
 
-            Vector origin = hmmg.getOrigin();
+            Vector3 origin = hmmg.getOrigin();
 
             int bx = position.getBlockX();
             int bz = position.getBlockZ();
@@ -131,14 +133,14 @@ public class HeightBrush implements Brush {
             }
 
             if (smooth) {
-                Vector2D min = new Vector2D(Math.max(0, bx - size), Math.max(0, bz - size));
-                Vector2D max = new Vector2D(Math.min(hmmg.getWidth() - 1, bx + size), Math.min(hmmg.getLength() - 1, bz + size));
+            	BlockVector2 min = new BlockVector2(Math.max(0, bx - size), Math.max(0, bz - size));
+            	BlockVector2 max = new BlockVector2(Math.min(hmmg.getWidth() - 1, bx + size), Math.min(hmmg.getLength() - 1, bz + size));
                 hmmg.smooth(min, max, 8, 1);
 
                 if (size > 20) {
                     int smoothSize = size + 8;
-                    min = new Vector2D(Math.max(0, bx - smoothSize), Math.max(0, bz - smoothSize));
-                    max = new Vector2D(Math.min(hmmg.getWidth() - 1, bx + smoothSize), Math.min(hmmg.getLength() - 1, bz + smoothSize));
+                    min = new BlockVector2(Math.max(0, bx - smoothSize), Math.max(0, bz - smoothSize));
+                    max = new BlockVector2(Math.min(hmmg.getWidth() - 1, bx + smoothSize), Math.min(hmmg.getLength() - 1, bz + smoothSize));
                     hmmg.smooth(min, max, 1, 1);
                 }
             }

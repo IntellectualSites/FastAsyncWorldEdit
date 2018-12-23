@@ -1,10 +1,10 @@
-package com.sk89q.worldedit;
+package com.sk89q.worldedit.math;
 
 import com.boydti.fawe.util.MathMan;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class MutableBlockVector extends BlockVector implements Serializable {
+public class MutableBlockVector extends BlockVector3 implements Serializable {
     private transient int x, y, z;
 
     private static ThreadLocal<MutableBlockVector> MUTABLE_CACHE = new ThreadLocal<MutableBlockVector>() {
@@ -18,7 +18,7 @@ public class MutableBlockVector extends BlockVector implements Serializable {
         return MUTABLE_CACHE.get().setComponents(x, y, z);
     }
 
-    public MutableBlockVector(Vector v) {
+    public MutableBlockVector(BlockVector3 v) {
         this(v.getBlockX(), v.getBlockY(), v.getBlockZ());
     }
 
@@ -33,16 +33,16 @@ public class MutableBlockVector extends BlockVector implements Serializable {
         super(0, 0, 0);
     }
 
-    public MutableBlockVector setComponents(Vector other) {
+    public MutableBlockVector setComponents(BlockVector3 other) {
         return setComponents(other.getBlockX(), other.getBlockY(), other.getBlockZ());
     }
 
-    @Override
+//    @Override
     public MutableBlockVector setComponents(double x, double y, double z) {
         return this.setComponents((int) x, (int) y, (int) z);
     }
 
-    @Override
+//    @Override
     public MutableBlockVector setComponents(int x, int y, int z) {
         this.mutX(x);
         this.mutY(y);
@@ -50,48 +50,48 @@ public class MutableBlockVector extends BlockVector implements Serializable {
         return this;
     }
 
-    @Override
+//    @Override
     public final void mutX(double x) {
         this.x = MathMan.roundInt(x);
     }
 
-    @Override
+//    @Override
     public final void mutY(double y) {
         this.y = MathMan.roundInt(y);
     }
 
-    @Override
+//    @Override
     public final void mutZ(double z) {
         this.z = MathMan.roundInt(z);
     }
 
-    @Override
+//    @Override
     public final void mutX(int x) {
         this.x = x;
     }
 
-    @Override
+//    @Override
     public final void mutY(int y) {
         this.y = y;
     }
 
-    @Override
+//    @Override
     public final void mutZ(int z) {
         this.z = z;
     }
 
     @Override
-    public final double getX() {
+    public final int getX() {
         return x;
     }
 
     @Override
-    public final double getY() {
+    public final int getY() {
         return y;
     }
 
     @Override
-    public final double getZ() {
+    public final int getZ() {
         return z;
     }
 

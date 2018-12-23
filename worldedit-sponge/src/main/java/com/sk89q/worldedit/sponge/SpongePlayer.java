@@ -21,18 +21,20 @@ package com.sk89q.worldedit.sponge;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.sk89q.util.StringUtil;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemTypes;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -143,7 +145,7 @@ public class SpongePlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public void setPosition(Vector pos, float pitch, float yaw) {
+    public void setPosition(Vector3 pos, float pitch, float yaw) {
         org.spongepowered.api.world.Location<World> loc = new org.spongepowered.api.world.Location<>(
                 this.player.getWorld(), pos.getX(), pos.getY(), pos.getZ()
         );
@@ -184,6 +186,26 @@ public class SpongePlayer extends AbstractPlayerActor {
     }
 
     @Override
+<<<<<<< HEAD
+=======
+    public void sendFakeBlock(BlockVector3 pos, BlockStateHolder block) {
+        org.spongepowered.api.world.Location<World> loc = player.getWorld().getLocation(pos.getX(), pos.getY(), pos.getZ());
+        if (block == null) {
+            player.sendBlockChange(loc.getBlockPosition(), loc.getBlock());
+        } else {
+            // TODO
+//            player.sendBlockChange(loc, BukkitAdapter.adapt(block));
+//            if (block instanceof BaseBlock && ((BaseBlock) block).hasNbtData()) {
+//                BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+//                if (adapter != null) {
+//                    adapter.sendFakeNBT(player, pos, ((BaseBlock) block).getNbtData());
+//                }
+//            }
+        }
+    }
+
+    @Override
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     public SessionKey getSessionKey() {
         return new SessionKeyImpl(player.getUniqueId(), player.getName());
     }

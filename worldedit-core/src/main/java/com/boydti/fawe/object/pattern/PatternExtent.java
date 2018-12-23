@@ -1,7 +1,5 @@
 package com.boydti.fawe.object.pattern;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -11,6 +9,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 public class PatternExtent extends AbstractPattern implements Extent {
     private final Pattern pattern;
     private transient BlockStateHolder block;
-    private transient Vector target = new Vector();
+    private transient BlockVector3 target = new BlockVector3(0, 0, 0);
 
     public PatternExtent(Pattern pattern) {
         this.pattern = pattern;
@@ -32,17 +32,17 @@ public class PatternExtent extends AbstractPattern implements Extent {
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        target = new Vector();
+        target = new BlockVector3(0, 0, 0);
     }
 
     @Override
-    public Vector getMinimumPoint() {
-        return new Vector(Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
+    public BlockVector3 getMinimumPoint() {
+        return new BlockVector3(Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
     }
 
     @Override
-    public Vector getMaximumPoint() {
-        return new Vector(Integer.MAX_VALUE, 255, Integer.MAX_VALUE);
+    public BlockVector3 getMaximumPoint() {
+        return new BlockVector3(Integer.MAX_VALUE, 255, Integer.MAX_VALUE);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class PatternExtent extends AbstractPattern implements Extent {
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         BlockStateHolder tmp = pattern.apply(position);
         if (position == target || (position.getX() == target.getX() && position.getY() == target.getY() && position.getZ() == target.getZ())) {
             block = tmp;
@@ -72,11 +72,11 @@ public class PatternExtent extends AbstractPattern implements Extent {
         return (BlockState) tmp;
     }
 
-    public void setTarget(Vector vector) {
+    public void setTarget(BlockVector3 vector) {
         this.target = vector;
     }
 
-    public boolean getAndResetTarget(Extent extent, Vector set, Vector get) throws WorldEditException {
+    public boolean getAndResetTarget(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
         BlockStateHolder result = block;
         if (result != null) {
             block = null;
@@ -97,22 +97,22 @@ public class PatternExtent extends AbstractPattern implements Extent {
     }
 
     @Override
-    public BlockState getFullBlock(Vector position) {
+    public BlockState getFullBlock(BlockVector3 position) {
         return getBlock(position);
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return new BaseBiome(0);
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         return false;
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return false;
     }
 
@@ -123,12 +123,12 @@ public class PatternExtent extends AbstractPattern implements Extent {
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BlockStateHolder apply(BlockVector3 position) {
         return pattern.apply(position);
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
         return pattern.apply(extent, set, get);
     }
 }

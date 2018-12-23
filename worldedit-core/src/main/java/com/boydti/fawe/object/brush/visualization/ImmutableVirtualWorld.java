@@ -13,6 +13,9 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
@@ -59,7 +62,7 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return FaweCache.getBiome(0);
     }
 
@@ -185,27 +188,27 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
         return setBlock(position, block);
     }
 
     @Override
-    public int getBlockLightLevel(Vector position) {
+    public int getBlockLightLevel(BlockVector3 position) {
         return 0;
     }
 
     @Override
-    public boolean clearContainerBlockContents(Vector position) {
+    public boolean clearContainerBlockContents(BlockVector3 position) {
         return unsupported();
     }
 
     @Override
-    public void dropItem(Vector position, BaseItemStack item) {
+    public void dropItem(Vector3 position, BaseItemStack item) {
         unsupported();
     }
 
     @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, Vector position) throws MaxChangedBlocksException {
+    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
         return unsupported();
     }
 
@@ -264,12 +267,12 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public boolean setBlock(Vector pt, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 pt, BlockStateHolder block) throws WorldEditException {
         return unsupported();
     }
 
     @Override
-    public void simulateBlockMine(Vector position) {
+    public void simulateBlockMine(BlockVector3 position) {
         unsupported();
     }
 

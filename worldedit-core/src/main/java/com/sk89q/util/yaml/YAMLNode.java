@@ -19,9 +19,9 @@
 
 package com.sk89q.util.yaml;
 
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.Vector2;
+import com.sk89q.worldedit.math.Vector3;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -110,9 +110,9 @@ public class YAMLNode {
      * @return the new object
      */
     private Object prepareSerialization(Object value) {
-        if (value instanceof Vector) {
+        if (value instanceof Vector3) {
             Map<String, Double> out = new LinkedHashMap<>();
-            Vector vec = (Vector) value;
+            Vector3 vec = (Vector3) value;
             out.put("x", vec.getX());
             out.put("y", vec.getY());
             out.put("z", vec.getZ());
@@ -200,7 +200,7 @@ public class YAMLNode {
      * @param path path to node (dot notation)
      * @return string or default
      */
-    public Vector getVector(String path) {
+    public Vector3 getVector(String path) {
         YAMLNode o = getNode(path);
         if (o == null) {
             return null;
@@ -214,7 +214,7 @@ public class YAMLNode {
             return null;
         }
 
-        return new Vector(x, y, z);
+        return new Vector3(x, y, z);
     }
 
     /**
@@ -225,7 +225,7 @@ public class YAMLNode {
      * @param path path to node (dot notation)
      * @return string or default
      */
-    public Vector2D getVector2d(String path) {
+    public Vector2 getVector2(String path) {
         YAMLNode o = getNode(path);
         if (o == null) {
             return null;
@@ -238,7 +238,7 @@ public class YAMLNode {
             return null;
         }
 
-        return new Vector2D(x, z);
+        return new Vector2(x, z);
     }
 
     /**
@@ -250,8 +250,8 @@ public class YAMLNode {
      * @param def default value
      * @return string or default
      */
-    public Vector getVector(String path, Vector def) {
-        Vector v = getVector(path);
+    public Vector3 getVector(String path, Vector3 def) {
+        Vector3 v = getVector(path);
         if (v == null) {
             if (writeDefaults) setProperty(path, def);
             return def;
@@ -557,9 +557,9 @@ public class YAMLNode {
      * @param def default value or null for an empty list as default
      * @return list of integers
      */
-    public List<Vector> getVectorList(String path, List<Vector> def) {
+    public List<Vector3> getVectorList(String path, List<Vector3> def) {
         List<YAMLNode> raw = getNodeList(path, null);
-        List<Vector> list = new ArrayList<>();
+        List<Vector3> list = new ArrayList<>();
 
         for (YAMLNode o : raw) {
             Double x = o.getDouble("x");
@@ -570,7 +570,7 @@ public class YAMLNode {
                 continue;
             }
 
-            list.add(new Vector(x, y, z));
+            list.add(new Vector3(x, y, z));
         }
 
         return list;
@@ -587,10 +587,10 @@ public class YAMLNode {
      * @param def default value or null for an empty list as default
      * @return list of integers
      */
-    public List<Vector2D> getVector2dList(String path, List<Vector2D> def) {
+    public List<Vector2> getVector2List(String path, List<Vector2> def) {
 
         List<YAMLNode> raw = getNodeList(path, null);
-        List<Vector2D> list = new ArrayList<>();
+        List<Vector2> list = new ArrayList<>();
 
         for (YAMLNode o : raw) {
             Double x = o.getDouble("x");
@@ -600,7 +600,7 @@ public class YAMLNode {
                 continue;
             }
 
-            list.add(new Vector2D(x, z));
+            list.add(new Vector2(x, z));
         }
 
         return list;
@@ -617,10 +617,10 @@ public class YAMLNode {
      * @param def default value or null for an empty list as default
      * @return list of integers
      */
-    public List<BlockVector2D> getBlockVector2dList(String path, List<BlockVector2D> def) {
+    public List<BlockVector2> getBlockVector2List(String path, List<BlockVector2> def) {
 
         List<YAMLNode> raw = getNodeList(path, null);
-        List<BlockVector2D> list = new ArrayList<>();
+        List<BlockVector2> list = new ArrayList<>();
 
         for (YAMLNode o : raw) {
             Double x = o.getDouble("x");
@@ -630,7 +630,7 @@ public class YAMLNode {
                 continue;
             }
 
-            list.add(new BlockVector2D(x, z));
+            list.add(new BlockVector2(x, z));
         }
 
         return list;

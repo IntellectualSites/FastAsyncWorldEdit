@@ -21,7 +21,6 @@ import com.boydti.fawe.util.StringMan;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BlockType;
@@ -29,6 +28,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.annotation.Selection;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.command.binding.Switch;
@@ -396,8 +396,8 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.clear")
     public void unset(Player player, EditSession editSession, @Selection Region selection) throws WorldEditException {
-        Vector bot = selection.getMinimumPoint();
-        Vector top = selection.getMaximumPoint();
+        BlockVector3 bot = selection.getMinimumPoint();
+        BlockVector3 top = selection.getMaximumPoint();
         RegionWrapper region = new RegionWrapper(bot, top);
 
         MCAFilterCounter filter = new MCAFilterCounter() {
@@ -618,8 +618,8 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.removelayer")
     public void removeLayers(Player player, EditSession editSession, @Selection Region selection, int id) throws WorldEditException {
-        Vector min = selection.getMinimumPoint();
-        Vector max = selection.getMaximumPoint();
+        BlockVector3 min = selection.getMinimumPoint();
+        BlockVector3 max = selection.getMaximumPoint();
         int minY = min.getBlockY();
         int maxY = max.getBlockY();
         RemoveLayerFilter filter = new RemoveLayerFilter(minY, maxY, id);
@@ -644,7 +644,7 @@ public class AnvilCommands {
         String worldName = Fawe.imp().getWorldName(editSession.getWorld());
         FaweQueue tmp = SetQueue.IMP.getNewQueue(worldName, true, false);
         MCAQueue queue = new MCAQueue(tmp);
-        Vector origin = session.getPlacementPosition(player);
+        BlockVector3 origin = session.getPlacementPosition(player);
         MCAClipboard clipboard = new MCAClipboard(queue, cuboid, origin);
         FawePlayer fp = FawePlayer.wrap(player);
         fp.setMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD, clipboard);

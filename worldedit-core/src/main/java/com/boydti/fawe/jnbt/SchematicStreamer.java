@@ -14,12 +14,12 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.StringTag;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
@@ -49,7 +49,7 @@ public class SchematicStreamer extends NBTStreamer {
     public SchematicStreamer(NBTInputStream stream, UUID uuid) {
         super(stream);
         this.uuid = uuid;
-        clipboard = new BlockArrayClipboard(new CuboidRegion(new Vector(0, 0, 0), new Vector(0, 0, 0)), fc);
+        clipboard = new BlockArrayClipboard(new CuboidRegion(new BlockVector3(0, 0, 0), new BlockVector3(0, 0, 0)), fc);
     }
 
     public void addBlockReaders() throws IOException {
@@ -180,7 +180,7 @@ public class SchematicStreamer extends NBTStreamer {
         FaweInputStream dataIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())));
 
         LegacyMapper remap = LegacyMapper.getInstance();
-        Vector dimensions = fc.getDimensions();
+        BlockVector3 dimensions = fc.getDimensions();
         int length = dimensions.getBlockX() * dimensions.getBlockY() * dimensions.getBlockZ();
         if (adds == null) {
             for (int i = 0; i < length; i++) {
@@ -223,7 +223,7 @@ public class SchematicStreamer extends NBTStreamer {
                         Object half = block.getState(PropertyKey.HALF);
                         Direction facing = block.getState(PropertyKey.FACING);
 
-                        BlockVector forward = facing.toBlockVector();
+                        BlockVector3 forward = facing.toBlockVector();
                         Direction left = facing.getLeft();
                         Direction right = facing.getRight();
 
@@ -419,7 +419,7 @@ public class SchematicStreamer extends NBTStreamer {
     private FaweClipboard setupClipboard(int size) {
         if (fc != null) {
             if (fc.getDimensions().getX() == 0) {
-                fc.setDimensions(new Vector(size, 1, 1));
+                fc.setDimensions(new BlockVector3(size, 1, 1));
             }
             return fc;
         }
@@ -432,16 +432,16 @@ public class SchematicStreamer extends NBTStreamer {
         }
     }
 
-    public Vector getOrigin() {
-        return new Vector(originX, originY, originZ);
+    public BlockVector3 getOrigin() {
+        return new BlockVector3(originX, originY, originZ);
     }
 
-    public Vector getOffset() {
-        return new Vector(offsetX, offsetY, offsetZ);
+    public BlockVector3 getOffset() {
+        return new BlockVector3(offsetX, offsetY, offsetZ);
     }
 
-    public Vector getDimensions() {
-        return new Vector(width, height, length);
+    public BlockVector3 getDimensions() {
+        return new BlockVector3(width, height, length);
     }
 
     public void setClipboard(FaweClipboard clipboard) {
@@ -453,13 +453,13 @@ public class SchematicStreamer extends NBTStreamer {
             addDimensionReaders();
             addBlockReaders();
             readFully();
-            Vector min = new Vector(originX, originY, originZ);
-            Vector offset = new Vector(offsetX, offsetY, offsetZ);
-            Vector origin = min.subtract(offset);
-            Vector dimensions = new Vector(width, height, length);
+            BlockVector3 min = new BlockVector3(originX, originY, originZ);
+            BlockVector3 offset = new BlockVector3(offsetX, offsetY, offsetZ);
+            BlockVector3 origin = min.subtract(offset);
+            BlockVector3 dimensions = new BlockVector3(width, height, length);
             fc.setDimensions(dimensions);
             fixStates();
-            CuboidRegion region = new CuboidRegion(min, min.add(width, height, length).subtract(Vector.ONE));
+            CuboidRegion region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
             clipboard.init(region, fc);
             clipboard.setOrigin(origin);
             return clipboard;

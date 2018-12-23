@@ -4,10 +4,10 @@ import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
@@ -191,7 +191,7 @@ public class PropertyPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BlockStateHolder apply(BlockVector3 position) {
         BlockState block = getExtent().getBlock(position);
         return apply(block, block);
     }
@@ -208,7 +208,7 @@ public class PropertyPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
         BlockState block = getExtent().getBlock(get);
         block = apply(block, null);
         if (block != null) {

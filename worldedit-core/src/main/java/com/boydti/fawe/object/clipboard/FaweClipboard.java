@@ -5,12 +5,12 @@ import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -51,12 +51,12 @@ public abstract class FaweClipboard {
 
     public abstract boolean remove(ClipboardEntity clipboardEntity);
 
-    public void setOrigin(Vector offset) {
+    public void setOrigin(BlockVector3 offset) {
     } // Do nothing
 
-    public abstract void setDimensions(Vector dimensions);
+    public abstract void setDimensions(BlockVector3 dimensions);
 
-    public abstract Vector getDimensions();
+    public abstract BlockVector3 getDimensions();
 
     /**
      * The locations provided are relative to the clipboard min

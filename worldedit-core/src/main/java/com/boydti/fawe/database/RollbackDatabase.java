@@ -9,7 +9,8 @@ import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
@@ -126,7 +127,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         });
     }
 
-    public void getPotentialEdits(final UUID uuid, final long minTime, final Vector pos1, final Vector pos2, final RunnableVal<DiskStorageHistory> onEach, final Runnable whenDone, final boolean delete, final boolean ascending) {
+    public void getPotentialEdits(final UUID uuid, final long minTime, final BlockVector3 pos1, final BlockVector3 pos2, final RunnableVal<DiskStorageHistory> onEach, final Runnable whenDone, final boolean delete, final boolean ascending) {
         final World world = FaweAPI.getWorld(this.worldName);
         addTask(new Runnable() {
             @Override

@@ -19,8 +19,14 @@
 
 package com.sk89q.worldedit.function.mask;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector2D;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 
 import java.util.Arrays;
@@ -90,7 +96,7 @@ public class BiomeMask2D extends AbstractMask2D {
     }
 
     @Override
-    public boolean test(Vector2D vector) {
+    public boolean test(BlockVector2 vector) {
         BaseBiome biome = extent.getBiome(vector);
         return biomes.contains(biome);
     }

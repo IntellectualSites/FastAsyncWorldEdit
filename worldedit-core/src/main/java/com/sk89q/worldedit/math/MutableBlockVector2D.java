@@ -1,9 +1,9 @@
-package com.sk89q.worldedit;
+package com.sk89q.worldedit.math;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-public final class MutableBlockVector2D extends BlockVector2D implements Serializable {
+public final class MutableBlockVector2D extends BlockVector2 implements Serializable {
     private static ThreadLocal<MutableBlockVector2D> MUTABLE_CACHE = new ThreadLocal<MutableBlockVector2D>() {
         @Override
         protected MutableBlockVector2D initialValue() {
@@ -23,13 +23,13 @@ public final class MutableBlockVector2D extends BlockVector2D implements Seriali
         this.z = 0;
     }
 
-    @Override
-    public double getX() {
+//    @Override
+    public int getX() {
         return x;
     }
 
-    @Override
-    public double getZ() {
+//    @Override
+    public int getZ() {
         return z;
     }
 

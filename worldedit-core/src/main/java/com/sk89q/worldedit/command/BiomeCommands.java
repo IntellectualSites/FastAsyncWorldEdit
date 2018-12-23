@@ -30,8 +30,6 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
@@ -44,7 +42,12 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
+<<<<<<< HEAD
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+=======
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -150,6 +153,7 @@ public class BiomeCommands extends MethodCommands {
                 return;
             }
 
+<<<<<<< HEAD
             BaseBiome biome = player.getWorld().getBiome(blockPosition.toVector().toVector2D());
             biomes[biome.getId()]++;
             size = 1;
@@ -157,11 +161,23 @@ public class BiomeCommands extends MethodCommands {
             BaseBiome biome = player.getWorld().getBiome(player.getLocation().toVector().toVector2D());
             biomes[biome.getId()]++;
             size = 1;
+=======
+            BaseBiome biome = player.getWorld().getBiome(blockPosition.toVector().toBlockPoint().toBlockVector2());
+            biomes.add(biome);
+
+            qualifier = "at line of sight point";
+        } else if (args.hasFlag('p')) {
+            BaseBiome biome = player.getWorld().getBiome(player.getLocation().toVector().toBlockPoint().toBlockVector2());
+            biomes.add(biome);
+
+            qualifier = "at your position";
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         } else {
             World world = player.getWorld();
             Region region = session.getSelection(world);
 
             if (region instanceof FlatRegion) {
+<<<<<<< HEAD
                 for (Vector2D pt : new Fast2DIterator(((FlatRegion) region).asFlatRegion(), editSession)) {
                     biomes[editSession.getBiome(pt).getId()]++;
                     size++;
@@ -176,6 +192,15 @@ public class BiomeCommands extends MethodCommands {
                 }, editSession);
                 Operations.completeBlindly(visitor);
                 size += visitor.getAffected();
+=======
+                for (BlockVector2 pt : ((FlatRegion) region).asFlatRegion()) {
+                    biomes.add(world.getBiome(pt));
+                }
+            } else {
+                for (BlockVector3 pt : region) {
+                    biomes.add(world.getBiome(pt.toBlockVector2()));
+                }
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
         }
 
@@ -219,7 +244,7 @@ public class BiomeCommands extends MethodCommands {
         Mask2D mask2d = mask != null ? mask.toMask2D() : null;
 
         if (atPosition) {
-            region = new CuboidRegion(player.getLocation().toVector(), player.getLocation().toVector());
+            region = new CuboidRegion(player.getLocation().toVector().toBlockPoint(), player.getLocation().toVector().toBlockPoint());
         } else {
             region = session.getSelection(world);
         }

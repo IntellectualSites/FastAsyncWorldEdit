@@ -23,6 +23,10 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -104,6 +108,14 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default BlockMaterial getMaterial(BlockType blockType) {
         return null;
     }
+    /**
+     * Send the given NBT data to the player.
+     *
+     * @param player The player
+     * @param pos The position
+     * @param nbtData The NBT Data
+     */
+    void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData);
 
     default BlockMaterial getMaterial(BlockState blockState) {
         return null;

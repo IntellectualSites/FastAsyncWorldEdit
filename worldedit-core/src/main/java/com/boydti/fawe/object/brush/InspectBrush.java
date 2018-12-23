@@ -13,12 +13,13 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.DoubleActionTraceTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -47,7 +48,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
         return perform(player, session, true);
     }
 
-    public Vector getTarget(Player player, boolean adjacent) {
+    public Vector3 getTarget(Player player, boolean adjacent) {
         Location target = null;
         int range = this.range > -1 ? getRange() : MAX_RANGE;
         if (adjacent) {
@@ -67,7 +68,7 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
             player.print(BBC.getPrefix() + BBC.SETTING_DISABLE.f("history.use-database (Import with /frb #import )"));
             return false;
         }
-        Vector target = getTarget(player, rightClick);
+        BlockVector3 target = getTarget(player, rightClick).toBlockPoint();
         final int x = target.getBlockX();
         final int y = target.getBlockY();
         final int z = target.getBlockZ();

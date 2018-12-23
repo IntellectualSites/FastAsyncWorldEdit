@@ -21,7 +21,13 @@
 
 package com.sk89q.worldedit.math.interpolation;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.Vector3;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import java.util.List;
 
@@ -42,7 +48,7 @@ public class LinearInterpolation implements Interpolation {
     }
 
     @Override
-    public Vector getPosition(double position) {
+    public Vector3 getPosition(double position) {
         if (nodes == null)
             throw new IllegalStateException("Must call setNodes first.");
 
@@ -54,8 +60,8 @@ public class LinearInterpolation implements Interpolation {
         final int index1 = (int) Math.floor(position);
         final double remainder = position - index1;
 
-        final Vector position1 = nodes.get(index1).getPosition();
-        final Vector position2 = nodes.get(index1 + 1).getPosition();
+        final Vector3 position1 = nodes.get(index1).getPosition();
+        final Vector3 position2 = nodes.get(index1 + 1).getPosition();
 
         return position1.multiply(1.0 - remainder).add(position2.multiply(remainder));
     }
@@ -76,7 +82,7 @@ public class LinearInterpolation implements Interpolation {
     */
 
     @Override
-    public Vector get1stDerivative(double position) {
+    public Vector3 get1stDerivative(double position) {
         if (nodes == null)
             throw new IllegalStateException("Must call setNodes first.");
 
@@ -87,8 +93,8 @@ public class LinearInterpolation implements Interpolation {
 
         final int index1 = (int) Math.floor(position);
 
-        final Vector position1 = nodes.get(index1).getPosition();
-        final Vector position2 = nodes.get(index1 + 1).getPosition();
+        final Vector3 position1 = nodes.get(index1).getPosition();
+        final Vector3 position2 = nodes.get(index1 + 1).getPosition();
 
         return position2.subtract(position1);
     }
@@ -135,8 +141,8 @@ public class LinearInterpolation implements Interpolation {
     }
 
     private double arcLengthRecursive(int index, double remainderA, double remainderB) {
-        final Vector position1 = nodes.get(index).getPosition();
-        final Vector position2 = nodes.get(index + 1).getPosition();
+        final Vector3 position1 = nodes.get(index).getPosition();
+        final Vector3 position2 = nodes.get(index + 1).getPosition();
 
         return position1.distance(position2) * (remainderB - remainderA);
     }

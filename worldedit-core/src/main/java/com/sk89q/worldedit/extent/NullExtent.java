@@ -19,9 +19,8 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
+<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.LazyBlock;
@@ -32,9 +31,24 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.operation.Operation;
+=======
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+<<<<<<< HEAD
+=======
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -46,18 +60,21 @@ import java.util.List;
  */
 public class NullExtent implements Extent {
 
+<<<<<<< HEAD
     private final Vector nullPoint = new Vector(0, 0, 0);
 
     public static final NullExtent INSTANCE = new NullExtent();
 
+=======
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     @Override
-    public Vector getMinimumPoint() {
-        return nullPoint;
+    public BlockVector3 getMinimumPoint() {
+        return BlockVector3.ZERO;
     }
 
     @Override
-    public Vector getMaximumPoint() {
-        return nullPoint;
+    public BlockVector3 getMaximumPoint() {
+        return BlockVector3.ZERO;
     }
 
     @Override
@@ -77,11 +94,12 @@ public class NullExtent implements Extent {
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         return BlockTypes.AIR.getDefaultState();
     }
 
     @Override
+<<<<<<< HEAD
     public BlockState getLazyBlock(Vector position) {
         return BlockTypes.AIR.getDefaultState();
     }
@@ -89,21 +107,25 @@ public class NullExtent implements Extent {
     @Override
     public BlockState getFullBlock(Vector position) {
         return new BaseBlock(getBlock(position));
+=======
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return getBlock(position).toBaseBlock();
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Nullable
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return null;
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         return false;
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return false;
     }
 

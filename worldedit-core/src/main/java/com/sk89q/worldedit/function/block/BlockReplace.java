@@ -19,11 +19,17 @@
 
 package com.sk89q.worldedit.function.block;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.Vector;
+=======
+import static com.google.common.base.Preconditions.checkNotNull;
+
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -50,8 +56,13 @@ public class BlockReplace implements RegionFunction {
     }
 
     @Override
+<<<<<<< HEAD
     public boolean apply(Vector position) throws WorldEditException {
         return pattern.apply(extent, position, position);
+=======
+    public boolean apply(BlockVector3 position) throws WorldEditException {
+        return extent.setBlock(position, pattern.apply(position));
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
 

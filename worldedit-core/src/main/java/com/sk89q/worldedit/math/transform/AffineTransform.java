@@ -1,10 +1,12 @@
 package com.sk89q.worldedit.math.transform;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.math.MathUtils;
 import java.io.IOException;
 import java.io.Serializable;
+
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MathUtils;
+import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.Vector3;
 
 /**
  * An affine transform.
@@ -234,7 +236,11 @@ public class AffineTransform implements Transform, Serializable {
                 n20, n21, n22, n23);
     }
 
-    public AffineTransform translate(Vector vec) {
+    public AffineTransform translate(Vector3 vec) {
+        return translate(vec.getX(), vec.getY(), vec.getZ());
+    }
+
+    public AffineTransform translate(BlockVector3 vec) {
         return translate(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -280,16 +286,13 @@ public class AffineTransform implements Transform, Serializable {
         return concatenate(new AffineTransform(sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0));
     }
 
-    public AffineTransform scale(Vector vec) {
+    public AffineTransform scale(Vector3 vec) {
         return scale(vec.getX(), vec.getY(), vec.getZ());
     }
 
     @Override
-    public Vector apply(Vector vector) {
-        // vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03
-        // vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13
-        // vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23
-        return new Vector(
+    public Vector3 apply(Vector3 vector) {
+        return new Vector3(
                 vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03,
                 vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13,
                 vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23);

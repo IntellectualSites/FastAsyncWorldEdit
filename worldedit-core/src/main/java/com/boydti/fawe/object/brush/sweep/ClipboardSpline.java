@@ -3,11 +3,11 @@ package com.boydti.fawe.object.brush.sweep;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.RoundedTransform;
@@ -24,11 +24,11 @@ public class ClipboardSpline extends Spline {
 
     private final Transform transform;
     private ClipboardHolder clipboardHolder;
-    private Vector originalOrigin;
+    private BlockVector3 originalOrigin;
     private Transform originalTransform;
 
-    private Vector center;
-    private Vector centerOffset;
+    private BlockVector3 center;
+    private BlockVector3 centerOffset;
     private LocalBlockVectorSet buffer;
 
     /**
@@ -70,8 +70,9 @@ public class ClipboardSpline extends Spline {
         this.originalOrigin = clipboard.getOrigin();
 
         Region region = clipboard.getRegion();
-        Vector origin = clipboard.getOrigin();
-        center = region.getCenter().setY(origin.getY() - 1);
+        BlockVector3 origin = clipboard.getOrigin();
+//        center = region.getCenter().setY(origin.getY() - 1);
+        center = region.getCenter().withY(origin.getY() - 1).toBlockPoint();
         this.centerOffset = center.subtract(center.round());
         this.center = center.subtract(centerOffset);
         this.transform = transform;
@@ -79,7 +80,7 @@ public class ClipboardSpline extends Spline {
     }
 
     @Override
-    protected int pasteBlocks(Vector target, Vector offset, double angle) throws MaxChangedBlocksException {
+    protected int pasteBlocks(BlockVector3 target, BlockVector3 offset, double angle) throws MaxChangedBlocksException {
         RoundedTransform transform = new RoundedTransform(new AffineTransform()
                 .translate(offset)
                 .rotateY(angle));
@@ -95,7 +96,7 @@ public class ClipboardSpline extends Spline {
         clipboard.setOrigin(center.subtract(centerOffset).round());
         clipboardHolder.setTransform(transform);
 
-        Vector functionOffset = target.subtract(clipboard.getOrigin());
+        BlockVector3 functionOffset = target.subtract(clipboard.getOrigin());
         final int offX = functionOffset.getBlockX();
         final int offY = functionOffset.getBlockY();
         final int offZ = functionOffset.getBlockZ();

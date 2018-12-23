@@ -25,14 +25,13 @@ import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.exception.FaweException;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.operation.RunContext;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import java.util.Iterator;
 import java.util.List;
@@ -43,7 +42,7 @@ import java.util.List;
 public class RegionVisitor implements Operation {
 
     public final Region region;
-    public final Iterable<? extends Vector> iterable;
+    public final Iterable<? extends BlockVector3> iterable;
     public final RegionFunction function;
     private final MappedFaweQueue queue;
     private boolean useCuboidIterator = false;
@@ -65,10 +64,10 @@ public class RegionVisitor implements Operation {
     }
 
     public RegionVisitor(Region region, RegionFunction function, FaweQueue queue) {
-        this((Iterable<BlockVector>) region, function, queue);
+        this((Iterable<BlockVector3>) region, function, queue);
     }
 
-    public RegionVisitor(Iterable<? extends Vector> iterable, RegionFunction function, HasFaweQueue hasQueue) {
+    public RegionVisitor(Iterable<? extends BlockVector3> iterable, RegionFunction function, HasFaweQueue hasQueue) {
         region = (iterable instanceof Region) ? (Region) iterable : null;
         this.iterable = iterable;
         this.function = function;
@@ -94,8 +93,8 @@ public class RegionVisitor implements Operation {
              *  - Stop iteration on exception instead of hasNext
              *  - Do not calculate the stacktrace as it is expensive
              */
-            Iterator<? extends Vector> trailIter = iterable.iterator();
-            Iterator<? extends Vector> leadIter = iterable.iterator();
+            Iterator<? extends BlockVector3> trailIter = iterable.iterator();
+            Iterator<? extends BlockVector3> leadIter = iterable.iterator();
             int lastTrailChunkX = Integer.MIN_VALUE;
             int lastTrailChunkZ = Integer.MIN_VALUE;
             int lastLeadChunkX = Integer.MIN_VALUE;
@@ -103,7 +102,7 @@ public class RegionVisitor implements Operation {
             int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNKS;
             try {
                 for (; ; ) {
-                    Vector pt = trailIter.next();
+                    BlockVector3 pt = trailIter.next();
                     apply(pt);
                     int cx = pt.getBlockX() >> 4;
                     int cz = pt.getBlockZ() >> 4;
@@ -119,7 +118,7 @@ public class RegionVisitor implements Operation {
                             amount = 1;
                         }
                         for (int count = 0; count < amount; ) {
-                            Vector v = leadIter.next();
+                            BlockVector3 v = leadIter.next();
                             int vcx = v.getBlockX() >> 4;
                             int vcz = v.getBlockZ() >> 4;
                             if (vcx != lastLeadChunkX || vcz != lastLeadChunkZ) {
@@ -176,14 +175,14 @@ public class RegionVisitor implements Operation {
             } catch (Throwable ignore) {
             }
         } else {
-            for (Vector pt : iterable) {
+            for (BlockVector3 pt : iterable) {
                 apply(pt);
             }
         }
         return null;
     }
 
-    private void apply(Vector pt) throws WorldEditException {
+    private void apply(BlockVector3 pt) throws WorldEditException {
         if (function.apply(pt)) {
             affected++;
         }

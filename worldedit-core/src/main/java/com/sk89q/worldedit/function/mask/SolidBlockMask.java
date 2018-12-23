@@ -1,6 +1,11 @@
 package com.sk89q.worldedit.function.mask;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseBlock;
+=======
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.extent.Extent;
@@ -18,8 +23,16 @@ public class SolidBlockMask extends BlockTypeMask {
         return types;
     }
 
+<<<<<<< HEAD
     public SolidBlockMask(Extent extent) {
         super(extent, getTypes());
+=======
+    @Override
+    public boolean test(BlockVector3 vector) {
+        Extent extent = getExtent();
+        BlockState block = extent.getBlock(vector);
+        return block.getBlockType().getMaterial().isMovementBlocker();
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Nullable

@@ -2,9 +2,9 @@ package com.boydti.fawe.object.mask;
 
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 
 public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
@@ -41,7 +41,7 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         return test(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
     }
 

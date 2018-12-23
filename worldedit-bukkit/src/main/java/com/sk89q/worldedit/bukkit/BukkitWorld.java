@@ -21,13 +21,20 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.LazyBlock;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.history.change.BlockChange;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
@@ -35,6 +42,7 @@ import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
+
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -52,8 +60,6 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BukkitWorld extends AbstractWorld {
 
@@ -84,7 +90,7 @@ public class BukkitWorld extends AbstractWorld {
         List<Entity> ents = world.getEntities();
         List<com.sk89q.worldedit.entity.Entity> entities = new ArrayList<>();
         for (Entity ent : ents) {
-            if (region.contains(BukkitAdapter.asVector(ent.getLocation()))) {
+            if (region.contains(BukkitAdapter.asBlockVector(ent.getLocation()))) {
                 addEntities(ent, entities);
             }
         }
@@ -185,7 +191,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public int getBlockLightLevel(Vector pt) {
+    public int getBlockLightLevel(BlockVector3 pt) {
         return getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).getLightLevel();
     }
 
@@ -193,14 +199,14 @@ public class BukkitWorld extends AbstractWorld {
     public boolean regenerate(Region region, EditSession editSession) {
         com.sk89q.worldedit.world.block.BlockStateHolder[] history = new com.sk89q.worldedit.world.block.BlockState[16 * 16 * (getMaxY() + 1)];
 
-        for (Vector2D chunk : region.getChunks()) {
-            Vector min = new Vector(chunk.getBlockX() * 16, 0, chunk.getBlockZ() * 16);
+        for (BlockVector2 chunk : region.getChunks()) {
+            BlockVector3 min = new BlockVector3(chunk.getBlockX() * 16, 0, chunk.getBlockZ() * 16);
 
             // First save all the blocks inside
             for (int x = 0; x < 16; ++x) {
                 for (int y = 0; y < (getMaxY() + 1); ++y) {
                     for (int z = 0; z < 16; ++z) {
-                        Vector pt = min.add(x, y, z);
+                        BlockVector3 pt = min.add(x, y, z);
                         int index = y * 16 * 16 + z * 16 + x;
                         history[index] = editSession.getFullBlock(pt);
                     }
@@ -217,14 +223,14 @@ public class BukkitWorld extends AbstractWorld {
             for (int x = 0; x < 16; ++x) {
                 for (int y = 0; y < (getMaxY() + 1); ++y) {
                     for (int z = 0; z < 16; ++z) {
-                        Vector pt = min.add(x, y, z);
+                        BlockVector3 pt = min.add(x, y, z);
                         int index = y * 16 * 16 + z * 16 + x;
 
                         // We have to restore the block if it was outside
                         if (!region.contains(pt)) {
                             editSession.smartSetBlock(pt, history[index]);
                         } else { // Otherwise fool with history
-                            editSession.getChangeSet().add(new BlockChange(pt.toBlockVector(), history[index], editSession.getFullBlock(pt)));
+                            editSession.getChangeSet().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
                         }
                     }
                 }
@@ -263,7 +269,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean clearContainerBlockContents(Vector pt) {
+    public boolean clearContainerBlockContents(BlockVector3 pt) {
         Block block = getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
         if (block == null) {
             return false;
@@ -317,7 +323,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, Vector pt) {
+    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
         World world = getWorld();
         TreeType bukkitType = toBukkitTreeType(type);
         return type != null && world.generateTree(BukkitAdapter.adapt(world, pt), bukkitType,
@@ -325,13 +331,13 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public void dropItem(Vector pt, BaseItemStack item) {
+    public void dropItem(Vector3 pt, BaseItemStack item) {
         World world = getWorld();
         world.dropItemNaturally(BukkitAdapter.adapt(world, pt), BukkitAdapter.adapt(item));
     }
 
     @Override
-    public void checkLoadedChunk(Vector pt) {
+    public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
 
         if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
@@ -363,15 +369,15 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public void fixAfterFastMode(Iterable<BlockVector2D> chunks) {
+    public void fixAfterFastMode(Iterable<BlockVector2> chunks) {
         World world = getWorld();
-        for (BlockVector2D chunkPos : chunks) {
+        for (BlockVector2 chunkPos : chunks) {
             world.refreshChunk(chunkPos.getBlockX(), chunkPos.getBlockZ());
         }
     }
 
     @Override
-    public boolean playEffect(Vector position, int type, int data) {
+    public boolean playEffect(Vector3 position, int type, int data) {
         World world = getWorld();
 
         final Effect effect = effects.get(type);
@@ -430,18 +436,18 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public void simulateBlockMine(Vector pt) {
+    public void simulateBlockMine(BlockVector3 pt) {
         getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
     }
 
     @Override
-    public com.sk89q.worldedit.world.block.BlockState getBlock(Vector position) {
+    public com.sk89q.worldedit.world.block.BlockState getBlock(BlockVector3 position) {
         Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
         return BukkitAdapter.adapt(bukkitBlock.getBlockData());
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block, boolean notifyAndLight) {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             try {
@@ -467,12 +473,12 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public com.sk89q.worldedit.world.block.BlockState getLazyBlock(Vector position) {
+    public com.sk89q.worldedit.world.block.BlockState getLazyBlock(BlockVector3 position) {
         return getBlock(position);
     }
 
     @Override
-    public com.sk89q.worldedit.world.block.BlockState getFullBlock(Vector position) {
+    public com.sk89q.worldedit.world.block.BlockState getFullBlock(BlockVector3 position) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.getBlock(BukkitAdapter.adapt(getWorld(), position));
@@ -482,7 +488,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             int id = adapter.getBiomeId(getWorld().getBiome(position.getBlockX(), position.getBlockZ()));
@@ -493,7 +499,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             Biome bukkitBiome = adapter.getBiome(biome.getId());

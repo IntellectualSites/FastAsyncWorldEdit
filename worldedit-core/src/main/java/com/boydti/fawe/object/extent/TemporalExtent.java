@@ -1,13 +1,13 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
@@ -51,7 +51,7 @@ public class TemporalExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         if (position.getX() == x && position.getY() == y && position.getZ() == z) {
             return block;
         }
@@ -59,7 +59,7 @@ public class TemporalExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BlockState getLazyBlock(Vector position) {
+    public BlockState getLazyBlock(BlockVector3 position) {
         if (position.getX() == x && position.getY() == y && position.getZ() == z) {
             return block;
         }
@@ -75,7 +75,7 @@ public class TemporalExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         if (position.getX() == bx && position.getZ() == bz) {
             return biome;
         }

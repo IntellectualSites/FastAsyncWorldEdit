@@ -2,15 +2,14 @@ package com.boydti.fawe.object.regions;
 
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.collection.BlockVectorSet;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.World;
@@ -48,18 +47,18 @@ public class FuzzyRegion extends AbstractRegion {
     public void select(int x, int y, int z) {
         RecursiveVisitor search = new RecursiveVisitor(mask, new RegionFunction() {
             @Override
-            public boolean apply(Vector p) throws WorldEditException {
+            public boolean apply(BlockVector3 p) throws WorldEditException {
                 setMinMax(p.getBlockX(), p.getBlockY(), p.getBlockZ());
                 return true;
             }
         }, 256, extent instanceof HasFaweQueue ? (HasFaweQueue) extent : null);
         search.setVisited(set);
-        search.visit(new Vector(x, y, z));
+        search.visit(new BlockVector3(x, y, z));
         Operations.completeBlindly(search);
     }
 
     @Override
-    public Iterator<BlockVector> iterator() {
+    public Iterator<BlockVector3> iterator() {
         return (Iterator) set.iterator();
     }
 
@@ -94,32 +93,32 @@ public class FuzzyRegion extends AbstractRegion {
     }
 
     @Override
-    public Vector getMinimumPoint() {
-        return new Vector(minX, minY, minZ);
+    public BlockVector3 getMinimumPoint() {
+        return new BlockVector3(minX, minY, minZ);
     }
 
     @Override
-    public Vector getMaximumPoint() {
-        return new Vector(maxX, maxY, maxZ);
+    public BlockVector3 getMaximumPoint() {
+        return new BlockVector3(maxX, maxY, maxZ);
     }
 
     @Override
-    public void expand(Vector... changes) throws RegionOperationException {
+    public void expand(BlockVector3... changes) throws RegionOperationException {
         throw new RegionOperationException("Selection cannot expand");
     }
 
     @Override
-    public void contract(Vector... changes) throws RegionOperationException {
+    public void contract(BlockVector3... changes) throws RegionOperationException {
         throw new RegionOperationException("Selection cannot contract");
     }
 
     @Override
-    public boolean contains(Vector position) {
+    public boolean contains(BlockVector3 position) {
         return contains(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
     @Override
-    public void shift(Vector change) throws RegionOperationException {
+    public void shift(BlockVector3 change) throws RegionOperationException {
         throw new RegionOperationException("Selection cannot be shifted");
     }
 

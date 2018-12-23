@@ -32,6 +32,9 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
@@ -46,22 +49,22 @@ import javax.annotation.Nullable;
  */
 public interface SimpleWorld extends World {
     @Override
-    default boolean useItem(Vector position, BaseItem item, Direction face) {
+    default boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
         return false;
     }
 
     @Override
-    default boolean setBlock(Vector position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    default boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
         return setBlock(position, block);
     }
 
     @Override
-    default BlockState getFullBlock(Vector position) {
+    default BlockState getFullBlock(BlockVector3 position) {
         return getLazyBlock(position);
     }
 
     @Override
-    boolean setBlock(Vector pt, BlockStateHolder block) throws WorldEditException;
+    boolean setBlock(BlockVector3 pt, BlockStateHolder block) throws WorldEditException;
 
     @Override
     default int getMaxY() {
@@ -74,43 +77,43 @@ public interface SimpleWorld extends World {
     }
 
     @Override
-    default void dropItem(Vector pt, BaseItemStack item, int times) {
+    default void dropItem(Vector3 pt, BaseItemStack item, int times) {
         for (int i = 0; i < times; ++i) {
             dropItem(pt, item);
         }
     }
 
     @Override
-    default void checkLoadedChunk(Vector pt) {
+    default void checkLoadedChunk(BlockVector3 pt) {
     }
 
     @Override
-    default void fixAfterFastMode(Iterable<BlockVector2D> chunks) {
+    default void fixAfterFastMode(Iterable<BlockVector2> chunks) {
     }
 
     @Override
-    default void fixLighting(Iterable<BlockVector2D> chunks) {
+    default void fixLighting(Iterable<BlockVector2> chunks) {
     }
 
-    @Override
-    default boolean playEffect(Vector position, int type, int data) {
+//    @Override
+    default boolean playEffect(BlockVector3 position, int type, int data) {
         return false;
     }
 
     @Override
-    default boolean queueBlockBreakEffect(Platform server, Vector position, BlockType blockType, double priority) {
+    default boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
         SetQueue.IMP.addTask(() -> playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4));
         return true;
     }
 
     @Override
-    default Vector getMinimumPoint() {
-        return new Vector(-30000000, 0, -30000000);
+    default BlockVector3 getMinimumPoint() {
+        return new BlockVector3(-30000000, 0, -30000000);
     }
 
     @Override
-    default Vector getMaximumPoint() {
-        return new Vector(30000000, 255, 30000000);
+    default BlockVector3 getMaximumPoint() {
+        return new BlockVector3(30000000, 255, 30000000);
     }
 
     @Override
@@ -120,12 +123,12 @@ public interface SimpleWorld extends World {
 
 
     @Override
-    default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, Vector position) throws MaxChangedBlocksException {
+    default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
         return false;
     }
 
     @Override
-    default void simulateBlockMine(Vector position) {
+    default void simulateBlockMine(BlockVector3 position) {
         try {
             setBlock(position, BlockTypes.AIR.getDefaultState());
         } catch (WorldEditException e) {

@@ -432,6 +432,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         });
     }
 
+<<<<<<< HEAD
     public boolean act(BrushAction action, Platform server, LocalConfiguration config, Player player, LocalSession session) {
         switch (action) {
             case PRIMARY:
@@ -474,6 +475,14 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 MaskIntersection newMask = new MaskIntersection(existingMask);
                 newMask.add(mask);
                 editSession.setMask(newMask);
+=======
+            try {
+                brush.build(editSession, target.toVector().toBlockPoint(), material, size);
+            } catch (MaxChangedBlocksException e) {
+                player.printError("Max blocks change limit reached.");
+            } finally {
+                session.remember(editSession);
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
         }
         Mask sourceMask = current.getSourceMask();

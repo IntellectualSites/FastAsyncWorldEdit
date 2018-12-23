@@ -16,7 +16,7 @@ import com.boydti.fawe.object.RunnableVal4;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import java.io.File;
 import java.io.IOException;
@@ -155,11 +155,11 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
         return super.setMCA(mcaX, mcaZ, region, whileLocked, save, unload);
     }
 
-    public void pasteRegion(MCAQueue from, final RegionWrapper regionFrom, Vector offset) throws IOException {
+    public void pasteRegion(MCAQueue from, final RegionWrapper regionFrom, BlockVector3 offset) throws IOException {
         pasteRegion(from, regionFrom, offset, new NullAnvilHistory());
     }
 
-    public void pasteRegion(MCAQueue from, final RegionWrapper regionFrom, Vector offset, IAnvilHistory history) throws IOException {
+    public void pasteRegion(MCAQueue from, final RegionWrapper regionFrom, BlockVector3 offset, IAnvilHistory history) throws IOException {
         int oX = offset.getBlockX();
         int oZ = offset.getBlockZ();
         int oY = offset.getBlockY();
