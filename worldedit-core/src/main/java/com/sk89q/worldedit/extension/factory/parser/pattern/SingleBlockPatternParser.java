@@ -17,24 +17,30 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.extension.factory;
+package com.sk89q.worldedit.extension.factory.parser.pattern;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BaseItem;
-import com.sk89q.worldedit.extension.factory.parser.DefaultItemParser;
-import com.sk89q.worldedit.internal.registry.AbstractFactory;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.function.pattern.BlockPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.registry.InputParser;
 
-public class ItemFactory extends AbstractFactory<BaseItem> {
+public class SingleBlockPatternParser extends InputParser<Pattern> {
 
-    /**
-     * Create a new instance.
-     *
-     * @param worldEdit the WorldEdit instance.
-     */
-    public ItemFactory(WorldEdit worldEdit) {
+    public SingleBlockPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
+    }
 
-        register(new DefaultItemParser(worldEdit));
+    @Override
+    public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
+        String[] items = input.split(",");
+
+        if (items.length == 1) {
+            return new BlockPattern(worldEdit.getBlockFactory().parseFromInput(items[0], context));
+        } else {
+            return null;
+        }
     }
 
 }

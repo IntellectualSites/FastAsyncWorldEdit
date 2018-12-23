@@ -22,9 +22,9 @@ import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extension.factory.DefaultMaskParser;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
-import com.sk89q.worldedit.extension.factory.HashTagPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -102,7 +102,7 @@ public class FaweAPI {
      * @see com.sk89q.worldedit.command.PatternCommands
      */
     public static boolean registerPatterns(Object methods) {
-        HashTagPatternParser parser = getParser(HashTagPatternParser.class);
+        DefaultPatternParser parser = getParser(DefaultPatternParser.class);
         if (parser != null) parser.register(methods);
         return parser != null;
     }

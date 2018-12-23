@@ -59,9 +59,10 @@ import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
-import com.sk89q.worldedit.extension.factory.DefaultMaskParser;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
-import com.sk89q.worldedit.extension.factory.HashTagPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.CommandManager;
@@ -128,7 +129,7 @@ public class UtilityCommands extends MethodCommands {
             queued = false
     )
     public void patterns(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-        displayModifierHelp(player, HashTagPatternParser.class, args);
+        displayModifierHelp(player, DefaultPatternParser.class, args);
     }
 
     @Command(

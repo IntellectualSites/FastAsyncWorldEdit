@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.extension.factory;
+package com.sk89q.worldedit.extension.factory.parser;
 
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.jnbt.JSON2NBT;
