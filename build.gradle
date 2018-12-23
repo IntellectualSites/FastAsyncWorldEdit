@@ -77,7 +77,7 @@ subprojects {
         maven { url "http://maven.sk89q.com/repo/" }
         maven { url "http://repo.maven.apache.org/maven2" }
         // Fawe
-        maven {url "http://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/"}
+        maven {url "https://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/"}
         maven {url "https://mvnrepository.com/artifact/"}
         maven {url "http://repo.dmulloy2.net/content/groups/public/"}
         maven {url "https://repo.destroystokyo.com/repository/maven-public//"}
