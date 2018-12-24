@@ -19,23 +19,16 @@
 
 package com.sk89q.worldedit.world.registry;
 
-<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.world.item.ItemType;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
-=======
-import com.sk89q.worldedit.world.item.ItemType;
-
-import javax.annotation.Nullable;
->>>>>>> b75d5149... Fixed the bundle being directly used outside of the registry system.
 
 public interface ItemRegistry {
 
     /**
-<<<<<<< HEAD
      * Create a new item using its ID.
      *
      * @param id the id
@@ -52,8 +45,6 @@ public interface ItemRegistry {
     }
     
     /**
-=======
->>>>>>> b75d5149... Fixed the bundle being directly used outside of the registry system.
      * Gets the name for the given item.
      *
      * @param itemType the item

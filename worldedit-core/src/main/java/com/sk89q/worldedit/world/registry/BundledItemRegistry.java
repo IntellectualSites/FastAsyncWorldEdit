@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.registry;
 
-<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
@@ -27,11 +26,6 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
-=======
-import com.sk89q.worldedit.world.item.ItemType;
-
-import javax.annotation.Nullable;
->>>>>>> b75d5149... Fixed the bundle being directly used outside of the registry system.
 
 /**
  * A item registry that uses {@link BundledItemRegistry} to serve information
@@ -41,7 +35,6 @@ public class BundledItemRegistry implements ItemRegistry {
 
     @Nullable
     @Override
-<<<<<<< HEAD
     public BaseItem createFromId(String id) {
         ItemType itemType = ItemTypes.get(id);
         return itemType == null ? null : new BaseItem(itemType);
@@ -54,8 +47,6 @@ public class BundledItemRegistry implements ItemRegistry {
 
     @Nullable
     @Override
-=======
->>>>>>> b75d5149... Fixed the bundle being directly used outside of the registry system.
     public String getName(ItemType itemType) {
         BundledItemData.ItemEntry itemEntry = BundledItemData.getInstance().findById(itemType.getId());
         return itemEntry != null ? itemEntry.localizedName : null;
