@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.block;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.util.MathMan;
@@ -823,6 +825,24 @@ public enum BlockTypes implements BlockType {
     public List<BlockState> getAllStates() {
         if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
         return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> states[i]).collect(Collectors.toList());
+    }
+
+    public BlockState getState(Map<Property<?>, Object> key) {
+        int id = getInternalId();
+        for (Map.Entry<Property<?>, Object> iter : key.entrySet()) {
+            Property<?> prop = iter.getKey();
+            Object value = iter.getValue();
+
+            /*
+             * TODO:
+             * This is likely wrong. The only place this seems to currently (Dec 23 2018)
+             * be invoked is via ForgeWorld, and value is a String when invoked there...
+             */
+            AbstractProperty btp = settings.propertiesMap.get(prop.getName());
+            checkArgument(btp != null, "%s has no property named %s", this, prop.getName());
+            id = btp.modify(id, btp.getValueFor((String)value));
+        }
+        return withStateId(id);
     }
 
     @Deprecated

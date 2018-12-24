@@ -117,6 +117,11 @@ public class AbstractProperty<T> implements Property<T> {
     }
 
     @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{name=" + name + "}";
+    }
+
+    @Override
     public int hashCode() {
         return name.hashCode();
     }
