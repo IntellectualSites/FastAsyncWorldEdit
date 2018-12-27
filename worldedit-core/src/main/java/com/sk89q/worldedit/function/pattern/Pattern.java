@@ -28,6 +28,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.internal.expression.runtime.Return;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 
@@ -55,7 +56,7 @@ public interface Pattern{
      * @param position the position
      * @return a block
      */
-    BlockStateHolder apply(BlockVector3 position);
+    BaseBlock apply(BlockVector3 position);
 
     default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return extent.setBlock(set, apply(get));

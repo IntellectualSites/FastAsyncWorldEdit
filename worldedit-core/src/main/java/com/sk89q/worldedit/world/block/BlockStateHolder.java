@@ -31,7 +31,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface BlockStateHolder<T extends BlockStateHolder> extends FawePattern, TileEntityBlock {
+public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePattern, TileEntityBlock {
 
     /**
      * Get the block type
@@ -121,8 +121,7 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
      * @param o other block
      * @return true if equal
      */
-    @Deprecated
-    boolean equalsFuzzy(BlockStateHolder o);
+    boolean equalsFuzzy(BlockStateHolder<?> o);
 
     /**
      * Returns an immutable {@link BlockState} from this BlockStateHolder.

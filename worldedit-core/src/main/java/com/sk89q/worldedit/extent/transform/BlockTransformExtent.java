@@ -138,7 +138,7 @@ public class BlockTransformExtent extends ResettableExtent {
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return super.setBlock(location, transformFastInverse((BlockState)block));
     }
-
+    
     private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
 
     /**

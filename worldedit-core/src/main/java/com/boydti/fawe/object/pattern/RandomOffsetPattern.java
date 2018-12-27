@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.pattern;
 
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -34,7 +34,7 @@ public class RandomOffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         mutable.mutX((position.getX() + r.nextInt(dx2) - dx));
         mutable.mutY((position.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((position.getZ() + r.nextInt(dz2) - dz));

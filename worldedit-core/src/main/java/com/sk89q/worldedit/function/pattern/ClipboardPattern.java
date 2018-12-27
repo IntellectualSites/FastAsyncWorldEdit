@@ -6,7 +6,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,23 +37,14 @@ public class ClipboardPattern extends AbstractPattern {
     }
 
     @Override
-//<<<<<<< HEAD
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         int xp = position.getBlockX() % sx;
         int yp = position.getBlockY() % sy;
         int zp = position.getBlockZ() % sz;
         if (xp < 0) xp += sx;
         if (yp < 0) yp += sy;
         if (zp < 0) zp += sz;
-        return clipboard.getBlock(BlockVector3.at(min.getX() + xp, min.getY() + yp, min.getZ() + zp));
-//=======
-//    public BlockStateHolder apply(BlockVector3 position) {
-//        int xp = Math.abs(position.getBlockX()) % size.getBlockX();
-//        int yp = Math.abs(position.getBlockY()) % size.getBlockY();
-//        int zp = Math.abs(position.getBlockZ()) % size.getBlockZ();
-//
-//        return clipboard.getFullBlock(clipboard.getMinimumPoint().add(xp, yp, zp));
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        return clipboard.getFullBlock(BlockVector3.at(min.getX() + xp, min.getY() + yp, min.getZ() + zp));
     }
 
 

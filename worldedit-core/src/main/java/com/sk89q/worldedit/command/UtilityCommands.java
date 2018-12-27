@@ -88,6 +88,7 @@ import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.imageio.ImageIO;

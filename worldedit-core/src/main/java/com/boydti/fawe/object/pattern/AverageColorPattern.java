@@ -4,7 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -26,12 +26,12 @@ public class AverageColorPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
-        BlockStateHolder block = getExtent().getBlock(position);
+    public BaseBlock apply(BlockVector3 position) {
+        BaseBlock block = getExtent().getFullBlock(position);
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(block.getBlockType());
         int newColor = util.averageColor(currentColor, color);
-        return util.getNearestBlock(newColor).getDefaultState();
+        return util.getNearestBlock(newColor).getDefaultState().toBaseBlock();
     }
 
     @Override

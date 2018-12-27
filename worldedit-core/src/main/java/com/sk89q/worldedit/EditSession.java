@@ -1027,7 +1027,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return whether the block changed
      * @throws WorldEditException thrown on a set error
      */
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block, Stage stage) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, Stage stage) throws WorldEditException {
         this.changes++;
         switch (stage) {
             case BEFORE_HISTORY:
@@ -1041,7 +1041,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         throw new RuntimeException("New enum entry added that is unhandled here");
     }
 
-    public boolean rawSetBlock(BlockVector3 position, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean rawSetBlock(BlockVector3 position, B block) {
         try {
             return this.bypassAll.setBlock(position, block);
         } catch (final WorldEditException e) {
@@ -1056,7 +1056,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param block the block
      * @return whether the block changed
      */
-    public boolean smartSetBlock(BlockVector3 position, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean smartSetBlock(BlockVector3 position, B block) {
         try {
             return setBlock(position, block, Stage.BEFORE_REORDER);
         } catch (WorldEditException e) {
@@ -1065,7 +1065,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     @Override
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws MaxChangedBlocksException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
         this.changes++;
         try {
             return this.extent.setBlock(position, block);
@@ -1611,7 +1611,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     @SuppressWarnings("deprecation")
-    public int setBlocks(final Region region, final BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> int setBlocks(final Region region, final B block) {
         checkNotNull(region);
         checkNotNull(block);
         if (canBypassAll(region, false, true) && !block.hasNbtData()) {
@@ -1670,7 +1670,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int replaceBlocks(Region region, Set<BlockStateHolder> filter, BlockStateHolder replacement) throws MaxChangedBlocksException {
+    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BlockStateHolder> filter, B replacement) throws MaxChangedBlocksException {
         return replaceBlocks(region, filter, new BlockPattern(replacement));
     }
 
@@ -1748,7 +1748,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     @SuppressWarnings("deprecation")
-    public int makeCuboidFaces(final Region region, final BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> int makeCuboidFaces(final Region region, final B block) {
         return this.makeCuboidFaces(region, (Pattern) (block));
     }
 
@@ -1803,7 +1803,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     @SuppressWarnings("deprecation")
-    public int makeCuboidWalls(final Region region, final BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> int makeCuboidWalls(final Region region, final B block) {
         return this.makeCuboidWalls(region, (Pattern) (block));
     }
 
@@ -1865,7 +1865,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int overlayCuboidBlocks(Region region, BlockStateHolder block) throws MaxChangedBlocksException {
+    public <B extends BlockStateHolder<B>> int overlayCuboidBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(block);
         return this.overlayCuboidBlocks(region, (Pattern) (block));
     }
@@ -2947,7 +2947,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
         final ArbitraryShape shape = new ArbitraryShape(region) {
             @Override
-            public BlockStateHolder getMaterial(final int x, final int y, final int z, final BlockStateHolder defaultMaterial) {
+            public BaseBlock getMaterial(final int x, final int y, final int z, final BaseBlock defaultMaterial) {
                 //TODO Optimize - avoid vector creation (math)
 //                final Vector3 current = mutablev.setComponents(x, y, z);
 //            protected BlockStateHolder getMaterial(int x, int y, int z, BlockStateHolder defaultMaterial) {
@@ -2961,7 +2961,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                         return null;
                     }
 
-                    return BlockTypes.get((int) typeVariable.getValue()).withPropertyId((int) dataVariable.getValue());
+                    return BlockTypes.get((int) typeVariable.getValue()).withPropertyId((int) dataVariable.getValue()).toBaseBlock();
                 } catch (final Exception e) {
                     Fawe.debug("Failed to create shape: " + e);
                     return null;

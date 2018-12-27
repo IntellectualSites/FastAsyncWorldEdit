@@ -202,10 +202,10 @@ public class WorldEditBinding extends BindingHelper {
         return result instanceof BlockState ? (BlockState) result : result.toImmutableState();
     }
 
-    @BindingMatch(type = BaseBlock.class,
+    @BindingMatch(type = {BaseBlock.class, BlockState.class, BlockStateHolder.class},
             behavior = BindingBehavior.CONSUMES,
             consumedCount = 1)
-    public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, WorldEditException {
+public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, WorldEditException {
         return new BaseBlock(getBlockState(context));
     }
 
@@ -360,7 +360,6 @@ public class WorldEditBinding extends BindingHelper {
         String input = context.next();
         if (input != null) {
             if (MathMan.isInteger(input)) return new BaseBiome(Integer.parseInt(input));
-
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
             List<BaseBiome> knownBiomes = biomeRegistry.getBiomes();

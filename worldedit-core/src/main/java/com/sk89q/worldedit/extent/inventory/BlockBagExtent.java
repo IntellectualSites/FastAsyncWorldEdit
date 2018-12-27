@@ -86,12 +86,12 @@ public class BlockBagExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 pos, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 pos, B block) throws WorldEditException {
         return setBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), block);
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         if(blockBag != null) {
             BlockStateHolder lazyBlock = getExtent().getLazyBlock(x, y, z);
             BlockType fromType = lazyBlock.getBlockType();

@@ -2,7 +2,7 @@ package com.boydti.fawe.object.pattern;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.PseudoRandom;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -38,7 +38,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         return pattern.apply(travel(position));
     }
 

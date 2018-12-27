@@ -2,7 +2,7 @@ package com.boydti.fawe.object.pattern;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.TextureUtil;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -28,9 +28,9 @@ public class ShadePattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         BlockType block = extent.getBlockType(position);
-        return (darken ? util.getDarkerBlock(block) : util.getLighterBlock(block)).getDefaultState();
+        return (darken ? util.getDarkerBlock(block) : util.getLighterBlock(block)).getDefaultState().toBaseBlock();
     }
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {

@@ -326,8 +326,8 @@ public class BlockType implements FawePattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
-        return this.getDefaultState();
+    public BaseBlock apply(BlockVector3 position) {
+        return this.getDefaultState().toBaseBlock();
     }
 
     public Mask toMask(Extent extent) {

@@ -54,7 +54,7 @@ public interface SimpleWorld extends World {
     }
 
     @Override
-    default boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
         return setBlock(position, block);
     }
 
@@ -64,7 +64,7 @@ public interface SimpleWorld extends World {
     }
 
     @Override
-    boolean setBlock(BlockVector3 pt, BlockStateHolder block) throws WorldEditException;
+    <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 pt, B block) throws WorldEditException;
 
     @Override
     default int getMaxY() {

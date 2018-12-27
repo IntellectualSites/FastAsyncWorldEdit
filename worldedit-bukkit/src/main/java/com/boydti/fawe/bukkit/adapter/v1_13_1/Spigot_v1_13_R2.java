@@ -29,7 +29,6 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.*;
@@ -53,6 +52,7 @@ import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import javax.annotation.Nullable;
@@ -357,7 +357,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     @SuppressWarnings("unchecked")
     @Override
-    public Map<String, ? extends Property> getProperties(BlockType blockType) {
+    public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
         Block block;
         try {
             block = IRegistry.BLOCK.getOrDefault(new MinecraftKey(blockType.getNamespace(), blockType.getResource()));
@@ -369,7 +369,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             logger.warning("Failed to find properties for " + blockType.getId());
             return Collections.emptyMap();
         }
-        Map<String, Property> properties = Maps.newLinkedHashMap();
+        Map<String, Property<?>> properties = Maps.newLinkedHashMap();
         BlockStateList<Block, IBlockData> blockStateList = block.getStates();
         for (IBlockState state : blockStateList.d()) {
             Property property;
@@ -552,6 +552,16 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
 	@Override
 	public void notifyAndLightBlock(Location position, BlockState previousType) {
+		this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
+	}
+
+	@Override
+	public boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
+		return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
+	}
+
+	@Override
+	public void sendFakeOP(Player player) {
 		// TODO Auto-generated method stub
 		
 	}

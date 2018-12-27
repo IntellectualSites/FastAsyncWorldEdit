@@ -5,7 +5,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.DataAnglePattern;
 import com.boydti.fawe.util.TextureHolder;
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -32,14 +32,14 @@ public class AngleColorPattern extends DataAnglePattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
-        BlockStateHolder block = extent.getBlock(position);
+    public BaseBlock apply(BlockVector3 position) {
+        BaseBlock block = extent.getFullBlock(position);
         int slope = getSlope(block, position);
         if (slope == -1) return block;
         int color = util.getTextureUtil().getColor(block.getBlockType());
         if (color == 0) return block;
         int newColor = getColor(color, slope);
-        return util.getTextureUtil().getNearestBlock(newColor).getDefaultState();
+        return util.getTextureUtil().getNearestBlock(newColor).getDefaultState().toBaseBlock();
     }
 
     @Override

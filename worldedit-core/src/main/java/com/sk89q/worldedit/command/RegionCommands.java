@@ -74,6 +74,7 @@ import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

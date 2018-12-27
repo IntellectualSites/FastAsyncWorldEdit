@@ -192,25 +192,25 @@ public class PropertyPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
-        BlockState block = getExtent().getBlock(position);
+    public BaseBlock apply(BlockVector3 position) {
+        BaseBlock block = getExtent().getFullBlock(position);
         return apply(block, block);
     }
 
-    public BlockState apply(BlockState block, BlockState orDefault) {
+    public BaseBlock apply(BaseBlock block, BaseBlock orDefault) {
         int ordinal = block.getOrdinal();
         int newOrdinal = transformed[ordinal];
         if (newOrdinal != ordinal) {
             CompoundTag nbt = block.getNbtData();
             BlockState newState = BlockState.getFromOrdinal(newOrdinal);
-            return nbt != null ? new BaseBlock(newState, nbt).toImmutableState() : newState;
+            return nbt != null ? new BaseBlock(newState, nbt) : newState.toBaseBlock();
         }
         return orDefault;
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-        BlockState block = getExtent().getBlock(get);
+        BaseBlock block = getExtent().getFullBlock(get);
         block = apply(block, null);
         if (block != null) {
             return extent.setBlock(set, block);

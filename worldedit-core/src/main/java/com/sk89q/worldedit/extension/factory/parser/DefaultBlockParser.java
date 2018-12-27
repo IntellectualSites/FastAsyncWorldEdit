@@ -34,7 +34,6 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.MobSpawnerBlock;
 import com.sk89q.worldedit.blocks.SignBlock;
 import com.sk89q.worldedit.blocks.SkullBlock;
@@ -53,8 +52,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -69,7 +68,7 @@ import java.util.stream.Stream;
 /**
  * Parses block input strings.
  */
-public class DefaultBlockParser extends InputParser<BlockStateHolder> {
+public class DefaultBlockParser extends InputParser<BaseBlock> {
 
     public DefaultBlockParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -89,13 +88,14 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
         }
     }
 
-    public BlockStateHolder parseFromInput(String input, ParserContext context)
+    @Override
+    public BaseBlock parseFromInput(String input, ParserContext context)
             throws InputParseException {
         String originalInput = input;
         input = input.replace(";", "|");
         Exception suppressed = null;
         try {
-            BlockStateHolder modified = parseLogic(input, context);
+            BaseBlock modified = parseLogic(input, context);
             if (modified != null) {
                 return modified;
             }
@@ -164,7 +164,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
         }
     }
 
-    private BlockStateHolder parseLogic(String input, ParserContext context) throws InputParseException {
+    private BaseBlock parseLogic(String input, ParserContext context) throws InputParseException {
         String[] blockAndExtraData = input.trim().split("\\|", 2);
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
 
@@ -320,7 +320,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
 
             return new SkullBlock(state, type.replace(" ", "_")); // valid MC usernames
         } else {
-            return state;
+            return state.toBaseBlock();
         }
     }
 }

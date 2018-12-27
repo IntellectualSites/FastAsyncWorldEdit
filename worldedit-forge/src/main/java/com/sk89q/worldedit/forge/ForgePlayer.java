@@ -175,8 +175,12 @@ public class ForgePlayer extends AbstractPlayerActor {
 
     @Override
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     public void sendFakeBlock(BlockVector3 pos, BlockStateHolder block) {
+=======
+    public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
+>>>>>>> 3fefcbf9... Remove all raw usages of BSH, improve API generics
         BlockPos loc = ForgeAdapter.toBlockPos(pos);
         if (block == null) {
             // TODO

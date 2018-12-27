@@ -135,6 +135,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     @Override
     public void close() {
         IMP.close();
+
     }
 
     @Override
@@ -197,18 +198,10 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     @Override
     public BlockState getBlock(BlockVector3 position) {
         if (region.contains(position)) {
-//<<<<<<< HEAD
             int x = position.getBlockX() - mx;
             int y = position.getBlockY() - my;
             int z = position.getBlockZ() - mz;
             return IMP.getBlock(x, y, z);
-//=======
-//            BlockVector3 v = position.subtract(region.getMinimumPoint());
-//            BlockStateHolder block = blocks[v.getBlockX()][v.getBlockY()][v.getBlockZ()];
-//            if (block != null) {
-//                return block.toImmutableState();
-//            }
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         }
         return EditSession.nullBlock;
     }
@@ -239,21 +232,12 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (region.contains(location)) {
             final int x = location.getBlockX();
             final int y = location.getBlockY();
             final int z = location.getBlockZ();
             return setBlock(x, y, z, block);
-//=======
-//    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
-//        if (region.contains(position)) {
-//            BlockVector3 v = position.subtract(region.getMinimumPoint());
-//            blocks[v.getBlockX()][v.getBlockY()][v.getBlockZ()] = block;
-//            return true;
-//        } else {
-//            return false;
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         }
         return false;
     }
@@ -266,7 +250,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         x -= mx;
         y -= my;
         z -= mz;

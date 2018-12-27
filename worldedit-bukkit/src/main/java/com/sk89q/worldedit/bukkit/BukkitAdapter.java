@@ -146,8 +146,8 @@ public enum BukkitAdapter {
         return getAdapter().adapt(material);
     }
 
-    public static BlockData adapt(BlockStateHolder block) {
-        return getAdapter().adapt(block);
+	public static <B extends BlockStateHolder<B>> BlockData adapt(B block) {
+		return getAdapter().adapt(block);
     }
 
     public static BlockData getBlockData(int combinedId) {

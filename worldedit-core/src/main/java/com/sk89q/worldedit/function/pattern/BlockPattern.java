@@ -12,10 +12,15 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 @Deprecated
 public class BlockPattern implements Pattern {
 
-    private BlockStateHolder block;
+    private BaseBlock block;
 
-    public BlockPattern(BlockStateHolder block) {
-        this.block = block;
+    /**
+     * Create a new pattern with the given block.
+     *
+     * @param block the block
+     */
+    public BlockPattern(BlockStateHolder<?> block) {
+        setBlock(block);
     }
 
     /**
@@ -23,7 +28,7 @@ public class BlockPattern implements Pattern {
      *
      * @return the block that is always returned
      */
-    public BlockStateHolder getBlock() {
+    public BaseBlock getBlock() {
         return block;
     }
 
@@ -32,13 +37,13 @@ public class BlockPattern implements Pattern {
      *
      * @param block the block
      */
-    public void setBlock(BlockStateHolder block) {
+    public void setBlock(BlockStateHolder<?> block) {
         checkNotNull(block);
-        this.block = block;
+        this.block = block.toBaseBlock();
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         return block;
     }
 

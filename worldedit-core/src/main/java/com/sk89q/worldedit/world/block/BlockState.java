@@ -64,6 +64,18 @@ public class BlockState implements BlockStateHolder<BlockState> {
     }
     
     /**
+     * Creates a fuzzy BlockState. This can be used for partial matching.
+     *
+     * @param blockType The block type
+     * @param values The block state values
+     */
+    private BlockState(BlockType blockType, Map<Property<?>, Object> values) {
+        this.blockType = blockType;
+//        this.values = values;
+//        this.fuzzy = true;
+    }
+    
+    /**
      * Returns a temporary BlockState for a given internal id
      * @param combinedId
      * @deprecated magic number
@@ -224,8 +236,8 @@ public class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    public BlockState apply(BlockVector3 position) {
-        return this;
+    public BaseBlock apply(BlockVector3 position) {
+        return this.toBaseBlock();
     }
 
     @Override
@@ -330,15 +342,6 @@ public class BlockState implements BlockStateHolder<BlockState> {
     	return this.blockType;
     }
 
-    /**
-     * Deprecated, use masks - not try to this fuzzy/non fuzzy state nonsense
-     * @return
-     */
-    @Deprecated
-    public BlockState toFuzzy() {
-        return this;
-    }
-
     @Override
     public int hashCode() {
         return getOrdinal();
@@ -349,10 +352,42 @@ public class BlockState implements BlockStateHolder<BlockState> {
         return this == obj;
     }
 
+    public BlockState toFuzzy() {
+        return new BlockState(this.getBlockType(), new HashMap<>());
+    }
+
     @Override
-    @Deprecated
-    public boolean equalsFuzzy(BlockStateHolder o) {
-        return o.getOrdinal() == this.getOrdinal();
+    public boolean equalsFuzzy(BlockStateHolder<?> o) {
+        if (this == o) {
+            // Added a reference equality check for
+            return true;
+        }
+        if (!getBlockType().equals(o.getBlockType())) {
+            return false;
+        }
+
+        Set<Property<?>> differingProperties = new HashSet<>();
+        for (Object state : o.getStates().keySet()) {
+            if (getState((Property<?>) state) == null) {
+                differingProperties.add((Property<?>) state);
+            }
+        }
+        for (Property<?> property : getStates().keySet()) {
+            if (o.getState(property) == null) {
+                differingProperties.add(property);
+            }
+        }
+
+        for (Property<?> property : getStates().keySet()) {
+            if (differingProperties.contains(property)) {
+                continue;
+            }
+            if (!Objects.equals(getState(property), o.getState(property))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

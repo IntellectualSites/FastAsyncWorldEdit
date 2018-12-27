@@ -10,7 +10,7 @@ import com.sk89q.worldedit.extent.Extent;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -56,24 +56,8 @@ public class RandomPattern extends AbstractPattern {
         this.patterns.add(pattern);
     }
 
-//<<<<<<< HEAD
     public Set<Pattern> getPatterns() {
         return patterns;
-//=======
-//    @Override
-//    public BlockStateHolder apply(BlockVector3 position) {
-//        double r = random.nextDouble();
-//        double offset = 0;
-//
-//        for (Chance chance : patterns) {
-//            if (r <= (offset + chance.getChance()) / max) {
-//                return chance.getPattern().apply(position);
-//            }
-//            offset += chance.getChance();
-//        }
-//
-//        throw new RuntimeException("ProportionalFillPattern");
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     public RandomCollection<Pattern> getCollection() {
@@ -81,7 +65,7 @@ public class RandomPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 get) {
+    public BaseBlock apply(BlockVector3 get) {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(get);
     }
 

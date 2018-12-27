@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.pattern;
 
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -18,7 +18,7 @@ public class Linear3DBlockPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         int index = (position.getBlockX() + position.getBlockY() + position.getBlockZ()) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;

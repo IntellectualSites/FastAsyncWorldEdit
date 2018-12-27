@@ -3,6 +3,7 @@ package com.boydti.fawe.object;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.extent.ExtentHeightCacher;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -40,12 +41,12 @@ public class DataAnglePattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         BlockStateHolder block = extent.getBlock(position);
         int slope = getSlope(block, position);
-        if (slope == -1) return block;
+        if (slope == -1) return block.toBaseBlock();
         int data = (Math.min(slope, 255)) >> 4;
-        return block.withPropertyId(data);
+        return block.withPropertyId(data).toBaseBlock();
     }
 
     @Override

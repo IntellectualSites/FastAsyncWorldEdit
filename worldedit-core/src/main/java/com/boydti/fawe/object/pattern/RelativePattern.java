@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.pattern;
 
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -23,7 +23,7 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 pos) {
+    public BaseBlock apply(BlockVector3 pos) {
         if (origin == null) {
             origin = pos;
         }

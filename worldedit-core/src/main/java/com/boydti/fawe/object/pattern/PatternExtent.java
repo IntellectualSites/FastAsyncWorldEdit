@@ -123,7 +123,7 @@ public class PatternExtent extends AbstractPattern implements Extent {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         return pattern.apply(position);
     }
 

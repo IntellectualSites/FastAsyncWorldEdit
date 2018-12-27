@@ -45,7 +45,6 @@ import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
 @Command(aliases = {}, desc = "Commands for moving the player around: [More Info](https://goo.gl/uQTUiT)")
 public class NavigationCommands {
 
-    @SuppressWarnings("unused")
     private final WorldEdit worldEdit;
 
     /**

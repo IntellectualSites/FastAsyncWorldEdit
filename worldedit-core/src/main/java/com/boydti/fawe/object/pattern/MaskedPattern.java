@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.pattern;
 
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -24,10 +24,10 @@ public class MaskedPattern extends AbstractPattern {
 
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         patternExtent.setTarget(position);
         if (mask.test(position)) {
-            return patternExtent.getAndResetTarget();
+            return patternExtent.getAndResetTarget().toBaseBlock();
         }
         return secondaryPattern.apply(position);
     }

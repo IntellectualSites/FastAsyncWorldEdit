@@ -105,7 +105,7 @@ public class NullExtent implements Extent {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         return false;
     }
 

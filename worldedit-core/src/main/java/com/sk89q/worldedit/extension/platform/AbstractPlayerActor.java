@@ -532,7 +532,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
-    public void sendFakeBlock(BlockVector3 pos, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
 
     }
 }

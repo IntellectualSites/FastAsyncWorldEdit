@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.pattern;
 
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -22,7 +22,7 @@ public class NoXPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 pos) {
+    public BaseBlock apply(BlockVector3 pos) {
 //        mutable.mutY((pos.getY()));
 //        mutable.mutZ((pos.getZ()));
 //        return pattern.apply(mutable.toBlockVector3());

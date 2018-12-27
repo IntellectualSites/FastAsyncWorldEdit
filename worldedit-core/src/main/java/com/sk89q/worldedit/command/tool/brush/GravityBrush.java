@@ -22,7 +22,6 @@ package com.sk89q.worldedit.command.tool.brush;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -47,23 +46,11 @@ public class GravityBrush implements Brush {
         int endY = position.getBlockY() + size;
         int startPerformY = Math.max(0, position.getBlockY() - size);
         int startCheckY = fullHeight ? 0 : startPerformY;
-//        Vector mutablePos = new Vector(0, 0, 0);
         for (int x = position.getBlockX() + size; x > position.getBlockX() - size; --x) {
             for (int z = position.getBlockZ() + size; z > position.getBlockZ() - size; --z) {
                 int freeSpot = startCheckY;
                 for (int y = startCheckY; y <= endY; y++) {
                     BlockStateHolder block = editSession.getLazyBlock(x, y, z);
-//=======
-//    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-//        final double startY = fullHeight ? editSession.getWorld().getMaxY() : position.getBlockY() + size;
-//        for (double x = position.getBlockX() + size; x > position.getBlockX() - size; --x) {
-//            for (double z = position.getBlockZ() + size; z > position.getBlockZ() - size; --z) {
-//                double y = startY;
-//                final List<BlockStateHolder> blockTypes = new ArrayList<>();
-//                for (; y > position.getBlockY() - size; --y) {
-//                    final BlockVector3 pt = new BlockVector3(x, y, z);
-//                    final BlockStateHolder block = editSession.getBlock(pt);
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     if (!block.getBlockType().getMaterial().isAir()) {
                         if (y != freeSpot) {
                             editSession.setBlock(x, y, z, EditSession.nullBlock);
@@ -72,17 +59,6 @@ public class GravityBrush implements Brush {
                         freeSpot = y + 1;
                     }
                 }
-//<<<<<<< HEAD
-//=======
-//                BlockVector3 pt = new BlockVector3(x, y, z);
-//                Collections.reverse(blockTypes);
-//                for (int i = 0; i < blockTypes.size();) {
-//                    if (editSession.getBlock(pt).getBlockType().getMaterial().isAir()) {
-//                        editSession.setBlock(pt, blockTypes.get(i++));
-//                    }
-//                    pt = pt.add(0, 1, 0);
-//                }
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
         }
     }

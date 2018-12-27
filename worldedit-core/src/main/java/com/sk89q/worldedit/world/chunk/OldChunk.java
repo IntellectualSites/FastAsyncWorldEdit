@@ -30,8 +30,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
@@ -154,13 +154,9 @@ public class OldChunk implements Chunk {
     }
 
     @Override
-//<<<<<<< HEAD
-    public BlockStateHolder getBlock(BlockVector3 position) throws DataException {
-        if(position.getBlockY() >= 128) return BlockTypes.VOID_AIR.getDefaultState();
-//=======
-//    public BlockStateHolder getBlock(BlockVector3 position) throws DataException {
-//        if(position.getY() >= 128) return BlockTypes.VOID_AIR.getDefaultState().toBaseBlock();
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
+
+    public BaseBlock getBlock(BlockVector3 position) throws DataException {
+        if(position.getY() >= 128) return BlockTypes.VOID_AIR.getDefaultState().toBaseBlock();
         int id, dataVal;
 
         int x = position.getX() - rootX * 16;
@@ -189,13 +185,13 @@ public class OldChunk implements Chunk {
         BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(id, dataVal);
         if (state == null) {
             WorldEdit.logger.warning("Unknown legacy block " + id + ":" + dataVal + " found when loading legacy anvil chunk.");
-            return BlockTypes.AIR.getDefaultState();
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         if (state.getBlockType().getMaterial().hasContainer()) {
             CompoundTag tileEntity = getBlockTileEntity(position);
             if (tileEntity != null) return new BaseBlock(state, tileEntity);
         }
-        return state;
+        return state.toBaseBlock();
     }
 
 }

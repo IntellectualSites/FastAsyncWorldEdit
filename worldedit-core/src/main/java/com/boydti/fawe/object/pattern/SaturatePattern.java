@@ -4,7 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -28,12 +28,12 @@ public class SaturatePattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(BlockVector3 position) {
+    public BaseBlock apply(BlockVector3 position) {
         BlockType block = extent.getBlockType(position);
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(block);
         int newColor = util.multiplyColor(currentColor, color);
-        return util.getNearestBlock(newColor).getDefaultState();
+        return util.getNearestBlock(newColor).getDefaultState().toBaseBlock();
     }
 
     @Override
