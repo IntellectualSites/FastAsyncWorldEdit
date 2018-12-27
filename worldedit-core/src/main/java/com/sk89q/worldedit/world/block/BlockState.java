@@ -45,6 +45,14 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * An immutable class that represents the state a block can be in.
@@ -53,6 +61,7 @@ import java.util.stream.Stream;
 public class BlockState implements BlockStateHolder<BlockState> {
     private final BlockType blockType;
     private BaseBlock emptyBaseBlock;
+    
     BlockState(BlockType blockType) {
         this.blockType = blockType;
         this.emptyBaseBlock = new BaseBlock(this);
@@ -348,15 +357,6 @@ public class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return this == obj;
-    }
-
-    public BlockState toFuzzy() {
-        return new BlockState(this.getBlockType(), new HashMap<>());
-    }
-
-    @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
         if (this == o) {
             // Added a reference equality check for
@@ -415,4 +415,12 @@ public class BlockState implements BlockStateHolder<BlockState> {
 		//?
 		return 0;
 	}
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BlockState)) {
+            return false;
+        }
+
+        return equalsFuzzy((BlockState) obj);
+    }
 }
