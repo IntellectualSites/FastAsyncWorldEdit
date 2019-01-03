@@ -30,6 +30,8 @@ clean { delete "target" }
 print new File('splash.txt').text
 
 group = 'com.boydti.fawe'
+
+def rootVersion = "1.13"
 def revision = ""
 def buildNumber = ""
 def date = ""
@@ -38,13 +40,13 @@ ext {
         git = org.ajoberstar.grgit.Grgit.open(file(".git"))
         date = git.head().date.format("yy.MM.dd")
         revision = "-${git.head().abbreviatedId}"
-        index = 0;  // Offset to match CI
+        index = -1959;  // Offset to match CI
         parents = git.head().parentIds;
         for (; parents != null && !parents.isEmpty(); index++) {
             commit = git.getResolve().toCommit(parents.get(0));
             parents = commit.getParentIds()
         }
-        buildNumber = "-${index}"
+        buildNumber = "${index}"
     } catch (Throwable ignore) {
         revision = "-unknown"
     }
@@ -53,7 +55,7 @@ ext {
 if ( project.hasProperty("lzNoVersion") ) { // gradle build -PlzNoVersion
     version = "unknown"
 } else {
-    version = date + revision + buildNumber
+    version = String.format("%s.%s", rootVersion, buildNumber)
 }
 description = """FastAsyncWorldEdit"""
 
