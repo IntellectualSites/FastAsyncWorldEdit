@@ -124,13 +124,13 @@ public class FaweBukkit implements IFawe, Listener {
                     new ChunkListener_9();
                 }
 
-                try {
+                /*try {
                 	Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
                     new AsyncTabCompleteListener(WorldEditPlugin.getInstance());
                 } catch (Throwable ignore)
                 {
                     Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-                }
+                }*/
             }
         });
     }
