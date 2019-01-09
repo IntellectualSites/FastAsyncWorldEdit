@@ -509,4 +509,16 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             return count;
         }
     }
+
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
+		
+	}
 }

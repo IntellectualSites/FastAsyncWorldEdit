@@ -172,4 +172,16 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     public void add(int x, int y, int z, int combinedFrom, BaseBlock to) {
         parent.add(x, y, z, combinedFrom, to);
     }
+
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
+		
+	}
 }

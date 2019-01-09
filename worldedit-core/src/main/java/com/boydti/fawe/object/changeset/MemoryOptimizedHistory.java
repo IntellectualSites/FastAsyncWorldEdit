@@ -238,4 +238,16 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
     public NBTInputStream getTileRemoveIS() throws IOException {
         return tileR == null ? null : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArraysInputStream(tileR)));
     }
+
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
+		
+	}
 }

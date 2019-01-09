@@ -102,4 +102,16 @@ public class AnvilHistory extends FaweChangeSet implements IAnvilHistory {
     public int size() {
         return size == -1 ? folder.listFiles().length : size;
     }
+
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -29,9 +29,10 @@ import com.sk89q.worldedit.function.operation.BlockMapEntryPlacer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
 import com.sk89q.worldedit.function.operation.RunContext;
-import com.sk89q.worldedit.function.operation.SetLocatedBlocks;
+//import com.sk89q.worldedit.function.operation.SetLocatedBlocks;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.LocatedBlock;
 import com.sk89q.worldedit.util.collection.TupleArrayList;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -51,9 +52,9 @@ import java.util.Set;
  */
 public class MultiStageReorder extends AbstractDelegateExtent implements ReorderingExtent {
 
-    private TupleArrayList<BlockVector, BlockStateHolder> stage1 = new TupleArrayList<>();
-    private TupleArrayList<BlockVector, BlockStateHolder> stage2 = new TupleArrayList<>();
-    private TupleArrayList<BlockVector, BlockStateHolder> stage3 = new TupleArrayList<>();
+    private TupleArrayList<BlockVector3, BlockStateHolder> stage1 = new TupleArrayList<>();
+    private TupleArrayList<BlockVector3, BlockStateHolder> stage2 = new TupleArrayList<>();
+    private TupleArrayList<BlockVector3, BlockStateHolder> stage3 = new TupleArrayList<>();
     private boolean enabled;
 
     /**
@@ -95,13 +96,8 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
-        BlockStateHolder existing = getBlock(location);
-=======
     public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         BlockState existing = getBlock(location);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         if (!enabled) {
             return super.setBlock(location, block);
@@ -109,30 +105,30 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
 
         if (Blocks.shouldPlaceLast(block.getBlockType())) {
             // Place torches, etc. last
-<<<<<<< HEAD
-            stage2.put(location.toBlockVector(), block);
+//<<<<<<< HEAD
+            stage2.put(location, block);
             return !existing.equalsFuzzy(block);
         } else if (Blocks.shouldPlaceFinal(block.getBlockType())) {
             // Place signs, reed, etc even later
-            stage3.put(location.toBlockVector(), block);
-=======
-            stage2.add(location, block);
-            return !existing.equalsFuzzy(block);
-        } else if (Blocks.shouldPlaceFinal(block.getBlockType())) {
-            // Place signs, reed, etc even later
-            stage3.add(location, block);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+            stage3.put(location, block);
+//=======
+//            stage2.add(location, block);
+//            return !existing.equalsFuzzy(block);
+//        } else if (Blocks.shouldPlaceFinal(block.getBlockType())) {
+//            // Place signs, reed, etc even later
+//            stage3.add(location, block);
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             return !existing.equalsFuzzy(block);
         } else if (Blocks.shouldPlaceLast(existing.getBlockType())) {
             // Destroy torches, etc. first
             super.setBlock(location, BlockTypes.AIR.getDefaultState());
             return super.setBlock(location, block);
         } else {
-<<<<<<< HEAD
-            stage1.put(location.toBlockVector(), block);
-=======
-            stage1.add(location, block);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//<<<<<<< HEAD
+            stage1.put(location, block);
+//=======
+//            stage1.add(location, block);
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             return !existing.equalsFuzzy(block);
         }
     }
@@ -152,17 +148,17 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
         public Operation resume(RunContext run) throws WorldEditException {
             Extent extent = getExtent();
 
-<<<<<<< HEAD
-            final Set<BlockVector> blocks = new HashSet<>();
-            final Map<BlockVector, BlockStateHolder> blockTypes = new HashMap<>();
-            for (Map.Entry<BlockVector, BlockStateHolder> entry : stage3) {
-                final BlockVector pt = entry.getKey();
-=======
+//<<<<<<< HEAD
             final Set<BlockVector3> blocks = new HashSet<>();
             final Map<BlockVector3, BlockStateHolder> blockTypes = new HashMap<>();
-            for (LocatedBlock entry : stage3) {
-                final BlockVector3 pt = entry.getLocation();
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+            for (Map.Entry<BlockVector3, BlockStateHolder> entry : stage3) {
+                final BlockVector3 pt = entry.getKey();
+//=======
+//            final Set<BlockVector3> blocks = new HashSet<>();
+//            final Map<BlockVector3, BlockStateHolder> blockTypes = new HashMap<>();
+//            for (LocatedBlock entry : stage3) {
+//                final BlockVector3 pt = entry.getLocation();
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 blocks.add(pt);
                 blockTypes.put(pt, entry.getValue());
             }
