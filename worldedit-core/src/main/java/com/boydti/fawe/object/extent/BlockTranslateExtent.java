@@ -28,7 +28,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
         mutable.mutX((location.getX() + dx));
         mutable.mutY((location.getY() + dy));
         mutable.mutZ((location.getZ() + dz));
-        return getExtent().setBlock(mutable, block);
+        return getExtent().setBlock(mutable.toBlockVector3(), block);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
         mutable.mutX(x + dx);
         mutable.mutY(y + dy);
         mutable.mutZ(z + dz);
-        return getExtent().setBlock(mutable, block);
+        return getExtent().setBlock(mutable.toBlockVector3(), block);
     }
 
     @Override

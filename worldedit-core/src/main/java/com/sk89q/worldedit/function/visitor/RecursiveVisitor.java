@@ -19,13 +19,9 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-<<<<<<< HEAD
 import com.boydti.fawe.object.HasFaweQueue;
-import com.sk89q.worldedit.Vector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -62,13 +58,8 @@ public class RecursiveVisitor extends BreadthFirstSearch {
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean isVisitable(final Vector from, final Vector to) {
-        return this.mask.test(to);
-=======
     protected boolean isVisitable(BlockVector3 from, BlockVector3 to) {
         return mask.test(to);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
 

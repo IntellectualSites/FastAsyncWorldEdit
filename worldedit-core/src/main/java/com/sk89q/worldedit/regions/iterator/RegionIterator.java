@@ -19,25 +19,16 @@
 
 package com.sk89q.worldedit.regions.iterator;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.regions.Region;
 
 import java.util.Iterator;
 
-<<<<<<< HEAD
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class RegionIterator implements Iterator<BlockVector> {
-=======
 public class RegionIterator implements Iterator<BlockVector3> {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     private final Region region;
     private final int maxX;

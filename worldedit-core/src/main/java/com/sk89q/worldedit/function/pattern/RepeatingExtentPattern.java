@@ -19,14 +19,10 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.Vector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
@@ -97,10 +93,10 @@ public class RepeatingExtentPattern extends AbstractPattern {
         int x = base.getBlockX() % size.getBlockX();
         int y = base.getBlockY() % size.getBlockY();
         int z = base.getBlockZ() % size.getBlockZ();
-<<<<<<< HEAD
-        return extent.getBlock(new Vector(x, y, z));
-=======
+//<<<<<<< HEAD
+//        return extent.getBlock(new Vector(x, y, z));
+//=======
         return extent.getFullBlock(new BlockVector3(x, y, z));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 }

@@ -44,18 +44,18 @@ public abstract class BreadthFirstSearch implements Operation {
     public static final BlockVector3[] DIAGONAL_DIRECTIONS;
 
     static {
-        DEFAULT_DIRECTIONS[0] = (new MutableBlockVector(0, -1, 0));
-        DEFAULT_DIRECTIONS[1] = (new MutableBlockVector(0, 1, 0));
-        DEFAULT_DIRECTIONS[2] = (new MutableBlockVector(-1, 0, 0));
-        DEFAULT_DIRECTIONS[3] = (new MutableBlockVector(1, 0, 0));
-        DEFAULT_DIRECTIONS[4] = (new MutableBlockVector(0, 0, -1));
-        DEFAULT_DIRECTIONS[5] = (new MutableBlockVector(0, 0, 1));
-        List<MutableBlockVector> list = new ArrayList<>();
+        DEFAULT_DIRECTIONS[0] = (new BlockVector3(0, -1, 0));
+        DEFAULT_DIRECTIONS[1] = (new BlockVector3(0, 1, 0));
+        DEFAULT_DIRECTIONS[2] = (new BlockVector3(-1, 0, 0));
+        DEFAULT_DIRECTIONS[3] = (new BlockVector3(1, 0, 0));
+        DEFAULT_DIRECTIONS[4] = (new BlockVector3(0, 0, -1));
+        DEFAULT_DIRECTIONS[5] = (new BlockVector3(0, 0, 1));
+        List<BlockVector3> list = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
                     if (x != 0 || y != 0 || z != 0) {
-                        MutableBlockVector pos = new MutableBlockVector(x, y, z);
+                    	BlockVector3 pos = new BlockVector3(x, y, z);
                         if (!list.contains(pos)) {
                             list.add(pos);
                         }
@@ -184,7 +184,7 @@ public abstract class BreadthFirstSearch implements Operation {
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         MutableBlockVector mutable = new MutableBlockVector();
-        MutableBlockVector mutable2 = new MutableBlockVector();
+//        MutableBlockVector mutable2 = new MutableBlockVector();
         boolean shouldTrim = false;
         IntegerTrio[] dirs = getIntDirections();
         BlockVectorSet tempQueue = new BlockVectorSet();
@@ -223,10 +223,7 @@ public abstract class BreadthFirstSearch implements Operation {
                     int x = from.getBlockX() + direction.x;
                     int z = from.getBlockZ() + direction.z;
                     if (!visited.contains(x, y, z)) {
-                        mutable2.mutX(x);
-                        mutable2.mutY(y);
-                        mutable2.mutZ(z);
-                        if (isVisitable(from, mutable2)) {
+                        if (isVisitable(from, new BlockVector3(x, y, z))) {
                             j++;
                             visited.add(x, y, z);
                             tempQueue.add(x, y, z);

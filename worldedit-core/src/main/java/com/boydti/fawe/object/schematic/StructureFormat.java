@@ -13,8 +13,6 @@ import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -23,6 +21,8 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -77,8 +77,8 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         int length = size.getInt(2);
 
         // Init clipboard
-        Vector origin = new Vector(0, 0, 0);
-        CuboidRegion region = new CuboidRegion(origin, origin.add(width, height, length).subtract(Vector.ONE));
+        BlockVector3 origin = new BlockVector3(0, 0, 0);
+        CuboidRegion region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region, clipboardId);
         // Blocks
         ListTag blocks = (ListTag) tags.get("blocks");
@@ -175,7 +175,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         // Palette
         {
             ArrayList<HashMap<String, Object>> palette = new ArrayList<>();
-            for (Vector point : region) {
+            for (BlockVector3 point : region) {
                 BlockStateHolder block = clipboard.getBlock(point);
                 int combined = block.getInternalId();
                 BlockTypes type = block.getBlockType();
@@ -215,8 +215,8 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         // Blocks
         {
             ArrayList<Map<String, Object>> blocks = new ArrayList<>();
-            Vector min = region.getMinimumPoint();
-            for (Vector point : region) {
+            BlockVector3 min = region.getMinimumPoint();
+            for (BlockVector3 point : region) {
                 BlockStateHolder block = clipboard.getBlock(point);
                 switch (block.getBlockType()) {
                     case STRUCTURE_VOID:
@@ -272,7 +272,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         }
     }
 
-    private Tag writeVector(Vector vector, String name) {
+    private Tag writeVector(BlockVector3 vector, String name) {
         List<DoubleTag> list = new ArrayList<DoubleTag>();
         list.add(new DoubleTag(vector.getX()));
         list.add(new DoubleTag(vector.getY()));

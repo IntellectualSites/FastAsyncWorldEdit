@@ -19,12 +19,8 @@
 
 package com.sk89q.worldedit.function.biome;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.Vector2D;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;

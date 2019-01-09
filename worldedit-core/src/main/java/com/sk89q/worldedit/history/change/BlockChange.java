@@ -19,24 +19,15 @@
 
 package com.sk89q.worldedit.history.change;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.BlockVector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.history.UndoContext;
-<<<<<<< HEAD
-
-import static com.google.common.base.Preconditions.checkNotNull;
-=======
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 /**
  * Represents a block change that may be undone or replayed.

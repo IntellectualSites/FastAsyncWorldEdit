@@ -19,14 +19,11 @@
 
 package com.sk89q.worldedit.command.tool;
 
-<<<<<<< HEAD
 import com.sk89q.worldedit.*;
-=======
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -62,12 +59,8 @@ public class FloodFillTool implements BlockTool {
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
         World world = (World) clicked.getExtent();
 
-<<<<<<< HEAD
-        BlockType initialType = world.getBlockType(clicked.toVector());
-=======
         BlockVector3 origin = clicked.toVector().toBlockPoint();
         BlockType initialType = world.getBlock(origin).getBlockType();
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         if (initialType.getMaterial().isAir()) {
             return true;
@@ -77,38 +70,22 @@ public class FloodFillTool implements BlockTool {
             return true;
         }
 
-<<<<<<< HEAD
         EditSession editSession = session.createEditSession(player);
-=======
-        try (EditSession editSession = session.createEditSession(player)) {
-            try {
-                recurse(editSession, origin, origin, range, initialType, new HashSet<>());
-            } catch (MaxChangedBlocksException e) {
-                player.printError("Max blocks change limit reached.");
-            } finally {
-                session.remember(editSession);
-            }
-        }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
-
         try {
-            recurse(editSession, clicked.toVector().toBlockVector(),
-                    clicked.toVector(), range, initialType, new HashSet<BlockVector>());
-        } catch (WorldEditException e) {
-            throw new RuntimeException(e);
+        	recurse(editSession, origin, origin, range, initialType, new HashSet<>());
+        } catch (MaxChangedBlocksException e) {
+        	player.printError("Max blocks change limit reached.");
+        } finally {
+        	session.remember(editSession);
         }
+
         editSession.flushQueue();
         session.remember(editSession);
         return true;
     }
 
-<<<<<<< HEAD
-    private void recurse(EditSession editSession, BlockVector pos, Vector origin, int size, BlockType initialType,
-                         Set<BlockVector> visited) throws WorldEditException {
-=======
     private void recurse(EditSession editSession, BlockVector3 pos, BlockVector3 origin, int size, BlockType initialType,
             Set<BlockVector3> visited) throws MaxChangedBlocksException {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         if (origin.distance(pos) > size || visited.contains(pos)) {
             return;

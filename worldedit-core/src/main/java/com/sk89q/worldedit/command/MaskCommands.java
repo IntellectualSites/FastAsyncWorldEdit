@@ -4,7 +4,6 @@ import com.boydti.fawe.object.mask.*;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -13,6 +12,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.*;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.request.RequestSelection;
 import com.sk89q.worldedit.util.command.binding.Switch;
@@ -129,7 +130,7 @@ public class MaskCommands extends MethodCommands {
             max = 4
     )
     public Mask offset(double x, double y, double z, Mask mask) {
-        return new OffsetMask(mask, new Vector(x, y, z));
+        return new OffsetMask(mask, new BlockVector3(x, y, z));
     }
 
     @Command(
@@ -389,7 +390,7 @@ public class MaskCommands extends MethodCommands {
             max = 1
     )
     public Mask below(Mask mask) throws ExpressionException {
-        OffsetMask offsetMask = new OffsetMask(mask, new Vector(0, 1, 0));
+        OffsetMask offsetMask = new OffsetMask(mask, new BlockVector3(0, 1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(mask));
     }
 
@@ -401,7 +402,7 @@ public class MaskCommands extends MethodCommands {
             max = 1
     )
     public Mask above(Mask mask) throws ExpressionException {
-        OffsetMask offsetMask = new OffsetMask(mask, new Vector(0, -1, 0));
+        OffsetMask offsetMask = new OffsetMask(mask, new BlockVector3(0, -1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(mask));
     }
 
@@ -438,7 +439,7 @@ public class MaskCommands extends MethodCommands {
     )
     public Mask expression(Extent extent, String input) throws ExpressionException {
         Expression exp = Expression.compile(input, "x", "y", "z");
-        WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector.ONE, Vector.ZERO);
+        WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
         exp.setEnvironment(env);
         return new ExpressionMask(exp);
     }

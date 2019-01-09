@@ -50,7 +50,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
                     int cz = MathMan.unpairY(pair);
                     pos.mutX((cx << 11) + pos.getBlockX());
                     pos.mutZ((cz << 11) + pos.getBlockZ());
-                    return pos;
+                    return pos.toBlockVector3();
                 }
             }
             count += newSize;
@@ -117,7 +117,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
                 int pair = entry.getIntKey();
                 int cx = MathMan.unpairX(pair);
                 int cz = MathMan.unpairY(pair);
-                return mutable.setComponents((cx << 11) + localPos.getBlockX(), localPos.getBlockY(), (cz << 11) + localPos.getBlockZ());
+                return mutable.setComponents((cx << 11) + localPos.getBlockX(), localPos.getBlockY(), (cz << 11) + localPos.getBlockZ()).toBlockVector3();
             }
         };
     }

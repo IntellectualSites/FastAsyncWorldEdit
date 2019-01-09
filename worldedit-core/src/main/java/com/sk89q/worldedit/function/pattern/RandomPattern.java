@@ -1,19 +1,15 @@
 package com.sk89q.worldedit.function.pattern;
 
-<<<<<<< HEAD
 import com.boydti.fawe.object.collection.RandomCollection;
 import com.boydti.fawe.object.random.SimpleRandom;
 import com.boydti.fawe.object.random.TrueRandom;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.HashMap;
@@ -60,24 +56,24 @@ public class RandomPattern extends AbstractPattern {
         this.patterns.add(pattern);
     }
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
     public Set<Pattern> getPatterns() {
         return patterns;
-=======
-    @Override
-    public BlockStateHolder apply(BlockVector3 position) {
-        double r = random.nextDouble();
-        double offset = 0;
-
-        for (Chance chance : patterns) {
-            if (r <= (offset + chance.getChance()) / max) {
-                return chance.getPattern().apply(position);
-            }
-            offset += chance.getChance();
-        }
-
-        throw new RuntimeException("ProportionalFillPattern");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//=======
+//    @Override
+//    public BlockStateHolder apply(BlockVector3 position) {
+//        double r = random.nextDouble();
+//        double offset = 0;
+//
+//        for (Chance chance : patterns) {
+//            if (r <= (offset + chance.getChance()) / max) {
+//                return chance.getPattern().apply(position);
+//            }
+//            offset += chance.getChance();
+//        }
+//
+//        throw new RuntimeException("ProportionalFillPattern");
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     public RandomCollection<Pattern> getCollection() {
@@ -85,12 +81,12 @@ public class RandomPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(Vector get) {
+    public BlockStateHolder apply(BlockVector3 get) {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(get);
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, set, get);
     }
 

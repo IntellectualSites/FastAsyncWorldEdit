@@ -21,38 +21,38 @@ public class AdjacentMask extends AbstractMask {
     public boolean test(BlockVector3 bv) {
     	v.setComponents(bv);
         int count = 0;
-        double x = v.getX();
-        double y = v.getY();
-        double z = v.getZ();
+        double x = bv.getX();
+        double y = bv.getY();
+        double z = bv.getZ();
         v.mutX(x + 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutX(x);
             return true;
         }
         v.mutX(x - 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutX(x);
             return true;
         }
         v.mutX(x);
         v.mutY(y + 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutY(y);
             return true;
         }
         v.mutY(y - 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutY(y);
             return true;
         }
         v.mutY(y);
         v.mutZ(z + 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutZ(z);
             return true;
         }
         v.mutZ(z - 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutZ(z);
             return true;
         }

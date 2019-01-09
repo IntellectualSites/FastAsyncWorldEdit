@@ -19,13 +19,9 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.BlockVector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -176,13 +172,8 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-<<<<<<< HEAD
-    public void explainPrimarySelection(Actor player, LocalSession session, Vector pos) {
-        BBC.SELECTOR_CENTER.send(player, pos, 0);
-=======
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.print("Starting a new cylindrical selection at " + pos + ".");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BBC.SELECTOR_CENTER.send(player, pos, 0);
 
         session.describeCUI(player);
     }
@@ -191,13 +182,8 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
         Vector3 center = region.getCenter();
 
-<<<<<<< HEAD
-        if (!center.equals(Vector.ZERO)) {
+        if (!center.equals(BlockVector3.ZERO)) {
             BBC.SELECTOR_RADIUS.send(player, NUMBER_FORMAT.format(region.getRadius().getX()) + "/" + NUMBER_FORMAT.format(region.getRadius().getZ()), region.getArea());
-=======
-        if (!center.equals(Vector3.ZERO)) {
-            player.print("Radius set to " + NUMBER_FORMAT.format(region.getRadius().getX()) + "/" + NUMBER_FORMAT.format(region.getRadius().getZ()) + " blocks. (" + region.getArea() + ").");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         } else {
             BBC.SELECTION_WAND.send(player);
             return;

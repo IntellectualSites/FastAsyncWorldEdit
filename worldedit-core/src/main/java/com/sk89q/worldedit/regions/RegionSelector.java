@@ -161,7 +161,7 @@ public interface RegionSelector {
      * @return
      * @throws IncompleteRegionException
      */
-    default List<Vector> getVerticies() throws IncompleteRegionException {
+    default List<BlockVector3> getVerticies() throws IncompleteRegionException {
         return Collections.singletonList(getPrimaryPosition());
     }
 

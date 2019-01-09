@@ -1,11 +1,11 @@
 package com.sk89q.worldedit.math.transform;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 
 public class RoundedTransform implements Transform{
     private final Transform transform;
-    private MutableBlockVector mutable = new MutableBlockVector();
+//    private MutableBlockVector mutable = new MutableBlockVector();
 
     public RoundedTransform(Transform transform) {
         this.transform = transform;
@@ -17,12 +17,12 @@ public class RoundedTransform implements Transform{
     }
 
     @Override
-    public Vector apply(Vector input) {
-        Vector val = transform.apply(input);
-        mutable.mutX((int) Math.floor(val.getX() + 0.5));
-        mutable.mutY((int) Math.floor(val.getY() + 0.5));
-        mutable.mutZ((int) Math.floor(val.getZ() + 0.5));
-        return mutable;
+    public Vector3 apply(Vector3 input) {
+        Vector3 val = transform.apply(input);
+//        mutable.mutX((int) Math.floor(val.getX() + 0.5));
+//        mutable.mutY((int) Math.floor(val.getY() + 0.5));
+//        mutable.mutZ((int) Math.floor(val.getZ() + 0.5));
+        return new Vector3(Math.floor(val.getX() + 0.5), Math.floor(val.getY() + 0.5), Math.floor(val.getY() + 0.5));
     }
 
     @Override

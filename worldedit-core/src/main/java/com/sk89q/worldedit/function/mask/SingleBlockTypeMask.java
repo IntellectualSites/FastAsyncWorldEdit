@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.function.mask;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -15,7 +15,7 @@ public class SingleBlockTypeMask extends AbstractExtentMask {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         return getExtent().getBlockType(vector).getInternalId() == internalId;
     }
 

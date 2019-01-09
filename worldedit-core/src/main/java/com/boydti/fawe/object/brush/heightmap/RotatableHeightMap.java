@@ -22,7 +22,7 @@ public class RotatableHeightMap extends AbstractDelegateHeightMap {
     public double getHeight(int x, int z) {
         mutable.mutX(x);
         mutable.mutZ(z);
-        BlockVector3 pos = transform.apply(mutable.setComponents(x, 0, z)).toBlockPoint();
+        BlockVector3 pos = transform.apply(mutable.setComponents(x, 0, z).toVector3()).toBlockPoint();
         return super.getHeight(pos.getBlockX(), pos.getBlockZ());
     }
 }

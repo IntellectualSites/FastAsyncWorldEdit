@@ -46,7 +46,7 @@ public class ScaleTransform extends ResettableExtent {
         mutable.mutX((min.getX() + (pos.getX() - min.getX()) * dx));
         mutable.mutY((min.getY() + (pos.getY() - min.getY()) * dy));
         mutable.mutZ((min.getZ() + (pos.getZ() - min.getZ()) * dz));
-        return mutable;
+        return mutable.toBlockVector3();
     }
 
     private BlockVector3 getPos(int x, int y, int z) {
@@ -56,7 +56,7 @@ public class ScaleTransform extends ResettableExtent {
         mutable.mutX((min.getX() + (x - min.getX()) * dx));
         mutable.mutY((min.getY() + (y - min.getY()) * dy));
         mutable.mutZ((min.getZ() + (z - min.getZ()) * dz));
-        return mutable;
+        return mutable.toBlockVector3();
     }
 
 
@@ -73,7 +73,7 @@ public class ScaleTransform extends ResettableExtent {
         for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
             for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
                 for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
-                    result |= super.setBlock(pos, block);
+                    result |= super.setBlock(pos.toBlockVector3(), block);
                 }
             }
         }
@@ -109,7 +109,7 @@ public class ScaleTransform extends ResettableExtent {
         for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
             for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
                 for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
-                    result |= super.setBlock(pos, block);
+                    result |= super.setBlock(pos.toBlockVector3(), block);
                 }
             }
         }

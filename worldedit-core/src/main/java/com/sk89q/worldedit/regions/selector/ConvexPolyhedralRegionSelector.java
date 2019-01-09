@@ -19,14 +19,9 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -104,15 +99,9 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
             region = new ConvexPolyhedralRegion(oldRegion.getWorld());
 
-<<<<<<< HEAD
-            for (final BlockVector2D pt : new ArrayList<BlockVector2D>(oldRegion.polygonize(Integer.MAX_VALUE))) {
-                region.addVertex(pt.toVector(minY));
-                region.addVertex(pt.toVector(maxY));
-=======
             for (final BlockVector2 pt : new ArrayList<>(oldRegion.polygonize(Integer.MAX_VALUE))) {
                 region.addVertex(pt.toBlockVector3(minY));
                 region.addVertex(pt.toBlockVector3(maxY));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
 
             learnChanges();
@@ -120,7 +109,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     }
 
     @Override
-    public List<Vector> getVerticies() {
+    public List<BlockVector3> getVerticies() {
         return new ArrayList<>(region.getVertices());
     }
 
@@ -258,11 +247,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         Collection<BlockVector3> vertices = region.getVertices();
         Collection<Triangle> triangles = region.getTriangles();
 
-<<<<<<< HEAD
-        Map<Vector, Integer> vertexIds = new HashMap<Vector, Integer>(vertices.size());
-=======
         Map<BlockVector3, Integer> vertexIds = new HashMap<>(vertices.size());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         int lastVertexId = -1;
         for (BlockVector3 vertex : vertices) {
             vertexIds.put(vertex, ++lastVertexId);

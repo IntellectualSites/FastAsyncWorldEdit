@@ -1,14 +1,9 @@
 package com.sk89q.worldedit.function.mask;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector3;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import javax.annotation.Nullable;
 
 
@@ -21,12 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class OffsetMask extends AbstractMask {
 
     private Mask mask;
-<<<<<<< HEAD
-    private Vector offset;
-    private MutableBlockVector mutable = new MutableBlockVector();
-=======
     private BlockVector3 offset;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     /**
      * Create a new instance.
@@ -80,16 +70,8 @@ public class OffsetMask extends AbstractMask {
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean test(Vector vector) {
-        mutable.mutX((vector.getX() + offset.getX()));
-        mutable.mutY((vector.getY() + offset.getY()));
-        mutable.mutZ((vector.getZ() + offset.getZ()));
-        return getMask().test(mutable);
-=======
     public boolean test(BlockVector3 vector) {
         return getMask().test(vector.add(offset));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Nullable

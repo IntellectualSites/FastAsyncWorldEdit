@@ -22,11 +22,11 @@ package com.sk89q.worldedit.blocks;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 
 /**
  * A implementation of a lazy block for {@link Extent#getLazyBlock(Vector)}
@@ -42,7 +42,7 @@ import com.sk89q.worldedit.extent.Extent;
 public class LazyBlock extends BaseBlock {
 
     private final Extent extent;
-    private final Vector position;
+    private final BlockVector3 position;
     private boolean loaded = false;
 
     /**
@@ -52,7 +52,7 @@ public class LazyBlock extends BaseBlock {
      * @param extent the extent to later load the full block data from
      * @param position the position to later load the full block data from
      */
-    public LazyBlock(BlockType type, Extent extent, Vector position) {
+    public LazyBlock(BlockType type, Extent extent, BlockVector3 position) {
         super(type);
         checkNotNull(extent);
         checkNotNull(position);
@@ -67,7 +67,7 @@ public class LazyBlock extends BaseBlock {
      * @param extent the extent to later load the full block data from
      * @param position the position to later load the full block data from
      */
-    public LazyBlock(BlockState state, Extent extent, Vector position) {
+    public LazyBlock(BlockState state, Extent extent, BlockVector3 position) {
         super(state);
         checkNotNull(extent);
         checkNotNull(position);

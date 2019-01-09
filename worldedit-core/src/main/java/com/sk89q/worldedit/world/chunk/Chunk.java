@@ -35,10 +35,6 @@ public interface Chunk {
      * @return block the block
      * @throws DataException thrown on data error
      */
-<<<<<<< HEAD
-    BlockStateHolder getBlock(Vector position) throws DataException;
-=======
     BlockStateHolder getBlock(BlockVector3 position) throws DataException;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 }

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-<<<<<<< HEAD
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
@@ -41,7 +40,6 @@ import com.boydti.fawe.util.gui.FormBuilder;
 import com.boydti.fawe.wrappers.FakePlayer;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.*;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
@@ -53,7 +51,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -127,15 +124,15 @@ public class ClipboardCommands extends MethodCommands {
     public void lazyCopy(Player player, LocalSession session, EditSession editSession,
                          @Selection final Region region, @Switch('e') boolean skipEntities,
                          @Switch('m') Mask mask, @Switch('b') boolean copyBiomes) throws WorldEditException {
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
+    	BlockVector3 min = region.getMinimumPoint();
+    	BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
         }
         session.setClipboard(null);
-        final Vector origin = region.getMinimumPoint();
+        final BlockVector3 origin = region.getMinimumPoint();
         final int mx = origin.getBlockX();
         final int my = origin.getBlockY();
         final int mz = origin.getBlockZ();
@@ -167,14 +164,14 @@ public class ClipboardCommands extends MethodCommands {
     public void copy(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                      @Selection Region region, @Switch('e') boolean skipEntities,
                      @Switch('m') Mask mask, CommandContext context, @Switch('b') boolean copyBiomes) throws WorldEditException {
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
+    	BlockVector3 min = region.getMinimumPoint();
+    	BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
         }
-        Vector pos = session.getPlacementPosition(player);
+        BlockVector3 pos = session.getPlacementPosition(player);
         fp.checkConfirmationRegion(() -> {
             session.setClipboard(null);
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
@@ -217,8 +214,8 @@ public class ClipboardCommands extends MethodCommands {
     public void lazyCut(Player player, LocalSession session, EditSession editSession,
                         @Selection final Region region, @Switch('e') boolean skipEntities,
                         @Switch('m') Mask mask, @Switch('b') boolean copyBiomes) throws WorldEditException {
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
+    	BlockVector3 min = region.getMinimumPoint();
+    	BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
@@ -228,7 +225,7 @@ public class ClipboardCommands extends MethodCommands {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
         }
         session.setClipboard(null);
-        final Vector origin = region.getMinimumPoint();
+        final BlockVector3 origin = region.getMinimumPoint();
         final int mx = origin.getBlockX();
         final int my = origin.getBlockY();
         final int mz = origin.getBlockZ();
@@ -258,8 +255,8 @@ public class ClipboardCommands extends MethodCommands {
     public void cut(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                     @Selection Region region, @Optional("air") Pattern leavePattern, @Switch('e') boolean skipEntities,
                     @Switch('m') Mask mask, @Switch('b') boolean copyBiomes, CommandContext context) throws WorldEditException {
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
+    	BlockVector3 min = region.getMinimumPoint();
+    	BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
@@ -268,7 +265,7 @@ public class ClipboardCommands extends MethodCommands {
         if (volume >= limit.MAX_CHANGES) {
             throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
         }
-        Vector pos = session.getPlacementPosition(player);
+        BlockVector3 pos = session.getPlacementPosition(player);
         fp.checkConfirmationRegion(() -> {
             session.setClipboard(null);
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
@@ -481,14 +478,8 @@ public class ClipboardCommands extends MethodCommands {
         }
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
-<<<<<<< HEAD
-        Vector to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
+BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
         checkPaste(player, editSession, to, holder, clipboard);
-
-=======
-
-        BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         Operation operation = holder
                 .createPaste(editSession)
                 .to(to)
@@ -499,27 +490,20 @@ public class ClipboardCommands extends MethodCommands {
         Operations.completeLegacy(operation);
 
         if (selectPasted) {
-<<<<<<< HEAD
-            Vector clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Vector realTo = to.add(new Vector(holder.getTransform().apply(clipboardOffset)));
-            Vector max = realTo.add(new Vector(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()))));
-            RegionSelector selector = new CuboidRegionSelector(player.getWorld(), realTo, max);
-=======
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
             Vector3 realTo = to.toVector3().add(holder.getTransform().apply(clipboardOffset.toVector3()));
             Vector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()));
             RegionSelector selector = new CuboidRegionSelector(player.getWorld(), realTo.toBlockPoint(), max.toBlockPoint());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             session.setRegionSelector(player.getWorld(), selector);
             selector.learnChanges();
             selector.explainRegionAdjust(player, session);
         }
-        BBC.COMMAND_PASTE.send(player, to.toBlockVector());
+        BBC.COMMAND_PASTE.send(player, to);
         if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
             BBC.TIP_COPYPASTE.or(BBC.TIP_SOURCE_MASK, BBC.TIP_REPLACE_MARKER).send(player, to);
     }
 
-    private void checkPaste(Player player, EditSession editSession, Vector to, ClipboardHolder holder, Clipboard clipboard) {
+    private void checkPaste(Player player, EditSession editSession, BlockVector3 to, ClipboardHolder holder, Clipboard clipboard) {
         URI uri = null;
         if (holder instanceof URIClipboardHolder) uri = ((URIClipboardHolder) holder).getURI(clipboard);
         PasteEvent event = new PasteEvent(player, clipboard, uri, editSession, to);
@@ -550,8 +534,8 @@ public class ClipboardCommands extends MethodCommands {
                       @Switch('s') boolean selectPasted) throws WorldEditException {
         ClipboardHolder holder = session.getClipboard();
         final Clipboard clipboard = holder.getClipboard();
-        final Vector origin = clipboard.getOrigin();
-        final Vector to = atOrigin ? origin : session.getPlacementPosition(player);
+        final BlockVector3 origin = clipboard.getOrigin();
+        final BlockVector3 to = atOrigin ? origin : session.getPlacementPosition(player);
         checkPaste(player, editSession, to, holder, clipboard);
 
         Schematic schem = new Schematic(clipboard);
@@ -559,9 +543,9 @@ public class ClipboardCommands extends MethodCommands {
 
         Region region = clipboard.getRegion().clone();
         if (selectPasted) {
-            Vector clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            Vector realTo = to.add(new Vector(holder.getTransform().apply(clipboardOffset)));
-            Vector max = realTo.add(new Vector(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()))));
+        	BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+        	BlockVector3 realTo = to.add(holder.getTransform().apply(clipboardOffset.toVector3()).toBlockPoint());
+            BlockVector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()).toBlockPoint());
             RegionSelector selector = new CuboidRegionSelector(player.getWorld(), realTo, max);
             session.setRegionSelector(player.getWorld(), selector);
             selector.learnChanges();
@@ -605,24 +589,13 @@ public class ClipboardCommands extends MethodCommands {
             max = 1
     )
     @CommandPermissions("worldedit.clipboard.flip")
-<<<<<<< HEAD
-    public void flip(Player player, LocalSession session,
-                     @Optional(Direction.AIM) @Direction Vector direction) throws WorldEditException {
-=======
     public void flip(Player player, LocalSession session, EditSession editSession,
                      @Optional(Direction.AIM) @Direction BlockVector3 direction) throws WorldEditException {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         ClipboardHolder holder = session.getClipboard();
         AffineTransform transform = new AffineTransform();
-<<<<<<< HEAD
-        transform = transform.scale(direction.positive().multiply(-2).add(1, 1, 1));
+        transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());
         holder.setTransform(transform.combine(holder.getTransform()));
         BBC.COMMAND_FLIPPED.send(player);
-=======
-        transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());
-        holder.setTransform(holder.getTransform().combine(transform));
-        player.print("The clipboard copy has been flipped.");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Deprecated // See SchematicCommands#clear

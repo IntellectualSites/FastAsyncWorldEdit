@@ -19,14 +19,10 @@
 
 package com.sk89q.worldedit.session;
 
-<<<<<<< HEAD
 import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;

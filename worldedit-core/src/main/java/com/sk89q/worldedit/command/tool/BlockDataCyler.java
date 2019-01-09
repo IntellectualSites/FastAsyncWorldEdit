@@ -19,6 +19,12 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -26,13 +32,11 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
-<<<<<<< HEAD
-=======
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 /**
@@ -44,18 +48,17 @@ public class BlockDataCyler implements DoubleActionBlockTool {
     public boolean canUse(Actor player) {
         return player.hasPermission("worldedit.tool.data-cycler");
     }
+    
+    private Map<UUID, Property<?>> selectedProperties = new HashMap<>();
 
     private boolean handleCycle(Platform server, LocalConfiguration config,
             Player player, LocalSession session, Location clicked, boolean forward) {
 
         World world = (World) clicked.getExtent();
 
-<<<<<<< HEAD
-        BlockStateHolder block = world.getBlock(clicked.toVector());
-=======
+//        BlockStateHolder block = world.getBlock(clicked.toVector());
         BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
         BlockState block = world.getBlock(blockPoint);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         if (!config.allowedDataCycleBlocks.isEmpty()
                 && !player.hasPermission("worldedit.override.data-cycler")
@@ -64,61 +67,45 @@ public class BlockDataCyler implements DoubleActionBlockTool {
             return true;
         }
 
-        if (block.getBlockType().getProperties().isEmpty()) {
-            player.printError("That block's data cannot be cycled!");
+        if (block.getStates().keySet().isEmpty()) {
+        	player.printError("That block's data cannot be cycled!");
         } else {
-<<<<<<< HEAD
-            BlockStateHolder newBlock = block;
-
-            // TODO Forward = cycle value, Backward = Next property
-            //        int increment = forward ? 1 : -1;
-            //        BaseBlock newBlock = new BaseBlock(type, BlockData.cycle(type, data, increment));
-            EditSession editSession = session.createEditSession(player);
-
-            try {
-                editSession.setBlock(clicked.toVector(), newBlock);
-            } catch (MaxChangedBlocksException e) {
-                player.printError("Max blocks change limit reached.");
-            } finally {
-                session.remember(editSession);
-=======
-            Property currentProperty = selectedProperties.get(player.getUniqueId());
-
-            if (currentProperty == null || (forward && block.getState(currentProperty) == null)) {
-                currentProperty = block.getStates().keySet().stream().findFirst().get();
-                selectedProperties.put(player.getUniqueId(), currentProperty);
-            }
-
-            if (forward) {
-                block.getState(currentProperty);
-                int index = currentProperty.getValues().indexOf(block.getState(currentProperty));
-                index = (index + 1) % currentProperty.getValues().size();
-                BlockState newBlock = block.with(currentProperty, currentProperty.getValues().get(index));
-
-                try (EditSession editSession = session.createEditSession(player)) {
-                    editSession.disableBuffering();
-
-                    try {
-                        editSession.setBlock(blockPoint, newBlock);
-                        player.print("Value of " + currentProperty.getName() + " is now " + currentProperty.getValues().get(index).toString());
-                    } catch (MaxChangedBlocksException e) {
-                        player.printError("Max blocks change limit reached.");
-                    } finally {
-                        session.remember(editSession);
-                    }
-                }
-            } else {
-                List<Property<?>> properties = Lists.newArrayList(block.getStates().keySet());
-                int index = properties.indexOf(currentProperty);
-                index = (index + 1) % properties.size();
-                currentProperty = properties.get(index);
-                selectedProperties.put(player.getUniqueId(), currentProperty);
-                player.print("Now cycling " + currentProperty.getName());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
-            }
+        	Property<?> currentProperty = selectedProperties.get(player.getUniqueId());
+        	
+        	if (currentProperty == null || (forward && block.getState(currentProperty) == null)) {
+        		currentProperty = block.getStates().keySet().stream().findFirst().get();
+        		selectedProperties.put(player.getUniqueId(), currentProperty);
+        	}
+		
+        	if (forward) {
+        		block.getState(currentProperty);
+        		int index = currentProperty.getValues().indexOf(block.getState(currentProperty));
+        		index = (index + 1) % currentProperty.getValues().size();
+        		@SuppressWarnings("unchecked")
+        		Property<Object> objProp = (Property<Object>) currentProperty;
+        		BlockState newBlock = block.with(objProp, currentProperty.getValues().get(index));
+	
+        		try {
+        			EditSession editSession = session.createEditSession(player);
+        			try {
+        				editSession.setBlock(blockPoint, newBlock);
+        				player.print("Value of " + currentProperty.getName() + " is now " + currentProperty.getValues().get(index).toString());
+        			} catch (MaxChangedBlocksException e) {
+        				player.printError("Max blocks change limit reached.");
+        			} finally {
+        				session.remember(editSession);
+        			}
+        		}catch (Exception e) {}
+        	} else {
+        		List<Property<?>> properties = Lists.newArrayList(block.getStates().keySet());
+        		int index = properties.indexOf(currentProperty);
+        		index = (index + 1) % properties.size();
+        		currentProperty = properties.get(index);
+        		selectedProperties.put(player.getUniqueId(), currentProperty);
+        		player.print("Now cycling " + currentProperty.getName());
+        	}
         }
-
-        return true;
+            return true;
     }
 
     @Override

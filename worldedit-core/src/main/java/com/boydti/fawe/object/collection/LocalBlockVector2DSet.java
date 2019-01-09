@@ -102,7 +102,7 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
         if (index != -1) {
             int x = MathMan.unpairSearchCoordsX(index);
             int y = MathMan.unpairSearchCoordsY(index);
-            return mutable.setComponents(x, y);
+            return mutable.setComponents(x, y).toBlockVector2();
         }
         return null;
     }
@@ -131,7 +131,7 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
                     mutable.setComponents(x, y);
                     previous = index;
                     index = set.nextSetBit(index + 1);
-                    return mutable;
+                    return mutable.toBlockVector2();
                 }
                 return null;
             }

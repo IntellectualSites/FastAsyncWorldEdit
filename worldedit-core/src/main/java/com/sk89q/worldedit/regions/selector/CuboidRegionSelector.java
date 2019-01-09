@@ -19,22 +19,17 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.util.chat.Message;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.SelectionCommands;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.cui.CUIRegion;
 import com.sk89q.worldedit.internal.cui.SelectionPointEvent;
@@ -57,15 +52,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CuboidRegionSelector implements RegionSelector, CUIRegion {
 
-<<<<<<< HEAD
-    public transient BlockVector position1;
-    public transient BlockVector position2;
-    public transient CuboidRegion region;
-=======
     protected transient BlockVector3 position1;
     protected transient BlockVector3 position2;
     protected transient CuboidRegion region;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     /**
      * Create a new region selector with a {@code null} world.
@@ -129,7 +118,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public List<Vector> getVerticies() {
+    public List<BlockVector3> getVerticies() {
         return Arrays.asList(position1, position2);
     }
 

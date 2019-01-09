@@ -4,7 +4,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.google.common.base.Charsets;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -15,6 +14,8 @@ import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.platform.*;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -166,11 +167,12 @@ public class FakePlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public void setPosition(Vector pos, float pitch, float yaw) {
-        if (pos instanceof Location) {
-            Extent extent = ((Location) pos).getExtent();
-            if (extent instanceof World) this.world = (World) extent;
-        }
+    public void setPosition(Vector3 pos, float pitch, float yaw) {
+    	//TODO: find replacement for following code
+//        if (pos instanceof Location) {
+//            Extent extent = ((Location) pos).getExtent();
+//            if (extent instanceof World) this.world = (World) extent;
+//        }
         this.pos = new Location(world, pos, yaw, pitch);
     }
 

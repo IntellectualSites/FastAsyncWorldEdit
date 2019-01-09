@@ -81,7 +81,7 @@ public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap
             MutableBlockVector bv = new MutableBlockVector(pos);
             for (int y = minY; y <= maxY; y++) {
                 bv.mutY(y);
-                BlockStateHolder block = clipboard.getBlock(bv);
+                BlockStateHolder block = clipboard.getBlock(bv.toBlockVector3());
                 if (!block.getBlockType().getMaterial().isAir()) {
                     highestY = y + 1;
                 }

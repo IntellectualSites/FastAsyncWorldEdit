@@ -24,13 +24,9 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-<<<<<<< HEAD
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
-=======
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
@@ -79,17 +75,10 @@ public class ChunkCommands {
         String filename = "c." + Integer.toString(chunkX, 36)
                 + "." + Integer.toString(chunkZ, 36) + ".dat";
 
-<<<<<<< HEAD
         player.print(BBC.getPrefix() + "Chunk: " + chunkX + ", " + chunkZ);
         player.print(BBC.getPrefix() + "Old format: " + folder1 + "/" + folder2 + "/" + filename);
         player.print(BBC.getPrefix() + "McRegion: region/" + McRegionChunkStore.getFilename(
-                new Vector2D(chunkX, chunkZ)));
-=======
-        player.print("Chunk: " + chunkX + ", " + chunkZ);
-        player.print("Old format: " + folder1 + "/" + folder2 + "/" + filename);
-        player.print("McRegion: region/" + McRegionChunkStore.getFilename(
                 new BlockVector2(chunkX, chunkZ)));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Command(
@@ -100,19 +89,11 @@ public class ChunkCommands {
             max = 0
     )
     @CommandPermissions("worldedit.listchunks")
-<<<<<<< HEAD
-    public void listChunks(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-        Set<Vector2D> chunks = session.getSelection(player.getWorld()).getChunks();
-
-        for (Vector2D chunk : chunks) {
-            player.print(BBC.getPrefix() + LegacyChunkStore.getFilename(chunk));
-=======
     public void listChunks(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
         Set<BlockVector2> chunks = session.getSelection(player.getWorld()).getChunks();
 
         for (BlockVector2 chunk : chunks) {
-            player.print(LegacyChunkStore.getFilename(chunk));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+            player.print(BBC.getPrefix() + LegacyChunkStore.getFilename(chunk));
         }
     }
 

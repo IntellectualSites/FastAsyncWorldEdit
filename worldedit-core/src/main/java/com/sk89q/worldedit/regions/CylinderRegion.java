@@ -19,15 +19,8 @@
 
 package com.sk89q.worldedit.regions;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -48,14 +41,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
-<<<<<<< HEAD
-    private BlockVector2D center;
-    private BlockVector2D radius;
-    private Vector2D radiusInverse;
-=======
     private BlockVector2 center;
     private Vector2 radius;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+    private Vector2 radiusInverse;
     private int minY;
     private int maxY;
     private boolean hasY = false;
@@ -117,24 +105,9 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         hasY = region.hasY;
     }
 
-    @Override
-<<<<<<< HEAD
-    public Vector getCenter() {
-        return center.toVector((getMaximumY() + getMinimumY()) / 2);
-    }
-
-    /**
-     * Sets the main center point of the region
-     *
-     * @deprecated replaced by {@link #setCenter(Vector2D)}
-     */
-    @Deprecated
-    public void setCenter(Vector center) {
-        setCenter(center.toVector2D());
-=======
+	@Override
     public Vector3 getCenter() {
         return center.toVector3((maxY + minY) / 2);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     /**
@@ -142,13 +115,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      *
      * @param center the center point
      */
-<<<<<<< HEAD
-    public void setCenter(Vector2D center) {
-        this.center = new BlockVector2D(center);
-=======
     public void setCenter(BlockVector2 center) {
         this.center = center;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     /**
@@ -165,14 +133,9 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      *
      * @param radius the radius along the X and Z axes
      */
-<<<<<<< HEAD
-    public void setRadius(Vector2D radius) {
-        this.radius = radius.add(0.5, 0.5).toBlockVector2D();
-        this.radiusInverse = Vector2D.ONE.divide(radius);
-=======
     public void setRadius(Vector2 radius) {
         this.radius = radius.add(0.5, 0.5);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        this.radiusInverse = Vector2.ONE.divide(radius);
     }
 
     /**
@@ -203,17 +166,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         hasY = true;
         maxY = y;
     }
-
+    
     @Override
-<<<<<<< HEAD
-    public Vector getMinimumPoint() {
-        return center.subtract(getRadius()).toVector(getMinimumY());
-    }
-
-    @Override
-    public Vector getMaximumPoint() {
-        return center.add(getRadius()).toVector(getMaximumY());
-=======
     public BlockVector3 getMinimumPoint() {
         return center.toVector2().subtract(getRadius()).toVector3(minY).toBlockPoint();
     }
@@ -221,7 +175,6 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     @Override
     public BlockVector3 getMaximumPoint() {
         return center.toVector2().add(getRadius()).toVector3(maxY).toBlockPoint();
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Override
@@ -291,18 +244,11 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      * @throws RegionOperationException
      */
     @Override
-<<<<<<< HEAD
-    public void expand(Vector... changes) throws RegionOperationException {
-        center = center.add(calculateDiff2D(changes)).toBlockVector2D();
-        radius = radius.add(calculateChanges2D(changes)).toBlockVector2D();
-        this.radiusInverse = Vector2D.ONE.divide(radius);
-        for (Vector change : changes) {
-=======
     public void expand(BlockVector3... changes) throws RegionOperationException {
         center = center.add(calculateDiff2D(changes));
         radius = radius.add(calculateChanges2D(changes).toVector2());
+        this.radiusInverse = Vector2.ONE.divide(radius);
         for (BlockVector3 change : changes) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             int changeY = change.getBlockY();
             if (changeY > 0) {
                 maxY += changeY;
@@ -319,20 +265,12 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      * @throws RegionOperationException
      */
     @Override
-<<<<<<< HEAD
-    public void contract(Vector... changes) throws RegionOperationException {
-        center = center.subtract(calculateDiff2D(changes)).toBlockVector2D();
-        Vector2D newRadius = radius.subtract(calculateChanges2D(changes));
-        radius = Vector2D.getMaximum(new Vector2D(1.5, 1.5), newRadius).toBlockVector2D();
-        this.radiusInverse = Vector2D.ONE.divide(radius);
-        for (Vector change : changes) {
-=======
     public void contract(BlockVector3... changes) throws RegionOperationException {
         center = center.subtract(calculateDiff2D(changes));
         Vector2 newRadius = radius.subtract(calculateChanges2D(changes).toVector2());
         radius = new Vector2(1.5, 1.5).getMaximum(newRadius);
+        this.radiusInverse = Vector2.ONE.divide(radius);
         for (BlockVector3 change : changes) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             int height = maxY - minY;
             int changeY = change.getBlockY();
             if (changeY > 0) {
@@ -344,13 +282,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-<<<<<<< HEAD
-    public void shift(Vector change) throws RegionOperationException {
-        center = center.add(change.toVector2D()).toBlockVector2D();
-=======
     public void shift(BlockVector3 change) throws RegionOperationException {
         center = center.add(change.toBlockVector2());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         int changeY = change.getBlockY();
         maxY += changeY;
@@ -361,15 +294,9 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      * Checks to see if a point is inside this region.
      */
     @Override
-<<<<<<< HEAD
-    public boolean contains(Vector position) {
-        final int pt = position.getBlockY();
-        if (pt < getMinimumY() || pt > getMaximumY()) {
-=======
     public boolean contains(BlockVector3 position) {
         final int blockY = position.getBlockY();
         if (blockY < minY || blockY > maxY) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             return false;
         }
         int px = position.getBlockX();
@@ -378,11 +305,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         double dx = Math.abs(px - center.getBlockX()) * radiusInverse.getX();
         double dz = Math.abs(pz - center.getBlockZ()) * radiusInverse.getZ();
 
-<<<<<<< HEAD
         return dx * dx + dz * dz <= 1;
-=======
-        return position.toBlockVector2().subtract(center).toVector2().divide(radius).lengthSq() <= 1;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//        return position.toBlockVector2().subtract(center).toVector2().divide(radius).lengthSq() <= 1;
     }
 
 
@@ -415,18 +339,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-<<<<<<< HEAD
-    public Iterable<Vector2D> asFlatRegion() {
-        return new Iterable<Vector2D>() {
-            @Override
-            public Iterator<Vector2D> iterator() {
-                return new FlatRegionIterator(CylinderRegion.this);
-            }
-        };
-=======
     public Iterable<BlockVector2> asFlatRegion() {
         return () -> new FlatRegionIterator(CylinderRegion.this);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     /**

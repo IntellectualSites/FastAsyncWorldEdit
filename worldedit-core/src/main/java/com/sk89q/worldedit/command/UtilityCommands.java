@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-<<<<<<< HEAD
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.command.FaweParser;
@@ -40,10 +39,8 @@ import com.boydti.fawe.util.gui.FormBuilder;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-=======
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
 
 import com.google.common.base.Joiner;
@@ -57,7 +54,6 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.entity.Entity;
@@ -260,7 +256,6 @@ public class UtilityCommands extends MethodCommands {
         BBC.WORLDEDIT_CANCEL_COUNT.send(player, cancelled);
     }
 
-<<<<<<< HEAD
     @Command(
             aliases = {"/fill"},
             usage = "<pattern> <radius> [depth] [direction]",
@@ -270,17 +265,12 @@ public class UtilityCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.fill")
     @Logging(PLACEMENT)
-    public void fill(Player player, LocalSession session, EditSession editSession, Pattern pattern, double radius, @Optional("1") double depth, @Optional("down") @Direction Vector direction) throws WorldEditException {
+    public void fill(Player player, LocalSession session, EditSession editSession, Pattern pattern, double radius, @Optional("1") double depth, @Optional("down") @Direction BlockVector3 direction) throws WorldEditException {
         worldEdit.checkMaxRadius(radius);
-        Vector pos = session.getPlacementPosition(player);
+        BlockVector3 pos = session.getPlacementPosition(player);
         int affected;
         affected = editSession.fillDirection(pos, pattern, radius, (int) depth, direction);
         player.print(BBC.getPrefix() + affected + " block(s) have been created.");
-=======
-        BlockVector3 pos = session.getPlacementPosition(player);
-        int affected = editSession.fillXZ(pos, pattern, radius, depth, false);
-        player.print(affected + " block(s) have been created.");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Command(
@@ -292,35 +282,34 @@ public class UtilityCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.fill.recursive")
     @Logging(PLACEMENT)
-<<<<<<< HEAD
     public void fillr(Player player, LocalSession session, EditSession editSession, Pattern pattern, double radius, @Optional("-1") double depth) throws WorldEditException {
         worldEdit.checkMaxRadius(radius);
-        Vector pos = session.getPlacementPosition(player);
+        BlockVector3 pos = session.getPlacementPosition(player);
         if (depth == -1) depth = Integer.MAX_VALUE;
         int affected = editSession.fillXZ(pos, pattern, radius, (int) depth, true);
         player.print(BBC.getPrefix() + affected + " block(s) have been created.");
-=======
-    public void fillr(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-
-        ParserContext context = new ParserContext();
-        context.setActor(player);
-        context.setWorld(player.getWorld());
-        context.setSession(session);
-        Pattern pattern = we.getPatternFactory().parseFromInput(args.getString(0), context);
-
-        double radius = Math.max(1, args.getDouble(1));
-        we.checkMaxRadius(radius);
-        int depth = args.argsLength() > 2 ? Math.max(1, args.getInteger(2)) : Integer.MAX_VALUE;
-
-        BlockVector3 pos = session.getPlacementPosition(player);
-        int affected = 0;
-        if (pattern instanceof BlockPattern) {
-            affected = editSession.fillXZ(pos, ((BlockPattern) pattern).getBlock(), radius, depth, true);
-        } else {
-            affected = editSession.fillXZ(pos, pattern, radius, depth, true);
-        }
-        player.print(affected + " block(s) have been created.");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//=======
+//    public void fillr(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+//
+//        ParserContext context = new ParserContext();
+//        context.setActor(player);
+//        context.setWorld(player.getWorld());
+//        context.setSession(session);
+//        Pattern pattern = we.getPatternFactory().parseFromInput(args.getString(0), context);
+//
+//        double radius = Math.max(1, args.getDouble(1));
+//        we.checkMaxRadius(radius);
+//        int depth = args.argsLength() > 2 ? Math.max(1, args.getInteger(2)) : Integer.MAX_VALUE;
+//
+//        BlockVector3 pos = session.getPlacementPosition(player);
+//        int affected = 0;
+//        if (pattern instanceof BlockPattern) {
+//            affected = editSession.fillXZ(pos, ((BlockPattern) pattern).getBlock(), radius, depth, true);
+//        } else {
+//            affected = editSession.fillXZ(pos, pattern, radius, depth, true);
+//        }
+//        player.print(affected + " block(s) have been created.");
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Command(
@@ -430,16 +419,10 @@ public class UtilityCommands extends MethodCommands {
         if (from == null) {
             from = new ExistingBlockMask(editSession);
         }
-<<<<<<< HEAD
-        Vector base = session.getPlacementPosition(player);
-        Vector min = base.subtract(size, size, size);
-        Vector max = base.add(size, size, size);
-=======
 
         BlockVector3 base = session.getPlacementPosition(player);
-        BlockVector3 min = base.subtract(size, size, size);
-        BlockVector3 max = base.add(size, size, size);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BlockVector3 min = base.subtract((int)size, (int)size, (int)size);
+        BlockVector3 max = base.add((int)size, (int)size, (int)size);
         Region region = new CuboidRegion(player.getWorld(), min, max);
 
         int affected = editSession.replaceBlocks(region, from, to);
@@ -574,13 +557,8 @@ public class UtilityCommands extends MethodCommands {
         EditSession editSession = null;
 
         if (player != null) {
-<<<<<<< HEAD
             session = worldEdit.getSessionManager().get(player);
-            Vector center = session.getPlacementPosition(player);
-=======
-            session = we.getSessionManager().get(player);
             BlockVector3 center = session.getPlacementPosition(player);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             editSession = session.createEditSession(player);
             List<? extends Entity> entities;
             if (radius >= 0) {
@@ -639,13 +617,8 @@ public class UtilityCommands extends MethodCommands {
         EditSession editSession = null;
 
         if (player != null) {
-<<<<<<< HEAD
             session = worldEdit.getSessionManager().get(player);
-            Vector center = session.getPlacementPosition(player);
-=======
-            session = we.getSessionManager().get(player);
             BlockVector3 center = session.getPlacementPosition(player);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             editSession = session.createEditSession(player);
             List<? extends Entity> entities;
             if (radius >= 0) {

@@ -19,14 +19,9 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
-=======
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.Mask2D;
@@ -58,7 +53,7 @@ public class LayerVisitor implements Operation {
     private Mask2D mask = Masks.alwaysTrue2D();
     private final int minY;
     private final int maxY;
-    private final Iterable<Vector2D> iterator;
+    private final Iterable<BlockVector2> iterator;
 
     /**
      * Create a new visitor.
@@ -100,36 +95,21 @@ public class LayerVisitor implements Operation {
     }
 
     @Override
-<<<<<<< HEAD
     public Operation resume(final RunContext run) throws WorldEditException {
-        for (final Vector2D column : this.iterator) {
+        for (final BlockVector2 column : this.iterator) {
             if (!this.mask.test(column)) {
-=======
-    public Operation resume(RunContext run) throws WorldEditException {
-        for (BlockVector2 column : flatRegion.asFlatRegion()) {
-            if (!mask.test(column)) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 continue;
             }
 
             // Abort if we are underground
-<<<<<<< HEAD
-            if (this.function.isGround(column.toVector(this.maxY + 1))) {
-=======
             if (function.isGround(column.toBlockVector3(maxY + 1))) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 return null;
             }
 
             boolean found = false;
             int groundY = 0;
-<<<<<<< HEAD
-            for (int y = this.maxY; y >= this.minY; --y) {
-                final Vector test = column.toVector(y);
-=======
             for (int y = maxY; y >= minY; --y) {
                 BlockVector3 test = column.toBlockVector3(y);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 if (!found) {
                     if (this.function.isGround(test)) {
                         found = true;

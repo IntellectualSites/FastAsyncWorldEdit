@@ -1,14 +1,9 @@
 package com.sk89q.worldedit.function.mask;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import javax.annotation.Nullable;
 
@@ -57,36 +52,36 @@ public final class Masks {
      * @param finalMask the mask
      * @return a new mask
      */
-<<<<<<< HEAD
+//<<<<<<< HEAD
     public static Mask negate(final Mask finalMask) {
         return finalMask.inverse();
-=======
-    public static Mask negate(final Mask mask) {
-        if (mask instanceof AlwaysTrue) {
-            return ALWAYS_FALSE;
-        } else if (mask instanceof AlwaysFalse) {
-            return ALWAYS_TRUE;
-        }
-
-        checkNotNull(mask);
-        return new AbstractMask() {
-            @Override
-            public boolean test(BlockVector3 vector) {
-                return !mask.test(vector);
-            }
-
-            @Nullable
-            @Override
-            public Mask2D toMask2D() {
-                Mask2D mask2d = mask.toMask2D();
-                if (mask2d != null) {
-                    return negate(mask2d);
-                } else {
-                    return null;
-                }
-            }
-        };
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//=======
+//    public static Mask negate(final Mask mask) {
+//        if (mask instanceof AlwaysTrue) {
+//            return ALWAYS_FALSE;
+//        } else if (mask instanceof AlwaysFalse) {
+//            return ALWAYS_TRUE;
+//        }
+//
+//        checkNotNull(mask);
+//        return new AbstractMask() {
+//            @Override
+//            public boolean test(BlockVector3 vector) {
+//                return !mask.test(vector);
+//            }
+//
+//            @Nullable
+//            @Override
+//            public Mask2D toMask2D() {
+//                Mask2D mask2d = mask.toMask2D();
+//                if (mask2d != null) {
+//                    return negate(mask2d);
+//                } else {
+//                    return null;
+//                }
+//            }
+//        };
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     /**

@@ -19,19 +19,15 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-<<<<<<< HEAD
 import com.boydti.fawe.object.HasFaweQueue;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import java.util.Collection;
 
 
@@ -63,12 +59,8 @@ public class DownwardVisitor extends RecursiveVisitor {
         super(mask, function, depth, hasFaweQueue);
         checkNotNull(mask);
         this.baseY = baseY;
-<<<<<<< HEAD
-        final Collection<Vector> directions = this.getDirections();
-=======
 
         Collection<BlockVector3> directions = getDirections();
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         directions.clear();
         directions.add(new BlockVector3(1, 0, 0));
         directions.add(new BlockVector3(-1, 0, 0));
@@ -78,15 +70,9 @@ public class DownwardVisitor extends RecursiveVisitor {
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean isVisitable(final Vector from, final Vector to) {
-        final int fromY = from.getBlockY();
-        return ((fromY == this.baseY) || (to.getBlockY() - from.getBlockY() < 0)) && super.isVisitable(from, to);
-=======
     protected boolean isVisitable(BlockVector3 from, BlockVector3 to) {
         int fromY = from.getBlockY();
         return (fromY == baseY || to.subtract(from).getBlockY() < 0) && super.isVisitable(from, to);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
 

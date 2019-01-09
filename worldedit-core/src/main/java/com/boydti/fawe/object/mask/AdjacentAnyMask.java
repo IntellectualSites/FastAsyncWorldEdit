@@ -58,23 +58,23 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
         int y = v.getBlockY();
         int z = v.getBlockZ();
         if (mask.test(x + 1, y, z)) {
-            return mutable.setComponents(1, 0, 0);
-        }
+        	mutable.setComponents(1, 0, 0);
+        }else
         if (mask.test(x - 1, y, z)) {
-            return mutable.setComponents(-1, 0, 0);
-        }
+        	mutable.setComponents(-1, 0, 0);
+        }else
         if (mask.test(x, y, z + 1)) {
-            return mutable.setComponents(0, 0, 1);
-        }
+        	mutable.setComponents(0, 0, 1);
+        }else
         if (mask.test(x, y, z - 1)) {
-            return mutable.setComponents(0, 0, -1);
-        }
-        if (y < 256 && mask.test(x, y + 1, z)) {
-            return mutable.setComponents(0, 1, 0);
-        }
-        if (y > 0 && mask.test(x, y - 1, z)) {
-            return mutable.setComponents(0, -1, 0);
-        }
-        return null;
+        	mutable.setComponents(0, 0, -1);
+        }else
+       	if (y < 256 && mask.test(x, y + 1, z)) {
+       		mutable.setComponents(0, 1, 0);
+       	}else
+       	if (y > 0 && mask.test(x, y - 1, z)) {
+       		mutable.setComponents(0, -1, 0);
+       	}
+        return (mutable.getX() == 0 && mutable.getY() == 0 && mutable.getZ() == 0) ? null : mutable.toBlockVector3();
     }
 }

@@ -48,7 +48,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         mutable.mutX((position.getX() + r.nextInt(dx2) - dx));
         mutable.mutY((position.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((position.getZ() + r.nextInt(dz2) - dz));
-        BlockStateHolder block = pattern.apply(mutable);
+        BlockStateHolder block = pattern.apply(mutable.toBlockVector3());
         if (solid[block.getInternalBlockTypeId()]) {
             return block;
         } else {
@@ -61,9 +61,9 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         mutable.mutX((get.getX() + r.nextInt(dx2) - dx));
         mutable.mutY((get.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((get.getZ() + r.nextInt(dz2) - dz));
-        BlockStateHolder block = pattern.apply(mutable);
+        BlockStateHolder block = pattern.apply(mutable.toBlockVector3());
         if (solid[block.getInternalBlockTypeId()]) {
-            return pattern.apply(extent, set, mutable);
+            return pattern.apply(extent, set, mutable.toBlockVector3());
         } else {
             return pattern.apply(extent, set, get);
         }

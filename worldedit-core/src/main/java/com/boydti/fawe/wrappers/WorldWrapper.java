@@ -10,6 +10,9 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
@@ -59,12 +62,12 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean useItem(Vector position, BaseItem item, Direction face) {
+    public boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
         return parent.useItem(position, item, face);
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
         return parent.setBlock(position, block, notifyAndLight);
     }
 
@@ -79,12 +82,12 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void dropItem(Vector pt, BaseItemStack item, int times) {
+    public void dropItem(Vector3 pt, BaseItemStack item, int times) {
         parent.dropItem(pt, item, times);
     }
 
     @Override
-    public void simulateBlockMine(final Vector pt) {
+    public void simulateBlockMine(final BlockVector3 pt) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
@@ -94,7 +97,7 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, Vector position) throws MaxChangedBlocksException {
+    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
         return TaskManager.IMP.sync((Supplier<Boolean>) () -> {
             try {
                 return parent.generateTree(type, editSession, position);
@@ -105,27 +108,27 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void checkLoadedChunk(Vector pt) {
+    public void checkLoadedChunk(BlockVector3 pt) {
         parent.checkLoadedChunk(pt);
     }
 
     @Override
-    public void fixAfterFastMode(Iterable<BlockVector2D> chunks) {
+    public void fixAfterFastMode(Iterable<BlockVector2> chunks) {
         parent.fixAfterFastMode(chunks);
     }
 
     @Override
-    public void fixLighting(Iterable<BlockVector2D> chunks) {
+    public void fixLighting(Iterable<BlockVector2> chunks) {
         parent.fixLighting(chunks);
     }
 
     @Override
-    public boolean playEffect(Vector position, int type, int data) {
+    public boolean playEffect(Vector3 position, int type, int data) {
         return parent.playEffect(position, type, data);
     }
 
     @Override
-    public boolean queueBlockBreakEffect(Platform server, Vector position, BlockType blockType, double priority) {
+    public boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
         return parent.queueBlockBreakEffect(server, position, blockType, priority);
     }
 
@@ -150,12 +153,12 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public Vector getMinimumPoint() {
+    public BlockVector3 getMinimumPoint() {
         return parent.getMinimumPoint();
     }
 
     @Override
-    public Vector getMaximumPoint() {
+    public BlockVector3 getMaximumPoint() {
         return parent.getMaximumPoint();
     }
 
@@ -171,17 +174,17 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public int getBlockLightLevel(Vector position) {
+    public int getBlockLightLevel(BlockVector3 position) {
         return parent.getBlockLightLevel(position);
     }
 
     @Override
-    public boolean clearContainerBlockContents(Vector position) {
+    public boolean clearContainerBlockContents(BlockVector3 position) {
         return parent.clearContainerBlockContents(position);
     }
 
     @Override
-    public void dropItem(Vector position, BaseItemStack item) {
+    public void dropItem(Vector3 position, BaseItemStack item) {
         parent.dropItem(position, item);
     }
 
@@ -227,27 +230,27 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         return parent.getBlock(position);
     }
 
     @Override
-    public BlockState getLazyBlock(Vector position) {
+    public BlockState getLazyBlock(BlockVector3 position) {
         return parent.getLazyBlock(position);
     }
 
     @Override
-    public BlockState getFullBlock(Vector position) {
+    public BlockState getFullBlock(BlockVector3 position) {
         return parent.getFullBlock(position);
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return parent.getBiome(position);
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return parent.setBiome(position, biome);
     }
 }

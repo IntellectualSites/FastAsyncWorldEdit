@@ -19,13 +19,9 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.BlockVector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -149,33 +145,15 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-<<<<<<< HEAD
-    public void explainPrimarySelection(Actor player, LocalSession session, Vector pos) {
-        BBC.SELECTOR_CENTER.send(player, region.getCenter(), region.getArea());
-=======
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        if (isDefined()) {
-            player.print("Center position set to " + region.getCenter() + " (" + region.getArea() + ").");
-        } else {
-            player.print("Center position set to " + region.getCenter() + ".");
-        }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BBC.SELECTOR_CENTER.send(player, region.getCenter(), region.getArea());
 
         session.describeCUI(player);
     }
 
     @Override
-<<<<<<< HEAD
-    public void explainSecondarySelection(Actor player, LocalSession session, Vector pos) {
-        BBC.SELECTOR_RADIUS.send(player, region.getRadius(), region.getArea());
-=======
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        if (isDefined()) {
-            player.print("Radius set to " + region.getRadius() + " (" + region.getArea() + ").");
-        } else {
-            player.print("Radius set to " + region.getRadius() + ".");
-        }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BBC.SELECTOR_RADIUS.send(player, region.getRadius(), region.getArea());
 
         session.describeCUI(player);
     }

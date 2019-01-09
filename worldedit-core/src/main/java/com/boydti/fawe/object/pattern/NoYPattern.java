@@ -20,24 +20,24 @@ public class NoYPattern extends AbstractPattern {
         this.pattern = pattern;
     }
 
-    private transient MutableBlockVector mutable = new MutableBlockVector();
+//    private transient MutableBlockVector mutable = new MutableBlockVector();
 
     @Override
     public BlockStateHolder apply(BlockVector3 pos) {
-        mutable.mutX((pos.getX()));
-        mutable.mutZ((pos.getZ()));
-        return pattern.apply(mutable);
+//        mutable.mutX((pos.getX()));
+//        mutable.mutZ((pos.getZ()));
+        return pattern.apply(pos);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-        mutable.mutX((get.getX()));
-        mutable.mutZ((get.getZ()));
-        return pattern.apply(extent, set, mutable);
+//        mutable.mutX((get.getX()));
+//        mutable.mutZ((get.getZ()));
+        return pattern.apply(extent, set, get);
     }
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        mutable = new MutableBlockVector();
+//        mutable = new MutableBlockVector();
     }
 }

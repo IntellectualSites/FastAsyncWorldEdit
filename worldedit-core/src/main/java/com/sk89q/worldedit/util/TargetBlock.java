@@ -19,10 +19,7 @@
 
 package com.sk89q.worldedit.util;
 
-<<<<<<< HEAD
 import com.sk89q.worldedit.*;
-=======
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -77,12 +74,7 @@ public class TargetBlock {
      * @param viewHeight where the view is positioned in y-axis
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
-<<<<<<< HEAD
-    private void setValues(Vector loc, double xRotation, double yRotation,
-                           int maxDistance, double viewHeight, double checkDistance) {
-=======
     private void setValues(Vector3 loc, double xRotation, double yRotation, int maxDistance, double viewHeight, double checkDistance) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         this.maxDistance = maxDistance;
         this.checkDistance = checkDistance;
         this.curDistance = 0;
@@ -91,15 +83,9 @@ public class TargetBlock {
 
         double h = (checkDistance * Math.cos(Math.toRadians(yRotation)));
 
-<<<<<<< HEAD
-        offset = new Vector((h * Math.cos(Math.toRadians(xRotation))),
-                (checkDistance * Math.sin(Math.toRadians(yRotation))),
-                (h * Math.sin(Math.toRadians(xRotation))));
-=======
         offset = new Vector3((h * Math.cos(Math.toRadians(xRotation))),
                             (checkDistance * Math.sin(Math.toRadians(yRotation))),
                             (h * Math.sin(Math.toRadians(xRotation))));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         targetPosDouble = loc.add(0, viewHeight, 0);
         targetPos = targetPosDouble.toBlockPoint();
@@ -116,11 +102,7 @@ public class TargetBlock {
         boolean searchForLastBlock = true;
         Location lastBlock = null;
         while (getNextBlock() != null) {
-<<<<<<< HEAD
-            if (world.getBlockType(getCurrentBlock().toVector()).getMaterial().isAir()) {
-=======
             if (world.getBlock(targetPos).getBlockType().getMaterial().isAir()) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 if (searchForLastBlock) {
                     lastBlock = getCurrentBlock();
                     if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
@@ -142,11 +124,7 @@ public class TargetBlock {
      * @return Block
      */
     public Location getTargetBlock() {
-<<<<<<< HEAD
-        while (getNextBlock() != null && world.getBlockType(getCurrentBlock().toVector()).getMaterial().isAir()) ;
-=======
         while (getNextBlock() != null && world.getBlock(targetPos).getBlockType().getMaterial().isAir()) ;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         return getCurrentBlock();
     }
 
@@ -157,11 +135,7 @@ public class TargetBlock {
      * @return Block
      */
     public Location getSolidTargetBlock() {
-<<<<<<< HEAD
-        while (getNextBlock() != null && !world.getBlockType(getCurrentBlock().toVector()).getMaterial().isMovementBlocker()) ;
-=======
         while (getNextBlock() != null && !world.getBlock(targetPos).getBlockType().getMaterial().isMovementBlocker()) ;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         return getCurrentBlock();
     }
 

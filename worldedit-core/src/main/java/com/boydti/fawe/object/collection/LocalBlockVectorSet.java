@@ -117,7 +117,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             int x = offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21);
             int y = b1;
             int z = offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21);
-            return MutableBlockVector.get(x, y, z);
+            return MutableBlockVector.get(x, y, z).toBlockVector3();
         }
         return null;
     }
@@ -151,7 +151,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
                     mutable.mutZ(offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21));
                     previous = index;
                     index = set.nextSetBit(index + 1);
-                    return mutable;
+                    return mutable.toBlockVector3();
                 }
                 return null;
             }
@@ -310,7 +310,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     public void forEach(BlockVectorSetVisitor visitor) {
         int size = size();
         int index = -1;
-        BlockVector3 mVec = MutableBlockVector.get(0, 0, 0);
+        BlockVector3 mVec = MutableBlockVector.get(0, 0, 0).toBlockVector3();
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index + 1);
             int b1 = (index & 0xFF);

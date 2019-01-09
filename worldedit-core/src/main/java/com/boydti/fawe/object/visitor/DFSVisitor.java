@@ -77,8 +77,8 @@ public abstract class DFSVisitor implements Operation {
         NodePair current;
         Node from;
         Node adjacent;
-        MutableBlockVector mutable = new MutableBlockVector();
-        MutableBlockVector mutable2 = new MutableBlockVector();
+//        MutableBlockVector mutable = new MutableBlockVector();
+//        MutableBlockVector mutable2 = new MutableBlockVector();
         int countAdd, countAttempt;
         IntegerTrio[] dirs = getIntDirections();
 
@@ -89,18 +89,20 @@ public abstract class DFSVisitor implements Operation {
             if (visited.containsKey(from)) {
                 continue;
             }
-            mutable.mutX(from.getX());
-            mutable.mutY(from.getY());
-            mutable.mutZ(from.getZ());
-            function.apply(mutable);
+//            mutable.mutX(from.getX());
+//            mutable.mutY(from.getY());
+//            mutable.mutZ(from.getZ());
+            BlockVector3 bv = new BlockVector3(from.getX(), from.getY(), from.getZ());
+            function.apply(bv);
             countAdd = 0;
             countAttempt = 0;
             for (IntegerTrio direction : dirs) {
-                mutable2.mutX(from.getX() + direction.x);
-                mutable2.mutY(from.getY() + direction.y);
-                mutable2.mutZ(from.getZ() + direction.z);
-                if (isVisitable(mutable, mutable2)) {
-                    adjacent = new Node(mutable2.getBlockX(), mutable2.getBlockY(), mutable2.getBlockZ());
+//                mutable2.mutX(from.getX() + direction.x);
+//                mutable2.mutY(from.getY() + direction.y);
+//                mutable2.mutZ(from.getZ() + direction.z);
+            	BlockVector3 bv2 = new BlockVector3(from.getX() + direction.x, from.getY() + direction.y, from.getZ() + direction.z);
+                if (isVisitable(bv, bv2)) {
+                    adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
                     if ((current.from == null || !adjacent.equals(current.from))) {
                         AtomicInteger adjacentCount = visited.get(adjacent);
                         if (adjacentCount == null) {

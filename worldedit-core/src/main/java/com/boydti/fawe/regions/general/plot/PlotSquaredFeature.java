@@ -23,7 +23,7 @@ import com.intellectualcrafters.plot.util.UUIDHandler;
 import com.intellectualcrafters.plot.util.block.GlobalBlockQueue;
 import com.intellectualcrafters.plot.util.block.QueueProvider;
 import com.plotsquared.listener.WEManager;
-import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import java.util.HashSet;
@@ -125,8 +125,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
             faweRegions.add(new com.boydti.fawe.object.RegionWrapper(current.minX, current.maxX, min, max, current.minZ, current.maxZ));
         }
         final RegionWrapper region = regions.iterator().next();
-        final BlockVector pos1 = new BlockVector(region.minX, min, region.minZ);
-        final BlockVector pos2 = new BlockVector(region.maxX, max, region.maxZ);
+        final BlockVector3 pos1 = new BlockVector3(region.minX, min, region.minZ);
+        final BlockVector3 pos2 = new BlockVector3(region.maxX, max, region.maxZ);
         final Plot finalPlot = plot;
         if (Settings.Done.RESTRICT_BUILDING && Flags.DONE.isSet(finalPlot) || regions.isEmpty()) {
             return null;

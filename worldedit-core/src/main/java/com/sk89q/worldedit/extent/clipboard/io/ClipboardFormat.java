@@ -38,12 +38,12 @@ import com.google.gson.Gson;
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -304,7 +304,7 @@ public enum ClipboardFormat {
         // summary
         // blocks
         HashMap<String, Object> map = new HashMap<String, Object>();
-        Vector dimensions = clipboard.getDimensions();
+        BlockVector3 dimensions = clipboard.getDimensions();
         map.put("width", dimensions.getX());
         map.put("height", dimensions.getY());
         map.put("length", dimensions.getZ());

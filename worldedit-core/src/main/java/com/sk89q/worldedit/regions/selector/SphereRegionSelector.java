@@ -86,17 +86,8 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
     }
 
     @Override
-<<<<<<< HEAD
-    public void explainSecondarySelection(Actor player, LocalSession session, Vector pos) {
-        BBC.SELECTOR_RADIUS.send(player, region.getRadius().getX(), region.getArea());
-=======
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        if (isDefined()) {
-            player.print("Radius set to " + region.getRadius().getX() + " (" + region.getArea() + ").");
-        } else {
-            player.print("Radius set to " + region.getRadius().getX() + ".");
-        }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BBC.SELECTOR_RADIUS.send(player, region.getRadius().getX(), region.getArea());
 
         session.describeCUI(player);
     }

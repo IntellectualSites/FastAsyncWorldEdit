@@ -25,23 +25,23 @@ public class WallMask extends AbstractMask {
         double y = v.getY();
         double z = v.getZ();
         v.mutX(x + 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutX(x);
             return true;
         }
         v.mutX(x - 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutX(x);
             return true;
         }
         v.mutX(x);
         v.mutZ(z + 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutZ(z);
             return true;
         }
         v.mutZ(z - 1);
-        if (mask.test(v) && ++count == min && max >= 8) {
+        if (mask.test(v.toBlockVector3()) && ++count == min && max >= 8) {
             v.mutZ(z);
             return true;
         }

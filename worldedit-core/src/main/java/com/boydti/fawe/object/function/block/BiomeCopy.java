@@ -3,6 +3,7 @@ package com.boydti.fawe.object.function.block;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2D;
 
@@ -24,7 +25,8 @@ public class BiomeCopy implements RegionFunction {
         int z = position.getBlockZ();
         if (x != mPos2d.getBlockX() || z != mPos2d.getBlockZ()) {
             mPos2d.setComponents(x, z);
-            return destination.setBiome(mPos2d, source.getBiome(mPos2d));
+            BlockVector2 bv = mPos2d.toBlockVector2();
+            return destination.setBiome( bv, source.getBiome(bv));
         }
         return false;
     }

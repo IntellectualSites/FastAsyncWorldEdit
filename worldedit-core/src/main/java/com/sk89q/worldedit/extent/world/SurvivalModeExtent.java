@@ -19,13 +19,8 @@
 
 package com.sk89q.worldedit.extent.world;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -98,7 +93,7 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
         if (toolUse && block.getBlockType().getMaterial().isAir()) {
-            world.simulateBlockMine(MutableBlockVector.get(x, y, z));
+            world.simulateBlockMine(new BlockVector3(x, y, z));
             return true;
         } else {
             return super.setBlock(x, y, z, block);

@@ -24,6 +24,8 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -379,19 +381,19 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         this.range = range;
     }
 
-    public Vector getPosition(EditSession editSession, Player player) {
+    public BlockVector3 getPosition(EditSession editSession, Player player) {
         Location loc = player.getLocation();
         switch (targetMode) {
             case TARGET_BLOCK_RANGE:
-                return offset(new MutableBlockVector(trace(editSession, player, getRange(), true)), loc.toVector());
+                return offset(trace(editSession, player, getRange(), true), loc.toVector()).toBlockPoint();
             case FOWARD_POINT_PITCH: {
                 int d = 0;
                 float pitch = loc.getPitch();
                 pitch = 23 - (pitch / 4);
                 d += (int) (Math.sin(Math.toRadians(pitch)) * 50);
-                final Vector vector = loc.getDirection().setY(0).normalize().multiply(d);
-                vector.add(loc.getX(), loc.getY(), loc.getZ()).toBlockVector();
-                return offset(new MutableBlockVector(vector), loc.toVector());
+                final Vector3 vector = loc.getDirection().withY(0).normalize().multiply(d).add(loc.getX(), loc.getY(), loc.getZ());
+//                vector = vector.add(loc.getX(), loc.getY(), loc.getZ());
+                return offset(vector, loc.toVector()).toBlockPoint();
             }
             case TARGET_POINT_HEIGHT: {
                 final int height = loc.getBlockY();
@@ -405,34 +407,33 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                     }
                 }
                 final int distance = (height - y) + 8;
-                return offset(new MutableBlockVector(trace(editSession, player, distance, true)), loc.toVector());
+                return offset(trace(editSession, player, distance, true), loc.toVector()).toBlockPoint();
             }
             case TARGET_FACE_RANGE:
-                return offset(new MutableBlockVector(trace(editSession, player, getRange(), true)), loc.toVector());
+                return offset(trace(editSession, player, getRange(), true), loc.toVector()).toBlockPoint();
             default:
                 return null;
         }
     }
 
-    private Vector offset(Vector target, Vector playerPos) {
+    private Vector3 offset(Vector3 target, Vector3 playerPos) {
         if (targetOffset == 0) return target;
         return target.subtract(target.subtract(playerPos).normalize().multiply(targetOffset));
     }
 
-    private Vector trace(EditSession editSession, Player player, int range, boolean useLastBlock) {
+    private Vector3 trace(EditSession editSession, Player player, int range, boolean useLastBlock) {
         Mask mask = targetMask == null ? new SolidBlockMask(editSession) : targetMask;
         new MaskTraverser(mask).reset(editSession);
         MaskedTargetBlock tb = new MaskedTargetBlock(mask, player, range, 0.2);
-        return TaskManager.IMP.sync(new RunnableVal<Vector>() {
+        return TaskManager.IMP.sync(new RunnableVal<Vector3>() {
             @Override
-            public void run(Vector value) {
+            public void run(Vector3 value) {
                 Location result = tb.getMaskedTargetBlock(useLastBlock);
                 this.value = result.toVector();
             }
         });
     }
 
-<<<<<<< HEAD
     public boolean act(BrushAction action, Platform server, LocalConfiguration config, Player player, LocalSession session) {
         switch (action) {
             case PRIMARY:
@@ -454,7 +455,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
             return false;
         }
 
-        Vector target = getPosition(editSession, player);
+        BlockVector3 target = getPosition(editSession, player);
 
         if (target == null) {
             editSession.cancel();
@@ -475,14 +476,14 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 MaskIntersection newMask = new MaskIntersection(existingMask);
                 newMask.add(mask);
                 editSession.setMask(newMask);
-=======
-            try {
-                brush.build(editSession, target.toVector().toBlockPoint(), material, size);
-            } catch (MaxChangedBlocksException e) {
-                player.printError("Max blocks change limit reached.");
-            } finally {
-                session.remember(editSession);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//=======
+//            try {
+//                brush.build(editSession, target.toVector().toBlockPoint(), material, size);
+//            } catch (MaxChangedBlocksException e) {
+//                player.printError("Max blocks change limit reached.");
+//            } finally {
+//                session.remember(editSession);
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
         }
         Mask sourceMask = current.getSourceMask();
@@ -622,7 +623,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 .combineStages(false)
                 .build();
         VisualExtent newVisualExtent = new VisualExtent(editSession.getExtent(), editSession.getQueue());
-        Vector position = getPosition(editSession, player);
+        BlockVector3 position = getPosition(editSession, player);
         if (position != null) {
             editSession.setExtent(newVisualExtent);
             switch (mode) {

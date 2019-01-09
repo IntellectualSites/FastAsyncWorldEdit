@@ -30,7 +30,7 @@ public class RandomOffsetTransform extends ResettableExtent {
     public boolean setBiome(BlockVector2 pos, BaseBiome biome) {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
-        return getExtent().setBiome(mutable.setComponents(x, z), biome);
+        return getExtent().setBiome(mutable.setComponents(x, z).toBlockVector2(), biome);
     }
 
     @Override

@@ -6,15 +6,14 @@ import com.boydti.fawe.object.regions.FuzzyRegion;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
@@ -27,7 +26,7 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
 
     private final Player player;
     private FuzzyRegion region;
-    private ArrayList<Vector> positions;
+    private ArrayList<BlockVector3> positions;
 
     public FuzzyRegionSelector(Player player, @Nullable World world, Mask mask) {
         super(new EditSessionBuilder(world)
@@ -43,7 +42,7 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
     }
 
     @Override
-    public List<Vector> getVerticies() {
+    public List<BlockVector3> getVerticies() {
         return positions;
     }
 
@@ -72,7 +71,7 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
     }
 
     @Override
-    public boolean selectPrimary(Vector position, SelectorLimits limits) {
+    public boolean selectPrimary(BlockVector3 position, SelectorLimits limits) {
         setWorld(getWorld());
         new MaskTraverser(getMask()).reset(getExtent());
         positions.clear();
@@ -83,7 +82,7 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
     }
 
     @Override
-    public boolean selectSecondary(Vector position, SelectorLimits limits) {
+    public boolean selectSecondary(BlockVector3 position, SelectorLimits limits) {
         this.positions.add(position);
         new MaskTraverser(getMask()).reset(getExtent());
         this.region.select(position.getBlockX(), position.getBlockY(), position.getBlockZ());
@@ -91,13 +90,13 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
     }
 
     @Override
-    public void explainPrimarySelection(Actor actor, LocalSession session, Vector position) {
+    public void explainPrimarySelection(Actor actor, LocalSession session, BlockVector3 position) {
         int size = this.region.getArea();
         BBC.SELECTOR_FUZZY_POS1.send(player, position, "(" + region.getArea() + ")");
     }
 
     @Override
-    public void explainSecondarySelection(Actor actor, LocalSession session, Vector position) {
+    public void explainSecondarySelection(Actor actor, LocalSession session, BlockVector3 position) {
         int size = this.region.getArea();
         BBC.SELECTOR_FUZZY_POS2.send(player, position, "(" + region.getArea() + ")");
     }
@@ -108,11 +107,11 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
     }
 
     @Override
-    public BlockVector getPrimaryPosition() throws IncompleteRegionException {
+    public BlockVector3 getPrimaryPosition() throws IncompleteRegionException {
         if (positions.isEmpty()) {
             throw new IncompleteRegionException();
         }
-        return new BlockVector(positions.get(0));
+        return positions.get(0);
     }
 
     @Override

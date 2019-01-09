@@ -73,7 +73,7 @@ public class StencilBrush extends HeightBrush {
                     int dy = vector.getBlockY() - cy;
                     int dz = vector.getBlockZ() - cz;
 
-                    Vector3 srcPos = transform.apply(mutable.setComponents(dx, dy, dz));
+                    Vector3 srcPos = transform.apply(mutable.setComponents(dx, dy, dz).toVector3());
                     dx = MathMan.roundInt(srcPos.getX());
                     dz = MathMan.roundInt(srcPos.getZ());
 

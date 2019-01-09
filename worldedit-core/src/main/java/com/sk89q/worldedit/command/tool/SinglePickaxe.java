@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command.tool;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -42,30 +43,20 @@ public class SinglePickaxe implements BlockTool {
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
-        World world = (World) clicked.getExtent();
-<<<<<<< HEAD
-        final BlockType blockType = world.getLazyBlock(clicked.toVector()).getBlockType();
-        if (blockType == BlockTypes.BEDROCK && !player.canDestroyBedrock()) {
-            return true;
-        }
-
-        EditSession editSession = session.createEditSession(player);
-        editSession.getSurvivalExtent().setToolUse(config.superPickaxeDrop);
-=======
+    	World world = (World) clicked.getExtent();
         BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
         final BlockType blockType = world.getBlock(blockPoint).getBlockType();
         if (blockType == BlockTypes.BEDROCK
                 && !player.canDestroyBedrock()) {
             return true;
         }
-
-        try (EditSession editSession = session.createEditSession(player)) {
+        final EditSession editSession = session.createEditSession(player);
+        try {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeDrop);
             editSession.setBlock(blockPoint, BlockTypes.AIR.getDefaultState());
         } catch (MaxChangedBlocksException e) {
             player.printError("Max blocks change limit reached.");
         }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         try {
             if (editSession.setBlock(clicked.getBlockX(), clicked.getBlockY(), clicked.getBlockZ(), EditSession.nullBlock)) {

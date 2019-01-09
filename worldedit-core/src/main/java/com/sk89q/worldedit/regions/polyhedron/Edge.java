@@ -19,13 +19,9 @@
 
 package com.sk89q.worldedit.regions.polyhedron;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.Vector;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.Vector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

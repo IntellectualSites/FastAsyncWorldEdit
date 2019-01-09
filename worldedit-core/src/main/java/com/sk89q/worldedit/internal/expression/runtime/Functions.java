@@ -19,12 +19,8 @@
 
 package com.sk89q.worldedit.internal.expression.runtime;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-=======
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.runtime.Function.Dynamic;
 import com.sk89q.worldedit.math.Vector3;

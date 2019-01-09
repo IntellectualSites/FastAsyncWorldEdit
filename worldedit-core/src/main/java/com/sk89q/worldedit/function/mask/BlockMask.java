@@ -1,22 +1,18 @@
 package com.sk89q.worldedit.function.mask;
 
-<<<<<<< HEAD
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -82,7 +78,6 @@ public class BlockMask extends AbstractExtentMask {
     }
 
     @Override
-<<<<<<< HEAD
     public Mask optimize() {
         Map<Object, Integer> states = new HashMap<>();
         int indexFound = -1;
@@ -102,13 +97,6 @@ public class BlockMask extends AbstractExtentMask {
                 } else {
                     return this;
                 }
-=======
-    public boolean test(BlockVector3 vector) {
-        BlockStateHolder block = getExtent().getBlock(vector);
-        for (BlockStateHolder testBlock : blocks) {
-            if (testBlock.equalsFuzzy(block)) {
-                return true;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
             // Only types, no states
             if (indexFound == -1) {
@@ -138,6 +126,12 @@ public class BlockMask extends AbstractExtentMask {
             return mask;
         }
     }
+//    public boolean test(BlockVector3 vector) {
+//        BlockStateHolder block = getExtent().getBlock(vector);
+//        for (BlockStateHolder testBlock : blocks) {
+//            if (testBlock.equalsFuzzy(block)) {
+//                return true;
+
 
     private Mask getOptimizedMask(BlockType type, long[] bitSet) {
         boolean single = true;
@@ -233,7 +227,7 @@ public class BlockMask extends AbstractExtentMask {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         BlockStateHolder block = getExtent().getBlock(vector);
         long[] bitSet = bitSets[block.getInternalBlockTypeId()];
         if (bitSet == null) return false;

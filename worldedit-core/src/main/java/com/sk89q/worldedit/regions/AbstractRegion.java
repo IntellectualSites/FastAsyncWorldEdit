@@ -19,14 +19,10 @@
 
 package com.sk89q.worldedit.regions;
 
-<<<<<<< HEAD
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
-=======
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.regions.iterator.RegionIterator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;

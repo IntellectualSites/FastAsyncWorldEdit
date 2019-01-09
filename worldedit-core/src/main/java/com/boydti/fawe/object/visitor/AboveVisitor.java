@@ -1,10 +1,11 @@
 package com.boydti.fawe.object.visitor;
 
 import com.boydti.fawe.object.HasFaweQueue;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import java.util.Collection;
 
 
@@ -38,18 +39,18 @@ public class AboveVisitor extends RecursiveVisitor {
 
         this.baseY = baseY;
 
-        Collection<Vector> directions = getDirections();
+        Collection<BlockVector3> directions = getDirections();
         directions.clear();
-        directions.add(new Vector(1, 0, 0));
-        directions.add(new Vector(-1, 0, 0));
-        directions.add(new Vector(0, 0, 1));
-        directions.add(new Vector(0, 0, -1));
-        directions.add(new Vector(0, 1, 0));
-        directions.add(new Vector(0, -1, 0));
+        directions.add(new BlockVector3(1, 0, 0));
+        directions.add(new BlockVector3(-1, 0, 0));
+        directions.add(new BlockVector3(0, 0, 1));
+        directions.add(new BlockVector3(0, 0, -1));
+        directions.add(new BlockVector3(0, 1, 0));
+        directions.add(new BlockVector3(0, -1, 0));
     }
 
     @Override
-    public boolean isVisitable(Vector from, Vector to) {
+    public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
         return (from.getBlockY() >= baseY) && super.isVisitable(from, to);
     }
 }

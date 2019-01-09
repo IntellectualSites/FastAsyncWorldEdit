@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.extent.logging;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -47,11 +47,11 @@ public abstract class AbstractLoggingExtent extends AbstractDelegateExtent {
      * @param position the position
      * @param newBlock the new block to replace the old one
      */
-    protected void onBlockChange(Vector position, BlockStateHolder newBlock) {
+    protected void onBlockChange(BlockVector3 position, BlockStateHolder newBlock) {
     }
 
     @Override
-    public final boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    public final boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         onBlockChange(position, block);
         return super.setBlock(position, block);
     }

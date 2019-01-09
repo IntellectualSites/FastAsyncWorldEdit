@@ -50,7 +50,7 @@ public class DirectionalVisitor extends RecursiveVisitor {
         super(mask, function, distance, hasFaweQueue);
         checkNotNull(mask);
         this.origin = origin;
-        this.dirVec = new MutableBlockVector(direction);
+        this.dirVec = direction;
         final Collection<BlockVector3> directions = this.getDirections();
         directions.clear();
         directions.add(new BlockVector3(1, 0, 0));

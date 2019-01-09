@@ -19,14 +19,11 @@
 
 package com.sk89q.worldedit.function.mask;
 
-<<<<<<< HEAD
 import com.google.common.base.Function;
-import com.sk89q.worldedit.Vector;
-=======
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -172,17 +169,12 @@ public class MaskIntersection extends AbstractMask {
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean test(Vector vector) {
-        for (Mask mask : masksArray) {
-=======
     public boolean test(BlockVector3 vector) {
         if (masks.isEmpty()) {
             return false;
         }
 
         for (Mask mask : masks) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             if (!mask.test(vector)) {
                 return false;
             }

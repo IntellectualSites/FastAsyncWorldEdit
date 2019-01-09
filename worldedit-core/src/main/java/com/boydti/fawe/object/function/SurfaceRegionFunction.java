@@ -30,7 +30,7 @@ public class SurfaceRegionFunction implements FlatRegionFunction {
         int layer = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY, false);
         if (layer != -1) {
             lastY = layer;
-            return function.apply(mutable.setComponents(x, layer, z));
+            return function.apply(mutable.setComponents(x, layer, z).toBlockVector3());
         }
         return false;
     }

@@ -34,15 +34,15 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public BlockVector3 getMinimumPoint() {
-    	BlockVector3 pos1 = new MutableBlockVector(getPos(super.getMinimumPoint()));
-    	BlockVector3 pos2 = new MutableBlockVector(getPos(super.getMaximumPoint()));
+    	BlockVector3 pos1 = getPos(super.getMinimumPoint());
+    	BlockVector3 pos2 = getPos(super.getMaximumPoint());
         return pos1.getMinimum(pos2);
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-    	BlockVector3 pos1 = new MutableBlockVector(getPos(super.getMinimumPoint()));
-    	BlockVector3 pos2 = new MutableBlockVector(getPos(super.getMaximumPoint()));
+    	BlockVector3 pos1 = getPos(super.getMinimumPoint());
+    	BlockVector3 pos2 = getPos(super.getMaximumPoint());
         return pos1.getMaximum(pos2);
     }
 
@@ -99,7 +99,7 @@ public class TransformExtent extends BlockTransformExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.getBiome(getPos(mutable).toBlockVector2());
+        return super.getBiome(getPos(mutable.toBlockVector3()).toBlockVector2());
     }
 
     @Override
@@ -118,6 +118,6 @@ public class TransformExtent extends BlockTransformExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.setBiome(getPos(mutable).toBlockVector2(), biome);
+        return super.setBiome(getPos(mutable.toBlockVector3()).toBlockVector2(), biome);
     }
 }

@@ -51,7 +51,7 @@ import javax.annotation.Nullable;
 public class AbstractDelegateExtent implements LightingExtent {
 
     private transient final Extent extent;
-    private MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+//    private MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
 
     /**
      * Create a new instance.
@@ -126,10 +126,10 @@ public class AbstractDelegateExtent implements LightingExtent {
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        mutable.mutX(x);
-        mutable.mutY(y);
-        mutable.mutZ(z);
-        return extent.getLazyBlock(mutable);
+//        mutable.mutX(x);
+//        mutable.mutY(y);
+//        mutable.mutZ(z);
+        return extent.getLazyBlock(new BlockVector3(x, y, z));
     }
 
     @Override
@@ -139,10 +139,10 @@ public class AbstractDelegateExtent implements LightingExtent {
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        mutable.mutX(x);
-        mutable.mutY(y);
-        mutable.mutZ(z);
-        return setBlock(mutable, block);
+//        mutable.mutX(x);
+//        mutable.mutY(y);
+//        mutable.mutZ(z);
+        return setBlock(new BlockVector3(x, y, z), block);
     }
     
     public BlockState getBlock(BlockVector3 position) {

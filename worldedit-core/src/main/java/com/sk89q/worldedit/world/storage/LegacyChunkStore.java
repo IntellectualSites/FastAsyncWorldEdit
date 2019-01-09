@@ -22,11 +22,7 @@ package com.sk89q.worldedit.world.storage;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.Tag;
-<<<<<<< HEAD
-import com.sk89q.worldedit.*;
-=======
 import com.sk89q.worldedit.math.BlockVector2;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
 

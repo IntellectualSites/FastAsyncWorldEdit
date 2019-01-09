@@ -19,13 +19,8 @@
 
 package com.sk89q.worldedit.extent.reorder;
 
-<<<<<<< HEAD
 import com.google.common.collect.Iterators;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
-=======
 import com.google.common.collect.Iterables;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.Blocks;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -34,11 +29,8 @@ import com.sk89q.worldedit.function.operation.BlockMapEntryPlacer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
 import com.sk89q.worldedit.function.operation.RunContext;
-<<<<<<< HEAD
-=======
 import com.sk89q.worldedit.function.operation.SetLocatedBlocks;
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.collection.TupleArrayList;
 import com.sk89q.worldedit.world.block.BlockCategories;

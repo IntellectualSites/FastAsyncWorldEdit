@@ -20,13 +20,13 @@
 package com.sk89q.worldedit.world.block;
 
 import com.google.common.collect.ImmutableList;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.item.ItemType;
@@ -47,12 +47,12 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
     int getMaxStateId();
 
     @Override
-    default boolean apply(Extent extent, Vector get, Vector set) throws WorldEditException {
+    default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return extent.setBlock(set, this.getDefaultState());
     }
 
     @Override
-    default BlockStateHolder apply(Vector position) {
+    default BlockStateHolder apply(BlockVector3 position) {
         return this.getDefaultState();
     }
 

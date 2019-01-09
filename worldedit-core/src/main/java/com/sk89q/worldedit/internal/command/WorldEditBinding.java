@@ -28,11 +28,8 @@ import com.sk89q.worldedit.PlayerDirection;
 import com.sk89q.worldedit.UnknownDirectionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-=======
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.NoMatchException;
@@ -56,7 +53,6 @@ import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.biome.Biomes;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -310,17 +306,10 @@ public class WorldEditBinding extends BindingHelper {
      * @throws UnknownDirectionException on an unknown direction
      */
     @BindingMatch(classifier = Direction.class,
-<<<<<<< HEAD
-            type = Vector.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
-    public Vector getDirection(ArgumentStack context, Direction direction)
-=======
                   type = BlockVector3.class,
                   behavior = BindingBehavior.CONSUMES,
                   consumedCount = 1)
     public BlockVector3 getDirection(ArgumentStack context, Direction direction) 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             throws ParameterException, UnknownDirectionException {
         Player sender = getPlayer(context);
         return worldEdit.getDirection(sender, context.next());

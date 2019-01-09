@@ -83,7 +83,7 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.getBiome(getPos(mutable).toBlockVector2());
+        return super.getBiome(getPos(mutable.toBlockVector3()).toBlockVector2());
     }
 
     @Override
@@ -102,7 +102,7 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.setBiome(getPos(mutable).toBlockVector2(), biome);
+        return super.setBiome(getPos(mutable.toBlockVector3()).toBlockVector2(), biome);
     }
 
     public void setTransform(Transform transform) {

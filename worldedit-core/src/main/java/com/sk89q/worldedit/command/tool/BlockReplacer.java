@@ -58,22 +58,10 @@ public class BlockReplacer implements DoubleActionBlockTool {
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
         BlockBag bag = session.getBlockBag(player);
 
-<<<<<<< HEAD
         EditSession editSession = session.createEditSession(player);
 
         try {
-            editSession.setBlock(clicked.toVector(), pattern);
-=======
-        try (EditSession editSession = session.createEditSession(player)) {
-            try {
-                editSession.disableBuffering();
-                BlockVector3 position = clicked.toVector().toBlockPoint();
-                editSession.setBlock(position, pattern.apply(position));
-            } catch (MaxChangedBlocksException ignored) {
-            } finally {
-                session.remember(editSession);
-            }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+            editSession.setBlock(clicked.toVector().toBlockPoint(), pattern);
         } finally {
             if (bag != null) {
                 bag.flushChanges();
@@ -87,13 +75,9 @@ public class BlockReplacer implements DoubleActionBlockTool {
 
     @Override
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
-<<<<<<< HEAD
         EditSession editSession = session.createEditSession(player);
-        BlockStateHolder targetBlock = (editSession).getBlock(clicked.toVector());
+        BlockStateHolder targetBlock = (editSession).getBlock(clicked.toVector().toBlockPoint());
         BlockType type = targetBlock.getBlockType();
-=======
-        BlockStateHolder targetBlock = player.getWorld().getBlock(clicked.toVector().toBlockPoint());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
         if (type != null) {
             this.pattern = targetBlock;

@@ -1,13 +1,10 @@
 package com.sk89q.worldedit.extent.transform;
 
-<<<<<<< HEAD
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
@@ -15,25 +12,20 @@ import com.sk89q.worldedit.internal.helper.MCDirections;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.registry.state.BooleanProperty;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.util.Direction;
-<<<<<<< HEAD
 import com.sk89q.worldedit.world.biome.BaseBiome;
-=======
-import com.sk89q.worldedit.world.block.BaseBlock;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -43,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Transforms blocks themselves (but not their position) according to a
@@ -77,71 +70,12 @@ public class BlockTransformExtent extends ResettableExtent {
 
                 case ROTATION:
 
-<<<<<<< HEAD
                 case AXIS:
 
                 case FACING:
 
                 case SHAPE:
-=======
-    @Override
-    public BlockState getBlock(BlockVector3 position) {
-        return transformBlock(super.getBlock(position), false);
-    }
-
-    @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return transformBlock(super.getFullBlock(position), false);
-    }
-
-    @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(location, transformBlock(block, true));
-    }
-
-
-    /**
-     * Transform the given block using the given transform.
-     *
-     * <p>The provided block is modified.</p>
-     *
-     * @param block the block
-     * @param transform the transform
-     * @return the same block
-     */
-    public static <T extends BlockStateHolder> T transform(T block, Transform transform) {
-        return transform(block, transform, block);
-    }
-
-    private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
-
-    /**
-     * Transform the given block using the given transform.
-     *
-     * @param block the block
-     * @param transform the transform
-     * @param changedBlock the block to change
-     * @return the changed block
-     */
-    private static <T extends BlockStateHolder> T transform(T block, Transform transform, T changedBlock) {
-        checkNotNull(block);
-        checkNotNull(transform);
-
-        List<? extends Property> properties = block.getBlockType().getProperties();
-
-        for (Property property : properties) {
-            if (property instanceof DirectionalProperty) {
-                Direction value = (Direction) block.getState(property);
-                if (value != null) {
-                    Vector3 newValue = getNewStateValue((DirectionalProperty) property, transform, value.toVector());
-                    if (newValue != null) {
-                        changedBlock = (T) changedBlock.with(property, Direction.findClosest(newValue, Direction.Flag.ALL));
-                    }
-                }
-            }
-        }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
-
+                	
                 case NORTH:
                 case EAST:
                 case SOUTH:
@@ -150,21 +84,79 @@ public class BlockTransformExtent extends ResettableExtent {
         }
         return null;
     }
+//    @Override
+//    public BlockState getBlock(BlockVector3 position) {
+//        return transformBlock(super.getBlock(position), false);
+//    }
+//
+//    @Override
+//    public BaseBlock getFullBlock(BlockVector3 position) {
+//        return transformBlock(super.getFullBlock(position), false);
+//    }
+
+//    @Override
+//    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+//        return super.setBlock(location, transformBlock(block, true));
+//    }
+
+
+//    /**
+//     * Transform the given block using the given transform.
+//     *
+//     * <p>The provided block is modified.</p>
+//     *
+//     * @param block the block
+//     * @param transform the transform
+//     * @return the same block
+//     */
+//    public static <T extends BlockStateHolder> T transform(T block, Transform transform) {
+//        return transform(block, transform, block);
+//    }
+
+    private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
+
+//    /**
+//     * Transform the given block using the given transform.
+//     *
+//     * @param block the block
+//     * @param transform the transform
+//     * @param changedBlock the block to change
+//     * @return the changed block
+//     */
+//    private static <T extends BlockStateHolder> T transform(T block, Transform transform, T changedBlock) {
+//        checkNotNull(block);
+//        checkNotNull(transform);
+//
+//        List<? extends Property> properties = block.getBlockType().getProperties();
+//
+//        for (Property property : properties) {
+//            if (property instanceof DirectionalProperty) {
+//                Direction value = (Direction) block.getState(property);
+//                if (value != null) {
+//                    Vector3 newValue = getNewStateValue((DirectionalProperty) property, transform, value.toVector());
+//                    if (newValue != null) {
+//                        changedBlock = (T) changedBlock.with(property, Direction.findClosest(newValue, Direction.Flag.ALL));
+//                    }
+//                }
+//            }
+//        }
+
+
 
     @Nullable
-<<<<<<< HEAD
+//<<<<<<< HEAD
     private static Integer getNewStateIndex(Transform transform, List<Direction> directions, int oldIndex) {
         Direction oldDirection = directions.get(oldIndex);
-        Vector oldVector = oldDirection.toVector();
-        Vector newVector = transform.apply(oldVector).subtract(transform.apply(Vector.ZERO)).normalize();
+        Vector3 oldVector = oldDirection.toVector();
+        Vector3 newVector = transform.apply(oldVector).subtract(transform.apply(Vector3.ZERO)).normalize();
         int newIndex = oldIndex;
-        double closest = oldVector.toVector().normalize().dot(newVector);
-=======
-    private static Vector3 getNewStateValue(DirectionalProperty state, Transform transform, Vector3 oldDirection) {
-        Vector3 newDirection = transform.apply(oldDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
-        Vector3 newValue = null;
-        double closest = -2;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        double closest = oldVector.normalize().dot(newVector);
+//=======
+//    private static Vector3 getNewStateValue(DirectionalProperty state, Transform transform, Vector3 oldDirection) {
+//        Vector3 newDirection = transform.apply(oldDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
+//        Vector3 newValue = null;
+//        double closest = -2;
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         boolean found = false;
 
         for (int i = 0; i < directions.size(); i++) {
@@ -265,13 +257,10 @@ public class BlockTransformExtent extends ResettableExtent {
                 Direction direction = MCDirections.fromRotation(rot);
 
                 if (direction != null) {
-                    Vector applyAbsolute = transform.apply(direction.toVector());
-                    Vector applyOrigin = transform.apply(Vector.ZERO);
-                    applyAbsolute.mutX(applyAbsolute.getX() - applyOrigin.getX());
-                    applyAbsolute.mutY(applyAbsolute.getY() - applyOrigin.getY());
-                    applyAbsolute.mutZ(applyAbsolute.getZ() - applyOrigin.getZ());
+                    Vector3 applyAbsolute = transform.apply(direction.toVector());
+                    Vector3 applyOrigin = transform.apply(Vector3.ZERO);
 
-                    Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
+                    Direction newDirection = Direction.findClosest(applyAbsolute.subtract(applyOrigin), Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
                         Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
@@ -294,13 +283,10 @@ public class BlockTransformExtent extends ResettableExtent {
                 Direction direction = MCDirections.fromRotation(rot);
 
                 if (direction != null) {
-                    Vector applyAbsolute = transformInverse.apply(direction.toVector());
-                    Vector applyOrigin = transformInverse.apply(Vector.ZERO);
-                    applyAbsolute.mutX(applyAbsolute.getX() - applyOrigin.getX());
-                    applyAbsolute.mutY(applyAbsolute.getY() - applyOrigin.getY());
-                    applyAbsolute.mutZ(applyAbsolute.getZ() - applyOrigin.getZ());
+                    Vector3 applyAbsolute = transformInverse.apply(direction.toVector());
+                    Vector3 applyOrigin = transformInverse.apply(Vector3.ZERO);
 
-                    Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
+                    Direction newDirection = Direction.findClosest(applyAbsolute.subtract(applyOrigin), Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
                         Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
@@ -319,17 +305,17 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     @Override
-    public BlockState getLazyBlock(Vector position) {
+    public BlockState getLazyBlock(BlockVector3 position) {
         return transformFast(super.getLazyBlock(position));
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         return transformFast(super.getBlock(position));
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return super.getBiome(position);
     }
 
@@ -340,7 +326,7 @@ public class BlockTransformExtent extends ResettableExtent {
 
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         return super.setBlock(location, transformFastInverse((BlockState) block));
     }
 

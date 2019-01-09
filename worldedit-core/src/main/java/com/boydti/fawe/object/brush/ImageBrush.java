@@ -98,11 +98,11 @@ public class ImageBrush implements Brush {
                     int dy = vector.getBlockY() - cy;
                     int dz = vector.getBlockZ() - cz;
 
-                    Vector3 pos1 = transform.apply(mutable.setComponents(dx - 0.5, dy - 0.5, dz - 0.5));
+                    Vector3 pos1 = transform.apply(mutable.setComponents(dx - 0.5, dy - 0.5, dz - 0.5).toVector3());
                     int x1 = (int) (pos1.getX() * scale + centerX);
                     int z1 = (int) (pos1.getZ() * scale + centerZ);
 
-                    Vector3 pos2 = transform.apply(mutable.setComponents(dx + 0.5, dy + 0.5, dz + 0.5));
+                    Vector3 pos2 = transform.apply(mutable.setComponents(dx + 0.5, dy + 0.5, dz + 0.5).toVector3());
                     int x2 = (int) (pos2.getX() * scale + centerX);
                     int z2 = (int) (pos2.getZ() * scale + centerZ);
                     if (x2 < x1) {

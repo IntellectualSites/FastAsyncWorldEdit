@@ -191,7 +191,7 @@ public class NavigationCommands {
             pos = player.getSolidBlockTrace(300);
         }
         if (pos != null) {
-            if(args.hasFlag('f')) player.setPosition(pos); else player.findFreePosition(pos);
+            if(args.hasFlag('f')) player.setPosition(pos.toVector()); else player.findFreePosition(pos);
             BBC.POOF.send(player);
         } else {
             BBC.NO_BLOCK.send(player);

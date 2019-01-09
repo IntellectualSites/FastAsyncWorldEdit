@@ -20,35 +20,27 @@
 package com.sk89q.worldedit.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.LazyBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.operation.Operation;
-=======
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-<<<<<<< HEAD
-=======
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -60,13 +52,10 @@ import java.util.List;
  */
 public class NullExtent implements Extent {
 
-<<<<<<< HEAD
-    private final Vector nullPoint = new Vector(0, 0, 0);
+    private final BlockVector3 nullPoint = new BlockVector3(0, 0, 0);
 
     public static final NullExtent INSTANCE = new NullExtent();
 
-=======
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     @Override
     public BlockVector3 getMinimumPoint() {
         return BlockVector3.ZERO;
@@ -98,19 +87,13 @@ public class NullExtent implements Extent {
         return BlockTypes.AIR.getDefaultState();
     }
 
-    @Override
-<<<<<<< HEAD
-    public BlockState getLazyBlock(Vector position) {
+    public BlockState getLazyBlock(BlockVector3 position) {
         return BlockTypes.AIR.getDefaultState();
     }
 
     @Override
-    public BlockState getFullBlock(Vector position) {
+    public BlockState getFullBlock(BlockVector3 position) {
         return new BaseBlock(getBlock(position));
-=======
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return getBlock(position).toBaseBlock();
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Nullable

@@ -19,11 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.BlockVector;
-=======
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -132,25 +128,15 @@ public class ExtendingCuboidRegionSelector extends CuboidRegionSelector {
     }
 
     @Override
-<<<<<<< HEAD
-    public void explainPrimarySelection(Actor player, LocalSession session, Vector pos) {
-        BBC.SELECTOR_POS.send(player, 1, pos, region.getArea());
-=======
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.print("Started selection at " + pos + " (" + region.getArea() + ").");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BBC.SELECTOR_POS.send(player, 1, pos, region.getArea());
 
         explainRegionAdjust(player, session);
     }
 
     @Override
-<<<<<<< HEAD
-    public void explainSecondarySelection(Actor player, LocalSession session, Vector pos) {
-        BBC.SELECTOR_EXPANDED.send(player, pos, region.getArea());
-=======
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.print("Extended selection to encompass " + pos + " (" + region.getArea() + ").");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BBC.SELECTOR_EXPANDED.send(player, pos, region.getArea());
 
         explainRegionAdjust(player, session);
     }

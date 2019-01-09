@@ -54,6 +54,6 @@ public class SourceMaskExtent extends TemporalExtent {
         mutable.mutX(x);
         mutable.mutY(y);
         mutable.mutZ(z);
-        return mask.test(mutable) && super.setBlock(x, y, z, block);
+        return mask.test(mutable.toBlockVector3()) && super.setBlock(x, y, z, block);
     }
 }

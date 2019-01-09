@@ -72,6 +72,7 @@ import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -1085,8 +1086,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public boolean setBlock(int x, int y, int z, Pattern pattern) {
         this.changes++;
         try {
-            mutablebv.setComponents(x, y, z);
-            return pattern.apply(extent, mutablebv, mutablebv);
+            BlockVector3 bv = mutablebv.setComponents(x, y, z).toBlockVector3();
+            return pattern.apply(extent, bv, bv);
         } catch (WorldEditException e) {
             throw new RuntimeException("Unexpected exception", e);
         }
@@ -2225,10 +2226,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     for (int y = 0; y < height; ++y) {
-                        this.setBlock(mutable.setComponents(px + x, py + y, pz + z), block);
-                        this.setBlock(mutable.setComponents(px - x, py + y, pz + z), block);
-                        this.setBlock(mutable.setComponents(px + x, py + y, pz - z), block);
-                        this.setBlock(mutable.setComponents(px - x, py + y, pz - z), block);
+                        this.setBlock(mutable.setComponents(px + x, py + y, pz + z).toBlockVector3(), block);
+                        this.setBlock(mutable.setComponents(px - x, py + y, pz + z).toBlockVector3(), block);
+                        this.setBlock(mutable.setComponents(px + x, py + y, pz - z).toBlockVector3(), block);
+                        this.setBlock(mutable.setComponents(px - x, py + y, pz - z).toBlockVector3(), block);
                     }
                 }
             }
@@ -2259,10 +2260,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     for (int y = 0; y < height; ++y) {
-                        this.setBlock(mutable.setComponents(px + x, py + y, pz + z), block);
-                        this.setBlock(mutable.setComponents(px - x, py + y, pz + z), block);
-                        this.setBlock(mutable.setComponents(px + x, py + y, pz - z), block);
-                        this.setBlock(mutable.setComponents(px - x, py + y, pz - z), block);
+                        this.setBlock(mutable.setComponents(px + x, py + y, pz + z).toBlockVector3(), block);
+                        this.setBlock(mutable.setComponents(px - x, py + y, pz + z).toBlockVector3(), block);
+                        this.setBlock(mutable.setComponents(px + x, py + y, pz - z).toBlockVector3(), block);
+                        this.setBlock(mutable.setComponents(px - x, py + y, pz - z).toBlockVector3(), block);
                     }
                 }
             }
@@ -2336,21 +2337,21 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     if (Math.abs((x) * nx + (y) * ny + (z) * nz) < threshold)
-                        setBlock(mutable.setComponents(px + x, py + y, pz + z), block);
+                        setBlock(mutable.setComponents(px + x, py + y, pz + z).toBlockVector3(), block);
                     if (Math.abs((-x) * nx + (y) * ny + (z) * nz) < threshold)
-                        setBlock(mutable.setComponents(px - x, py + y, pz + z), block);
+                        setBlock(mutable.setComponents(px - x, py + y, pz + z).toBlockVector3(), block);
                     if (Math.abs((x) * nx + (-y) * ny + (z) * nz) < threshold)
-                        setBlock(mutable.setComponents(px + x, py - y, pz + z), block);
+                        setBlock(mutable.setComponents(px + x, py - y, pz + z).toBlockVector3(), block);
                     if (Math.abs((x) * nx + (y) * ny + (-z) * nz) < threshold)
-                        setBlock(mutable.setComponents(px + x, py + y, pz - z), block);
+                        setBlock(mutable.setComponents(px + x, py + y, pz - z).toBlockVector3(), block);
                     if (Math.abs((-x) * nx + (-y) * ny + (z) * nz) < threshold)
-                        setBlock(mutable.setComponents(px - x, py - y, pz + z), block);
+                        setBlock(mutable.setComponents(px - x, py - y, pz + z).toBlockVector3(), block);
                     if (Math.abs((x) * nx + (-y) * ny + (-z) * nz) < threshold)
-                        setBlock(mutable.setComponents(px + x, py - y, pz - z), block);
+                        setBlock(mutable.setComponents(px + x, py - y, pz - z).toBlockVector3(), block);
                     if (Math.abs((-x) * nx + (y) * ny + (-z) * nz) < threshold)
-                        setBlock(mutable.setComponents(px - x, py + y, pz - z), block);
+                        setBlock(mutable.setComponents(px - x, py + y, pz - z).toBlockVector3(), block);
                     if (Math.abs((-x) * nx + (-y) * ny + (-z) * nz) < threshold)
-                        setBlock(mutable.setComponents(px - x, py - y, pz - z), block);
+                        setBlock(mutable.setComponents(px - x, py - y, pz - z).toBlockVector3(), block);
                 }
             }
         }
@@ -2956,9 +2957,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             @Override
             public BlockStateHolder getMaterial(final int x, final int y, final int z, final BlockStateHolder defaultMaterial) {
                 //TODO Optimize - avoid vector creation (math)
-                final Vector3 current = mutablev.setComponents(x, y, z);
+//                final Vector3 current = mutablev.setComponents(x, y, z);
 //            protected BlockStateHolder getMaterial(int x, int y, int z, BlockStateHolder defaultMaterial) {
-//                final Vector3 current = new Vector3(x, y, z);
+                final Vector3 current = new Vector3(x, y, z);
                 environment.setCurrentBlock(current);
                 final Vector3 scaled = current.subtract(zero).divide(unit);
 
@@ -3472,14 +3473,17 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             boolean containsAny = false;
             if (cuboid && containsBot1 && containsBot2 && containsTop1 && containsTop2 && conNextX && conNextZ) {
                 containsAny = true;
+                BlockVector3 mbv = mutable.toBlockVector3();
                 if (fcs != null) {
                     for (int x = 0; x < 16; x++) {
                         int xx = x + bx;
                         for (int z = 0; z < 16; z++) {
                             int zz = z + bz;
                             for (int y = 0; y < getMaxY() + 1; y++) {
-                                BlockStateHolder block = getFullBlock(mutable.setComponents(xx, y, zz));
-                                fcs.add(mutable, block, BlockTypes.AIR.getDefaultState());
+//                                BlockStateHolder block = getFullBlock(mutable.setComponents(xx, y, zz));
+                            	BlockVector3 bv = new BlockVector3(xx, y, zz);
+                            	BlockStateHolder block = getFullBlock(bv);
+                                fcs.add(mbv, block, BlockTypes.AIR.getDefaultState());
                             }
                         }
                     }
@@ -3502,17 +3506,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                         mutable.mutZ(zz);
                         for (int y = 0; y < getMaxY() + 1; y++) {
                             mutable.mutY(y);
-                            boolean contains = (fe == null || fe.contains(xx, y, zz)) && region.contains(mutable);
+                            BlockVector3 mbv = new BlockVector3(xx, y, zz);
+                            boolean contains = (fe == null || fe.contains(xx, y, zz)) && region.contains(mbv);
                             if (contains) {
                                 containsAny = true;
                                 if (fcs != null) {
-                                    BlockStateHolder block = getFullBlock(mutable.setComponents(xx, y, zz));
-                                    fcs.add(mutable, block, BlockTypes.AIR.getDefaultState());
+                                    BlockStateHolder block = getFullBlock(mbv);
+                                    fcs.add(mbv, block, BlockTypes.AIR.getDefaultState());
                                 }
                             } else {
-                                BlockStateHolder block = getFullBlock(mutable.setComponents(xx, y, zz));
+                                BlockStateHolder block = getFullBlock(mbv);
                                 try {
-                                    setBlock(mutable, block);
+                                    setBlock(mbv, block);
                                 } catch (MaxChangedBlocksException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -3601,6 +3606,5 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 
 }

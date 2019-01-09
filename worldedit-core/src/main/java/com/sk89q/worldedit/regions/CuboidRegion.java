@@ -329,7 +329,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
                     @Override
                     public BlockVector2 next() {
-                    	BlockVector2 result = pos;
+                    	MutableBlockVector2D result = pos;
                         // calc next
                         pos.setComponents(pos.getX() - 1, pos.getZ());
                         if (pos.getX() <= minX) {
@@ -339,7 +339,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                                 pos.setComponents(maxX, pos.getZ() - 1);
                             }
                         }
-                        return result;
+                        return result.toBlockVector2();
                     }
 
                     @Override
@@ -484,7 +484,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                                     x = tx;
                                     y = ty;
                                     hasNext = false;
-                                    return mutable;
+                                    return mutable.toBlockVector3();
                                 }
                             } else {
                                 z = cbz;
@@ -503,7 +503,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         x = cbx;
                     }
                 }
-                return mutable;
+                return mutable.toBlockVector3();
             }
         };
     }
@@ -549,7 +549,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         }
                     }
                 }
-                return mutable;
+                return mutable.toBlockVector3();
             }
         };
     }
@@ -574,7 +574,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                     @Override
                     public BlockVector2 next() {
                         if (!hasNext()) throw new java.util.NoSuchElementException();
-                        BlockVector2 answer = mutable.setComponents(nextX, nextZ);
+//                        BlockVector2 answer = mutable.setComponents(nextX, nextZ);
+                        BlockVector2 answer = new BlockVector2(nextX, nextZ);
                         if (++nextX > max.getBlockX()) {
                             nextX = min.getBlockX();
                             if (++nextZ > max.getBlockZ()) {

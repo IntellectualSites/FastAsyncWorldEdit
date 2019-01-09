@@ -19,27 +19,16 @@
 
 package com.sk89q.worldedit.regions.iterator;
 
-<<<<<<< HEAD
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector2D;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.regions.FlatRegion;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-<<<<<<< HEAD
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public class FlatRegion3DIterator implements Iterator<BlockVector> {
-=======
 public class FlatRegion3DIterator implements Iterator<BlockVector3> {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     private Iterator<BlockVector2> flatIterator;
     private int minY;

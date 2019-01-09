@@ -22,10 +22,8 @@ package com.sk89q.worldedit.extension.platform;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.PlayerDirection;
 import com.sk89q.worldedit.WorldEditException;
-<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockMaterial;
-=======
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -35,8 +33,6 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.world.block.BaseBlock;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -127,13 +123,10 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
             if (free == 2) {
                 if (y - 1 != origY) {
-<<<<<<< HEAD
-                    final Vector pos = new Vector(x, y - 2, z);
+                    final BlockVector3 pos = new BlockVector3(x, y - 2, z);
                     final BlockStateHolder state = world.getBlock(pos);
-                    setPosition(new Vector(x + 0.5, y - 2 + BlockType.centralTopLimit(state), z + 0.5));
-=======
-                    setPosition(new Vector3(x + 0.5, y - 2 + 1, z + 0.5));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+                    setPosition(new Vector3(x + 0.5, y - 2 + BlockType.centralTopLimit(state), z + 0.5));
+//                    setPosition(new Vector3(x + 0.5, y - 2 + 1, z + 0.5));
                 }
 
                 return;
@@ -151,17 +144,10 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         int z = searchPos.getBlockZ();
 
         while (y >= 0) {
-<<<<<<< HEAD
-            final Vector pos = new Vector(x, y, z);
-            final BlockStateHolder id = world.getBlock(pos);
-            if (id.getBlockType().getMaterial().isMovementBlocker()) {
-                setPosition(new Vector(x + 0.5, y + BlockType.centralTopLimit(id), z + 0.5));
-=======
             final BlockVector3 pos = new BlockVector3(x, y, z);
             final BlockState id = world.getBlock(pos);
             if (id.getBlockType().getMaterial().isMovementBlocker()) {
-                setPosition(new Vector3(x + 0.5, y + 1, z + 0.5));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+                setPosition(new Vector3(x + 0.5, y + + BlockType.centralTopLimit(id), z + 0.5));
                 return;
             }
 
@@ -185,8 +171,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         int maxY = world.getMaxY();
         if (y >= maxY) return false;
 
-<<<<<<< HEAD
-        BlockMaterial initialMaterial = world.getBlockType(new Vector(x, y, z)).getMaterial();
+        BlockMaterial initialMaterial = world.getBlockType(new BlockVector3(x, y, z)).getMaterial();
 
         boolean lastState = initialMaterial.isMovementBlocker() && initialMaterial.isFullCube();
 
@@ -196,7 +181,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         for (int level = y + 1; level <= maxY + 2; level++) {
             BlockState state;
             if (level >= maxY) state = BlockTypes.VOID_AIR.getDefaultState();
-            else state = world.getBlock(new Vector(x, level, z));
+            else state = world.getBlock(new BlockVector3(x, level, z));
             BlockTypes type = state.getBlockType();
             BlockMaterial material = type.getMaterial();
 
@@ -204,29 +189,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 if (!lastState) {
                     lastState = BlockType.centralBottomLimit(state) != 1;
                     continue;
-=======
-        while (y <= world.getMaximumPoint().getY() + 2) {
-            if (!world.getBlock(new BlockVector3(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
-                ++free;
-            } else {
-                free = 0;
-            }
-
-            if (free == 2) {
-                ++spots;
-                if (spots == 2) {
-                    final BlockVector3 platform = new BlockVector3(x, y - 2, z);
-                    final BlockStateHolder block = world.getBlock(platform);
-                    final com.sk89q.worldedit.world.block.BlockType type = block.getBlockType();
-
-                    // Don't get put in lava!
-                    if (type == BlockTypes.LAVA) {
-                        return false;
-                    }
-
-                    setPosition(platform.toVector3().add(0.5, 1, 0.5));
-                    return true;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 }
                 if (freeStart == -1) {
                     freeStart = level + BlockType.centralTopLimit(state);
@@ -234,7 +196,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     double bottomLimit = BlockType.centralBottomLimit(state);
                     double space = level + bottomLimit - freeStart;
                     if (space >= height) {
-                        setPosition(new Vector(x + 0.5, freeStart, z + 0.5));
+                        setPosition(new Vector3(x + 0.5, freeStart, z + 0.5));
                         return true;
                     }
                     // Not enough room, reset the free position
@@ -258,9 +220,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         final int z = pos.getBlockZ();
         final Extent world = pos.getExtent();
 
-        BlockMaterial initialMaterial = world.getBlockType(new Vector(x, y, z)).getMaterial();
+        BlockMaterial initialMaterial = world.getBlockType(new BlockVector3(x, y, z)).getMaterial();
 
-<<<<<<< HEAD
         boolean lastState = initialMaterial.isMovementBlocker() && initialMaterial.isFullCube();
 
         double height = 1.85;
@@ -272,7 +233,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         for (int level = y + 1; level > 0; level--) {
             BlockState state;
             if (level >= maxY) state = BlockTypes.VOID_AIR.getDefaultState();
-            else state = world.getBlock(new Vector(x, level, z));
+            else state = world.getBlock(new BlockVector3(x, level, z));
             BlockTypes type = state.getBlockType();
             BlockMaterial material = type.getMaterial();
 
@@ -288,29 +249,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     double freeStart = level + topLimit;
                     double space = freeEnd - freeStart;
                     if (space >= height) {
-                        setPosition(new Vector(x + 0.5, freeStart, z + 0.5));
-=======
-        while (y >= 1) {
-            if (!world.getBlock(new BlockVector3(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
-                ++free;
-            } else {
-                free = 0;
-            }
-
-            if (free == 2) {
-                // So we've found a spot, but we have to drop the player
-                // lightly and also check to see if there's something to
-                // stand upon
-                while (y >= 0) {
-                    final BlockVector3 platform = new BlockVector3(x, y, z);
-                    final BlockStateHolder block = world.getBlock(platform);
-                    final BlockType type = block.getBlockType();
-
-                    // Don't want to end up in lava
-                    if (!type.getMaterial().isAir() && type != BlockTypes.LAVA) {
-                        // Found a block!
-                        setPosition(platform.toVector3().add(0.5, 1, 0.5));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+                        setPosition(new Vector3(x + 0.5, freeStart, z + 0.5));
                         return true;
                     }
                     // Not enough room, reset the free position
@@ -392,41 +331,25 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public void floatAt(int x, int y, int z, boolean alwaysGlass) {
-<<<<<<< HEAD
-        Vector spot = new Vector(x, y - 1, z);
-        if (!getLocation().getExtent().getBlock(spot).getBlockType().getMaterial().isMovementBlocker()) {
-            try {
-                getLocation().getExtent().setBlock(new Vector(x, y - 1, z), BlockTypes.GLASS.getDefaultState());
-            } catch (WorldEditException e) {
-                e.printStackTrace();
-=======
         try {
             BlockVector3 spot = new BlockVector3(x, y - 1, z);
             if (!getLocation().getExtent().getBlock(spot).getBlockType().getMaterial().isMovementBlocker()) {
                 getLocation().getExtent().setBlock(spot, BlockTypes.GLASS.getDefaultState());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
+        }catch (WorldEditException e) {
+            e.printStackTrace();
         }
         setPosition(new Vector3(x + 0.5, y, z + 0.5));
     }
 
     @Override
     public Location getBlockIn() {
-<<<<<<< HEAD
-        Location loc = getLocation();
-        return new Location(loc.getExtent(), loc.toBlockVector(), loc.getDirection());
-=======
         return getLocation().setPosition(getLocation().toVector().floor());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Override
     public Location getBlockOn() {
-<<<<<<< HEAD
-        return getLocation().setY(getLocation().getY() - 1);
-=======
         return getLocation().setPosition(getLocation().setY(getLocation().getY() - 1).toVector().floor());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Override
@@ -607,12 +530,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return false;
     }
 
-<<<<<<< HEAD
-}
-=======
     @Override
     public void sendFakeBlock(BlockVector3 pos, BlockStateHolder block) {
 
     }
 }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner

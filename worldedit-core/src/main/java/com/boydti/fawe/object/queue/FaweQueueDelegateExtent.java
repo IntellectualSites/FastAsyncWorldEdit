@@ -18,7 +18,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FaweQueueDelegateExtent extends DelegateFaweQueue {
     private final FaweQueue parentQueue;
     private final Extent parentExtent;
-    private final MutableBlockVector2D mutable2d = new MutableBlockVector2D();
+//    private final MutableBlockVector2D mutable2d = new MutableBlockVector2D();
 
     public FaweQueueDelegateExtent(FaweQueue parentQueue, Extent parentExtent) {
         super(parentQueue);
@@ -58,7 +58,7 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
 
     @Override
     public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
-        return parentExtent.getBiome(mutable2d.setComponents(x, z)).getId();
+        return parentExtent.getBiome(new BlockVector2(x, z)).getId();
     }
 
     @Override

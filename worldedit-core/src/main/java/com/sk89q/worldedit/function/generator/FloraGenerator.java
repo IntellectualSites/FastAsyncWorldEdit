@@ -27,12 +27,9 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
-<<<<<<< HEAD
-=======
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 /**
  * Generates flora (which may include tall grass, flowers, etc.).

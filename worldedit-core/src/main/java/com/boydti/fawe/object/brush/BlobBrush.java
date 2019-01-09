@@ -80,7 +80,7 @@ public class BlobBrush implements Brush {
                     mutable.mutY(yr);
                     for (int zr = -sizeInt; zr <= sizeInt; zr++) {
                         mutable.mutZ(zr);
-                        Vector3 pt = transform.apply(mutable);
+                        Vector3 pt = transform.apply(mutable.toVector3());
                         int x = MathMan.roundInt(pt.getX());
                         int y = MathMan.roundInt(pt.getY());
                         int z = MathMan.roundInt(pt.getZ());

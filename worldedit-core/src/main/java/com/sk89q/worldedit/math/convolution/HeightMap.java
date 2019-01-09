@@ -3,15 +3,10 @@ package com.sk89q.worldedit.math.convolution;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-<<<<<<< HEAD
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.blocks.BaseBlock;
-=======
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
@@ -74,16 +69,15 @@ public class HeightMap {
         invalid = new boolean[data.length];
 
         if (layers) {
-            Vector min = region.getMinimumPoint();
-            Vector max = region.getMaximumPoint();
+        	BlockVector3 min = region.getMinimumPoint();
+        	BlockVector3 max = region.getMaximumPoint();
             int bx = min.getBlockX();
             int bz = min.getBlockZ();
-            Iterable<Vector2D> flat = Regions.asFlatRegion(region).asFlatRegion();
-            Iterator<Vector2D> iter = new Fast2DIterator(flat, session).iterator();
+            Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
+            Iterator<BlockVector2> iter = new Fast2DIterator(flat, session).iterator();
             int layer = 0;
-            MutableBlockVector mutable = new MutableBlockVector();
             while (iter.hasNext()) {
-                Vector2D pos = iter.next();
+                BlockVector2 pos = iter.next();
                 int x = pos.getBlockX();
                 int z = pos.getBlockZ();
                 layer = session.getNearestSurfaceLayer(x, z, (layer + 7) >> 3, 0, maxY);
@@ -186,7 +180,7 @@ public class HeightMap {
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight > curHeight) {
                     // Set the top block of the column to be the same type (this might go wrong with rounding)
-<<<<<<< HEAD
+//<<<<<<< HEAD
                     BlockStateHolder existing = session.getBlock(xr, curBlock, zr);
 
                     // Skip water/lava
@@ -206,33 +200,33 @@ public class HeightMap {
                         } else {
                             existing = PropertyGroup.LEVEL.set(existing, 15);
                             session.setBlock(xr, newBlock, zr, existing);
-=======
-                    BlockState existing = session.getBlock(new BlockVector3(xr, curHeight, zr));
-
-                    // Skip water/lava
-                    if (existing.getBlockType() != BlockTypes.WATER && existing.getBlockType() != BlockTypes.LAVA) {
-                        session.setBlock(new BlockVector3(xr, newHeight, zr), existing);
-                        ++blocksChanged;
-
-                        // Grow -- start from 1 below top replacing airblocks
-                        for (int y = newHeight - 1 - originY; y >= 0; --y) {
-                            int copyFrom = (int) (y * scale);
-                            session.setBlock(new BlockVector3(xr, originY + y, zr), session.getBlock(new BlockVector3(xr, originY + copyFrom, zr)));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//=======
+//                    BlockState existing = session.getBlock(new BlockVector3(xr, curHeight, zr));
+//
+//                    // Skip water/lava
+//                    if (existing.getBlockType() != BlockTypes.WATER && existing.getBlockType() != BlockTypes.LAVA) {
+//                        session.setBlock(new BlockVector3(xr, newHeight, zr), existing);
+//                        ++blocksChanged;
+//
+//                        // Grow -- start from 1 below top replacing airblocks
+//                        for (int y = newHeight - 1 - originY; y >= 0; --y) {
+//                            int copyFrom = (int) (y * scale);
+//                            session.setBlock(new BlockVector3(xr, originY + y, zr), session.getBlock(new BlockVector3(xr, originY + copyFrom, zr)));
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                             ++blocksChanged;
                         }
                     }
                 } else if (curHeight > newHeight) {
-<<<<<<< HEAD
+//<<<<<<< HEAD
                     // Fill rest with air
                     for (int y = newBlock + 1; y <= ((curHeight + 15) >> 4); ++y) {
                         session.setBlock(xr, y, zr, fillerAir);
-=======
-                    // Shrink -- start from bottom
-                    for (int y = 0; y < newHeight - originY; ++y) {
-                        int copyFrom = (int) (y * scale);
-                        session.setBlock(new BlockVector3(xr, originY + y, zr), session.getBlock(new BlockVector3(xr, originY + copyFrom, zr)));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//=======
+//                    // Shrink -- start from bottom
+//                    for (int y = 0; y < newHeight - originY; ++y) {
+//                        int copyFrom = (int) (y * scale);
+//                        session.setBlock(new BlockVector3(xr, originY + y, zr), session.getBlock(new BlockVector3(xr, originY + copyFrom, zr)));
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                         ++blocksChanged;
                     }
                     // Set the top block of the column to be the same type
@@ -256,7 +250,7 @@ public class HeightMap {
     public int apply(int[] data) throws MaxChangedBlocksException {
         checkNotNull(data);
 
-        Vector minY = region.getMinimumPoint();
+        BlockVector3 minY = region.getMinimumPoint();
         int originX = minY.getBlockX();
         int originY = minY.getBlockY();
         int originZ = minY.getBlockZ();
@@ -300,20 +294,12 @@ public class HeightMap {
                 } else if (curHeight > newHeight) {
                     // Set the top block of the column to be the same type
                     // (this could otherwise go wrong with rounding)
-<<<<<<< HEAD
                     session.setBlock(xr, newHeight, zr, session.getBlock(xr, curHeight, zr));
-=======
-                    session.setBlock(new BlockVector3(xr, newHeight, zr), session.getBlock(new BlockVector3(xr, curHeight, zr)));
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     ++blocksChanged;
 
                     // Fill rest with air
                     for (int y = newHeight + 1; y <= curHeight; ++y) {
-<<<<<<< HEAD
                         session.setBlock(xr, y, zr, fillerAir);
-=======
-                        session.setBlock(new BlockVector3(xr, y, zr), fillerAir);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                         ++blocksChanged;
                     }
                 }

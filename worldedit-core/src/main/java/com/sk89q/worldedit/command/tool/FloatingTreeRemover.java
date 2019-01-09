@@ -75,24 +75,8 @@ public class FloatingTreeRemover implements BlockTool {
             player.printError("That's not a tree.");
             return true;
         }
-
-<<<<<<< HEAD
         final EditSession editSession = session.createEditSession(player);
-
-        try {
-            final Set<Vector> blockSet = bfs(world, clicked.toVector());
-            if (blockSet == null) {
-                player.printError("That's not a floating tree.");
-                return true;
-            }
-
-            for (Vector blockVector : blockSet) {
-                final BlockState otherState = editSession.getBlock(blockVector);
-                if (isTreeBlock(otherState.getBlockType())) {
-                    editSession.setBlock(blockVector, BlockTypes.AIR.getDefaultState());
-=======
-        try (EditSession editSession = session.createEditSession(player)) {
-            try {
+        try /*(EditSession editSession = session.createEditSession(player))*/ {
                 final Set<BlockVector3> blockSet = bfs(world, clicked.toVector().toBlockPoint());
                 if (blockSet == null) {
                     player.printError("That's not a floating tree.");
@@ -104,9 +88,7 @@ public class FloatingTreeRemover implements BlockTool {
                     if (isTreeBlock(otherState.getBlockType())) {
                         editSession.setBlock(blockVector, BlockTypes.AIR.getDefaultState());
                     }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 }
-            }
         } catch (MaxChangedBlocksException e) {
             player.printError("Max blocks change limit reached.");
         } finally {

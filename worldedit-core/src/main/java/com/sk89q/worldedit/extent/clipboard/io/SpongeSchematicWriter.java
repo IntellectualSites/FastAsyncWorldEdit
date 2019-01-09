@@ -27,23 +27,14 @@ import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-<<<<<<< HEAD
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-=======
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-<<<<<<< HEAD
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
-=======
-import com.sk89q.worldedit.world.block.BaseBlock;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -83,15 +74,9 @@ public class SpongeSchematicWriter implements ClipboardWriter {
     public void write1(Clipboard clipboard) throws IOException {
         // metadata
         Region region = clipboard.getRegion();
-<<<<<<< HEAD
-        Vector origin = clipboard.getOrigin();
-        BlockVector min = region.getMinimumPoint().toBlockVector();
-        Vector offset = min.subtract(origin);
-=======
         BlockVector3 origin = clipboard.getOrigin();
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 offset = min.subtract(origin);
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         int width = region.getWidth();
         int height = region.getHeight();
         int length = region.getLength();
@@ -104,7 +89,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         if (length > MAX_SIZE) {
             throw new IllegalArgumentException("Length of region too large for a .schematic");
         }
-<<<<<<< HEAD
+//<<<<<<< HEAD
         // output
         final DataOutput rawStream = outputStream.getOutputStream();
         outputStream.writeLazyCompoundTag("Schematic", out -> {
@@ -157,49 +142,49 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                             }));
                             numTiles[0]++;
                             tilesOut.writeTagPayload(tile);
-=======
-
-        Map<String, Tag> schematic = new HashMap<>();
-        schematic.put("Version", new IntTag(1));
-
-        Map<String, Tag> metadata = new HashMap<>();
-        metadata.put("WEOffsetX", new IntTag(offset.getBlockX()));
-        metadata.put("WEOffsetY", new IntTag(offset.getBlockY()));
-        metadata.put("WEOffsetZ", new IntTag(offset.getBlockZ()));
-
-        schematic.put("Metadata", new CompoundTag(metadata));
-
-        schematic.put("Width", new ShortTag((short) width));
-        schematic.put("Height", new ShortTag((short) height));
-        schematic.put("Length", new ShortTag((short) length));
-
-        // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
-        schematic.put("Offset", new IntArrayTag(new int[]{
-                min.getBlockX(),
-                min.getBlockY(),
-                min.getBlockZ(),
-        }));
-
-        int paletteMax = 0;
-        Map<String, Integer> palette = new HashMap<>();
-
-        List<CompoundTag> tileEntities = new ArrayList<>();
-
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream(width * height * length);
-
-        for (int y = 0; y < height; y++) {
-            int y0 = min.getBlockY() + y;
-            for (int z = 0; z < length; z++) {
-                int z0 = min.getBlockZ() + z;
-                for (int x = 0; x < width; x++) {
-                    int x0 = min.getBlockX() + x;
-                    BlockVector3 point = new BlockVector3(x0, y0, z0);
-                    BaseBlock block = clipboard.getFullBlock(point);
-                    if (block.getNbtData() != null) {
-                        Map<String, Tag> values = new HashMap<>();
-                        for (Map.Entry<String, Tag> entry : block.getNbtData().getValue().entrySet()) {
-                            values.put(entry.getKey(), entry.getValue());
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//=======
+//
+//        Map<String, Tag> schematic = new HashMap<>();
+//        schematic.put("Version", new IntTag(1));
+//
+//        Map<String, Tag> metadata = new HashMap<>();
+//        metadata.put("WEOffsetX", new IntTag(offset.getBlockX()));
+//        metadata.put("WEOffsetY", new IntTag(offset.getBlockY()));
+//        metadata.put("WEOffsetZ", new IntTag(offset.getBlockZ()));
+//
+//        schematic.put("Metadata", new CompoundTag(metadata));
+//
+//        schematic.put("Width", new ShortTag((short) width));
+//        schematic.put("Height", new ShortTag((short) height));
+//        schematic.put("Length", new ShortTag((short) length));
+//
+//        // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
+//        schematic.put("Offset", new IntArrayTag(new int[]{
+//                min.getBlockX(),
+//                min.getBlockY(),
+//                min.getBlockZ(),
+//        }));
+//
+//        int paletteMax = 0;
+//        Map<String, Integer> palette = new HashMap<>();
+//
+//        List<CompoundTag> tileEntities = new ArrayList<>();
+//
+//        ByteArrayOutputStream buffer = new ByteArrayOutputStream(width * height * length);
+//
+//        for (int y = 0; y < height; y++) {
+//            int y0 = min.getBlockY() + y;
+//            for (int z = 0; z < length; z++) {
+//                int z0 = min.getBlockZ() + z;
+//                for (int x = 0; x < width; x++) {
+//                    int x0 = min.getBlockX() + x;
+//                    BlockVector3 point = new BlockVector3(x0, y0, z0);
+//                    BaseBlock block = clipboard.getFullBlock(point);
+//                    if (block.getNbtData() != null) {
+//                        Map<String, Tag> values = new HashMap<>();
+//                        for (Map.Entry<String, Tag> entry : block.getNbtData().getValue().entrySet()) {
+//                            values.put(entry.getKey(), entry.getValue());
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                         }
                         int ordinal = block.getOrdinal();
                         char value = palette[ordinal];
@@ -221,7 +206,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             if (clipboard instanceof BlockArrayClipboard) {
                 ((BlockArrayClipboard) clipboard).IMP.forEach(reader, true);
             } else {
-                for (Vector pt : region) {
+                for (BlockVector3 pt : region) {
                     BlockState block = clipboard.getBlock(pt);
                     int x = pt.getBlockX() - min.getBlockX();
                     int y = pt.getBlockY() - min.getBlockY();

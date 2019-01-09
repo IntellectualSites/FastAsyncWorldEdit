@@ -157,7 +157,7 @@ public class SplineBrush implements Brush, ResettableTool {
             sum.mutY(sum.getY() + p.getY());
             sum.mutZ(sum.getZ() + p.getZ());
         }
-        return sum.multiply(1.0 / points.size());
+        return sum.multiply(1.0 / points.size()).toVector3();
     }
 
     private BlockVector3 normal(Collection<BlockVector3> points, BlockVector3 centroid) {

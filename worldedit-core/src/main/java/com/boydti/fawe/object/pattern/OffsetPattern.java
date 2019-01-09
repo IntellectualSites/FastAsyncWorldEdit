@@ -15,7 +15,7 @@ import java.io.IOException;
 public class OffsetPattern extends AbstractPattern {
 
     private final int dx, dy, dz;
-    private transient MutableBlockVector mutable = new MutableBlockVector();
+//    private transient MutableBlockVector mutable = new MutableBlockVector();
     private final Pattern pattern;
 
     public OffsetPattern(Pattern pattern, int dx, int dy, int dz) {
@@ -27,22 +27,24 @@ public class OffsetPattern extends AbstractPattern {
 
     @Override
     public BlockStateHolder apply(BlockVector3 position) {
-        mutable.mutX((position.getX() + dx));
-        mutable.mutY((position.getY() + dy));
-        mutable.mutZ((position.getZ() + dz));
-        return pattern.apply(mutable);
+//        mutable.mutX((position.getX() + dx));
+//        mutable.mutY((position.getY() + dy));
+//        mutable.mutZ((position.getZ() + dz));
+//        return pattern.apply(mutable);
+    	return pattern.apply(new BlockVector3(position.getX() + dx, position.getY() + dy, position.getZ() + dz));
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-        mutable.mutX((get.getX() + dx));
-        mutable.mutY((get.getY() + dy));
-        mutable.mutZ((get.getZ() + dz));
-        return pattern.apply(extent, set, mutable);
+//        mutable.mutX((get.getX() + dx));
+//        mutable.mutY((get.getY() + dy));
+//        mutable.mutZ((get.getZ() + dz));
+//        return pattern.apply(extent, set, mutable);
+    	return pattern.apply(extent, set, new BlockVector3(get.getX() + dx, get.getY() + dy, get.getZ() + dz));
     }
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        mutable = new MutableBlockVector();
+//        mutable = new MutableBlockVector();
     }
 }

@@ -57,7 +57,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     @Override
     public BaseBiome getBiome(int x, int z) {
-        return extent.getBiome(mutableBlockVector2D.setComponents(mx + x, mz + z));
+        return extent.getBiome(mutableBlockVector2D.setComponents(mx + x, mz + z).toBlockVector2());
     }
 
     @Override
@@ -137,7 +137,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                     for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
                         pos.mutX(x);
                         int xx = pos.getBlockX() - mx;
-                        if (region.contains(pos)) {
+                        if (region.contains(pos.toBlockVector3())) {
                             BlockState block = getBlockAbs(x, y, z);
                             if (!air && block.getBlockType().getMaterial().isAir()) {
                                 continue;

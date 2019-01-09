@@ -286,9 +286,9 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                     CompoundTag tile = getTileEntity(x, y, z);
                     if (tile != null) {
                         BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
-                        onEach.run(mutable, block);
+                        onEach.run(mutable.toBlockVector3(), block);
                     } else {
-                        onEach.run(mutable, state);
+                        onEach.run(mutable.toBlockVector3(), state);
                     }
                 }
             }
@@ -316,7 +316,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                             mutable.mutZ(zz);
                             mutable.mutY(y);
                             BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
-                            onEach.run(mutable, block);
+                            onEach.run(mutable.toBlockVector3(), block);
                         }
                     }
                 }

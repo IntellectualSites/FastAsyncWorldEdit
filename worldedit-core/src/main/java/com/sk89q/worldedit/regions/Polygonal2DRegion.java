@@ -277,7 +277,6 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-<<<<<<< HEAD
     public boolean contains(int targetX, int targetZ) {
         boolean inside = false;
         int npoints = points.size();
@@ -325,11 +324,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         return inside;
     }
 
-    @Override
-    public boolean contains(Vector position) {
-=======
     public boolean contains(BlockVector3 position) {
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
         return contains(points, minY, maxY, position);
     }
 

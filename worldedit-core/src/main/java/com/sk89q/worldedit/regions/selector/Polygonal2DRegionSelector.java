@@ -19,14 +19,9 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-<<<<<<< HEAD
 import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
-=======
 import static com.google.common.base.Preconditions.checkNotNull;
 
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -174,13 +169,8 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-<<<<<<< HEAD
-    public void explainPrimarySelection(Actor player, LocalSession session, Vector pos) {
-        BBC.SELECTOR_POS.send(player, 1, pos, region.getArea());
-=======
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.print("Starting a new polygon at " + pos + ".");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BBC.SELECTOR_POS.send(player, 1, pos, region.getArea());
 
         session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
         session.dispatchCUIEvent(player, new SelectionPoint2DEvent(0, pos, getArea()));
@@ -188,13 +178,8 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-<<<<<<< HEAD
-    public void explainSecondarySelection(Actor player, LocalSession session, Vector pos) {
-        BBC.SELECTOR_POS.send(player, region.size(), pos, region.getArea());
-=======
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.print("Added point #" + region.size() + " at " + pos + ".");
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        BBC.SELECTOR_POS.send(player, region.size(), pos, region.getArea());
 
         session.dispatchCUIEvent(player, new SelectionPoint2DEvent(region.size() - 1, pos, getArea()));
         session.dispatchCUIEvent(player, new SelectionMinMaxEvent(region.getMinimumY(), region.getMaximumY()));

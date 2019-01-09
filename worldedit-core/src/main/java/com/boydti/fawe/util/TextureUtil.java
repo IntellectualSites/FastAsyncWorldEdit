@@ -8,7 +8,6 @@ import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.util.command.binding.Text;
@@ -16,6 +15,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -42,7 +42,7 @@ public class TextureUtil implements TextureHolder{
 
     public static TextureUtil fromClipboard(Clipboard clipboard) throws FileNotFoundException {
         boolean[] ids = new boolean[BlockTypes.size()];
-        for (com.sk89q.worldedit.Vector pt : clipboard.getRegion()) {
+        for (BlockVector3 pt : clipboard.getRegion()) {
             ids[clipboard.getBlock(pt).getInternalBlockTypeId()] = true;
         }
         HashSet<BlockType> blocks = new HashSet<>();
@@ -65,7 +65,7 @@ public class TextureUtil implements TextureHolder{
         for (int typeId : tu.getValidBlockIds()) {
             BlockType block = BlockTypes.get(typeId);
             pattern.setBlock(block.getDefaultState());
-            if (mask.test(Vector.ZERO)) blocks.add(block);
+            if (mask.test(BlockVector3.ZERO)) blocks.add(block);
         }
         return fromBlocks(blocks);
     }

@@ -50,22 +50,22 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
                 next = buffer[i];
                 BlockVector3 dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
                 next.setComponents(cur.getBlockX() + dir.getBlockX(), cur.getBlockY() + dir.getBlockY(), cur.getBlockZ() + dir.getBlockZ());
-                if (allowed(next)) {
+                if (allowed(next.toBlockVector3())) {
                     allowed[index++] = next;
                 }
             }
             if (index == 0) {
-                return cur;
+                return cur.toBlockVector3();
             }
             next = allowed[PseudoRandom.random.nextInt(index)];
             cur.setComponents(next.getBlockX(), next.getBlockY(), next.getBlockZ());
         }
-        return cur;
+        return cur.toBlockVector3();
     }
 
     private boolean allowed(BlockVector3 bv) {
     	MutableBlockVector v = new MutableBlockVector(bv);
-        BlockStateHolder block = pattern.apply(v);
+        BlockStateHolder block = pattern.apply(bv);
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return false;
         }
@@ -73,34 +73,34 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         int y = v.getBlockY();
         int z = v.getBlockZ();
         v.mutY(y + 1);
-        if (canPassthrough(v)) {
+        if (canPassthrough(v.toBlockVector3())) {
             v.mutY(y);
             return true;
         }
         v.mutY(y - 1);
-        if (canPassthrough(v)) {
+        if (canPassthrough(v.toBlockVector3())) {
             v.mutY(y);
             return true;
         }
         v.mutY(y);
         v.mutX(x + 1);
-        if (canPassthrough(v)) {
+        if (canPassthrough(v.toBlockVector3())) {
             v.mutX(x);
             return true;
         }
         v.mutX(x - 1);
-        if (canPassthrough(v)) {
+        if (canPassthrough(v.toBlockVector3())) {
             v.mutX(x);
             return true;
         }
         v.mutX(x);
         v.mutZ(z + 1);
-        if (canPassthrough(v)) {
+        if (canPassthrough(v.toBlockVector3())) {
             v.mutZ(z);
             return true;
         }
         v.mutZ(z - 1);
-        if (canPassthrough(v)) {
+        if (canPassthrough(v.toBlockVector3())) {
             v.mutZ(z);
             return true;
         }

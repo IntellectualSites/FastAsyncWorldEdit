@@ -20,11 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
-<<<<<<< HEAD
-import com.sk89q.worldedit.Vector;
-=======
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 import javax.annotation.Nullable;
 
@@ -44,13 +40,8 @@ public class ExistingBlockMask extends AbstractExtentMask {
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean test(Vector vector) {
-        return !getExtent().getBlock(vector).getMaterial().isAir();
-=======
     public boolean test(BlockVector3 vector) {
         return !getExtent().getBlock(vector).getBlockType().getMaterial().isAir();
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Nullable

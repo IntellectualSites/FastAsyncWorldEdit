@@ -42,12 +42,9 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
-<<<<<<< HEAD
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
-=======
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -153,54 +150,32 @@ public class BiomeCommands extends MethodCommands {
                 return;
             }
 
-<<<<<<< HEAD
-            BaseBiome biome = player.getWorld().getBiome(blockPosition.toVector().toVector2D());
-            biomes[biome.getId()]++;
-            size = 1;
-        } else if (args.hasFlag('p')) {
-            BaseBiome biome = player.getWorld().getBiome(player.getLocation().toVector().toVector2D());
-            biomes[biome.getId()]++;
-            size = 1;
-=======
             BaseBiome biome = player.getWorld().getBiome(blockPosition.toVector().toBlockPoint().toBlockVector2());
-            biomes.add(biome);
-
-            qualifier = "at line of sight point";
+            biomes[biome.getId()]++;
+            size = 1;
         } else if (args.hasFlag('p')) {
             BaseBiome biome = player.getWorld().getBiome(player.getLocation().toVector().toBlockPoint().toBlockVector2());
-            biomes.add(biome);
-
-            qualifier = "at your position";
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+            biomes[biome.getId()]++;
+            size = 1;
         } else {
             World world = player.getWorld();
             Region region = session.getSelection(world);
 
             if (region instanceof FlatRegion) {
-<<<<<<< HEAD
-                for (Vector2D pt : new Fast2DIterator(((FlatRegion) region).asFlatRegion(), editSession)) {
+                for (BlockVector2 pt : new Fast2DIterator(((FlatRegion) region).asFlatRegion(), editSession)) {
                     biomes[editSession.getBiome(pt).getId()]++;
                     size++;
                 }
             } else {
                 RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
                     @Override
-                    public boolean apply(Vector position) throws WorldEditException {
-                        biomes[editSession.getBiome(position.toVector2D()).getId()]++;
+                    public boolean apply(BlockVector3 position) throws WorldEditException {
+                        biomes[editSession.getBiome(position.toBlockVector2()).getId()]++;
                         return true;
                     }
                 }, editSession);
                 Operations.completeBlindly(visitor);
                 size += visitor.getAffected();
-=======
-                for (BlockVector2 pt : ((FlatRegion) region).asFlatRegion()) {
-                    biomes.add(world.getBiome(pt));
-                }
-            } else {
-                for (BlockVector3 pt : region) {
-                    biomes.add(world.getBiome(pt.toBlockVector2()));
-                }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
         }
 

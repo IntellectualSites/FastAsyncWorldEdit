@@ -21,9 +21,9 @@ import com.intellectualcrafters.plot.util.WorldUtil;
 import com.plotsquared.general.commands.Command;
 import com.plotsquared.general.commands.CommandDeclaration;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.biome.Biomes;
@@ -84,7 +84,7 @@ public class PlotSetBiome extends Command {
                                 .build();
                         long seed = PseudoRandom.random.nextLong();
                         for (RegionWrapper region : regions) {
-                            CuboidRegion cuboid = new CuboidRegion(new Vector(region.minX, 0, region.minZ), new Vector(region.maxX, 256, region.maxZ));
+                            CuboidRegion cuboid = new CuboidRegion(new BlockVector3(region.minX, 0, region.minZ), new BlockVector3(region.maxX, 256, region.maxZ));
                             session.regenerate(cuboid, biome, seed);
                         }
                         session.flushQueue();

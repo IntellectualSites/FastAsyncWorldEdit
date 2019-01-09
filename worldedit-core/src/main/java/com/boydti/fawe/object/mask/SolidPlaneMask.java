@@ -34,13 +34,13 @@ public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
                 originZ = vector.getBlockZ();
                 mode = 0;
                 Extent extent = getExtent();
-                if (!extent.getBlockType(mutable.setComponents(originX - 1, originY, originZ)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX + 1, originY, originZ)).getMaterial().isAir()) {
+                if (!extent.getBlockType(mutable.setComponents(originX - 1, originY, originZ).toBlockVector3()).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX + 1, originY, originZ).toBlockVector3()).getMaterial().isAir()) {
                     mode &= 1;
                 }
-                if (!extent.getBlockType(mutable.setComponents(originX, originY, originZ - 1)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY, originZ + 1)).getMaterial().isAir()) {
+                if (!extent.getBlockType(mutable.setComponents(originX, originY, originZ - 1).toBlockVector3()).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY, originZ + 1).toBlockVector3()).getMaterial().isAir()) {
                     mode &= 4;
                 }
-                if (!extent.getBlockType(mutable.setComponents(originX, originY - 1, originZ + 1)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY + 1, originZ + 1)).getMaterial().isAir()) {
+                if (!extent.getBlockType(mutable.setComponents(originX, originY - 1, originZ + 1).toBlockVector3()).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY + 1, originZ + 1).toBlockVector3()).getMaterial().isAir()) {
                     mode &= 2;
                 }
                 if (Integer.bitCount(mode) >= 3) {

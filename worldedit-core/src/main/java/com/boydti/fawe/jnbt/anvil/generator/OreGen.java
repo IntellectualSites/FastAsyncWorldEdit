@@ -43,7 +43,7 @@ public class OreGen extends Resource {
     @Override
     public boolean spawn(Random rand, int x, int z) throws WorldEditException {
         int y = rand.nextInt(maxY - minY) + minY;
-        if (!mask.test(mutable.setComponents(x, y, z))) {
+        if (!mask.test(mutable.setComponents(x, y, z).toBlockVector3())) {
             return false;
         }
         double f = rand.nextDouble() * Math.PI;
@@ -106,8 +106,8 @@ public class OreGen extends Resource {
                                 double dz = (zz + 0.5D - d9) * id11o2;
                                 double dxyz2 = dxy2 + dz * dz;
                                 if ((dxyz2 < 1)) {
-                                    if (mask.test(mutable))
-                                        pattern.apply(extent, mutable, mutable);
+                                    if (mask.test(mutable.toBlockVector3()))
+                                        pattern.apply(extent, mutable.toBlockVector3(), mutable.toBlockVector3());
                                 }
                             }
                         }

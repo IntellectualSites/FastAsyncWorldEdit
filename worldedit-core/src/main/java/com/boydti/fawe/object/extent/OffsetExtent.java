@@ -23,7 +23,7 @@ public class OffsetExtent extends ResettableExtent {
 
     @Override
     public boolean setBiome(BlockVector2 position, BaseBiome biome) {
-        return getExtent().setBiome(mutable.setComponents(position.getBlockX() + dx, position.getBlockZ() + dz), biome);
+        return getExtent().setBiome(mutable.setComponents(position.getBlockX() + dx, position.getBlockZ() + dz).toBlockVector2(), biome);
     }
 
     @Override

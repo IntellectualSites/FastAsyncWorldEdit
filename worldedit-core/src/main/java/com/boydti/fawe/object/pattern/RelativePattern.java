@@ -30,7 +30,7 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         mutable.mutX((pos.getX() - origin.getX()));
         mutable.mutY((pos.getY() - origin.getY()));
         mutable.mutZ((pos.getZ() - origin.getZ()));
-        return pattern.apply(mutable);
+        return pattern.apply(mutable.toBlockVector3());
     }
 
     @Override
@@ -41,7 +41,7 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         mutable.mutX((get.getX() - origin.getX()));
         mutable.mutY((get.getY() - origin.getY()));
         mutable.mutZ((get.getZ() - origin.getZ()));
-        return pattern.apply(extent, set, mutable);
+        return pattern.apply(extent, set, mutable.toBlockVector3());
     }
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {

@@ -36,7 +36,7 @@ public class SchemGen extends Resource {
         int y = extent.getNearestSurfaceTerrainBlock(x, z, mutable.getBlockY(), 0, 255);
         if (y == -1) return false;
         mutable.mutY(y);
-        if (!mask.test(mutable)) {
+        if (!mask.test(mutable.toBlockVector3())) {
             return false;
         }
         mutable.mutY(y + 1);
@@ -48,9 +48,9 @@ public class SchemGen extends Resource {
         Schematic schematic = new Schematic(clipboard);
         Transform transform = holder.getTransform();
         if (transform.isIdentity()) {
-            schematic.paste(extent, mutable, false);
+            schematic.paste(extent, mutable.toBlockVector3(), false);
         } else {
-            schematic.paste(extent, mutable, false, transform);
+            schematic.paste(extent, mutable.toBlockVector3(), false, transform);
         }
         mutable.mutY(y);
         return true;

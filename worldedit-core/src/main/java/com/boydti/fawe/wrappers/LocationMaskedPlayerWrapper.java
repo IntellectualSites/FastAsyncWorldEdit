@@ -1,7 +1,7 @@
 package com.boydti.fawe.wrappers;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 
 public class LocationMaskedPlayerWrapper extends PlayerWrapper {
@@ -32,7 +32,7 @@ public class LocationMaskedPlayerWrapper extends PlayerWrapper {
     }
 
     @Override
-    public void setPosition(Vector pos, float pitch, float yaw) {
+    public void setPosition(Vector3 pos, float pitch, float yaw) {
         this.position = new Location(position.getExtent(), pos, pitch, yaw);
         if (allowTeleport) {
             super.setPosition(pos, pitch, yaw);

@@ -26,11 +26,8 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
-<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseBlock;
-=======
 import com.sk89q.worldedit.math.BlockVector3;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -157,13 +154,13 @@ public class OldChunk implements Chunk {
     }
 
     @Override
-<<<<<<< HEAD
-    public BlockStateHolder getBlock(Vector position) throws DataException {
-        if(position.getBlockY() >= 128) return BlockTypes.VOID_AIR.getDefaultState();
-=======
+//<<<<<<< HEAD
     public BlockStateHolder getBlock(BlockVector3 position) throws DataException {
-        if(position.getY() >= 128) return BlockTypes.VOID_AIR.getDefaultState().toBaseBlock();
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+        if(position.getBlockY() >= 128) return BlockTypes.VOID_AIR.getDefaultState();
+//=======
+//    public BlockStateHolder getBlock(BlockVector3 position) throws DataException {
+//        if(position.getY() >= 128) return BlockTypes.VOID_AIR.getDefaultState().toBaseBlock();
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         int id, dataVal;
 
         int x = position.getX() - rootX * 16;

@@ -40,6 +40,8 @@ import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;
 import com.sk89q.jchronic.utils.Time;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -140,6 +142,7 @@ public class LocalSession implements TextureHolder {
     // Saved properties
     private String lastScript;
     private RegionSelectorType defaultSelector;
+    private boolean useServerCUI = false; // Save this to not annoy players.
 
     /**
      * Construct the object.

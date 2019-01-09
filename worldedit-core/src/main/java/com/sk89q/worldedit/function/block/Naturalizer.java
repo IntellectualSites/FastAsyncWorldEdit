@@ -29,13 +29,10 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
-<<<<<<< HEAD
 
 import static com.google.common.base.Preconditions.checkNotNull;
-=======
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypes;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
 /**
  * Makes a layer of grass on top, three layers of dirt below, and smooth stone

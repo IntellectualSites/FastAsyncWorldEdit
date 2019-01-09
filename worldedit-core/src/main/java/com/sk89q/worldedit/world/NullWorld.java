@@ -19,13 +19,10 @@
 
 package com.sk89q.worldedit.world;
 
-<<<<<<< HEAD
 import com.sk89q.worldedit.*;
-=======
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -128,18 +125,18 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-<<<<<<< HEAD
-    public BlockState getLazyBlock(Vector position) {
+//<<<<<<< HEAD
+    public BlockState getLazyBlock(BlockVector3 position) {
         return getBlock(position);
     }
 
     @Override
-    public BlockState getFullBlock(Vector position) {
+    public BlockState getFullBlock(BlockVector3 position) {
         return getBlock(position);
-=======
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return getBlock(position).toBaseBlock();
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
+//=======
+//    public BaseBlock getFullBlock(BlockVector3 position) {
+//        return getBlock(position).toBaseBlock();
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Override

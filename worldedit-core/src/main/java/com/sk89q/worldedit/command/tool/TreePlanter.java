@@ -50,23 +50,14 @@ public class TreePlanter implements BlockTool {
 
         EditSession editSession = session.createEditSession(player);
 
-<<<<<<< HEAD
         try {
             boolean successful = false;
-            
-            for (int i = 0; i < 10; i++) {
-                if (treeType.generate(editSession, clicked.toVector().add(0, 1, 0))) {
-                    successful = true;
-                    break;
-=======
                 for (int i = 0; i < 10; i++) {
                     if (treeType.generate(editSession, clicked.toVector().add(0, 1, 0).toBlockPoint())) {
                         successful = true;
                         break;
                     }
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
                 }
-            }
             
             if (!successful) {
                 player.printError("A tree can't go there.");
