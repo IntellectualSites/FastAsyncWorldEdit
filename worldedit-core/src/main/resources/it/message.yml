@@ -274,7 +274,7 @@ tips:
   tip_fast: '&7Consiglio: Imposta velocemente e senza l''annullamento usando &c//fast'
   tip_cancel: '&7Consiglio: Puoi cancellare con &c//cancel &7una modifica in corso'
   tip_mask: '&7Consiglio: Imposta una maschera di destinazione globale con &c/gmask'
-  tip_mask_angle: 'Consiglio: Sostituire le pendenze verso l'alto di 3-20 blocchi usando&c //replace /[-20][-3] bedrock'
+  tip_mask_angle: 'Consiglio: Sostituire le pendenze verso l''alto di 3-20 blocchi usando&c //replace /[-20][-3] bedrock'
   tip_set_linear: '&7Consiglio: Imposta i blocchi linearmente con&c //set #l3d[wood,bedrock]'
   tip_surface_spread: '&7Consiglio: Propaga una superficie piana con&c //set #surfacespread[5][0][5][#existing]'
   tip_set_hand: '&7Consiglio: Usa la tua mano attuale con &c//set hand'

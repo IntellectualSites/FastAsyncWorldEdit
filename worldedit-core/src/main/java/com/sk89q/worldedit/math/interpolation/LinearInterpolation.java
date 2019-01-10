@@ -27,8 +27,6 @@ import com.sk89q.worldedit.math.Vector3;
 
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Simple linear interpolation. Mainly used for testing.
  */

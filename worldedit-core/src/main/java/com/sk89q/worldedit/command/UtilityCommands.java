@@ -401,6 +401,7 @@ public class UtilityCommands extends MethodCommands {
     @Logging(PLACEMENT)
     public void removeNear(Player player, LocalSession session, EditSession editSession, Mask mask, @Optional("50") double size) throws WorldEditException {
         worldEdit.checkMaxRadius(size);
+        size = Math.max(1, size);
         int affected = editSession.removeNear(session.getPlacementPosition(player), mask, (int) size);
         player.print(BBC.getPrefix() + affected + " block(s) have been removed.");
     }

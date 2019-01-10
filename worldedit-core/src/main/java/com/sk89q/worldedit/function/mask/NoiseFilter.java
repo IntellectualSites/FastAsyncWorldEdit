@@ -27,9 +27,6 @@ import com.sk89q.worldedit.math.noise.NoiseGenerator;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * A mask that uses a noise generator and returns true whenever the noise
  * generator returns a value above the given density.

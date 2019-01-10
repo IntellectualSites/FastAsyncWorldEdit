@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.Animals;
@@ -41,8 +43,6 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 class BukkitEntityProperties implements EntityProperties {
 

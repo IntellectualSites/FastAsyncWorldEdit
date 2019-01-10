@@ -1,4 +1,4 @@
-#Updated by NotMyFault
+#Updated by NotMyFault and enterih
 info:
   prefix: '&8(&4&lFAWE&8)&r&7'
   schematic_pasting: '&7Die Schematic wird eingefügt. Dies kann nicht rückgängig gemacht
@@ -17,7 +17,7 @@ info:
     Du darfst nur innerhalb erlaubter Regionen Veränderungen durchführen.'
   worldedit_volume: '&7Du kannst keine %current% verändern. Die maximale Anzahl an
     Blöcken die du verändern darfst ist %max%.'
-  worldedit_iterations: '&7Du kannst keine Aktion %current% Mal wiederholen. Die maximale
+  worldedit_iterations: '&7Du kannst %current% nicht wiederholen. Die maximale
     Anzahl an erlaubten Wiederholungen ist %max%.'
   worldedit_unsafe: '&7Der Zugang zu diesem Befehl wurde verboten.'
   worldedit_dangerous_worldedit: '&cFAWE führt unsicher WorldEdit Aktionen aus! Position:
@@ -163,27 +163,27 @@ worldedit:
     brush_target_mask_set: Zielmaske auf %s0 gesetzt
     brush_target_offset_set: Zielausrichtung auf %s0 gesetzt
     brush_equipped: Brush %s0 ausgerüstet
-    brush_line_primary: Punkt %s0 hinzugefügt, klicke auf eine andere Position um
+    brush_line_primary: Punkt %s0 hinzugefügt. Klicke auf eine andere Position um
       die Linie zu erstellen
     brush_line_secondary: Spline erstellt
-    brush_spline_primary_2: Position hinzugefügt, klicke auf die gleiche Position
+    brush_spline_primary_2: Position hinzugefügt. Klicke auf die gleiche Position
       um zu beginnen!
-    brush_catenary_direction: Punkt %s0 hinzugefügt, klicke in die Richtung in der
+    brush_catenary_direction: Punkt %s0 hinzugefügt. Klicke in die Richtung in der
       du die spline generieren willst
   rollback:
     rollback_element: annulliere %s0
   tool:
-    tool_inspect: Inpektions-Tool gebunden an %s0.
+    tool_inspect: Inpektions-Tool an %s0 gebunden.
     tool_inspect_info: '&7%s0 änderte %s1 zu %s2 %s3 zuvor'
     tool_inspect_info_footer: '&6Total: &7%s0 Änderungen'
     tool_none: Tool vom aktuellen Item entfernt.
     tool_info: Info-Tool gebunden an %s0.
     tool_tree: Tree-Tool gebunden an %s0.
     tool_tree_error: Baum Typ %s0 ist unbekannt.
-    tool_repl: Block Replacer-Tool gebunden an %s0.
-    tool_cycler: Block Data Cycler-Tool gebunden an %s0.
-    tool_flood_fill: Block Flood Fill-Tool gebunden an %s0.
-    tool_deltree: Floating Tree Remover-Tool gebunden an %s0.
+    tool_repl: Block Replacer-Tool an %s0 gebunden.
+    tool_cycler: Block Data Cycler-Tool an %s0 gebunden
+    tool_flood_fill: Block Flood Fill-Tool an %s0 gebunden
+    tool_deltree: Floating Tree Remover-Tool an %s0 gebunden
     tool_farwand: Far Wand-Tool gebunden an%s0.
     tool_lrbuild_bound: Long-range Building-Tool gebunden an %s0.
     tool_lrbuild_info: 'Linksklick: Setze Position %s0; Rechtsklick: Setze Position
@@ -192,17 +192,17 @@ worldedit:
     superpickaxe_disabled: Super-Spitzhacke deaktiviert.
     tool_range_error: 'Maximale Reichweite: %s0.'
     tool_radius_error: 'Maximal erlaubter Brush Radius: %s0.'
-    superpickaxe_area_enabled: Modus geändert. Linksklick mit einer Spitzhacke. //
+    superpickaxe_area_enabled: Modus geändert. Linksklick mit einer Spitzhacke. Verwende //
       zum deaktivieren.
   schematic:
     schematic_format: 'Verfügbare Zwischenablage Formate (Name: Suche Namen)'
     schematic_loaded: Schematic %s0 geladen. Platziere sie mit //paste
     schematic_saved: Schematic %s0 gespeichert.
-    schematic_page: Seite muss %s sein
+    schematic_page: Seite muss %s sein.
     schematic_none: Keine Schematics gefunden.
     schematic_list: 'Verfügbare Schematics (Dateiname: Format) [%s0/%s1]:'
     schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
-    schematic_prompt_clear: '&7Meintest du &c%s0 &7um deine Zwischenablage zu leeren'
+    schematic_prompt_clear: '&7Meintest du &c%s0 &7um deine Zwischenablage zu leeren?'
     schematic_show: |-
       &7Displaying &a%s0&7 Schematics von &a%s1&7:
       &8 - &aLinksklick &7a um der Zwischenablage hinzuzufügen
@@ -214,7 +214,7 @@ worldedit:
   clipboard:
     clipboard_cleared: Zwischenablage geleert
     clipboard_invalid_format: 'Unbekanntes Zwischenablage Format:  %s0'
-    clipboard_uri_not_found: Du hast %s0 nicht geladen
+    clipboard_uri_not_found: Du hast %s0 nicht geladen.
   visitor:
     visitor_block: '%s0 Blöcke betroffen'
     visitor_entity: '%s0 Entities betroffen'
@@ -223,7 +223,7 @@ worldedit:
     selector_invalid_coordinates: Ungültige Koordinaten %s0
     selector_already_set: Position bereits gesetzt.
     selector_fuzzy_pos1: Region gesetzt und expandiert von %s0 %s1.
-    selector_fuzzy_pos2: Erweiterung hinzugefügt um %s0 %s1.
+    selector_fuzzy_pos2: Erweiterung um %s0 %s1 hinzugefügt.
     selector_set_default: Dein Standard Auswahl-Tool ist nun %s0.
     selector_pos: Position%s0 zu %s1 (%s2) gesetzt.
     selector_center: Mittelpunkt zu %s0 (%s1) gesetzt.
@@ -251,8 +251,8 @@ worldedit:
   navigation:
     navigation_wand_error: '&cNichts zu durchqueren'
   anvil:
-    world_is_loaded: Die Welt sollte nicht in Benutzung sein währen der Ausführung.
-      Entlade die Welt, oder überschreibe diese mit -f (vorher speichern)
+    world_is_loaded: Die Welt sollte während er Ausführung nicht in Benutzung sein.
+      Entlade die Welt oder überschreibe diese mit -f (vorher speichern)
   help:
     command_clarifying_bracket: '&7Klammer für&c%s0 wurde hinzugefügt'
     help_suggest: '&7%s0 konnte nicht gefunden werden. Versuche &c%s1 &7'
@@ -282,43 +282,43 @@ cancel:
   worldedit_cancel_reason_confirm: '&7Deine Selektion ist zu groß (%s0 -> %s1). Benutze
     &c//confirm &7um &c%s2 auszuführen'
   worldedit_cancel_reason_outside_level: Außerhalb der Welt
-  worldedit_cancel_reason_outside_region: Außerhalb erlaubter Region (Umgehe mit /wea,
+  worldedit_cancel_reason_outside_region: Außerhalb erlaubter Region (Umgehe es mit /wea,
     oder deaktiviere `region-restrictions` in der config.yml)
 history: {}
 navigation:
-  ascend_fail: Kein freier Platz über dir gefunden.
+  ascend_fail: Über dir konnte kein freier Platz gefunden werden.
   ascended_plural: '%s0 Schichten aufgestiegen.'
   ascended_singular: Eine Schicht aufgestiegen.
   unstuck: Sollte jetzt besser sein!
-  descend_fail: Kein freier Platz unter dir gefunden.
+  descend_fail: Unter dir konnte kein freier Platz gefunden werden.
   descend_plural: '%s0 Schichten abgestiegen.'
   descend_singular: Eine Schicht abgestiegen.
   whoosh: Wusch!
   poof: Puff!
-  thru_fail: Kein freier Platz vor dir gefunden.
+  thru_fail: Vor dir konnte kein freier Platz gefunden werden.
   up_fail: Du würdest einen Block treffen!
-  no_block: Kein Block in Sichweite! (oder zu weit entfernt)
+  no_block: Es ist kein Block in Sichweite! (oder zu weit entfernt)
 selection:
-  sel_cuboid: 'Quader: Linksklick für Position1, Rechtsklick für Position2'
-  sel_cuboid_extend: 'Quader: Linksklick für einen Startpunkt, Rechtsklick zum erweitern'
+  sel_cuboid: 'Quader: Linksklick für Position1; Rechtsklick für Position2'
+  sel_cuboid_extend: 'Quader: Linksklick für einen Startpunkt; Rechtsklick zum erweitern'
   sel_2d_polygon: '2D Polygon Auswahl: Links/Rechtsklick um eine Markierung hinzuzufügen.'
   sel_ellipsiod: 'Ellipsen Auswahl: Linksklick=Mitte, Rechtsklick zum erweitern'
   sel_sphere: 'Kugel Auswahl : Linksklick=Mitte, Rechtsklick um den Radius zu setzen'
   sel_cylindrical: 'Zylinder Auswahl: Linksklick=Mitte, Rechtsklick zum erweitern'
   sel_max: '%s0 Punkte maximal.'
-  sel_fuzzy: 'Fuzzy Auswahl: Linksklick um alle verbundenen Blöcke zu markieren, Rechtsklick
+  sel_fuzzy: 'Fuzzy Auswahl: Linksklick um alle verbundenen Blöcke zu markieren; Rechtsklick
     zum hinzufügen'
-  sel_convex_polyhedral: 'Convexe Polyeder Auswahl: Linksklick=Erster Vertex, Rechtsklick,
+  sel_convex_polyhedral: 'Convexe Polyeder Auswahl: Linksklick=Erster Vertex; Rechtsklick,
     um mehr hinzuzufügen.'
   sel_list: Für eine Liste der Selektoren nutze:&c //sel
   sel_modes: 'Wähle einen der unten aufgelisteten Modi:'
 tips:
-  tip_cancel: 'Tipp: Du kannst eine Aktion abbrechen mit `//cancel`'
+  tip_cancel: 'Tipp: Du kannst eine Aktion mit `//cancel` abbrechen'
   tip_download: 'Tipp: Du kannst deine Zwischenablage mit `//download` herunterladen'
   tip_sel_list: 'Tipp: Liste die verschiedenen Selektoren auf mit &c//sel list'
-  tip_select_connected: 'Tipp: Wähle alle verbundenen Blöcke mit //sel fuzzy'
+  tip_select_connected: 'Tipp: Wähle alle verbundenen Blöcke mit &c//sel fuzzy'
   tip_set_pos1: 'Tipp: Nutze Position1 als Muster &c//set pos1'
-  tip_farwand: 'Tipp: Markiere entferne Blöcke mit &c//farwand'
+  tip_farwand: 'Tipp: Markiere entfernte Blöcke mit &c//farwand'
   tip_fast: '&7Tipp: Platziere schnell und ohne Undo-Historie &c//fast'
   tip_mask: '&7Tipp: Setze eine Globale Zielmaske mit &c/gmask'
   tip_mask_angle: 'Tipp: Ersetze aufwärts Steigungen von 3-20 Blöcken mit&c //replace
@@ -327,9 +327,9 @@ tips:
   tip_surface_spread: '&7Tipp: Streue einen flachen Untergrund mit&c //set #surfacespread:5:0:5:#existing'
   tip_set_hand: '&7Tipp: Setze das Item in deiner Hand mit&c//set hand'
   tip_replace_id: '&7Tipp: Ersetze nur die Block-ID:&c //replace woodenstair #id:cobblestair'
-  tip_replace_light: 'Tipp: Entferne Licht-Quellen&c //replace #brightness:1:15 0'
+  tip_replace_light: 'Tipp: Entferne Licht-Quellen mit&c //replace #brightness:1:15 0'
   tip_tab_complete: 'Tipp: Der Replace-Befehl unterstützt Tab-Vervollständigung'
-  tip_flip: 'Tipp: Spiegeln mit &c//flip'
+  tip_flip: '&7Tipp: Du kannst mit &c//flip &7spiegeln'
   tip_deform: 'Tipp: Forme um mit &c//deform'
   tip_transform: 'Tipp: Platziere eine Umformung mit &c//gtransform'
   tip_copypaste: 'Tipp: Füge durch Klick ein mit &c//br copypaste'
@@ -339,8 +339,8 @@ tips:
   tip_paste: 'Tipp: Füge deine Zwischeneinlage mit &c//paste ein'
   tip_lazycopy: 'Tipp: lazycopy ist schneller'
   tip_rotate: 'Tipp: Ausrichten mit &c//rotate'
-  tip_copy_pattern: 'Tipp: Um ein Muster zu verwenden nutze &c#copy'
-  tip_lazycut: '&7Tipp: Es ist sicherer den Befehl &c//lazycut zu verwenden.'
+  tip_copy_pattern: 'Tipp: Um ein Muster zu verwenden verwende &c#copy'
+  tip_lazycut: '&7Tipp: Es ist sicherer den Befehl &c//lazycut &7zu verwenden.'
   tip_regen_0: 'Tipp: Benutze ein Biom mit /regen [biome]'
   tip_regen_1: 'Tipp: Benutzte einen Seed mit /regen [biome] [seed]'
   tip_biome_pattern: 'Tipp: Das &c#biome[forest]&7 Muster kann in jedem Befehl genutzt

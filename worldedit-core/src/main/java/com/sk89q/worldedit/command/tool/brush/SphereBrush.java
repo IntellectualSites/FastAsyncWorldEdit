@@ -21,10 +21,10 @@ package com.sk89q.worldedit.command.tool.brush;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class SphereBrush implements Brush {

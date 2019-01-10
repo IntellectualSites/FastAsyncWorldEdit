@@ -28,7 +28,8 @@ import java.util.*;
 
 public final class ReflectionUtil {
 
-    private ReflectionUtil() {}
+    private ReflectionUtil() {
+    }
 
     @SuppressWarnings("unchecked")
     public static <T> T getField(Object from, String name) {
@@ -50,4 +51,5 @@ public final class ReflectionUtil {
         } while (checkClass.getSuperclass() != Object.class && ((checkClass = checkClass.getSuperclass()) != null));
         return null;
     }
+
 }

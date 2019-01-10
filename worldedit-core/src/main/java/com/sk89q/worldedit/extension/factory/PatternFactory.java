@@ -39,6 +39,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
      */
     public PatternFactory(WorldEdit worldEdit) {
         super(worldEdit);
+
         parsers.add(new HashTagPatternParser(worldEdit));
     }
 

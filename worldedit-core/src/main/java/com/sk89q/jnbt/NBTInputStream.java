@@ -37,7 +37,7 @@ import java.util.function.Function;
  * This class reads <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * streams, and produces an object graph of subclasses of the {@code Tag}
  * object.
- * <p>
+ * 
  * <p>The NBT format was created by Markus Persson, and the specification may be
  * found at <a href="http://www.minecraft.net/docs/NBT.txt">
  * http://www.minecraft.net/docs/NBT.txt</a>.</p>
@@ -49,7 +49,7 @@ public final class NBTInputStream implements Closeable {
     /**
      * Creates a new {@code NBTInputStream}, which will source its data
      * from the specified input stream.
-     *
+     * 
      * @param is the input stream
      * @throws IOException if an I/O error occurs
      */
@@ -67,7 +67,7 @@ public final class NBTInputStream implements Closeable {
 
     /**
      * Reads an NBT tag from the stream.
-     *
+     * 
      * @return The tag that was read.
      * @throws IOException if an I/O error occurs.
      */
@@ -87,7 +87,7 @@ public final class NBTInputStream implements Closeable {
 
     /**
      * Reads an NBT from the stream.
-     *
+     * 
      * @param depth the depth of this tag
      * @return The tag that was read.
      * @throws IOException if an I/O error occurs.
@@ -519,8 +519,8 @@ public final class NBTInputStream implements Closeable {
 
     /**
      * Reads the payload of a tag given the type.
-     *
-     * @param type  the type
+     * 
+     * @param type the type
      * @param depth the depth
      * @return the tag
      * @throws IOException if an I/O error occurs.
@@ -616,6 +616,5 @@ public final class NBTInputStream implements Closeable {
             }
         }
     }
-
 
 }

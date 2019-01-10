@@ -118,7 +118,7 @@ public enum BBC {
     BRUSH_RESET("Reset your brush. (SHIFT + Click)", "WorldEdit.Brush"),
     BRUSH_NONE("You aren't holding a brush!", "WorldEdit.Brush"),
     BRUSH_SCROLL_ACTION_SET("Set scroll action to %s0", "WorldEdit.Brush"),
-    BRUSH_SCROLL_ACTION_UNSET("Removed scrol action", "WorldEdit.Brush"),
+    BRUSH_SCROLL_ACTION_UNSET("Removed scroll action", "WorldEdit.Brush"),
     BRUSH_VISUAL_MODE_SET("Set visual mode to %s0", "WorldEdit.Brush"),
     BRUSH_TARGET_MODE_SET("Set target mode to %s0", "WorldEdit.Brush"),
     BRUSH_TARGET_MASK_SET("Set target mask to %s0", "WorldEdit.Brush"),

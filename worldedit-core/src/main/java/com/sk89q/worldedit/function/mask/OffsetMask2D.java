@@ -23,8 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector2;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Checks whether another mask tests true for a position that is offset
  * a given vector.

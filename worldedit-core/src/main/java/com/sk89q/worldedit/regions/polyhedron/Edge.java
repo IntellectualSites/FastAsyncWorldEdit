@@ -23,8 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.Vector3;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class Edge {
 
     private final Vector3 start;

@@ -1,4 +1,4 @@
-
+ 
 ============= You are compiling: =============
  _______    ___   ____    __    ____  _______
 |   ____|  /   \  \   \  /  \  /   / |   ____|
@@ -15,7 +15,6 @@ If you encounter trouble:
  - Use gradlew and not gradle
  - Ask us!
    - https://discord.gg/ngZCzbU (Discord)
-   - https://goo.gl/Zwvv8J (IRC)
 
 Files will be output to `/target`
 

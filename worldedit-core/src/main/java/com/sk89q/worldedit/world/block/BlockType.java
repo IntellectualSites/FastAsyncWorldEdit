@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.block;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BlockMaterial;
@@ -99,7 +101,7 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
     }
 
     /**
-     * Gets the properties of this BlockType in a key->property mapping.
+     * Gets the properties of this BlockType in a {@code key->property} mapping.
      *
      * @return The properties map
      */
@@ -138,7 +140,9 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      */
     @Deprecated
     default <V> Property<V> getProperty(String name) {
-        return getPropertyMap().get(name);
+        Property<V> property = getPropertyMap().get(name);
+        checkArgument(property != null, "%s has no property named %s", this, name);
+        return property;
     }
 
     default boolean hasProperty(PropertyKey key) {
@@ -146,7 +150,9 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
     }
 
     default <V> Property<V> getProperty(PropertyKey key) {
-        return getPropertyMap().get(key.getId());
+        Property<V> property = getPropertyMap().get(key.getId());
+        checkArgument(property != null, "%s has no property named %s", this, key.getId());
+        return property;
     }
 
     /**
@@ -162,6 +168,13 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      * @return All possible states
      */
     List<BlockState> getAllStates();
+
+    /**
+     * Gets a state of this BlockType with the given properties.
+     *
+     * @return The state, if it exists
+     */
+    BlockState getState(Map<Property<?>, Object> key);
 
     /**
      * Gets whether this block type has an item representation.

@@ -22,11 +22,10 @@ package com.sk89q.worldedit.regions.iterator;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 
 import java.util.Iterator;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RegionIterator implements Iterator<BlockVector3> {
 

@@ -21,13 +21,11 @@ package com.sk89q.worldedit.function.biome;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Replaces the biome at the locations that this function is applied to.

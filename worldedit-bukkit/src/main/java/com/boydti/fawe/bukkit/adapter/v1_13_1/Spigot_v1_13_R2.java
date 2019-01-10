@@ -419,7 +419,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         } else if (foreign instanceof NBTTagDouble) {
             return new DoubleTag(((NBTTagDouble) foreign).asDouble()); // getDouble
         } else if (foreign instanceof NBTTagFloat) {
-            return new FloatTag(((NBTTagFloat) foreign).asByte()); // getFloat
+            return new FloatTag(((NBTTagFloat) foreign).asFloat()); // getFloat
         } else if (foreign instanceof NBTTagInt) {
             return new IntTag(((NBTTagInt) foreign).asInt()); // getInt
         } else if (foreign instanceof NBTTagIntArray) {

@@ -4,13 +4,14 @@ apply plugin: 'maven'
 
 repositories {
     maven { url "https://hub.spigotmc.org/nexus/content/groups/public" }
+    maven { url "https://ci.athion.net/job/FAWE-WorldGuard-1.13/lastSuccessfulBuild/artifact/mvn" }
 }
 
 dependencies {
     compile project(':worldedit-core')
     compile 'com.sk89q:dummypermscompat:1.8'
     compile 'com.destroystokyo.paper:paper-api:1.13-R0.1-SNAPSHOT'
-    compile "org.spigotmc:spigot-1.13:SNAPSHOT"
+    compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
     compile 'net.milkbowl.vault:VaultAPI:1.5.6'
     compile 'com.massivecraft:factions:2.8.0'
@@ -28,9 +29,6 @@ dependencies {
     compile 'com.wasteofplastic:askyblock:3.0.8.2'
     compile 'com.sk89q:worldguard-core:latest'
     compile 'com.sk89q:worldguard-legacy:latest'
-    compile('org.inventivetalent:mapmanager:1.4.0-SNAPSHOT') {
-        transitive = false
-    }
 }
 
 processResources {
