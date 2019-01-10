@@ -829,7 +829,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     /**
      * Return fast mode status.
-     * <p>
+     *
      * <p>Fast mode may skip lighting checks or adjacent block
      * notification.</p>
      *
@@ -1020,8 +1020,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Set a block, bypassing both history and block re-ordering.
      *
      * @param position the position to set the block at
-     * @param block    the block
-     * @param stage    the level
+     * @param block the block
+     * @param stage the level
      * @return whether the block changed
      * @throws WorldEditException thrown on a set error
      */
@@ -1648,7 +1648,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Sets all the blocks inside a region to a given pattern.
      *
-     * @param region  the region
+     * @param region the region
      * @param pattern the pattern that provides the replacement block
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1702,8 +1702,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Replaces all the blocks matching a given mask, within a given region, to a block
      * returned by a given pattern.
      *
-     * @param region  the region to replace the blocks within
-     * @param mask    the mask that blocks must match
+     * @param region the region to replace the blocks within
+     * @param mask the mask that blocks must match
      * @param pattern the pattern that provides the new blocks
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1725,7 +1725,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * If the center sits between two blocks on a certain axis, then two blocks
      * will be placed to mark the center.
      *
-     * @param region  the region to find the center of
+     * @param region the region to find the center of
      * @param pattern the replacement pattern
      * @return the number of blocks placed
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1752,7 +1752,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Make the faces of the given region as if it was a {@link CuboidRegion}.
      *
      * @param region the region
-     * @param block  the block to place
+     * @param block the block to place
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -1764,7 +1764,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Make the faces of the given region as if it was a {@link CuboidRegion}.
      *
-     * @param region  the region
+     * @param region the region
      * @param pattern the pattern to place
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1784,7 +1784,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * may be inefficient, because there may not be an efficient implementation supported
      * for that specific shape.
      *
-     * @param region  the region
+     * @param region the region
      * @param pattern the pattern to place
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1801,12 +1801,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
     }
 
+
     /**
      * Make the walls (all faces but those parallel to the X-Z plane) of the given region
      * as if it was a {@link CuboidRegion}.
      *
      * @param region the region
-     * @param block  the block to place
+     * @param block the block to place
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -1819,7 +1820,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Make the walls (all faces but those parallel to the X-Z plane) of the given region
      * as if it was a {@link CuboidRegion}.
      *
-     * @param region  the region
+     * @param region the region
      * @param pattern the pattern to place
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1839,7 +1840,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * may be inefficient, because there may not be an efficient implementation supported
      * for that specific shape.
      *
-     * @param region  the region
+     * @param region the region
      * @param pattern the pattern to place
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1869,7 +1870,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * (as if it were a cuboid).
      *
      * @param region the region
-     * @param block  the placed block
+     * @param block the placed block
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -1882,7 +1883,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Places a layer of blocks on top of ground blocks in the given region
      * (as if it were a cuboid).
      *
-     * @param region  the region
+     * @param region the region
      * @param pattern the placed block pattern
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1931,9 +1932,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Stack a cuboid region.
      *
-     * @param region  the region to stack
-     * @param dir     the direction to stack
-     * @param count   the number of times to stack
+     * @param region the region to stack
+     * @param dir the direction to stack
+     * @param count the number of times to stack
      * @param copyAir true to also copy air blocks
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1973,10 +1974,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Move the blocks in a region a certain direction.
      *
-     * @param region      the region to move
-     * @param dir         the direction
-     * @param distance    the distance to move
-     * @param copyAir     true to copy air blocks
+     * @param region the region to move
+     * @param dir the direction
+     * @param distance the distance to move
+     * @param copyAir true to copy air blocks
      * @param replacement the replacement block to fill in after moving, or null to use air
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -2030,10 +2031,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Move the blocks in a region a certain direction.
      *
-     * @param region      the region to move
-     * @param dir         the direction
-     * @param distance    the distance to move
-     * @param copyAir     true to copy air blocks
+     * @param region the region to move
+     * @param dir the direction
+     * @param distance the distance to move
+     * @param copyAir true to copy air blocks
      * @param replacement the replacement block to fill in after moving, or null to use air
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -2099,8 +2100,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Fix liquids so that they turn into stationary blocks and extend outward.
      *
-     * @param origin     the original position
-     * @param radius     the radius to fix
+     * @param origin the original position
+     * @param radius the radius to fix
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -2131,8 +2132,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Makes a cylinder.
      *
-     * @param pos    Center of the cylinder
-     * @param block  The block pattern to use
+     * @param pos Center of the cylinder
+     * @param block The block pattern to use
      * @param radius The cylinder's radius
      * @param height The cylinder's up/down extent. If negative, extend downward.
      * @param filled If false, only a shell will be generated.
@@ -2146,12 +2147,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Makes a cylinder.
      *
-     * @param pos     Center of the cylinder
-     * @param block   The block pattern to use
+     * @param pos Center of the cylinder
+     * @param block The block pattern to use
      * @param radiusX The cylinder's largest north/south extent
      * @param radiusZ The cylinder's largest east/west extent
-     * @param height  The cylinder's up/down extent. If negative, extend downward.
-     * @param filled  If false, only a shell will be generated.
+     * @param height The cylinder's up/down extent. If negative, extend downward.
+     * @param filled If false, only a shell will be generated.
      * @return number of blocks changed
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -2360,28 +2361,28 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     /**
-     * Makes a sphere.
-     *
-     * @param pos    Center of the sphere or ellipsoid
-     * @param block  The block pattern to use
-     * @param radius The sphere's radius
-     * @param filled If false, only a shell will be generated.
-     * @return number of blocks changed
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
+    * Makes a sphere.
+    *
+    * @param pos Center of the sphere or ellipsoid
+    * @param block The block pattern to use
+    * @param radius The sphere's radius
+    * @param filled If false, only a shell will be generated.
+    * @return number of blocks changed
+    * @throws MaxChangedBlocksException thrown if too many blocks are changed
+    */
     public int makeSphere(final BlockVector3 pos, final Pattern block, final double radius, final boolean filled) {
-        return this.makeSphere(pos, block, radius, radius, radius, filled);
+        return makeSphere(pos, block, radius, radius, radius, filled);
     }
 
     /**
      * Makes a sphere or ellipsoid.
      *
-     * @param pos     Center of the sphere or ellipsoid
-     * @param block   The block pattern to use
+     * @param pos Center of the sphere or ellipsoid
+     * @param block The block pattern to use
      * @param radiusX The sphere/ellipsoid's largest north/south extent
      * @param radiusY The sphere/ellipsoid's largest up/down extent
      * @param radiusZ The sphere/ellipsoid's largest east/west extent
-     * @param filled  If false, only a shell will be generated.
+     * @param filled If false, only a shell will be generated.
      * @return number of blocks changed
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -2458,9 +2459,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Makes a pyramid.
      *
      * @param position a position
-     * @param block    a block
-     * @param size     size of pyramid
-     * @param filled   true if filled
+     * @param block a block
+     * @param size size of pyramid
+     * @param filled true if filled
      * @return number of blocks changed
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -2488,7 +2489,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Thaw blocks in a radius.
      *
      * @param position the position
-     * @param radius   the radius
+     * @param radius the radius
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -2559,7 +2560,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Make snow in a radius.
      *
      * @param position a position
-     * @param radius   a radius
+     * @param radius a radius
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -2651,7 +2652,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Make dirt green.
      *
      * @param position a position
-     * @param radius   a radius
+     * @param radius a radius
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -2735,7 +2736,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Makes pumpkin patches randomly in an area around the given position.
      *
      * @param position the base position
-     * @param apothem  the apothem of the (square) area
+     * @param apothem the apothem of the (square) area
      * @return number of patches created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -3047,9 +3048,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Hollows out the region (Semi-well-defined for non-cuboid selections).
      *
-     * @param region    the region to hollow out.
+     * @param region the region to hollow out.
      * @param thickness the thickness of the shell to leave (manhattan distance)
-     * @param pattern   The block pattern to use
+     * @param pattern The block pattern to use
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -3127,10 +3128,11 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Draws a line (out of blocks) between two vectors.
      *
      * @param pattern The block pattern used to draw the line.
-     * @param pos1    One of the points that define the line.
-     * @param pos2    The other point that defines the line.
-     * @param radius  The radius (thickness) of the line.
-     * @param filled  If false, only a shell will be generated.
+     * @param pos1 One of the points that define the line.
+     * @param pos2 The other point that defines the line.
+     * @param radius The radius (thickness) of the line.
+     * @param filled If false, only a shell will be generated.
+     *
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -3196,14 +3198,15 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Draws a spline (out of blocks) between specified vectors.
      *
-     * @param pattern     The block pattern used to draw the spline.
+     * @param pattern The block pattern used to draw the spline.
      * @param nodevectors The list of vectors to draw through.
-     * @param tension     The tension of every node.
-     * @param bias        The bias of every node.
-     * @param continuity  The continuity of every node.
-     * @param quality     The quality of the spline. Must be greater than 0.
-     * @param radius      The radius (thickness) of the spline.
-     * @param filled      If false, only a shell will be generated.
+     * @param tension The tension of every node.
+     * @param bias The bias of every node.
+     * @param continuity The continuity of every node.
+     * @param quality The quality of the spline. Must be greater than 0.
+     * @param radius The radius (thickness) of the spline.
+     * @param filled If false, only a shell will be generated.
+     *
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
@@ -3335,7 +3338,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             for (BlockVector3 recurseDirection : recurseDirections) {
                 queue.addLast(current.add(recurseDirection));
             }
-        }
+        } // while
     }
 
     public int makeBiomeShape(final Region region, final Vector3 zero, final Vector3 unit, final BaseBiome biomeType, final String expressionString, final boolean hollow) throws ExpressionException, MaxChangedBlocksException {

@@ -26,8 +26,6 @@ import com.sk89q.worldedit.regions.Region;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * A mask that tests whether given positions are contained within a region.
  */

@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.util.formatting;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.Maps;
 
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * All supported color values for chat.
@@ -221,7 +221,7 @@ public enum Style {
      * ChatColor.COLOR_CODE color code character. The alternate color code character will only be replaced
      * if it is immediately followed by 0-9, A-F, a-f, K-O, k-o, R or r.
      *
-     * @param altColorChar The alternate color code character to replace. Ex: &
+     * @param altColorChar The alternate color code character to replace. Ex: &amp;
      * @param textToTranslate Text containing the alternate color code character.
      * @return Text containing the ChatColor.COLOR_CODE color code character.
      */

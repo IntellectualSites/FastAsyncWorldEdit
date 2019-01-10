@@ -25,8 +25,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 /**
  * Has the criteria where the Y value of passed positions must be within
  * a certain range of Y values (inclusive).

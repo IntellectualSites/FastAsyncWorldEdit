@@ -39,6 +39,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
      */
     public MaskFactory(WorldEdit worldEdit) {
         super(worldEdit);
+
         parsers.add(new DefaultMaskParser(worldEdit));
     }
 

@@ -21,11 +21,9 @@ package com.sk89q.worldedit.function.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.math.BlockVector3;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Offsets the position parameter by adding a given offset vector.

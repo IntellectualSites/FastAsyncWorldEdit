@@ -91,7 +91,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
             if (Bukkit.getVersion().contains("git-Spigot")) {
                 debug("====== USE PAPER ======");
-                debug("DOWNLOAD: https://ci.destroystokyo.com/job/PaperSpigot/");
+                debug("DOWNLOAD: https://ci.destroystokyo.com/job/Paper-1.13/");
                 debug("GUIDE: https://www.spigotmc.org/threads/21726/");
                 debug(" - This is only a recommendation");
                 debug("==============================");
@@ -124,13 +124,13 @@ public class FaweBukkit implements IFawe, Listener {
                     new ChunkListener_9();
                 }
 
-                try {
+                /*try {
                 	Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
                     new AsyncTabCompleteListener(WorldEditPlugin.getInstance());
                 } catch (Throwable ignore)
                 {
                     Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-                }
+                }*/
             }
         });
     }

@@ -26,7 +26,7 @@ public abstract class Tag {
 
     /**
      * Gets the value of this tag.
-     *
+     * 
      * @return the value
      */
     public abstract Object getValue();
@@ -34,8 +34,4 @@ public abstract class Tag {
     public Object getRaw() {
         return getValue();
     }
-
-
-
-
 }
