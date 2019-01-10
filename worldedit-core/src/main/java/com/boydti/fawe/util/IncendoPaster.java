@@ -208,6 +208,7 @@ public final class IncendoPaster {
         b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
         b.append("# Okay :D Great. You are now ready to create your bug report!");
         b.append("\n# You can do so at https://github.com/boy0001/FastAsyncWorldedit/issues");
+        b.append("\n# or via our Discord at https://discord.gg/ngZCzbU");
         incendoPaster.addFile(new IncendoPaster.PasteFile("information", b.toString()));
 
         try {
