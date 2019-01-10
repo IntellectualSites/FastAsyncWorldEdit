@@ -24,10 +24,7 @@ import com.boydti.fawe.FaweVersion;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.util.HastebinUtility;
-import com.boydti.fawe.util.StringMan;
-import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.util.Updater;
+import com.boydti.fawe.util.*;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -189,7 +186,7 @@ public class WorldEditCommands {
     )
     @CommandPermissions("worldedit.debugpaste")
     public void debugpaste(Actor actor) throws WorldEditException, IOException {
-        BBC.DOWNLOAD_LINK.send(actor, HastebinUtility.debugPaste());
+        BBC.DOWNLOAD_LINK.send(actor, IncendoPaster.debugPaste());
     }
 
     @Command(
