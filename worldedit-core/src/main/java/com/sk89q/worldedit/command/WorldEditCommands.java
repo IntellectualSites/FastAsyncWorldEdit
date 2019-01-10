@@ -180,7 +180,7 @@ public class WorldEditCommands {
     @Command(
             aliases = {"debugpaste"},
             usage = "",
-            desc = "Upload debug information to hastebin.com",
+            desc = "Upload latest.log, config.yml, message.yml and your commands.yml to https://incendo.org",
             min = 0,
             max = 0
     )
