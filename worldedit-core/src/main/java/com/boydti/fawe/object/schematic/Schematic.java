@@ -276,6 +276,10 @@ public class Schematic {
         final int entityOffsetZ = to.getBlockZ() - origin.getBlockZ();
         // entities
         for (Entity entity : clipboard.getEntities()) {
+            // skip players on pasting schematic
+            if (entity.getState() != null && entity.getState().getType().getId().equals("minecraft:player")) {
+                continue;
+            }
             Location pos = entity.getLocation();
             Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX, pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(), pos.getPitch());
             extent.createEntity(newPos, entity.getState());

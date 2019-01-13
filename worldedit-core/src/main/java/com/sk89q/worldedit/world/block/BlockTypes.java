@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.block;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.util.MathMan;
@@ -219,19 +221,24 @@ public enum BlockTypes implements BlockType {
     DARK_PRISMARINE_SLAB,
     DARK_PRISMARINE_STAIRS,
     DAYLIGHT_DETECTOR,
+    DEAD_BRAIN_CORAL,
     DEAD_BRAIN_CORAL_BLOCK,
     DEAD_BRAIN_CORAL_FAN,
     DEAD_BRAIN_CORAL_WALL_FAN,
+    DEAD_BUBBLE_CORAL,
     DEAD_BUBBLE_CORAL_BLOCK,
     DEAD_BUBBLE_CORAL_FAN,
     DEAD_BUBBLE_CORAL_WALL_FAN,
     DEAD_BUSH,
+    DEAD_FIRE_CORAL,
     DEAD_FIRE_CORAL_BLOCK,
     DEAD_FIRE_CORAL_FAN,
     DEAD_FIRE_CORAL_WALL_FAN,
+    DEAD_HORN_CORAL,
     DEAD_HORN_CORAL_BLOCK,
     DEAD_HORN_CORAL_FAN,
     DEAD_HORN_CORAL_WALL_FAN,
+    DEAD_TUBE_CORAL,
     DEAD_TUBE_CORAL_BLOCK,
     DEAD_TUBE_CORAL_FAN,
     DEAD_TUBE_CORAL_WALL_FAN,
@@ -654,11 +661,6 @@ public enum BlockTypes implements BlockType {
     YELLOW_WOOL,
     ZOMBIE_HEAD,
     ZOMBIE_WALL_HEAD,
-    DEAD_BRAIN_CORAL,
-    DEAD_BUBBLE_CORAL,
-    DEAD_FIRE_CORAL,
-    DEAD_HORN_CORAL,
-    DEAD_TUBE_CORAL,
 
     ;
 
@@ -823,6 +825,24 @@ public enum BlockTypes implements BlockType {
     public List<BlockState> getAllStates() {
         if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
         return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> states[i]).collect(Collectors.toList());
+    }
+
+    public BlockState getState(Map<Property<?>, Object> key) {
+        int id = getInternalId();
+        for (Map.Entry<Property<?>, Object> iter : key.entrySet()) {
+            Property<?> prop = iter.getKey();
+            Object value = iter.getValue();
+
+            /*
+             * TODO:
+             * This is likely wrong. The only place this seems to currently (Dec 23 2018)
+             * be invoked is via ForgeWorld, and value is a String when invoked there...
+             */
+            AbstractProperty btp = settings.propertiesMap.get(prop.getName());
+            checkArgument(btp != null, "%s has no property named %s", this, prop.getName());
+            id = btp.modify(id, btp.getValueFor((String)value));
+        }
+        return withStateId(id);
     }
 
     @Deprecated

@@ -177,6 +177,9 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
         // platforms to be worried about... at the current time of writing
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
 
+        // Setup the BukkitImplementationTester.
+        BukkitImplementationTester.getImplementation();
+
         { // Register 1.13 Material ids with LegacyMapper
             LegacyMapper legacyMapper = LegacyMapper.getInstance();
             for (Material m : Material.values()) {

@@ -35,8 +35,8 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.LocatedBlock;
 import com.sk89q.worldedit.util.collection.TupleArrayList;
 import com.sk89q.worldedit.world.block.BlockCategories;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Deque;

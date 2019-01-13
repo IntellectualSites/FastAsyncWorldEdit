@@ -25,7 +25,7 @@ package com.sk89q.worldedit.util.formatting;
 public class Fragment {
 
     private final StringBuilder builder = new StringBuilder();
-
+    
     public Fragment() {
     }
 
@@ -88,6 +88,5 @@ public class Fragment {
     public String toString() {
         return builder.toString();
     }
-
-
+    
 }

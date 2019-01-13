@@ -84,7 +84,4 @@ public class BaseBiome {
     public int hashCode() {
         return id;
     }
-
-
-
 }

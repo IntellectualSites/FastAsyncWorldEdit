@@ -21,14 +21,11 @@ package com.sk89q.worldedit.regions.iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.Region;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class FlatRegionIterator implements Iterator<BlockVector2>  {
 
@@ -75,7 +72,7 @@ public class FlatRegionIterator implements Iterator<BlockVector2>  {
     @Override
     public BlockVector2 next() {
         if (!hasNext()) {
-            throw new NoSuchElementException();
+            throw new java.util.NoSuchElementException();
         }
 
         BlockVector2 answer = BlockVector2.at(nextX, nextZ);

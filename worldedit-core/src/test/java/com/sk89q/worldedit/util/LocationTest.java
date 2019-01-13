@@ -26,9 +26,6 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
 /**
  * Tests {@link Location}.
  */

@@ -25,9 +25,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.util.gson.GsonUtil;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.util.gson.GsonUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 
