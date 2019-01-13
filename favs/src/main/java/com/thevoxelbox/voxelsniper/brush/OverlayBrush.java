@@ -1,7 +1,7 @@
 package com.thevoxelbox.voxelsniper.brush;
 
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
