@@ -83,9 +83,15 @@ public class BaseBlock extends BlockState {
     public BaseBlock(BlockType blockType) {
         this(blockType.getDefaultState());
     }
+    /**
+     * Construct a block with a state.
+     *
+     * @param blockState The blockstate
+     */
 
     public BaseBlock(BlockState blockState) {
-        this(blockState, blockState.getNbtData());
+//        this(blockState, blockState.getNbtData());
+    	this.blockState = blockState;
     }
 
     /**
@@ -95,7 +101,7 @@ public class BaseBlock extends BlockState {
      * @param nbtData NBT data, which must be provided
      */
     public BaseBlock(BlockState state, CompoundTag nbtData) {
-    	super(state.getBlockType());
+//    	super(state.getBlockType());
         checkNotNull(nbtData);
         this.blockState = state;
         this.nbtData = nbtData;
@@ -200,7 +206,7 @@ public class BaseBlock extends BlockState {
 
     @Override
     public BlockTypes getBlockType() {
-        return blockState.getBlockType();
+    	return blockState.getBlockType();
     }
 
     @Override

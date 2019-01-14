@@ -85,14 +85,17 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     public static BlockState get(@Nullable BlockType type, String state) throws InputParseException {
         return get(type, state, null);
     }
-    private BaseBlock emptyBaseBlock;
+//    private BlockTypes blockType;
+//    private BaseBlock emptyBaseBlock;
 
     // Neighbouring state table.
     private Table<Property<?>, Object, BlockState> states;
-
-    protected BlockState(BlockType blockType) {
-        this.emptyBaseBlock = new BaseBlock(this);
-    }
+    
+//    protected BlockState(BlockTypes blockType) {
+////    protected BlockState() {
+//    	this.blockType = blockType;
+//        this.emptyBaseBlock = new BaseBlock(this);
+//    }
 
     /**
      * Returns a temporary BlockState for a given type and string
@@ -306,13 +309,13 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
         return (Map<Property<?>, Object>) map;
     }
 
-    @Override
-    public BaseBlock toBaseBlock() {
-//        if (this.fuzzy) {
-//            throw new IllegalArgumentException("Can't create a BaseBlock from a fuzzy BlockState!");
-//        }
-        return this.emptyBaseBlock;
-    }
+//    @Override
+//    public BaseBlock toBaseBlock() {
+////        if (this.fuzzy) {
+////            throw new IllegalArgumentException("Can't create a BaseBlock from a fuzzy BlockState!");
+////        }
+//        return this.emptyBaseBlock;
+//    }
 
     @Override
     public BaseBlock toBaseBlock(CompoundTag compoundTag) {
@@ -321,6 +324,11 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
         }
         return new BaseBlock(this, compoundTag);
     }
+    
+//    @Override
+//    public BlockTypes getBlockType() {
+//    	return this.blockType;
+//    }
 
     /**
      * Deprecated, use masks - not try to this fuzzy/non fuzzy state nonsense

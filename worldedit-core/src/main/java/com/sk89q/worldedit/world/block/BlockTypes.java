@@ -774,7 +774,7 @@ public enum BlockTypes implements BlockType {
                 String name = (name().indexOf(':') == -1 ? "minecraft:" : "") + name().toLowerCase();
                 ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("id"), this, name);
             }
-            Settings settings = new Settings((this.getTypeEnum() == BlockTypes.__RESERVED__ ? BlockTypes.AIR : this), id, internalId, states);
+            Settings settings = new Settings(this, id, internalId, states);
             ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("settings"), this, settings);
         } catch (Throwable e) {
             e.printStackTrace();

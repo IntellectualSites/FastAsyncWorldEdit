@@ -9,12 +9,14 @@ public class BlockStateImpl extends BlockState {
     private final int ordinal;
     private final BlockTypes type;
     private BlockMaterial material;
+    private BaseBlock baseBlock;
 
     protected BlockStateImpl(BlockTypes type, int internalId, int ordinal) {
-    	super(type);
+//    	super(type);
         this.type = type;
         this.internalId = internalId;
         this.ordinal = ordinal;
+        this.baseBlock = new BaseBlock(this);
     }
 
     public BlockMaterial getMaterial() {
@@ -45,4 +47,9 @@ public class BlockStateImpl extends BlockState {
     public final BlockTypes getBlockType() {
         return type;
     }
+
+	@Override
+	public BaseBlock toBaseBlock() {
+		return this.baseBlock;
+	}
 }
