@@ -10,6 +10,8 @@ import java.util.List;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -20,6 +22,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 
 public class AsyncBlock implements Block {
 
@@ -343,4 +347,14 @@ public class AsyncBlock implements Block {
     public void removeMetadata(String metadataKey, Plugin owningPlugin) {
         this.getUnsafeBlock().removeMetadata(metadataKey, owningPlugin);
     }
+
+	@Override
+	public boolean isPassable() {
+		return this.getUnsafeBlock().isPassable();
+	}
+
+	@Override
+	public RayTraceResult rayTrace(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3) {
+		return this.getUnsafeBlock().rayTrace(arg0, arg1, arg2, arg3);
+	}
 }

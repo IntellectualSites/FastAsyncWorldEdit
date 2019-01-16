@@ -10,7 +10,7 @@ repositories {
 dependencies {
     compile project(':worldedit-core')
     compile 'com.sk89q:dummypermscompat:1.8'
-    compile 'com.destroystokyo.paper:paper-api:1.13-R0.1-SNAPSHOT'
+    compile 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
     compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
     compile 'net.milkbowl.vault:VaultAPI:1.5.6'

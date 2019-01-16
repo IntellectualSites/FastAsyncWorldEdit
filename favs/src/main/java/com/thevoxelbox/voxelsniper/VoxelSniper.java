@@ -169,6 +169,7 @@ public class VoxelSniper extends JavaPlugin
         brushManager.registerSniperBrush(EntityRemovalBrush.class, "er", "entityremoval");
         brushManager.registerSniperBrush(EraserBrush.class, "erase", "eraser");
         brushManager.registerSniperBrush(ErodeBrush.class, "e", "erode");
+        brushManager.registerSniperBrush(ErodeBlendBrush.class, "eb", "erodeblend", "erodeblendball");
         brushManager.registerSniperBrush(ExtrudeBrush.class, "ex", "extrude");
         brushManager.registerSniperBrush(FillDownBrush.class, "fd", "filldown");
         brushManager.registerSniperBrush(FlatOceanBrush.class, "fo", "flatocean");
@@ -218,6 +219,7 @@ public class VoxelSniper extends JavaPlugin
         brushManager.registerSniperBrush(VoxelDiscBrush.class, "vd", "voxeldisc");
         brushManager.registerSniperBrush(VoxelDiscFaceBrush.class, "vdf", "voxeldiscface");
         brushManager.registerSniperBrush(WarpBrush.class, "w", "warp");
+        brushManager.registerSniperBrush(WallSider.class, "wallsider", "sider");
     }
 
     public void setupCommand(final String label, final FaweCommand cmd) {
