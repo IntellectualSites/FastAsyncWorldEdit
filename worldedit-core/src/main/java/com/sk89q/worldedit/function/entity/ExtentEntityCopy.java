@@ -38,6 +38,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.util.Location;
 import java.util.Arrays;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class ExtentEntityCopy implements EntityFunction {
     @Override
     public boolean apply(Entity entity) throws WorldEditException {
         BaseEntity state = entity.getState();
-        if (state != null) {
+        if (state != null && state.getType() != EntityTypes.PLAYER) {
             Location newLocation;
             Location location = entity.getLocation();
 

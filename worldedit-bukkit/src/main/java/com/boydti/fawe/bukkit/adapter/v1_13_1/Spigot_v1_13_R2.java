@@ -52,6 +52,7 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import javax.annotation.Nullable;
@@ -328,7 +329,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
     public org.bukkit.entity.Entity createEntity(Location location, BaseEntity state) {
         checkNotNull(location);
         checkNotNull(state);
-
+        if (state.getType() == com.sk89q.worldedit.world.entity.EntityTypes.PLAYER) return null;
         CraftWorld craftWorld = ((CraftWorld) location.getWorld());
         WorldServer worldServer = craftWorld.getHandle();
 
