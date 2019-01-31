@@ -1,5 +1,6 @@
 package com.thevoxelbox.voxelsniper.brush;
 
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
@@ -69,7 +70,7 @@ public class BlendDiscBrush extends BlendBrushBase
                 }
 
                 // Find most common neighboring material.
-                for (BlockTypes type : BlockTypes.values)
+                for (BlockType type : BlockTypes.values)
                 {
                     int i = type.getInternalId();
                     if (materialFrequency[i] > modeMatCount && !(this.excludeAir && type.getMaterial().isAir()) && !(this.excludeWater && (type == BlockTypes.WATER)))
@@ -81,7 +82,7 @@ public class BlendDiscBrush extends BlendBrushBase
                 // Make sure there'world not a tie for most common
                 for (int i = 0; i < modeMatId; i++)
                 {
-                    BlockTypes type = BlockTypes.get(i);
+                    BlockType type = BlockTypes.get(i);
                     if (materialFrequency[i] == modeMatCount && !(this.excludeAir && type.getMaterial().isAir()) && !(this.excludeWater && (type == BlockTypes.WATER)))
                     {
                         tiecheck = false;

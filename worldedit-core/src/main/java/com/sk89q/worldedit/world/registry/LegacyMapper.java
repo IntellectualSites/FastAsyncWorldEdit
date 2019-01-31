@@ -57,7 +57,7 @@ public class LegacyMapper {
     private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
     private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
     private final int[] blockArr = new int[4096];
-    private final BiMap<Integer, ItemTypes> itemMap = HashBiMap.create();
+    private final BiMap<Integer, ItemType> itemMap = HashBiMap.create();
 
     /**
      * Create a new instance.
@@ -96,7 +96,7 @@ public class LegacyMapper {
             try {
                 BlockStateHolder blockState = BlockState.get(null, blockEntry.getValue());
 //            	BlockState blockState = WorldEdit.getInstance().getBlockFactory().parseFromInput(blockEntry.getValue(), parserContext).toImmutableState();
-                BlockTypes type = blockState.getBlockType();
+                BlockType type = blockState.getBlockType();
                 if (type.hasProperty(PropertyKey.WATERLOGGED)) {
                     blockState = blockState.with(PropertyKey.WATERLOGGED, false);
                 }
@@ -134,11 +134,11 @@ public class LegacyMapper {
     }
 
     @Nullable
-    public ItemTypes getItemFromLegacy(int legacyId) {
+    public ItemType getItemFromLegacy(int legacyId) {
         return itemMap.get(legacyId << 4);
     }
 
-    public ItemTypes getItemFromLegacy(String input) {
+    public ItemType getItemFromLegacy(String input) {
         if (input.startsWith("minecraft:")) input = input.substring(10);
         return itemMap.get(getCombinedId(input));
     }
@@ -149,7 +149,7 @@ public class LegacyMapper {
     }
 
     @Nullable
-    public ItemTypes getItemFromLegacy(int legacyId, int data) {
+    public ItemType getItemFromLegacy(int legacyId, int data) {
         return itemMap.get((legacyId << 4) + data);
     }
 

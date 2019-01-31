@@ -2,6 +2,7 @@ package com.thevoxelbox.voxelsniper.brush;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.thevoxelbox.voxelsniper.Message;
@@ -724,7 +725,7 @@ public class SpiralStaircaseBrush extends Brush
             // step/slab
 
             try {
-                BlockTypes type = BlockTypes.parse(par[i]);
+                BlockType type = BlockTypes.parse(par[i]);
                 this.stairtype = par[i].toLowerCase().intern();
                 v.sendMessage(ChatColor.BLUE + "Staircase type: " + this.stairtype);
                 return;

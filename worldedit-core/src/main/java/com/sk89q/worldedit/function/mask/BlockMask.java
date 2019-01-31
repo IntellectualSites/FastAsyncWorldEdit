@@ -62,7 +62,7 @@ public class BlockMask extends AbstractExtentMask {
         for (int i = 0; i < bitSets.length; i++) {
             if (bitSets[i] != null) {
                 long[] set = bitSets[i];
-                BlockTypes type = BlockTypes.get(i);
+                BlockType type = BlockTypes.get(i);
                 if (set == ALL) {
                     strings.add(type.getId());
                 } else {
@@ -137,7 +137,7 @@ public class BlockMask extends AbstractExtentMask {
         boolean single = true;
         int and = type.getInternalId();
         List<? extends Property> properties = type.getProperties();
-        for (AbstractProperty prop : (List<AbstractProperty>) type.getProperties()) {
+        for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
             List values = prop.getValues();
             int numSet = 0;
             for (int i = 0; i < values.size(); i++) {

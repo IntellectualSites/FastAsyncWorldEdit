@@ -234,8 +234,8 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
 //>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     @Override
-    public BlockState getFullBlock(BlockVector3 position) {
-        return getLazyBlock(position);
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return getLazyBlock(position).toBaseBlock();
     }
 
     @Override

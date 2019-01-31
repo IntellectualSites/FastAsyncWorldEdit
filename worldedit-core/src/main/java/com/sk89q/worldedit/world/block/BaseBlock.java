@@ -34,9 +34,15 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
+import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.registry.state.PropertyKey;
 
 import javax.annotation.Nullable;
+
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -48,7 +54,7 @@ import java.util.Objects;
  * snapshot of blocks correctly, so, for example, the NBT data for a block
  * may be missing.</p>
  */
-public class BaseBlock extends BlockState {
+public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     private final BlockState blockState;
 
     @Nullable
@@ -68,11 +74,6 @@ public class BaseBlock extends BlockState {
 //    public BaseBlock(BlockStateHolder blockState) {
 //        this(blockState, blockState.getNbtData());
 //    }
-
-    @Deprecated
-    public BaseBlock(BlockTypes id) {
-        this(id.getDefaultState());
-    }
 
     /**
      * Construct a block with the given type and default data.
@@ -101,7 +102,6 @@ public class BaseBlock extends BlockState {
      * @param nbtData NBT data, which must be provided
      */
     public BaseBlock(BlockState state, CompoundTag nbtData) {
-//    	super(state.getBlockType());
         checkNotNull(nbtData);
         this.blockState = state;
         this.nbtData = nbtData;
@@ -146,11 +146,6 @@ public class BaseBlock extends BlockState {
     }
 
     @Override
-    public BlockState toFuzzy() {
-        return blockState;
-    }
-
-    @Override
     public String getNbtId() {
         CompoundTag nbtData = getNbtData();
         if (nbtData == null) {
@@ -181,12 +176,15 @@ public class BaseBlock extends BlockState {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof BaseBlock)) {
+            if (!hasNbtData() && o instanceof BlockStateHolder) {
+                return Objects.equals(toImmutableState(), ((BlockStateHolder<?>) o).toImmutableState());
+            }
             return false;
         }
 
         final BaseBlock otherBlock = (BaseBlock) o;
 
-        return this.equals(otherBlock) && Objects.equals(getNbtData(), otherBlock.getNbtData());
+        return this.blockState.equalsFuzzy(otherBlock.blockState) && Objects.equals(getNbtData(), otherBlock.getNbtData());
     }
 
     @Override
@@ -205,7 +203,7 @@ public class BaseBlock extends BlockState {
     }
 
     @Override
-    public BlockTypes getBlockType() {
+    public BlockType getBlockType() {
     	return blockState.getBlockType();
     }
 
@@ -243,5 +241,66 @@ public class BaseBlock extends BlockState {
             return getAsString();
         }
     }
+
+	@Override
+	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean hasNbtData() {
+		return this.nbtData != null;
+	}
+
+	@Override
+	public BlockStateHolder withPropertyId(int propertyId) {
+		return getBlockType().withPropertyId(propertyId);
+	}
+
+	@Override
+	public int getInternalBlockTypeId() {
+		return toImmutableState().getInternalBlockTypeId();
+	}
+
+	@Override
+	public int getInternalPropertiesId() {
+		return toImmutableState().getInternalPropertiesId();
+	}
+
+	@Override
+	public Mask toMask(Extent extent) {
+		return new SingleBlockStateMask(extent, toImmutableState());
+	}
+
+	@Override
+	public <V> BaseBlock with(Property<V> property, V value) {
+		return toImmutableState().with(property, value).toBaseBlock();
+	}
+
+	@Override
+	public <V> BlockStateHolder with(PropertyKey property, V value) {
+		return toImmutableState().with(property, value);
+	}
+
+	@Override
+	public <V> V getState(Property<V> property) {
+		return toImmutableState().getState(property);
+	}
+
+	@Override
+	public <V> V getState(PropertyKey property) {
+		return toImmutableState().getState(property);
+	}
+
+	@Override
+	public Map<Property<?>, Object> getStates() {
+		return toImmutableState().getStates();
+	}
+
+	@Override
+	public boolean equalsFuzzy(BlockStateHolder o) {
+		return toImmutableState().equalsFuzzy(o);
+	}
 
 }

@@ -118,19 +118,19 @@ public interface Extent extends InputExtent, OutputExtent {
 
     @Override
     default BlockState getBlock(BlockVector3 position) {
-        return getFullBlock(position);
+        return getFullBlock(position).toImmutableState();
     }
 
     @Override
     default BlockState getLazyBlock(BlockVector3 position) {
-        return getFullBlock(position);
+        return getFullBlock(position).toImmutableState();
     }
 
     default BlockState getLazyBlock(int x, int y, int z) {
         return getLazyBlock(BlockVector3.at(x, y, z));
     }
 
-    default boolean setBlock(int x, int y, int z, BlockStateHolder state) throws WorldEditException {
+    default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T state) throws WorldEditException {
         return setBlock(BlockVector3.at(x, y, z), state);
     }
 

@@ -4,7 +4,6 @@ import com.boydti.fawe.FaweCache;
 import com.sk89q.worldedit.WorldEditException;
 
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;

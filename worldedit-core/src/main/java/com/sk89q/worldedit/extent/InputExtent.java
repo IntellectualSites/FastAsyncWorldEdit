@@ -80,7 +80,7 @@ public interface InputExtent {
      * @param position position of the block
      * @return the block
      */
-    BlockState getFullBlock(BlockVector3 position);
+    BaseBlock getFullBlock(BlockVector3 position);
 
     /**
      * Get the biome at the given location.

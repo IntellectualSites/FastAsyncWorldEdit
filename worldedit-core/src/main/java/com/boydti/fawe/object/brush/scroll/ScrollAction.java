@@ -10,6 +10,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import java.io.IOException;
@@ -34,7 +35,7 @@ public abstract class ScrollAction implements ScrollTool {
                 }
                 String filename = split[1];
                 try {
-                    MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, filename, null, message);
+                    MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(player, filename, null, message);
                     if (multi == null) {
                         return null;
                     }

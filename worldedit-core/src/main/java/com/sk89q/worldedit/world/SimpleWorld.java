@@ -59,8 +59,8 @@ public interface SimpleWorld extends World {
     }
 
     @Override
-    default BlockState getFullBlock(BlockVector3 position) {
-        return getLazyBlock(position);
+    default BaseBlock getFullBlock(BlockVector3 position) {
+        return getLazyBlock(position).toBaseBlock();
     }
 
     @Override

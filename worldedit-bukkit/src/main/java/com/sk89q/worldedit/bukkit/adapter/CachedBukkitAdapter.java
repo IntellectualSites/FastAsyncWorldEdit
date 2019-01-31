@@ -5,6 +5,7 @@ import com.sk89q.worldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
@@ -52,17 +53,17 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
     @Override
     public ItemType asItemType(Material material) {
         try {
-            return ItemTypes.values[itemTypes[material.ordinal()]];
+            return ItemTypes.get(itemTypes[material.ordinal()]);
         } catch (NullPointerException e) {
             if (init()) return asItemType(material);
-            return ItemTypes.values[itemTypes[material.ordinal()]];
+            return ItemTypes.get(itemTypes[material.ordinal()]);
         }
     }
 
     @Override
-    public BlockTypes adapt(Material material) {
+    public BlockType adapt(Material material) {
         try {
-            return BlockTypes.values[blockTypes[material.ordinal()]];
+        	return BlockTypes.values[blockTypes[material.ordinal()]];
         } catch (NullPointerException e) {
             if (init()) return adapt(material);
             throw e;
@@ -80,7 +81,7 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
         try {
             checkNotNull(blockData);
             Material material = blockData.getMaterial();
-            BlockTypes type = BlockTypes.getFromStateId(blockTypes[material.ordinal()]);
+            BlockType type = BlockTypes.getFromStateId(blockTypes[material.ordinal()]);
             List<? extends Property> propList = type.getProperties();
             if (propList.size() == 0) return type.getDefaultState();
             String properties = blockData.getAsString();

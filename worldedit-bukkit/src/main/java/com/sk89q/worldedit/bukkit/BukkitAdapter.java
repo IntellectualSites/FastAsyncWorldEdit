@@ -142,7 +142,7 @@ public enum BukkitAdapter {
         return getAdapter().adapt(blockData);
     }
 
-    public static BlockTypes adapt(Material material) {
+    public static BlockType adapt(Material material) {
         return getAdapter().adapt(material);
     }
 

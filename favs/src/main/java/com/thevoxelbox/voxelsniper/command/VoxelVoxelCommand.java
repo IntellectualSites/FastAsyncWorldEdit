@@ -29,6 +29,7 @@ import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.bukkit.favs.PatternUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.RangeBlockHelper;
 import com.thevoxelbox.voxelsniper.SnipeData;
@@ -53,7 +54,7 @@ public class VoxelVoxelCommand extends VoxelCommand {
             Block block = (new RangeBlockHelper(player, sniper.getWorld())).getTargetBlock();
             Material blockType = block.getType();
 
-            BlockTypes weType = BukkitAdapter.adapt(blockType);
+            BlockType weType = BukkitAdapter.adapt(blockType);
             if(!player.hasPermission("voxelsniper.ignorelimitations") && WorldEdit.getInstance().getConfiguration().disallowedBlocks.contains(weType)) {
                 player.sendMessage("You are not allowed to use " + blockType.name() + ". (WorldEdit config.yml)");
                 return true;
@@ -65,7 +66,7 @@ public class VoxelVoxelCommand extends VoxelCommand {
 
             return true;
         } else {
-            BlockTypes weType = BlockTypes.parse(args[0]);
+            BlockType weType = BlockTypes.parse(args[0]);
             if(weType != null) {
                 if(!player.hasPermission("voxelsniper.ignorelimitations") && WorldEdit.getInstance().getConfiguration().disallowedBlocks.contains(weType)) {
                     player.sendMessage("You are not allowed to use " + weType + ".");

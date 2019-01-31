@@ -10,6 +10,7 @@ import com.sk89q.worldedit.event.platform.PlayerInputEvent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.SimpleWorld;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -22,8 +23,8 @@ public interface VirtualWorld extends SimpleWorld, FaweQueue, Closeable {
     FaweChunk getSnapshot(int chunkX, int chunkZ);
 
     @Override
-    default BlockState getFullBlock(BlockVector3 position) {
-        return getLazyBlock(position);
+    default BaseBlock getFullBlock(BlockVector3 position) {
+        return getLazyBlock(position).toBaseBlock();
     }
 
     @Override

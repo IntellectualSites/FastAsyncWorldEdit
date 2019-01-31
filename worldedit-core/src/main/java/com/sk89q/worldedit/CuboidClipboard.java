@@ -28,6 +28,7 @@ import com.sk89q.worldedit.command.SchematicCommands;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -149,7 +150,7 @@ public class CuboidClipboard {
     }
 
     private BaseBlock adapt(BlockState state) {
-        if (state instanceof BaseBlock) return (BaseBlock) state;
+//        if (state instanceof BaseBlock) return (BaseBlock) state;
         return new BaseBlock(state);
     }
 
@@ -173,7 +174,7 @@ public class CuboidClipboard {
     }
 
     public boolean setBlock(int x, int y, int z, BaseBlock block) {
-        return setBlock(x, y, z, (BlockState) block);
+        return setBlock(x, y, z, block.toImmutableState());
     }
 
     public boolean setBlock(int x, int y, int z, BlockState block) {
@@ -270,7 +271,7 @@ public class CuboidClipboard {
                     if (region.contains(pt)) {
                         setBlock(x, y, z, editSession.getBlock(pt));
                     } else {
-                        setBlock(x, y, z, null);
+                        setBlock(x, y, z, (BlockState)null);
                     }
                 }
             }
@@ -435,7 +436,7 @@ public class CuboidClipboard {
             Operations.completeLegacy(result.copyTo(target));
             this.clipboard = target;
         }
-        new Schematic(clipboard).save(path, ClipboardFormat.SPONGE_SCHEMATIC);
+        new Schematic(clipboard).save(path, BuiltInClipboardFormat.SPONGE_SCHEMATIC);
     }
 
     /**
@@ -450,7 +451,7 @@ public class CuboidClipboard {
     @Deprecated
     public static CuboidClipboard loadSchematic(File path) throws DataException, IOException {
         checkNotNull(path);
-        return new CuboidClipboard((BlockVector3) ClipboardFormat.SCHEMATIC.load(path).getClipboard());
+        return new CuboidClipboard((BlockVector3) BuiltInClipboardFormat.MCEDIT_SCHEMATIC.load(path).getClipboard());
     }
 
     /**

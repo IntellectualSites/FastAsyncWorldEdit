@@ -53,7 +53,7 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                     if (type != null) {
                         Integer legacy = LegacyMapper.getInstance().getLegacyCombined(type);
                         if (legacy != null) {
-                            ItemTypes newType = LegacyMapper.getInstance().getItemFromLegacy(legacy >> 4, Integer.parseInt(split[1]));
+                            ItemType newType = LegacyMapper.getInstance().getItemFromLegacy(legacy >> 4, Integer.parseInt(split[1]));
                             if (newType != null) type = newType;
                         }
                     }

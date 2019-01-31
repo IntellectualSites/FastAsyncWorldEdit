@@ -79,14 +79,14 @@ public class RandomTextureUtil extends CachedTextureUtil {
     }
 
     @Override
-    public BlockTypes getNearestBlock(int color) {
+    public BlockType getNearestBlock(int color) {
         int offsetColor = offsets.getOrDefault(color, 0);
         if (offsetColor != 0) {
             offsetColor = addRandomColor(color, offsetColor);
         } else {
             offsetColor = color;
         }
-        BlockTypes res = super.getNearestBlock(offsetColor);
+        BlockType res = super.getNearestBlock(offsetColor);
         if (res == null) return null;
         int newColor = getColor(res);
         {

@@ -33,8 +33,9 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypeUtil;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
@@ -125,7 +126,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 if (y - 1 != origY) {
                     final BlockVector3 pos = BlockVector3.at(x, y - 2, z);
                     final BlockStateHolder state = world.getBlock(pos);
-                    setPosition(Vector3.at(x + 0.5, y - 2 + BlockType.centralTopLimit(state), z + 0.5));
+                    setPosition(Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5));
 //                    setPosition(Vector3.at(x + 0.5, y - 2 + 1, z + 0.5));
                 }
 
@@ -147,7 +148,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             final BlockVector3 pos = BlockVector3.at(x, y, z);
             final BlockState id = world.getBlock(pos);
             if (id.getBlockType().getMaterial().isMovementBlocker()) {
-                setPosition(Vector3.at(x + 0.5, y + + BlockType.centralTopLimit(id), z + 0.5));
+                setPosition(Vector3.at(x + 0.5, y + + BlockTypeUtil.centralTopLimit(id), z + 0.5));
                 return;
             }
 
@@ -182,18 +183,18 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             BlockState state;
             if (level >= maxY) state = BlockTypes.VOID_AIR.getDefaultState();
             else state = world.getBlock(BlockVector3.at(x, level, z));
-            BlockTypes type = state.getBlockType();
+            BlockType type = state.getBlockType();
             BlockMaterial material = type.getMaterial();
 
             if (!material.isFullCube() || !material.isMovementBlocker()) {
                 if (!lastState) {
-                    lastState = BlockType.centralBottomLimit(state) != 1;
+                    lastState = BlockTypeUtil.centralBottomLimit(state) != 1;
                     continue;
                 }
                 if (freeStart == -1) {
-                    freeStart = level + BlockType.centralTopLimit(state);
+                    freeStart = level + BlockTypeUtil.centralTopLimit(state);
                 } else {
-                    double bottomLimit = BlockType.centralBottomLimit(state);
+                    double bottomLimit = BlockTypeUtil.centralBottomLimit(state);
                     double space = level + bottomLimit - freeStart;
                     if (space >= height) {
                         setPosition(Vector3.at(x + 0.5, freeStart, z + 0.5));
@@ -234,18 +235,18 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             BlockState state;
             if (level >= maxY) state = BlockTypes.VOID_AIR.getDefaultState();
             else state = world.getBlock(BlockVector3.at(x, level, z));
-            BlockTypes type = state.getBlockType();
+            BlockType type = state.getBlockType();
             BlockMaterial material = type.getMaterial();
 
             if (!material.isFullCube() || !material.isMovementBlocker()) {
                 if (!lastState) {
-                    lastState = BlockType.centralTopLimit(state) != 0;
+                    lastState = BlockTypeUtil.centralTopLimit(state) != 0;
                     continue;
                 }
                 if (freeEnd == -1) {
-                    freeEnd = level + BlockType.centralBottomLimit(state);
+                    freeEnd = level + BlockTypeUtil.centralBottomLimit(state);
                 } else {
-                    double topLimit = BlockType.centralTopLimit(state);
+                    double topLimit = BlockTypeUtil.centralTopLimit(state);
                     double freeStart = level + topLimit;
                     double space = freeEnd - freeStart;
                     if (space >= height) {
@@ -398,7 +399,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
-    public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
+    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
         final ItemType typeId = getItemInHand(handSide).getType();
         if (typeId.hasBlockType()) {
             return typeId.getBlockType().getDefaultState().toBaseBlock();

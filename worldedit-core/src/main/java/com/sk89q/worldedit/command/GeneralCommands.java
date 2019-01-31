@@ -187,7 +187,7 @@ public class GeneralCommands {
 
             int found = 0;
 
-            for (ItemType searchType : ItemTypes.values) {
+            for (ItemType searchType : ItemTypes.values()) {
                 if (found >= 15) {
                     actor.print(BBC.getPrefix() + "Too many results!");
                     break;

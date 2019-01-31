@@ -37,7 +37,6 @@ import com.sk89q.worldedit.WorldEditException;
 
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
@@ -287,7 +286,7 @@ public class SelectionCommands {
     )
     @CommandPermissions("worldedit.wand")
     public void wand(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-        player.giveItem(new BaseItemStack(we.getConfiguration().wandItem, 1));
+        player.giveItem(new BaseItemStack(ItemTypes.parse(we.getConfiguration().wandItem), 1));
         BBC.SELECTION_WAND.send(player);
         if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
             BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND, BBC.TIP_DISCORD).send(player);

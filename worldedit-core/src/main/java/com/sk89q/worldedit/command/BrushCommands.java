@@ -57,6 +57,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
@@ -469,7 +470,7 @@ public class BrushCommands extends BrushProcessor {
 
 
         try {
-            MultiClipboardHolder clipboards = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, clipboard, null, true);
+            MultiClipboardHolder clipboards = ClipboardFormats.loadAllFromInput(player, clipboard, null, true);
             if (clipboards == null) {
                 BBC.SCHEMATIC_NOT_FOUND.send(player, clipboard);
                 return null;

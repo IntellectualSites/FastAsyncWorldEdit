@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
@@ -80,17 +81,22 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return transformFast(super.getLazyBlock(getPos(x, y, z)));
+        return transformFast(super.getLazyBlock(getPos(x, y, z))).toImmutableState();
     }
 
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
-        return transformFast(super.getLazyBlock(getPos(position)));
+        return transformFast(super.getLazyBlock(getPos(position))).toImmutableState();
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transformFast(super.getBlock(getPos(position)));
+        return transformFast(super.getBlock(getPos(position))).toImmutableState();
+    }
+    
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+    	return transformFast(super.getFullBlock(getPos(position)).toImmutableState());
     }
 
     @Override
@@ -102,14 +108,14 @@ public class TransformExtent extends BlockTransformExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(getPos(x, y, z), transformFastInverse((BlockState) block));
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return super.setBlock(getPos(x, y, z), transformFastInverse((BlockState)block));
     }
 
 
     @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(getPos(location), transformFastInverse((BlockState) block));
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+        return super.setBlock(getPos(location), transformFastInverse((BlockState)block));
     }
 
     @Override

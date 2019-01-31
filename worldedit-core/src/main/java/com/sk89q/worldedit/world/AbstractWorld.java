@@ -93,7 +93,7 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
-        return new BaseBlock(getBlock(position));
+        return new BaseBlock(getBlock(position)).toImmutableState();
     }
 
     @Override

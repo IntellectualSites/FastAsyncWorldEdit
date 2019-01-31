@@ -1,5 +1,6 @@
 package com.thevoxelbox.voxelsniper.brush;
 
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.thevoxelbox.voxelsniper.Message;
@@ -135,7 +136,7 @@ public class SplatterOverlayBrush extends PerformBrush
                                 if (!this.allBlocks)
                                 {
                                     // if the override parameter has not been activated, go to the switch that filters out manmade stuff.
-                                    BlockTypes type = BlockTypes.get(this.getBlockIdAt(this.getTargetBlock().getX() + x, y, this.getTargetBlock().getZ() + z));
+                                    BlockType type = BlockTypes.get(this.getBlockIdAt(this.getTargetBlock().getX() + x, y, this.getTargetBlock().getZ() + z));
                                     BlockMaterial mat = type.getMaterial();
                                     if (mat.isSolid() && mat.isFullCube() && !mat.hasContainer()) {
                                         final int depth = randomizeHeight ? generator.nextInt(this.depth) : this.depth;
@@ -268,7 +269,7 @@ public class SplatterOverlayBrush extends PerformBrush
                                     if (!this.allBlocks)
                                     { // if the override parameter has not been activated, go to the switch that filters out manmade stuff.
 
-                                        BlockTypes type = BlockTypes.get(this.getBlockIdAt(this.getTargetBlock().getX() + x, y, this.getTargetBlock().getZ() + z));
+                                        BlockType type = BlockTypes.get(this.getBlockIdAt(this.getTargetBlock().getX() + x, y, this.getTargetBlock().getZ() + z));
                                         BlockMaterial mat = type.getMaterial();
                                         if (mat.isSolid() && mat.isFullCube() && !mat.hasContainer())
                                         {

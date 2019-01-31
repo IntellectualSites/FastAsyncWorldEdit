@@ -445,9 +445,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     private final void setLayerHeight(int index, int blockHeight, int layerHeight) {
         int floorState = floor.get()[index];
-        switch (BlockTypes.getFromStateId(floorState)) {
-            case SNOW:
-            case SNOW_BLOCK:
+        switch (BlockTypes.getFromStateId(floorState).getResource().toUpperCase()) {
+            case "SNOW":
+            case "SNOW_BLOCK":
                 if (layerHeight != 0) {
                     this.heights.setByte(index, (byte) (blockHeight + 1));
                     this.floor.setInt(index, (BlockTypes.SNOW.getInternalId() + layerHeight));
@@ -470,9 +470,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     private final void setLayerHeightRaw(int index, int blockHeight, int layerHeight) {
         int floorState = floor.get()[index];
-        switch (BlockTypes.getFromStateId(floorState)) {
-            case SNOW:
-            case SNOW_BLOCK:
+        switch (BlockTypes.getFromStateId(floorState).getResource().toUpperCase()) {
+            case "SNOW":
+            case "SNOW_BLOCK":
                 if (layerHeight != 0) {
                     this.heights.getByteArray()[index] = (byte) (blockHeight + 1);
                     this.floor.getIntArray()[index] = (BlockTypes.SNOW.getInternalId() + layerHeight);

@@ -55,6 +55,7 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
@@ -77,7 +78,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
     private static BlockState getBlockInHand(Actor actor, HandSide handSide) throws InputParseException {
         if (actor instanceof Player) {
             try {
-                return ((Player) actor).getBlockInHand(handSide);
+                return ((Player) actor).getBlockInHand(handSide).toImmutableState();
             } catch (NotABlockException e) {
                 throw new InputParseException("You're not holding a block!");
             } catch (WorldEditException e) {
@@ -179,7 +180,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
                 } else if (MathMan.isInteger(split[0])) {
                     state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
                 } else {
-                    BlockTypes type = BlockTypes.get(split[0].toLowerCase());
+                    BlockType type = BlockTypes.get(split[0].toLowerCase());
                     if (type != null) {
                         state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, Integer.parseInt(split[1]));
                     }
@@ -238,7 +239,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
                 state = item.getType().getBlockType().getDefaultState();
                 nbt = item.getNbtData();
             } else {
-                BlockTypes type = BlockTypes.parse(typeString.toLowerCase());
+                BlockType type = BlockTypes.parse(typeString.toLowerCase());
                 if (type != null) state = type.getDefaultState();
                 if (state == null) {
                     throw new NoMatchException("Does not match a valid block type: '" + input + "'");
@@ -261,7 +262,7 @@ public class DefaultBlockParser extends InputParser<BlockStateHolder> {
         }
 
         // Check if the item is allowed
-        BlockTypes blockType = state.getBlockType();
+        BlockType blockType = state.getBlockType();
 
         if (context.isRestricted()) {
             Actor actor = context.requireActor();

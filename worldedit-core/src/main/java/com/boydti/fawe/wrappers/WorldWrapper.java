@@ -20,6 +20,7 @@ import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -240,7 +241,7 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public BlockState getFullBlock(BlockVector3 position) {
+    public BaseBlock getFullBlock(BlockVector3 position) {
         return parent.getFullBlock(position);
     }
 

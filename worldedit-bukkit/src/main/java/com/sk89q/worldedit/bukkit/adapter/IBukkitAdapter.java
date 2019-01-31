@@ -284,7 +284,7 @@ public interface IBukkitAdapter {
      */
     BlockState adapt(BlockData blockData);
 
-    BlockTypes adapt(Material material);
+    BlockType adapt(Material material);
 
     /**
      * Create a Bukkit BlockData from a WorldEdit BlockStateHolder

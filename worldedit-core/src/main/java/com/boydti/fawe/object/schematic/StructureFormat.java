@@ -178,14 +178,9 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
             for (BlockVector3 point : region) {
                 BlockStateHolder block = clipboard.getBlock(point);
                 int combined = block.getInternalId();
-                BlockTypes type = block.getBlockType();
+                BlockType type = block.getBlockType();
 
-                switch (type) {
-                    case STRUCTURE_VOID:
-                        continue;
-                    default:
-                }
-                if (indexes.containsKey(combined)) {
+                if (type == BlockTypes.STRUCTURE_VOID || indexes.containsKey(combined)) {
                     continue;
                 }
 
@@ -194,7 +189,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
                 paletteEntry.put("Name", type.getId());
                 if (block.getInternalId() != type.getInternalId()) {
                     Map<String, Object> properties = null;
-                    for (AbstractProperty property : (List<AbstractProperty>) type.getProperties()) {
+                    for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
                         int propIndex = property.getIndex(block.getInternalId());
                         if (propIndex != 0) {
                             if (properties == null) properties = new HashMap<>();
@@ -218,8 +213,8 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
             BlockVector3 min = region.getMinimumPoint();
             for (BlockVector3 point : region) {
                 BlockStateHolder block = clipboard.getBlock(point);
-                switch (block.getBlockType()) {
-                    case STRUCTURE_VOID:
+                switch (block.getBlockType().getResource().toUpperCase()) {
+                    case "STRUCTURE_VOID":
                         continue;
                     default:
                         int combined = block.getInternalId();

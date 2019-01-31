@@ -62,7 +62,7 @@ public class PropertyPattern extends AbstractExtentPattern {
         }
     }
 
-    private void add(BlockTypes type, PropertyKey key, Operator operator, MutableCharSequence value, boolean wrap) {
+    private void add(BlockType type, PropertyKey key, Operator operator, MutableCharSequence value, boolean wrap) {
         if (!type.hasProperty(key)) return;
         AbstractProperty property = (AbstractProperty) type.getProperty(key);
         BlockState defaultState = type.getDefaultState();
@@ -129,14 +129,14 @@ public class PropertyPattern extends AbstractExtentPattern {
             charSequence.setString(input);
             charSequence.setSubstring(0, propStart);
 
-            BlockTypes type = null;
-            List<BlockTypes> blockTypeList = null;
+            BlockType type = null;
+            List<BlockType> blockTypeList = null;
             if (StringMan.isAlphanumericUnd(charSequence)) {
                 type = BlockTypes.get(charSequence);
             } else {
                 String regex = charSequence.toString();
                 blockTypeList = new ArrayList<>();
-                for (BlockTypes myType : BlockTypes.values) {
+                for (BlockType myType : BlockTypes.values) {
                     if (myType.getId().matches(regex)) {
                         blockTypeList.add(myType);
                     }
@@ -164,7 +164,7 @@ public class PropertyPattern extends AbstractExtentPattern {
                         char firstChar = input.charAt(last + 1);
                         if (type != null) add(type, key, operator, charSequence, wrap);
                         else {
-                            for (BlockTypes myType : blockTypeList) {
+                            for (BlockType myType : blockTypeList) {
                                 add(myType, key, operator, charSequence, wrap);
                             }
                         }
@@ -203,7 +203,7 @@ public class PropertyPattern extends AbstractExtentPattern {
         if (newOrdinal != ordinal) {
             CompoundTag nbt = block.getNbtData();
             BlockState newState = BlockState.getFromOrdinal(newOrdinal);
-            return nbt != null ? new BaseBlock(newState, nbt) : newState;
+            return nbt != null ? new BaseBlock(newState, nbt).toImmutableState() : newState;
         }
         return orDefault;
     }

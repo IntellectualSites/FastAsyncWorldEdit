@@ -123,12 +123,12 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
         int combinedId4Data = queue.getCombinedId4Data(x, y, z, 0);
-        BlockTypes type = BlockTypes.getFromStateId(combinedId4Data);
+        BlockType type = BlockTypes.getFromStateId(combinedId4Data);
         BlockState state = type.withStateId(combinedId4Data);
         if (type.getMaterial().hasContainer()) {
             CompoundTag tile = queue.getTileEntity(x, y, z);
             if (tile != null) {
-                return new BaseBlock(state, tile);
+                return new BaseBlock(state, tile).toImmutableState();
             }
         }
         return state;

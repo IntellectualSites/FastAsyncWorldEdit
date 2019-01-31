@@ -190,7 +190,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     @Override
     public BlockMaterial getMaterial(BlockState state) {
-        BlockTypes type = state.getBlockType();
+        BlockType type = state.getBlockType();
         IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
         return new BlockMaterial_1_13(bs.getBlock(), bs);
     }
@@ -233,7 +233,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             if (te != null) {
                 NBTTagCompound tag = new NBTTagCompound();
                 readTileEntityIntoTag(te, tag); // Load data
-                return new BaseBlock(state, (CompoundTag) toNative(tag));
+                return new BaseBlock(state, (CompoundTag) toNative(tag)).toImmutableState();
             }
         }
 

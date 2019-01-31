@@ -120,7 +120,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
         try {
             CompoundTag tile = getTile(x & 15, y, z & 15);
             if (tile != null) {
-                return BaseBlock.getFromInternalId(combined, tile);
+                return BaseBlock.getFromInternalId(combined, tile).toImmutableState();
             }
         } catch (Throwable e) {
             MainUtil.handleError(e);

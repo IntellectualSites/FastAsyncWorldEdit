@@ -55,7 +55,9 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -296,7 +298,7 @@ public class ClipboardCommands extends MethodCommands {
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.download"})
     public void download(final Player player, final LocalSession session, @Optional("schematic") final String formatName) throws CommandException, WorldEditException {
-        final ClipboardFormat format = ClipboardFormat.findByAlias(formatName);
+        final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
             BBC.CLIPBOARD_INVALID_FORMAT.send(player, formatName);
             return;
@@ -356,8 +358,8 @@ public class ClipboardCommands extends MethodCommands {
             } else {
                 target = clipboard;
             }
-            switch (format) {
-                case PNG:
+            switch (format.getName()) {
+                case "PNG":
                     try {
                         FastByteArrayOutputStream baos = new FastByteArrayOutputStream(Short.MAX_VALUE);
                         ClipboardWriter writer = format.getWriter(baos);
@@ -369,7 +371,7 @@ public class ClipboardCommands extends MethodCommands {
                         url = null;
                     }
                     break;
-                case SCHEMATIC:
+                case "SCHEMATIC":
                     if (Settings.IMP.WEB.URL.isEmpty()) {
                         BBC.SETTING_DISABLE.send(player, "web.url");
                         return;
@@ -380,30 +382,30 @@ public class ClipboardCommands extends MethodCommands {
                     url = null;
                     break;
             }
-        }
-        if (url == null) {
-            BBC.GENERATING_LINK_FAILED.send(player);
-        } else {
-            String urlText = url.toString();
-            if (Settings.IMP.WEB.SHORTEN_URLS) {
-                try {
-                    urlText = MainUtil.getText("https://empcraft.com/s/?" + URLEncoder.encode(url.toString(), "UTF-8"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (Fawe.imp().getPlatform().equalsIgnoreCase("nukkit")) {
-                FormBuilder form = Fawe.imp().getFormBuilder();
-                FawePlayer<Object> fp = FawePlayer.wrap(player);
-                if (form != null && fp != FakePlayer.getConsole().toFawePlayer()) {
-                    form.setTitle("Download Clipboard");
-                    form.addInput("url:", urlText, urlText);
-                    form.display(fp);
-                    return;
-                }
-            }
-            BBC.DOWNLOAD_LINK.send(player, urlText);
-        }
+	        if (url == null) {
+	            BBC.GENERATING_LINK_FAILED.send(player);
+	        } else {
+	            String urlText = url.toString();
+	            if (Settings.IMP.WEB.SHORTEN_URLS) {
+	                try {
+	                    urlText = MainUtil.getText("https://empcraft.com/s/?" + URLEncoder.encode(url.toString(), "UTF-8"));
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	            if (Fawe.imp().getPlatform().equalsIgnoreCase("nukkit")) {
+	                FormBuilder form = Fawe.imp().getFormBuilder();
+	                FawePlayer<Object> fp = FawePlayer.wrap(player);
+	                if (form != null && fp != FakePlayer.getConsole().toFawePlayer()) {
+	                    form.setTitle("Download Clipboard");
+	                    form.addInput("url:", urlText, urlText);
+	                    form.display(fp);
+	                    return;
+	                }
+	            }
+	            BBC.DOWNLOAD_LINK.send(player, urlText);
+	        }
+	    }
     }
 
     @Command(
@@ -416,7 +418,7 @@ public class ClipboardCommands extends MethodCommands {
     )
     @CommandPermissions({"worldedit.clipboard.asset"})
     public void asset(final Player player, final LocalSession session, String category) throws CommandException, WorldEditException {
-        final ClipboardFormat format = ClipboardFormat.SCHEMATIC;
+        final ClipboardFormat format = BuiltInClipboardFormat.MCEDIT_SCHEMATIC;
         ClipboardHolder holder = session.getClipboard();
         Clipboard clipboard = holder.getClipboard();
         final Transform transform = holder.getTransform();
@@ -430,7 +432,7 @@ public class ClipboardCommands extends MethodCommands {
         } else {
             target = clipboard;
         }
-        BBC.GENERATING_LINK.send(player, format.name());
+        BBC.GENERATING_LINK.send(player, format.getName());
         if (Settings.IMP.WEB.ASSETS.isEmpty()) {
             BBC.SETTING_DISABLE.send(player, "web.assets");
             return;
@@ -478,7 +480,7 @@ public class ClipboardCommands extends MethodCommands {
         }
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
-BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
+        BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
         checkPaste(player, editSession, to, holder, clipboard);
         Operation operation = holder
                 .createPaste(editSession)

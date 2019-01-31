@@ -31,6 +31,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -222,7 +223,7 @@ public class FaweAPI {
      * @see com.boydti.fawe.object.schematic.Schematic
      */
     public static Schematic load(File file) throws IOException {
-        return ClipboardFormat.SCHEMATIC.load(file);
+        return ClipboardFormats.findByFile(file).load(file);
     }
 
     /**

@@ -19,7 +19,7 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
-    public BlockTypes getNearestBlock(int color) {
+    public BlockType getNearestBlock(int color) {
         return parent.getNearestBlock(color);
     }
 
@@ -34,7 +34,7 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
-    public BlockTypes[] getNearestLayer(int color) {
+    public BlockType[] getNearestLayer(int color) {
         return parent.getNearestLayer(color);
     }
 

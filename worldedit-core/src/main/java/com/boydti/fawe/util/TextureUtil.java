@@ -372,7 +372,7 @@ public class TextureUtil implements TextureHolder{
         }
     }
 
-    public BlockTypes getNearestBlock(int color) {
+    public BlockType getNearestBlock(int color) {
         long min = Long.MAX_VALUE;
         int closest = 0;
         int red1 = (color >> 16) & 0xFF;
@@ -420,7 +420,7 @@ public class TextureUtil implements TextureHolder{
         return BlockTypes.get(closest);
     }
 
-    private BlockTypes[] layerBuffer = new BlockTypes[2];
+    private BlockType[] layerBuffer = new BlockType[2];
 
     /**
      * Returns the block combined ids as an array
@@ -428,7 +428,7 @@ public class TextureUtil implements TextureHolder{
      * @param color
      * @return
      */
-    public BlockTypes[] getNearestLayer(int color) {
+    public BlockType[] getNearestLayer(int color) {
         int[] closest = null;
         long min = Long.MAX_VALUE;
         int red1 = (color >> 16) & 0xFF;

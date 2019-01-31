@@ -95,14 +95,14 @@ public class SnowConeBrush extends Brush
 
                             if (snowData > snowconeData[x][z])
                             {
-                                switch (BlockTypes.get(snowcone[x][z]))
+                                switch (BlockTypes.get(snowcone[x][z]).getResource().toUpperCase())
                                 {
-                                    case AIR:
-                                    case CAVE_AIR:
-                                    case VOID_AIR:
+                                    case "AIR":
+                                    case "CAVE_AIR":
+                                    case "VOID_AIR":
                                         snowconeData[x][z] = snowData;
                                         snowcone[x][z] = BlockTypes.SNOW.getInternalId();
-                                    case SNOW_BLOCK:
+                                    case "SNOW_BLOCK":
                                         snowconeData[x][z] = snowData;
                                         break;
                                     default:

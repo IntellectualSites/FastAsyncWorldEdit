@@ -232,12 +232,12 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                 if (combined == 0) continue;
                                 int xx = bx + x;
 
-                                BlockTypes type = BlockTypes.getFromStateId(combined);
+                                BlockType type = BlockTypes.getFromStateId(combined);
                                 if (type == BlockTypes.__RESERVED__) continue;
-                                switch (type) {
-                                    case AIR:
-                                    case CAVE_AIR:
-                                    case VOID_AIR:
+                                switch (type.getResource().toUpperCase()) {
+                                    case "AIR":
+                                    case "CAVE_AIR":
+                                    case "VOID_AIR":
                                         if (!place) {
                                             mutableLoc.setX(xx);
                                             mutableLoc.setY(yy);
@@ -277,12 +277,12 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                     for (;index < 4096; index++) {
                         int j = place ? index : 4095 - index;
                         int combined = newArray[j];
-                        BlockTypes type = BlockTypes.getFromStateId(combined);
+                        BlockType type = BlockTypes.getFromStateId(combined);
                         if (type == BlockTypes.__RESERVED__) continue;
-                        switch (type) {
-                            case AIR:
-                            case CAVE_AIR:
-                            case VOID_AIR:
+                        switch (type.getResource().toUpperCase()) {
+                            case "AIR":
+                            case "CAVE_AIR":
+                            case "VOID_AIR":
                                 if (!place) {
                                     int x = cacheX[j];
                                     int z = cacheZ[j];

@@ -16,6 +16,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.ClipboardPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -191,7 +192,7 @@ public class PatternCommands extends MethodCommands {
                 clipboards = Collections.singletonList(clipboard);
                 break;
             default:
-                MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, location, null, true);
+                MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(player, location, null, true);
                 clipboards = multi != null ? multi.getHolders() : null;
                 break;
         }

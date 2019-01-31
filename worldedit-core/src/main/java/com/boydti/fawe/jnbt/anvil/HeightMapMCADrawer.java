@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.awt.image.BufferedImage;
@@ -80,12 +81,12 @@ public final class HeightMapMCADrawer {
                     if (height + 1 < waterHeight) {
                         int waterId = gen.primtives.waterId;
                         int waterColor = 0;
-                        BlockTypes waterType = BlockTypes.get(waterId);
-                        switch (waterType) {
-                            case WATER:
+                        BlockType waterType = BlockTypes.get(waterId);
+                        switch (waterType.getResource().toUpperCase()) {
+                            case "WATER":
                                 color = tu.averageColor((0x11 << 16) + (0x66 << 8) + (0xCC), color);
                                 break;
-                            case LAVA:
+                            case "LAVA":
                                 color = (0xCC << 16) + (0x33 << 8) + (0);
                                 break;
                             default:

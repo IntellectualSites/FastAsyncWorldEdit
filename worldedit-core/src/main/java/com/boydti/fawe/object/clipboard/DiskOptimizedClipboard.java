@@ -21,6 +21,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.Closeable;
@@ -371,14 +372,14 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                     for (int z = 0; z < length; z++) {
                         for (int x = 0; x < width; x++, pos += 4) {
                             int combinedId = mbb.getInt(pos);
-                            BlockTypes type = BlockTypes.getFromStateId(combinedId);
+                            BlockType type = BlockTypes.getFromStateId(combinedId);
                             BlockState state = type.withStateId(combinedId);
                             if (type.getMaterial().hasContainer()) {
                                 trio.set(x, y, z);
                                 CompoundTag nbt = nbtMap.get(trio);
                                 if (nbt != null) {
                                     BaseBlock block = new BaseBlock(state, nbt);
-                                    task.run(x, y, z, block);
+                                    task.run(x, y, z, block.toImmutableState());
                                     continue;
                                 }
                             }
@@ -402,11 +403,11 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++, pos += 4) {
                         int combinedId = mbb.getInt(pos);
-                        BlockTypes type = BlockTypes.getFromStateId(combinedId);
-                        switch (type) {
-                            case AIR:
-                            case CAVE_AIR:
-                            case VOID_AIR:
+                        BlockType type = BlockTypes.getFromStateId(combinedId);
+                        switch (type.getResource().toUpperCase()) {
+                            case "AIR":
+                            case "CAVE_AIR":
+                            case "VOID_AIR":
                                 continue;
                             default:
                                 BlockState state = type.withStateId(combinedId);
@@ -415,7 +416,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                                     CompoundTag nbt = nbtMap.get(trio);
                                     if (nbt != null) {
                                         BaseBlock block = new BaseBlock(state, nbt);
-                                        task.run(x, y, z, block);
+                                        task.run(x, y, z, block.toImmutableState());
                                         continue;
                                     }
                                 }
@@ -436,12 +437,12 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
         try {
             int index = HEADER_SIZE + (getIndex(x, y, z) << 2);
             int combinedId = mbb.getInt(index);
-            BlockTypes type = BlockTypes.getFromStateId(combinedId);
+            BlockType type = BlockTypes.getFromStateId(combinedId);
             BlockState state = type.withStateId(combinedId);
             if (type.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
                 CompoundTag nbt = nbtMap.get(new IntegerTrio(x, y, z));
                 if (nbt != null) {
-                    return new BaseBlock(state, nbt);
+                    return new BaseBlock(state, nbt).toImmutableState();
                 }
             }
             return state;
@@ -458,7 +459,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
         try {
             int diskIndex = (HEADER_SIZE) + (i << 2);
             int combinedId = mbb.getInt(diskIndex);
-            BlockTypes type = BlockTypes.getFromStateId(combinedId);
+            BlockType type = BlockTypes.getFromStateId(combinedId);
             BlockState state = type.withStateId(combinedId);
             if (type.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
                 CompoundTag nbt;
@@ -481,7 +482,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                     nbt = nbtMap.get(new IntegerTrio(x, y, z));
                 }
                 if (nbt != null) {
-                    return new BaseBlock(state, nbt);
+                    return new BaseBlock(state, nbt).toImmutableState();
                 }
             }
             return state;

@@ -5,6 +5,7 @@ import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.queue.DelegateFaweQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class ChangeSetFaweQueue extends DelegateFaweQueue {
@@ -28,7 +29,7 @@ public class ChangeSetFaweQueue extends DelegateFaweQueue {
 
         if (super.setBlock(x, y, z, combinedId)) {
             int combinedFrom = getParent().getCombinedId4Data(x, y, z);
-            BlockTypes typeFrom = BlockTypes.getFromStateId(combinedFrom);
+            BlockType typeFrom = BlockTypes.getFromStateId(combinedFrom);
             if (typeFrom.getMaterial().hasContainer()) {
                 CompoundTag nbt = getParent().getTileEntity(x, y, z);
                 if (nbt != null) {

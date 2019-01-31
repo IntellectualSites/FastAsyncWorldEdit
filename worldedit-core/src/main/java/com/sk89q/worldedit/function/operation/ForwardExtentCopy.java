@@ -90,13 +90,8 @@ public class ForwardExtentCopy implements Operation {
      * @param source      the source extent
      * @param region      the region to copy
      * @param destination the destination extent
-<<<<<<< HEAD
-     * @param to          the destination position
-     * @see #ForwardExtentCopy(Extent, Region, Vector, Extent, Vector) the main constructor
-=======
      * @param to the destination position
      * @see #ForwardExtentCopy(Extent, Region, BlockVector3, Extent, BlockVector3) the main constructor
->>>>>>> 399e0ad5... Refactor vector system to be cleaner
      */
     public ForwardExtentCopy(Extent source, Region region, Extent destination, BlockVector3 to) {
         this(source, region, region.getMinimumPoint(), destination, to);

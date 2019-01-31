@@ -172,9 +172,9 @@ public class CavesGen extends GenBase {
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D)) {
                                 BlockStateHolder material = chunk.getLazyBlock(bx + local_x, local_y, bz + local_z);
                                 BlockStateHolder materialAbove = chunk.getLazyBlock(bx + local_x, local_y + 1, bz + local_z);
-                                switch (material.getBlockType()) {
-                                    case GRASS:
-                                    case MYCELIUM:
+                                switch (material.getBlockType().getResource().toUpperCase()) {
+                                    case "GRASS":
+                                    case "MYCELIUM":
                                         grassFound = true;
                                         break;
                                 }
@@ -205,13 +205,13 @@ public class CavesGen extends GenBase {
     }
 
     protected boolean isSuitableBlock(BlockStateHolder material, BlockStateHolder materialAbove) {
-        switch (material.getBlockType()) {
-            case AIR:
-            case CAVE_AIR:
-            case VOID_AIR:
-            case WATER:
-            case LAVA:
-            case BEDROCK:
+        switch (material.getBlockType().getResource().toUpperCase()) {
+            case "AIR":
+            case "CAVE_AIR":
+            case "VOID_AIR":
+            case "WATER":
+            case "LAVA":
+            case "BEDROCK":
                 return false;
             default:
                 return true;

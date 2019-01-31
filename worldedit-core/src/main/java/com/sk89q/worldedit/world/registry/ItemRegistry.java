@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.world.item.ItemType;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -42,5 +43,14 @@ public interface ItemRegistry {
     default Collection<String> registerItems() {
         return Collections.emptyList();
     }
+    
+    /**
+     * Gets the name for the given item.
+     *
+     * @param itemType the item
+     * @return The name, or null if it's unknown
+     */
+    @Nullable
+    String getName(ItemType itemType);
 
 }

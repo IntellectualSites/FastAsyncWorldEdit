@@ -23,6 +23,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.File;
@@ -78,7 +79,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
             if (state.getMaterial().hasContainer()) {
                 CompoundTag tile = getTileEntity(x, y, z);
                 if (tile != null) {
-                    return BaseBlock.getFromInternalId(combinedId4Data, tile);
+                    return BaseBlock.getFromInternalId(combinedId4Data, tile).toImmutableState();
                 }
             }
             return state;
@@ -94,8 +95,8 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default BlockState getFullBlock(BlockVector3 position) {
-        return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+    default BaseBlock getFullBlock(BlockVector3 position) {
+        return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ()).toBaseBlock();
     }
 
     @Override
@@ -275,18 +276,18 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                 for (int y = 0; y <= getMaxY(); y++) {
                     int combined = getCombinedId4Data(xx, y, zz);
                     BlockState state = BlockState.getFromInternalId(combined);
-                    BlockTypes type = state.getBlockType();
-                    switch (type.getTypeEnum()) {
-                        case AIR:
-                        case VOID_AIR:
-                        case CAVE_AIR:
+                    BlockType type = state.getBlockType();
+                    switch (type.getResource().toUpperCase()) {
+                        case "AIR":
+                        case "VOID_AIR":
+                        case "CAVE_AIR":
                             continue;
                     }
                     mutable.mutY(y);
                     CompoundTag tile = getTileEntity(x, y, z);
                     if (tile != null) {
                         BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
-                        onEach.run(mutable.toBlockVector3(), block);
+                        onEach.run(mutable.toBlockVector3(), block.toImmutableState());
                     } else {
                         onEach.run(mutable.toBlockVector3(), state);
                     }
@@ -308,7 +309,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                     if (combined == 0) {
                         continue;
                     }
-                    BlockTypes type = BlockTypes.getFromStateId(combined);
+                    BlockType type = BlockTypes.getFromStateId(combined);
                     if (type.getMaterial().hasContainer()) {
                         CompoundTag tile = getTileEntity(x, y, z);
                         if (tile != null) {
@@ -316,7 +317,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                             mutable.mutZ(zz);
                             mutable.mutY(y);
                             BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
-                            onEach.run(mutable.toBlockVector3(), block);
+                            onEach.run(mutable.toBlockVector3(), block.toImmutableState());
                         }
                     }
                 }

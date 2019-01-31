@@ -67,6 +67,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -903,7 +904,7 @@ public class UtilityCommands extends MethodCommands {
         }
 
         if (formatName != null) {
-            final ClipboardFormat cf = ClipboardFormat.findByAlias(formatName);
+            final ClipboardFormat cf = ClipboardFormats.findByAlias(formatName);
             forEachFile = new DelegateConsumer<File>(forEachFile) {
                 @Override
                 public void accept(File file) {
@@ -1013,7 +1014,7 @@ public class UtilityCommands extends MethodCommands {
             dir = root;
         }
 
-        ClipboardFormat format = ClipboardFormat.findByFile(file);
+        ClipboardFormat format = ClipboardFormats.findByFile(file);
         URI relative = dir.toURI().relativize(file.toURI());
         StringBuilder name = new StringBuilder();
         if (relative.isAbsolute()) {

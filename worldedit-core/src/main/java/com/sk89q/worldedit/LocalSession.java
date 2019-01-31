@@ -1030,12 +1030,12 @@ public class LocalSession implements TextureHolder {
     }
 
     public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {
-        ItemTypes type = item.getType();
+        ItemType type = item.getType();
         if (type.hasBlockType() && type.getBlockType().getMaterial().isAir()) {
             throw new InvalidToolBindException(type, "Blocks can't be used");
-        } else if (type == config.wandItem) {
+        } else if (type.getId().equalsIgnoreCase(config.wandItem)) {
             throw new InvalidToolBindException(type, "Already used for the wand");
-        } else if (type == config.navigationWand) {
+        } else if (type.getId().equalsIgnoreCase(config.navigationWand)) {
             throw new InvalidToolBindException(type, "Already used for the navigation wand");
         }
         Tool previous;

@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import org.bukkit.FluidCollisionMode;
@@ -214,10 +215,10 @@ public class AsyncBlock implements Block {
     @Override
     public AsyncBlockState getState() {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
-        BlockTypes type = BlockTypes.getFromStateId(combined);
-        switch (type) {
-            case SIGN:
-            case WALL_SIGN:
+        BlockType type = BlockTypes.getFromStateId(combined);
+        switch (type.getResource().toUpperCase()) {
+            case "SIGN":
+            case "WALL_SIGN":
                 return new AsyncSign(this, combined);
         }
         return new AsyncBlockState(this, combined);
@@ -284,7 +285,7 @@ public class AsyncBlock implements Block {
     @Override
     public boolean isLiquid() {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
-        BlockTypes type = BlockTypes.getFromStateId(combined);
+        BlockType type = BlockTypes.getFromStateId(combined);
         return type.getMaterial().isLiquid();
     }
 

@@ -17,6 +17,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.ArrayList;
@@ -147,12 +148,12 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     @Override
     public BlockState getBlock(int index) {
         int combinedId = states[index];
-        BlockTypes type = BlockTypes.getFromStateId(combinedId);
+        BlockType type = BlockTypes.getFromStateId(combinedId);
         BlockState state = type.withStateId(combinedId);
         if (type.getMaterial().hasContainer()) {
             CompoundTag nbt = getTag(index);
             if (nbt != null) {
-                return new BaseBlock(state, nbt);
+                return new BaseBlock(state, nbt).toImmutableState();
             }
         }
         return state;
@@ -174,10 +175,10 @@ public class CPUOptimizedClipboard extends FaweClipboard {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++, index++) {
                         BlockState block = getBlock(index);
-                        switch (block.getBlockType()) {
-                            case AIR:
-                            case CAVE_AIR:
-                            case VOID_AIR:
+                        switch (block.getBlockType().getResource().toUpperCase()) {
+                            case "AIR":
+                            case "CAVE_AIR":
+                            case "VOID_AIR":
                                 continue;
                             default:
                                 task.run(x, y, z, block);

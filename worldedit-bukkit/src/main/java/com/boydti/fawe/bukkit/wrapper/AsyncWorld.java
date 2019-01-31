@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -272,7 +273,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     public int getHighestBlockYAt(int x, int z) {
         for (int y = getMaxHeight() - 1; y >= 0; y--) {
             int stateId = queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
-            BlockTypes type = BlockTypes.getFromStateId(stateId);
+            BlockType type = BlockTypes.getFromStateId(stateId);
             if (!type.getMaterial().isAir()) return y;
         }
         return 0;

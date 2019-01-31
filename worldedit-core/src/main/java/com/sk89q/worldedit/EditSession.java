@@ -981,7 +981,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     @Override
-    public BlockState getFullBlock(BlockVector3 position) {
+    public BaseBlock getFullBlock(BlockVector3 position) {
         return world.getFullBlock(position);
     }
 
@@ -1094,12 +1094,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
     @Deprecated
     public boolean setBlock(int x, int y, int z, BaseBlock block) {
-        return setBlock(x, y, z, (BlockState) block);
+        return setBlock(x, y, z, block.toImmutableState());
     }
 
     @Deprecated
     public boolean setBlock(BlockVector3 position, BaseBlock block) throws MaxChangedBlocksException {
-        return setBlock(position, (BlockState) block);
+        return setBlock(position, block.toImmutableState());
     }
 
     @SuppressWarnings("deprecation")
@@ -2502,16 +2502,16 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 }
                 for (int y = maxY; y >= 1; --y) {
                     final BlockType type = getBlockType(x, y, z);
-                    switch (type.getTypeEnum()) {
-                        case ICE:
+                    switch (type.getResource().toUpperCase()) {
+                        case "ICE":
                             this.setBlock(x, y, z, BlockTypes.WATER.getDefaultState());
                             break;
-                        case SNOW:
+                        case "SNOW":
                             this.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
                             break;
-                        case CAVE_AIR:
-                        case VOID_AIR:
-                        case AIR:
+                        case "CAVE_AIR":
+                        case "VOID_AIR":
+                        case "AIR":
                             continue;
                         default:
                             break;
@@ -2574,20 +2574,20 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 outer:
                 for (int y = maxY; y >= 1; --y) {
                     BlockType type = getBlockType(x, y, z);
-                    switch (type.getTypeEnum()) {
-                        case AIR:
-                        case CAVE_AIR:
-                        case VOID_AIR:
+                    switch (type.getResource().toUpperCase()) {
+                        case "AIR":
+                        case "CAVE_AIR":
+                        case "VOID_AIR":
                             continue;
-                        case WATER:
+                        case "WATER":
                             this.setBlock(x, y, z, BlockTypes.ICE.getDefaultState());
                             break outer;
-                        case ACACIA_LEAVES: // TODO FIXME get leaves dynamically
-                        case BIRCH_LEAVES:
-                        case DARK_OAK_LEAVES:
-                        case JUNGLE_LEAVES:
-                        case OAK_LEAVES:
-                        case SPRUCE_LEAVES:
+                        case "ACACIA_LEAVES": // TODO FIXME get leaves dynamically
+                        case "BIRCH_LEAVES":
+                        case "DARK_OAK_LEAVES":
+                        case "JUNGLE_LEAVES":
+                        case "OAK_LEAVES":
+                        case "SPRUCE_LEAVES":
 //        int ceilRadius = (int) Math.ceil(radius);
 //        for (int x = ox - ceilRadius; x <= ox + ceilRadius; ++x) {
 //            for (int z = oz - ceilRadius; z <= oz + ceilRadius; ++z) {
@@ -2670,12 +2670,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 loop:
                 for (int y = maxY; y >= 1; --y) {
                     BlockType block = getBlockType(x, y, z);
-                    switch (block.getTypeEnum()) {
-                        case DIRT:
+                    switch (block.getResource().toUpperCase()) {
+                        case "DIRT":
                             this.setBlock(x, y, z, BlockTypes.GRASS_BLOCK.getDefaultState());
                             break loop;
-                        case WATER:
-                        case LAVA:
+                        case "WATER":
+                        case "LAVA":
                             break loop;
                         default:
                             if (block.getMaterial().isMovementBlocker()) {
@@ -2770,18 +2770,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     this.changes++;
                     for (int y = basePosition.getBlockY(); y >= (basePosition.getBlockY() - 10); --y) {
                         BlockType type = getBlockType(x, y, z);
-                        switch (type.getTypeEnum()) {
-                            case GRASS:
-                            case DIRT:
+                        switch (type.getResource().toUpperCase()) {
+                            case "GRASS":
+                            case "DIRT":
                                 treeType.generate(this, BlockVector3.at(x, y + 1, z));
                                 this.changes++;
                                 break;
-                            case SNOW:
+                            case "SNOW":
                                 setBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
                                 break;
-                            case AIR:
-                            case CAVE_AIR:
-                            case VOID_AIR:
+                            case "AIR":
+                            case "CAVE_AIR":
+                            case "VOID_AIR":
                                 continue;
                             default:
                                 break;

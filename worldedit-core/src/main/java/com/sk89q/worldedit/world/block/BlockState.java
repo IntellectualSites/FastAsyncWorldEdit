@@ -39,6 +39,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -49,13 +50,26 @@ import java.util.stream.Stream;
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
-public abstract class BlockState implements BlockStateHolder<BlockState> {
+public class BlockState implements BlockStateHolder<BlockState> {
+    private final BlockType blockType;
+    private BaseBlock emptyBaseBlock;
+    BlockState(BlockType blockType) {
+        this.blockType = blockType;
+        this.emptyBaseBlock = new BaseBlock(this);
+    }
+    
+    BlockState(BlockType blockType, BaseBlock baseBlock){
+    	this.blockType = blockType;
+    	this.emptyBaseBlock = baseBlock;
+    }
+    
     /**
      * Returns a temporary BlockState for a given internal id
      * @param combinedId
      * @deprecated magic number
      * @return BlockState
      */
+	
     @Deprecated
     public static BlockState getFromInternalId(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
@@ -85,17 +99,6 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     public static BlockState get(@Nullable BlockType type, String state) throws InputParseException {
         return get(type, state, null);
     }
-//    private BlockTypes blockType;
-//    private BaseBlock emptyBaseBlock;
-
-    // Neighbouring state table.
-    private Table<Property<?>, Object, BlockState> states;
-    
-//    protected BlockState(BlockTypes blockType) {
-////    protected BlockState() {
-//    	this.blockType = blockType;
-//        this.emptyBaseBlock = new BaseBlock(this);
-//    }
 
     /**
      * Returns a temporary BlockState for a given type and string
@@ -265,7 +268,7 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     @Override
     public <V> BlockState with(final Property<V> property, final V value) {
         try {
-            BlockTypes type = getBlockType();
+            BlockType type = getBlockType();
             int newState = ((AbstractProperty) property).modify(this.getInternalId(), value);
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
@@ -276,7 +279,7 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     @Override
     public <V> BlockState with(final PropertyKey property, final V value) {
         try {
-            BlockTypes type = getBlockType();
+            BlockType type = getBlockType();
             int newState = ((AbstractProperty) type.getProperty(property)).modify(this.getInternalId(), value);
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
@@ -309,13 +312,10 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
         return (Map<Property<?>, Object>) map;
     }
 
-//    @Override
-//    public BaseBlock toBaseBlock() {
-////        if (this.fuzzy) {
-////            throw new IllegalArgumentException("Can't create a BaseBlock from a fuzzy BlockState!");
-////        }
-//        return this.emptyBaseBlock;
-//    }
+    @Override
+    public BaseBlock toBaseBlock() {
+        return this.emptyBaseBlock;
+    }
 
     @Override
     public BaseBlock toBaseBlock(CompoundTag compoundTag) {
@@ -325,10 +325,10 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
         return new BaseBlock(this, compoundTag);
     }
     
-//    @Override
-//    public BlockTypes getBlockType() {
-//    	return this.blockType;
-//    }
+    @Override
+    public BlockType getBlockType() {
+    	return this.blockType;
+    }
 
     /**
      * Deprecated, use masks - not try to this fuzzy/non fuzzy state nonsense
@@ -364,4 +364,20 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     public String toString() {
         return getAsString();
     }
+
+	@Override
+	public int getInternalId() {
+		return blockType.getInternalId();
+	}
+
+	@Override
+	public BlockMaterial getMaterial() {
+		return blockType.getMaterial();
+	}
+
+	@Override
+	public int getOrdinal() {
+		//?
+		return 0;
+	}
 }

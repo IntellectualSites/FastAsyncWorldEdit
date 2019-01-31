@@ -12,6 +12,7 @@ import com.github.luben.zstd.ZstdOutputStream;
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
 import java.awt.Graphics2D;
@@ -889,7 +890,7 @@ public class MainUtil {
     public static File resolve(File dir, String filename, @Nullable ClipboardFormat format, boolean allowDir) {
         if (format != null) {
             if (!filename.matches(".*\\.[\\w].*")) {
-                filename = filename + "." + format.getExtension();
+                filename = filename + "." + format.getPrimaryFileExtension();
             }
             return MainUtil.resolveRelative(new File(dir, filename));
         }
@@ -897,8 +898,8 @@ public class MainUtil {
             File file = MainUtil.resolveRelative(new File(dir, filename));
             if (file.exists() && file.isDirectory()) return file;
         }
-        for (ClipboardFormat f : ClipboardFormat.values) {
-            File file = MainUtil.resolveRelative(new File(dir, filename + "." + f.getExtension()));
+        for (ClipboardFormat f : ClipboardFormats.getAll()) {
+            File file = MainUtil.resolveRelative(new File(dir, filename + "." + f.getPrimaryFileExtension()));
             if (file.exists()) return file;
         }
         return null;

@@ -57,7 +57,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         }
 
         profile = config.getBoolean("debug", profile);
-        wandItem = ItemTypes.parse(config.getString("wand-item", wandItem.getId()));
+        wandItem = ItemTypes.parse(config.getString("wand-item", wandItem)).getId();
 
         defaultChangeLimit = Math.max(-1, config.getInt(
                 "limits.max-blocks-changed.default", defaultChangeLimit));
@@ -105,7 +105,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         useInventoryCreativeOverride = config.getBoolean("use-inventory.creative-mode-overrides",
                 useInventoryCreativeOverride);
 
-        navigationWand = ItemTypes.parse(config.getString("navigation-wand.item", navigationWand.getId()));
+        navigationWand = ItemTypes.parse(config.getString("navigation-wand.item", navigationWand)).getId();
         navigationWandMaxDistance = config.getInt("navigation-wand.max-distance", navigationWandMaxDistance);
         navigationUseGlass = config.getBoolean("navigation.use-glass", navigationUseGlass);
 

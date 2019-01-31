@@ -22,8 +22,13 @@ package com.sk89q.worldedit.util;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
-import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+
+import javax.annotation.Nullable;
 
 /**
  * A collection of cardinal, ordinal, and secondary-ordinal directions.
@@ -55,12 +60,9 @@ public enum Direction {
     private final Vector3 direction;
     private final BlockVector3 blockVector;
     private final int flags, left, right;
-
-
+    
     private static HashMap<String, Direction> map = new HashMap<>();
-    public static final Direction[] values = values();
-    public static final Direction[] cardinal = new Direction[]{ NORTH, EAST, SOUTH, WEST };
-
+    
     static {
         for (Direction dir : Direction.values()) {
             map.put(dir.name(), dir);
@@ -68,24 +70,24 @@ public enum Direction {
         }
     }
 
-    private Direction(Vector3 vector, int flags, int left, int right) {
+    Direction(Vector3 vector, int flags, int left, int right) {
         this.direction = vector.normalize();
         this.blockVector = BlockVector3.at(Math.signum(vector.getX()), Math.signum(vector.getY()), Math.signum(vector.getZ()));
         this.flags = flags;
         this.left = left;
         this.right = right;
     }
-
+    
     public static Direction get(CharSequence sequence) {
         return map.get(sequence);
     }
-
+    
     public Direction getLeft() {
-        return left != -1 ? values[left] : null;
+        return left != -1 ? values()[left] : null;
     }
 
     public Direction getRight() {
-        return right != -1 ? values[right] : null;
+        return right != -1 ? values()[right] : null;
     }
 
     public double getX() {
@@ -163,11 +165,6 @@ public enum Direction {
         return direction;
     }
 
-    @Override
-    public String toString() {
-        return name().toLowerCase();
-    }
-
     /**
      * Get the vector.
      *
@@ -209,6 +206,110 @@ public enum Direction {
     }
 
     /**
+     * Gets all directions with the given flags.
+     *
+     * @param flags The flags
+     * @return The directions that fit the flags
+     */
+    public static List<Direction> valuesOf(int flags) {
+        List<Direction> directions = new ArrayList<>();
+        for (Direction direction : values()) {
+            if ((~flags & direction.flags) == 0) {
+                directions.add(direction);
+            }
+        }
+
+        return directions;
+    }
+
+    /**
+     * Converts a rotation index into a Direction.
+     *
+     * <p>
+     *     Rotation indexes are used in BlockStates, such as sign posts.
+     * </p>
+     *
+     * @param rotation The rotation index
+     * @return The direction, if applicable
+     */
+    public static Optional<Direction> fromRotationIndex(int rotation) {
+        switch (rotation) {
+            case 0:
+                return Optional.of(SOUTH);
+            case 1:
+                return Optional.of(SOUTH_SOUTHWEST);
+            case 2:
+                return Optional.of(SOUTHWEST);
+            case 3:
+                return Optional.of(WEST_SOUTHWEST);
+            case 4:
+                return Optional.of(WEST);
+            case 5:
+                return Optional.of(WEST_NORTHWEST);
+            case 6:
+                return Optional.of(NORTHWEST);
+            case 7:
+                return Optional.of(NORTH_NORTHWEST);
+            case 8:
+                return Optional.of(NORTH);
+            case 9:
+                return Optional.of(NORTH_NORTHEAST);
+            case 10:
+                return Optional.of(NORTHEAST);
+            case 11:
+                return Optional.of(EAST_NORTHEAST);
+            case 12:
+                return Optional.of(EAST);
+            case 13:
+                return Optional.of(EAST_SOUTHEAST);
+            case 14:
+                return Optional.of(SOUTHEAST);
+            case 15:
+                return Optional.of(SOUTH_SOUTHEAST);
+        }
+
+        return Optional.empty();
+    }
+
+    public OptionalInt toRotationIndex() {
+        switch (this) {
+            case SOUTH:
+                return OptionalInt.of(0);
+            case SOUTH_SOUTHWEST:
+                return OptionalInt.of(1);
+            case SOUTHWEST:
+                return OptionalInt.of(2);
+            case WEST_SOUTHWEST:
+                return OptionalInt.of(3);
+            case WEST:
+                return OptionalInt.of(4);
+            case WEST_NORTHWEST:
+                return OptionalInt.of(5);
+            case NORTHWEST:
+                return OptionalInt.of(6);
+            case NORTH_NORTHWEST:
+                return OptionalInt.of(7);
+            case NORTH:
+                return OptionalInt.of(8);
+            case NORTH_NORTHEAST:
+                return OptionalInt.of(9);
+            case NORTHEAST:
+                return OptionalInt.of(10);
+            case EAST_NORTHEAST:
+                return OptionalInt.of(11);
+            case EAST:
+                return OptionalInt.of(12);
+            case EAST_SOUTHEAST:
+                return OptionalInt.of(13);
+            case SOUTHEAST:
+                return OptionalInt.of(14);
+            case SOUTH_SOUTHEAST:
+                return OptionalInt.of(15);
+        }
+        return OptionalInt.empty();
+    }
+
+    /**
      * Flags to use with {@link #findClosest(Vector3, int)}.
      */
     public static final class Flag {
@@ -224,4 +325,3 @@ public enum Direction {
     }
 
 }
-

@@ -1,5 +1,6 @@
 package com.thevoxelbox.voxelsniper.brush;
 
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.thevoxelbox.voxelsniper.Message;
@@ -72,11 +73,11 @@ public class OverlayBrush extends PerformBrush
     @SuppressWarnings("deprecation")
 	private boolean isIgnoredBlock(int materialId)
     {
-        BlockTypes type = BlockTypes.get(materialId);
-        switch (type) {
-            case WATER:
-            case LAVA:
-            case CACTUS:
+        BlockType type = BlockTypes.get(materialId);
+        switch (type.getResource().toUpperCase()) {
+            case "WATER":
+            case "LAVA":
+            case "CACTUS":
                 return true;
         }
         BlockMaterial mat = type.getMaterial();
@@ -123,7 +124,7 @@ public class OverlayBrush extends PerformBrush
                                     if (!this.allBlocks)
                                     { // if the override parameter has not been activated, go to the switch that filters out manmade stuff.
 
-                                        BlockTypes type = BlockTypes.get(this.getBlockIdAt(this.getTargetBlock().getX() + x, y, this.getTargetBlock().getZ() + z));
+                                        BlockType type = BlockTypes.get(this.getBlockIdAt(this.getTargetBlock().getX() + x, y, this.getTargetBlock().getZ() + z));
                                         BlockMaterial mat = type.getMaterial();
                                         if (mat.isSolid() && mat.isFullCube() && !mat.hasContainer()) {
                                             for (int d = 1; (d < this.depth + 1); d++) {

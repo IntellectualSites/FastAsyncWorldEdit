@@ -201,25 +201,25 @@ public class SchematicStreamer extends NBTStreamer {
         fc.forEach(new FaweClipboard.BlockReader() {
             @Override
             public void run(int x, int y, int z, BlockState block) {
-                BlockTypes type = block.getBlockType();
-                switch (type) {
-                    case ACACIA_STAIRS:
-                    case BIRCH_STAIRS:
-                    case BRICK_STAIRS:
-                    case COBBLESTONE_STAIRS:
-                    case DARK_OAK_STAIRS:
-                    case DARK_PRISMARINE_STAIRS:
-                    case JUNGLE_STAIRS:
-                    case NETHER_BRICK_STAIRS:
-                    case OAK_STAIRS:
-                    case PRISMARINE_BRICK_STAIRS:
-                    case PRISMARINE_STAIRS:
-                    case PURPUR_STAIRS:
-                    case QUARTZ_STAIRS:
-                    case RED_SANDSTONE_STAIRS:
-                    case SANDSTONE_STAIRS:
-                    case SPRUCE_STAIRS:
-                    case STONE_BRICK_STAIRS:
+                BlockType type = block.getBlockType();
+                switch (type.getResource().toUpperCase()) {
+                    case "ACACIA_STAIRS":
+                    case "BIRCH_STAIRS":
+                    case "BRICK_STAIRS":
+                    case "COBBLESTONE_STAIRS":
+                    case "DARK_OAK_STAIRS":
+                    case "DARK_PRISMARINE_STAIRS":
+                    case "JUNGLE_STAIRS":
+                    case "NETHER_BRICK_STAIRS":
+                    case "OAK_STAIRS":
+                    case "PRISMARINE_BRICK_STAIRS":
+                    case "PRISMARINE_STAIRS":
+                    case "PURPUR_STAIRS":
+                    case "QUARTZ_STAIRS":
+                    case "RED_SANDSTONE_STAIRS":
+                    case "SANDSTONE_STAIRS":
+                    case "SPRUCE_STAIRS":
+                    case "STONE_BRICK_STAIRS":
                         Object half = block.getState(PropertyKey.HALF);
                         Direction facing = block.getState(PropertyKey.FACING);
 
@@ -228,19 +228,19 @@ public class SchematicStreamer extends NBTStreamer {
                         Direction right = facing.getRight();
 
                         BlockStateHolder forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
-                        BlockTypes forwardType = forwardBlock.getBlockType();
+                        BlockType forwardType = forwardBlock.getBlockType();
                         if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
                             Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
                             if (forwardFacing == left) {
                                 BlockStateHolder rightBlock = fc.getBlock(x + right.getBlockX(), y + right.getBlockY(), z + right.getBlockZ());
-                                BlockTypes rightType = rightBlock.getBlockType();
+                                BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_left"));
                                 }
                                 return;
                             } else if (forwardFacing == right) {
                                 BlockStateHolder leftBlock = fc.getBlock(x + left.getBlockX(), y + left.getBlockY(), z + left.getBlockZ());
-                                BlockTypes leftType = leftBlock.getBlockType();
+                                BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
                                 }
@@ -249,19 +249,19 @@ public class SchematicStreamer extends NBTStreamer {
                         }
 
                         BlockStateHolder backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
-                        BlockTypes backwardsType = backwardsBlock.getBlockType();
+                        BlockType backwardsType = backwardsBlock.getBlockType();
                         if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
                             Direction backwardsFacing = (Direction) backwardsBlock.getState(PropertyKey.FACING);
                             if (backwardsFacing == left) {
                                 BlockStateHolder rightBlock = fc.getBlock(x + right.getBlockX(), y + right.getBlockY(), z + right.getBlockZ());
-                                BlockTypes rightType = rightBlock.getBlockType();
+                                BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_left"));
                                 }
                                 return;
                             } else if (backwardsFacing == right) {
                                 BlockStateHolder leftBlock = fc.getBlock(x + left.getBlockX(), y + left.getBlockY(), z + left.getBlockZ());
-                                BlockTypes leftType = leftBlock.getBlockType();
+                                BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_right"));
                                 }
@@ -301,43 +301,43 @@ public class SchematicStreamer extends NBTStreamer {
 
     private boolean merge(int group, int x, int y, int z) {
         BlockStateHolder block = fc.getBlock(x, y, z);
-        BlockTypes type = block.getBlockType();
+        BlockType type = block.getBlockType();
         return group(type) == group || fullCube.apply(type);
     }
 
-    private int group(BlockTypes type) {
-        switch (type) {
-            case ACACIA_FENCE:
-            case BIRCH_FENCE:
-            case DARK_OAK_FENCE:
-            case JUNGLE_FENCE:
-            case OAK_FENCE:
-            case SPRUCE_FENCE:
+    private int group(BlockType type) {
+        switch (type.getResource().toUpperCase()) {
+            case "ACACIA_FENCE":
+            case "BIRCH_FENCE":
+            case "DARK_OAK_FENCE":
+            case "JUNGLE_FENCE":
+            case "OAK_FENCE":
+            case "SPRUCE_FENCE":
                 return 0;
-            case NETHER_BRICK_FENCE:
+            case "NETHER_BRICK_FENCE":
                 return 1;
-            case COBBLESTONE_WALL:
-            case MOSSY_COBBLESTONE_WALL:
+            case "COBBLESTONE_WALL":
+            case "MOSSY_COBBLESTONE_WALL":
                 return 2;
-            case IRON_BARS:
-            case BLACK_STAINED_GLASS_PANE:
-            case BLUE_STAINED_GLASS_PANE:
-            case BROWN_MUSHROOM_BLOCK:
-            case BROWN_STAINED_GLASS_PANE:
-            case CYAN_STAINED_GLASS_PANE:
-            case GLASS_PANE:
-            case GRAY_STAINED_GLASS_PANE:
-            case GREEN_STAINED_GLASS_PANE:
-            case LIGHT_BLUE_STAINED_GLASS_PANE:
-            case LIGHT_GRAY_STAINED_GLASS_PANE:
-            case LIME_STAINED_GLASS_PANE:
-            case MAGENTA_STAINED_GLASS_PANE:
-            case ORANGE_STAINED_GLASS_PANE:
-            case PINK_STAINED_GLASS_PANE:
-            case PURPLE_STAINED_GLASS_PANE:
-            case RED_STAINED_GLASS_PANE:
-            case WHITE_STAINED_GLASS_PANE:
-            case YELLOW_STAINED_GLASS_PANE:
+            case "IRON_BARS":
+            case "BLACK_STAINED_GLASS_PANE":
+            case "BLUE_STAINED_GLASS_PANE":
+            case "BROWN_MUSHROOM_BLOCK":
+            case "BROWN_STAINED_GLASS_PANE":
+            case "CYAN_STAINED_GLASS_PANE":
+            case "GLASS_PANE":
+            case "GRAY_STAINED_GLASS_PANE":
+            case "GREEN_STAINED_GLASS_PANE":
+            case "LIGHT_BLUE_STAINED_GLASS_PANE":
+            case "LIGHT_GRAY_STAINED_GLASS_PANE":
+            case "LIME_STAINED_GLASS_PANE":
+            case "MAGENTA_STAINED_GLASS_PANE":
+            case "ORANGE_STAINED_GLASS_PANE":
+            case "PINK_STAINED_GLASS_PANE":
+            case "PURPLE_STAINED_GLASS_PANE":
+            case "RED_STAINED_GLASS_PANE":
+            case "WHITE_STAINED_GLASS_PANE":
+            case "YELLOW_STAINED_GLASS_PANE":
                 return 3;
             default:
                 return -1;
@@ -450,6 +450,7 @@ public class SchematicStreamer extends NBTStreamer {
 
     public Clipboard getClipboard() throws IOException {
         try {
+        	setupClipboard(0);
             addDimensionReaders();
             addBlockReaders();
             readFully();

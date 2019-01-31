@@ -22,6 +22,7 @@ package com.sk89q.worldedit;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
@@ -53,7 +54,7 @@ public abstract class LocalConfiguration {
     public String logFile = "";
     public String logFormat = LogFormat.DEFAULT_FORMAT;
     public boolean registerHelp = true; // what is the point of this, it's not even used
-    public ItemTypes wandItem = ItemTypes.WOODEN_AXE;
+    public String wandItem = ItemTypes.WOODEN_AXE.getId();
     public boolean superPickaxeDrop = true;
     public boolean superPickaxeManyDrop = true;
     public boolean noDoubleSlash = false;
@@ -61,7 +62,7 @@ public abstract class LocalConfiguration {
     public boolean useInventoryOverride = false;
     public boolean useInventoryCreativeOverride = false;
     public boolean navigationUseGlass = true;
-    public ItemTypes navigationWand = ItemTypes.COMPASS;
+    public String navigationWand = ItemTypes.COMPASS.getId();
     public int navigationWandMaxDistance = 50;
     public int scriptTimeout = 3000;
     public Set<BlockType> allowedDataCycleBlocks = new HashSet<>();

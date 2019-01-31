@@ -38,7 +38,7 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
      *
      * @return The type
      */
-    BlockTypes getBlockType();
+    BlockType getBlockType();
 
     /**
      * Magic number (legacy uses)
@@ -46,9 +46,7 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
      * @return
      */
     @Deprecated
-    default BlockStateHolder withPropertyId(int propertyId) {
-        return getBlockType().withPropertyId(propertyId);
-    }
+    BlockStateHolder withPropertyId(int propertyId);
 
     /**
      * Get combined id (legacy uses)
@@ -60,18 +58,13 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
     @Deprecated
     int getOrdinal();
 
-    default BlockMaterial getMaterial() {
-        return getBlockType().getMaterial();
-    }
-
+    BlockMaterial getMaterial();
     /**
      * Get type id (legacy uses)
      * @return
      */
     @Deprecated
-    default int getInternalBlockTypeId() {
-        return getBlockType().getInternalId();
-    }
+    int getInternalBlockTypeId();
 
     /**
      * Get the block data (legacy uses)
@@ -132,11 +125,7 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
     boolean equalsFuzzy(BlockStateHolder o);
 
     /**
-<<<<<<< HEAD
-     * Returns an immutable BlockStateHolder from this BlockStateHolder.
-=======
      * Returns an immutable {@link BlockState} from this BlockStateHolder.
->>>>>>> f54d6afb... Make BaseBlock more memory efficient, and make it clear in the API that it's not intended to be used for every single block.
      *
      * @return A BlockState
      */

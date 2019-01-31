@@ -23,6 +23,7 @@ import com.sk89q.worldedit.event.platform.InputType;
 import com.sk89q.worldedit.event.platform.PlayerInputEvent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -128,7 +129,7 @@ public class SchemVis extends ImmutableVirtualWorld {
 
                             File file = new File(cachedFile.getParentFile(), filename.substring(1, filename.length() - 7));
                             URI uri = file.toURI();
-                            ClipboardFormat format = ClipboardFormat.findByFile(file);
+                            ClipboardFormat format = ClipboardFormats.findByFile(file);
                             format.hold(player, uri, new FileInputStream(file));
                             BBC.SCHEMATIC_LOADED.send(player, filename);
                             session.setVirtualWorld(null);
@@ -144,7 +145,7 @@ public class SchemVis extends ImmutableVirtualWorld {
 
                             File file = new File(clicked.getParentFile(), filename.substring(1, filename.length() - 7));
                             URI uri = file.toURI();
-                            ClipboardFormat format = ClipboardFormat.findByFile(file);
+                            ClipboardFormat format = ClipboardFormats.findByFile(file);
 
                             boolean contains = existing instanceof URIClipboardHolder && ((URIClipboardHolder) existing).contains(uri);
                             if (contains) {
@@ -386,7 +387,7 @@ public class SchemVis extends ImmutableVirtualWorld {
                 player.sendMessage(BBC.getPrefix() + "Converting: " + file);
                 cached.createNewFile();
                 try (FileInputStream in = new FileInputStream(file)) {
-                    ClipboardFormat format = ClipboardFormat.findByFile(file);
+                    ClipboardFormat format = ClipboardFormats.findByFile(file);
                     if (format != null) {
                         ClipboardReader reader = format.getReader(in);
                         Clipboard clipboard = reader.read();

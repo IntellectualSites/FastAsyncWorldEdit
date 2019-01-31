@@ -319,7 +319,7 @@ public class PlatformManager {
                 }
 
                 if (event.getType() == Interaction.HIT) {
-                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().wandItem)) {
+                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
                         FawePlayer<?> fp = FawePlayer.wrap(playerActor);
                         if (!actor.hasPermission("worldedit.selection.pos")) {
                             return;
@@ -378,7 +378,7 @@ public class PlatformManager {
 //>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 } else if (event.getType() == Interaction.OPEN) {
-                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().wandItem)) {
+                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
                         FawePlayer<?> fp = FawePlayer.wrap(playerActor);
                         if (!actor.hasPermission("worldedit.selection.pos")) {
                             return;

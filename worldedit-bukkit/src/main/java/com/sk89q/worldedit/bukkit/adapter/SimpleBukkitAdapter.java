@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -31,7 +32,7 @@ public class SimpleBukkitAdapter extends CachedBukkitAdapter {
             int typeId = block.getInternalBlockTypeId();
             BlockData[] dataCache = blockDataCache[typeId];
             if (dataCache == null) {
-                BlockTypes type = BlockTypes.get(typeId);
+                BlockType type = BlockTypes.get(typeId);
                 blockDataCache[typeId] = dataCache = new BlockData[type.getMaxStateId() + 1];
             }
             int propId = block.getInternalPropertiesId();

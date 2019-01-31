@@ -81,7 +81,7 @@ public class AbstractDelegateExtent implements LightingExtent {
     }
 
     @Override
-    public BlockState getFullBlock(BlockVector3 position) {
+    public BaseBlock getFullBlock(BlockVector3 position) {
         return extent.getFullBlock(position);
     }
 
@@ -138,7 +138,7 @@ public class AbstractDelegateExtent implements LightingExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
 //        mutable.mutX(x);
 //        mutable.mutY(y);
 //        mutable.mutZ(z);
@@ -150,7 +150,7 @@ public class AbstractDelegateExtent implements LightingExtent {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
         return extent.setBlock(location, block);
     }
 

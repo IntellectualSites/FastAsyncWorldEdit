@@ -7,12 +7,12 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 public class BlockStateImpl extends BlockState {
     private final int internalId;
     private final int ordinal;
-    private final BlockTypes type;
+    private final BlockType type;
     private BlockMaterial material;
     private BaseBlock baseBlock;
 
-    protected BlockStateImpl(BlockTypes type, int internalId, int ordinal) {
-//    	super(type);
+    protected BlockStateImpl(BlockType type, int internalId, int ordinal) {
+    	super(type);
         this.type = type;
         this.internalId = internalId;
         this.ordinal = ordinal;
@@ -44,7 +44,7 @@ public class BlockStateImpl extends BlockState {
     }
 
     @Override
-    public final BlockTypes getBlockType() {
+    public final BlockType getBlockType() {
         return type;
     }
 

@@ -53,12 +53,12 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public BaseBlock getBlock(final BlockVector3 arg0) {
+    public BlockState getBlock(final BlockVector3 arg0) {
         throw new FaweException(reason);
     }
 
     @Override
-    public BaseBlock getLazyBlock(final BlockVector3 arg0) {
+    public BlockState getLazyBlock(final BlockVector3 arg0) {
         throw new FaweException(reason);
     }
 
@@ -78,7 +78,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public BaseBlock getLazyBlock(int x, int y, int z) {
+    public BlockState getLazyBlock(int x, int y, int z) {
         throw new FaweException(reason);
     }
 

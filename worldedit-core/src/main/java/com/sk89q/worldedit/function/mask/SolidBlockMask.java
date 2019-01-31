@@ -4,7 +4,7 @@ package com.sk89q.worldedit.function.mask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -14,7 +14,7 @@ public class SolidBlockMask extends BlockTypeMask {
 
     public static boolean[] getTypes() {
         boolean[] types = new boolean[BlockTypes.size()];
-        for (BlockTypes type : BlockTypes.values) {
+        for (BlockType type : BlockTypes.values) {
             types[type.getInternalId()] = type.getMaterial().isSolid();
         }
         return types;

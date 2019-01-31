@@ -33,6 +33,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.item.ItemType;
@@ -40,30 +41,55 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public interface BlockType extends FawePattern, Comparable<BlockTypes> {
+public class BlockType implements FawePattern {
+	
+	public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
+	
+	private final @Nonnull String id;
+	private ArrayList<BlockState> states;
+	public final Function<BlockState, BlockState> defaultValue;
+	private BlockTypes.Settings settings;
+	private BlockMaterial material;
 
-    default BlockTypes getTypeEnum() {
-        return (BlockTypes) this;
-    }
-
+	public BlockType(@Nonnull String id) {
+		this(id, null);
+	}
+	
+	public BlockType(@Nonnull String id, Function<BlockState, BlockState> defaultValue) {
+		this.id = id;
+		this.defaultValue = defaultValue;
+	}
+	
+	public void setStates(ArrayList<BlockState> states) {
+		this.states = states;
+	}
+	
+	public void setSettings(BlockTypes.Settings settings) {
+		this.settings = settings;
+	}
+	
+	public BlockTypes.Settings getSettings(){
+		return settings;
+	}
+	
+	public ArrayList<BlockState> updateStates(){
+		if(settings != null) {
+			return settings.localStates = new ArrayList<BlockState>(settings.localStates.stream().map(state -> new BlockStateImpl(this, state.getInternalId(), state.getOrdinal())).collect(Collectors.toList()));
+		}else {
+			return null;
+		}
+	}
+	
     @Deprecated
-    int getMaxStateId();
-
-    @Override
-    default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return extent.setBlock(set, this.getDefaultState());
-    }
-
-    @Override
-    default BlockStateHolder apply(BlockVector3 position) {
-        return this.getDefaultState();
-    }
-
-    default Mask toMask(Extent extent) {
-        return new SingleBlockTypeMask(extent, this);
+    public int getMaxStateId() {
+    	return settings.permutations;
     }
 
     /**
@@ -71,15 +97,17 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      *
      * @return The id
      */
-    String getId();
+    public String getId() {
+    	return this.id;
+    }
 
-    default String getNamespace() {
+    public String getNamespace() {
         String id = getId();
         int i = id.indexOf(':');
         return i == -1 ? "minecraft" : id.substring(0, i);
     }
 
-    default String getResource() {
+    public String getResource() {
         String id = getId();
         return id.substring(id.indexOf(':') + 1);
     }
@@ -89,7 +117,7 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      *
      * @return The name, or ID
      */
-    default String getName() {
+    public String getName() {
         BundledBlockData.BlockEntry entry = BundledBlockData.getInstance().findById(this.getId());
         if (entry == null) {
             return getId();
@@ -99,28 +127,41 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
     }
 
     @Deprecated
-    default BlockState withPropertyId(int internalPropertiesId) {
-        if (internalPropertiesId == 0) return getDefaultState();
-        return BlockState.getFromInternalId(getInternalId() + (internalPropertiesId << BlockTypes.BIT_OFFSET));
+    public BlockState withPropertyId(int propertyId) {
+        if (settings.stateOrdinals == null) return settings.defaultState;
+        return states.get(settings.stateOrdinals[propertyId]);
+    }
+    
+    @Deprecated
+    public BlockState withStateId(int internalStateId) {
+        return this.withPropertyId(internalStateId >> BlockTypes.BIT_OFFSET);
     }
 
     /**
-     * Gets the properties of this BlockType in a {@code key->property} mapping.
+     * Properties string in the form property1=foo,prop2=bar
+     * @param properties
+     * @return
+     */
+    public BlockState withProperties(String properties) {
+        int id = getInternalId();
+        for (String keyPair : properties.split(",")) {
+            String[] split = keyPair.split("=");
+            String name = split[0];
+            String value = split[1];
+            AbstractProperty btp = settings.propertiesMap.get(name);
+            id = btp.modify(id, btp.getValueFor(value));
+        }
+        return withStateId(id);
+    }
+
+    /**
+     * Gets the properties of this BlockType in a key->property mapping.
      *
      * @return The properties map
      */
     @Deprecated
-    default Map<String, ? extends Property> getPropertyMap() {
-        List<? extends Property> properties = getProperties();
-        if (properties.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        Map<String, Property> map = new HashMap<>(properties.size());
-        for (Property property : properties) {
-            map.put(property.getName(), property);
-        }
-        return map;
+    public Map<String, ? extends Property<?>> getPropertyMap() {
+        return this.settings.propertiesMap;
     }
 
     /**
@@ -129,11 +170,13 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      * @return the properties
      */
     @Deprecated
-    List<? extends Property> getProperties();
+    public List<? extends Property<?>> getProperties() {
+        return this.settings.propertiesList;
+    }
 
     @Deprecated
-    default Set<? extends Property> getPropertiesSet() {
-        return new HashSet<>(getProperties());
+    public Set<? extends Property<?>> getPropertiesSet() {
+        return this.settings.propertiesSet;
     }
 
     /**
@@ -143,20 +186,22 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      * @return The property
      */
     @Deprecated
-    default <V> Property<V> getProperty(String name) {
-        Property<V> property = getPropertyMap().get(name);
-        checkArgument(property != null, "%s has no property named %s", this, name);
-        return property;
+    public <V> Property<V> getProperty(String name) {
+    	checkArgument(this.settings.propertiesMap.get(name) != null, "%s has no property named %s", this, name);
+        return (Property<V>) this.settings.propertiesMap.get(name);
     }
 
-    default boolean hasProperty(PropertyKey key) {
-        return getPropertyMap().containsKey(key.getId());
+    public boolean hasProperty(PropertyKey key) {
+        int ordinal = key.ordinal();
+        return this.settings.propertiesMapArr.length > ordinal ? this.settings.propertiesMapArr[ordinal] != null : false;
     }
-
-    default <V> Property<V> getProperty(PropertyKey key) {
-        Property<V> property = getPropertyMap().get(key.getId());
-        checkArgument(property != null, "%s has no property named %s", this, key.getId());
-        return property;
+    
+    public <V> Property<V> getProperty(PropertyKey key) {
+        try {
+            return (Property<V>) this.settings.propertiesMapArr[key.ordinal()];
+        } catch (IndexOutOfBoundsException ignore) {
+            return null;
+        }
     }
 
     /**
@@ -164,28 +209,54 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      *
      * @return The default state
      */
-    BlockState getDefaultState();
+    public BlockState getDefaultState() {
+    	BlockState defaultState = this.settings.defaultState;
+        if (defaultValue != null) {
+            defaultState = defaultValue.apply(defaultState);
+        }
+        return defaultState;
+    }
 
     /**
-     * Gets a list of all possible states for this BlockType.
-     *
-     * @return All possible states
+     * Slow
+     * @return collection of states
      */
-    List<BlockState> getAllStates();
+    @Deprecated
+    public List<BlockState> getAllStates() {
+        if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
+        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> states.get(i)).collect(Collectors.toList());
+    }
 
     /**
      * Gets a state of this BlockType with the given properties.
      *
      * @return The state, if it exists
      */
-    BlockState getState(Map<Property<?>, Object> key);
+    public BlockState getState(Map<Property<?>, Object> key) {
+        int id = getInternalId();
+        for (Map.Entry<Property<?>, Object> iter : key.entrySet()) {
+            Property<?> prop = iter.getKey();
+            Object value = iter.getValue();
+
+            /*
+             * TODO:
+             * This is likely wrong. The only place this seems to currently (Dec 23 2018)
+             * be invoked is via ForgeWorld, and value is a String when invoked there...
+             */
+            AbstractProperty btp = this.settings.propertiesMap.get(prop.getName());
+            checkArgument(btp != null, "%s has no property named %s", this, prop.getName());
+            id = btp.modify(id, btp.getValueFor((String)value));
+        }
+        return withStateId(id);
+    }
+
 
     /**
      * Gets whether this block type has an item representation.
      *
      * @return If it has an item
      */
-    default boolean hasItemType() {
+    public boolean hasItemType() {
         return getItemType() != null;
     }
 
@@ -195,8 +266,8 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      * @return The item representation
      */
     @Nullable
-    default ItemType getItemType() {
-        return ItemTypes.get(this.getTypeEnum());
+    public ItemType getItemType() {
+        return ItemTypes.get(this);
     }
 
     /**
@@ -204,7 +275,11 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      *
      * @return The material
      */
-    BlockMaterial getMaterial();
+    public BlockMaterial getMaterial() {
+    	return this.material == null ? 
+    			WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this) 
+    			: this.material;
+    }
 
     /**
      * Gets the legacy ID. Needed for legacy reasons.
@@ -213,7 +288,7 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      *
      * @return legacy id or 0, if unknown
      */
-    default int getLegacyCombinedId() {
+    public int getLegacyCombinedId() {
         Integer combinedId = LegacyMapper.getInstance().getLegacyCombined(this);
         return combinedId == null ? 0 : combinedId;
     }
@@ -225,16 +300,43 @@ public interface BlockType extends FawePattern, Comparable<BlockTypes> {
      *
      * @return internal id
      */
-    int getInternalId();
+    public int getInternalId() {
+    	return this.settings.internalId;
+    }
 
     @Override
-    boolean equals(Object obj);
+    public int hashCode() {
+        return this.id.hashCode();
+    }
 
     @Override
-    int hashCode();
+    public boolean equals(Object obj) {
+        return obj instanceof BlockType && this.id.equals(((BlockType) obj).id);
+    }
+    
+    @Override
+    public String toString() {
+        return getId();
+    }
+    
+
+    @Override
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        return extent.setBlock(set, this.getDefaultState());
+    }
+
+    @Override
+    public BlockStateHolder apply(BlockVector3 position) {
+        return this.getDefaultState();
+    }
+
+    public Mask toMask(Extent extent) {
+        return new SingleBlockTypeMask(extent, this);
+    }
+
 
     @Deprecated
-    default int getLegacyId() {
+    public int getLegacyId() {
         Integer id = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
         if (id != null) {
             return id >> 4;
