@@ -47,7 +47,7 @@ public class PatternCommands extends MethodCommands {
     public PatternCommands(WorldEdit worldEdit) {
         super(worldEdit);
     }
-
+    
     @Command(
             aliases = {"#existing", "#*", "*", ".*"},
             desc = "Use the block that is already there",
@@ -268,7 +268,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern data(Actor actor, LocalSession session, Extent extent, BaseBiome biome) {
+    public Pattern biome(Actor actor, LocalSession session, Extent extent, BaseBiome biome) {
         return new BiomePattern(extent, biome);
     }
 
