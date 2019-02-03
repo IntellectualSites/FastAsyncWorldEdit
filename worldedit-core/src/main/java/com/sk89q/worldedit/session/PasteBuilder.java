@@ -131,7 +131,6 @@ public class PasteBuilder {
         if (ignoreAirBlocks) {
             copy.setSourceMask(new ExistingBlockMask(clipboard));
         }
-        System.out.println("PasteBuilder info: extent: " + extent.toString() + "; copy: " + copy + "; transform: " + transform);
         return copy;
     }
 
