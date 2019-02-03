@@ -23,7 +23,7 @@ import com.boydti.fawe.command.FaweParser;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.util.StringMan;
-import com.plotsquared.general.commands.Command.CommandException;
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.MaskCommands;
