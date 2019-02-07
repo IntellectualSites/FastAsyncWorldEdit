@@ -210,7 +210,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         });
         streamer.readFully();
         if (fc == null) setupClipboard(length * width * height, uuid);
-        else fc.setDimensions(new Vector(width, height, length));
+        fc.setDimensions(new Vector(width, height, length));
         Vector origin = min;
         CuboidRegion region;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
