@@ -108,6 +108,11 @@ public class NullExtent implements Extent {
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         return false;
     }
+    
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return false;
+    }
 
     @Override
     public boolean setBiome(BlockVector2 position, BaseBiome biome) {

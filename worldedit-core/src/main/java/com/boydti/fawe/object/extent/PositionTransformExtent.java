@@ -43,29 +43,13 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutY(((pos.getY() - min.getY())));
         mutable.mutZ(((pos.getZ() - min.getZ())));
         MutableVector tmp = new MutableVector(transform.apply(mutable.toVector3()));
-        tmp.mutX((tmp.getX() + min.getX()));
-        tmp.mutY((tmp.getY() + min.getY()));
-        tmp.mutZ((tmp.getZ() + min.getZ()));
-        return tmp.toBlockPoint();
-    }
-
-    private BlockVector3 getPos(int x, int y, int z) {
-        if (min == null) {
-            min = BlockVector3.at(x, y, z);
-        }
-        mutable.mutX(((x - min.getX())));
-        mutable.mutY(((y - min.getY())));
-        mutable.mutZ(((z - min.getZ())));
-        MutableVector tmp = new MutableVector(transform.apply(mutable.toVector3()));
-        tmp.mutX((tmp.getX() + min.getX()));
-        tmp.mutY((tmp.getY() + min.getY()));
-        tmp.mutZ((tmp.getZ() + min.getZ()));
-        return tmp.toBlockPoint();
+        BlockVector3 result = min.add(tmp.toBlockPoint());
+        return result;
     }
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return super.getLazyBlock(getPos(x, y, z));
+        return super.getLazyBlock(getPos(BlockVector3.at(x, y, z)));
     }
 
     @Override
@@ -87,13 +71,13 @@ public class PositionTransformExtent extends ResettableExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(getPos(x, y, z), block);
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return super.setBlock(getPos(BlockVector3.at(x, y, z)), block);
     }
 
 
     @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return super.setBlock(getPos(location), block);
     }
 

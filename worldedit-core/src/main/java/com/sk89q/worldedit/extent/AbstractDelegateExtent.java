@@ -144,14 +144,14 @@ public class AbstractDelegateExtent implements LightingExtent {
 //        mutable.mutZ(z);
         return setBlock(BlockVector3.at(x, y, z), block);
     }
-    
-    public BlockState getBlock(BlockVector3 position) {
-        return extent.getBlock(position);
-    }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
         return extent.setBlock(location, block);
+    }
+    
+    public BlockState getBlock(BlockVector3 position) {
+        return extent.getBlock(position);
     }
 
     @Override

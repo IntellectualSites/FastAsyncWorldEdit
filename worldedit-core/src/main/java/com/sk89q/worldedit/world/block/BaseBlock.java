@@ -244,8 +244,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
 	@Override
 	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-		// TODO Auto-generated method stub
-		return false;
+		return this.toImmutableState().apply(extent, get, set);
 	}
 
 	@Override

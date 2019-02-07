@@ -86,7 +86,7 @@ public class RegionVisitor implements Operation {
     @Override
     public Operation resume(final RunContext run) throws WorldEditException {
         if (queue != null && Settings.IMP.QUEUE.PRELOAD_CHUNKS > 1) {
-            /*
+        	/*
              * The following is done to reduce iteration cost
              *  - Preload chunks just in time
              *  - Only check every 16th block for potential chunk loads
