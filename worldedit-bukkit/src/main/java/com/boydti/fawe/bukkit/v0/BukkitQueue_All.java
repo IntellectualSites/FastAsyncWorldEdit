@@ -154,7 +154,7 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
                                     Object nmsChunk = methodGetHandleChunk.invoke(chunk);
                                     boolean mustSave = saveChunks && (boolean) methodNeedsSaving.invoke(nmsChunk, false);
                                     chunk.unload(mustSave, false);
-                                    if (unloaded == null) unloaded = new ArrayDeque<Chunk>();
+                                    if (unloaded == null) unloaded = new ArrayDeque<>();
                                     unloaded.add(chunk);
                                 }
                             }

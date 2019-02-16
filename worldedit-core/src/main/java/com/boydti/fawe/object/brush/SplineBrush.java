@@ -121,7 +121,7 @@ public class SplineBrush implements Brush, ResettableTool {
         double continuity = 0;
         double quality = 10;
 
-        final List<Node> nodes = new ArrayList<Node>(centroids.size());
+        final List<Node> nodes = new ArrayList<>(centroids.size());
 
         for (final Vector3 nodevector : centroids) {
             final Node n = new Node(nodevector);

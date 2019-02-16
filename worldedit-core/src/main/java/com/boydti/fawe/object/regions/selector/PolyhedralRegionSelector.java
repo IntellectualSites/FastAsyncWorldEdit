@@ -146,7 +146,7 @@ public class PolyhedralRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public List<String> getInformationLines() {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
 
         ret.add("Vertices: " + region.getVertices().size());
         ret.add("Triangles: " + region.getTriangles().size());
@@ -202,7 +202,7 @@ public class PolyhedralRegionSelector implements RegionSelector, CUIRegion {
         Collection<BlockVector3> vertices = region.getVertices();
         Collection<Triangle> triangles = region.getTriangles();
 
-        Map<BlockVector3, Integer> vertexIds = new HashMap<BlockVector3, Integer>(vertices.size());
+        Map<BlockVector3, Integer> vertexIds = new HashMap<>(vertices.size());
         int lastVertexId = -1;
         for (BlockVector3 vertex : vertices) {
             vertexIds.put(vertex, ++lastVertexId);

@@ -16,7 +16,7 @@ public class ConfigurationSerialization {
 
     public static final String SERIALIZED_TYPE_KEY = "==";
     private static final Map<String, Class<? extends ConfigurationSerializable>> aliases =
-            new HashMap<String, Class<? extends ConfigurationSerializable>>();
+        new HashMap<>();
     private final Class<? extends ConfigurationSerializable> clazz;
 
     protected ConfigurationSerialization(Class<? extends ConfigurationSerializable> clazz) {

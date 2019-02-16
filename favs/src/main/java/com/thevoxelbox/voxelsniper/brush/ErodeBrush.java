@@ -133,7 +133,7 @@ public class ErodeBrush extends Brush
 
                         int count = 0;
 
-                        final Map<BlockWrapper, Integer> blockCount = new HashMap<BlockWrapper, Integer>();
+                        final Map<BlockWrapper, Integer> blockCount = new HashMap<>();
 
                         for (final Vector vector : ErodeBrush.FACES_TO_CHECK)
                         {
@@ -363,8 +363,8 @@ public class ErodeBrush extends Brush
 
         public BlockChangeTracker(final AsyncWorld world)
         {
-            this.blockChanges = new HashMap<Integer, Map<Vector, BlockWrapper>>();
-            this.flatChanges = new HashMap<Vector, BlockWrapper>();
+            this.blockChanges = new HashMap<>();
+            this.flatChanges = new HashMap<>();
             this.world = world;
         }
 
@@ -400,7 +400,7 @@ public class ErodeBrush extends Brush
         {
             if (!this.blockChanges.containsKey(iteration))
             {
-                this.blockChanges.put(iteration, new HashMap<Vector, BlockWrapper>());
+                this.blockChanges.put(iteration, new HashMap<>());
             }
 
             this.blockChanges.get(iteration).put(position, changedBlock);

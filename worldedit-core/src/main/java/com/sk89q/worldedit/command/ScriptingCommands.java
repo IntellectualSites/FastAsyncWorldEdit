@@ -139,7 +139,7 @@ public class ScriptingCommands {
 
         engine.setTimeLimit(worldEdit.getConfiguration().scriptTimeout);
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("argv", args);
         vars.put("actor", actor);
 

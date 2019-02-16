@@ -76,7 +76,7 @@ public class FaweCache {
     }
 
     public static Map<String, Object> asMap(Object... pairs) {
-        HashMap<String, Object> map = new HashMap<String, Object>(pairs.length >> 1);
+        HashMap<String, Object> map = new HashMap<>(pairs.length >> 1);
         for (int i = 0; i < pairs.length; i += 2) {
             String key = (String) pairs[i];
             Object value = pairs[i + 1];

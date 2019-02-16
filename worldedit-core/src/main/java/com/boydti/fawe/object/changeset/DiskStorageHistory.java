@@ -491,7 +491,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         public Map<Integer, Double> getPercents() {
             Map<Integer, Integer> map = getBlocks();
             int count = getSize();
-            Int2ObjectOpenHashMap<Double> newMap = new Int2ObjectOpenHashMap<Double>();
+            Int2ObjectOpenHashMap<Double> newMap = new Int2ObjectOpenHashMap<>();
             for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
                 int id = entry.getKey();
                 int changes = entry.getValue();

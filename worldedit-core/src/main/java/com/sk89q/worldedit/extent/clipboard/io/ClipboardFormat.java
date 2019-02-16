@@ -143,7 +143,7 @@ public interface ClipboardFormat {
     default URL uploadPublic(final Clipboard clipboard, String category, String user) {
         // summary
         // blocks
-        HashMap<String, Object> map = new HashMap<String, Object>();
+        HashMap<String, Object> map = new HashMap<>();
         BlockVector3 dimensions = clipboard.getDimensions();
         map.put("width", dimensions.getX());
         map.put("height", dimensions.getY());

@@ -38,17 +38,17 @@ public class PolyhedralRegion extends AbstractRegion {
     /**
      * Vertices that are contained in the convex hull.
      */
-    private final Set<BlockVector3> vertices = new LinkedHashSet<BlockVector3>();
+    private final Set<BlockVector3> vertices = new LinkedHashSet<>();
 
     /**
      * Triangles that form the convex hull.
      */
-    private final List<Triangle> triangles = new ArrayList<Triangle>();
+    private final List<Triangle> triangles = new ArrayList<>();
 
     /**
      * Vertices that are coplanar to the first 3 vertices.
      */
-    private final Set<BlockVector3> vertexBacklog = new LinkedHashSet<BlockVector3>();
+    private final Set<BlockVector3> vertexBacklog = new LinkedHashSet<>();
 
     /**
      * Minimum point of the axis-aligned bounding box.
@@ -165,7 +165,7 @@ public class PolyhedralRegion extends AbstractRegion {
                 triangles.add((new Triangle(v[0], v[size - 1], v[size - 2])));
                 return true;
         }
-        final Set<Edge> borderEdges = new LinkedHashSet<Edge>();
+        final Set<Edge> borderEdges = new LinkedHashSet<>();
         for (Iterator<Triangle> it = triangles.iterator(); it.hasNext(); ) {
             final Triangle triangle = it.next();
 
@@ -200,7 +200,7 @@ public class PolyhedralRegion extends AbstractRegion {
             vertices.remove(vertex);
 
             // Clone, clear and work through the backlog
-            final List<BlockVector3> vertexBacklog2 = new ArrayList<BlockVector3>(vertexBacklog);
+            final List<BlockVector3> vertexBacklog2 = new ArrayList<>(vertexBacklog);
             vertexBacklog.clear();
             for (BlockVector3 vertex2 : vertexBacklog2) {
                 addVertex(vertex2);
@@ -261,7 +261,7 @@ public class PolyhedralRegion extends AbstractRegion {
     }
 
     private static void shiftCollection(Collection<BlockVector3> collection, BlockVector3 change) {
-        final List<BlockVector3> tmp = new ArrayList<BlockVector3>(collection);
+        final List<BlockVector3> tmp = new ArrayList<>(collection);
         collection.clear();
         for (BlockVector3 vertex : tmp) {
             collection.add(change.add(vertex));
@@ -308,7 +308,7 @@ public class PolyhedralRegion extends AbstractRegion {
             return vertices;
         }
 
-        final List<BlockVector3> ret = new ArrayList<BlockVector3>(vertices);
+        final List<BlockVector3> ret = new ArrayList<>(vertices);
         ret.addAll(vertexBacklog);
 
         return ret;

@@ -39,7 +39,7 @@ public class PGZIPOutputStream extends FilterOutputStream {
 
     // todo: remove after block guessing is implemented
     // array list that contains the block sizes
-    ArrayList<Integer> blockSizes = new ArrayList<Integer>();
+    ArrayList<Integer> blockSizes = new ArrayList<>();
 
     private int level = Deflater.DEFAULT_COMPRESSION;
     private int strategy = Deflater.DEFAULT_STRATEGY;
@@ -80,7 +80,7 @@ public class PGZIPOutputStream extends FilterOutputStream {
         super(out);
         this.executor = executor;
         this.nthreads = nthreads;
-        this.emitQueue = new ArrayBlockingQueue<Future<byte[]>>(nthreads);
+        this.emitQueue = new ArrayBlockingQueue<>(nthreads);
         writeHeader();
     }
 

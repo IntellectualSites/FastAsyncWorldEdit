@@ -583,7 +583,7 @@ public class TextureUtil implements TextureHolder{
                     // Get all the groups in the current jar
                     // The vanilla textures are in `assets/minecraft`
                     // A jar may contain textures for multiple mods
-                    Set<String> mods = new HashSet<String>();
+                    Set<String> mods = new HashSet<>();
                     {
                         Enumeration<? extends ZipEntry> entries = zipFile.entries();
                         while (entries.hasMoreElements()) {

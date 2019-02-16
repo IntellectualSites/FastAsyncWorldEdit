@@ -73,8 +73,8 @@ public class PlatformManager {
 
     private final WorldEdit worldEdit;
     private final CommandManager commandManager;
-    private final List<Platform> platforms = new ArrayList<Platform>();
-    private final Map<Capability, Platform> preferences = new EnumMap<Capability, Platform>(Capability.class);
+    private final List<Platform> platforms = new ArrayList<>();
+    private final Map<Capability, Platform> preferences = new EnumMap<>(Capability.class);
     private @Nullable String firstSeenVersion;
     private final AtomicBoolean initialized = new AtomicBoolean();
     private final AtomicBoolean configured = new AtomicBoolean();
@@ -230,7 +230,7 @@ public class PlatformManager {
      * @return a list of platforms
      */
     public synchronized List<Platform> getPlatforms() {
-        return new ArrayList<Platform>(platforms);
+        return new ArrayList<>(platforms);
     }
 
     /**

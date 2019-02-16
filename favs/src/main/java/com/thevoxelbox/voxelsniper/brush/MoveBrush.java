@@ -58,7 +58,7 @@ public class MoveBrush extends Brush
             final AsyncWorld world = selection.getBlockStates().get(0).getWorld();
 
             final Undo undo = new Undo();
-            final HashSet<Block> undoSet = new HashSet<Block>();
+            final HashSet<Block> undoSet = new HashSet<>();
 
             final Selection newSelection = new Selection();
             final Location movedLocation1 = selection.getLocation1();
@@ -214,7 +214,7 @@ public class MoveBrush extends Brush
         /**
          * Calculated BlockStates of the selection.
          */
-        private final ArrayList<AsyncBlockState> blockStates = new ArrayList<AsyncBlockState>();
+        private final ArrayList<AsyncBlockState> blockStates = new ArrayList<>();
         /**
          *
          */

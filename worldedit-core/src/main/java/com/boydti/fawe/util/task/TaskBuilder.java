@@ -308,7 +308,7 @@ public class TaskBuilder extends Metadatable {
                         continue;
                     case SYNC_PARALLEL:
                     case ASYNC_PARALLEL:
-                        final ArrayList<RunnableTask> parallel = new ArrayList<RunnableTask>();
+                        final ArrayList<RunnableTask> parallel = new ArrayList<>();
                         parallel.add(task);
                         RunnableTask next = tasks.peek();
                         while (next != null && next.type == task.type) {

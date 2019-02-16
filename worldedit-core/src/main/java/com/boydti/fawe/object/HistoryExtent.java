@@ -97,7 +97,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     private List<? extends Entity> wrapEntities(final List<? extends Entity> entities) {
-        final List<Entity> newList = new ArrayList<Entity>(entities.size());
+        final List<Entity> newList = new ArrayList<>(entities.size());
         for (final Entity entity : entities) {
             newList.add(new TrackedEntity(entity));
         }

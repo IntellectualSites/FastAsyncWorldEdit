@@ -79,7 +79,7 @@ public class Brushes
      */
     public Set<String> getSniperBrushHandles(Class<? extends IBrush> clazz)
     {
-        return new HashSet<String>(brushes.get(clazz));
+        return new HashSet<>(brushes.get(clazz));
     }
 
     /**

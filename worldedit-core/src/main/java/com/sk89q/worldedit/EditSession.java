@@ -3172,7 +3172,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public int drawSpline(final Pattern pattern, final List<BlockVector3> nodevectors, final double tension, final double bias, final double continuity, final double quality, final double radius, final boolean filled) throws WorldEditException {
         LocalBlockVectorSet vset = new LocalBlockVectorSet();
-        final List<Node> nodes = new ArrayList<Node>(nodevectors.size());
+        final List<Node> nodes = new ArrayList<>(nodevectors.size());
 
         final KochanekBartelsInterpolation interpol = new KochanekBartelsInterpolation();
         for (BlockVector3 nodevector : nodevectors) {
@@ -3278,7 +3278,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     public void recurseHollow(final Region region, final BlockVector3 origin, final Set<BlockVector3> outside) {
         //TODO FIXME Optimize - avoid vector creation
-        final ArrayDeque<BlockVector3> queue = new ArrayDeque<BlockVector3>();
+        final ArrayDeque<BlockVector3> queue = new ArrayDeque<>();
         queue.addLast(origin);
 
         while (!queue.isEmpty()) {

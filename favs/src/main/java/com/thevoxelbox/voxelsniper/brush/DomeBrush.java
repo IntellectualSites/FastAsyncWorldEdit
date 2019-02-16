@@ -54,7 +54,7 @@ public class DomeBrush extends Brush
         final int absoluteHeight = Math.abs(v.getVoxelHeight());
         final boolean negative = v.getVoxelHeight() < 0;
 
-        final Set<Vector> changeablePositions = new HashSet<Vector>();
+        final Set<Vector> changeablePositions = new HashSet<>();
 
         final Undo undo = new Undo();
 

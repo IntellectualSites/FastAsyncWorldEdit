@@ -556,7 +556,7 @@ public class UtilityCommands extends MethodCommands {
         CreatureButcher flags = new CreatureButcher(actor);
         flags.fromCommand(args);
 
-        List<EntityVisitor> visitors = new ArrayList<EntityVisitor>();
+        List<EntityVisitor> visitors = new ArrayList<>();
         LocalSession session = null;
         EditSession editSession = null;
 
@@ -616,7 +616,7 @@ public class UtilityCommands extends MethodCommands {
         EntityRemover remover = new EntityRemover();
         remover.fromString(typeStr);
 
-        List<EntityVisitor> visitors = new ArrayList<EntityVisitor>();
+        List<EntityVisitor> visitors = new ArrayList<>();
         LocalSession session = null;
         EditSession editSession = null;
 

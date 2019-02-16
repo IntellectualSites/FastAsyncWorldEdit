@@ -163,8 +163,8 @@ public enum PerformerE
 
     static
     {
-        performers = new TreeMap<String, vPerformer>();
-        long_names = new TreeMap<String, String>();
+        performers = new TreeMap<>();
+        long_names = new TreeMap<>();
 
         for (PerformerE pe : values())
         {

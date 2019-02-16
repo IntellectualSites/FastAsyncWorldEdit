@@ -228,7 +228,7 @@ public class SetQueue {
     }
 
     public Collection<FaweQueue> getAllQueues() {
-        ArrayList<FaweQueue> list = new ArrayList<FaweQueue>(activeQueues.size() + inactiveQueues.size());
+        ArrayList<FaweQueue> list = new ArrayList<>(activeQueues.size() + inactiveQueues.size());
         list.addAll(inactiveQueues);
         list.addAll(activeQueues);
         return list;

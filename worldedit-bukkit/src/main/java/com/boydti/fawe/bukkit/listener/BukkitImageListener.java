@@ -72,7 +72,7 @@ public class BukkitImageListener implements Listener {
             String name = player.getName().toLowerCase();
             if (!event.getMessage().toLowerCase().contains(name)) {
                 ArrayDeque<String> buffered = fp.getMeta("CFIBufferedMessages");
-                if (buffered == null) fp.setMeta("CFIBufferedMessaged", buffered = new ArrayDeque<String>());
+                if (buffered == null) fp.setMeta("CFIBufferedMessaged", buffered = new ArrayDeque<>());
                 String full = String.format(event.getFormat(), event.getPlayer().getDisplayName(), event.getMessage());
                 buffered.add(full);
                 iter.remove();

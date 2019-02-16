@@ -26,7 +26,7 @@ public class StencilListBrush extends Brush
     private short zRef;
     private short yRef;
     private byte pasteParam = 0;
-    private HashMap<Integer, String> stencilList = new HashMap<Integer, String>();
+    private HashMap<Integer, String> stencilList = new HashMap<>();
 
     /**
      *

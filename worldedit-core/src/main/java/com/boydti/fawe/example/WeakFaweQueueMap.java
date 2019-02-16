@@ -123,7 +123,7 @@ public class WeakFaweQueueMap implements IFaweQueueMap {
     @Override
     public void add(FaweChunk chunk) {
         long pair = MathMan.pairInt(chunk.getX(), chunk.getZ());
-        Reference<FaweChunk> previous = this.blocks.put(pair, new SoftReference<FaweChunk>(chunk));
+        Reference<FaweChunk> previous = this.blocks.put(pair, new SoftReference<>(chunk));
         if (previous != null) {
             FaweChunk previousChunk = previous.get();
             if (previousChunk != null) {

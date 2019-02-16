@@ -26,7 +26,7 @@ public class VoxelSniperListener implements Listener
 
     private static final String SNIPER_PERMISSION = "voxelsniper.sniper";
     private final VoxelSniper plugin;
-    private Map<String, VoxelCommand> commands = new HashMap<String, VoxelCommand>();
+    private Map<String, VoxelCommand> commands = new HashMap<>();
 
     /**
      * @param plugin

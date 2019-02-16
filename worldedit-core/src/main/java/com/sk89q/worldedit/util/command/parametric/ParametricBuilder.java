@@ -65,10 +65,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ParametricBuilder {
 
-    private final Map<Type, Binding> bindings = new HashMap<Type, Binding>();
+    private final Map<Type, Binding> bindings = new HashMap<>();
     private final Paranamer paranamer = new FaweParanamer();
-    private final List<InvokeListener> invokeListeners = new ArrayList<InvokeListener>();
-    private final List<ExceptionConverter> exceptionConverters = new ArrayList<ExceptionConverter>();
+    private final List<InvokeListener> invokeListeners = new ArrayList<>();
+    private final List<ExceptionConverter> exceptionConverters = new ArrayList<>();
     private Authorizer authorizer = new NullAuthorizer();
     private CommandCompleter defaultCompleter = new NullCompleter();
 

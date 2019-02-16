@@ -55,9 +55,9 @@ public class ParametricCallable extends AParametricCallable {
     private final Object object;
     private final Method method;
     private final ParameterData[] parameters;
-    private final Set<Character> valueFlags = new HashSet<Character>();
+    private final Set<Character> valueFlags = new HashSet<>();
     private final boolean anyFlags;
-    private final Set<Character> legacyFlags = new HashSet<Character>();
+    private final Set<Character> legacyFlags = new HashSet<>();
     private final SimpleDescription description = new SimpleDescription();
     private final CommandPermissions commandPermissions;
     private final Command definition;
@@ -81,7 +81,7 @@ public class ParametricCallable extends AParametricCallable {
         Type[] types = method.getGenericParameterTypes();
 
         parameters = new ParameterData[types.length];
-        List<Parameter> userParameters = new ArrayList<Parameter>();
+        List<Parameter> userParameters = new ArrayList<>();
 
         // This helps keep tracks of @Nullables that appear in the middle of a list
         // of parameters
@@ -221,7 +221,7 @@ public class ParametricCallable extends AParametricCallable {
 
         try {
             // preProcess handlers
-            List<InvokeHandler> handlers = new ArrayList<InvokeHandler>();
+            List<InvokeHandler> handlers = new ArrayList<>();
             for (InvokeListener listener : builder.getInvokeListeners()) {
                 InvokeHandler handler = listener.createInvokeHandler();
                 handlers.add(handler);

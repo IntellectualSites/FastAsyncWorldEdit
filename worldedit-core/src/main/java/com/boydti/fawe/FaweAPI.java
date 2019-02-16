@@ -378,7 +378,7 @@ public class FaweAPI {
         });
         RegionWrapper bounds = new RegionWrapper(origin.x - radius, origin.x + radius, origin.z - radius, origin.z + radius);
         RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
-        HashSet<RegionWrapper> regionSet = new HashSet<RegionWrapper>(Arrays.asList(bounds));
+        HashSet<RegionWrapper> regionSet = new HashSet<>(Arrays.asList(bounds));
         ArrayList<DiskStorageHistory> result = new ArrayList<>();
         for (File file : files) {
             UUID uuid = UUID.fromString(file.getParentFile().getName());

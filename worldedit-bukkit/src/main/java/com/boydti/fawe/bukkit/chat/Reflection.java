@@ -177,12 +177,12 @@ public final class Reflection {
      */
     public synchronized static Method getMethod(Class<?> clazz, String name, Class<?>... args) {
         if (!_loadedMethods.containsKey(clazz)) {
-            _loadedMethods.put(clazz, new HashMap<String, Map<ArrayWrapper<Class<?>>, Method>>());
+            _loadedMethods.put(clazz, new HashMap<>());
         }
 
         Map<String, Map<ArrayWrapper<Class<?>>, Method>> loadedMethodNames = _loadedMethods.get(clazz);
         if (!loadedMethodNames.containsKey(name)) {
-            loadedMethodNames.put(name, new HashMap<ArrayWrapper<Class<?>>, Method>());
+            loadedMethodNames.put(name, new HashMap<>());
         }
 
         Map<ArrayWrapper<Class<?>>, Method> loadedSignatures = loadedMethodNames.get(name);

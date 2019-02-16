@@ -24,7 +24,7 @@ public class GenerateTreeBrush extends Brush
 {
     // Tree Variables.
     private Random randGenerator = new Random();
-    private ArrayList<Block> branchBlocks = new ArrayList<Block>();
+    private ArrayList<Block> branchBlocks = new ArrayList<>();
     private Undo undo;
     // If these default values are edited. Remember to change default values in the default preset.
     private Material leafType = Material.OAK_LEAVES;

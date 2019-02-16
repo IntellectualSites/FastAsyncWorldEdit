@@ -838,7 +838,7 @@ public final class ItemTypes {
 
     public static ItemType register(final ItemType item) {
     	if(sortedRegistry == null)
-    		sortedRegistry = new ArrayList<ItemType>();
+    		sortedRegistry = new ArrayList<>();
     	if(!sortedRegistry.contains(item))sortedRegistry.add(item);
 //        return ItemType.REGISTRY.register(item.getId(), item);
     	return internalRegister(item);

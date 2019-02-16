@@ -163,7 +163,7 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
 
     @Override
     public Map<Short, CompoundTag> getTiles() {
-        return tiles == null ? new HashMap<Short, CompoundTag>() : tiles;
+        return tiles == null ? new HashMap<>() : tiles;
     }
 
     @Override
@@ -189,7 +189,7 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
 
     @Override
     public HashSet<UUID> getEntityRemoves() {
-        return entityRemoves == null ? new HashSet<UUID>() : entityRemoves;
+        return entityRemoves == null ? new HashSet<>() : entityRemoves;
     }
 
     @Override

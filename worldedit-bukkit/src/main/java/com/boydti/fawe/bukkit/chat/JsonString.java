@@ -29,7 +29,7 @@ final class JsonString implements JsonRepresentedObject, ConfigurationSerializab
     }
 
     public Map<String, Object> serialize() {
-        HashMap<String, Object> theSingleValue = new HashMap<String, Object>();
+        HashMap<String, Object> theSingleValue = new HashMap<>();
         theSingleValue.put("stringValue", _value);
         return theSingleValue;
     }

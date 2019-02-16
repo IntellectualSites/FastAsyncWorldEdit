@@ -676,9 +676,9 @@ public class BlockTypes{
     
     public static BlockType register(BlockType type) {
     	if(sortedRegistry == null) {
-    		sortedRegistry = new ArrayList<BlockType>();
-    		stateList = new ArrayList<BlockState>();
-    		$NAMESPACES = new LinkedHashSet<String>();
+    		sortedRegistry = new ArrayList<>();
+    		stateList = new ArrayList<>();
+    		$NAMESPACES = new LinkedHashSet<>();
             BIT_OFFSET = MathMan.log2nlz(WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().registerBlocks().size());
             BIT_MASK = ((1 << BIT_OFFSET) - 1);
     	}
@@ -775,7 +775,7 @@ public class BlockTypes{
                 this.propertiesSet = Collections.emptySet();
             }
             this.permutations = maxInternalStateId;
-            this.localStates = new ArrayList<BlockState>();
+            this.localStates = new ArrayList<>();
 
             this.blockMaterial = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(type);
             this.itemType = ItemTypes.get(type);

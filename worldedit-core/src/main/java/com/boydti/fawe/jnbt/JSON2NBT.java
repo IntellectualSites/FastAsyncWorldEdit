@@ -406,7 +406,7 @@ public class JSON2NBT {
         }
 
         public Tag parse() throws NBTException {
-            HashMap<String, Tag> map = new HashMap<String, Tag>();
+            HashMap<String, Tag> map = new HashMap<>();
             Iterator var2 = this.tagList.iterator();
 
             while (var2.hasNext()) {

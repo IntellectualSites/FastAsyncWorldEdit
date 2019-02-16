@@ -191,7 +191,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
     @Override
     public List<String> getInformationLines() {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
 
         ret.add("Vertices: "+region.getVertices().size());
         ret.add("Triangles: "+region.getTriangles().size());

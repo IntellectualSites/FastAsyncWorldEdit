@@ -152,7 +152,7 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
 
     @Override
     public List<String> getInformationLines() {
-        final List<String> lines = new ArrayList<String>();
+        final List<String> lines = new ArrayList<>();
         for (int i = 0; i < positions.size(); i++) {
             lines.add("Position " + i + ": " + positions.get(i));
         }

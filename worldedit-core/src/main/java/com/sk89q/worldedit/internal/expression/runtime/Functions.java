@@ -124,7 +124,7 @@ public final class Functions {
         throw new NoSuchMethodException(); // TODO: return null (check for side-effects first)
     }
 
-    private static final Map<String, List<Overload>> functions = new HashMap<String, List<Overload>>();
+    private static final Map<String, List<Overload>> functions = new HashMap<>();
 
     static {
         for (Method method : Functions.class.getMethods()) {
@@ -143,7 +143,7 @@ public final class Functions {
 
         List<Overload> overloads = functions.get(methodName);
         if (overloads == null) {
-            functions.put(methodName, overloads = new ArrayList<Overload>());
+            functions.put(methodName, overloads = new ArrayList<>());
         }
 
         overloads.add(overload);
@@ -281,8 +281,8 @@ public final class Functions {
     }
 
 
-    private static final Map<Integer, double[]> gmegabuf = new HashMap<Integer, double[]>();
-    private final Map<Integer, double[]> megabuf = new HashMap<Integer, double[]>();
+    private static final Map<Integer, double[]> gmegabuf = new HashMap<>();
+    private final Map<Integer, double[]> megabuf = new HashMap<>();
 
     public Map<Integer, double[]> getMegabuf() {
         return megabuf;

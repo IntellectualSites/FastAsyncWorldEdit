@@ -21,7 +21,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
     private int x, z;
     public static int HEIGHT = 256;
 
-    private final ArrayDeque<Runnable> tasks = new ArrayDeque<Runnable>(0);
+    private final ArrayDeque<Runnable> tasks = new ArrayDeque<>(0);
 
     /**
      * A FaweSections object represents a chunk and the blocks that you wish to change in it.

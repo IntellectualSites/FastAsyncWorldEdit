@@ -185,7 +185,7 @@ public class BiomeCommands extends MethodCommands {
         for (int i = 0; i < biomes.length; i++) {
             int count = biomes[i];
             if (count != 0) {
-                distribution.add(new Countable<BaseBiome>(new BaseBiome(i), count));
+                distribution.add(new Countable<>(new BaseBiome(i), count));
             }
         }
         Collections.sort(distribution);

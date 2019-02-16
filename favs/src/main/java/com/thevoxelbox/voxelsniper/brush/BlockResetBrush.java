@@ -13,7 +13,7 @@ import org.bukkit.block.Block;
  */
 public class BlockResetBrush extends Brush
 {
-    private static final ArrayList<Material> DENIED_UPDATES = new ArrayList<Material>();
+    private static final ArrayList<Material> DENIED_UPDATES = new ArrayList<>();
 
     static
     {

@@ -15,9 +15,9 @@ public class FunctionParametricCallable extends AParametricCallable {
 
     private final ParametricBuilder builder;
     private final ParameterData[] parameters;
-    private final Set<Character> valueFlags = new HashSet<Character>();
+    private final Set<Character> valueFlags = new HashSet<>();
     private final boolean anyFlags;
-    private final Set<Character> legacyFlags = new HashSet<Character>();
+    private final Set<Character> legacyFlags = new HashSet<>();
     private final SimpleDescription description = new SimpleDescription();
     private final String permission;
     private final Command command;
@@ -81,7 +81,7 @@ public class FunctionParametricCallable extends AParametricCallable {
         }
 
         parameters = new ParameterData[paramParsables.size()];
-        List<Parameter> userParameters = new ArrayList<Parameter>();
+        List<Parameter> userParameters = new ArrayList<>();
 
         // This helps keep tracks of @Nullables that appear in the middle of a list
         // of parameters

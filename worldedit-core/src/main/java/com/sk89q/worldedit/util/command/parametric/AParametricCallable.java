@@ -171,7 +171,7 @@ public abstract class AParametricCallable implements CommandCallable {
 
                 if (!found) {
                     if (unusedFlags == null) {
-                        unusedFlags = new HashSet<Character>();
+                        unusedFlags = new HashSet<>();
                     }
                     unusedFlags.add(flag);
                 }

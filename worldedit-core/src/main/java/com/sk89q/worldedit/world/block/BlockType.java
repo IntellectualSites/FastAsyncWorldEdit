@@ -81,7 +81,8 @@ public class BlockType implements FawePattern {
 	
 	public ArrayList<BlockState> updateStates(){
 		if(settings != null) {
-			return settings.localStates = new ArrayList<BlockState>(settings.localStates.stream().map(state -> new BlockStateImpl(this, state.getInternalId(), state.getOrdinal())).collect(Collectors.toList()));
+			return settings.localStates = new ArrayList<>(settings.localStates.stream()
+          .map(state -> new BlockStateImpl(this, state.getInternalId(), state.getOrdinal())).collect(Collectors.toList()));
 		}else {
 			return null;
 		}

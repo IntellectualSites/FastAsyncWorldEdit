@@ -102,12 +102,13 @@ public class MCAChunk extends FaweChunk<Void> {
                 if (entities.isEmpty()) {
                     out.writeNamedEmptyList("Entities");
                 } else {
-                    out.writeNamedTag("Entities", new ListTag(CompoundTag.class, new ArrayList<CompoundTag>(entities.values())));
+                    out.writeNamedTag("Entities", new ListTag(CompoundTag.class, new ArrayList<>(entities.values())));
                 }
                 if (tiles.isEmpty()) {
                     out.writeNamedEmptyList("TileEntities");
                 } else {
-                    out.writeNamedTag("TileEntities", new ListTag(CompoundTag.class, new ArrayList<CompoundTag>(tiles.values())));
+                    out.writeNamedTag("TileEntities", new ListTag(CompoundTag.class,
+                        new ArrayList<>(tiles.values())));
                 }
                 out.writeNamedTag("InhabitedTime", inhabitedTime);
                 out.writeNamedTag("LastUpdate", lastUpdate);
@@ -422,9 +423,9 @@ public class MCAChunk extends FaweChunk<Void> {
             return null;
         }
         // e.g. by precalculating the length
-        HashMap<String, Object> level = new HashMap<String, Object>();
-        level.put("Entities", new ListTag(CompoundTag.class, new ArrayList<CompoundTag>(entities.values())));
-        level.put("TileEntities", new ListTag(CompoundTag.class, new ArrayList<CompoundTag>(tiles.values())));
+        HashMap<String, Object> level = new HashMap<>();
+        level.put("Entities", new ListTag(CompoundTag.class, new ArrayList<>(entities.values())));
+        level.put("TileEntities", new ListTag(CompoundTag.class, new ArrayList<>(tiles.values())));
         level.put("InhabitedTime", inhabitedTime);
         level.put("LastUpdate", lastUpdate);
         level.put("LightPopulated", (byte) 0);
@@ -442,7 +443,7 @@ public class MCAChunk extends FaweChunk<Void> {
             if (idLayer == null) {
                 continue;
             }
-            HashMap<String, Object> map = new HashMap<String, Object>();
+            HashMap<String, Object> map = new HashMap<>();
             map.put("Y", (byte) layer);
             map.put("BlockLight", blockLight[layer]);
             map.put("SkyLight", skyLight[layer]);
@@ -499,7 +500,7 @@ public class MCAChunk extends FaweChunk<Void> {
             @Override
             public void accept(Integer index, CompoundTag entityTag) {
                 if (entities == null) {
-                    entities = new HashMap<UUID, CompoundTag>();
+                    entities = new HashMap<>();
                 }
                 long least = entityTag.getLong("UUIDLeast");
                 long most = entityTag.getLong("UUIDMost");
@@ -635,7 +636,7 @@ public class MCAChunk extends FaweChunk<Void> {
 
     @Override
     public Map<Short, CompoundTag> getTiles() {
-        return tiles == null ? new HashMap<Short, CompoundTag>() : tiles;
+        return tiles == null ? new HashMap<>() : tiles;
     }
 
     @Override

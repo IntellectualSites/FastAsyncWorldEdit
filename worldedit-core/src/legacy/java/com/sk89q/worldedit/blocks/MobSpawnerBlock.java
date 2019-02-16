@@ -118,7 +118,7 @@ public class MobSpawnerBlock extends BaseBlock {
 
     @Override
     public CompoundTag getNbtData() {
-        Map<String, Tag> values = new HashMap<String, Tag>();
+        Map<String, Tag> values = new HashMap<>();
         values.put("EntityId", new StringTag(mobType));
         values.put("Delay", new ShortTag(delay));
         values.put("SpawnCount", new ShortTag(spawnCount));
