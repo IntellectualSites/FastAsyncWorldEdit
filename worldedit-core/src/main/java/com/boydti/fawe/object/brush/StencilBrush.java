@@ -3,7 +3,7 @@ package com.boydti.fawe.object.brush;
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.object.mask.AdjacentAnyMask;
-import com.intellectualcrafters.plot.util.MathMan;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;

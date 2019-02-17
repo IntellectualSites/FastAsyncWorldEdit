@@ -1,9 +1,9 @@
 package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
-import com.intellectualcrafters.plot.object.Location;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import com.sk89q.worldedit.math.BlockVector2;
 
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ public class PlotRegionFilter extends CuboidRegionFilter {
     public void calculateRegions() {
         ArrayList<Plot> plots = new ArrayList<>(area.getPlots());
         for (Plot plot : plots) {
-            Location pos1 = plot.getBottom();
-            Location pos2 = plot.getTop();
-            add(BlockVector2.at(pos1.getX(), pos1.getZ()), BlockVector2.at(pos2.getX(), pos2.getZ()));
+            Location bottom = plot.getCorners()[0];
+            Location top = plot.getCorners()[1];
+            add(BlockVector2.at(bottom.getX(), bottom.getZ()), BlockVector2.at(top.getX(), top.getZ()));
         }
     }
 }

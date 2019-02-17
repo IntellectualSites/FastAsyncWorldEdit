@@ -12,19 +12,19 @@ import com.boydti.fawe.object.pattern.PatternExtent;
 import com.boydti.fawe.util.*;
 import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.commands.Auto;
-import com.intellectualcrafters.plot.config.C;
-import com.intellectualcrafters.plot.config.Settings;
-import com.intellectualcrafters.plot.database.DBFunc;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotArea;
-import com.intellectualcrafters.plot.object.PlotId;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import com.intellectualcrafters.plot.object.worlds.PlotAreaManager;
-import com.intellectualcrafters.plot.object.worlds.SinglePlotArea;
-import com.intellectualcrafters.plot.object.worlds.SinglePlotAreaManager;
-import com.intellectualcrafters.plot.util.MathMan;
+import com.github.intellectualsites.plotsquared.plot.PlotSquared;
+import com.github.intellectualsites.plotsquared.plot.commands.Auto;
+import com.github.intellectualsites.plotsquared.plot.config.C;
+import com.github.intellectualsites.plotsquared.plot.config.Settings;
+import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotId;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
+import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
+import com.github.intellectualsites.plotsquared.plot.util.MathMan;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -88,7 +88,7 @@ public class CFICommands extends MethodCommands {
     }
 
     private File getFolder(String worldName) {
-        return new File(PS.imp().getWorldContainer(), worldName + File.separator + "region");
+        return new File(PlotSquared.imp().getWorldContainer(), worldName + File.separator + "region");
     }
 
     @Command(
@@ -175,7 +175,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Deprecated
-    public static void autoClaimFromDatabase(PlotPlayer player, PlotArea area, PlotId start, com.intellectualcrafters.plot.object.RunnableVal<Plot> whenDone) {
+    public static void autoClaimFromDatabase(PlotPlayer player, PlotArea area, PlotId start, com.github.intellectualsites.plotsquared.plot.object.RunnableVal<Plot> whenDone) {
         final Plot plot = area.getNextFreePlot(player, start);
         if (plot == null) {
             whenDone.run(null);
@@ -200,7 +200,7 @@ public class CFICommands extends MethodCommands {
     public void done(FawePlayer fp) throws ParameterException, IOException {
         CFISettings settings = assertSettings(fp);
 
-        PlotAreaManager manager = PS.get().getPlotAreaManager();
+        PlotAreaManager manager = PlotSquared.get().getPlotAreaManager();
         if (manager instanceof SinglePlotAreaManager) {
             SinglePlotAreaManager sManager = (SinglePlotAreaManager) manager;
             SinglePlotArea area = sManager.getArea();

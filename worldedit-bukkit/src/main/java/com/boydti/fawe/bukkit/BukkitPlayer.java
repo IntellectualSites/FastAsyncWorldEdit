@@ -8,7 +8,6 @@ import com.boydti.fawe.wrappers.PlayerWrapper;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-import com.intellectualcrafters.plot.config.C;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.Bukkit;

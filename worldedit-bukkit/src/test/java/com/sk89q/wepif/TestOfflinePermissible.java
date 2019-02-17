@@ -184,4 +184,14 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     public Map<String, Object> serialize() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+	@Override
+	public long getLastLogin() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public long getLastSeen() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 }

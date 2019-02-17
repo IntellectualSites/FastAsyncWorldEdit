@@ -1,8 +1,8 @@
 package com.boydti.fawe.bukkit.filter;
 
+import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
-import com.intellectualcrafters.plot.object.RunnableVal;
-import com.intellectualcrafters.plot.util.TaskManager;
+import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector2;
 
 import java.util.ArrayDeque;

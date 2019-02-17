@@ -23,6 +23,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -357,5 +358,10 @@ public class AsyncBlock implements Block {
 	@Override
 	public RayTraceResult rayTrace(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3) {
 		return this.getUnsafeBlock().rayTrace(arg0, arg1, arg2, arg3);
+	}
+
+	@Override
+	public BoundingBox getBoundingBox() {
+		return this.getUnsafeBlock().getBoundingBox();
 	}
 }

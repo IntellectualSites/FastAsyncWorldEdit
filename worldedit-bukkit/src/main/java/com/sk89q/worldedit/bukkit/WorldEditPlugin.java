@@ -79,42 +79,42 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
     private BukkitConfiguration config;
 
     private static Map<String, Plugin> lookupNames;
-    static {
-        {   // Disable AWE as otherwise both fail to load
-            PluginManager manager = Bukkit.getPluginManager();
-            try {
-                Field pluginsField = manager.getClass().getDeclaredField("plugins");
-                Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
-                pluginsField.setAccessible(true);
-                lookupNamesField.setAccessible(true);
-                List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
-                lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
-                pluginsField.set(manager, plugins = new ArrayList<Plugin>(plugins) {
-                    @Override
-                    public boolean add(Plugin plugin) {
-                        if (plugin.getName().startsWith("AsyncWorldEdit")) {
-                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
-                        } else if (plugin.getName().startsWith("BetterShutdown")) {
-                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
-                        } else {
-                            return super.add(plugin);
-                        }
-                        return false;
-                    }
-                });
-                lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
-                    @Override
-                    public Plugin put(String key, Plugin plugin) {
-                        if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
-                            return null;
-                        }
-                        return super.put(key, plugin);
-                    }
-                });
-            } catch (Throwable ignore) {}
-        }
-    }
-
+//    static {
+//        {   // Disable AWE as otherwise both fail to load
+//            PluginManager manager = Bukkit.getPluginManager();
+//            try {
+//                Field pluginsField = manager.getClass().getDeclaredField("plugins");
+//                Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
+//                pluginsField.setAccessible(true);
+//                lookupNamesField.setAccessible(true);
+//                List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
+//                lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
+//                pluginsField.set(manager, plugins = new ArrayList<Plugin>(plugins) {
+//                    @Override
+//                    public boolean add(Plugin plugin) {
+//                        if (plugin.getName().startsWith("AsyncWorldEdit")) {
+//                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
+//                        } else if (plugin.getName().startsWith("BetterShutdown")) {
+//                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
+//                        } else {
+//                            return super.add(plugin);
+//                        }
+//                        return false;
+//                    }
+//                });
+//                lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
+//                    @Override
+//                    public Plugin put(String key, Plugin plugin) {
+//                        if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
+//                            return null;
+//                        }
+//                        return super.put(key, plugin);
+//                    }
+//                });
+//            } catch (Throwable ignore) {}
+//        }
+//    }
+//
     public WorldEditPlugin() {
         init();
     }
@@ -145,6 +145,7 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
     @SuppressWarnings("AccessStaticViaInstance")
     @Override
     public void onEnable() {
+    	rename();
         this.INSTANCE = this;
         FaweBukkit imp = new FaweBukkit(this);
 
@@ -188,6 +189,7 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
                 }
             }
         }
+        System.out.println("finished enable");
     }
 
     private void rename() {

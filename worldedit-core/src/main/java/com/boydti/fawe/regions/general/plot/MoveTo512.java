@@ -8,27 +8,27 @@ import com.boydti.fawe.jnbt.anvil.MCAWriter;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.SetQueue;
-import com.intellectualcrafters.configuration.ConfigurationSection;
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.commands.CommandCategory;
-import com.intellectualcrafters.plot.commands.MainCommand;
-import com.intellectualcrafters.plot.commands.RequiredType;
-import com.intellectualcrafters.plot.config.C;
-import com.intellectualcrafters.plot.database.DBFunc;
-import com.intellectualcrafters.plot.database.SQLManager;
-import com.intellectualcrafters.plot.generator.HybridPlotWorld;
-import com.intellectualcrafters.plot.object.Location;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotArea;
-import com.intellectualcrafters.plot.object.PlotId;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import com.intellectualcrafters.plot.object.RunnableVal2;
-import com.intellectualcrafters.plot.object.RunnableVal3;
-import com.intellectualcrafters.plot.object.SetupObject;
-import com.intellectualcrafters.plot.util.SetupUtils;
-import com.intellectualcrafters.plot.util.WorldUtil;
-import com.plotsquared.general.commands.Command;
-import com.plotsquared.general.commands.CommandDeclaration;
+import com.github.intellectualsites.plotsquared.commands.Command;
+import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
+import com.github.intellectualsites.plotsquared.configuration.ConfigurationSection;
+import com.github.intellectualsites.plotsquared.plot.PlotSquared;
+import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
+import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
+import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
+import com.github.intellectualsites.plotsquared.plot.config.C;
+import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
+import com.github.intellectualsites.plotsquared.plot.database.SQLManager;
+import com.github.intellectualsites.plotsquared.plot.generator.HybridPlotWorld;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotId;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
+import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
+import com.github.intellectualsites.plotsquared.plot.object.SetupObject;
+import com.github.intellectualsites.plotsquared.plot.util.SetupUtils;
+import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,117 +44,117 @@ import java.util.Map;
         usage = "/plots moveto512 [world]"
 )
 // TODO FIXME
-public class MoveTo512 extends Command {
+public class MoveTo512 /*extends Command*/ {
 
-    public MoveTo512() {
-        super(MainCommand.getInstance(), true);
-    }
+//    public MoveTo512() {
+//        super(MainCommand.getInstance(), true);
+//    }
+//
+//    private MCAChunk emptyPlot(MCAChunk chunk, HybridPlotWorld hpw) {
+//        int maxLayer = (hpw.PLOT_HEIGHT) >> 4;
+//        for (int i = maxLayer + 1; i < chunk.ids.length; i++) {
+//            chunk.ids[i] = null;
+//            chunk.data[i] = null;
+//        }
+//        for (int layer = 0; layer <= maxLayer; layer++) {
+//            byte[] ids = chunk.ids[layer];
+//            if (ids == null) {
+//                ids = chunk.ids[layer] = new byte[4096];
+//                chunk.data[layer] = new byte[2048];
+//                chunk.skyLight[layer] = new byte[2048];
+//                chunk.blockLight[layer] = new byte[2048];
+//            } else {
+//                Arrays.fill(ids, (byte) 0);
+//                Arrays.fill(chunk.data[layer], (byte) 0);
+//                Arrays.fill(chunk.skyLight[layer], (byte) 0);
+//                Arrays.fill(chunk.blockLight[layer], (byte) 0);
+//            }
+//            if (layer == maxLayer) {
+//                int yMax = hpw.PLOT_HEIGHT & 15;
+//                for (int y = yMax + 1; y < 15; y++) {
+//                    Arrays.fill(chunk.skyLight[layer], y << 7, (y << 7) + 128, (byte) 255);
+//                }
+//                if (layer == 0) {
+//                    Arrays.fill(ids, 0, 256, (byte) 7);
+//                    for (int y = 1; y < yMax; y++) {
+//                        int y8 = y << 8;
+//                        Arrays.fill(ids, y8, y8 + 256, (byte) 3);
+//                    }
+//                } else {
+//                    for (int y = 0; y < yMax; y++) {
+//                        int y8 = y << 8;
+//                        Arrays.fill(ids, y8, y8 + 256, (byte) 3);
+//                    }
+//                }
+//                int yMax15 = yMax & 15;
+//                int yMax158 = yMax15 << 8;
+//                Arrays.fill(ids, yMax158, yMax158 + 256, (byte) 2);
+//                if (yMax != 15) {
+//                    Arrays.fill(ids, yMax158 + 256, 4096, (byte) 0);
+//                }
+//            } else if (layer == 0){
+//                Arrays.fill(ids, 256, 4096, (byte) 3);
+//                Arrays.fill(ids, 0, 256, (byte) 7);
+//            } else {
+//                Arrays.fill(ids, (byte) 3);
+//            }
+//        }
+//        return chunk;
+//    }
+//
+//    private MCAChunk emptyRoad(MCAChunk chunk, HybridPlotWorld hpw) {
+//        int maxLayer = (hpw.ROAD_HEIGHT) >> 4;
+//        for (int i = maxLayer + 1; i < chunk.ids.length; i++) {
+//            chunk.ids[i] = null;
+//            chunk.data[i] = null;
+//        }
+//        for (int layer = 0; layer <= maxLayer; layer++) {
+//            byte[] ids = chunk.ids[layer];
+//            if (ids == null) {
+//                ids = chunk.ids[layer] = new byte[4096];
+//                chunk.data[layer] = new byte[2048];
+//                chunk.skyLight[layer] = new byte[2048];
+//                chunk.blockLight[layer] = new byte[2048];
+//            } else {
+//                Arrays.fill(ids, (byte) 0);
+//                Arrays.fill(chunk.data[layer], (byte) 0);
+//                Arrays.fill(chunk.skyLight[layer], (byte) 0);
+//                Arrays.fill(chunk.blockLight[layer], (byte) 0);
+//            }
+//            if (layer == maxLayer) {
+//                int yMax = hpw.ROAD_HEIGHT & 15;
+//                for (int y = yMax + 1; y < 15; y++) {
+//                    Arrays.fill(chunk.skyLight[layer], y << 7, (y << 7) + 128, (byte) 255);
+//                }
+//                if (layer == 0) {
+//                    Arrays.fill(ids, 0, 256, (byte) 7);
+//                    for (int y = 1; y <= yMax; y++) {
+//                        int y8 = y << 8;
+//                        Arrays.fill(ids, y8, y8 + 256, (byte) hpw.ROAD_BLOCK.id);
+//                    }
+//                } else {
+//                    for (int y = 0; y <= yMax; y++) {
+//                        int y8 = y << 8;
+//                        Arrays.fill(ids, y8, y8 + 256, (byte) hpw.ROAD_BLOCK.id);
+//                    }
+//                }
+//                if (yMax != 15) {
+//                    int yMax15 = yMax & 15;
+//                    int yMax158 = yMax15 << 8;
+//                    Arrays.fill(ids, yMax158 + 256, 4096, (byte) 0);
+//                }
+//            } else if (layer == 0){
+//                Arrays.fill(ids, 256, 4096, (byte) hpw.ROAD_BLOCK.id);
+//                Arrays.fill(ids, 0, 256, (byte) 7);
+//            } else {
+//                Arrays.fill(ids, (byte) hpw.ROAD_BLOCK.id);
+//            }
+//        }
+//        return chunk;
+//    }
 
-    private MCAChunk emptyPlot(MCAChunk chunk, HybridPlotWorld hpw) {
-        int maxLayer = (hpw.PLOT_HEIGHT) >> 4;
-        for (int i = maxLayer + 1; i < chunk.ids.length; i++) {
-            chunk.ids[i] = null;
-            chunk.data[i] = null;
-        }
-        for (int layer = 0; layer <= maxLayer; layer++) {
-            byte[] ids = chunk.ids[layer];
-            if (ids == null) {
-                ids = chunk.ids[layer] = new byte[4096];
-                chunk.data[layer] = new byte[2048];
-                chunk.skyLight[layer] = new byte[2048];
-                chunk.blockLight[layer] = new byte[2048];
-            } else {
-                Arrays.fill(ids, (byte) 0);
-                Arrays.fill(chunk.data[layer], (byte) 0);
-                Arrays.fill(chunk.skyLight[layer], (byte) 0);
-                Arrays.fill(chunk.blockLight[layer], (byte) 0);
-            }
-            if (layer == maxLayer) {
-                int yMax = hpw.PLOT_HEIGHT & 15;
-                for (int y = yMax + 1; y < 15; y++) {
-                    Arrays.fill(chunk.skyLight[layer], y << 7, (y << 7) + 128, (byte) 255);
-                }
-                if (layer == 0) {
-                    Arrays.fill(ids, 0, 256, (byte) 7);
-                    for (int y = 1; y < yMax; y++) {
-                        int y8 = y << 8;
-                        Arrays.fill(ids, y8, y8 + 256, (byte) 3);
-                    }
-                } else {
-                    for (int y = 0; y < yMax; y++) {
-                        int y8 = y << 8;
-                        Arrays.fill(ids, y8, y8 + 256, (byte) 3);
-                    }
-                }
-                int yMax15 = yMax & 15;
-                int yMax158 = yMax15 << 8;
-                Arrays.fill(ids, yMax158, yMax158 + 256, (byte) 2);
-                if (yMax != 15) {
-                    Arrays.fill(ids, yMax158 + 256, 4096, (byte) 0);
-                }
-            } else if (layer == 0){
-                Arrays.fill(ids, 256, 4096, (byte) 3);
-                Arrays.fill(ids, 0, 256, (byte) 7);
-            } else {
-                Arrays.fill(ids, (byte) 3);
-            }
-        }
-        return chunk;
-    }
-
-    private MCAChunk emptyRoad(MCAChunk chunk, HybridPlotWorld hpw) {
-        int maxLayer = (hpw.ROAD_HEIGHT) >> 4;
-        for (int i = maxLayer + 1; i < chunk.ids.length; i++) {
-            chunk.ids[i] = null;
-            chunk.data[i] = null;
-        }
-        for (int layer = 0; layer <= maxLayer; layer++) {
-            byte[] ids = chunk.ids[layer];
-            if (ids == null) {
-                ids = chunk.ids[layer] = new byte[4096];
-                chunk.data[layer] = new byte[2048];
-                chunk.skyLight[layer] = new byte[2048];
-                chunk.blockLight[layer] = new byte[2048];
-            } else {
-                Arrays.fill(ids, (byte) 0);
-                Arrays.fill(chunk.data[layer], (byte) 0);
-                Arrays.fill(chunk.skyLight[layer], (byte) 0);
-                Arrays.fill(chunk.blockLight[layer], (byte) 0);
-            }
-            if (layer == maxLayer) {
-                int yMax = hpw.ROAD_HEIGHT & 15;
-                for (int y = yMax + 1; y < 15; y++) {
-                    Arrays.fill(chunk.skyLight[layer], y << 7, (y << 7) + 128, (byte) 255);
-                }
-                if (layer == 0) {
-                    Arrays.fill(ids, 0, 256, (byte) 7);
-                    for (int y = 1; y <= yMax; y++) {
-                        int y8 = y << 8;
-                        Arrays.fill(ids, y8, y8 + 256, (byte) hpw.ROAD_BLOCK.id);
-                    }
-                } else {
-                    for (int y = 0; y <= yMax; y++) {
-                        int y8 = y << 8;
-                        Arrays.fill(ids, y8, y8 + 256, (byte) hpw.ROAD_BLOCK.id);
-                    }
-                }
-                if (yMax != 15) {
-                    int yMax15 = yMax & 15;
-                    int yMax158 = yMax15 << 8;
-                    Arrays.fill(ids, yMax158 + 256, 4096, (byte) 0);
-                }
-            } else if (layer == 0){
-                Arrays.fill(ids, 256, 4096, (byte) hpw.ROAD_BLOCK.id);
-                Arrays.fill(ids, 0, 256, (byte) 7);
-            } else {
-                Arrays.fill(ids, (byte) hpw.ROAD_BLOCK.id);
-            }
-        }
-        return chunk;
-    }
-
-    @Override
-    public void execute(PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
+//    @Override
+//    public void execute(PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
 //        checkTrue(args.length == 1, C.COMMAND_SYNTAX, getUsage());
 //        PlotArea area = player.getPlotAreaAbs();
 //        check(area, C.COMMAND_SYNTAX, getUsage());
@@ -368,5 +368,5 @@ public class MoveTo512 extends Command {
 //        object.plotManager = PS.imp().getPluginName();
 //        object.setupGenerator = PS.imp().getPluginName();
 //        String created = SetupUtils.manager.setupWorld(object);
-    }
+//    }
 }

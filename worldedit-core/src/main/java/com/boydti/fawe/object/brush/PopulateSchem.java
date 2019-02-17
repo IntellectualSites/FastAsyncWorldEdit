@@ -2,7 +2,7 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
 import com.boydti.fawe.util.MaskTraverser;
-import com.intellectualcrafters.plot.util.MathMan;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;

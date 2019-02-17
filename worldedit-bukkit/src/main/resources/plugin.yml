@@ -4,10 +4,9 @@ version: "${internalVersion}"
 api-version: 1.13
 description: Fast Async WorldEdit plugin
 authors: [Empire92]
-loadbefore: [WorldEdit,AsyncWorldEdit,AsyncWorldEditInjector,WorldGuard]
-load: STARTUP
+loadbefore: [PlotSquared, AsyncWorldEdit, AsyncWorldEditInjector]
 database: false
-#softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
+softdepend: [WorldGuard, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
 permissions:
   fawe.plotsquared:
       default: true

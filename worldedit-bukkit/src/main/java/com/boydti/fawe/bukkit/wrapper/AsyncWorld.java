@@ -1278,4 +1278,14 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 		parent.spawnParticle(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 		
 	}
+
+	@Override
+	public void setChunkForceLoaded(int x, int z, boolean forced) {
+		parent.setChunkForceLoaded(x, z, forced);
+	}
+
+	@Override
+	public Collection<Chunk> getForceLoadedChunks() {
+		return parent.getForceLoadedChunks();
+	}
 }

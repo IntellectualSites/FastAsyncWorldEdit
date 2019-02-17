@@ -7,15 +7,14 @@ import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
-import com.intellectualcrafters.jnbt.CompoundTag;
-import com.intellectualcrafters.jnbt.Tag;
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.object.Location;
-import com.intellectualcrafters.plot.object.RegionWrapper;
-import com.intellectualcrafters.plot.object.RunnableVal;
-import com.intellectualcrafters.plot.util.MainUtil;
-import com.intellectualcrafters.plot.util.SchematicHandler;
-import com.intellectualcrafters.plot.util.block.LocalBlockQueue;
+import com.github.intellectualsites.plotsquared.plot.PlotSquared;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
+import com.github.intellectualsites.plotsquared.plot.object.RunnableVal;
+import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
+import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
+import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -74,11 +73,11 @@ public class FaweSchematicHandler extends SchematicHandler {
     @Override
     public boolean save(CompoundTag tag, String path) {
         if (tag == null) {
-            PS.debug("&cCannot save empty tag");
+            PlotSquared.debug("&cCannot save empty tag");
             return false;
         }
         try {
-            File tmp = MainUtil.getFile(PS.get().IMP.getDirectory(), path);
+            File tmp = MainUtil.getFile(PlotSquared.get().IMP.getDirectory(), path);
             tmp.getParentFile().mkdirs();
             com.sk89q.jnbt.CompoundTag weTag = (com.sk89q.jnbt.CompoundTag) FaweCache.asTag(tag);
             try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new PGZIPOutputStream(stream))) {
@@ -97,8 +96,8 @@ public class FaweSchematicHandler extends SchematicHandler {
     @Override
     public void upload(final CompoundTag tag, final UUID uuid, final String file, final RunnableVal<URL> whenDone) {
         if (tag == null) {
-            PS.debug("&cCannot save empty tag");
-            com.intellectualcrafters.plot.util.TaskManager.runTask(whenDone);
+            PlotSquared.debug("&cCannot save empty tag");
+            com.github.intellectualsites.plotsquared.plot.util.TaskManager.runTask(whenDone);
             return;
         }
         MainUtil.upload(uuid, file, "schematic", new RunnableVal<OutputStream>() {

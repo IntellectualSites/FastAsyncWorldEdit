@@ -5,14 +5,14 @@ import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAFile;
 import com.boydti.fawe.object.RunnableVal4;
 import com.boydti.fawe.object.collection.LongHashSet;
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.generator.HybridGen;
-import com.intellectualcrafters.plot.generator.HybridPlotWorld;
-import com.intellectualcrafters.plot.generator.IndependentPlotGenerator;
-import com.intellectualcrafters.plot.object.Location;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotArea;
-import com.intellectualcrafters.plot.util.expiry.ExpireManager;
+import com.github.intellectualsites.plotsquared.plot.PlotSquared;
+import com.github.intellectualsites.plotsquared.plot.generator.HybridGen;
+import com.github.intellectualsites.plotsquared.plot.generator.HybridPlotWorld;
+import com.github.intellectualsites.plotsquared.plot.generator.IndependentPlotGenerator;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpireManager;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -37,7 +37,7 @@ public class PlotTrimFilter extends DeleteUninhabitedFilter {
         IndependentPlotGenerator gen = area.getGenerator();
         if (area instanceof HybridPlotWorld && gen instanceof HybridGen) {
             HybridPlotWorld hpw = (HybridPlotWorld) area;
-            return hpw.PLOT_BEDROCK && !hpw.PLOT_SCHEMATIC && hpw.MAIN_BLOCK.length == 1 && hpw.TOP_BLOCK.length == 1;
+            return hpw.PLOT_BEDROCK && !hpw.PLOT_SCHEMATIC && hpw.MAIN_BLOCK.getBlocks().size() == 1 && hpw.TOP_BLOCK.getBlocks().size() == 1;
         }
         return false;
     }
@@ -47,21 +47,21 @@ public class PlotTrimFilter extends DeleteUninhabitedFilter {
         Fawe.debug("Initializing Plot trim...");
 
         String worldName = Fawe.imp().getWorldName(world);
-        PlotArea area = PS.get().getPlotAreaByString(worldName);
+        PlotArea area = PlotSquared.get().getPlotAreaByString(worldName);
         IndependentPlotGenerator gen = area.getGenerator();
         if (!(area instanceof HybridPlotWorld) || !(gen instanceof HybridGen)) {
             throw new UnsupportedOperationException("Trim does not support non hybrid plot worlds");
         }
         this.hg = (HybridGen) gen;
         this.hpw = (HybridPlotWorld) area;
-        if (hpw.PLOT_SCHEMATIC || hpw.MAIN_BLOCK.length != 1 || hpw.TOP_BLOCK.length != 1) {
+        if (hpw.PLOT_SCHEMATIC || hpw.MAIN_BLOCK.getBlocks().size() != 1 || hpw.TOP_BLOCK.getBlocks().size() != 1) {
             throw new UnsupportedOperationException("WIP - will implement later");
         }
         this.occupiedRegions = new LongHashSet();
         this.unoccupiedChunks = new LongHashSet();
 
         this.reference = calculateReference();
-
+        
         Fawe.debug(" - calculating claims");
         this.calculateClaimedArea();
     }
@@ -70,11 +70,11 @@ public class PlotTrimFilter extends DeleteUninhabitedFilter {
         MCAChunk reference = new MCAChunk(null, 0, 0);
         if (hpw.PLOT_BEDROCK) {
             reference.fillCuboid(0, 15, 0, 0, 0, 15, BlockTypes.BEDROCK.getInternalId());
-        } else if (hpw.MAIN_BLOCK[0].id == 0 && hpw.TOP_BLOCK[0].id == 0) {
+        } else if (hpw.MAIN_BLOCK.hasSingleItem() && hpw.MAIN_BLOCK.getBlock().isAir() && hpw.TOP_BLOCK.hasSingleItem() && hpw.TOP_BLOCK.getBlock().isAir()) {
             referenceIsVoid = true;
         }
-        reference.fillCuboid(0, 15, 1, hpw.PLOT_HEIGHT - 1, 0, 15, LegacyMapper.getInstance().getBlockFromLegacy(hpw.MAIN_BLOCK[0].id).getInternalId());
-        reference.fillCuboid(0, 15, hpw.PLOT_HEIGHT, hpw.PLOT_HEIGHT, 0, 15, LegacyMapper.getInstance().getBlockFromLegacy(hpw.TOP_BLOCK[0].id).getInternalId());
+        reference.fillCuboid(0, 15, 1, hpw.PLOT_HEIGHT - 1, 0, 15, LegacyMapper.getInstance().getBaseBlockFromPlotBlock(hpw.MAIN_BLOCK.getBlock()).getInternalBlockTypeId());
+        reference.fillCuboid(0, 15, hpw.PLOT_HEIGHT, hpw.PLOT_HEIGHT, 0, 15, LegacyMapper.getInstance().getBaseBlockFromPlotBlock(hpw.TOP_BLOCK.getBlock()).getInternalBlockTypeId());
         return reference;
     }
 

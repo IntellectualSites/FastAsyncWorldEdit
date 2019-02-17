@@ -1,17 +1,17 @@
 package com.boydti.fawe.regions.general.plot;
 
-import com.intellectualcrafters.plot.commands.CommandCategory;
-import com.intellectualcrafters.plot.commands.MainCommand;
-import com.intellectualcrafters.plot.commands.RequiredType;
-import com.intellectualcrafters.plot.config.C;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotArea;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import com.intellectualcrafters.plot.object.RunnableVal2;
-import com.intellectualcrafters.plot.object.RunnableVal3;
-import com.intellectualcrafters.plot.object.worlds.SinglePlotArea;
-import com.plotsquared.general.commands.Command;
-import com.plotsquared.general.commands.CommandDeclaration;
+import com.github.intellectualsites.plotsquared.commands.Command;
+import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
+import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
+import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
+import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
+import com.github.intellectualsites.plotsquared.plot.config.C;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
+import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
+import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.sk89q.worldedit.WorldEdit;
 
 @CommandDeclaration(
