@@ -213,12 +213,12 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                                 throw new InputParseException(e2.getMessage());
                             }
                         });
+                    }
                 }
                 if (pe.and) {
                     masks.add(new ArrayList<>());
                 }
                 masks.get(masks.size() - 1).add(mask);
-                }
             }
         } catch (InputParseException rethrow) {
             throw rethrow;
@@ -240,7 +240,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
             return new MaskIntersection(maskUnions);
         } else {
             return null;
-            }
+        }
         
     }
 }

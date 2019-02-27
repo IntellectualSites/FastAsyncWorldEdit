@@ -542,10 +542,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             return new NullExtent(extent, BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
         }
         final Extent toReturn = event.getExtent();
-//        if(toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
-//        	return new NullExtent(toReturn, null);
-//        	return new AbstractDelegateExtent(toReturn);
-//        });
+        if(toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
+        	return new NullExtent(toReturn, null);
+        }
         if (!(toReturn instanceof AbstractDelegateExtent)) {
             Fawe.debug("Extent " + toReturn + " must be AbstractDelegateExtent");
             return extent;

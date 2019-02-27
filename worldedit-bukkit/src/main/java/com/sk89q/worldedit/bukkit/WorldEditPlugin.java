@@ -189,7 +189,6 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
                 }
             }
         }
-        System.out.println("finished enable");
     }
 
     private void rename() {

@@ -33,7 +33,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
         Fawe.debug("Optimizing PlotSquared");
-        PlotSquared.get().worldedit = null;
+//        PlotSquared.get().worldedit = null;
         setupBlockQueue();
         setupSchematicHandler();
         setupChunkManager();
