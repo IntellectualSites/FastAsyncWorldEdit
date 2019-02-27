@@ -149,7 +149,7 @@ import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
  * {@link Extent}s that are chained together. For example, history is logged
  * using the {@link ChangeSetExtent}.</p>
  */
-public class EditSession extends AbstractDelegateExtent implements HasFaweQueue, SimpleWorld {
+public class EditSession extends AbstractDelegateExtent implements HasFaweQueue, SimpleWorld, AutoCloseable {
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
      * determine which {@link Extent}s should be bypassed.
@@ -1261,6 +1261,27 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     @Override
     public List<? extends Entity> getEntities() {
         return this.extent.getEntities();
+    }
+    
+    /**
+     * Closing an EditSession {@linkplain #flushSession() flushes its buffers}.
+     */
+    @Override
+    public void close() {
+        flushSession();
+    }
+
+    /**
+     * Communicate to the EditSession that all block changes are complete,
+     * and that it should apply them to the world.
+     */
+    public void flushSession() {
+        Operations.completeBlindly(commit());
+    }
+
+    @Override
+    public @Nullable Operation commit() {
+        return extent.commit();
     }
 
     /**
