@@ -14,7 +14,7 @@ import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.commands.Auto;
-import com.github.intellectualsites.plotsquared.plot.config.C;
+import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.config.Settings;
 import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
@@ -213,7 +213,7 @@ public class CFICommands extends MethodCommands {
                     int currentPlots = Settings.Limit.GLOBAL ? player.getPlotCount() : player.getPlotCount(area.worldname);
                     int diff = player.getAllowedPlots() - currentPlots;
                     if (diff < 1) {
-                        C.CANT_CLAIM_MORE_PLOTS_NUM.send(player, -diff);
+                        Captions.CANT_CLAIM_MORE_PLOTS_NUM.send(player, -diff);
                         return;
                     }
 

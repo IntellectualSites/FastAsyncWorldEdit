@@ -15,7 +15,7 @@ import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
 import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
 import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
-import com.github.intellectualsites.plotsquared.plot.config.C;
+import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
 import com.github.intellectualsites.plotsquared.plot.database.SQLManager;
 import com.github.intellectualsites.plotsquared.plot.generator.HybridPlotWorld;
@@ -155,9 +155,9 @@ public class MoveTo512 /*extends Command*/ {
 
 //    @Override
 //    public void execute(PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
-//        checkTrue(args.length == 1, C.COMMAND_SYNTAX, getUsage());
+//        checkTrue(args.length == 1, Captions.COMMAND_SYNTAX, getUsage());
 //        PlotArea area = player.getPlotAreaAbs();
-//        check(area, C.COMMAND_SYNTAX, getUsage());
+//        check(area, Captions.COMMAND_SYNTAX, getUsage());
 //        checkTrue(area instanceof HybridPlotWorld, C.NOT_VALID_HYBRID_PLOT_WORLD);
 //
 //        WorldUtil.IMP.saveWorld(area.worldname);
