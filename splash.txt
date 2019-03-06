@@ -10,7 +10,6 @@
 ======= By Empire92 and WorldEdit team =======
 
 If you encounter trouble:
- - Read COMPILING.md if you haven't yet
  - Run `build` in a separate Gradle run
  - Use gradlew and not gradle
  - Ask us!

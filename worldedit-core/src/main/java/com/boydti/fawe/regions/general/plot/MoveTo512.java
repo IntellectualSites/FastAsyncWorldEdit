@@ -155,10 +155,10 @@ public class MoveTo512 /*extends Command*/ {
 
 //    @Override
 //    public void execute(PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
-//        checkTrue(args.length == 1, C.COMMAND_SYNTAX, getUsage());
+//        checkTrue(args.length == 1, Captions.COMMAND_SYNTAX, getUsage());
 //        PlotArea area = player.getPlotAreaAbs();
-//        check(area, C.COMMAND_SYNTAX, getUsage());
-//        checkTrue(area instanceof HybridPlotWorld, C.NOT_VALID_HYBRID_PLOT_WORLD);
+//        check(area, Captions.COMMAND_SYNTAX, getUsage());
+//        checkTrue(area instanceof HybridPlotWorld, Captions.NOT_VALID_HYBRID_PLOT_WORLD);
 //
 //        WorldUtil.IMP.saveWorld(area.worldname);
 //
@@ -167,7 +167,7 @@ public class MoveTo512 /*extends Command*/ {
 //
 //        String world = args[0];
 //        File folder = new File(PS.imp().getWorldContainer(), world + File.separator + "region");
-//        checkTrue(!folder.exists(), C.SETUP_WORLD_TAKEN, world);
+//        checkTrue(!folder.exists(), Captions.SETUP_WORLD_TAKEN, world);
 //
 //        HybridPlotWorld hpw = (HybridPlotWorld) area;
 //        int minRoad = 7;
