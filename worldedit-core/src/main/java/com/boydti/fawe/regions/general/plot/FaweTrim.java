@@ -5,7 +5,7 @@ import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
 import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
 import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
 import com.github.intellectualsites.plotsquared.plot.commands.SubCommand;
-import com.github.intellectualsites.plotsquared.plot.config.C;
+import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
@@ -33,7 +33,7 @@ public class FaweTrim extends SubCommand {
             return false;
         }
         if (!WorldUtil.IMP.isWorld(strings[0])) {
-            C.NOT_VALID_PLOT_WORLD.send(plotPlayer, strings[0]);
+            Captions.NOT_VALID_PLOT_WORLD.send(plotPlayer, strings[0]);
             return false;
         }
         ran = true;

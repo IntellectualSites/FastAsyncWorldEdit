@@ -10,7 +10,7 @@ import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
 import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
 import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
 import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
-import com.github.intellectualsites.plotsquared.plot.config.C;
+import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
@@ -36,15 +36,15 @@ public class ReplaceAll extends Command {
 
     @Override
     public void execute(final PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
-        checkTrue(args.length >= 1, C.COMMAND_SYNTAX, getUsage());
-        final Plot plot = check(player.getCurrentPlot(), C.NOT_IN_PLOT);
-        checkTrue(plot.isOwner(player.getUUID()), C.NOW_OWNER);
-        checkTrue(plot.getRunning() == 0, C.WAIT_FOR_TIMER);
+        checkTrue(args.length >= 1, Captions.COMMAND_SYNTAX, getUsage());
+        final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
+        checkTrue(plot.isOwner(player.getUUID()), Captions.NOW_OWNER);
+        checkTrue(plot.getRunning() == 0, Captions.WAIT_FOR_TIMER);
         final PlotArea area = plot.getArea();
         if (area instanceof SinglePlotArea) {
             plot.addRunning();
             FawePlayer<Object> fp = FawePlayer.wrap(player.getName());
-            C.TASK_START.send(player);
+            Captions.TASK_START.send(player);
             TaskManager.IMP.async(new Runnable() {
                 @Override
                 public void run() {

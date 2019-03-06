@@ -4,7 +4,6 @@ apply plugin: 'maven'
 
 repositories {
     maven { url "https://hub.spigotmc.org/nexus/content/groups/public" }
-    maven { url "https://ci.athion.net/job/FAWE-WorldGuard-1.13/lastSuccessfulBuild/artifact/mvn" }
 }
 
 dependencies {
@@ -27,8 +26,8 @@ dependencies {
     compile 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
     compile 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
     compile 'com.wasteofplastic:askyblock:3.0.8.2'
-    compile 'com.sk89q:worldguard-core:latest'
-    compile 'com.sk89q:worldguard-legacy:latest'
+    compileOnly 'com.sk89q.worldguard:worldguard-core:7.0.0-20190215.210421-39'
+    compileOnly 'com.sk89q.worldguard:worldguard-legacy:7.0.0-20190215.210421-39'
 }
 
 processResources {
