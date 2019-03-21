@@ -77,7 +77,7 @@ public class SnipeData {
      */
     private int voxelHeight = SnipeData.DEFAULT_VOXEL_HEIGHT;
     /**
-     * Voxel centroid -- set Cylynder center /vc #.
+     * Voxel centroid -- set Cylinder center /vc #.
      */
     private int cCen = SnipeData.DEFAULT_CYLINDER_CENTER;
     private int range = 0;
