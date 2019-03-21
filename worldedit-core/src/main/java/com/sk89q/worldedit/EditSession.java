@@ -43,16 +43,7 @@ import com.boydti.fawe.util.*;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.google.common.base.Supplier;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.function.mask.*;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
-
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
@@ -66,10 +57,10 @@ import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
-import com.sk89q.worldedit.function.block.BlockDistributionCounter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
+import com.sk89q.worldedit.function.mask.*;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -85,16 +76,7 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
-
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MathUtils;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
-import com.sk89q.worldedit.math.MutableVector;
-import com.sk89q.worldedit.math.Vector2;
-import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.math.interpolation.Interpolation;
+import com.sk89q.worldedit.math.*;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.math.noise.RandomNoise;
@@ -107,39 +89,21 @@ import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
-import com.sk89q.worldedit.util.collection.DoubleArrayList;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.SimpleWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.weather.WeatherType;
-import com.sk89q.worldedit.world.block.BlockCategories;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+import static com.sk89q.worldedit.regions.Regions.*;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -1750,17 +1714,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         checkNotNull(region);
         checkNotNull(pattern);
 
-        final BlockVector3 center = region.getCenter().toBlockPoint();
-        final Region centerRegion = new CuboidRegion(this.getWorld(), // Causes clamping of Y range
-                center.floor(), center.ceil());
-        return this.setBlocks(centerRegion, pattern);
-//        Vector3 center = region.getCenter();
-//        Region centerRegion = new CuboidRegion(
-//                getWorld(), // Causes clamping of Y range
-//                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
-//                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
-//                            center.getY(), MathUtils.roundHalfUp(center.getZ())));
-//        return setBlocks(centerRegion, pattern);
+        Vector3 center = region.getCenter();
+        Region centerRegion = new CuboidRegion(
+                getWorld(), // Causes clamping of Y range
+                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
+                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
+                            center.getY(), MathUtils.roundHalfUp(center.getZ())));
+        return setBlocks(centerRegion, pattern);
     }
 
     /**
