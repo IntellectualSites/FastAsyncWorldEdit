@@ -440,7 +440,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         } else if (foreign instanceof NBTTagString) {
             return new StringTag(foreign.asString()); // data
         } else if (foreign instanceof NBTTagEnd) {
-            return EndTag.INSTANCE;
+            return new EndTag();
         } else {
             throw new IllegalArgumentException("Don't know how to make native " + foreign.getClass().getCanonicalName());
         }

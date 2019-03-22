@@ -9,22 +9,16 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class NBTStreamer {
     private final NBTInputStream is;
-    private final Map<String, BiConsumer> readers;
+    private final HashMap<String, BiConsumer> readers;
 
     public NBTStreamer(NBTInputStream stream) {
         this.is = stream;
         readers = new HashMap<>();
-    }
-
-    public NBTStreamer(NBTInputStream stream, Map<String, BiConsumer> readers) {
-        this.is = stream;
-        this.readers = readers;
     }
 
     /**

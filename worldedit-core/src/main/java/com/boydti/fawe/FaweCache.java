@@ -174,7 +174,7 @@ public class FaweCache {
             if (clazz.getName().startsWith("com.intellectualcrafters.jnbt")) {
                 try {
                     if (clazz.getName().equals("com.intellectualcrafters.jnbt.EndTag")) {
-                        return EndTag.INSTANCE;
+                        return new EndTag();
                     }
                     Field field = clazz.getDeclaredField("value");
                     field.setAccessible(true);
