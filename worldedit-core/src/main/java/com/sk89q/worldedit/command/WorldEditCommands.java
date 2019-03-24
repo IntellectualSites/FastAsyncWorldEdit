@@ -24,10 +24,7 @@ import com.boydti.fawe.FaweVersion;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.util.HastebinUtility;
-import com.boydti.fawe.util.StringMan;
-import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.util.Updater;
+import com.boydti.fawe.util.*;
 import com.google.common.io.Files;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -196,14 +193,14 @@ public class WorldEditCommands {
     @Command(
             aliases = {"debugpaste"},
             usage = "",
-            desc = "Upload debug information to hastebin.com",
+            desc = "Upload latest.log, config.yml, message.yml and your commands.yml to https://incendo.org",
             min = 0,
             max = 0
     )
     @CommandPermissions("worldedit.debugpaste")
     public void debugpaste(Actor actor) throws WorldEditException, IOException {
-//        BBC.DOWNLOAD_LINK.send(actor, HastebinUtility.debugPaste());
-    	ActorCallbackPaste.pastebin(we.getSupervisor(), actor, null, "FastAsyncWorldEdit report: " + BBC.DOWNLOAD_LINK, WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter());
+        BBC.DOWNLOAD_LINK.send(actor, IncendoPaster.debugPaste());
+
     }
 
     @Command(
