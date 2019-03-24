@@ -1,7 +1,7 @@
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 repositories {
-    maven {url "http://ci.athion.net/job/PlotSquared/ws/mvn/"}
+    maven {url "http://ci.athion.net/job/PlotSquared-Legacy/ws/mvn/"}
 }
 dependencies {
     compile 'de.schlichtherle:truezip:6.8.3'
