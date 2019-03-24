@@ -6,14 +6,12 @@ description: Fast Async WorldEdit plugin
 authors: [Empire92]
 loadbefore: [PlotSquared, AsyncWorldEdit, AsyncWorldEditInjector]
 database: false
-softdepend: [WorldGuard, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
+softdepend: [WorldGuard, MCore, Factions, GriefPrevention, Residence, Towny, PreciousStones]
 permissions:
   fawe.plotsquared:
       default: true
       children:
         fawe.plotsquared.trusted: true
-  fawe.plotme:
-    default: true
   fawe.bypass.regions:
     default: false
   fawe.bypass:

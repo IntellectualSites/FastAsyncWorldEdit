@@ -7,7 +7,7 @@ load: STARTUP
 database: false
 depend: [WorldEdit]
 api-version: 1.13
-#softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
+#softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PreciousStones]
 commands:
   '/p':
     description: VoxelSniper perform command
