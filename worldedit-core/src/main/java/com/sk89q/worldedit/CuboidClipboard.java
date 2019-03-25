@@ -162,7 +162,8 @@ public class CuboidClipboard {
 
 
     public BaseBlock getBlock(int x, int y, int z) {
-        return adapt(clipboard.IMP.getBlock(x, y, z));
+//        return adapt(clipboard.IMP.getBlock(x, y, z));
+    	return clipboard.IMP.getBlock(x, y, z);
     }
 
     public BaseBlock getLazyBlock(BlockVector3 position) {
@@ -174,7 +175,7 @@ public class CuboidClipboard {
     }
 
     public boolean setBlock(int x, int y, int z, BaseBlock block) {
-        return setBlock(x, y, z, block.toImmutableState());
+        return setBlock(x, y, z, block);
     }
 
     public boolean setBlock(int x, int y, int z, BlockState block) {

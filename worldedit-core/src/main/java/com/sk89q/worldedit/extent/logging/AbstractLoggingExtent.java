@@ -51,7 +51,7 @@ public abstract class AbstractLoggingExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public final boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         onBlockChange(position, block);
         return super.setBlock(position, block);
     }

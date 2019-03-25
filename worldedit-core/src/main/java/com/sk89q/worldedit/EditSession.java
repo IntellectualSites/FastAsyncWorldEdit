@@ -1043,7 +1043,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
     }
 
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         this.changes++;
         try {
             return this.extent.setBlock(x, y, z, block);
@@ -1060,15 +1060,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         } catch (WorldEditException e) {
             throw new RuntimeException("Unexpected exception", e);
         }
-    }
-    @Deprecated
-    public boolean setBlock(int x, int y, int z, BaseBlock block) {
-        return setBlock(x, y, z, block.toImmutableState());
-    }
-
-    @Deprecated
-    public boolean setBlock(BlockVector3 position, BaseBlock block) throws MaxChangedBlocksException {
-        return setBlock(position, block.toImmutableState());
     }
 
     @SuppressWarnings("deprecation")
@@ -1602,7 +1593,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public <B extends BlockStateHolder<B>> int setBlocks(final Region region, final B block) {
         checkNotNull(region);
         checkNotNull(block);
-        if (canBypassAll(region, false, true) && !block.hasNbtData()) {
+        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        		
+        if (canBypassAll(region, false, true) && !hasNbt) {
             return changes = queue.setBlocks((CuboidRegion) region, block.getInternalId());
         }
         try {
@@ -3370,7 +3363,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     @Override
     public boolean clearContainerBlockContents(BlockVector3 pos) {
-        BlockStateHolder block = getFullBlock(pos);
+        BaseBlock block = getFullBlock(pos);
         CompoundTag nbt = block.getNbtData();
         if (nbt != null) {
             if (nbt.containsKey("items")) {
@@ -3452,8 +3445,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                             for (int y = 0; y < getMaxY() + 1; y++) {
 //                                BlockStateHolder block = getFullBlock(mutable.setComponents(xx, y, zz));
                             	BlockVector3 bv = BlockVector3.at(xx, y, zz);
-                            	BlockStateHolder block = getFullBlock(bv);
-                                fcs.add(mbv, block, BlockTypes.AIR.getDefaultState());
+                            	BaseBlock block = getFullBlock(bv);
+                                fcs.add(mbv, block, BlockTypes.AIR.getDefaultState().toBaseBlock());
                             }
                         }
                     }
@@ -3481,8 +3474,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                             if (contains) {
                                 containsAny = true;
                                 if (fcs != null) {
-                                    BlockStateHolder block = getFullBlock(mbv);
-                                    fcs.add(mbv, block, BlockTypes.AIR.getDefaultState());
+                                    BaseBlock block = getFullBlock(mbv);
+                                    fcs.add(mbv, block, BlockTypes.AIR.getDefaultState().toBaseBlock());
                                 }
                             } else {
                                 BlockStateHolder block = getFullBlock(mbv);

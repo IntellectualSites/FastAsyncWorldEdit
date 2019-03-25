@@ -5,6 +5,7 @@ import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -59,19 +60,19 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        BlockStateHolder previous = queue.getLazyBlock(x, y, z);
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        BaseBlock previous = queue.getFullBlock(BlockVector3.at(x, y, z)).toBaseBlock();
         if (previous.getInternalId() == block.getInternalId()) {
-            if (!previous.hasNbtData() && !block.hasNbtData()) {
+            if (!previous.hasNbtData() && (block instanceof BaseBlock && !((BaseBlock)block).hasNbtData())) {
                 return false;
             }
         }
-        this.changeSet.add(x, y, z, previous, block);
+        this.changeSet.add(x, y, z, previous, block.toBaseBlock());
         return getExtent().setBlock(x, y, z, block);
     }
 
     @Override
-    public boolean setBlock(final BlockVector3 location, final BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 

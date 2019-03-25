@@ -105,38 +105,38 @@ public class BlockTransformExtent extends ResettableExtent {
      * @param reverse true to transform in the opposite direction
      * @return the same block
      */
-    private <T extends BlockStateHolder<T>> T transformBlock(T block, boolean reverse) {
+    protected <T extends BlockStateHolder<T>> T transformBlock(T block, boolean reverse) {
         return transform(block, reverse ? transform.inverse() : transform);
     }
     
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
-    	return transformFast(super.getLazyBlock(position)).toImmutableState();
+    	return transformBlock(super.getLazyBlock(position), false).toImmutableState();
     }
     
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return transformFast(super.getLazyBlock(x, y, z)).toImmutableState();
+        return transformBlock(super.getLazyBlock(x, y, z), false).toImmutableState();
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transformFast(super.getBlock(position)).toImmutableState();
+        return transformBlock(super.getBlock(position), false).toImmutableState();
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return transformFast(super.getFullBlock(position).toImmutableState());
+        return transformBlock(super.getFullBlock(position), false);
     }
     
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return super.setBlock(x, y, z, transformFastInverse((BlockState)block));
+        return super.setBlock(x, y, z, transformBlock(block, true));
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return super.setBlock(location, transformFastInverse((BlockState)block));
+        return super.setBlock(location, transformBlock(block, true));
     }
     
     private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
@@ -239,61 +239,6 @@ public class BlockTransformExtent extends ResettableExtent {
             }
         }
         return result;
-    }
-    
-    public final BaseBlock transformFast(BlockState block) {
-        BaseBlock transformed = transformBlock(block, false).toBaseBlock();
-        if (block.hasNbtData()) {
-            CompoundTag tag = block.getNbtData();
-            if (tag.containsKey("Rot")) {
-                int rot = tag.asInt("Rot");
-
-                Direction direction = Direction.fromRotationIndex(rot).get();
-
-                if (direction != null) {
-                    Vector3 applyAbsolute = transform.apply(direction.toVector());
-                    Vector3 applyOrigin = transform.apply(Vector3.ZERO);
-                    Vector3 newAbsolute = Vector3.at(applyAbsolute.getX() - applyOrigin.getX(), applyAbsolute.getY() - applyOrigin.getY(), applyAbsolute.getZ() - applyOrigin.getZ());
-
-                    Direction newDirection = Direction.findClosest(newAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
-
-                    if (newDirection != null) {
-                        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
-                        values.put("Rot", new ByteTag((byte) newDirection.toRotationIndex().getAsInt()));
-                    }
-                }
-                transformed.setNbtData(tag);
-            }
-        }
-        return transformed;
-    }
-
-    public final BaseBlock transformFastInverse(BlockState block) {
-        BaseBlock transformed = transformBlock(block, true).toBaseBlock();
-        if (block.hasNbtData()) {
-            CompoundTag tag = block.getNbtData();
-            if (tag.containsKey("Rot")) {
-                int rot = tag.asInt("Rot");
-
-                Direction direction = Direction.fromRotationIndex(rot).get();
-
-                if (direction != null) {
-                    Vector3 applyAbsolute = getTransform().inverse().apply(direction.toVector());
-                    Vector3 applyOrigin = getTransform().inverse().apply(Vector3.ZERO);
-                    
-                    Vector3 newAbsolute = Vector3.at(applyAbsolute.getX() - applyOrigin.getX(), applyAbsolute.getY() - applyOrigin.getY(), applyAbsolute.getZ() - applyOrigin.getZ());
-
-                    Direction newDirection = Direction.findClosest(newAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
-
-                    if (newDirection != null) {
-                        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
-                        values.put("Rot", new ByteTag((byte) newDirection.toRotationIndex().getAsInt()));
-                    }
-                }
-            }
-            transformed.setNbtData(tag);
-        }
-        return transformed;
     }
 
     /**

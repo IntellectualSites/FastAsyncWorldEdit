@@ -111,8 +111,15 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     }
 
     @Override
-    public boolean setBlock(final BlockVector3 location, final BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
+    }
+    
+
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, final B block) throws WorldEditException {
+        return queue.setBlock(x, y, z, block);
     }
 
     @Override
@@ -125,13 +132,21 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
         int combinedId4Data = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combinedId4Data);
         BlockState state = type.withStateId(combinedId4Data);
+        return state;
+    }
+    
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 pos) {
+        int combinedId4Data = queue.getCombinedId4Data(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), 0);
+        BlockType type = BlockTypes.getFromStateId(combinedId4Data);
+        BaseBlock base = type.withStateId(combinedId4Data).toBaseBlock();
         if (type.getMaterial().hasContainer()) {
-            CompoundTag tile = queue.getTileEntity(x, y, z);
+            CompoundTag tile = queue.getTileEntity(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
             if (tile != null) {
-                return new BaseBlock(state, tile).toImmutableState();
+                return base.toBaseBlock(tile);
             }
         }
-        return state;
+        return base;
     }
 
     @Override
@@ -153,10 +168,5 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     public boolean setBiome(final BlockVector2 position, final BaseBiome biome) {
         queue.setBiome(position.getBlockX(), position.getBlockZ(), biome);
         return true;
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, final BlockStateHolder block) throws WorldEditException {
-        return queue.setBlock(x, y, z, block);
     }
 }

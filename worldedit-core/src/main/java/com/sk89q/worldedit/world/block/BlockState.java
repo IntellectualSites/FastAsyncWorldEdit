@@ -19,19 +19,13 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
@@ -45,10 +39,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -247,27 +238,6 @@ public class BlockState implements BlockStateHolder<BlockState> {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         return this.toBaseBlock();
-    }
-
-    @Override
-    public boolean hasNbtData() {
-        return getNbtData() != null;
-    }
-
-    @Override
-    public String getNbtId() {
-        return "";
-    }
-
-    @Nullable
-    @Override
-    public CompoundTag getNbtData() {
-        return null;
-    }
-
-    @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {
-        throw new UnsupportedOperationException("This class is immutable.");
     }
 
     /**

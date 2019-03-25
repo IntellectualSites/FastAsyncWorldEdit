@@ -356,12 +356,12 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
     }
 
     public void setBlock(BukkitImplAdapter adapter, Chunk chunk, Location location, int combinedId, boolean update) {
-        com.sk89q.worldedit.world.block.BlockState state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId);
+    	com.sk89q.worldedit.world.block.BaseBlock base = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId).toBaseBlock();
         if (adapter != null) {
-            adapter.setBlock(chunk, (int) location.getX(), (int) location.getY(), (int) location.getZ(), state, update);
+            adapter.setBlock(chunk, (int) location.getX(), (int) location.getY(), (int) location.getZ(), base, update);
         } else {
             Block block = location.getWorld().getBlockAt(location);
-            block.setBlockData(BukkitAdapter.adapt(state), false);
+            block.setBlockData(BukkitAdapter.adapt(base), false);
         }
     }
 }

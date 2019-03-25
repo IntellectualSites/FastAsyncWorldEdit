@@ -8,6 +8,7 @@ import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -215,7 +216,7 @@ public class Schematic {
                         mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
                     }
                     @Override
-                    public void run(int x, int y, int z, BlockState block) {
+                    public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                         try {
                             int xx = x + relx;
                             int zz = z + relz;
@@ -233,7 +234,7 @@ public class Schematic {
             } else {
                 bac.IMP.forEach(new FaweClipboard.BlockReader() {
                     @Override
-                    public void run(int x, int y, int z, BlockState block) {
+                    public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                         try {
                             extent.setBlock(x + relx, y + rely, z + relz, block);
                         } catch (WorldEditException e) { throw new RuntimeException(e);}

@@ -107,10 +107,10 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
      */
     public abstract int getBlockCombinedId(int x, int y, int z);
 
-    public void setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> void setBlock(int x, int y, int z, B block) {
         setBlock(x, y, z, block.getInternalId());
-        if (block.hasNbtData()) {
-            setTile(x & 15, y, z & 15, block.getNbtData());
+        if (block instanceof BaseBlock && ((BaseBlock)block).hasNbtData()) {
+            setTile(x & 15, y, z & 15, ((BaseBlock)block).getNbtData());
         }
     }
 

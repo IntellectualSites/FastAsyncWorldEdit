@@ -4,7 +4,7 @@ import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -34,28 +34,40 @@ public class StripNBTExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(location, stripNBT(block));
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+        return super.setBlock(location, stripBlockNBT(block));
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(x, y, z, stripNBT(block));
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return super.setBlock(x, y, z, stripBlockNBT(block));
     }
 
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
-        return super.createEntity(location, stripNBT(entity));
+        return super.createEntity(location, stripEntityNBT(entity));
     }
 
-    public <T extends NbtValued> T stripNBT(T block) {
-        if (!block.hasNbtData()) return block;
-        CompoundTag nbt = block.getNbtData();
+    public <B extends BlockStateHolder<B>> B stripBlockNBT(B block) {
+    	if(!(block instanceof BaseBlock)) return block;
+    	BaseBlock localBlock = (BaseBlock)block;
+        if (!localBlock.hasNbtData()) return block;
+        CompoundTag nbt = localBlock.getNbtData();
         Map<String, Tag> value = nbt.getValue();
         for (String key : strip) {
             value.remove(key);
         }
-        return block;
+        return (B) localBlock;
+    }
+    
+    public <T extends NbtValued> T stripEntityNBT(T entity) {
+        if (!entity.hasNbtData()) return entity;
+        CompoundTag nbt = entity.getNbtData();
+        Map<String, Tag> value = nbt.getValue();
+        for (String key : strip) {
+            value.remove(key);
+        }
+        return entity;
     }
 }

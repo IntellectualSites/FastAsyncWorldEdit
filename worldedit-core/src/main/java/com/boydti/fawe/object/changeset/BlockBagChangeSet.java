@@ -9,6 +9,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.extent.inventory.UnplaceableBlockException;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -70,7 +71,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     }
 
     @Override
-    public void add(BlockVector3 loc, BlockStateHolder from, BlockStateHolder to) {
+    public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
@@ -78,7 +79,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     }
 
     @Override
-    public void add(int x, int y, int z, BlockStateHolder from, BlockStateHolder to) {
+    public void add(int x, int y, int z, BaseBlock from, BaseBlock to) {
         check(from.getBlockType(), to.getBlockType());
         super.add(x, y, z, from, to);
     }

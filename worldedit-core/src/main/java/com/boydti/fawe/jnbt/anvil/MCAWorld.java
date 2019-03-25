@@ -7,6 +7,7 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -60,7 +61,7 @@ public class MCAWorld implements SimpleWorld {
 
     @Override
     public boolean clearContainerBlockContents(BlockVector3 position) {
-        BlockStateHolder block = extent.getLazyBlock(position);
+        BaseBlock block = extent.getFullBlock(position);
         if (block.hasNbtData()) {
             Map<String, Tag> nbt = ReflectionUtils.getMap(block.getNbtData().getValue());
             if (nbt.containsKey("Items")) {

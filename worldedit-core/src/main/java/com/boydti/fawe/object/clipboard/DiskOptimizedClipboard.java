@@ -379,7 +379,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                                 CompoundTag nbt = nbtMap.get(trio);
                                 if (nbt != null) {
                                     BaseBlock block = new BaseBlock(state, nbt);
-                                    task.run(x, y, z, block.toImmutableState());
+                                    task.run(x, y, z, block);
                                     continue;
                                 }
                             }
@@ -416,7 +416,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                                     CompoundTag nbt = nbtMap.get(trio);
                                     if (nbt != null) {
                                         BaseBlock block = new BaseBlock(state, nbt);
-                                        task.run(x, y, z, block.toImmutableState());
+                                        task.run(x, y, z, block);
                                         continue;
                                     }
                                 }
@@ -433,34 +433,34 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
+    public BaseBlock getBlock(int x, int y, int z) {
         try {
             int index = HEADER_SIZE + (getIndex(x, y, z) << 2);
             int combinedId = mbb.getInt(index);
             BlockType type = BlockTypes.getFromStateId(combinedId);
-            BlockState state = type.withStateId(combinedId);
+            BaseBlock base = type.withStateId(combinedId).toBaseBlock();
             if (type.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
                 CompoundTag nbt = nbtMap.get(new IntegerTrio(x, y, z));
                 if (nbt != null) {
-                    return new BaseBlock(state, nbt).toImmutableState();
+                    return base.toBaseBlock(nbt);
                 }
             }
-            return state;
+            return base;
         } catch (IndexOutOfBoundsException ignore) {
         } catch (Exception e) {
             e.printStackTrace();
             MainUtil.handleError(e);
         }
-        return EditSession.nullBlock;
+        return EditSession.nullBlock.toBaseBlock();
     }
 
     @Override
-    public BlockState getBlock(int i) {
+    public BaseBlock getBlock(int i) {
         try {
             int diskIndex = (HEADER_SIZE) + (i << 2);
             int combinedId = mbb.getInt(diskIndex);
             BlockType type = BlockTypes.getFromStateId(combinedId);
-            BlockState state = type.withStateId(combinedId);
+            BaseBlock base = type.withStateId(combinedId).toBaseBlock();
             if (type.getMaterial().hasContainer() && !nbtMap.isEmpty()) {
                 CompoundTag nbt;
                 if (nbtMap.size() < 4) {
@@ -482,15 +482,15 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                     nbt = nbtMap.get(new IntegerTrio(x, y, z));
                 }
                 if (nbt != null) {
-                    return new BaseBlock(state, nbt).toImmutableState();
+                    return base.toBaseBlock(nbt);
                 }
             }
-            return state;
+            return base;
         } catch (IndexOutOfBoundsException ignore) {
         } catch (Exception e) {
             MainUtil.handleError(e);
         }
-        return EditSession.nullBlock;
+        return EditSession.nullBlock.toBaseBlock();
     }
 
     @Override
@@ -504,14 +504,14 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         try {
             int index = (HEADER_SIZE) + ((getIndex(x, y, z) << 2));
             int combined = block.getInternalId();
             mbb.putInt(index, combined);
-            CompoundTag tile = block.getNbtData();
-            if (tile != null) {
-                setTile(x, y, z, tile);
+            boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+            if (hasNbt) {
+                setTile(x, y, z, ((BaseBlock)block).getNbtData());
             }
             return true;
         } catch (Exception e) {
@@ -521,18 +521,18 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public boolean setBlock(int i, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int i, B block) {
         try {
             int combined = block.getInternalId();
             int index = (HEADER_SIZE) + (i << 2);
             mbb.putInt(index, combined);
-            CompoundTag tile = block.getNbtData();
-            if (tile != null) {
+            boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+            if (hasNbt) {
                 int y = i / area;
                 int newI = (i - (y * area));
                 int z = newI / width;
                 int x = newI - z * width;
-                setTile(x, y, z, tile);
+                setTile(x, y, z, ((BaseBlock)block).getNbtData());
             }
             return true;
         } catch (Exception e) {

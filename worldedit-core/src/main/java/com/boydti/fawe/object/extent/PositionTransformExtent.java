@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -61,6 +61,11 @@ public class PositionTransformExtent extends ResettableExtent {
     public BlockState getBlock(BlockVector3 position) {
         return super.getBlock(getPos(position));
     }
+    
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+    	return super.getFullBlock(getPos(position));
+    }
 
     @Override
     public BaseBiome getBiome(BlockVector2 position) {
@@ -72,7 +77,7 @@ public class PositionTransformExtent extends ResettableExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return super.setBlock(getPos(BlockVector3.at(x, y, z)), block);
+        return this.setBlock(getPos(BlockVector3.at(x, y, z)), block);
     }
 
 

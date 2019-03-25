@@ -6,7 +6,7 @@ import com.boydti.fawe.util.WEManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -71,9 +71,19 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
             return extent.getLazyBlock(x, y, z);
         }
     }
+    
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 pos) {
+        if (!limit.MAX_CHECKS()) {
+            WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            return EditSession.nullBlock.toBaseBlock();
+        } else {
+            return extent.getFullBlock(pos);
+        }
+    }
 
     @Override
-    public boolean setBlock(final BlockVector3 location, final BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
@@ -83,9 +93,9 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        CompoundTag nbt = block.getNbtData();
-        if (nbt != null) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        if (hasNbt) {
             if (!limit.MAX_BLOCKSTATES()) {
                 WEManager.IMP.cancelEdit(this, BBC.WORLDEDIT_CANCEL_REASON_MAX_TILES);
                 return false;

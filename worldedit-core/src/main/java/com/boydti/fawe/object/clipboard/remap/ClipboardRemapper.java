@@ -493,7 +493,7 @@ public class ClipboardRemapper {
 //        }
     }
 
-    public BlockStateHolder remap(BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> B remap(B block) {
 //        int combined = block.getCombined();
 //        if (remap[combined]) {
 //            char value = remapCombined[combined];

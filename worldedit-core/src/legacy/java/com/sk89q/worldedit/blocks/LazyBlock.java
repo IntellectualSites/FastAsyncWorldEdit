@@ -79,7 +79,7 @@ public class LazyBlock extends BaseBlock {
     @Override
     public CompoundTag getNbtData() {
         if (!loaded) {
-            BlockState loadedBlock = extent.getFullBlock(position).toImmutableState();
+            BaseBlock loadedBlock = extent.getFullBlock(position);
             this.nbtData = loadedBlock.getNbtData();
             loaded = true;
         }

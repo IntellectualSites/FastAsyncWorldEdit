@@ -1,6 +1,8 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.regions.Region;
 
@@ -14,17 +16,17 @@ public class WorldCutClipboard extends WorldCopyClipboard {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
+    public BaseBlock getBlock(int x, int y, int z) {
         int xx = mx + x;
         int yy = my + y;
         int zz = mz + z;
-        BlockState block = extent.getLazyBlock(xx, yy, zz);
+        BaseBlock block = extent.getFullBlock(BlockVector3.at(xx, yy, zz));
         extent.setBlock(xx, yy, zz, EditSession.nullBlock);
         return block;
     }
 
-    public BlockState getBlockAbs(int x, int y, int z) {
-        BlockState block = extent.getLazyBlock(x, y, z);
+    public BaseBlock getBlockAbs(int x, int y, int z) {
+        BaseBlock block = extent.getFullBlock(BlockVector3.at(x, y, z));
         extent.setBlock(x, y, z, EditSession.nullBlock);
         return block;
     }

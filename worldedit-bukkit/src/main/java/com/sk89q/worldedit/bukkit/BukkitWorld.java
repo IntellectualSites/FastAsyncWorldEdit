@@ -1,5 +1,4 @@
 /*
- * WorldEdit, a Minecraft world manipulation toolkit
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
@@ -461,9 +460,9 @@ public class BukkitWorld extends AbstractWorld {
                 int z = position.getBlockZ();
                 return adapter.setBlock(getWorld().getChunkAt(x >> 4, z >> 4), x, y, z, block, true);
             } catch (Exception e) {
-                if (block.getNbtData() != null) {
+                if (block instanceof BaseBlock && ((BaseBlock)block).getNbtData() != null) {
                     logger.warning("Tried to set a corrupt tile entity at " + position.toString());
-                    logger.warning(block.getNbtData().toString());
+                    logger.warning(((BaseBlock)block).getNbtData().toString());
                 }
                 e.printStackTrace();
                 Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
@@ -486,7 +485,7 @@ public class BukkitWorld extends AbstractWorld {
     public BaseBlock getFullBlock(BlockVector3 position) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
-            return adapter.getBlock(BukkitAdapter.adapt(getWorld(), position)).toBaseBlock();
+            return adapter.getBlock(BukkitAdapter.adapt(getWorld(), position));
         } else {
             return getBlock(position).toBaseBlock();
         }

@@ -10,6 +10,7 @@ import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
@@ -67,9 +68,9 @@ public class CopyPastaBrush implements Brush, ResettableTool {
                 @Override
                 public boolean test(BlockVector3 vector) {
                     if (super.test(vector) && vector.getBlockY() >= minY) {
-                        BlockStateHolder block = editSession.getLazyBlock(vector);
+                    	BaseBlock block = editSession.getFullBlock(position);
                         if (!block.getBlockType().getMaterial().isAir()) {
-                            builder.add(vector, EditSession.nullBlock, block);
+                            builder.add(vector, EditSession.nullBlock.toBaseBlock(), block);
                             return true;
                         }
                     }

@@ -54,7 +54,7 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
 
     @Override
     public CompoundTag getTileEntity(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return getLazyBlock(x, y, z).getNbtData();
+        return getFullBlock(BlockVector3.at(x, y, z)).getNbtData();
     }
 
     @Override

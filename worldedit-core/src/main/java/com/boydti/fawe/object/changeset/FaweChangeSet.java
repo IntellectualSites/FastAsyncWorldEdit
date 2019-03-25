@@ -197,22 +197,22 @@ public abstract class FaweChangeSet implements ChangeSet {
     public void add(BlockChange change) {
         try {
             BlockVector3 loc = change.getPosition();
-            BlockStateHolder from = change.getPrevious();
-            BlockStateHolder to = change.getCurrent();
+            BaseBlock from = change.getPrevious();
+            BaseBlock to = change.getCurrent();
             add(loc, from, to);
         } catch (Exception e) {
             MainUtil.handleError(e);
         }
     }
 
-    public void add(BlockVector3 loc, BlockStateHolder from, BlockStateHolder to) {
+    public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
         add(x, y, z, from, to);
     }
 
-    public void add(int x, int y, int z, BlockStateHolder from, BlockStateHolder to) {
+    public void add(int x, int y, int z, BaseBlock from, BaseBlock to) {
         try {
             if (from.hasNbtData()) {
                 CompoundTag nbt = from.getNbtData();

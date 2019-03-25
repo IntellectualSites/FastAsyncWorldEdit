@@ -201,13 +201,13 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
             int x = position.getBlockX() - mx;
             int y = position.getBlockY() - my;
             int z = position.getBlockZ() - mz;
-            return IMP.getBlock(x, y, z);
+            return IMP.getBlock(x, y, z).toImmutableState();
         }
         return EditSession.nullBlock;
     }
 
     public BlockState getBlockAbs(int x, int y, int z) {
-        return IMP.getBlock(x, y, z);
+        return IMP.getBlock(x, y, z).toImmutableState();
     }
 
     @Override
@@ -228,7 +228,13 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return getLazyBlock(position).toBaseBlock();
+    	if(region.contains(position)) {
+            int x = position.getBlockX() - mx;
+            int y = position.getBlockY() - my;
+            int z = position.getBlockZ() - mz;
+    		return IMP.getBlock(x, y, z);
+    	}
+    	return EditSession.nullBlock.toBaseBlock();
     }
 
     @Override

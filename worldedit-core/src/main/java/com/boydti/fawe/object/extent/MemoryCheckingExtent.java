@@ -21,7 +21,7 @@ public class MemoryCheckingExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(final BlockVector3 location, final BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
         if (super.setBlock(location, block)) {
             if (MemUtil.isMemoryLimited()) {
                 if (this.player != null) {

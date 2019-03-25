@@ -33,6 +33,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -125,67 +126,25 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
             FaweClipboard.BlockReader reader = new FaweClipboard.BlockReader() {
                 @Override
-                public void run(int x, int y, int z, BlockState block) {
+                public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                     try {
-                        CompoundTag tile = block.getNbtData();
-                        if (tile != null) {
-                            Map<String, Tag> values = tile.getValue();
+                        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+                        if (hasNbt) {
+                        	BaseBlock localBlock = (BaseBlock)block;
+                            Map<String, Tag> values = localBlock.getNbtData().getValue();
                             values.remove("id"); // Remove 'id' if it exists. We want 'Id'
                             // Positions are kept in NBT, we don't want that.
                             values.remove("x");
                             values.remove("y");
                             values.remove("z");
-                            if (!values.containsKey("Id")) values.put("Id", new StringTag(block.getNbtId()));
+                            if (!values.containsKey("Id")) values.put("Id", new StringTag(localBlock.getNbtId()));
                             values.put("Pos", new IntArrayTag(new int[]{
                                     x,
                                     y,
                                     z
                             }));
                             numTiles[0]++;
-                            tilesOut.writeTagPayload(tile);
-//=======
-//
-//        Map<String, Tag> schematic = new HashMap<>();
-//        schematic.put("Version", new IntTag(1));
-//
-//        Map<String, Tag> metadata = new HashMap<>();
-//        metadata.put("WEOffsetX", new IntTag(offset.getBlockX()));
-//        metadata.put("WEOffsetY", new IntTag(offset.getBlockY()));
-//        metadata.put("WEOffsetZ", new IntTag(offset.getBlockZ()));
-//
-//        schematic.put("Metadata", new CompoundTag(metadata));
-//
-//        schematic.put("Width", new ShortTag((short) width));
-//        schematic.put("Height", new ShortTag((short) height));
-//        schematic.put("Length", new ShortTag((short) length));
-//
-//        // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
-//        schematic.put("Offset", new IntArrayTag(new int[]{
-//                min.getBlockX(),
-//                min.getBlockY(),
-//                min.getBlockZ(),
-//        }));
-//
-//        int paletteMax = 0;
-//        Map<String, Integer> palette = new HashMap<>();
-//
-//        List<CompoundTag> tileEntities = new ArrayList<>();
-//
-//        ByteArrayOutputStream buffer = new ByteArrayOutputStream(width * height * length);
-//
-//        for (int y = 0; y < height; y++) {
-//            int y0 = min.getBlockY() + y;
-//            for (int z = 0; z < length; z++) {
-//                int z0 = min.getBlockZ() + z;
-//                for (int x = 0; x < width; x++) {
-//                    int x0 = min.getBlockX() + x;
-//                    BlockVector3 point = BlockVector3.at(x0, y0, z0);
-//                    BaseBlock block = clipboard.getFullBlock(point);
-//                    if (block.getNbtData() != null) {
-//                        Map<String, Tag> values = new HashMap<>();
-//                        for (Map.Entry<String, Tag> entry : block.getNbtData().getValue().entrySet()) {
-//                            values.put(entry.getKey(), entry.getValue());
-//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
+                            tilesOut.writeTagPayload(localBlock.getNbtData());
                         }
                         int ordinal = block.getOrdinal();
                         char value = palette[ordinal];
@@ -208,7 +167,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 ((BlockArrayClipboard) clipboard).IMP.forEach(reader, true);
             } else {
                 for (BlockVector3 pt : region) {
-                    BlockState block = clipboard.getBlock(pt);
+                    BaseBlock block = clipboard.getFullBlock(pt);
                     int x = pt.getBlockX() - min.getBlockX();
                     int y = pt.getBlockY() - min.getBlockY();
                     int z = pt.getBlockZ() - min.getBlockY();

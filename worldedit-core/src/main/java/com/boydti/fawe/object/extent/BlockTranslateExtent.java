@@ -1,6 +1,7 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -32,10 +33,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        mutable.mutX(x + dx);
-        mutable.mutY(y + dy);
-        mutable.mutZ(z + dz);
-        return getExtent().setBlock(mutable.toBlockVector3(), block);
+        return this.setBlock(BlockVector3.at(x, y, z), block);
     }
 
     @Override
@@ -66,5 +64,10 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
         return super.getLazyBlock(x + dx, y + dy, z + dz);
+    }
+    
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 pos) {
+    	return super.getFullBlock(pos.add(dx, dy, dz));
     }
 }

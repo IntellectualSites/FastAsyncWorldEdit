@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
@@ -31,7 +30,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePattern, TileEntityBlock {
+public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePattern {
 
     /**
      * Get the block type
@@ -46,7 +45,7 @@ public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePat
      * @return
      */
     @Deprecated
-    BlockStateHolder withPropertyId(int propertyId);
+    T withPropertyId(int propertyId);
 
     /**
      * Get combined id (legacy uses)
@@ -91,7 +90,7 @@ public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePat
      * @param value The value
      * @return The modified state, or same if could not be applied
      */
-    <V> BlockStateHolder with(final PropertyKey property, final V value);
+    <V> T with(final PropertyKey property, final V value);
 
     /**
      * Gets the value at the given state

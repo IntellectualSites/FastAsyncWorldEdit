@@ -212,7 +212,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
             ArrayList<Map<String, Object>> blocks = new ArrayList<>();
             BlockVector3 min = region.getMinimumPoint();
             for (BlockVector3 point : region) {
-                BlockStateHolder block = clipboard.getBlock(point);
+                BaseBlock block = clipboard.getFullBlock(point);
                 switch (block.getBlockType().getResource().toUpperCase()) {
                     case "STRUCTURE_VOID":
                         continue;

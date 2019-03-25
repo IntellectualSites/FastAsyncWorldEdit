@@ -81,22 +81,22 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return transformFast(super.getLazyBlock(getPos(x, y, z))).toImmutableState();
+        return transformBlock(super.getLazyBlock(getPos(x, y, z)), false).toImmutableState();
     }
 
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
-        return transformFast(super.getLazyBlock(getPos(position))).toImmutableState();
+        return transformBlock(super.getLazyBlock(getPos(position)), false).toImmutableState();
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transformFast(super.getBlock(getPos(position))).toImmutableState();
+        return transformBlock(super.getBlock(getPos(position)), false).toImmutableState();
     }
     
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-    	return transformFast(super.getFullBlock(getPos(position)).toImmutableState());
+    	return transformBlock(super.getFullBlock(getPos(position)), false);
     }
 
     @Override
@@ -109,13 +109,13 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return super.setBlock(getPos(x, y, z), transformFastInverse((BlockState)block));
+        return super.setBlock(getPos(x, y, z), transformBlock((BlockState)block, false));
     }
 
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return super.setBlock(getPos(location), transformFastInverse((BlockState)block));
+        return super.setBlock(getPos(location), transformBlock((BlockState)block, false));
     }
 
     @Override

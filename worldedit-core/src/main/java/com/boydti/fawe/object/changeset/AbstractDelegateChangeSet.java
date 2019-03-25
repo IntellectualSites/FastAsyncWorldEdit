@@ -154,12 +154,12 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void add(BlockVector3 loc, BlockStateHolder from, BlockStateHolder to) {
+    public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
         parent.add(loc, from, to);
     }
 
     @Override
-    public void add(int x, int y, int z, BlockStateHolder from, BlockStateHolder to) {
+    public void add(int x, int y, int z, BaseBlock from, BaseBlock to) {
         parent.add(x, y, z, from, to);
     }
 

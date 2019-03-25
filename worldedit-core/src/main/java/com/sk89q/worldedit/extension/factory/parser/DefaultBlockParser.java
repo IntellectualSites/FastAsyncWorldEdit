@@ -246,7 +246,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new NoMatchException("Does not match a valid block type: '" + input + "'");
                 }
             }
-            if (nbt == null) nbt = state.getNbtData();
+//            if (nbt == null) nbt = state.getNbtData();
 
             if (stateString != null) {
                 state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state);

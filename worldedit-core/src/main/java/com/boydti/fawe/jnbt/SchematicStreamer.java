@@ -200,7 +200,7 @@ public class SchematicStreamer extends NBTStreamer {
     private void fixStates() {
         fc.forEach(new FaweClipboard.BlockReader() {
             @Override
-            public void run(int x, int y, int z, BlockState block) {
+            public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                 BlockType type = block.getBlockType();
                 switch (type.getResource().toUpperCase()) {
                     case "ACACIA_STAIRS":

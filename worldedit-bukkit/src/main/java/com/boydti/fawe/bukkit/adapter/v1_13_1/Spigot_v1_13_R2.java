@@ -73,7 +73,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     private final Field nbtListTagListField;
     private final Method nbtCreateTagMethod;
-    private Method chunkSetTypeMethod;
 
     static {
         // A simple test
@@ -92,13 +91,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         // The method to create an NBTBase tag given its type ID
         nbtCreateTagMethod = NBTBase.class.getDeclaredMethod("createTag", byte.class);
         nbtCreateTagMethod.setAccessible(true);
-        
-        // 1.13.2 Adaptation to find the a/setType method
-        try {
-        	chunkSetTypeMethod = Chunk.class.getMethod("setType", BlockPosition.class, IBlockData.class, boolean.class);
-        }catch(NoSuchMethodException e) {
-        	chunkSetTypeMethod = Chunk.class.getMethod("a", BlockPosition.class, IBlockData.class, boolean.class);
-        }
     }
 
     private int[] idbToStateOrdinal;
@@ -217,7 +209,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     @SuppressWarnings("deprecation")
     @Override
-    public BlockState getBlock(Location location) {
+    public BaseBlock getBlock(Location location) {
         checkNotNull(location);
 
         CraftWorld craftWorld = ((CraftWorld) location.getWorld());
@@ -233,11 +225,11 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             if (te != null) {
                 NBTTagCompound tag = new NBTTagCompound();
                 readTileEntityIntoTag(te, tag); // Load data
-                return new BaseBlock(state, (CompoundTag) toNative(tag)).toImmutableState();
+                return new BaseBlock(state, (CompoundTag) toNative(tag));
             }
         }
 
-        return state;
+        return state.toBaseBlock();
     }
 
     @Override
@@ -265,7 +257,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             existing = section.getType(x & 15, y & 15, z & 15);
         }
         BlockPosition pos = null;
-        CompoundTag nativeTag = state.getNbtData();
+        CompoundTag nativeTag = state instanceof BaseBlock ? ((BaseBlock)state).getNbtData() : null;
         if (nativeTag != null || existing instanceof TileEntityBlock) {
             pos = new BlockPosition(x, y, z);
             nmsWorld.setTypeAndData(pos, blockData, 0);
@@ -289,12 +281,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
                 sections[y4] = section = new ChunkSection(y4 << 4, nmsWorld.worldProvider.g());
             }
             if (existing.e() != blockData.e() || existing.getMaterial().f() != blockData.getMaterial().f()) {
-            	try {
-					chunkSetTypeMethod.invoke(nmsChunk, pos = new BlockPosition(x, y, z), blockData, false);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					logger.warning("Error when setting block!");
-					e.printStackTrace();
-				}
+            	nmsChunk.setType(pos = new BlockPosition(x, y, z), blockData, false);
             } else {
                 section.setType(x & 15, y & 15, z & 15, blockData);
             }

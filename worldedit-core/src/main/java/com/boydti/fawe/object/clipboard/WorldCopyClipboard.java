@@ -7,6 +7,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -47,12 +48,12 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
-        return extent.getLazyBlock(mx + x, my + y, mz + z);
+    public BaseBlock getBlock(int x, int y, int z) {
+        return extent.getFullBlock(BlockVector3.at(mx + x, my + y, mz + z));
     }
 
-    public BlockState getBlockAbs(int x, int y, int z) {
-        return extent.getLazyBlock(x, y, z);
+    public BaseBlock getBlockAbs(int x, int y, int z) {
+        return extent.getFullBlock(BlockVector3.at(x, y, z));
     }
 
     @Override
@@ -82,13 +83,12 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                 RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
                     @Override
                     public boolean apply(BlockVector3 pos) throws WorldEditException {
-                        BlockState block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                        BaseBlock block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
                         int x = pos.getBlockX() - mx;
                         int y = pos.getBlockY() - my;
                         int z = pos.getBlockZ() - mz;
-                        CompoundTag tag = block.getNbtData();
-                        if (tag != null) {
-                            Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+                        if (block.hasNbtData()) {
+                            Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
                             values.put("x", new IntTag(x));
                             values.put("y", new IntTag(y));
                             values.put("z", new IntTag(z));
@@ -108,10 +108,10 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                         int y = pos.getBlockY() - my;
                         int z = pos.getBlockZ() - mz;
                         if (region.contains(pos)) {
-                            BlockState block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
-                            CompoundTag tag = block.getNbtData();
-                            if (tag != null) {
-                                Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+//                            BlockState block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                        	BaseBlock block = extent.getFullBlock(pos);
+                            if (block.hasNbtData()) {
+                                Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
                                 values.put("x", new IntTag(x));
                                 values.put("y", new IntTag(y));
                                 values.put("z", new IntTag(z));
@@ -138,13 +138,13 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                         pos.mutX(x);
                         int xx = pos.getBlockX() - mx;
                         if (region.contains(pos.toBlockVector3())) {
-                            BlockState block = getBlockAbs(x, y, z);
+//                            BlockState block = getBlockAbs(x, y, z);
+                        	BaseBlock block = extent.getFullBlock(pos.toBlockVector3());
                             if (!air && block.getBlockType().getMaterial().isAir()) {
                                 continue;
                             }
-                            CompoundTag tag = block.getNbtData();
-                            if (tag != null) {
-                                Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+                            if (block.hasNbtData()) {
+                                Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
                                 values.put("x", new IntTag(xx));
                                 values.put("y", new IntTag(yy));
                                 values.put("z", new IntTag(zz));

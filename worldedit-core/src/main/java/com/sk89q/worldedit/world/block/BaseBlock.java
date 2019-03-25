@@ -244,7 +244,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
 	@Override
 	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-		return this.toImmutableState().apply(extent, get, set);
+		return extent.setBlock(set, this);
 	}
 
 	@Override
@@ -253,8 +253,8 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 	}
 
 	@Override
-	public BlockStateHolder withPropertyId(int propertyId) {
-		return getBlockType().withPropertyId(propertyId);
+	public BaseBlock withPropertyId(int propertyId) {
+		return getBlockType().withPropertyId(propertyId).toBaseBlock(getNbtData());
 	}
 
 	@Override
@@ -274,12 +274,12 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
 	@Override
 	public <V> BaseBlock with(Property<V> property, V value) {
-		return toImmutableState().with(property, value).toBaseBlock();
+		return toImmutableState().with(property, value).toBaseBlock(getNbtData());
 	}
 
 	@Override
-	public <V> BlockStateHolder with(PropertyKey property, V value) {
-		return toImmutableState().with(property, value);
+	public <V> BaseBlock with(PropertyKey property, V value) {
+		return toImmutableState().with(property, value).toBaseBlock(getNbtData());
 	}
 
 	@Override

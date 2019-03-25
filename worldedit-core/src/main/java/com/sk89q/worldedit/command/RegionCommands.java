@@ -172,7 +172,7 @@ public class RegionCommands extends MethodCommands {
             BBC.NO_BLOCK.send(player);
             return;
         }
-        CompoundTag nbt = editSession.getBlock(pos.toVector().toBlockPoint()).getNbtData();
+        CompoundTag nbt = editSession.getFullBlock(pos.toVector().toBlockPoint()).getNbtData();
         if (nbt != null) {
             player.print(nbt.getValue().toString());
         } else {

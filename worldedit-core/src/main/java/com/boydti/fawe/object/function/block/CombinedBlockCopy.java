@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.function.block;
 
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -22,7 +22,8 @@ public class CombinedBlockCopy implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        BlockStateHolder block = source.getBlock(position);
+//        BlockStateHolder block = source.getBlock(position);
+    	BaseBlock block = source.getFullBlock(position);
         function.apply(position);
         return destination.setBlock(position, block);
     }

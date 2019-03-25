@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Chunk;
@@ -333,7 +334,7 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
             return null;
         }
         Location loc = new Location(getWorld(), x, y, z);
-        BlockStateHolder block = getAdapter().getBlock(loc);
+        BaseBlock block = getAdapter().getBlock(loc);
         return block.getNbtData();
     }
 

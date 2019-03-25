@@ -140,23 +140,23 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
+    public BaseBlock getBlock(int x, int y, int z) {
         int index = getIndex(x, y, z);
         return getBlock(index);
     }
 
     @Override
-    public BlockState getBlock(int index) {
+    public BaseBlock getBlock(int index) {
         int combinedId = states[index];
         BlockType type = BlockTypes.getFromStateId(combinedId);
-        BlockState state = type.withStateId(combinedId);
+        BaseBlock base = type.withStateId(combinedId).toBaseBlock();
         if (type.getMaterial().hasContainer()) {
             CompoundTag nbt = getTag(index);
             if (nbt != null) {
-                return new BaseBlock(state, nbt).toImmutableState();
+                return base.toBaseBlock(nbt);
             }
         }
-        return state;
+        return base;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
             for (int y = 0, index = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++, index++) {
-                        BlockState block = getBlock(index);
+                        BaseBlock block = getBlock(index);
                         task.run(x, y, z, block);
                     }
                 }
@@ -174,7 +174,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
             for (int y = 0, index = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++, index++) {
-                        BlockState block = getBlock(index);
+                        BaseBlock block = getBlock(index);
                         switch (block.getBlockType().getResource().toUpperCase()) {
                             case "AIR":
                             case "CAVE_AIR":
@@ -237,16 +237,16 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return setBlock(getIndex(x, y, z), block);
     }
 
     @Override
-    public boolean setBlock(int index, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
         states[index] = block.getInternalId();
-        CompoundTag tile = block.getNbtData();
-        if (tile != null) {
-            setTile(index, tile);
+        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        if (hasNbt) {
+            setTile(index, ((BaseBlock)block).getNbtData());
         }
         return true;
     }

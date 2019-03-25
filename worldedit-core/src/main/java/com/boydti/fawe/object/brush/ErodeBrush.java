@@ -67,7 +67,7 @@ public class ErodeBrush implements Brush {
 
         finalBuffer.forEach(new FaweClipboard.BlockReader() {
             @Override
-            public void run(int x, int y, int z, BlockState block) {
+            public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                 es.setBlock(x + bx, y + by, z + bz, block);
             }
         }, true);

@@ -18,7 +18,7 @@ public class SlowExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (!Fawe.isMainThread()) try {
             Thread.sleep(sleep);
         } catch (InterruptedException e) {

@@ -76,12 +76,6 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         int combinedId4Data = getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
         try {
             BlockState state = BlockState.getFromInternalId(combinedId4Data);
-            if (state.getMaterial().hasContainer()) {
-                CompoundTag tile = getTileEntity(x, y, z);
-                if (tile != null) {
-                    return BaseBlock.getFromInternalId(combinedId4Data, tile).toImmutableState();
-                }
-            }
             return state;
         } catch (Throwable e) {
             MainUtil.handleError(e);
@@ -90,13 +84,26 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return setBlock(x, y, z, block.getInternalId(), block.getNbtData());
+    default <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return setBlock(x, y, z, block.getInternalId(), block instanceof BaseBlock ? ((BaseBlock)block).getNbtData() : null);
     }
 
     @Override
     default BaseBlock getFullBlock(BlockVector3 position) {
-        return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ()).toBaseBlock();
+        int combinedId4Data = getCachedCombinedId4Data(position.getBlockX(), position.getBlockY(), position.getBlockZ(), BlockTypes.AIR.getInternalId());
+        try {
+            BaseBlock block = BaseBlock.getFromInternalId(combinedId4Data, null);
+            if (block.getMaterial().hasContainer()) {
+                CompoundTag tile = getTileEntity(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+                if (tile != null) {
+                    return BaseBlock.getFromInternalId(combinedId4Data, tile);
+                }
+            }
+            return block;
+        } catch (Throwable e) {
+            MainUtil.handleError(e);
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        }
     }
 
     @Override
@@ -105,7 +112,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         return setBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
     }
 
@@ -263,7 +270,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
 
     void addTask(Runnable whenFree);
 
-    default void forEachBlockInChunk(int cx, int cz, RunnableVal2<BlockVector3, BlockState> onEach) {
+    default void forEachBlockInChunk(int cx, int cz, RunnableVal2<BlockVector3, BaseBlock> onEach) {
         int bx = cx << 4;
         int bz = cz << 4;
         MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
@@ -275,8 +282,8 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                 mutable.mutZ(zz);
                 for (int y = 0; y <= getMaxY(); y++) {
                     int combined = getCombinedId4Data(xx, y, zz);
-                    BlockState state = BlockState.getFromInternalId(combined);
-                    BlockType type = state.getBlockType();
+                    BaseBlock block = BlockState.getFromInternalId(combined).toBaseBlock();
+                    BlockType type = block.getBlockType();
                     switch (type.getResource().toUpperCase()) {
                         case "AIR":
                         case "VOID_AIR":
@@ -286,17 +293,16 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                     mutable.mutY(y);
                     CompoundTag tile = getTileEntity(x, y, z);
                     if (tile != null) {
-                        BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
-                        onEach.run(mutable.toBlockVector3(), block.toImmutableState());
+                        onEach.run(mutable.toBlockVector3(), block.toBaseBlock(tile));
                     } else {
-                        onEach.run(mutable.toBlockVector3(), state);
+                        onEach.run(mutable.toBlockVector3(), block);
                     }
                 }
             }
         }
     }
 
-    default void forEachTileInChunk(int cx, int cz, RunnableVal2<BlockVector3, BlockState> onEach) {
+    default void forEachTileInChunk(int cx, int cz, RunnableVal2<BlockVector3, BaseBlock> onEach) {
         int bx = cx << 4;
         int bz = cz << 4;
         MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
@@ -317,7 +323,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                             mutable.mutZ(zz);
                             mutable.mutY(y);
                             BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
-                            onEach.run(mutable.toBlockVector3(), block.toImmutableState());
+                            onEach.run(mutable.toBlockVector3(), block);
                         }
                     }
                 }

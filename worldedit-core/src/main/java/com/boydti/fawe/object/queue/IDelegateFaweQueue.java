@@ -14,7 +14,7 @@ import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -66,7 +66,7 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         return getQueue().setBlock(x, y, z, block);
     }
 
@@ -81,7 +81,7 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         return getQueue().setBlock(position, block);
     }
 
@@ -261,12 +261,12 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default void forEachBlockInChunk(int cx, int cz, RunnableVal2<BlockVector3, BlockState> onEach) {
+    default void forEachBlockInChunk(int cx, int cz, RunnableVal2<BlockVector3, BaseBlock> onEach) {
         getQueue().forEachBlockInChunk(cx, cz, onEach);
     }
 
     @Override
-    default void forEachTileInChunk(int cx, int cz, RunnableVal2<BlockVector3, BlockState> onEach) {
+    default void forEachTileInChunk(int cx, int cz, RunnableVal2<BlockVector3, BaseBlock> onEach) {
         getQueue().forEachTileInChunk(cx, cz, onEach);
     }
 
