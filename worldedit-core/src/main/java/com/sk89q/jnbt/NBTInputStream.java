@@ -532,7 +532,7 @@ public final class NBTInputStream implements Closeable {
                     throw new IOException(
                             "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
-                    return EndTag.INSTANCE;
+                    return new EndTag();
                 }
             case NBTConstants.TYPE_BYTE:
                 return new ByteTag(is.readByte());
