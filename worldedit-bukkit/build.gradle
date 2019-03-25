@@ -22,7 +22,6 @@ dependencies {
     compile 'net.jzx7:regios:5.9.9'
     compile 'com.bekvon.bukkit.residence:Residence:4.5._13.1'
     compile 'com.palmergames.bukkit:towny:0.84.0.9'
-    compile 'com.worldcretornica:plotme_core:0.16.3'
     compile 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
     compile 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
     compile 'com.wasteofplastic:askyblock:3.0.8.2'
