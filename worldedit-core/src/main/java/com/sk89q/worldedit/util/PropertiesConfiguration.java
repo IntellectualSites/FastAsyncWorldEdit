@@ -81,7 +81,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
         profile = getBool("profile", profile);
 
         disallowedBlocks =
-            new HashSet<>(getStringSet("limits.disallowed-blocks", defaultDisallowedBlocks));
+            new HashSet<>(getStringSet("limits.disallowed-blocks", getDefaultDisallowedBlocks()));
         allowedDataCycleBlocks =
                 new HashSet<>(getStringSet("limits.allowed-data-cycle-blocks", null));
         defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
