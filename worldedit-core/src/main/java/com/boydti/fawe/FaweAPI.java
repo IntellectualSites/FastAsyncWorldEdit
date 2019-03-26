@@ -19,6 +19,7 @@ import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
+import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -192,12 +193,12 @@ public class FaweAPI {
         List<? extends World> worlds = platform.getWorlds();
         for (World current : worlds) {
             if (Fawe.imp().getWorldName(current).equals(worldName)) {
-                return WorldWrapper.wrap((AbstractWorld) current);
+                return WorldWrapper.wrap(current);
             }
         }
         for (World current : worlds) {
             if (current.getName().equals(worldName)) {
-                return WorldWrapper.wrap((AbstractWorld) current);
+                return WorldWrapper.wrap(current);
             }
         }
         return null;
@@ -247,11 +248,10 @@ public class FaweAPI {
     /**
      * Use ThreadLocalRandom instead
      *
-     * @return
      */
     @Deprecated
     public static PseudoRandom getFastRandom() {
-        return new PseudoRandom();
+        throw new UnsupportedOperationException("Please Use ThreadLocalRandom instead.");
     }
 
     /**
@@ -365,20 +365,17 @@ public class FaweAPI {
             }
         }
         World world = origin.getWorld();
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File a, File b) {
-                String aName = a.getName();
-                String bName = b.getName();
-                int aI = Integer.parseInt(aName.substring(0, aName.length() - 3));
-                int bI = Integer.parseInt(bName.substring(0, bName.length() - 3));
-                long value = aI - bI;
-                return value == 0 ? 0 : value < 0 ? -1 : 1;
-            }
+        files.sort((a, b) -> {
+            String aName = a.getName();
+            String bName = b.getName();
+            int aI = Integer.parseInt(aName.substring(0, aName.length() - 3));
+            int bI = Integer.parseInt(bName.substring(0, bName.length() - 3));
+            long value = aI - bI;
+            return value == 0 ? 0 : value < 0 ? -1 : 1;
         });
         RegionWrapper bounds = new RegionWrapper(origin.x - radius, origin.x + radius, origin.z - radius, origin.z + radius);
         RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
-        HashSet<RegionWrapper> regionSet = new HashSet<>(Arrays.asList(bounds));
+        HashSet<RegionWrapper> regionSet = Sets.<RegionWrapper>newHashSet(bounds);
         ArrayList<DiskStorageHistory> result = new ArrayList<>();
         for (File file : files) {
             UUID uuid = UUID.fromString(file.getParentFile().getName());

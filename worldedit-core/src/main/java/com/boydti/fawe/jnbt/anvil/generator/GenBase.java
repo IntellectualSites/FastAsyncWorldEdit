@@ -5,6 +5,8 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public abstract class GenBase {
 
     private final int checkAreaSize;
@@ -15,9 +17,9 @@ public abstract class GenBase {
     public GenBase(int area) {
         this.random = new PseudoRandom();
         this.checkAreaSize = area;
-        this.seed = PseudoRandom.random.nextLong();
-        this.worldSeed1 = PseudoRandom.random.nextLong();
-        this.worldSeed2 = PseudoRandom.random.nextLong();
+        this.seed = ThreadLocalRandom.current().nextLong();
+        this.worldSeed1 = ThreadLocalRandom.current().nextLong();
+        this.worldSeed2 = ThreadLocalRandom.current().nextLong();
     }
 
     public int getCheckAreaSize() {
@@ -34,7 +36,6 @@ public abstract class GenBase {
         int chunkZ = chunkPos.getBlockZ();
         for (int x = chunkX - i; x <= chunkX + i; x++) {
             for (int z = chunkZ - i; z <= chunkZ + i; z++) {
-                this.random.setSeed(worldSeed1 * x ^ worldSeed2 * z ^ seed);
                 generateChunk(x, z, chunkPos, chunk);
             }
         }

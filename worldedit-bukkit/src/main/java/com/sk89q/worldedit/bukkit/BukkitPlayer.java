@@ -24,7 +24,6 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -36,7 +35,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
@@ -51,10 +50,11 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -106,25 +106,24 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         final ItemStack item = player.getItemInHand();
         player.setItemInHand(newItem);
-        if (item != null) {
-            HashMap<Integer, ItemStack> overflow = inv.addItem(item);
-            if (overflow != null && !overflow.isEmpty()) {
-                TaskManager.IMP.sync(new RunnableVal<Object>() {
-                    @Override
-                    public void run(Object value) {
-                        for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
-                            ItemStack stack = entry.getValue();
-                            if (stack.getType() != Material.AIR && stack.getAmount() > 0) {
-                                Item dropped = player.getWorld().dropItem(player.getLocation(), stack);
-                                PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
-                                if (event.isCancelled()) {
-                                    dropped.remove();
-                                }
+        HashMap<Integer, ItemStack> overflow = inv.addItem(item);
+        if (!overflow.isEmpty()) {
+            TaskManager.IMP.sync(new RunnableVal<Object>() {
+                @Override
+                public void run(Object value) {
+                    for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
+                        ItemStack stack = entry.getValue();
+                        if (stack.getType() != Material.AIR && stack.getAmount() > 0) {
+                            Item
+                                dropped = player.getWorld().dropItem(player.getLocation(), stack);
+                            PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
+                            if (event.isCancelled()) {
+                                dropped.remove();
                             }
                         }
                     }
-                });
-            }
+                }
+            });
         }
         player.updateInventory();
     }

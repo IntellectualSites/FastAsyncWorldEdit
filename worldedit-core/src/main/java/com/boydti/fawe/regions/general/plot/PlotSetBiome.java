@@ -1,8 +1,6 @@
 package com.boydti.fawe.regions.general.plot;
 
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.commands.Command;
@@ -30,6 +28,7 @@ import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @CommandDeclaration(
         command = "generatebiome",
@@ -82,7 +81,7 @@ public class PlotSetBiome extends Command {
                                 .player(FawePlayer.wrap(player.getName()))
                                 .limitUnlimited()
                                 .build();
-                        long seed = PseudoRandom.random.nextLong();
+                        long seed = ThreadLocalRandom.current().nextLong();
                         for (RegionWrapper region : regions) {
                             CuboidRegion cuboid = new CuboidRegion(BlockVector3.at(region.minX, 0, region.minZ), BlockVector3.at(region.maxX, 256, region.maxZ));
                             session.regenerate(cuboid, biome, seed);

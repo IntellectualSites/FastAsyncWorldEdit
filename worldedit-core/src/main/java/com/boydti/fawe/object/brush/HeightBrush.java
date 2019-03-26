@@ -3,7 +3,6 @@ package com.boydti.fawe.object.brush;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.object.brush.heightmap.RotatableHeightMap;
 import com.boydti.fawe.object.brush.heightmap.ScalableHeightMap;
@@ -22,6 +21,7 @@ import com.sk89q.worldedit.math.Vector3;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class HeightBrush implements Brush {
 
@@ -60,7 +60,7 @@ public class HeightBrush implements Brush {
                 heightMap = new RotatableHeightMap(heightMap);
             }
             RotatableHeightMap rotatable = (RotatableHeightMap) heightMap;
-            rotatable.rotate(PseudoRandom.random.nextInt(360));
+            rotatable.rotate(ThreadLocalRandom.current().nextInt(360));
         }
         return heightMap;
     }

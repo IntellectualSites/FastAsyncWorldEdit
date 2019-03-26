@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nullable;
 
 // TODO FIXME
@@ -513,7 +514,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     for (int z = 0; z < getLength(); z++) {
                         for (int x = 0; x < getWidth(); x++, index++) {
                             int height = img.getRGB(x, z) & 0xFF;
-                            if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                            if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                                .nextInt(256) <= height) {
                                 int newHeight = table.average(x, z, index);
                                 setLayerHeightRaw(index, newHeight);
                             }
@@ -576,7 +578,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             for (int x = 0; x < getWidth(); x++, index++) {
                 int y = heights.getByte(index) & 0xFF;
                 int height = img.getRGB(x, z) & 0xFF;
-                if (height == 0 || PseudoRandom.random.nextInt(256) > height * doubleRarity) {
+                if (height == 0 || ThreadLocalRandom.current().nextInt(256) > height * doubleRarity) {
                     continue;
                 }
                 mutable.mutX(x);
@@ -624,7 +626,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             mutable.mutZ(z);
             for (int x = 0; x < getWidth(); x++, index++) {
                 int y = heights.getByte(index) & 0xFF;
-                if (PseudoRandom.random.nextInt(256) > scaledRarity) {
+                if (ThreadLocalRandom.current().nextInt(256) > scaledRarity) {
                     continue;
                 }
                 mutable.mutX(x);
@@ -1085,7 +1087,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int z = 0; z < getLength(); z++) {
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
-                        if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                        if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                            .nextInt(256) <= height) {
                             biomeArr[index] = biome;
                         }
                     }
@@ -1136,7 +1139,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     }
                     if (imgMask != null) {
                         int height = imgMask.getRGB(x, z) & 0xFF;
-                        if (height != 255 && (height <= 0 || !whiteOnly || PseudoRandom.random.nextInt(256) > height)) continue;
+                        if (height != 255 && (height <= 0 || !whiteOnly || ThreadLocalRandom
+                            .current().nextInt(256) > height)) continue;
                     }
                     int color = img.getRGB(x, z);
                     if (textureUtil.getIsBlockCloserThanBiome(buffer, color, primtives.biomePriority)) {
@@ -1220,7 +1224,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             for (int z = 0; z < getLength(); z++) {
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = mask.getRGB(x, z) & 0xFF;
-                    if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                    if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                        .nextInt(256) <= height) {
                         int color = img.getRGB(x, z);
                         BlockType block = textureUtil.getNearestBlock(color);
                         if (block != null) {
@@ -1353,7 +1358,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
-                        if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                        if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                            .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
                             overlayArr[index] = pattern.apply(mutable.toBlockVector3()).getInternalId();
@@ -1380,7 +1386,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
-                        if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                        if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                            .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
                             mainArr[index] = pattern.apply(mutable.toBlockVector3()).getInternalId();
@@ -1405,7 +1412,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
-                        if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                        if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                            .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
                             floorArr[index] = pattern.apply(mutable.toBlockVector3()).getInternalId();
@@ -1432,7 +1440,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     mutable.mutZ(z);
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
-                        if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                        if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                            .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
                             int combined = pattern.apply(mutable.toBlockVector3()).getInternalId();
@@ -2078,7 +2087,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             for (int z = 0; z < getLength(); z++) {
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = img.getRGB(x, z) & 0xFF;
-                    if (height == 255 || height > 0 && white && PseudoRandom.random.nextInt(256) <= height) {
+                    if (height == 255 || height > 0 && white && ThreadLocalRandom.current()
+                        .nextInt(256) <= height) {
                         overlay.get()[index] = combined;
                     }
                 }
@@ -2096,7 +2106,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             for (int z = 0; z < getLength(); z++) {
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = img.getRGB(x, z) & 0xFF;
-                    if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                    if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                        .nextInt(256) <= height) {
                         main.get()[index] = combined;
                     }
                 }
@@ -2113,7 +2124,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             for (int z = 0; z < getLength(); z++) {
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = img.getRGB(x, z) & 0xFF;
-                    if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                    if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                        .nextInt(256) <= height) {
                         floor.get()[index] = combined;
                     }
                 }
@@ -2131,7 +2143,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             for (int z = 0; z < getLength(); z++) {
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = img.getRGB(x, z) & 0xFF;
-                    if (height == 255 || height > 0 && !white && PseudoRandom.random.nextInt(256) <= height) {
+                    if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
+                        .nextInt(256) <= height) {
                         main.get()[index] = combined;
                         floor.get()[index] = combined;
                     }

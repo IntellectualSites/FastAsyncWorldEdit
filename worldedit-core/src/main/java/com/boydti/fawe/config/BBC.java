@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public enum BBC {
 
@@ -523,7 +524,7 @@ public enum BBC {
     }
 
     public BBC or(BBC... others) {
-        int index = PseudoRandom.random.nextInt(others.length + 1);
+        int index = ThreadLocalRandom.current().nextInt(others.length + 1);
         return index == 0 ? this : others[index - 1];
     }
 

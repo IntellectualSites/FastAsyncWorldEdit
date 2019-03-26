@@ -63,7 +63,6 @@ public abstract class FaweBlockMatcher {
 //            return setBlock(blocks.iterator().next());
 //        }
 //        final BaseBlock[] array = blocks.toArray(new BaseBlock[blocks.size()]);
-//        final PseudoRandom random = new PseudoRandom(System.nanoTime());
 //        final int size = array.length;
 //        return new FaweBlockMatcher() {
 //            @Override

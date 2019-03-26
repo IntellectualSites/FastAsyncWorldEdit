@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.mask.AdjacentAnyMask;
@@ -18,6 +17,7 @@ import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ScatterBrush implements Brush {
 
@@ -63,7 +63,7 @@ public class ScatterBrush implements Brush {
         LocalBlockVectorSet placed = new LocalBlockVectorSet();
         int maxFails = 1000;
         for (int i = 0; i < count; i++) {
-            int index = PseudoRandom.random.nextInt(length);
+            int index = ThreadLocalRandom.current().nextInt(length);
             BlockVector3 pos = visited.get(index);
             if (pos != null && canApply(editSession, pos)) {
                 int x = pos.getBlockX();

@@ -1,9 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.PseudoRandom;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
@@ -12,6 +9,7 @@ import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private final Pattern pattern;
@@ -57,7 +55,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
             if (index == 0) {
                 return cur.toBlockVector3();
             }
-            next = allowed[PseudoRandom.random.nextInt(index)];
+            next = allowed[ThreadLocalRandom.current().nextInt(index)];
             cur.setComponents(next.getBlockX(), next.getBlockY(), next.getBlockZ());
         }
         return cur.toBlockVector3();
