@@ -34,10 +34,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 
 /**
  * Returns a {@link BlockStateHolder} for a given position.
- * @deprecated Use FawePattern
  */
 @Link(clazz = UtilityCommands.class, value = "patterns")
-@Deprecated
 public interface Pattern{
 
 //    @Override
