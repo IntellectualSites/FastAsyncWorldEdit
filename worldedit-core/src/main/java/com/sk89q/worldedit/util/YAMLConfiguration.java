@@ -25,15 +25,12 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.session.SessionManager;
 import com.sk89q.worldedit.util.report.Unreported;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * A less simple implementation of {@link LocalConfiguration}
@@ -53,12 +50,12 @@ public class YAMLConfiguration extends LocalConfiguration {
     public void load() {
         try {
             config.load();
-        } catch (Throwable e) {
+        } catch (IOException e) {
             logger.log(Level.WARNING, "Error loading WorldEdit configuration", e);
         }
 
         profile = config.getBoolean("debug", profile);
-        wandItem = ItemTypes.parse(config.getString("wand-item", wandItem)).getId();
+        wandItem = convertLegacyItem(config.getString("wand-item", wandItem));
 
         defaultChangeLimit = Math.max(-1, config.getInt(
                 "limits.max-blocks-changed.default", defaultChangeLimit));
@@ -81,8 +78,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherDefaultRadius = Math.max(-1, config.getInt("limits.butcher-radius.default", butcherDefaultRadius));
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
-        disallowedBlocks =
-                new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(defaultDisallowedBlocks)));
+        disallowedBlocks = new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks())));
         allowedDataCycleBlocks =
                 new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
 
@@ -104,7 +100,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         useInventoryCreativeOverride = config.getBoolean("use-inventory.creative-mode-overrides",
                 useInventoryCreativeOverride);
 
-        navigationWand = ItemTypes.parse(config.getString("navigation-wand.item", navigationWand)).getId();
+        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand));
         navigationWandMaxDistance = config.getInt("navigation-wand.max-distance", navigationWandMaxDistance);
         navigationUseGlass = config.getBoolean("navigation.use-glass", navigationUseGlass);
 

@@ -665,15 +665,15 @@ public class BlockTypes{
     public static final BlockType ZOMBIE_HEAD = register("minecraft:zombie_head", state -> state.with(state.getBlockType().getProperty("rotation"), 0));
     public static final BlockType ZOMBIE_WALL_HEAD = register("minecraft:zombie_wall_head", state -> state.with(state.getBlockType().getProperty("facing"), Direction.NORTH));
 
-    
+
     private static BlockType register(String id) {
     	return register(new BlockType(id));
     }
-    
+
     private static BlockType register(String id, Function<BlockState, BlockState> values) {
     	return register(new BlockType(id, values));
     }
-    
+
     public static BlockType register(BlockType type) {
     	if(sortedRegistry == null) {
     		sortedRegistry = new ArrayList<>();
@@ -685,7 +685,7 @@ public class BlockTypes{
     	if(!sortedRegistry.contains(type))sortedRegistry.add(type);
     	return internalRegister(type, sortedRegistry.indexOf(type));
     }
-    
+
     private static ArrayList<BlockType> sortedRegistry;
     private static ArrayList<BlockState> stateList;
     public static BlockType[] values;
@@ -693,7 +693,7 @@ public class BlockTypes{
     private static Set<String> $NAMESPACES;
     @Deprecated public static int BIT_OFFSET; // Used internally
     @Deprecated public static int BIT_MASK; // Used internally
-    
+
     private static BlockType internalRegister(BlockType blockType, final int internalId) {
         init(blockType, blockType.getId(), internalId, stateList);
         if(BlockType.REGISTRY.get(blockType.getId()) == null) BlockType.REGISTRY.register(blockType.getId(), blockType);
@@ -703,10 +703,6 @@ public class BlockTypes{
         return blockType;
     }
 
-    private static BlockType[] values() {
-    	return sortedRegistry.toArray(new BlockType[sortedRegistry.size()]);
-    }
-    
     private static void init(BlockType type, String id, int internalId, ArrayList<BlockState> states) {
         try {
             type.setSettings(new Settings(type, id, internalId, states));
@@ -856,7 +852,7 @@ public class BlockTypes{
 	public static final @Nullable BlockType get(final String id) {
 	  return BlockType.REGISTRY.get(id.toLowerCase());
 	}
-	
+
 	public static final @Nullable BlockType get(final CharSequence id) {
 	  return BlockType.REGISTRY.get(id.toString().toLowerCase());
 	}

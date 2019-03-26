@@ -300,7 +300,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int cx = scx; cx <= ecx; cx++) {
                     final int finalCX = cx;
                     final int finalCZ = cz;
-                    TaskManager.IMP.getPublicForkJoinPool().submit((Runnable) () -> {
+                    TaskManager.IMP.getPublicForkJoinPool().submit(() -> {
                         try {
                             FaweChunk toSend = getSnapshot(finalCX, finalCZ);
                             toSend.setLoc(HeightMapMCAGenerator.this, finalCX + OX, finalCZ + OZ);

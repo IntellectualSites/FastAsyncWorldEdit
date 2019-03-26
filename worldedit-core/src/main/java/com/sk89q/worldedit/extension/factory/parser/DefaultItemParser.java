@@ -19,12 +19,10 @@
 
 package com.sk89q.worldedit.extension.factory.parser;
 
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
@@ -46,17 +44,8 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                 ItemType type;
                 if (split.length == 1) {
                     type = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(split[0]));
-                } else if (MathMan.isInteger(split[0])) {
-                    type = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
                 } else {
-                    type = ItemTypes.parse(input);
-                    if (type != null) {
-                        Integer legacy = LegacyMapper.getInstance().getLegacyCombined(type);
-                        if (legacy != null) {
-                            ItemType newType = LegacyMapper.getInstance().getItemFromLegacy(legacy >> 4, Integer.parseInt(split[1]));
-                            if (newType != null) type = newType;
-                        }
-                    }
+                    type = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
                 }
                 item = new BaseItem(type);
             } catch (NumberFormatException e) {

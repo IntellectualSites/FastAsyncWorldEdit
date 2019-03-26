@@ -225,7 +225,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             if (te != null) {
                 NBTTagCompound tag = new NBTTagCompound();
                 readTileEntityIntoTag(te, tag); // Load data
-                return new BaseBlock(state, (CompoundTag) toNative(tag));
+                return state.toBaseBlock((CompoundTag) toNative(tag));
             }
         }
 
@@ -402,17 +402,19 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             }
             return new CompoundTag(values);
         } else if (foreign instanceof NBTTagByte) {
-            return new ByteTag(((NBTTagByte) foreign).asByte()); // getByte
+            return new ByteTag(((NBTTagByte) foreign).asByte());
         } else if (foreign instanceof NBTTagByteArray) {
             return new ByteArrayTag(((NBTTagByteArray) foreign).c()); // data
         } else if (foreign instanceof NBTTagDouble) {
             return new DoubleTag(((NBTTagDouble) foreign).asDouble()); // getDouble
         } else if (foreign instanceof NBTTagFloat) {
-            return new FloatTag(((NBTTagFloat) foreign).asFloat()); // getFloat
+            return new FloatTag(((NBTTagFloat) foreign).asFloat());
         } else if (foreign instanceof NBTTagInt) {
-            return new IntTag(((NBTTagInt) foreign).asInt()); // getInt
+            return new IntTag(((NBTTagInt) foreign).asInt());
         } else if (foreign instanceof NBTTagIntArray) {
             return new IntArrayTag(((NBTTagIntArray) foreign).d()); // data
+        } else if (foreign instanceof NBTTagLongArray) {
+            return new LongArrayTag(((NBTTagLongArray) foreign).d()); // data
         } else if (foreign instanceof NBTTagList) {
             try {
                 return toNativeList((NBTTagList) foreign);
@@ -421,11 +423,11 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
                 return new ListTag(ByteTag.class, new ArrayList<ByteTag>());
             }
         } else if (foreign instanceof NBTTagLong) {
-            return new LongTag(((NBTTagLong) foreign).asLong()); // getLong
+            return new LongTag(((NBTTagLong) foreign).asLong());
         } else if (foreign instanceof NBTTagShort) {
-            return new ShortTag(((NBTTagShort) foreign).asShort()); // getShort
+            return new ShortTag(((NBTTagShort) foreign).asShort());
         } else if (foreign instanceof NBTTagString) {
-            return new StringTag(foreign.asString()); // data
+            return new StringTag(foreign.asString());
         } else if (foreign instanceof NBTTagEnd) {
             return new EndTag();
         } else {
@@ -445,7 +447,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
      */
     public ListTag toNativeList(NBTTagList foreign) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         List<Tag> values = new ArrayList<>();
-        int type = foreign.getTypeId();
+        int type = foreign.d();
 
         List foreignList;
         foreignList = (List) nbtListTagListField.get(foreign);
@@ -488,9 +490,11 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             return new NBTTagInt(((IntTag) foreign).getValue());
         } else if (foreign instanceof IntArrayTag) {
             return new NBTTagIntArray(((IntArrayTag) foreign).getValue());
+        } else if (foreign instanceof LongArrayTag) {
+            return new NBTTagLongArray(((LongArrayTag) foreign).getValue());
         } else if (foreign instanceof ListTag) {
             NBTTagList tag = new NBTTagList();
-            ListTag<?> foreignList = (ListTag) foreign;
+            ListTag foreignList = (ListTag) foreign;
             for (Tag t : foreignList.getValue()) {
                 tag.add(fromNative(t));
             }

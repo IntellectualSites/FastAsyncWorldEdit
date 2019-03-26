@@ -266,10 +266,9 @@ public class AnvilChunk implements Chunk {
         if (state.getMaterial().hasContainer()) {
             CompoundTag tileEntity = getBlockTileEntity(position);
             if (tileEntity != null) {
-                return new BaseBlock(state, tileEntity);
+                return state.toBaseBlock(tileEntity);
             }
         }
-
         return state.toBaseBlock();
     }
 

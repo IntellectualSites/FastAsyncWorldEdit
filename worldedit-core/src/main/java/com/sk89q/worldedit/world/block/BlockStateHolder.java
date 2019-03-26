@@ -116,7 +116,8 @@ public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePat
     Map<Property<?>, Object> getStates();
 
     /**
-     * @deprecated use masks - not try to this fuzzy/non fuzzy state nonsense
+     * Checks if the type is the same, and if the matched states are the same.
+     *
      * @param o other block
      * @return true if equal
      */
@@ -148,7 +149,9 @@ public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePat
         if (getStates().isEmpty()) {
             return this.getBlockType().getId();
         } else {
-            String properties = getStates().entrySet().stream().map(entry -> entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase()).collect(Collectors.joining(","));
+            String properties =
+                    getStates().entrySet().stream().map(entry -> entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase()).collect(Collectors.joining(
+                    ","));
             return this.getBlockType().getId() + "[" + properties + "]";
         }
     }

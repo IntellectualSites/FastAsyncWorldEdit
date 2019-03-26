@@ -18,16 +18,12 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.boydti.fawe.Fawe;
-import com.sk89q.worldedit.*;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.blocks.LazyBlock;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.history.change.BlockChange;
@@ -50,15 +46,19 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BukkitWorld extends AbstractWorld {
 
@@ -90,7 +90,7 @@ public class BukkitWorld extends AbstractWorld {
         List<com.sk89q.worldedit.entity.Entity> entities = new ArrayList<>();
         for (Entity ent : ents) {
             if (region.contains(BukkitAdapter.asBlockVector(ent.getLocation()))) {
-                addEntities(ent, entities);
+                entities.add(BukkitAdapter.adapt(ent));
             }
         }
         return entities;
@@ -100,41 +100,9 @@ public class BukkitWorld extends AbstractWorld {
     public List<com.sk89q.worldedit.entity.Entity> getEntities() {
         List<com.sk89q.worldedit.entity.Entity> list = new ArrayList<>();
         for (Entity entity : getWorld().getEntities()) {
-            addEntities(entity, list);
+            list.add(BukkitAdapter.adapt(entity));
         }
         return list;
-    }
-
-    private static com.sk89q.worldedit.entity.Entity adapt(Entity ent) {
-        if (ent == null) return null;
-        return BukkitAdapter.adapt(ent);
-    }
-
-    private void addEntities(Entity ent, Collection<com.sk89q.worldedit.entity.Entity> ents) {
-        ents.add(BukkitAdapter.adapt(ent));
-        if (ent instanceof Player) {
-            final Player plr = (Player) ent;
-            com.sk89q.worldedit.entity.Entity left = adapt(((Player) ent).getShoulderEntityLeft());
-            com.sk89q.worldedit.entity.Entity right = adapt(((Player) ent).getShoulderEntityRight());
-            if (left != null) {
-                ents.add(new DelegateEntity(left) {
-                    @Override
-                    public boolean remove() {
-                        plr.setShoulderEntityLeft(null);
-                        return true;
-                    }
-                });
-            }
-            if (right != null) {
-                ents.add(new DelegateEntity(right) {
-                    @Override
-                    public boolean remove() {
-                        plr.setShoulderEntityRight(null);
-                        return true;
-                    }
-                });
-            }
-        }
     }
 
     @Nullable
@@ -196,7 +164,7 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean regenerate(Region region, EditSession editSession) {
-        com.sk89q.worldedit.world.block.BlockStateHolder[] history = new com.sk89q.worldedit.world.block.BlockState[16 * 16 * (getMaxY() + 1)];
+        BaseBlock[] history = new BaseBlock[16 * 16 * (getMaxY() + 1)];
 
         for (BlockVector2 chunk : region.getChunks()) {
             BlockVector3 min = BlockVector3.at(chunk.getBlockX() * 16, 0, chunk.getBlockZ() * 16);
@@ -455,10 +423,7 @@ public class BukkitWorld extends AbstractWorld {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             try {
-                int x = position.getBlockX();
-                int y = position.getBlockY();
-                int z = position.getBlockZ();
-                return adapter.setBlock(getWorld().getChunkAt(x >> 4, z >> 4), x, y, z, block, true);
+                return adapter.setBlock(BukkitAdapter.adapt(getWorld(), position), block, notifyAndLight);
             } catch (Exception e) {
                 if (block instanceof BaseBlock && ((BaseBlock)block).getNbtData() != null) {
                     logger.warning("Tried to set a corrupt tile entity at " + position.toString());

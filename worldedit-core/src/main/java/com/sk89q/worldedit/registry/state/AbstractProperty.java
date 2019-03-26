@@ -30,11 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkState;
+
 public class AbstractProperty<T> implements Property<T> {
 
     private final PropertyKey key;
-    private final String name;
-    private final List<T> values;
+    private String name;
+    private List<T> values;
 
     private final int bitMask;
     private final int bitMaskInverse;
@@ -75,6 +77,7 @@ public class AbstractProperty<T> implements Property<T> {
         return bitMask;
     }
 
+    //todo remove the following to allow for upstream compatibility.
     public <C extends AbstractProperty<T>> C withOffset(int bitOffset) {
         return (C) new AbstractProperty<>(name, values, bitOffset);
     }
@@ -114,6 +117,14 @@ public class AbstractProperty<T> implements Property<T> {
     @Override
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Internal method for name setting post-deserialise. Do not use.
+     */
+    public void setName(final String name) {
+        checkState(this.name == null, "name already set");
+        this.name = name;
     }
 
     @Override

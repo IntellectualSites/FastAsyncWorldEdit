@@ -230,7 +230,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public int hashCode() {
-        return getOrdinal();
+        int ret = toImmutableState().hashCode() << 3;
+        if (hasNbtData()) {
+            ret += getNbtData().hashCode();
+        }
+        return ret;
     }
 
     @Override
