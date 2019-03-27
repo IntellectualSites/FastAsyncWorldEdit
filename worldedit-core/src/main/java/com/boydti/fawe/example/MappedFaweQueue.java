@@ -111,12 +111,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
         map.forEachChunk(new RunnableVal<FaweChunk>() {
             @Override
             public void run(final FaweChunk chunk) {
-                pool.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        chunk.optimize();
-                    }
-                });
+                pool.submit(chunk::optimize);
             }
         });
         pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -300,8 +295,8 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
 
     @Override
     public boolean supports(Capability capability) {
-        switch (capability) {
-            case CHANGE_TASKS: return true;
+        if (capability == Capability.CHANGE_TASKS) {
+            return true;
         }
         return false;
     }
@@ -416,12 +411,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     public boolean queueChunkLoad(final int cx, final int cz) {
         CHUNK chunk = getCachedChunk(getWorld(), cx, cz);
         if (chunk == null) {
-            SetQueue.IMP.addTask(new Runnable() {
-                @Override
-                public void run() {
-                    loadChunk(getWorld(), cx, cz, true);
-                }
-            });
+            SetQueue.IMP.addTask(() -> loadChunk(getWorld(), cx, cz, true));
             return true;
         }
         return false;
@@ -430,12 +420,9 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     public boolean queueChunkLoad(final int cx, final int cz, RunnableVal<CHUNK> operation) {
         operation.value = getCachedChunk(getWorld(), cx, cz);
         if (operation.value == null) {
-            SetQueue.IMP.addTask(new Runnable() {
-                @Override
-                public void run() {
-                    operation.value = loadChunk(getWorld(), cx, cz, true);
-                    if (operation.value != null) TaskManager.IMP.async(operation);
-                }
+            SetQueue.IMP.addTask(() -> {
+                operation.value = loadChunk(getWorld(), cx, cz, true);
+                if (operation.value != null) TaskManager.IMP.async(operation);
             });
             return true;
         } else {

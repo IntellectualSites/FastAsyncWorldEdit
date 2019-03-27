@@ -9,7 +9,6 @@ import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
-import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.*;
 import com.boydti.fawe.wrappers.FakePlayer;
@@ -17,8 +16,7 @@ import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.command.tool.BrushTool;
-import com.sk89q.worldedit.command.tool.Tool;
+
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.platform.*;
@@ -41,7 +39,6 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 public abstract class FawePlayer<T> extends Metadatable {
 
@@ -164,18 +161,10 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     private void setConfirmTask(@Nullable Runnable task, CommandContext context, String command) {
         if (task != null) {
-            Runnable newTask = new Runnable() {
-                @Override
-                public void run() {
-                    CommandManager.getInstance().handleCommandTask(new ThrowableSupplier<Throwable>() {
-                        @Override
-                        public Object get() throws Throwable {
-                            task.run();
-                            return null;
-                        }
-                    }, context.getLocals());
-                }
-            };
+            Runnable newTask = () -> CommandManager.getInstance().handleCommandTask(() -> {
+                task.run();
+                return null;
+            }, context.getLocals());
             setMeta("cmdConfirm", newTask);
         } else {
             setMeta("cmdConfirm", new CommandEvent(getPlayer(), command));
@@ -365,15 +354,15 @@ public abstract class FawePlayer<T> extends Metadatable {
                     }
                 } catch (EmptyClipboardException e) {
                 }
-                if (player != null && session != null) {
+                if (player != null) {
                     Clipboard clip = doc.toClipboard();
                     ClipboardHolder holder = new ClipboardHolder(clip);
                     getSession().setClipboard(holder);
                 }
             }
-        } catch (Exception ignore) {
+        } catch (Exception event) {
             Fawe.debug("====== INVALID CLIPBOARD ======");
-            MainUtil.handleError(ignore, false);
+            MainUtil.handleError(event, false);
             Fawe.debug("===============---=============");
             Fawe.debug("This shouldn't result in any failure");
             Fawe.debug("File: " + file.getName() + " (len:" + file.length() + ")");

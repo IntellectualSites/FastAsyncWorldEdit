@@ -167,45 +167,33 @@ public class TaskBuilder extends Metadatable {
     }
 
     public TaskBuilder abortIfTrue(final Runnable run) {
-        tasks.add(RunnableTask.adapt(new Task<Boolean, Boolean>() {
-            @Override
-            public Boolean run(Boolean previous) {
-                if (previous == Boolean.TRUE) run.run();
-                return previous == Boolean.TRUE;
-            }
+        tasks.add(RunnableTask.adapt((Task<Boolean, Boolean>) previous -> {
+            if (previous == Boolean.TRUE) run.run();
+            return previous == Boolean.TRUE;
         }, TaskType.ABORT));
         return this;
     }
 
     public TaskBuilder abortIfNull(final Runnable run) {
-        tasks.add(RunnableTask.adapt(new Task<Boolean, Object>() {
-            @Override
-            public Boolean run(Object previous) {
-                if (previous == null) run.run();
-                return previous == null;
-            }
+        tasks.add(RunnableTask.adapt((Task<Boolean, Object>) previous -> {
+            if (previous == null) run.run();
+            return previous == null;
         }, TaskType.ABORT));
         return this;
     }
 
     public TaskBuilder abortIfEqual(final Runnable run, final Object other) {
-        tasks.add(RunnableTask.adapt(new Task<Boolean, Object>() {
-            @Override
-            public Boolean run(Object previous) {
-                if (Objects.equals(previous, other)) run.run();
-                return Objects.equals(previous, other);
-            }
+        tasks.add(RunnableTask.adapt((Task<Boolean, Object>) previous -> {
+            if (Objects.equals(previous, other)) run.run();
+            return Objects.equals(previous, other);
         }, TaskType.ABORT));
         return this;
     }
 
     public TaskBuilder abortIfNotEqual(final Runnable run, final Object other) {
-        tasks.add(RunnableTask.adapt(new Task<Boolean, Object>() {
-            @Override
-            public Boolean run(Object previous) {
-                if (!Objects.equals(previous, other)) run.run();
-                return !Objects.equals(previous, other);
-            }
+        tasks.add(RunnableTask.adapt((Task<Boolean, Object>) previous -> {
+            if (!Objects.equals(previous, other)) run.run();
+            return !Objects.equals(previous, other);
         }, TaskType.ABORT));
         return this;
     }
@@ -215,12 +203,7 @@ public class TaskBuilder extends Metadatable {
      * - As opposed to trying to using the current thread
      */
     public void buildAsync() {
-        TaskManager.IMP.async(new Runnable() {
-            @Override
-            public void run() {
-                build();
-            }
-        });
+        TaskManager.IMP.async(this::build);
     }
 
     /**
@@ -240,20 +223,10 @@ public class TaskBuilder extends Metadatable {
                                 case SYNC:
                                 case ABORT:
                                 case SYNC_PARALLEL:
-                                    TaskManager.IMP.later(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            build();
-                                        }
-                                    }, task.getDelay(result));
+                                    TaskManager.IMP.later(this::build, task.getDelay(result));
                                     return;
                                 default:
-                                    TaskManager.IMP.laterAsync(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            build();
-                                        }
-                                    }, task.getDelay(result));
+                                    TaskManager.IMP.laterAsync(this::build, task.getDelay(result));
                                     return;
                             }
                         }
@@ -274,12 +247,7 @@ public class TaskBuilder extends Metadatable {
                     case ASYNC:
                     case ASYNC_PARALLEL:
                         if (Fawe.isMainThread()) {
-                            TaskManager.IMP.async(new Runnable() {
-                                @Override
-                                public void run() {
-                                    build();
-                                }
-                            });
+                            TaskManager.IMP.async(this::build);
                             return;
                         }
                         break;
@@ -484,24 +452,21 @@ public class TaskBuilder extends Metadatable {
 
         public Object execSplit(final Object previous) {
             this.value = previous;
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        synchronized (asyncWaitLock) {
-                            asyncWaitLock.notifyAll();
-                            asyncWaitLock.wait(Long.MAX_VALUE);
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+            final Thread thread = new Thread(() -> {
+                try {
+                    synchronized (asyncWaitLock) {
+                        asyncWaitLock.notifyAll();
+                        asyncWaitLock.wait(Long.MAX_VALUE);
                     }
-                    exec(previous);
-                    finished = true;
-                    waitingAsync = true;
-                    waitingSync = false;
-                    synchronized (syncWaitLock) {
-                        syncWaitLock.notifyAll();
-                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                exec(previous);
+                finished = true;
+                waitingAsync = true;
+                waitingSync = false;
+                synchronized (syncWaitLock) {
+                    syncWaitLock.notifyAll();
                 }
             });
             try {

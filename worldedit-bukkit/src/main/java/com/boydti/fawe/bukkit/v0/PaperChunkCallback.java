@@ -5,7 +5,7 @@ import org.bukkit.World;
 
 public abstract class PaperChunkCallback {
     public PaperChunkCallback(World world, int x, int z) {
-        world.getChunkAtAsync(x, z, chunk -> PaperChunkCallback.this.onLoad(chunk));
+        world.getChunkAtAsync(x, z, PaperChunkCallback.this::onLoad);
     }
 
     public abstract void onLoad(Chunk chunk);

@@ -124,14 +124,10 @@ public abstract class TaskManager {
         }
         for (i = 0; i < threads.length; i++) {
             final Runnable[] toRun = split[i];
-            Thread thread = threads[i] = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int j = 0; j < toRun.length; j++) {
-                        Runnable run = toRun[j];
-                        if (run != null) {
-                            run.run();
-                        }
+            Thread thread = threads[i] = new Thread(() -> {
+                for (Runnable run : toRun) {
+                    if (run != null) {
+                        run.run();
                     }
                 }
             });
@@ -420,7 +416,7 @@ public abstract class TaskManager {
         } catch (InterruptedException e) {
             MainUtil.handleError(e);
         }
-        if (run.value != null && run.value instanceof RuntimeException) {
+        if (run.value instanceof RuntimeException) {
             throw (RuntimeException) run.value;
         }
         return (T) run.value;

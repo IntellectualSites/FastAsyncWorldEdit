@@ -152,10 +152,10 @@ public class Fawe {
      * The platform specific implementation
      */
     private final IFawe IMP;
-    private Thread thread = Thread.currentThread();
+    private Thread thread;
 
     private Fawe(final IFawe implementation) {
-        this.INSTANCE = this;
+        INSTANCE = this;
         this.IMP = implementation;
         this.thread = Thread.currentThread();
         /*
@@ -164,26 +164,18 @@ public class Fawe {
         this.setupConfigs();
         TaskManager.IMP = this.IMP.getTaskManager();
 
-        TaskManager.IMP.async(new Runnable() {
-            @Override
-            public void run() {
-                MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.HISTORY), TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS), false);
-                MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.CLIPBOARD), TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS), false);
-            }
+        TaskManager.IMP.async(() -> {
+            MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.HISTORY), TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS), false);
+            MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.CLIPBOARD), TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS), false);
         });
 
         if (Settings.IMP.METRICS) {
             try {
                 this.stats = new BStats();
                 this.IMP.startMetrics();
-                TaskManager.IMP.later(new Runnable() {
-                    @Override
-                    public void run() {
-                        stats.start();
-                    }
-                }, 1);
-            } catch (Throwable ignore) {
-                ignore.printStackTrace();
+                TaskManager.IMP.later(() -> stats.start(), 1);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
             }
         }
         /*
@@ -216,7 +208,7 @@ public class Fawe {
                 WEManager.IMP.managers.addAll(Fawe.this.IMP.getMaskManagers());
                 WEManager.IMP.managers.add(new PlotSquaredFeature());
                 Fawe.debug("Plugin 'PlotSquared' found. Using it now.");
-            } catch (Throwable e) {}
+            } catch (Throwable ignored) {}
         }, 0);
 
         TaskManager.IMP.repeat(timer, 1);
@@ -224,8 +216,8 @@ public class Fawe {
         if (!Settings.IMP.UPDATE.equalsIgnoreCase("false")) {
             // Delayed updating
             updater = new Updater();
-            TaskManager.IMP.async(() -> update());
-            TaskManager.IMP.repeatAsync(() -> update(), 36000);
+            TaskManager.IMP.async(this::update);
+            TaskManager.IMP.repeatAsync(this::update, 36000);
         }
     }
 
@@ -452,16 +444,13 @@ public class Fawe {
             final MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
             final NotificationEmitter ne = (NotificationEmitter) memBean;
 
-            ne.addNotificationListener(new NotificationListener() {
-                @Override
-                public void handleNotification(final Notification notification, final Object handback) {
-                    final long heapSize = Runtime.getRuntime().totalMemory();
-                    final long heapMaxSize = Runtime.getRuntime().maxMemory();
-                    if (heapSize < heapMaxSize) {
-                        return;
-                    }
-                    MemUtil.memoryLimitedTask();
+            ne.addNotificationListener((notification, handback) -> {
+                final long heapSize = Runtime.getRuntime().totalMemory();
+                final long heapMaxSize = Runtime.getRuntime().maxMemory();
+                if (heapSize < heapMaxSize) {
+                    return;
                 }
+                MemUtil.memoryLimitedTask();
             }, null, null);
 
             final List<MemoryPoolMXBean> memPools = ManagementFactory.getMemoryPoolMXBeans();

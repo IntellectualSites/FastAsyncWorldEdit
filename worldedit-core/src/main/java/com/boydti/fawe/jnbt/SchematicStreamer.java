@@ -133,39 +133,33 @@ public class SchematicStreamer extends NBTStreamer {
         addReader("Schematic.Biomes.#", biomeReader); // FAWE stores as a byte[] (4x smaller)
 
         // Tiles
-        addReader("Schematic.TileEntities.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag value) {
-                if (fc == null) {
-                    setupClipboard(0);
-                }
-                int x = value.getInt("x");
-                int y = value.getInt("y");
-                int z = value.getInt("z");
-                fc.setTile(x, y, z, value);
+        addReader("Schematic.TileEntities.#", (BiConsumer<Integer, CompoundTag>) (index, value) -> {
+            if (fc == null) {
+                setupClipboard(0);
             }
+            int x = value.getInt("x");
+            int y = value.getInt("y");
+            int z = value.getInt("z");
+            fc.setTile(x, y, z, value);
         });
         // Entities
-        addReader("Schematic.Entities.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag compound) {
-                if (fc == null) {
-                    setupClipboard(0);
-                }
-                String id = compound.getString("id");
-                if (id.isEmpty()) {
-                    return;
-                }
-                ListTag positionTag = compound.getListTag("Pos");
-                ListTag directionTag = compound.getListTag("Rotation");
-                EntityType type = EntityTypes.parse(id);
-                if (type != null) {
-                    compound.getValue().put("Id", new StringTag(type.getId()));
-                    BaseEntity state = new BaseEntity(type, compound);
-                    fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
-                } else {
-                    Fawe.debug("Invalid entity: " + id);
-                }
+        addReader("Schematic.Entities.#", (BiConsumer<Integer, CompoundTag>) (index, compound) -> {
+            if (fc == null) {
+                setupClipboard(0);
+            }
+            String id = compound.getString("id");
+            if (id.isEmpty()) {
+                return;
+            }
+            ListTag positionTag = compound.getListTag("Pos");
+            ListTag directionTag = compound.getListTag("Rotation");
+            EntityType type = EntityTypes.parse(id);
+            if (type != null) {
+                compound.getValue().put("Id", new StringTag(type.getId()));
+                BaseEntity state = new BaseEntity(type, compound);
+                fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
+            } else {
+                Fawe.debug("Invalid entity: " + id);
             }
         });
     }
@@ -345,60 +339,23 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     public void addDimensionReaders() {
-        addReader("Schematic.Height", new BiConsumer<Integer, Short>() {
-            @Override
-            public void accept(Integer index, Short value) {
-                height = (value);
-            }
-        });
-        addReader("Schematic.Width", new BiConsumer<Integer, Short>() {
-            @Override
-            public void accept(Integer index, Short value) {
-                width = (value);
-            }
-        });
-        addReader("Schematic.Length", new BiConsumer<Integer, Short>() {
-            @Override
-            public void accept(Integer index, Short value) {
-                length = (value);
-            }
-        });
-        addReader("Schematic.WEOriginX", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                originX = (value);
-            }
-        });
-        addReader("Schematic.WEOriginY", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                originY = (value);
-            }
-        });
-        addReader("Schematic.WEOriginZ", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                originZ = (value);
-            }
-        });
-        addReader("Schematic.WEOffsetX", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                offsetX = (value);
-            }
-        });
-        addReader("Schematic.WEOffsetY", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                offsetY = (value);
-            }
-        });
-        addReader("Schematic.WEOffsetZ", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                offsetZ = (value);
-            }
-        });
+        addReader("Schematic.Height",
+            (BiConsumer<Integer, Short>) (index, value) -> height = (value));
+        addReader("Schematic.Width", (BiConsumer<Integer, Short>) (index, value) -> width = (value));
+        addReader("Schematic.Length",
+            (BiConsumer<Integer, Short>) (index, value) -> length = (value));
+        addReader("Schematic.WEOriginX",
+            (BiConsumer<Integer, Integer>) (index, value) -> originX = (value));
+        addReader("Schematic.WEOriginY",
+            (BiConsumer<Integer, Integer>) (index, value) -> originY = (value));
+        addReader("Schematic.WEOriginZ",
+            (BiConsumer<Integer, Integer>) (index, value) -> originZ = (value));
+        addReader("Schematic.WEOffsetX",
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetX = (value));
+        addReader("Schematic.WEOffsetY",
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetY = (value));
+        addReader("Schematic.WEOffsetZ",
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetZ = (value));
     }
 
     private int height;

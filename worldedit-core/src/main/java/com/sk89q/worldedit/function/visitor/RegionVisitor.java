@@ -166,7 +166,7 @@ public class RegionVisitor implements Operation {
             } catch (Throwable ignore) {
             }
             try {
-                for (; ; ) {
+                while (true) {
                     apply(trailIter.next());
                     apply(trailIter.next());
                 }

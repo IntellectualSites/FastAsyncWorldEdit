@@ -91,50 +91,47 @@ public class MCAChunk extends FaweChunk<Void> {
 
     public void write(NBTOutputStream nbtOut) throws IOException {
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
-        nbtOut.writeLazyCompoundTag("Level", new NBTOutputStream.LazyWrite() {
-            @Override
-            public void write(NBTOutputStream out) throws IOException {
-                out.writeNamedTag("V", (byte) 1);
-                out.writeNamedTag("xPos", getX());
-                out.writeNamedTag("zPos", getZ());
-                out.writeNamedTag("LightPopulated", (byte) 0);
-                out.writeNamedTag("TerrainPopulated", (byte) 1);
-                if (entities.isEmpty()) {
-                    out.writeNamedEmptyList("Entities");
-                } else {
-                    out.writeNamedTag("Entities", new ListTag(CompoundTag.class, new ArrayList<>(entities.values())));
+        nbtOut.writeLazyCompoundTag("Level", out -> {
+            out.writeNamedTag("V", (byte) 1);
+            out.writeNamedTag("xPos", getX());
+            out.writeNamedTag("zPos", getZ());
+            out.writeNamedTag("LightPopulated", (byte) 0);
+            out.writeNamedTag("TerrainPopulated", (byte) 1);
+            if (entities.isEmpty()) {
+                out.writeNamedEmptyList("Entities");
+            } else {
+                out.writeNamedTag("Entities", new ListTag(CompoundTag.class, new ArrayList<>(entities.values())));
+            }
+            if (tiles.isEmpty()) {
+                out.writeNamedEmptyList("TileEntities");
+            } else {
+                out.writeNamedTag("TileEntities", new ListTag(CompoundTag.class,
+                    new ArrayList<>(tiles.values())));
+            }
+            out.writeNamedTag("InhabitedTime", inhabitedTime);
+            out.writeNamedTag("LastUpdate", lastUpdate);
+            if (biomes != null) {
+                out.writeNamedTag("Biomes", biomes);
+            }
+            out.writeNamedTag("HeightMap", heightMap);
+            out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
+            nbtOut.getOutputStream().writeByte(NBTConstants.TYPE_COMPOUND);
+            int len = 0;
+            for (int layer = 0; layer < ids.length; layer++) {
+                if (ids[layer] != null) len++;
+            }
+            nbtOut.getOutputStream().writeInt(len);
+            for (int layer = 0; layer < ids.length; layer++) {
+                byte[] idLayer = ids[layer];
+                if (idLayer == null) {
+                    continue;
                 }
-                if (tiles.isEmpty()) {
-                    out.writeNamedEmptyList("TileEntities");
-                } else {
-                    out.writeNamedTag("TileEntities", new ListTag(CompoundTag.class,
-                        new ArrayList<>(tiles.values())));
-                }
-                out.writeNamedTag("InhabitedTime", inhabitedTime);
-                out.writeNamedTag("LastUpdate", lastUpdate);
-                if (biomes != null) {
-                    out.writeNamedTag("Biomes", biomes);
-                }
-                out.writeNamedTag("HeightMap", heightMap);
-                out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
-                nbtOut.getOutputStream().writeByte(NBTConstants.TYPE_COMPOUND);
-                int len = 0;
-                for (int layer = 0; layer < ids.length; layer++) {
-                    if (ids[layer] != null) len++;
-                }
-                nbtOut.getOutputStream().writeInt(len);
-                for (int layer = 0; layer < ids.length; layer++) {
-                    byte[] idLayer = ids[layer];
-                    if (idLayer == null) {
-                        continue;
-                    }
-                    out.writeNamedTag("Y", (byte) layer);
-                    out.writeNamedTag("BlockLight", blockLight[layer]);
-                    out.writeNamedTag("SkyLight", skyLight[layer]);
-                    out.writeNamedTag("Blocks", idLayer);
-                    out.writeNamedTag("Data", data[layer]);
-                    out.writeEndTag();
-                }
+                out.writeNamedTag("Y", (byte) layer);
+                out.writeNamedTag("BlockLight", blockLight[layer]);
+                out.writeNamedTag("SkyLight", skyLight[layer]);
+                out.writeNamedTag("Blocks", idLayer);
+                out.writeNamedTag("Data", data[layer]);
+                out.writeEndTag();
             }
         });
         nbtOut.writeEndTag();
@@ -464,74 +461,43 @@ public class MCAChunk extends FaweChunk<Void> {
         skyLight = new byte[16][];
         blockLight = new byte[16][];
         NBTStreamer streamer = new NBTStreamer(nis);
-        streamer.addReader(".Level.InhabitedTime", new BiConsumer<Integer, Long>() {
-            @Override
-            public void accept(Integer index, Long value) {
-                inhabitedTime = value;
-            }
+        streamer.addReader(".Level.InhabitedTime",
+            (BiConsumer<Integer, Long>) (index, value) -> inhabitedTime = value);
+        streamer.addReader(".Level.LastUpdate",
+            (BiConsumer<Integer, Long>) (index, value) -> lastUpdate = value);
+        streamer.addReader(".Level.Sections.#", (BiConsumer<Integer, CompoundTag>) (index, tag) -> {
+            int layer = tag.getByte("Y");
+            ids[layer] = tag.getByteArray("Blocks");
+            data[layer] = tag.getByteArray("Data");
+            skyLight[layer] = tag.getByteArray("SkyLight");
+            blockLight[layer] = tag.getByteArray("BlockLight");
         });
-        streamer.addReader(".Level.LastUpdate", new BiConsumer<Integer, Long>() {
-            @Override
-            public void accept(Integer index, Long value) {
-                lastUpdate = value;
-            }
-        });
-        streamer.addReader(".Level.Sections.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag tag) {
-                int layer = tag.getByte("Y");
-                ids[layer] = tag.getByteArray("Blocks");
-                data[layer] = tag.getByteArray("Data");
-                skyLight[layer] = tag.getByteArray("SkyLight");
-                blockLight[layer] = tag.getByteArray("BlockLight");
-            }
-        });
-        streamer.addReader(".Level.TileEntities.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag tile) {
-                int x = tile.getInt("x") & 15;
+        streamer.addReader(".Level.TileEntities.#",
+            (BiConsumer<Integer, CompoundTag>) (index, tile) -> {
+                int x1 = tile.getInt("x") & 15;
                 int y = tile.getInt("y");
-                int z = tile.getInt("z") & 15;
-                short pair = MathMan.tripleBlockCoord(x, y, z);
+                int z1 = tile.getInt("z") & 15;
+                short pair = MathMan.tripleBlockCoord(x1, y, z1);
                 tiles.put(pair, tile);
-            }
-        });
-        streamer.addReader(".Level.Entities.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag entityTag) {
+            });
+        streamer.addReader(".Level.Entities.#",
+            (BiConsumer<Integer, CompoundTag>) (index, entityTag) -> {
                 if (entities == null) {
                     entities = new HashMap<>();
                 }
                 long least = entityTag.getLong("UUIDLeast");
                 long most = entityTag.getLong("UUIDMost");
                 entities.put(new UUID(most, least), entityTag);
-            }
-        });
-        streamer.addReader(".Level.Biomes", new BiConsumer<Integer, byte[]>() {
-            @Override
-            public void accept(Integer index, byte[] value) {
-                biomes = value;
-            }
-        });
-        streamer.addReader(".Level.HeightMap", new BiConsumer<Integer, int[]>() {
-            @Override
-            public void accept(Integer index, int[] value) {
-                heightMap = value;
-            }
-        });
+            });
+        streamer.addReader(".Level.Biomes",
+            (BiConsumer<Integer, byte[]>) (index, value) -> biomes = value);
+        streamer.addReader(".Level.HeightMap",
+            (BiConsumer<Integer, int[]>) (index, value) -> heightMap = value);
         if (readPos) {
-            streamer.addReader(".Level.xPos", new BiConsumer<Integer, Integer>() {
-                @Override
-                public void accept(Integer index, Integer value) {
-                    MCAChunk.this.setLoc(getParent(), value, getZ());
-                }
-            });
-            streamer.addReader(".Level.zPos", new BiConsumer<Integer, Integer>() {
-                @Override
-                public void accept(Integer index, Integer value) {
-                    MCAChunk.this.setLoc(getParent(), getX(), value);
-                }
-            });
+            streamer.addReader(".Level.xPos",
+                (BiConsumer<Integer, Integer>) (index, value) -> MCAChunk.this.setLoc(getParent(), value, getZ()));
+            streamer.addReader(".Level.zPos",
+                (BiConsumer<Integer, Integer>) (index, value) -> MCAChunk.this.setLoc(getParent(), getX(), value));
         }
         streamer.readFully();
     }

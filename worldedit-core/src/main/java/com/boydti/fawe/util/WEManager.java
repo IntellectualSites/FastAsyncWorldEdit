@@ -124,7 +124,7 @@ public class WEManager {
                         }
                     }
                 }
-                if (!removed) return regions.toArray(new Region[regions.size()]);
+                if (!removed) return regions.toArray(new Region[0]);
                 masks.clear();
             }
         }
@@ -146,7 +146,7 @@ public class WEManager {
         }
         if (!tmpMasks.isEmpty()) {
             masks = tmpMasks;
-            regions = masks.stream().map(mask -> mask.getRegion()).collect(Collectors.toSet());
+            regions = masks.stream().map(FaweMask::getRegion).collect(Collectors.toSet());
         } else {
             regions.addAll(backupRegions);
         }
@@ -155,7 +155,7 @@ public class WEManager {
         } else {
             player.deleteMeta("lastMask");
         }
-        return regions.toArray(new Region[regions.size()]);
+        return regions.toArray(new Region[0]);
     }
 
 
@@ -179,36 +179,22 @@ public class WEManager {
 
     public boolean delay(final FawePlayer<?> player, final String command) {
         final long start = System.currentTimeMillis();
-        return this.delay(player, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if ((System.currentTimeMillis() - start) > 1000) {
-                        BBC.WORLDEDIT_RUN.send(FawePlayer.wrap(player));
-                    }
-                    TaskManager.IMP.task(new Runnable() {
-                        @Override
-                        public void run() {
-                            final long start = System.currentTimeMillis();
-                            player.executeCommand(command.substring(1));
-                            TaskManager.IMP.later(new Runnable() {
-                                @Override
-                                public void run() {
-                                    SetQueue.IMP.addEmptyTask(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if ((System.currentTimeMillis() - start) > 1000) {
-                                                BBC.WORLDEDIT_COMPLETE.send(FawePlayer.wrap(player));
-                                            }
-                                        }
-                                    });
-                                }
-                            }, 2);
-                        }
-                    });
-                } catch (final Exception e) {
-                    MainUtil.handleError(e);
+        return this.delay(player, () -> {
+            try {
+                if ((System.currentTimeMillis() - start) > 1000) {
+                    BBC.WORLDEDIT_RUN.send(FawePlayer.wrap(player));
                 }
+                TaskManager.IMP.task(() -> {
+                    final long start1 = System.currentTimeMillis();
+                    player.executeCommand(command.substring(1));
+                    TaskManager.IMP.later(() -> SetQueue.IMP.addEmptyTask(() -> {
+                        if ((System.currentTimeMillis() - start1) > 1000) {
+                            BBC.WORLDEDIT_COMPLETE.send(FawePlayer.wrap(player));
+                        }
+                    }), 2);
+                });
+            } catch (final Exception e) {
+                MainUtil.handleError(e);
             }
         }, false, false);
     }

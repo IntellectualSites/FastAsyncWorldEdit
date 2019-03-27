@@ -73,120 +73,117 @@ public class SetQueue {
 
     public SetQueue() {
         tasks = new ConcurrentLinkedDeque<>();
-        activeQueues = new ConcurrentLinkedDeque();
+        activeQueues = new ConcurrentLinkedDeque<>();
         inactiveQueues = new ConcurrentLinkedDeque<>();
         if (TaskManager.IMP == null) return;
-        TaskManager.IMP.repeat(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    long now = System.currentTimeMillis();
-                    boolean empty = (inactiveQueues.isEmpty() && activeQueues.isEmpty());
-                    boolean emptyTasks = tasks.isEmpty();
-                    if (emptyTasks && empty) {
-                        last = now;
-                        runEmptyTasks();
-                        return;
-                    }
+        TaskManager.IMP.repeat(() -> {
+            try {
+                long now = System.currentTimeMillis();
+                boolean empty = (inactiveQueues.isEmpty() && activeQueues.isEmpty());
+                boolean emptyTasks = tasks.isEmpty();
+                if (emptyTasks && empty) {
+                    last = now;
+                    runEmptyTasks();
+                    return;
+                }
 
-                    targetTPS = 18 - Math.max(Settings.IMP.QUEUE.EXTRA_TIME_MS * 0.05, 0);
+                targetTPS = 18 - Math.max(Settings.IMP.QUEUE.EXTRA_TIME_MS * 0.05, 0);
 
-                    long diff = (50 + SetQueue.this.last) - (SetQueue.this.last = now);
-                    long absDiff = Math.abs(diff);
-                    if (diff == 0) {
-                        allocate = Math.min(50, allocate + 1);
-                    } else if (diff < 0) {
-                        allocate = Math.max(5, allocate + diff);
-                    } else if (!Fawe.get().getTimer().isAbove(targetTPS)) {
-                        allocate = Math.max(5, allocate - 1);
-                    }
+                long diff = (50 + SetQueue.this.last) - (SetQueue.this.last = now);
+                long absDiff = Math.abs(diff);
+                if (diff == 0) {
+                    allocate = Math.min(50, allocate + 1);
+                } else if (diff < 0) {
+                    allocate = Math.max(5, allocate + diff);
+                } else if (!Fawe.get().getTimer().isAbove(targetTPS)) {
+                    allocate = Math.max(5, allocate - 1);
+                }
 
-                    long currentAllocate = allocate - absDiff;
+                long currentAllocate = allocate - absDiff;
 
-                    if (!emptyTasks) {
-                        long taskAllocate = activeQueues.isEmpty() ? currentAllocate : 1 + (currentAllocate >> 1);
-                        long used = 0;
-                        boolean wait = false;
-                        do {
-                            Runnable task = tasks.poll();
-                            if (task == null) {
-                                if (wait) {
-                                    synchronized (tasks) {
-                                        tasks.wait(1);
-                                    }
-                                    task = tasks.poll();
-                                    wait = false;
-                                } else {
-                                    break;
+                if (!emptyTasks) {
+                    long taskAllocate = activeQueues.isEmpty() ? currentAllocate : 1 + (currentAllocate >> 1);
+                    long used = 0;
+                    boolean wait = false;
+                    do {
+                        Runnable task = tasks.poll();
+                        if (task == null) {
+                            if (wait) {
+                                synchronized (tasks) {
+                                    tasks.wait(1);
                                 }
-                            }
-                            if (task != null) {
-                                task.run();
-                                wait = true;
-                            }
-                        } while ((used = System.currentTimeMillis() - now) < taskAllocate);
-                        currentAllocate -= used;
-                    }
-
-                    if (empty) {
-                        runEmptyTasks();
-                        return;
-                    }
-
-                    if (!MemUtil.isMemoryFree()) {
-                        final int mem = MemUtil.calculateMemory();
-                        if (mem != Integer.MAX_VALUE) {
-                            allocate = Math.max(5, allocate - 1);
-                            if ((mem <= 1) && Settings.IMP.PREVENT_CRASHES) {
-                                for (FaweQueue queue : getAllQueues()) {
-                                    queue.saveMemory();
-                                }
-                                return;
-                            }
-                            if (SetQueue.this.forceChunkSet()) {
-                                System.gc();
+                                task = tasks.poll();
+                                wait = false;
                             } else {
-                                SetQueue.this.runEmptyTasks();
+                                break;
+                            }
+                        }
+                        if (task != null) {
+                            task.run();
+                            wait = true;
+                        }
+                    } while ((used = System.currentTimeMillis() - now) < taskAllocate);
+                    currentAllocate -= used;
+                }
+
+                if (empty) {
+                    runEmptyTasks();
+                    return;
+                }
+
+                if (!MemUtil.isMemoryFree()) {
+                    final int mem = MemUtil.calculateMemory();
+                    if (mem != Integer.MAX_VALUE) {
+                        allocate = Math.max(5, allocate - 1);
+                        if ((mem <= 1) && Settings.IMP.PREVENT_CRASHES) {
+                            for (FaweQueue queue : getAllQueues()) {
+                                queue.saveMemory();
                             }
                             return;
                         }
-                    }
-
-                    FaweQueue queue = getNextQueue();
-                    if (queue == null) {
+                        if (SetQueue.this.forceChunkSet()) {
+                            System.gc();
+                        } else {
+                            SetQueue.this.runEmptyTasks();
+                        }
                         return;
                     }
+                }
 
-                    long time = (long) Settings.IMP.QUEUE.EXTRA_TIME_MS + currentAllocate - System.currentTimeMillis() + now;
-                    // Disable the async catcher as it can't discern async vs parallel
-                    boolean parallel = Settings.IMP.QUEUE.PARALLEL_THREADS > 1;
-                    queue.startSet(parallel);
-                    try {
-                        if (!queue.next(Settings.IMP.QUEUE.PARALLEL_THREADS, time) && queue.getStage() == QueueStage.ACTIVE) {
-                            queue.setStage(QueueStage.NONE);
-                            queue.runTasks();
-                        }
-                    } catch (Throwable e) {
-                        pool.awaitQuiescence(Settings.IMP.QUEUE.DISCARD_AFTER_MS, TimeUnit.MILLISECONDS);
-                        completer = new ExecutorCompletionService(pool);
-                        e.printStackTrace();
+                FaweQueue queue = getNextQueue();
+                if (queue == null) {
+                    return;
+                }
+
+                long time = (long) Settings.IMP.QUEUE.EXTRA_TIME_MS + currentAllocate - System.currentTimeMillis() + now;
+                // Disable the async catcher as it can't discern async vs parallel
+                boolean parallel = Settings.IMP.QUEUE.PARALLEL_THREADS > 1;
+                queue.startSet(parallel);
+                try {
+                    if (!queue.next(Settings.IMP.QUEUE.PARALLEL_THREADS, time) && queue.getStage() == QueueStage.ACTIVE) {
+                        queue.setStage(QueueStage.NONE);
+                        queue.runTasks();
                     }
-                    if (pool.getQueuedSubmissionCount() != 0 || pool.getRunningThreadCount() != 0 || pool.getQueuedTaskCount() != 0) {
+                } catch (Throwable e) {
+                    pool.awaitQuiescence(Settings.IMP.QUEUE.DISCARD_AFTER_MS, TimeUnit.MILLISECONDS);
+                    completer = new ExecutorCompletionService(pool);
+                    e.printStackTrace();
+                }
+                if (pool.getQueuedSubmissionCount() != 0 || pool.getRunningThreadCount() != 0 || pool.getQueuedTaskCount() != 0) {
 //                        if (Fawe.get().isJava8())
-                        {
-                            pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-                        }
+                    {
+                        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                    }
 //                        else {
 //                            pool.shutdown();
 //                            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 //                            pool = new ForkJoinPool();
 //                            completer = new ExecutorCompletionService(pool);
 //                        }
-                    }
-                    queue.endSet(parallel);
-                } catch (Throwable e) {
-                    e.printStackTrace();
                 }
+                queue.endSet(parallel);
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }, 1);
     }
@@ -264,7 +261,7 @@ public class SetQueue {
 
     public void flush(FaweQueue queue) {
         int parallelThreads;
-        if (Fawe.get().isMainThread()) {
+        if (Fawe.isMainThread()) {
             parallelThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
             Settings.IMP.QUEUE.PARALLEL_THREADS = 1;
         } else {
