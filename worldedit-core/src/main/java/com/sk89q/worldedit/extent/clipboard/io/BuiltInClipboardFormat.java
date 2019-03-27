@@ -50,7 +50,7 @@ import com.sk89q.jnbt.Tag;
  */
 public enum BuiltInClipboardFormat implements ClipboardFormat{
     /**
-     * The Schematic format used by many software.
+     * The Schematic format used by MCEdit.
      */
     @Deprecated
     MCEDIT_SCHEMATIC("mcedit", "mce", "schematic") {
@@ -68,7 +68,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat{
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            throw new UnsupportedOperationException("No longer supported.");
+            throw new IOException("This format does not support saving, use `schem` as format");
         }
 
         @Override
