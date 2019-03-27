@@ -202,16 +202,12 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
         }
         vs[j] = combinedId;
         this.count[i]++;
-        switch (BlockTypes.getFromStateId(combinedId).getResource().toUpperCase()) {
-            case "AIR":
-            case "CAVE_AIR":
-            case "VOID_AIR":
-                this.air[i]++;
-                return;
-            default:
-                heightMap[z << 4 | x] = (byte) y;
-                return;
+        if (BlockTypes.getFromStateId(combinedId).getMaterial().isAir()) {
+            this.air[i]++;
+            return;
         }
+        heightMap[z << 4 | x] = (byte) y;
+        return;
     }
 
     @Deprecated

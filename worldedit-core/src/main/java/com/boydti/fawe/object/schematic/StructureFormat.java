@@ -84,7 +84,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         ListTag blocks = (ListTag) tags.get("blocks");
         if (blocks != null) {
             // Palette
-            List<CompoundTag> palette = (List<CompoundTag>) (List<?>) tags.get("palette").getValue();
+            List<CompoundTag> palette = (List<CompoundTag>) tags.get("palette").getValue();
             BlockState[] combinedArray = new BlockState[palette.size()];
             for (int i = 0; i < palette.size(); i++) {
                 CompoundTag compound = palette.get(i);
@@ -108,7 +108,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
                 combinedArray[i] = state;
             }
             // Populate blocks
-            List<CompoundTag> blocksList = (List<CompoundTag>) (List<?>) tags.get("blocks").getValue();
+            List<CompoundTag> blocksList = (List<CompoundTag>) tags.get("blocks").getValue();
             try {
                 for (CompoundTag compound : blocksList) {
                     Map<String, Tag> blockMap = compound.getValue();
@@ -184,7 +184,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
                     continue;
                 }
 
-                indexes.put((int) combined, (Integer) palette.size());
+                indexes.put(combined, (Integer) palette.size());
                 HashMap<String, Object> paletteEntry = new HashMap<>();
                 paletteEntry.put("Name", type.getId());
                 if (block.getInternalId() != type.getInternalId()) {
@@ -213,18 +213,17 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
             BlockVector3 min = region.getMinimumPoint();
             for (BlockVector3 point : region) {
                 BaseBlock block = clipboard.getFullBlock(point);
-                switch (block.getBlockType().getResource().toUpperCase()) {
-                    case "STRUCTURE_VOID":
-                        continue;
-                    default:
-                        int combined = block.getInternalId();
-                        int index = indexes.get(combined);
-                        List<Integer> pos = Arrays.asList((int) (point.getX() - min.getX()), (int) (point.getY() - min.getY()), (int) (point.getZ() - min.getZ()));
-                        if (!block.hasNbtData()) {
-                            blocks.add(FaweCache.asMap("state", index, "pos", pos));
-                        } else {
-                            blocks.add(FaweCache.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
-                        }
+                if (block.getBlockType() != BlockTypes.STRUCTURE_VOID) {
+                    int combined = block.getInternalId();
+                    int index = indexes.get(combined);
+                    List<Integer> pos = Arrays.asList(point.getX() - min.getX(),
+                        point.getY() - min.getY(), point.getZ() - min.getZ());
+                    if (!block.hasNbtData()) {
+                        blocks.add(FaweCache.asMap("state", index, "pos", pos));
+                    } else {
+                        blocks.add(
+                            FaweCache.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
+                    }
                 }
             }
             if (!blocks.isEmpty()) {
@@ -268,7 +267,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
     }
 
     private Tag writeVector(BlockVector3 vector, String name) {
-        List<DoubleTag> list = new ArrayList<DoubleTag>();
+        List<DoubleTag> list = new ArrayList<>();
         list.add(new DoubleTag(vector.getX()));
         list.add(new DoubleTag(vector.getY()));
         list.add(new DoubleTag(vector.getZ()));
@@ -276,7 +275,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
     }
 
     private Tag writeRotation(Location location, String name) {
-        List<FloatTag> list = new ArrayList<FloatTag>();
+        List<FloatTag> list = new ArrayList<>();
         list.add(new FloatTag(location.getYaw()));
         list.add(new FloatTag(location.getPitch()));
         return new ListTag(FloatTag.class, list);

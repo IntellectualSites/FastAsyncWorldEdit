@@ -205,11 +205,8 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
         }
         if (lastCombinedIds == null) {
         	BlockType bt = BlockTypes.getFromStateId(v);
-            switch (bt.getResource().toUpperCase()) {
-                case "AIR":
-                case "CAVE_AIR":
-                case "VOID_AIR":
-                    return;
+            if (bt.getMaterial().isAir()) {
+                return;
             }
             lastCombinedIds = new byte[BLOCK_SIZE];
         }
@@ -299,13 +296,8 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++, index++) {
                         BaseBlock block = getBlock(index);
-                        switch (block.getBlockType().getResource().toUpperCase()) {
-                            case "AIR":
-                            case "CAVE_AIR":
-                            case "VOID_AIR":
-                                continue;
-                            default:
-                                task.run(x, y, z, block);
+                        if (!block.getMaterial().isAir()) {
+                            task.run(x, y, z, block);
                         }
                     }
                 }

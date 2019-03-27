@@ -115,17 +115,12 @@ public class VisualChunk extends FaweChunk<FaweChunk> {
     public void setBlock(int x, int y, int z, int combinedId) {
         int index = getIndex(x, y, z);
         try {
-            switch (BlockTypes.getFromStateId(combinedId).getResource().toUpperCase()) {
-                case "AIR":
-                case "CAVE_AIR":
-                case "VOID_AIR":
-                    add.clear(index);
-                    remove.set(index);
-                    break;
-                default:
-                    remove.clear(index);
-                    add.set(index);
-                    break;
+            if (BlockTypes.getFromStateId(combinedId).getMaterial().isAir()) {
+                add.clear(index);
+                remove.set(index);
+            } else {
+                remove.clear(index);
+                add.set(index);
             }
         } catch (Throwable e) {
             e.printStackTrace();

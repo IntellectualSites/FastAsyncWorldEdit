@@ -404,23 +404,18 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                     for (int x = 0; x < width; x++, pos += 4) {
                         int combinedId = mbb.getInt(pos);
                         BlockType type = BlockTypes.getFromStateId(combinedId);
-                        switch (type.getResource().toUpperCase()) {
-                            case "AIR":
-                            case "CAVE_AIR":
-                            case "VOID_AIR":
-                                continue;
-                            default:
-                                BlockState state = type.withStateId(combinedId);
-                                if (type.getMaterial().hasContainer()) {
-                                    trio.set(x, y, z);
-                                    CompoundTag nbt = nbtMap.get(trio);
-                                    if (nbt != null) {
-                                        BaseBlock block = new BaseBlock(state, nbt);
-                                        task.run(x, y, z, block);
-                                        continue;
-                                    }
+                        if (!type.getMaterial().isAir()) {
+                            BlockState state = type.withStateId(combinedId);
+                            if (type.getMaterial().hasContainer()) {
+                                trio.set(x, y, z);
+                                CompoundTag nbt = nbtMap.get(trio);
+                                if (nbt != null) {
+                                    BaseBlock block = new BaseBlock(state, nbt);
+                                    task.run(x, y, z, block);
+                                    continue;
                                 }
-                                task.run(x, y, z, state);
+                            }
+                            task.run(x, y, z, state);
                         }
                     }
                 }

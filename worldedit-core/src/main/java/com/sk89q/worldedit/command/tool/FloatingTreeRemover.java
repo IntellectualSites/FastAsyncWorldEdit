@@ -66,7 +66,7 @@ public class FloatingTreeRemover implements BlockTool {
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config,
-                              Player player, LocalSession session, Location clicked) {
+            Player player, LocalSession session, Location clicked) {
 
         final World world = (World) clicked.getExtent();
         final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
@@ -132,13 +132,8 @@ public class FloatingTreeRemover implements BlockTool {
 
                 if (visited.add(next)) {
                     BlockState state = world.getBlock(next);
-                    BlockType type = state.getBlockType();
-                    switch (type.getResource().toUpperCase()) {
-                        case "AIR":
-                        case "CAVE_AIR":
-                        case "VOID_AIR":
-                        case "SNOW":
-                            continue;
+                    if (state.getBlockType().getMaterial().isAir() || state.getBlockType() == BlockTypes.SNOW) {
+                        continue;
                     }
                     if (isTreeBlock(state.getBlockType())) {
                         queue.addLast(next);

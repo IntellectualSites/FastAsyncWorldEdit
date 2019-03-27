@@ -284,11 +284,8 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                     int combined = getCombinedId4Data(xx, y, zz);
                     BaseBlock block = BlockState.getFromInternalId(combined).toBaseBlock();
                     BlockType type = block.getBlockType();
-                    switch (type.getResource().toUpperCase()) {
-                        case "AIR":
-                        case "VOID_AIR":
-                        case "CAVE_AIR":
-                            continue;
+                    if (type.getMaterial().isAir()) {
+                        continue;
                     }
                     mutable.mutY(y);
                     CompoundTag tile = getTileEntity(x, y, z);
