@@ -277,8 +277,7 @@ public class SchematicCommands extends MethodCommands {
         }
     }
 
-    @Command(
-            aliases = {"save"}, usage = "[format] <filename>", desc = "Save a schematic into your clipboard", help = "The default format for 1.13 is schem")
+    @Command(aliases = {"save"}, usage = "[format] <filename>", desc = "Save a schematic into your clipboard", help = "The default format for 1.13 is schem")
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other"})
     public void save(final Player player, final LocalSession session, @Optional("schem") final String formatName, String filename, @Switch('g') boolean global) throws CommandException, WorldEditException {
