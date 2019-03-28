@@ -124,10 +124,6 @@ public abstract class FawePlayer<T> extends Metadatable {
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
-        Updater updater = Fawe.get().getUpdater();
-        if (updater != null && updater.hasPending(this)) {
-            TaskManager.IMP.async(() -> updater.confirmUpdate(this));
-        }
     }
 
     public int cancel(boolean close) {
