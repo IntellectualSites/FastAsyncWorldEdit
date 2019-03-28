@@ -26,16 +26,9 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
-import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
@@ -271,12 +264,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 		return toImmutableState().getInternalPropertiesId();
 	}
 
-	@Override
-	public Mask toMask(Extent extent) {
-		return new SingleBlockStateMask(extent, toImmutableState());
-	}
-
-	@Override
+    @Override
 	public <V> BaseBlock with(Property<V> property, V value) {
 		return toImmutableState().with(property, value).toBaseBlock(getNbtData());
 	}

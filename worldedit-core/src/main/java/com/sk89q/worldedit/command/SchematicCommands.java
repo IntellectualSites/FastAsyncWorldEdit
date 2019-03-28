@@ -176,7 +176,7 @@ public class SchematicCommands extends MethodCommands {
     @CommandPermissions({"worldedit.schematic.remap"})
     public void remap(final Player player, final LocalSession session) throws WorldEditException {
         ClipboardRemapper remapper;
-        if (Fawe.imp().getPlatform().equalsIgnoreCase("nukkit")) {
+        if (false) {
             remapper = new ClipboardRemapper(ClipboardRemapper.RemapPlatform.PC, ClipboardRemapper.RemapPlatform.PE);
         } else {
             remapper = new ClipboardRemapper(ClipboardRemapper.RemapPlatform.PE, ClipboardRemapper.RemapPlatform.PC);

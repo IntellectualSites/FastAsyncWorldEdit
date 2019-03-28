@@ -55,7 +55,7 @@ public class Message {
         return text(caption.format(args));
     }
 
-    public Message text(Object text) {
+    public Message text(java.io.Serializable text) {
         Fawe.get().getChatManager().text(this, BBC.color(Objects.toString(text)));
         return this;
     }

@@ -36,8 +36,6 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
-import com.boydti.fawe.util.gui.FormBuilder;
-import com.boydti.fawe.wrappers.FakePlayer;
 import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.*;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -393,17 +391,7 @@ public class ClipboardCommands extends MethodCommands {
 	                    e.printStackTrace();
 	                }
 	            }
-	            if (Fawe.imp().getPlatform().equalsIgnoreCase("nukkit")) {
-	                FormBuilder form = Fawe.imp().getFormBuilder();
-	                FawePlayer<Object> fp = FawePlayer.wrap(player);
-	                if (form != null && fp != FakePlayer.getConsole().toFawePlayer()) {
-	                    form.setTitle("Download Clipboard");
-	                    form.addInput("url:", urlText, urlText);
-	                    form.display(fp);
-	                    return;
-	                }
-	            }
-	            BBC.DOWNLOAD_LINK.send(player, urlText);
+              BBC.DOWNLOAD_LINK.send(player, urlText);
 	        }
 	    }
     }

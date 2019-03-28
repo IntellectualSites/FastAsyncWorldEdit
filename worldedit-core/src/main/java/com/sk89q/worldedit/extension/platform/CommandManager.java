@@ -359,7 +359,7 @@ public final class CommandManager {
         return split;
     }
 
-    public void handleCommandOnCurrentThread(final CommandEvent event) {
+    public void handleCommandOnCurrentThread(CommandEvent event) {
         Actor actor = platformManager.createProxyActor(event.getActor());
         final String args = event.getArguments();
         final String[] split = commandDetection(args.split(" "));
@@ -408,12 +408,8 @@ public final class CommandManager {
         final Actor finalActor = actor;
         locals.put("arguments", args);
 
-        ThrowableSupplier<Throwable> task = new ThrowableSupplier<Throwable>() {
-            @Override
-            public Object get() throws Throwable {
-                return dispatcher.call(Joiner.on(" ").join(split), locals, new String[0]);
-            }
-        };
+        ThrowableSupplier<Throwable> task =
+            () -> dispatcher.call(Joiner.on(" ").join(split), locals, new String[0]);
 
         handleCommandTask(task, locals, actor, session, failedPermissions, fp);
     }
@@ -517,29 +513,21 @@ public final class CommandManager {
         String args = event.getArguments();
         CommandEvent finalEvent = new CommandEvent(actor, args);
         final FawePlayer<Object> fp = FawePlayer.wrap(actor);
-        TaskManager.IMP.taskNow(new Runnable() {
-            @Override
-            public void run() {
-                int space0 = args.indexOf(' ');
-                String arg0 = space0 == -1 ? args : args.substring(0, space0);
-                CommandMapping cmd = dispatcher.get(arg0);
-                if (cmd != null && cmd.getCallable() instanceof AParametricCallable) {
-                    Command info = ((AParametricCallable) cmd.getCallable()).getDefinition();
-                    if (!info.queued()) {
-                        handleCommandOnCurrentThread(finalEvent);
-                        return;
-                    }
+        TaskManager.IMP.taskNow(() -> {
+            int space0 = args.indexOf(' ');
+            String arg0 = space0 == -1 ? args : args.substring(0, space0);
+            CommandMapping cmd = dispatcher.get(arg0);
+            if (cmd != null && cmd.getCallable() instanceof AParametricCallable) {
+                Command info = ((AParametricCallable) cmd.getCallable()).getDefinition();
+                if (!info.queued()) {
+                    handleCommandOnCurrentThread(finalEvent);
+                    return;
                 }
-                if (!fp.runAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        handleCommandOnCurrentThread(finalEvent);
-                    }
-                }, false, true)) {
-                    BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
-                }
-                finalEvent.setCancelled(true);
             }
+            if (!fp.runAction(() -> handleCommandOnCurrentThread(finalEvent), false, true)) {
+                BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
+            }
+            finalEvent.setCancelled(true);
         }, Fawe.isMainThread());
     }
 
@@ -548,6 +536,7 @@ public final class CommandManager {
         try {
             CommandLocals locals = new CommandLocals();
             locals.put(Actor.class, event.getActor());
+            locals.put("arguments", event.getArguments());
             event.setSuggestions(dispatcher.getSuggestions(event.getArguments(), locals));
         } catch (CommandException e) {
             event.getActor().printError(e.getMessage());

@@ -27,8 +27,6 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
@@ -223,11 +221,6 @@ public class BlockState implements BlockStateHolder<BlockState> {
     @Override
     public BlockState withPropertyId(int propertyId) {
         return getBlockType().withPropertyId(propertyId);
-    }
-
-    @Override
-    public Mask toMask(Extent extent) {
-        return new SingleBlockStateMask(extent, this);
     }
 
     @Override

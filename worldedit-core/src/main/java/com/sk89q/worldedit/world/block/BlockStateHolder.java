@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.registry.state.Property;
@@ -30,7 +28,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePattern {
+public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePattern {
 
     /**
      * Get the block type
@@ -45,7 +43,7 @@ public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePat
      * @return
      */
     @Deprecated
-    T withPropertyId(int propertyId);
+    B withPropertyId(int propertyId);
 
     /**
      * Get combined id (legacy uses)
@@ -72,16 +70,14 @@ public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePat
     @Deprecated
     int getInternalPropertiesId();
 
-    Mask toMask(Extent extent);
-
     /**
-     * Returns a BlockStateHolder with the given state and value applied.
+     * Returns a BlockState with the given state and value applied.
      *
      * @param property The state
      * @param value The value
      * @return The modified state, or same if could not be applied
      */
-    <V> T with(final Property<V> property, final V value);
+    <V> B with(final Property<V> property, final V value);
 
     /**
      * Returns a BlockStateHolder with the given state and value applied.
@@ -90,7 +86,7 @@ public interface BlockStateHolder<T extends BlockStateHolder<T>> extends FawePat
      * @param value The value
      * @return The modified state, or same if could not be applied
      */
-    <V> T with(final PropertyKey property, final V value);
+    <V> B with(final PropertyKey property, final V value);
 
     /**
      * Gets the value at the given state
