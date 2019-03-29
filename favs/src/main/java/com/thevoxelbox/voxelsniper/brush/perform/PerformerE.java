@@ -99,7 +99,7 @@ public enum PerformerE
     public static String performer_list_short = "";
     public static String performer_list_long = "";
 
-    private PerformerE(Class<? extends vPerformer> c, String s, String l)
+    PerformerE(Class<? extends vPerformer> c, String s, String l)
     {
         pclass = c;
         short_name = s;
@@ -116,28 +116,12 @@ public enum PerformerE
                 p = pclass.getConstructor().newInstance();
                 return p;
             }
-            catch (InstantiationException ex)
-            {
-                Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            catch (IllegalAccessException ex)
-            {
-                Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            catch (IllegalArgumentException ex)
-            {
-                Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            catch (InvocationTargetException ex)
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException ex)
             {
                 Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        catch (NoSuchMethodException ex)
-        {
-            Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        catch (SecurityException ex)
+        catch (NoSuchMethodException | SecurityException ex)
         {
             Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
         }

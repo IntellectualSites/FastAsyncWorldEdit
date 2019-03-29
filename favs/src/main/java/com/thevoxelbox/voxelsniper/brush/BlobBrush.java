@@ -120,10 +120,7 @@ public class BlobBrush extends PerformBrush
             {
                 for (int y = brushSizeDoubled; y >= 0; y--)
                 {
-                    for (int z = brushSizeDoubled; z >= 0; z--)
-                    {
-                        splat[x][y][z] = tempSplat[x][y][z];
-                    }
+                    System.arraycopy(tempSplat[x][y], 0, splat[x][y], 0, brushSizeDoubled + 1);
                 }
             }
         }
@@ -218,10 +215,7 @@ public class BlobBrush extends PerformBrush
             {
                 for (int y = brushSizeDoubled; y >= 0; y--)
                 {
-                    for (int z = brushSizeDoubled; z >= 0; z--)
-                    {
-                        splat[x][y][z] = tempSplat[x][y][z];
-                    }
+                    System.arraycopy(tempSplat[x][y], 0, splat[x][y], 0, brushSizeDoubled + 1);
                 }
             }
         }

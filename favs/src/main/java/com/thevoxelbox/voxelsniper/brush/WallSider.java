@@ -104,7 +104,7 @@ public class WallSider extends Brush{
                 if (this.c > 4 || this.c < 0) {
                     this.c = 4;
                 }
-                snipeData.sendMessage(ChatColor.AQUA + "Orientation set to " + this.facings[this.c]);
+                snipeData.sendMessage(ChatColor.AQUA + "Orientation set to " + facings[this.c]);
             }
             else if (lowerCase.startsWith("true")) {
                 this.e = 0.5;

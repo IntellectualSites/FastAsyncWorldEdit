@@ -730,9 +730,7 @@ public class SpiralStaircaseBrush extends Brush
                 v.sendMessage(ChatColor.BLUE + "Staircase type: " + this.stairtype);
                 return;
             } catch (InputParseException ignore) {}
-            switch (par[i].toLowerCase()) {
-                case "block":
-
+            if ("block".equals(par[i].toLowerCase())) {
             }
             if (par[i].equalsIgnoreCase("block") || par[i].equalsIgnoreCase("step") || par[i].equalsIgnoreCase("woodstair") || par[i].equalsIgnoreCase("cobblestair"))
             {

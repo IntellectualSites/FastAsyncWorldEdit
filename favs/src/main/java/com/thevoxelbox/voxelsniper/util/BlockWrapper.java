@@ -1,6 +1,7 @@
 package com.thevoxelbox.voxelsniper.util;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 /**
@@ -10,6 +11,7 @@ public class BlockWrapper
 {
 
     private int id;
+    private Material type;
     private int x;
     private int y;
     private int z;
@@ -36,6 +38,10 @@ public class BlockWrapper
     public final int getPropertyId()
     {
         return this.data;
+    }
+
+    public Material getType() {
+        return type;
     }
 
     /**
@@ -131,4 +137,9 @@ public class BlockWrapper
     {
         this.z = z;
     }
+
+    public void setType(Material type) {
+        this.type = type;
+    }
+
 }

@@ -163,16 +163,11 @@ public class Rot2DBrush extends Brush
     {
         this.bSize = v.getBrushSize();
 
-        switch (this.mode)
-        {
-            case 0:
-                this.getMatrix();
-                this.rotate(v);
-                break;
-
-            default:
-                v.sendMessage(ChatColor.RED + "Something went wrong.");
-                break;
+        if (this.mode == 0) {
+            this.getMatrix();
+            this.rotate(v);
+        } else {
+            v.sendMessage(ChatColor.RED + "Something went wrong.");
         }
     }
 
@@ -181,16 +176,11 @@ public class Rot2DBrush extends Brush
     {
         this.bSize = v.getBrushSize();
 
-        switch (this.mode)
-        {
-            case 0:
-                this.getMatrix();
-                this.rotate(v);
-                break;
-
-            default:
-                v.sendMessage(ChatColor.RED + "Something went wrong.");
-                break;
+        if (this.mode == 0) {
+            this.getMatrix();
+            this.rotate(v);
+        } else {
+            v.sendMessage(ChatColor.RED + "Something went wrong.");
         }
     }
 

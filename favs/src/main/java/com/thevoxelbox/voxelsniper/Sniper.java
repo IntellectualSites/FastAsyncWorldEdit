@@ -94,7 +94,7 @@ public class Sniper {
     }
 
     public String getCurrentToolId() {
-        return getToolId((getPlayer().getItemInHand() != null) ? getPlayer().getItemInHand().getType() : null);
+        return getToolId((getPlayer().getInventory().getItemInMainHand() != null) ? getPlayer().getInventory().getItemInMainHand().getType() : null);
     }
 
     public String getToolId(Material itemInHand) {
@@ -169,17 +169,10 @@ public class Sniper {
         try {
             Player player = getPlayer();
             final FawePlayer<Player> fp = FawePlayer.wrap(player);
-            TaskManager.IMP.taskNow(new Runnable() {
-                @Override
-                public void run() {
-                    if (!fp.runAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            snipeOnCurrentThread(fp, action, itemInHand, clickedBlock, clickedFace, sniperTool, toolId);
-                        }
-                    }, false, true)) {
-                        BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
-                    }
+            TaskManager.IMP.taskNow(() -> {
+                if (!fp.runAction(
+                    () -> snipeOnCurrentThread(fp, action, itemInHand, clickedBlock, clickedFace, sniperTool, toolId), false, true)) {
+                    BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
                 }
             }, Fawe.isMainThread());
             return true;
@@ -660,9 +653,7 @@ public class Sniper {
         private IBrush instantiateBrush(Class<? extends IBrush> brush) {
             try {
                 return brush.newInstance();
-            } catch (InstantiationException e) {
-                return null;
-            } catch (IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException e) {
                 return null;
             }
         }

@@ -152,22 +152,17 @@ public class SnowConeBrush extends Brush
     @Override
     protected final void powder(final SnipeData v)
     {
-        switch (getTargetBlock().getType())
-        {
-            case SNOW:
-                this.addSnow(v, this.getTargetBlock());
-                break;
-            default:
-                Block blockAbove = getTargetBlock().getRelative(BlockFace.UP);
-                if (blockAbove != null && BukkitAdapter.adapt(blockAbove.getType()).getMaterial().isAir())
-                {
-                    addSnow(v, blockAbove);
-                }
-                else
-                {
-                    v.owner().getPlayer().sendMessage(ChatColor.RED + "Error: Center block neither snow nor air.");
-                }
-                break;
+        if (getTargetBlock().getType() == Material.SNOW) {
+            this.addSnow(v, this.getTargetBlock());
+        } else {
+            Block blockAbove = getTargetBlock().getRelative(BlockFace.UP);
+            if (blockAbove != null && BukkitAdapter.adapt(blockAbove.getType()).getMaterial()
+                .isAir()) {
+                addSnow(v, blockAbove);
+            } else {
+                v.owner().getPlayer()
+                    .sendMessage(ChatColor.RED + "Error: Center block neither snow nor air.");
+            }
         }
     }
 

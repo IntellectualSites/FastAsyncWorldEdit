@@ -82,17 +82,18 @@ public class BiomeBrush extends Brush
         if (args[1].equalsIgnoreCase("info"))
         {
             v.sendMessage(ChatColor.GOLD + "Biome Brush Parameters:");
-            String availableBiomes = "";
+            StringBuilder availableBiomes = new StringBuilder();
 
             for (final Biome biome : Biome.values())
             {
-                if (availableBiomes.isEmpty())
+                if (availableBiomes.length() == 0)
                 {
-                    availableBiomes = ChatColor.DARK_GREEN + biome.name();
+                    availableBiomes = new StringBuilder(ChatColor.DARK_GREEN + biome.name());
                     continue;
                 }
 
-                availableBiomes += ChatColor.RED + ", " + ChatColor.DARK_GREEN + biome.name();
+                availableBiomes.append(ChatColor.RED + ", " + ChatColor.DARK_GREEN)
+                    .append(biome.name());
 
             }
             v.sendMessage(ChatColor.DARK_BLUE + "Available biomes: " + availableBiomes);
@@ -100,15 +101,15 @@ public class BiomeBrush extends Brush
         else
         {
             // allows biome names with spaces in their name
-            String biomeName = args[1];
+            StringBuilder biomeName = new StringBuilder(args[1]);
             for (int i = 2; i < args.length; i++)
             {
-                biomeName += " " + args[i];
+                biomeName.append(" ").append(args[i]);
             }
 
             for (final Biome biome : Biome.values())
             {
-                if (biome.name().equalsIgnoreCase(biomeName))
+                if (biome.name().equalsIgnoreCase(biomeName.toString()))
                 {
                     this.selectedBiome = biome;
                     break;

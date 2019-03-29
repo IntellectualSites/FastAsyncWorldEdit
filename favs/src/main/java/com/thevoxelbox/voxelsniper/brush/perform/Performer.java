@@ -12,7 +12,7 @@ import com.thevoxelbox.voxelsniper.Message;
 public interface Performer
 {
 
-    public void parse(String[] args, com.thevoxelbox.voxelsniper.SnipeData v);
+    void parse(String[] args, com.thevoxelbox.voxelsniper.SnipeData v);
 
-    public void showInfo(Message vm);
+    void showInfo(Message vm);
 }
