@@ -29,6 +29,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -38,7 +39,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 // TODO FIXME
-public class TextureUtil implements TextureHolder{
+public class TextureUtil implements TextureHolder {
 
     public static TextureUtil fromClipboard(Clipboard clipboard) throws FileNotFoundException {
         boolean[] ids = new boolean[BlockTypes.size()];
@@ -47,7 +48,9 @@ public class TextureUtil implements TextureHolder{
         }
         HashSet<BlockType> blocks = new HashSet<>();
         for (int typeId = 0; typeId < ids.length; typeId++) {
-            if (ids[typeId]) blocks.add(BlockTypes.get(typeId));
+            if (ids[typeId]) {
+                blocks.add(BlockTypes.get(typeId));
+            }
         }
         return fromBlocks(blocks);
     }
@@ -65,13 +68,14 @@ public class TextureUtil implements TextureHolder{
         for (int typeId : tu.getValidBlockIds()) {
             BlockType block = BlockTypes.get(typeId);
             pattern.setBlock(block.getDefaultState());
-            if (mask.test(BlockVector3.ZERO)) blocks.add(block);
+            if (mask.test(BlockVector3.ZERO)) {
+                blocks.add(block);
+            }
         }
         return fromBlocks(blocks);
     }
 
-    @Override
-    public TextureUtil getTextureUtil() {
+    @Override public TextureUtil getTextureUtil() {
         return this;
     }
 
@@ -100,266 +104,270 @@ public class TextureUtil implements TextureHolder{
      * https://github.com/erich666/Mineways/blob/master/Win/biomes.cpp
      */
     protected BiomeColor[] validBiomes;
-    private BiomeColor[] biomes = new BiomeColor[]{
-            //    ID    Name             Temperature, rainfall, grass, foliage colors
-            //    - note: the colors here are just placeholders, they are computed in the program
-            new BiomeColor(0, "Ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),    // default values of temp and rain
-            new BiomeColor(1, "Plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(2, "Desert", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(3, "Extreme Hills", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(4, "Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(5, "Taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(6, "Swampland", 0.8f, 0.9f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(7, "River", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),    // default values of temp and rain
-            new BiomeColor(8, "Nether", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(9, "End", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),    // default values of temp and rain
-            new BiomeColor(10, "Frozen Ocean", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(11, "Frozen River", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(12, "Ice Plains", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(13, "Ice Mountains", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(14, "Mushroom Island", 0.9f, 1.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(15, "Mushroom Island Shore", 0.9f, 1.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(16, "Beach", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(17, "Desert Hills", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(18, "Forest Hills", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(19, "Taiga Hills", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(20, "Extreme Hills Edge", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(21, "Jungle", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(22, "Jungle Hills", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(23, "Jungle Edge", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(24, "Deep Ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(25, "Stone Beach", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(26, "Cold Beach", 0.05f, 0.3f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(27, "Birch Forest", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(28, "Birch Forest Hills", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(29, "Roofed Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(30, "Cold Taiga", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(31, "Cold Taiga Hills", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(32, "Mega Taiga", 0.3f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(33, "Mega Taiga Hills", 0.3f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(34, "Extreme Hills+", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(35, "Savanna", 1.2f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(36, "Savanna Plateau", 1.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(37, "Mesa", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(38, "Mesa Plateau F", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(39, "Mesa Plateau", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(40, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(41, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(42, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(43, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(44, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(45, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(46, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(47, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(48, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(49, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(50, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(51, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(52, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(53, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(54, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(55, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(56, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(57, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(58, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(59, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(60, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(61, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(62, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(63, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(64, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(65, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(66, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(67, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(68, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(69, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(70, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(71, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(72, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(73, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(74, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(75, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(76, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(77, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(78, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(79, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(80, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(81, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(82, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(83, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(84, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(85, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(86, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(87, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(88, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(89, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(90, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(91, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(92, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(93, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(94, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(95, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(96, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(97, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(98, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(99, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(100, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(101, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(102, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(103, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(104, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(105, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(106, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(107, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(108, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(109, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(110, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(111, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(112, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(113, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(114, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(115, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(116, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(117, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(118, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(119, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(120, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(121, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(122, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(123, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(124, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(125, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(126, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(127, "The Void", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),    // default values of temp and rain; also, no height differences
-            new BiomeColor(128, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(129, "Sunflower Plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(130, "Desert M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(131, "Extreme Hills M", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(132, "Flower Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(133, "Taiga M", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(134, "Swampland M", 0.8f, 0.9f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(135, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(136, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(137, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(138, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(139, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(140, "Ice Plains Spikes", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(141, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(142, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(143, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(144, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(145, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(146, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(147, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(148, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(149, "Jungle M", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(150, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(151, "JungleEdge M", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(152, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(153, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(154, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(155, "Birch Forest M", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(156, "Birch Forest Hills M", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(157, "Roofed Forest M", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(158, "Cold Taiga M", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(159, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(160, "Mega Spruce Taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),    // special exception, temperature not 0.3
-            new BiomeColor(161, "Mega Spruce Taiga Hills", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(162, "Extreme Hills+ M", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(163, "Savanna M", 1.1f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(164, "Savanna Plateau M", 1.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(165, "Mesa (Bryce)", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(166, "Mesa Plateau F M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(167, "Mesa Plateau M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(168, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(169, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(170, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(171, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(172, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(173, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(174, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(175, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(176, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(177, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(178, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(179, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(180, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(181, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(182, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(183, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(184, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(185, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(186, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(187, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(188, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(189, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(190, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(191, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(192, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(193, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(194, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(195, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(196, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(197, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(198, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(199, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(200, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(201, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(202, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(203, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(204, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(205, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(206, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(207, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(208, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(209, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(210, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(211, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(212, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(213, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(214, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(215, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(216, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(217, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(218, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(219, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(220, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(221, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(222, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(223, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(224, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(225, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(226, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(227, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(228, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(229, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(230, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(231, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(232, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(233, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(234, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(235, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(236, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(237, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(238, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(239, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(240, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(241, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(242, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(243, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(244, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(245, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(246, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(247, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(248, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(249, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(250, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(251, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(252, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(253, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(254, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-            new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-    };
+    private BiomeColor[] biomes = new BiomeColor[] {
+        //    ID    Name             Temperature, rainfall, grass, foliage colors
+        //    - note: the colors here are just placeholders, they are computed in the program
+        new BiomeColor(0, "Ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        // default values of temp and rain
+        new BiomeColor(1, "Plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(2, "Desert", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(3, "Extreme Hills", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(4, "Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(5, "Taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(6, "Swampland", 0.8f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(7, "River", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        // default values of temp and rain
+        new BiomeColor(8, "Nether", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(9, "End", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        // default values of temp and rain
+        new BiomeColor(10, "Frozen Ocean", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(11, "Frozen River", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(12, "Ice Plains", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(13, "Ice Mountains", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(14, "Mushroom Island", 0.9f, 1.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(15, "Mushroom Island Shore", 0.9f, 1.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(16, "Beach", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(17, "Desert Hills", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(18, "Forest Hills", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(19, "Taiga Hills", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(20, "Extreme Hills Edge", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(21, "Jungle", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(22, "Jungle Hills", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(23, "Jungle Edge", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(24, "Deep Ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(25, "Stone Beach", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(26, "Cold Beach", 0.05f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(27, "Birch Forest", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(28, "Birch Forest Hills", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(29, "Roofed Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(30, "Cold Taiga", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(31, "Cold Taiga Hills", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(32, "Mega Taiga", 0.3f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(33, "Mega Taiga Hills", 0.3f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(34, "Extreme Hills+", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(35, "Savanna", 1.2f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(36, "Savanna Plateau", 1.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(37, "Mesa", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(38, "Mesa Plateau F", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(39, "Mesa Plateau", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(40, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(41, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(42, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(43, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(44, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(45, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(46, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(47, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(48, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(49, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(50, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(51, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(52, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(53, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(54, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(55, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(56, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(57, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(58, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(59, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(60, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(61, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(62, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(63, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(64, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(65, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(66, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(67, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(68, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(69, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(70, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(71, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(72, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(73, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(74, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(75, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(76, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(77, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(78, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(79, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(80, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(81, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(82, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(83, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(84, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(85, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(86, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(87, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(88, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(89, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(90, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(91, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(92, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(93, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(94, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(95, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(96, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(97, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(98, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(99, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(100, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(101, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(102, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(103, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(104, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(105, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(106, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(107, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(108, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(109, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(110, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(111, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(112, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(113, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(114, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(115, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(116, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(117, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(118, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(119, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(120, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(121, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(122, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(123, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(124, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(125, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(126, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(127, "The Void", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        // default values of temp and rain; also, no height differences
+        new BiomeColor(128, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(129, "Sunflower Plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(130, "Desert M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(131, "Extreme Hills M", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(132, "Flower Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(133, "Taiga M", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(134, "Swampland M", 0.8f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(135, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(136, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(137, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(138, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(139, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(140, "Ice Plains Spikes", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(141, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(142, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(143, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(144, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(145, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(146, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(147, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(148, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(149, "Jungle M", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(150, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(151, "JungleEdge M", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(152, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(153, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(154, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(155, "Birch Forest M", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(156, "Birch Forest Hills M", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(157, "Roofed Forest M", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(158, "Cold Taiga M", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(159, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(160, "Mega Spruce Taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        // special exception, temperature not 0.3
+        new BiomeColor(161, "Mega Spruce Taiga Hills", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(162, "Extreme Hills+ M", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(163, "Savanna M", 1.1f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(164, "Savanna Plateau M", 1.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(165, "Mesa (Bryce)", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(166, "Mesa Plateau F M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(167, "Mesa Plateau M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(168, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(169, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(170, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(171, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(172, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(173, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(174, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(175, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(176, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(177, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(178, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(179, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(180, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(181, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(182, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(183, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(184, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(185, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(186, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(187, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(188, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(189, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(190, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(191, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(192, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(193, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(194, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(195, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(196, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(197, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(198, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(199, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(200, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(201, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(202, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(203, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(204, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(205, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(206, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(207, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(208, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(209, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(210, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(211, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(212, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(213, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(214, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(215, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(216, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(217, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(218, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(219, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(220, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(221, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(222, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(223, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(224, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(225, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(226, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(227, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(228, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(229, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(230, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(231, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(232, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(233, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(234, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(235, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(236, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(237, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(238, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(239, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(240, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(241, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(242, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(243, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(244, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(245, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(246, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(247, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(248, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(249, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(250, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(251, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(252, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(253, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(254, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),};
 
     public TextureUtil() throws FileNotFoundException {
         this(MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.TEXTURES));
@@ -368,7 +376,8 @@ public class TextureUtil implements TextureHolder{
     public TextureUtil(File folder) throws FileNotFoundException {
         this.folder = folder;
         if (!folder.exists()) {
-            throw new FileNotFoundException("Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+            throw new FileNotFoundException(
+                "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
         }
     }
 
@@ -389,13 +398,17 @@ public class TextureUtil implements TextureHolder{
                 }
             }
         }
-        if (min == Long.MAX_VALUE) return null;
+        if (min == Long.MAX_VALUE) {
+            return null;
+        }
         return BlockTypes.get(closest);
     }
 
     public BlockType getNearestBlock(BlockType block) {
         int color = getColor(block);
-        if (color == 0) return null;
+        if (color == 0) {
+            return null;
+        }
         return getNextNearestBlock(color);
     }
 
@@ -416,7 +429,9 @@ public class TextureUtil implements TextureHolder{
                 }
             }
         }
-        if (min == Long.MAX_VALUE) return null;
+        if (min == Long.MAX_VALUE) {
+            return null;
+        }
         return BlockTypes.get(closest);
     }
 
@@ -466,13 +481,15 @@ public class TextureUtil implements TextureHolder{
         return biomes[biome];
     }
 
-    public boolean getIsBlockCloserThanBiome(int[] blockAndBiomeIdOutput, int color, int biomePriority) {
+    public boolean getIsBlockCloserThanBiome(int[] blockAndBiomeIdOutput, int color,
+        int biomePriority) {
         BlockType block = getNearestBlock(color);
         TextureUtil.BiomeColor biome = getNearestBiome(color);
         int blockColor = getColor(block);
         blockAndBiomeIdOutput[0] = block.getInternalId();
         blockAndBiomeIdOutput[1] = biome.id;
-        if (colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor, color)) {
+        if (colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor,
+            color)) {
             return true;
         }
         return false;
@@ -513,8 +530,7 @@ public class TextureUtil implements TextureHolder{
         int red = (color >> 16) & 0xFF;
         int green = (color >> 8) & 0xFF;
         int blue = (color >> 0) & 0xFF;
-        for (int i = 0; i < validBiomes.length; i++) {
-            BiomeColor biome = validBiomes[i];
+        for (BiomeColor biome : validBiomes) {
             long distance = colorDistance(red, green, blue, biome.grassCombined);
             if (distance < min) {
                 min = distance;
@@ -560,22 +576,20 @@ public class TextureUtil implements TextureHolder{
         Gson gson = new Gson();
         if (folder.exists()) {
             // Get all the jar files
-            File[] files = folder.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".jar");
-                }
-            });
+            File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
             for (BlockType blockType : BlockTypes.values) {
                 BlockMaterial material = blockType.getMaterial();
-                if (!material.isSolid() || !material.isFullCube()) continue;
+                if (!material.isSolid() || !material.isFullCube()) {
+                    continue;
+                }
                 int color = material.getMapColor();
                 if (color != 0) {
-                    colorMap.put((int) blockType.getInternalId(), (Integer) color);
+                    colorMap.put(blockType.getInternalId(), (Integer) color);
                 }
             }
             if (files.length == 0) {
-                Fawe.debug("Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.13.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
+                Fawe.debug(
+                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.13.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
             } else {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);
@@ -591,7 +605,8 @@ public class TextureUtil implements TextureHolder{
                             String name = entry.getName();
                             Path path = Paths.get(name);
                             if (path.startsWith("assets" + File.separator)) {
-                                String[] split = path.toString().split(Pattern.quote(File.separator));
+                                String[] split =
+                                    path.toString().split(Pattern.quote(File.separator));
                                 if (split.length > 1) {
                                     String modId = split[1];
                                     mods.add(modId);
@@ -607,7 +622,9 @@ public class TextureUtil implements TextureHolder{
                     }.getType();
 
                     for (BlockType blockType : BlockTypes.values) {
-                        if (!blockType.getMaterial().isFullCube()) continue;
+                        if (!blockType.getMaterial().isFullCube()) {
+                            continue;
+                        }
                         int combined = blockType.getInternalId();
                         String id = blockType.getId();
                         String[] split = id.split(":", 2);
@@ -625,25 +642,34 @@ public class TextureUtil implements TextureHolder{
 
                             String textureFileName;
                             try (InputStream is = zipFile.getInputStream(entry)) {
-                                JsonReader reader = new JsonReader(new InputStreamReader(is, "UTF-8"));
+                                JsonReader reader = new JsonReader(
+                                    new InputStreamReader(is, StandardCharsets.UTF_8));
                                 Map<String, Object> root = gson.fromJson(reader, typeToken);
                                 Map<String, Object> textures = (Map) root.get("textures");
 
-                                if (textures == null) continue;
+                                if (textures == null) {
+                                    continue;
+                                }
                                 Set<String> models = new HashSet<>();
                                 // Get models
-                                for (Map.Entry<String, Object> stringObjectEntry : textures.entrySet()) {
+                                for (Map.Entry<String, Object> stringObjectEntry : textures
+                                    .entrySet()) {
                                     Object value = stringObjectEntry.getValue();
                                     if (value instanceof String) {
                                         models.add((String) value);
                                     } else if (value instanceof Map) {
                                         value = ((Map) value).get("model");
-                                        if (value != null) models.add((String) value);
+                                        if (value != null) {
+                                            models.add((String) value);
+                                        }
                                     }
                                 }
-                                if (models.size() != 1) continue;
+                                if (models.size() != 1) {
+                                    continue;
+                                }
 
-                                textureFileName = String.format(texturesDir, nameSpace, models.iterator().next());
+                                textureFileName =
+                                    String.format(texturesDir, nameSpace, models.iterator().next());
                             }
 
                             BufferedImage image = readImage(zipFile, textureFileName);
@@ -653,14 +679,15 @@ public class TextureUtil implements TextureHolder{
                             }
                             int color = ImageUtil.getColor(image);
                             long distance = getDistance(image, color);
-                            distanceMap.put((int) combined, (Long) distance);
-                            colorMap.put((int) combined, (Integer) color);
+                            distanceMap.put(combined, (Long) distance);
+                            colorMap.put(combined, (Integer) color);
                         }
                     }
                     {
                         Integer grass = null;
                         {
-                            String grassFileName = String.format(texturesDir, "minecraft", "grass_block_top");
+                            String grassFileName =
+                                String.format(texturesDir, "minecraft", "grass_block_top");
                             BufferedImage image = readImage(zipFile, grassFileName);
                             if (image != null) {
                                 grass = ImageUtil.getColor(image);
@@ -668,15 +695,17 @@ public class TextureUtil implements TextureHolder{
                         }
                         if (grass != null) {
                             // assets\minecraft\textures\colormap
-                            ZipEntry grassEntry = getEntry(zipFile, "assets/minecraft/textures/colormap/grass_block.png");
+                            ZipEntry grassEntry = getEntry(zipFile,
+                                "assets/minecraft/textures/colormap/grass_block.png");
                             if (grassEntry != null) {
                                 try (InputStream is = zipFile.getInputStream(grassEntry)) {
                                     BufferedImage image = ImageIO.read(is);
                                     // Update biome colors
-                                    for (int i = 0; i < biomes.length; i++) {
-                                        BiomeColor biome = biomes[i];
-                                        float adjTemp = MathMan.clamp(biome.temperature, 0.0f, 1.0f);
-                                        float adjRainfall = MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
+                                    for (BiomeColor biome : biomes) {
+                                        float adjTemp =
+                                            MathMan.clamp(biome.temperature, 0.0f, 1.0f);
+                                        float adjRainfall =
+                                            MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
                                         int x = (int) (255 - adjTemp * 255);
                                         int z = (int) (255 - adjRainfall * 255);
                                         biome.grass = image.getRGB(x, z);
@@ -686,8 +715,10 @@ public class TextureUtil implements TextureHolder{
                                 biomes[6].grass = 0;
                                 biomes[134].grass = 0;
                                 // roofed forest: averaged w/ 0x28340A
-                                biomes[29].grass = multiplyColor(biomes[29].grass, 0x28340A + (255 << 24));
-                                biomes[157].grass = multiplyColor(biomes[157].grass, 0x28340A + (255 << 24));
+                                biomes[29].grass =
+                                    multiplyColor(biomes[29].grass, 0x28340A + (255 << 24));
+                                biomes[157].grass =
+                                    multiplyColor(biomes[157].grass, 0x28340A + (255 << 24));
                                 // mesa : 0x90814D
                                 biomes[37].grass = 0x90814D + (255 << 24);
                                 biomes[38].grass = 0x90814D + (255 << 24);
@@ -696,10 +727,10 @@ public class TextureUtil implements TextureHolder{
                                 biomes[166].grass = 0x90814D + (255 << 24);
                                 biomes[167].grass = 0x90814D + (255 << 24);
                                 List<BiomeColor> valid = new ArrayList<>();
-                                for (int i = 0; i < biomes.length; i++) {
-                                    BiomeColor biome = biomes[i];
-//                                biome.grass = multiplyColor(biome.grass, grass);
-                                    if (biome.grass != 0 && !biome.name.equalsIgnoreCase("Unknown Biome")) {
+                                for (BiomeColor biome : biomes) {
+                                    //                                biome.grass = multiplyColor(biome.grass, grass);
+                                    if (biome.grass != 0 && !biome.name
+                                        .equalsIgnoreCase("Unknown Biome")) {
                                         valid.add(biome);
                                     }
                                     biome.grassCombined = multiplyColor(grass, biome.grass);
@@ -726,26 +757,30 @@ public class TextureUtil implements TextureHolder{
                                                 BiomeColor c1 = uniqueColors.get(i);
                                                 BiomeColor c2 = uniqueColors.get(j);
                                                 BiomeColor c3 = uniqueColors.get(k);
-                                                int average = averageColor(c1.grass, c2.grass, c3.grass);
+                                                int average =
+                                                    averageColor(c1.grass, c2.grass, c3.grass);
                                                 if (uniqueBiomesColors.add(average)) {
                                                     count++;
                                                     layerColors.add((long) average);
-                                                    layerIds.add((long) ((c1.id) + (c2.id << 8) + (c3.id << 16)));
+                                                    layerIds.add(
+                                                        (long) ((c1.id) + (c2.id << 8) + (c3.id
+                                                            << 16)));
                                                 }
                                             }
                                         }
                                     }
 
                                     validMixBiomeColors = new int[layerColors.size()];
-                                    for (int i = 0; i < layerColors.size(); i++)
+                                    for (int i = 0; i < layerColors.size(); i++) {
                                         validMixBiomeColors[i] = (int) layerColors.getLong(i);
+                                    }
                                     validMixBiomeIds = layerIds.toLongArray();
                                 }
                             }
 
                         }
                     }
-//                 Close the file
+                    //                 Close the file
                     zipFile.close();
                 }
             }
@@ -854,7 +889,7 @@ public class TextureUtil implements TextureHolder{
                     if (!hasAlpha(colorOther)) {
                         int combinedOther = validBlockIds[j];
                         int combinedColor = combineTransparency(color, colorOther);
-                        colorLayerMap.put(combinedColor, new int[]{combined, combinedOther});
+                        colorLayerMap.put(combinedColor, new int[] {combined, combinedOther});
                     }
                 }
             }
@@ -902,12 +937,14 @@ public class TextureUtil implements TextureHolder{
                 }
             }
         }
-        if (min == Long.MAX_VALUE) return null;
+        if (min == Long.MAX_VALUE) {
+            return null;
+        }
         return BlockTypes.get(closest);
     }
 
     private String getFileName(String path) {
-        String[] split = path.toString().split("[/|\\\\]");
+        String[] split = path.split("[/|\\\\]");
         String name = split[split.length - 1];
         int dot = name.indexOf('.');
         if (dot != -1) {
@@ -936,10 +973,12 @@ public class TextureUtil implements TextureHolder{
         int g = green1 - green2;
         int b = blue1 - blue2;
         int hd = hueDistance(red1, green1, blue1, red2, green2, blue2);
-        return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8) + (hd * hd);
+        return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8) + (hd
+            * hd);
     }
 
-    protected static int hueDistance(int red1, int green1, int blue1, int red2, int green2, int blue2) {
+    protected static int hueDistance(int red1, int green1, int blue1, int red2, int green2,
+        int blue2) {
         int total1 = (red1 + green1 + blue1);
         int total2 = (red2 + green2 + blue2);
         if (total1 == 0 || total2 == 0) {
@@ -980,7 +1019,8 @@ public class TextureUtil implements TextureHolder{
         public int grassCombined;
         public int foliage;
 
-        public BiomeColor(int id, String name, float temperature, float rainfall, int grass, int foliage) {
+        public BiomeColor(int id, String name, float temperature, float rainfall, int grass,
+            int foliage) {
             this.id = id;
             this.name = name;
             this.temperature = temperature;
