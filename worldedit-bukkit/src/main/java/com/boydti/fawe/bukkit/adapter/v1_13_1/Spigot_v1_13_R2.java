@@ -531,6 +531,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
       Chunk chunk = craftWorld.getHandle().getChunkAt(x >> 4, z >> 4);
       BlockPosition pos = new BlockPosition(x, y, z);
       IBlockData old = chunk.getBlockData(x, y, z);
+      chunk.d(pos); // Delete the tile entity from the internal list
       Block mcBlock = IRegistry.BLOCK.get(MinecraftKey.a(state.getBlockType().getId()));
       IBlockData newState = mcBlock.getBlockData();
       Map<Property<?>, Object> states = state.getStates();

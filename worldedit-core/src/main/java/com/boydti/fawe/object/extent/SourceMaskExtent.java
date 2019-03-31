@@ -1,21 +1,16 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SourceMaskExtent extends TemporalExtent {
-    private Mask mask;
-    private MutableBlockVector mutable = new MutableBlockVector();
 
+    private Mask mask;
 
     /**
      * Get the mask.
@@ -48,12 +43,4 @@ public class SourceMaskExtent extends TemporalExtent {
         return mask.test(location) && super.setBlock(location, block);
     }
 
-    @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        set(x, y, z, block);
-        mutable.mutX(x);
-        mutable.mutY(y);
-        mutable.mutZ(z);
-        return mask.test(mutable.toBlockVector3()) && super.setBlock(x, y, z, block);
-    }
 }

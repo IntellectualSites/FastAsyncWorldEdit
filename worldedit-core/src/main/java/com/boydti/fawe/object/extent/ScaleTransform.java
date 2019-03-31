@@ -1,8 +1,6 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -96,30 +94,11 @@ public class ScaleTransform extends ResettableExtent {
         return result;
     }
 
-    @Override
-    public boolean setBlock(int x1, int y1, int z1, BlockStateHolder block) throws WorldEditException {
-        boolean result = false;
-        MutableBlockVector pos = new MutableBlockVector(getPos(x1, y1, z1));
-        double sx = pos.getX();
-        double sy = pos.getY();
-        double sz = pos.getZ();
-        double ex = pos.getX() + dx;
-        double ey = Math.min(maxy, sy + dy);
-        double ez = pos.getZ() + dz;
-        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
-            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
-                    result |= super.setBlock(pos.toBlockVector3(), block);
-                }
-            }
-        }
-        return result;
-    }
-
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
         Location newLoc = new Location(location.getExtent(), getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()).toVector3(), location.getYaw(), location.getPitch());
         return super.createEntity(newLoc, entity);
     }
+
 }

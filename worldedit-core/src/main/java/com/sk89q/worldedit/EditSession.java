@@ -114,12 +114,15 @@ import static com.sk89q.worldedit.regions.Regions.*;
  * using the {@link ChangeSetExtent}.</p>
  */
 public class EditSession extends AbstractDelegateExtent implements HasFaweQueue, SimpleWorld, AutoCloseable {
+
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
      * determine which {@link Extent}s should be bypassed.
      */
     public enum Stage {
-        BEFORE_HISTORY, BEFORE_REORDER, BEFORE_CHANGE
+        BEFORE_HISTORY,
+        BEFORE_REORDER,
+        BEFORE_CHANGE
     }
 
     private World world;
@@ -1060,18 +1063,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
         this.changes++;
         try {
-            return this.extent.setBlock(position, block);
+            return this.setBlock(position, block, Stage.BEFORE_HISTORY);
         } catch (MaxChangedBlocksException e) {
             throw e;
-        } catch (WorldEditException e) {
-            throw new RuntimeException("Unexpected exception", e);
-        }
-    }
-
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
-        this.changes++;
-        try {
-            return this.extent.setBlock(x, y, z, block);
         } catch (WorldEditException e) {
             throw new RuntimeException("Unexpected exception", e);
         }

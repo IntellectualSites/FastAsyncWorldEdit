@@ -21,8 +21,6 @@ package com.sk89q.worldedit.world.block;
 
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -37,49 +35,31 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
 public class BlockState implements BlockStateHolder<BlockState> {
+
     private final BlockType blockType;
+    private final Map<Property<?>, Object> values;
+
     private BaseBlock emptyBaseBlock;
-    
+
     BlockState(BlockType blockType) {
         this.blockType = blockType;
+        this.values = new LinkedHashMap<>();
         this.emptyBaseBlock = new BaseBlock(this);
     }
-    
-    BlockState(BlockType blockType, BaseBlock baseBlock){
-    	this.blockType = blockType;
-    	this.emptyBaseBlock = baseBlock;
-    }
-    
-    /**
-     * Creates a fuzzy BlockState. This can be used for partial matching.
-     *
-     * @param blockType The block type
-     * @param values The block state values
-     */
-    private BlockState(BlockType blockType, Map<Property<?>, Object> values) {
-        this.blockType = blockType;
-//        this.values = values;
-//        this.fuzzy = true;
-    }
-    
+
+    // FAWE begin
     /**
      * Returns a temporary BlockState for a given internal id
      * @param combinedId
      * @deprecated magic number
      * @return BlockState
      */
-	
     @Deprecated
     public static BlockState getFromInternalId(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
@@ -222,6 +202,7 @@ public class BlockState implements BlockStateHolder<BlockState> {
     public BlockState withPropertyId(int propertyId) {
         return getBlockType().withPropertyId(propertyId);
     }
+    // FAWE end
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
@@ -288,12 +269,8 @@ public class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    @Deprecated
     public final Map<Property<?>, Object> getStates() {
-        BlockType type = this.getBlockType();
-        // Lazily initialize the map
-        Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) input -> getState(input));
-        return (Map<Property<?>, Object>) map;
+        return Collections.unmodifiableMap(this.values);
     }
 
     @Override
@@ -308,15 +285,24 @@ public class BlockState implements BlockStateHolder<BlockState> {
         }
         return new BaseBlock(this, compoundTag);
     }
-    
-    @Override
-    public BlockType getBlockType() {
-    	return this.blockType;
+
+    /**
+     * Internal method used for creating the initial BlockState.
+     *
+     * Sets a value. DO NOT USE THIS.
+     *
+     * @param property The state
+     * @param value The value
+     * @return The blockstate, for chaining
+     */
+    BlockState setState(final Property<?> property, final Object value) {
+        this.values.put(property, value);
+        return this;
     }
 
     @Override
-    public int hashCode() {
-        return getOrdinal();
+    public BlockType getBlockType() {
+    	return this.blockType;
     }
 
     @Override
@@ -383,7 +369,17 @@ public class BlockState implements BlockStateHolder<BlockState> {
         if (!(obj instanceof BlockState)) {
             return false;
         }
-
         return equalsFuzzy((BlockState) obj);
     }
+
+    private Integer hashCodeCache = null;
+
+    @Override
+    public int hashCode() {
+        if (hashCodeCache == null) {
+            hashCodeCache = Objects.hash(blockType, values);
+        }
+        return hashCodeCache;
+    }
+
 }

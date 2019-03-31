@@ -23,10 +23,6 @@ import com.boydti.fawe.jnbt.anvil.generator.GenBase;
 import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
-import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -35,15 +31,18 @@ import com.sk89q.worldedit.function.operation.OperationQueue;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.registry.BundledBlockData;
-import java.util.List;
+
 import javax.annotation.Nullable;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
@@ -51,7 +50,6 @@ import javax.annotation.Nullable;
 public class AbstractDelegateExtent implements LightingExtent {
 
     private transient final Extent extent;
-//    private MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
 
     /**
      * Create a new instance.
@@ -85,7 +83,7 @@ public class AbstractDelegateExtent implements LightingExtent {
         return extent.getFullBlock(position);
     }
 
-
+    // FAWE begin
     public int getBlockLight(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getBlockLight(x, y, z);
@@ -114,6 +112,7 @@ public class AbstractDelegateExtent implements LightingExtent {
         }
         return getLazyBlock(x, y, z).getBlockType().getMaterial().getLightValue();
     }
+    // FAWE end
 
     /**
      * Get the extent.
@@ -126,9 +125,6 @@ public class AbstractDelegateExtent implements LightingExtent {
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-//        mutable.mutX(x);
-//        mutable.mutY(y);
-//        mutable.mutZ(z);
         return extent.getLazyBlock(BlockVector3.at(x, y, z));
     }
 
@@ -138,10 +134,7 @@ public class AbstractDelegateExtent implements LightingExtent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-//        mutable.mutX(x);
-//        mutable.mutY(y);
-//        mutable.mutZ(z);
+    public final <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         return setBlock(BlockVector3.at(x, y, z), block);
     }
 
@@ -269,7 +262,11 @@ public class AbstractDelegateExtent implements LightingExtent {
     Operation commit() {
         Operation ours = commitBefore();
         Operation other = null;
-        if (extent != this) other = extent.commit();
+        // FAWE begin
+        if (extent != this) {
+            other = extent.commit();
+        }
+        // FAWE end
         if (ours != null && other != null) {
             return new OperationQueue(ours, other);
         } else if (ours != null) {
@@ -280,6 +277,5 @@ public class AbstractDelegateExtent implements LightingExtent {
             return null;
         }
     }
-
 
 }

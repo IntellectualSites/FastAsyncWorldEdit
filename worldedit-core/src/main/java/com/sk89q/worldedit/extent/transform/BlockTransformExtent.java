@@ -19,42 +19,25 @@
 
 package com.sk89q.worldedit.extent.transform;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.google.common.collect.Sets;
-import com.sk89q.jnbt.ByteTag;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
-import com.sk89q.worldedit.registry.state.BooleanProperty;
-import com.sk89q.worldedit.registry.state.DirectionalProperty;
-import com.sk89q.worldedit.registry.state.EnumProperty;
-import com.sk89q.worldedit.registry.state.IntegerProperty;
-import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.registry.state.*;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transforms blocks themselves (but not their position) according to a
@@ -127,11 +110,6 @@ public class BlockTransformExtent extends ResettableExtent {
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         return transformBlock(super.getFullBlock(position), false);
-    }
-    
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return super.setBlock(x, y, z, transformBlock(block, true));
     }
 
     @Override

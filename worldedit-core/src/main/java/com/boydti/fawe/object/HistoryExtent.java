@@ -1,12 +1,8 @@
 package com.boydti.fawe.object;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
-import com.boydti.fawe.object.exception.FaweException;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -14,17 +10,15 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
-
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -60,7 +54,10 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
+        final int x = location.getBlockX();
+        final int y = location.getBlockY();
+        final int z = location.getBlockZ();
         BaseBlock previous = queue.getFullBlock(BlockVector3.at(x, y, z)).toBaseBlock();
         if (previous.getInternalId() == block.getInternalId()) {
             if (!previous.hasNbtData() && (block instanceof BaseBlock && !((BaseBlock)block).hasNbtData())) {
@@ -69,11 +66,6 @@ public class HistoryExtent extends AbstractDelegateExtent {
         }
         this.changeSet.add(x, y, z, previous, block.toBaseBlock());
         return getExtent().setBlock(x, y, z, block);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
-        return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
     @Nullable

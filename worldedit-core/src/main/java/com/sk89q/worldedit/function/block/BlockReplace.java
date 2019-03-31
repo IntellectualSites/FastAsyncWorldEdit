@@ -19,14 +19,11 @@
 
 package com.sk89q.worldedit.function.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BaseBlock;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -55,7 +52,5 @@ public class BlockReplace implements RegionFunction {
     public boolean apply(BlockVector3 position) throws WorldEditException {
     	return pattern.apply(extent, position, position);
     }
-
-
 
 }

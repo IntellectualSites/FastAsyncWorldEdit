@@ -18,8 +18,6 @@ public class BackwardsExtentBlockCopy implements Operation {
     private final RegionFunction function;
     private final BlockVector3 origin;
 
-//    private Vector mutable = new MutableBlockVector();
-
     public BackwardsExtentBlockCopy(Extent source, Region region, Extent destination, BlockVector3 origin, Transform transform, RegionFunction function) {
         this.source = source;
         this.region = region;
@@ -60,15 +58,7 @@ public class BackwardsExtentBlockCopy implements Operation {
     }
 
     private BlockVector3 transform(Transform transform, BlockVector3 pt) {
-//        mutable.mutX(((pt.getBlockX() - origin.getBlockX())));
-//        mutable.mutY(((pt.getBlockY() - origin.getBlockY())));
-//        mutable.mutZ(((pt.getBlockZ() - origin.getBlockZ())));
-//        BlockVector3 tmp = transform.apply(new Vector3(pt.getBlockX() - origin.getBlockX(), pt.getBlockY() - origin.getBlockY(), pt.getBlockZ() - origin.getBlockZ())).toBlockPoint();
-//        tmp.mutX((tmp.getBlockX() + origin.getBlockX()));
-//        tmp.mutY((tmp.getBlockY() + origin.getBlockY()));
-//        tmp.mutZ((tmp.getBlockZ() + origin.getBlockZ()));
-//        return tmp;
-    	return transform.apply(Vector3.at(pt.getBlockX() - origin.getBlockX(), pt.getBlockY() - origin.getBlockY(), pt.getBlockZ() - origin.getBlockZ())).toBlockPoint().add(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
+        return transform.apply(Vector3.at(pt.getBlockX() - origin.getBlockX(), pt.getBlockY() - origin.getBlockY(), pt.getBlockZ() - origin.getBlockZ())).toBlockPoint().add(origin.getBlockX(), origin.getBlockY(), origin.getBlockZ());
     }
 
     @Override

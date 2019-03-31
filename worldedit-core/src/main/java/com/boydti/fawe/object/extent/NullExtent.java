@@ -4,8 +4,6 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -15,6 +13,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
@@ -85,19 +84,10 @@ public class NullExtent extends FaweRegionExtent {
 
     @Override
     public boolean setBlock(final BlockVector3 arg0, final BlockStateHolder arg1) throws WorldEditException {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return false;
-        }
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return false;
+        if (reason != null) {
+            throw new FaweException(reason);
+        } else {
+            return false;
         }
     }
 

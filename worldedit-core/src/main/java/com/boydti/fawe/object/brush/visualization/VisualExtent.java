@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush.visualization;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.example.NullQueueIntFaweChunk;
 import com.boydti.fawe.object.FawePlayer;
@@ -8,7 +7,6 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -31,15 +29,9 @@ public class VisualExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
-        return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
-    }
-
-    public VisualChunk getChunk(int cx, int cz) {
-        return chunks.get(MathMan.pairInt(cx, cz));
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+        final int x = location.getBlockX();
+        final int y = location.getBlockY();
+        final int z = location.getBlockZ();
         BlockStateHolder previous = super.getLazyBlock(x, y, z);
         int cx = x >> 4;
         int cz = z >> 4;
@@ -58,6 +50,10 @@ public class VisualExtent extends AbstractDelegateExtent {
             chunk.setBlock(x, y, z, block.getInternalId());
             return true;
         }
+    }
+
+    public VisualChunk getChunk(int cx, int cz) {
+        return chunks.get(MathMan.pairInt(cx, cz));
     }
 
     @Override

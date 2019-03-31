@@ -3,12 +3,9 @@ package com.boydti.fawe.object.extent;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -18,12 +15,12 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFaweQueue {
 
@@ -112,16 +109,12 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
-        return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
-    }
-    
-
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, final B block) throws WorldEditException {
+        final int x = location.getBlockX();
+        final int y = location.getBlockY();
+        final int z = location.getBlockZ();
         return queue.setBlock(x, y, z, block);
     }
-
+    
     @Override
     public BlockState getLazyBlock(BlockVector3 location) {
         return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());

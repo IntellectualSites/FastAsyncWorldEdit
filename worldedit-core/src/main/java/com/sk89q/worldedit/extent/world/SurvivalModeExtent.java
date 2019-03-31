@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.extent.world;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -90,13 +88,4 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
         }
     }
 
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        if (toolUse && block.getBlockType().getMaterial().isAir()) {
-            world.simulateBlockMine(BlockVector3.at(x, y, z));
-            return true;
-        } else {
-            return super.setBlock(x, y, z, block);
-        }
-    }
 }

@@ -5,8 +5,6 @@ import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.util.WEManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -15,10 +13,12 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.Collection;
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 public abstract class FaweRegionExtent extends ResettableExtent {
     private final FaweLimit limit;
@@ -65,17 +65,6 @@ public abstract class FaweRegionExtent extends ResettableExtent {
             return false;
         }
         return super.setBlock(location, block);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        if (!contains(x, y, z)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return false;
-        }
-        return super.setBlock(x, y, z, block);
     }
 
     @Override

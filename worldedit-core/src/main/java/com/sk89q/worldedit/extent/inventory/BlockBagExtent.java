@@ -4,11 +4,7 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -87,39 +83,36 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 pos, B block) throws WorldEditException {
-        return setBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), block);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        final int x = pos.getBlockX();
+        final int y = pos.getBlockY();
+        final int z = pos.getBlockZ();
         if(blockBag != null) {
             BlockStateHolder lazyBlock = getExtent().getLazyBlock(x, y, z);
             BlockType fromType = lazyBlock.getBlockType();
-        	if(!block.getBlockType().equals(fromType)) {
-				BlockType type = block.getBlockType();
-		        if (!type.getMaterial().isAir()) {
-		            try {
-		                blockBag.fetchPlacedBlock(block.toImmutableState());
-		            } catch (UnplaceableBlockException e) {
-		                throw new FaweException.FaweBlockBagException();
-		            } catch (BlockBagException e) {
-		                missingBlocks[type.getInternalId()]++;
-		                throw new FaweException.FaweBlockBagException();
-		            }
-		        }
-		        if (mine) {
-	
-		            if (!fromType.getMaterial().isAir()) {
-		                try {
-		                    blockBag.storeDroppedBlock(fromType.getDefaultState());
-		                } catch (BlockBagException ignored) {
-		                }
-		            }
-		        }
-        	}
+            if(!block.getBlockType().equals(fromType)) {
+                BlockType type = block.getBlockType();
+                if (!type.getMaterial().isAir()) {
+                    try {
+                        blockBag.fetchPlacedBlock(block.toImmutableState());
+                    } catch (UnplaceableBlockException e) {
+                        throw new FaweException.FaweBlockBagException();
+                    } catch (BlockBagException e) {
+                        missingBlocks[type.getInternalId()]++;
+                        throw new FaweException.FaweBlockBagException();
+                    }
+                }
+                if (mine) {
+
+                    if (!fromType.getMaterial().isAir()) {
+                        try {
+                            blockBag.storeDroppedBlock(fromType.getDefaultState());
+                        } catch (BlockBagException ignored) {
+                        }
+                    }
+                }
+            }
         }
         return getExtent().setBlock(x, y, z, block);
     }
-
 
 }

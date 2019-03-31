@@ -1,8 +1,6 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -38,14 +36,6 @@ public class RandomOffsetTransform extends ResettableExtent {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int y = pos.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
-        return getExtent().setBlock(x, y, z, block);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        x = x + random.nextInt(1 + (dx << 1)) - dx;
-        y = y + random.nextInt(1 + (dy << 1)) - dy;
-        z = z + random.nextInt(1 + (dz << 1)) - dz;
         return getExtent().setBlock(x, y, z, block);
     }
 

@@ -28,30 +28,27 @@ import com.boydti.fawe.object.function.block.CombinedBlockCopy;
 import com.boydti.fawe.object.function.block.SimpleBlockCopy;
 import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskTestFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
-import com.sk89q.worldedit.function.block.ExtentBlockCopy;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
 import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
-import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,13 +73,17 @@ public class ForwardExtentCopy implements Operation {
     private int repetitions = 1;
     private Mask sourceMask = Masks.alwaysTrue();
     private boolean removingEntities;
+    private boolean copyingEntities = true;
     private RegionFunction sourceFunction = null;
     private Transform transform = new Identity();
     private Transform currentTransform = null;
+    private RegionVisitor lastVisitor;
     private int affected;
-    private boolean copyEntities = true;
-    private boolean copyBiomes = false;
+
+    // FAWE begin
     private RegionFunction filterFunction;
+    private boolean copyBiomes = false;
+    // FAWE end
 
     /**
      * Create a new copy using the region's lowest minimum point as the
@@ -153,12 +154,22 @@ public class ForwardExtentCopy implements Operation {
         return sourceMask;
     }
 
-    public void setCopyingEntities(boolean copyEntities) {
-        this.copyEntities = copyEntities;
+    /**
+     * Set whether entities should be copied along with blocks.
+     *
+     * @param copyingEntities true if copying
+     */
+    public void setCopyingEntities(boolean copyingEntities) {
+        this.copyingEntities = copyingEntities;
     }
 
+    /**
+     * Return whether entities should be copied along with blocks.
+     *
+     * @return true if copying
+     */
     public boolean isCopyingEntities() {
-        return copyEntities;
+        return copyingEntities;
     }
 
     public void setCopyBiomes(boolean copyBiomes) {
@@ -253,9 +264,26 @@ public class ForwardExtentCopy implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
+        // FAWE Comment: The WorldEdit version of this class
+        //               is recursive, whereas this implementation is iterative.
+        //               The WorldEdit base case is "repititions <= 0", in which
+        //               case it just ends
+
+        // FAWE begin
+        // if (lastVisitor != null) {
+        //    affected += lastVisitor.getAffected();
+        //    lastVisitor = null;
+        // }
+        // FAWE end
+
         if (currentTransform == null) {
             currentTransform = transform;
         }
+        // FAWE begin
+        // else {
+        //     currentTransform = currentTransform.combine(transform);
+        // }
+
         FaweQueue queue;
         if (source instanceof EditSession) {
             queue = ((EditSession) source).getQueue();
@@ -355,23 +383,26 @@ public class ForwardExtentCopy implements Operation {
             // filter players since they can't be copied
             entities = source.getEntities()
                     .stream()
-                    .filter(entity -> entity.getState() != null &&
-                            entity.getState().getType().getId().equals("minecraft:player"))
+                    .filter(entity -> {
+                        // FAWE end
+                        EntityProperties properties = entity.getFacet(EntityProperties.class);
+                        return properties == null || properties.isPasteable();
+                        // FAWE begin
+                    })
                     .collect(Collectors.toList());
         } else {
             entities = new ArrayList<>();
         }
 
-
         for (int i = 0; i < repetitions; i++) {
             Operations.completeBlindly(blockCopy);
 
             if (!entities.isEmpty()) {
+                // FAWE end
                 ExtentEntityCopy entityCopy = new ExtentEntityCopy(from.toVector3(), destination, to.toVector3(), currentTransform);
-//            if (copyingEntities) {
-//                ExtentEntityCopy entityCopy = new ExtentEntityCopy(from.toVector3(), destination, to.toVector3(), currentTransform);
                 entityCopy.setRemoving(removingEntities);
                 EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
+                // FAWE begin
                 Operations.completeBlindly(entityVisitor);
             }
 
@@ -379,10 +410,10 @@ public class ForwardExtentCopy implements Operation {
                 currentTransform = currentTransform.combine(transform);
                 transExt.setTransform(currentTransform);
             }
-
         }
         affected = region.getArea();
         return null;
+        // FAWE end
     }
 
     @Override
