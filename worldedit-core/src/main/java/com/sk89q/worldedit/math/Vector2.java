@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.math;
 
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 /**
  * An immutable 2-dimensional vector.
  */
-public final class Vector2 {
+public class Vector2 {
 
     public static final Vector2 ZERO = new Vector2(0, 0);
     public static final Vector2 UNIT_X = new Vector2(1, 0);
@@ -32,23 +33,12 @@ public final class Vector2 {
     public static final Vector2 ONE = new Vector2(1, 1);
 
     public static Vector2 at(double x, double z) {
-        int xTrunc = (int) x;
-        switch (xTrunc) {
-            case 0:
-                if (x == 0 && z == 0) {
-                    return ZERO;
-                }
-                break;
-            case 1:
-                if (x == 1 && z == 1) {
-                    return ONE;
-                }
-                break;
-        }
         return new Vector2(x, z);
     }
 
-    private final double x, z;
+    protected double x, z;
+
+    protected Vector2(){}
 
     /**
      * Construct an instance.
@@ -56,9 +46,46 @@ public final class Vector2 {
      * @param x the X coordinate
      * @param z the Z coordinate
      */
-    private Vector2(double x, double z) {
+    protected Vector2(double x, double z) {
         this.x = x;
         this.z = z;
+    }
+
+    protected Vector2(Vector2 other) {
+        this.x = other.x;
+        this.z = other.z;
+    }
+
+    public int getBlockX() {
+        return MathMan.roundInt(getX());
+    }
+
+    public int getBlockZ() {
+        return MathMan.roundInt(getZ());
+    }
+
+    public MutableVector2 setComponents(int x, int z) {
+        return new MutableVector2(x, z);
+    }
+
+    public MutableVector2 setComponents(double x, double z) {
+        return new MutableVector2(x, z);
+    }
+
+    public MutableVector2 mutX(int x) {
+        return new MutableVector2(x, z);
+    }
+
+    public MutableVector2 mutZ(int z) {
+        return new MutableVector2(x, z);
+    }
+
+    public MutableVector2 mutX(double x) {
+        return new MutableVector2(x, z);
+    }
+
+    public MutableVector2 mutZ(double z) {
+        return new MutableVector2(x, z);
     }
 
     /**
@@ -458,21 +485,18 @@ public final class Vector2 {
         }
 
         Vector2 other = (Vector2) obj;
-        return other.x == this.x && other.z == this.z;
+        return other.getX() == this.getX() && other.getZ() == this.getZ();
 
     }
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + Double.hashCode(x);
-        hash = 31 * hash + Double.hashCode(z);
-        return hash;
+        return ((int) getX() ^ ((int) getZ() << 16));
     }
 
     @Override
     public String toString() {
-        return "(" + x + ", " + z + ")";
+        return "(" + getX() + ", " + getZ() + ")";
     }
 
 }

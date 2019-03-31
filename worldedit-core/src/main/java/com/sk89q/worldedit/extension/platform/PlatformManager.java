@@ -28,7 +28,6 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.command.tool.*;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,7 +43,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.*;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
@@ -310,7 +308,7 @@ public class PlatformManager {
         final Actor actor = createProxyActor(event.getCause());
         try {
             final Location location = event.getLocation();
-            final BlockVector3 vector = location.toVector().toBlockPoint();
+            final BlockVector3 vector = location.toBlockPoint();
 
             // At this time, only handle interaction from players
             if (actor instanceof Player) {

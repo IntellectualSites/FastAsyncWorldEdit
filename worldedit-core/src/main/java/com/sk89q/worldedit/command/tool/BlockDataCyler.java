@@ -37,7 +37,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 /**
  * A mode that cycles the data values of supported blocks.
@@ -56,8 +55,8 @@ public class BlockDataCyler implements DoubleActionBlockTool {
 
         World world = (World) clicked.getExtent();
 
-//        BlockStateHolder block = world.getBlock(clicked.toVector());
-        BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
+//        BlockStateHolder block = world.getBlock(clicked);
+        BlockVector3 blockPoint = clicked.toBlockPoint();
         BlockState block = world.getBlock(blockPoint);
 
         if (!config.allowedDataCycleBlocks.isEmpty()

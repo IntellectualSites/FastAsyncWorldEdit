@@ -69,7 +69,7 @@ public class FloatingTreeRemover implements BlockTool {
             Player player, LocalSession session, Location clicked) {
 
         final World world = (World) clicked.getExtent();
-        final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
+        final BlockState state = world.getBlock(clicked.toBlockPoint());
 
         if (!isTreeBlock(state.getBlockType())) {
             player.printError("That's not a tree.");
@@ -77,7 +77,7 @@ public class FloatingTreeRemover implements BlockTool {
         }
         final EditSession editSession = session.createEditSession(player);
         try /*(EditSession editSession = session.createEditSession(player))*/ {
-                final Set<BlockVector3> blockSet = bfs(world, clicked.toVector().toBlockPoint());
+                final Set<BlockVector3> blockSet = bfs(world, clicked.toBlockPoint());
                 if (blockSet == null) {
                     player.printError("That's not a floating tree.");
                     return true;

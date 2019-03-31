@@ -27,7 +27,7 @@ public class LoggingChangeSet extends AbstractDelegateChangeSet {
 
 //    public static IBlocksHubApi api;
 //
-//    private final MutableVector loc;
+//    private final MutableVector3 loc;
 //    private final IPlayer player;
 //    private IWorld world;
 //    private final MutableBlockData oldBlock;
@@ -46,7 +46,7 @@ public class LoggingChangeSet extends AbstractDelegateChangeSet {
 //        } catch (Throwable ignore) {
 //            this.world = api.getWorld(world);
 //        }
-//        this.loc = new MutableVector();
+//        this.loc = new MutableVector3();
 //        this.oldBlock = new MutableBlockData();
 //        this.newBlock = new MutableBlockData();
 //        this.player = api.getPlayer(player.getUUID());

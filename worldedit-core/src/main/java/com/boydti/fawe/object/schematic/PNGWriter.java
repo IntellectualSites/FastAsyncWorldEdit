@@ -5,7 +5,7 @@ import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -68,8 +68,8 @@ public class PNGWriter implements ClipboardWriter {
 
         boolean fill = length * 4 < imageSize && width * 4 < imageSize;
 
-        MutableBlockVector mutable, mutableTop, mutableRight, mutableLeft;
-        mutable = mutableTop = mutableRight = mutableLeft = new MutableBlockVector(0, 0, 0);
+        MutableBlockVector3 mutable, mutableTop, mutableRight, mutableLeft;
+        mutable = mutableTop = mutableRight = mutableLeft = new MutableBlockVector3(0, 0, 0);
 //        Vector mutableTop = new Vector(0, 0, 0);
 //        Vector mutableRight = new Vector(0, 0, 0);
 //        Vector mutableLeft = new Vector(0, 0, 0);
@@ -96,16 +96,16 @@ public class PNGWriter implements ClipboardWriter {
                 double cpy2 = cpy1 + dpyj[zz];
                 for (int y = y0; y < y0 + height; y++) {
                     mutable.mutY(y);
-                    BlockStateHolder block = clipboard.getBlock(mutable.toBlockVector3());
+                    BlockStateHolder block = clipboard.getBlock(mutable);
                     if (block.getBlockType().getMaterial().isAir()) {
                         continue;
                     }
                     mutableTop.mutY(y + 1);
                     mutableRight.mutY(y);
                     mutableLeft.mutY(y);
-                    if (!clipboard.getBlock(mutableTop.toBlockVector3()).getBlockType().getMaterial().isAir() &&
-                    !clipboard.getBlock(mutableRight.toBlockVector3()).getBlockType().getMaterial().isAir() &&
-                    !clipboard.getBlock(mutableLeft.toBlockVector3()).getBlockType().getMaterial().isAir() ) {
+                    if (!clipboard.getBlock(mutableTop).getBlockType().getMaterial().isAir() &&
+                    !clipboard.getBlock(mutableRight).getBlockType().getMaterial().isAir() &&
+                    !clipboard.getBlock(mutableLeft).getBlockType().getMaterial().isAir() ) {
                         continue;
                     }
                     double cpy = cpy2 - dpxi[y - y0];

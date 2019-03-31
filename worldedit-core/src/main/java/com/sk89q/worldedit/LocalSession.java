@@ -20,7 +20,6 @@
 package com.sk89q.worldedit;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweLimit;
@@ -43,7 +42,6 @@ import com.sk89q.jchronic.utils.Time;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.tool.*;
@@ -51,7 +49,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -67,7 +64,6 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
@@ -878,7 +874,7 @@ public class LocalSession implements TextureHolder {
     public BlockVector3 getPlacementPosition(Player player) throws IncompleteRegionException {
         checkNotNull(player);
         if (!placeAtPos1) {
-            return player.getBlockIn().toVector().toBlockPoint();
+            return player.getBlockIn().toBlockPoint();
         }
 
         return selector.getPrimaryPosition();

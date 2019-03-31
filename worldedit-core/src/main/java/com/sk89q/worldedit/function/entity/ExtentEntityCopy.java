@@ -26,7 +26,6 @@ import com.sk89q.jnbt.FloatTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.jnbt.CompoundTagBuilder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -104,7 +103,7 @@ public class ExtentEntityCopy implements EntityFunction {
 
 //<<<<<<< HEAD
 //            Vector pivot = from.round().add(0.5, 0.5, 0.5);
-//            Vector newPosition = transform.apply(location.toVector().subtract(pivot));
+//            Vector newPosition = transform.apply(location.subtract(pivot));
 //            Vector newDirection;
 //            if (transform.isIdentity()) {
 //                newDirection = entity.getLocation().getDirection();
@@ -116,7 +115,7 @@ public class ExtentEntityCopy implements EntityFunction {
 //            }
 //=======
             Vector3 pivot = from.round().add(0.5, 0.5, 0.5);
-            Vector3 newPosition = transform.apply(location.toVector().subtract(pivot));
+            Vector3 newPosition = transform.apply(location.subtract(pivot));
             Vector3 newDirection;
 
             newDirection = transform.isIdentity() ?

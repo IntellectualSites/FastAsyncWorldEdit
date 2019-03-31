@@ -20,8 +20,8 @@
 package com.boydti.fawe.object.regions;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.math.MutableVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
@@ -143,8 +143,8 @@ public class PolyhedralRegion extends AbstractRegion {
         if (minimumPoint == null) {
             minimumPoint = maximumPoint = vertex;
         } else {
-//            minimumPoint = new MutableBlockVector(minimumPoint.getMinimum(vertex));
-//            maximumPoint = new MutableBlockVector(maximumPoint.getMaximum(vertex));
+//            minimumPoint = new MutableBlockVector3(minimumPoint.getMinimum(vertex));
+//            maximumPoint = new MutableBlockVector3(maximumPoint.getMaximum(vertex));
         	minimumPoint = minimumPoint.getMinimum(vertex);
         	maximumPoint = maximumPoint.getMaximum(vertex);
         }

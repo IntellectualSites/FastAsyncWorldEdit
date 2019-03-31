@@ -7,7 +7,6 @@ import com.boydti.fawe.object.mask.RadiusMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
-import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
@@ -16,8 +15,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -27,7 +25,7 @@ public class LayerBrush implements Brush {
 
     private final BlockStateHolder[] layers;
     private RecursiveVisitor visitor;
-    private MutableBlockVector mutable = new MutableBlockVector();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public LayerBrush(BlockStateHolder[] layers) {
         this.layers = layers;
@@ -53,9 +51,9 @@ public class LayerBrush implements Brush {
                 int previous2 = layers[depth - 2].getInternalId();
                 for (BlockVector3 dir : BreadthFirstSearch.DEFAULT_DIRECTIONS) {
                     mutable.setComponents(pos.getBlockX() + dir.getBlockX(), pos.getBlockY() + dir.getBlockY(), pos.getBlockZ() + dir.getBlockZ());
-                    if (visitor.isVisited(mutable.toBlockVector3()) && queue.getCachedCombinedId4Data(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous) {
+                    if (visitor.isVisited(mutable) && queue.getCachedCombinedId4Data(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous) {
                         mutable.setComponents(pos.getBlockX() + dir.getBlockX() * 2, pos.getBlockY() + dir.getBlockY() * 2, pos.getBlockZ() + dir.getBlockZ() * 2);
-                        if (visitor.isVisited(mutable.toBlockVector3()) && queue.getCachedCombinedId4Data(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
+                        if (visitor.isVisited(mutable) && queue.getCachedCombinedId4Data(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
                             found = true;
                             break;
                         } else {

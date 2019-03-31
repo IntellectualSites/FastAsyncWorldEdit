@@ -35,7 +35,7 @@ import com.sk89q.worldedit.function.operation.OperationQueue;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -51,7 +51,7 @@ import javax.annotation.Nullable;
 public class AbstractDelegateExtent implements LightingExtent {
 
     private transient final Extent extent;
-//    private MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+//    private MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
     /**
      * Create a new instance.

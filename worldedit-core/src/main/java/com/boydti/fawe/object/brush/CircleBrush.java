@@ -19,7 +19,7 @@ public class CircleBrush implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-    	Vector3 normal = position.toVector3().subtract(player.getLocation().toVector());
+        Vector3 normal = position.toVector3().subtract(player.getLocation());
         editSession.makeCircle(position, pattern, size, size, size, false, normal);
     }
 

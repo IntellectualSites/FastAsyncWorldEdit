@@ -34,10 +34,9 @@ import com.sk89q.worldedit.math.Vector3;
  * {@link #equals(Object)} are subject to minor differences caused by
  * floating point errors.</p>
  */
-public class Location{
+public class Location extends Vector3 {
 
     private final Extent extent;
-    private final Vector3 position;
     private final float pitch;
     private final float yaw;
 
@@ -127,10 +126,10 @@ public class Location{
      */
 
     public Location(Extent extent, Vector3 position, float yaw, float pitch) {
+        super(position);
         checkNotNull(extent);
         checkNotNull(position);
         this.extent = extent;
-        this.position = position;
         this.pitch = pitch;
         this.yaw = yaw;
     }
@@ -151,7 +150,7 @@ public class Location{
      * @return the new instance
      */
     public Location setExtent(Extent extent) {
-        return new Location(extent, position, getDirection());
+        return new Location(extent, this, getDirection());
     }
 
     /**
@@ -170,7 +169,7 @@ public class Location{
      * @return the new instance
      */
     public Location setYaw(float yaw) {
-        return new Location(extent, position, yaw, pitch);
+        return new Location(extent, this, yaw, pitch);
     }
 
     /**
@@ -189,7 +188,7 @@ public class Location{
      * @return the new instance
      */
     public Location setPitch(float pitch) {
-        return new Location(extent, position, yaw, pitch);
+        return new Location(extent, this, yaw, pitch);
     }
 
     /**
@@ -200,7 +199,7 @@ public class Location{
      * @return the new instance
      */
     public Location setDirection(float yaw, float pitch) {
-        return new Location(extent, position, yaw, pitch);
+        return new Location(extent, this, yaw, pitch);
     }
 
     /**
@@ -234,7 +233,7 @@ public class Location{
      * @return the new instance
      */
     public Location setDirection(Vector3 direction) {
-        return new Location(extent, position, (float) direction.toYaw(), (float) direction.toPitch());
+        return new Location(extent, this, (float) direction.toYaw(), (float) direction.toPitch());
     }
 
     /**
@@ -242,8 +241,8 @@ public class Location{
      *
      * @return a vector
      */
-    public Vector3 toVector() {
-        return position;
+    public Vector3 vector() {
+        return this;
     }
 
     /**
@@ -252,7 +251,7 @@ public class Location{
      * @return the X component
      */
     public double getX() {
-        return position.getX();
+        return this.getX();
     }
 
     /**
@@ -261,7 +260,7 @@ public class Location{
      * @return the rounded X component
      */
     public int getBlockX() {
-        return (int) Math.floor(position.getX());
+        return (int) Math.floor(this.getX());
     }
 
     /**
@@ -272,7 +271,7 @@ public class Location{
      * @return a new immutable instance
      */
     public Location setX(double x) {
-        return new Location(extent, position.withX(x), yaw, pitch);
+        return new Location(extent, this.withX(x), yaw, pitch);
     }
 
     /**
@@ -281,7 +280,7 @@ public class Location{
      * @return the Y component
      */
     public double getY() {
-        return position.getY();
+        return this.getY();
     }
 
     /**
@@ -290,7 +289,7 @@ public class Location{
      * @return the rounded Y component
      */
     public int getBlockY() {
-        return (int) Math.floor(position.getY());
+        return (int) Math.floor(this.getY());
     }
 
     /**
@@ -301,7 +300,7 @@ public class Location{
      * @return a new immutable instance
      */
     public Location setY(double y) {
-        return new Location(extent, position.withY(y), yaw, pitch);
+        return new Location(extent, this.withY(y), yaw, pitch);
     }
 
     /**
@@ -310,7 +309,7 @@ public class Location{
      * @return the Z component
      */
     public double getZ() {
-        return position.getZ();
+        return this.getZ();
     }
 
     /**
@@ -319,7 +318,7 @@ public class Location{
      * @return the rounded Z component
      */
     public int getBlockZ() {
-        return (int) Math.floor(position.getZ());
+        return (int) Math.floor(this.getZ());
     }
 
     /**
@@ -330,7 +329,7 @@ public class Location{
      * @return a new immutable instance
      */
     public Location setZ(double z) {
-        return new Location(extent, position.withZ(z), yaw, pitch);
+        return new Location(extent, this.withZ(z), yaw, pitch);
     }
 
     /**

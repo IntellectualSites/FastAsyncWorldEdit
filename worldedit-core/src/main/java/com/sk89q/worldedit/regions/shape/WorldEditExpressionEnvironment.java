@@ -23,12 +23,13 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.expression.runtime.ExpressionEnvironment;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     private final Vector3 unit;
     private final Vector3 zero2;
-    private Vector3 current = Vector3.ZERO;
+    private Vector3 current = new MutableVector3(Vector3.ZERO);
     private EditSession editSession;
     private Extent extent;
 
@@ -79,6 +80,10 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     @Override
     public int getBlockDataRel(double x, double y, double z) {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
+    }
+
+    public void setCurrentBlock(int x, int y, int z) {
+        current.setComponents(x, y, z);
     }
 
     public void setCurrentBlock(Vector3 current) {

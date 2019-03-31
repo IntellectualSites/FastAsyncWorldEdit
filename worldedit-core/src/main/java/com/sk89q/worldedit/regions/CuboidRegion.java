@@ -20,17 +20,14 @@
 package com.sk89q.worldedit.regions;
 
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.collection.LocalBlockVectorSet;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.util.Location;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
@@ -320,7 +317,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             @Override
             public Iterator<BlockVector2> iterator() {
                 return new Iterator<BlockVector2>() {
-                    private MutableBlockVector2D pos = new MutableBlockVector2D().setComponents(maxX + 1, maxZ);
+                    private MutableBlockVector2 pos = new MutableBlockVector2().setComponents(maxX + 1, maxZ);
 
                     @Override
                     public boolean hasNext() {
@@ -329,7 +326,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
                     @Override
                     public BlockVector2 next() {
-                    	MutableBlockVector2D result = pos;
+                    	MutableBlockVector2 result = pos;
                         // calc next
                         pos.setComponents(pos.getX() - 1, pos.getZ());
                         if (pos.getX() <= minX) {
@@ -339,7 +336,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                                 pos.setComponents(maxX, pos.getZ() - 1);
                             }
                         }
-                        return result.toBlockVector2();
+                        return result;
                     }
 
                     @Override
@@ -437,7 +434,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             return iterator_old();
         }
         return new Iterator<BlockVector3>() {
-            final MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+            final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
             private BlockVector3 min = getMinimumPoint();
             private BlockVector3 max = getMaximumPoint();
 
@@ -492,7 +489,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                                     x = tx;
                                     y = ty;
                                     hasNext = false;
-                                    return mutable.toBlockVector3();
+                                    return mutable;
                                 }
                             } else {
                                 z = cbz;
@@ -521,13 +518,13 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         x = cbx;
                     }
                 }
-                return mutable.toBlockVector3();
+                return mutable;
             }
         };
     }
 
     public Iterator<BlockVector3> iterator_old() {
-        final MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+        final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         return new Iterator<BlockVector3>() {
             private BlockVector3 min = getMinimumPoint();
             private BlockVector3 max = getMaximumPoint();
@@ -573,7 +570,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         }
                     }
                 }
-                return mutable.toBlockVector3();
+                return mutable;
             }
         };
     }
@@ -583,7 +580,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return new Iterable<BlockVector2>() {
             @Override
             public Iterator<BlockVector2> iterator() {
-                MutableBlockVector2D mutable = new MutableBlockVector2D();
+                MutableBlockVector2 mutable = new MutableBlockVector2();
                 return new Iterator<BlockVector2>() {
                     private BlockVector3 min = getMinimumPoint();
                     private BlockVector3 max = getMaximumPoint();

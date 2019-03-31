@@ -52,7 +52,7 @@ public class MappedReplacePatternFilter extends MCAFilterCounter {
 //        map[block.getCombined()] = pattern;
     }
 
-//    private final MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+//    private final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
     @Override
     public void applyBlock(int x, int y, int z, BaseBlock block, MutableLong ignore) {

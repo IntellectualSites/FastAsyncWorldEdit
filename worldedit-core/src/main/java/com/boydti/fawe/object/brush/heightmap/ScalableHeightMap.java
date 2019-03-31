@@ -3,10 +3,9 @@ package com.boydti.fawe.object.brush.heightmap;
 import com.boydti.fawe.object.IntegerPair;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.awt.image.BufferedImage;
@@ -77,10 +76,10 @@ public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap
             int xx = pos.getBlockX();
             int zz = pos.getBlockZ();
             int highestY = minY;
-            MutableBlockVector bv = new MutableBlockVector(pos);
+            MutableBlockVector3 bv = new MutableBlockVector3(pos);
             for (int y = minY; y <= maxY; y++) {
                 bv.mutY(y);
-                BlockStateHolder block = clipboard.getBlock(bv.toBlockVector3());
+                BlockStateHolder block = clipboard.getBlock(bv);
                 if (!block.getBlockType().getMaterial().isAir()) {
                     highestY = y + 1;
                 }

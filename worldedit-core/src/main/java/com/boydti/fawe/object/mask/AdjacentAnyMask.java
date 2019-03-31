@@ -3,7 +3,7 @@ package com.boydti.fawe.object.mask;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 /**
  * Just an optimized version of the Adjacent Mask for single adjacency
@@ -11,16 +11,16 @@ import com.sk89q.worldedit.math.MutableBlockVector;
 public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
 
     private final CachedMask mask;
-    private transient MutableBlockVector mutable = new MutableBlockVector();
+    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public AdjacentAnyMask(Mask mask) {
         this.mask = CachedMask.cache(mask);
-        mutable = new MutableBlockVector();
+        mutable = new MutableBlockVector3();
     }
 
     @Override
     public void reset() {
-        mutable = new MutableBlockVector();
+        mutable = new MutableBlockVector3();
     }
 
     public CachedMask getParentMask() {
@@ -75,6 +75,6 @@ public class AdjacentAnyMask extends AbstractMask implements ResettableMask {
        	if (y > 0 && mask.test(x, y - 1, z)) {
        		mutable.setComponents(0, -1, 0);
        	}
-        return (mutable.getX() == 0 && mutable.getY() == 0 && mutable.getZ() == 0) ? null : mutable.toBlockVector3();
+        return (mutable.getX() == 0 && mutable.getY() == 0 && mutable.getZ() == 0) ? null : mutable;
     }
 }

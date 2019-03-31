@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MaskingExtent extends AbstractDelegateExtent {
 
     private Mask mask;
-//    private MutableBlockVector mutable = new MutableBlockVector();
+//    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     /**
      * Create a new instance.

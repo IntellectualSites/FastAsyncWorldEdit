@@ -8,7 +8,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -19,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FaweQueueDelegateExtent extends DelegateFaweQueue {
     private final FaweQueue parentQueue;
     private final Extent parentExtent;
-//    private final MutableBlockVector2D mutable2d = new MutableBlockVector2D();
+//    private final MutableBlockVector2 mutable2d = new MutableBlockVector2();
 
     public FaweQueueDelegateExtent(FaweQueue parentQueue, Extent parentExtent) {
         super(parentQueue);

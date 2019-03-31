@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extension.platform;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -112,7 +111,7 @@ public class PlayerProxy extends AbstractPlayerActor {
     @Override
     public Location getLocation() {
         Location loc = this.basePlayer.getLocation();
-        return new Location(loc.getExtent(), loc.toVector().add(offset), loc.getDirection());
+        return new Location(loc.getExtent(), loc.add(offset), loc.getDirection());
     }
 
     @Override

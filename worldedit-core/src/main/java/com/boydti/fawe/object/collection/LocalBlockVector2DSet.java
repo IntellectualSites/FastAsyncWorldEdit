@@ -2,7 +2,7 @@ package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class LocalBlockVector2DSet implements Set<BlockVector2> {
     private final SparseBitSet set;
-    private final MutableBlockVector2D mutable = new MutableBlockVector2D();
+    private final MutableBlockVector2 mutable = new MutableBlockVector2();
 
     public LocalBlockVector2DSet() {
         this.set = new SparseBitSet();
@@ -102,7 +102,7 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
         if (index != -1) {
             int x = MathMan.unpairSearchCoordsX(index);
             int y = MathMan.unpairSearchCoordsY(index);
-            return mutable.setComponents(x, y).toBlockVector2();
+            return mutable.setComponents(x, y);
         }
         return null;
     }
@@ -131,7 +131,7 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
                     mutable.setComponents(x, y);
                     previous = index;
                     index = set.nextSetBit(index + 1);
-                    return mutable.toBlockVector2();
+                    return mutable;
                 }
                 return null;
             }

@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.object.HasFaweQueue;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;

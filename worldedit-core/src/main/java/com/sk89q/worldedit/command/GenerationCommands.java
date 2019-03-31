@@ -31,9 +31,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
-import com.sk89q.worldedit.*;
 
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -49,10 +47,8 @@ import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
@@ -142,9 +138,9 @@ public class GenerationCommands extends MethodCommands {
             image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(), RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
         }
 
-//        MutableBlockVector pos1 = new MutableBlockVector(player.getLocation().toVector().toBlockPoint());
-//        MutableBlockVector pos2 = new MutableBlockVector(pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1));
-      BlockVector3 pos1 = player.getLocation().toVector().toBlockPoint();
+//        MutableBlockVector3 pos1 = new MutableBlockVector3(player.getLocation().toBlockPoint());
+//        MutableBlockVector3 pos2 = new MutableBlockVector3(pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1));
+      BlockVector3 pos1 = player.getLocation().toBlockPoint();
       BlockVector3 pos2 = pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1);
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         int[] count = new int[1];

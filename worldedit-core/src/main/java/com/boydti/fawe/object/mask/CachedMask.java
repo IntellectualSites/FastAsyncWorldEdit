@@ -4,11 +4,11 @@ import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
-    private transient MutableBlockVector mutable = new MutableBlockVector();
+    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private transient LocalBlockVectorSet cache_checked = new LocalBlockVectorSet();
     private transient LocalBlockVectorSet cache_results = new LocalBlockVectorSet();
 
@@ -27,7 +27,7 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
     @Override
     public void reset() {
-        mutable = new MutableBlockVector();
+        mutable = new MutableBlockVector3();
         cache_checked = new LocalBlockVectorSet();
         cache_results = new LocalBlockVectorSet();
         resetCache();
@@ -51,11 +51,11 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
             if (!check) {
                 return cache_results.contains(x, y, z);
             }
-            boolean result = getMask().test(mutable.setComponents(x, y, z).toBlockVector3());
+            boolean result = getMask().test(mutable.setComponents(x, y, z));
             if (result) cache_results.add(x, y, z);
             return result;
         } catch (UnsupportedOperationException ignore) {
-            boolean result = getMask().test(mutable.setComponents(x, y, z).toBlockVector3());
+            boolean result = getMask().test(mutable.setComponents(x, y, z));
             if (y < 0 || y > 255) return result;
             resetCache();
             cache_checked.setOffset(x, z);

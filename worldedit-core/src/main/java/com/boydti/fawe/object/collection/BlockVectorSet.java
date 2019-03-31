@@ -2,7 +2,7 @@ package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -43,14 +43,14 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
             int newSize = count + size;
             if (newSize > index) {
                 int localIndex = index - count;
-                MutableBlockVector pos = new MutableBlockVector(set.getIndex(localIndex));
+                MutableBlockVector3 pos = new MutableBlockVector3(set.getIndex(localIndex));
                 if (pos != null) {
                     int pair = entry.getIntKey();
                     int cx = MathMan.unpairX(pair);
                     int cz = MathMan.unpairY(pair);
                     pos.mutX((cx << 11) + pos.getBlockX());
                     pos.mutZ((cz << 11) + pos.getBlockZ());
-                    return pos.toBlockVector3();
+                    return pos;
                 }
             }
             count += newSize;
@@ -92,7 +92,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
         return new Iterator<BlockVector3>() {
             Int2ObjectMap.Entry<LocalBlockVectorSet> entry = entries.next();
             Iterator<BlockVector3> entryIter = entry.getValue().iterator();
-            MutableBlockVector mutable = new MutableBlockVector();
+            MutableBlockVector3 mutable = new MutableBlockVector3();
 
             @Override
             public void remove() {
@@ -117,7 +117,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
                 int pair = entry.getIntKey();
                 int cx = MathMan.unpairX(pair);
                 int cz = MathMan.unpairY(pair);
-                return mutable.setComponents((cx << 11) + localPos.getBlockX(), localPos.getBlockY(), (cz << 11) + localPos.getBlockZ()).toBlockVector3();
+                return mutable.setComponents((cx << 11) + localPos.getBlockX(), localPos.getBlockY(), (cz << 11) + localPos.getBlockZ());
             }
         };
     }

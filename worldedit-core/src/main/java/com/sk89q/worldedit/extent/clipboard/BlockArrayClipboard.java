@@ -32,7 +32,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockState;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -42,9 +41,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockState;
+
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -177,7 +175,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     public List<? extends Entity> getEntities(Region region) {
         List<Entity> filtered = new ArrayList<>();
         for (Entity entity : getEntities()) {
-            if (region.contains(entity.getLocation().toVector().toBlockPoint())) {
+            if (region.contains(entity.getLocation().toBlockPoint())) {
                 filtered.add(entity);
             }
         }

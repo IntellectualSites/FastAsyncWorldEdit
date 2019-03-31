@@ -15,8 +15,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.math.MutableVector;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
@@ -54,7 +53,7 @@ public class StencilBrush extends HeightBrush {
 
 
         Player player = editSession.getPlayer().getPlayer();
-//        BlockVector3 pos = player.getLocation().toVector();
+//        BlockVector3 pos = player.getLocation();
 
 
 
@@ -65,7 +64,7 @@ public class StencilBrush extends HeightBrush {
 
 
         RecursiveVisitor visitor = new RecursiveVisitor(new Mask() {
-            private final MutableVector mutable = new MutableVector();
+            private final MutableVector3 mutable = new MutableVector3();
             @Override
             public boolean test(BlockVector3 vector) {
                 if (solid.test(vector)) {
@@ -73,7 +72,7 @@ public class StencilBrush extends HeightBrush {
                     int dy = vector.getBlockY() - cy;
                     int dz = vector.getBlockZ() - cz;
 
-                    Vector3 srcPos = transform.apply(mutable.setComponents(dx, dy, dz).toVector3());
+                    Vector3 srcPos = transform.apply(mutable.setComponents(dx, dy, dz));
                     dx = MathMan.roundInt(srcPos.getX());
                     dz = MathMan.roundInt(srcPos.getZ());
 

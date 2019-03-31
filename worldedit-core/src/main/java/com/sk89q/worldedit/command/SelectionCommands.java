@@ -35,7 +35,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -45,7 +44,6 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.RegionSelector;
@@ -65,18 +63,13 @@ import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.util.formatting.StyledFragment;
 import com.sk89q.worldedit.util.formatting.component.CommandListBox;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
@@ -115,7 +108,7 @@ public class SelectionCommands {
                 return;
             }
         } else {
-            pos = player.getBlockIn().toVector().toBlockPoint();
+            pos = player.getBlockIn().toBlockPoint();
         }
         pos = pos.clampY(0, player.getWorld().getMaximumPoint().getBlockY());
         if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos, ActorSelectorLimits.forActor(player))) {
@@ -148,7 +141,7 @@ public class SelectionCommands {
                 return;
             }
         } else {
-            pos = player.getBlockIn().toVector().toBlockPoint();
+            pos = player.getBlockIn().toBlockPoint();
         }
         pos = pos.clampY(0, player.getWorld().getMaximumPoint().getBlockY());
         if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos, ActorSelectorLimits.forActor(player))) {
@@ -169,7 +162,7 @@ public class SelectionCommands {
     )
     @CommandPermissions("worldedit.selection.hpos")
     public void hpos1(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-    	BlockVector3 pos = player.getBlockTrace(300).toVector().toBlockPoint();
+    	BlockVector3 pos = player.getBlockTrace(300).toBlockPoint();
 
         if (pos != null) {
             if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos, ActorSelectorLimits.forActor(player))) {
@@ -193,7 +186,7 @@ public class SelectionCommands {
     )
     @CommandPermissions("worldedit.selection.hpos")
     public void hpos2(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-    	BlockVector3 pos = player.getBlockTrace(300).toVector().toBlockPoint();
+    	BlockVector3 pos = player.getBlockTrace(300).toBlockPoint();
 
         if (pos != null) {
             if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos, ActorSelectorLimits.forActor(player))) {
@@ -254,7 +247,7 @@ public class SelectionCommands {
                 min2D = (args.hasFlag('c')) ? pos : ChunkStore.toChunk(pos.toBlockVector3());
             } else {
                 // use player loc
-                min2D = ChunkStore.toChunk(player.getBlockIn().toVector().toBlockPoint());
+                min2D = ChunkStore.toChunk(player.getBlockIn().toBlockPoint());
             }
 
             min = BlockVector3.at(min2D.getBlockX() * 16, 0, min2D.getBlockZ() * 16);

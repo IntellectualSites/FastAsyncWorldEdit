@@ -113,7 +113,7 @@ public interface IBukkitAdapter {
      */
     default org.bukkit.Location adapt(Location location) {
         checkNotNull(location);
-        Vector3 position = location.toVector();
+        Vector3 position = location;
         return new org.bukkit.Location(
                 adapt((World) location.getExtent()),
                 position.getX(), position.getY(), position.getZ(),

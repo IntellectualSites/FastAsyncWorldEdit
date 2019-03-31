@@ -141,6 +141,8 @@ public class BlockTransformExtent extends ResettableExtent {
     
     private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
 
+
+
     /**
      * Transform the given block using the given transform.
      *

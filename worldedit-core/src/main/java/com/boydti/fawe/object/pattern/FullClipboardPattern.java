@@ -9,7 +9,7 @@ import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FullClipboardPattern extends AbstractExtentPattern {
     private final Clipboard clipboard;
-    private final MutableBlockVector mutable = new MutableBlockVector();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     /**
      * Create a new clipboard pattern.

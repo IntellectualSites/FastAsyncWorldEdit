@@ -60,22 +60,12 @@ public class BlockVector2 {
     }
 
     public static BlockVector2 at(int x, int z) {
-        switch (x) {
-            case 0:
-                if (z == 0) {
-                    return ZERO;
-                }
-                break;
-            case 1:
-                if (z == 1) {
-                    return ONE;
-                }
-                break;
-        }
         return new BlockVector2(x, z);
     }
 
-    private final int x, z;
+    protected int x, z;
+
+    protected BlockVector2(){}
 
     /**
      * Construct an instance.
@@ -83,9 +73,29 @@ public class BlockVector2 {
      * @param x the X coordinate
      * @param z the Z coordinate
      */
-    private BlockVector2(int x, int z) {
+    protected BlockVector2(int x, int z) {
         this.x = x;
         this.z = z;
+    }
+
+    public MutableBlockVector2 setComponents(int x, int z) {
+        return new MutableBlockVector2(x, z);
+    }
+
+    public MutableBlockVector2 mutX(double x) {
+        return new MutableBlockVector2((int) x, z);
+    }
+
+    public MutableBlockVector2 mutZ(double z) {
+        return new MutableBlockVector2(x, (int) z);
+    }
+
+    public MutableBlockVector2 mutX(int x) {
+        return new MutableBlockVector2(x, z);
+    }
+
+    public MutableBlockVector2 mutZ(int z) {
+        return new MutableBlockVector2(x, z);
     }
 
     /**
@@ -142,6 +152,35 @@ public class BlockVector2 {
      */
     public BlockVector2 withZ(int z) {
         return BlockVector2.at(x, z);
+    }
+
+    public MutableBlockVector2 nextPosition() {
+        int absX = Math.abs(x);
+        int absY = Math.abs(z);
+        if (absX > absY) {
+            if (x > 0) {
+                return setComponents(x, z + 1);
+            } else {
+                return setComponents(x, z - 1);
+            }
+        } else if (absY > absX) {
+            if (z > 0) {
+                return setComponents(x - 1, z);
+            } else {
+                return setComponents(x + 1, z);
+            }
+        } else {
+            if (x == z && x > 0) {
+                return setComponents(x, z + 1);
+            }
+            if (x == absX) {
+                return setComponents(x, z + 1);
+            }
+            if (z == absY) {
+                return setComponents(x, z - 1);
+            }
+            return setComponents(x + 1, z);
+        }
     }
 
     /**

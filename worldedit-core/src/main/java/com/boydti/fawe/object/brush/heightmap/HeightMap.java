@@ -4,7 +4,6 @@ import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.convolution.GaussianKernel;
@@ -31,7 +30,7 @@ public interface HeightMap {
         int iterations = 1;
         Location min = new Location(session.getWorld(), pos.subtract(size, maxY, size).toVector3());
         BlockVector3 max = pos.add(size, maxY, size);
-        Region region = new CuboidRegion(session.getWorld(), min.toVector().toBlockPoint(), max);
+        Region region = new CuboidRegion(session.getWorld(), min.toBlockPoint(), max);
         com.sk89q.worldedit.math.convolution.HeightMap heightMap = new com.sk89q.worldedit.math.convolution.HeightMap(session, region, data[0], layers);
         if (smooth) {
             try {

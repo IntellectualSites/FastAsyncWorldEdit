@@ -23,7 +23,7 @@ package com.sk89q.worldedit.math.interpolation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 import java.util.Collections;
@@ -139,7 +139,7 @@ public class KochanekBartelsInterpolation implements Interpolation {
         return nodes.get(index).getPosition();
     }
 
-    private MutableBlockVector mutable = new MutableBlockVector();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
     public Vector3 getPosition(double position) {

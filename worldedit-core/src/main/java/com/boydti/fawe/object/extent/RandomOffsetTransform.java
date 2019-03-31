@@ -2,11 +2,10 @@ package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
 
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -14,7 +13,7 @@ import java.util.SplittableRandom;
 
 public class RandomOffsetTransform extends ResettableExtent {
     private transient SplittableRandom random;
-    private transient MutableBlockVector2D mutable = new MutableBlockVector2D();
+    private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
     private final int dx, dy, dz;
 
@@ -30,7 +29,7 @@ public class RandomOffsetTransform extends ResettableExtent {
     public boolean setBiome(BlockVector2 pos, BaseBiome biome) {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
-        return getExtent().setBiome(mutable.setComponents(x, z).toBlockVector2(), biome);
+        return getExtent().setBiome(mutable.setComponents(x, z), biome);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class RandomOffsetTransform extends ResettableExtent {
     @Override
     public ResettableExtent setExtent(Extent extent) {
         random = new SplittableRandom();
-        mutable = new MutableBlockVector2D();
+        mutable = new MutableBlockVector2();
         return super.setExtent(extent);
     }
 }

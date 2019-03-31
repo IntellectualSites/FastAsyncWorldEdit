@@ -56,7 +56,7 @@ public class LocationTest {
         World world = mock(World.class);
         Vector3 position = Vector3.at(1, 1, 1);
         Location location = new Location(world, position);
-        assertEquals(position, location.toVector());
+        assertEquals(position, location);
     }
 
     @Test

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -59,7 +58,7 @@ public class FloodFillTool implements BlockTool {
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
         World world = (World) clicked.getExtent();
 
-        BlockVector3 origin = clicked.toVector().toBlockPoint();
+        BlockVector3 origin = clicked.toBlockPoint();
         BlockType initialType = world.getBlock(origin).getBlockType();
 
         if (initialType.getMaterial().isAir()) {

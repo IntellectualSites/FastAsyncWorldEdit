@@ -4,7 +4,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
 
     private transient int mode = -1;
-    private transient MutableBlockVector mutable = new MutableBlockVector();
+    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
 
     private int originX = Integer.MAX_VALUE, originY = Integer.MAX_VALUE, originZ = Integer.MAX_VALUE;
 
@@ -34,13 +34,13 @@ public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
                 originZ = vector.getBlockZ();
                 mode = 0;
                 Extent extent = getExtent();
-                if (!extent.getBlockType(mutable.setComponents(originX - 1, originY, originZ).toBlockVector3()).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX + 1, originY, originZ).toBlockVector3()).getMaterial().isAir()) {
+                if (!extent.getBlockType(mutable.setComponents(originX - 1, originY, originZ)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX + 1, originY, originZ)).getMaterial().isAir()) {
                     mode &= 1;
                 }
-                if (!extent.getBlockType(mutable.setComponents(originX, originY, originZ - 1).toBlockVector3()).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY, originZ + 1).toBlockVector3()).getMaterial().isAir()) {
+                if (!extent.getBlockType(mutable.setComponents(originX, originY, originZ - 1)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY, originZ + 1)).getMaterial().isAir()) {
                     mode &= 4;
                 }
-                if (!extent.getBlockType(mutable.setComponents(originX, originY - 1, originZ + 1).toBlockVector3()).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY + 1, originZ + 1).toBlockVector3()).getMaterial().isAir()) {
+                if (!extent.getBlockType(mutable.setComponents(originX, originY - 1, originZ + 1)).getMaterial().isAir() && !extent.getBlockType(mutable.setComponents(originX, originY + 1, originZ + 1)).getMaterial().isAir()) {
                     mode &= 2;
                 }
                 if (Integer.bitCount(mode) >= 3) {
@@ -85,7 +85,7 @@ public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
     @Override
     public void reset() {
         mode = -1;
-        mutable = new MutableBlockVector();
+        mutable = new MutableBlockVector3();
     }
 
     @Nullable

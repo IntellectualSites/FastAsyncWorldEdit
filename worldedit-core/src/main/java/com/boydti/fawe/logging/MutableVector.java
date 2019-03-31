@@ -2,11 +2,11 @@
 //
 //import org.primesoft.blockshub.api.Vector;
 //
-//public class MutableVector extends Vector {
+//public class MutableVector3 extends Vector {
 //
 //    public double x, y, z;
 //
-//    public MutableVector() {
+//    public MutableVector3() {
 //        super(0, 0, 0);
 //        this.x = 0;
 //        this.y = 0;

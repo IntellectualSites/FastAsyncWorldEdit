@@ -7,8 +7,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.math.MutableVector;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import java.util.concurrent.ThreadLocalRandom;
@@ -72,7 +71,7 @@ public class BlobBrush implements Brush {
             double manScaleY = (1.25 + seedY * 0.5);
             double manScaleZ = (1.25 + seedZ * 0.5);
 
-            MutableVector mutable = new MutableVector();
+            MutableVector3 mutable = new MutableVector3();
             double roughness = 1 - sphericity;
             for (int xr = -sizeInt; xr <= sizeInt; xr++) {
                 mutable.mutX(xr);
@@ -80,7 +79,7 @@ public class BlobBrush implements Brush {
                     mutable.mutY(yr);
                     for (int zr = -sizeInt; zr <= sizeInt; zr++) {
                         mutable.mutZ(zr);
-                        Vector3 pt = transform.apply(mutable.toVector3());
+                        Vector3 pt = transform.apply(mutable);
                         int x = MathMan.roundInt(pt.getX());
                         int y = MathMan.roundInt(pt.getY());
                         int z = MathMan.roundInt(pt.getZ());

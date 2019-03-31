@@ -21,9 +21,11 @@ package com.sk89q.worldedit.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.boydti.fawe.util.MathMan;
 import com.google.common.collect.ComparisonChain;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 
 /**
@@ -38,21 +40,6 @@ public class Vector3 {
     public static final Vector3 ONE = new Vector3(1, 1, 1);
 
     public static Vector3 at(double x, double y, double z) {
-        // switch for efficiency on typical cases
-        // in MC y is rarely 0/1 on selections
-        int yTrunc = (int) y;
-        switch (yTrunc) {
-            case 0:
-                if (x == 0 && y == 0 && z == 0) {
-                    return ZERO;
-                }
-                break;
-            case 1:
-                if (x == 1 && y == 1 && z == 1) {
-                    return ONE;
-                }
-                break;
-        }
         return new Vector3(x, y, z);
     }
 
@@ -77,7 +64,7 @@ public class Vector3 {
         return YzxOrderComparator.YZX_ORDER;
     }
 
-    private final double x, y, z;
+    protected double x, y, z;
 
     /**
      * Construct an instance.
@@ -86,10 +73,66 @@ public class Vector3 {
      * @param y the Y coordinate
      * @param z the Z coordinate
      */
-    private Vector3(double x, double y, double z) {
+    protected Vector3(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    protected Vector3() {}
+
+    protected Vector3(Vector3 other) {
+        this.x = other.x;
+        this.y = other.y;
+        this.z = other.z;
+    }
+
+    public int getBlockX() {
+        return MathMan.roundInt(getX());
+    }
+
+    public int getBlockY() {
+        return MathMan.roundInt(getY());
+    }
+
+    public int getBlockZ() {
+        return MathMan.roundInt(getZ());
+    }
+
+    public MutableVector3 setComponents(Vector3 other) {
+        return new MutableVector3(other);
+    }
+
+    public MutableVector3 setComponents(int x, int y, int z) {
+        return new MutableVector3(x, y, z);
+    }
+
+    public MutableVector3 setComponents(double x, double y, double z) {
+        return new MutableVector3(x, y, z);
+    }
+
+    public MutableVector3 mutX(int x) {
+        return new MutableVector3(x, y, getZ());
+    }
+
+    public MutableVector3 mutX(double x) {
+        return new MutableVector3(x, y, getZ());
+    }
+
+    public MutableVector3 mutY(int y) {
+        return new MutableVector3(getX(), y, getZ());
+    }
+
+    public MutableVector3 mutY(double y) {
+        return new MutableVector3(getX(), y, getZ());
+    }
+
+    public MutableVector3 mutZ(int z) {
+        return new MutableVector3(getX(), y, z);
+    }
+
+    public MutableVector3 mutZ(double z) {
+        return new MutableVector3(getX(), y, z);
     }
 
     /**
@@ -579,25 +622,25 @@ public class Vector3 {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == this) return true;
         if (!(obj instanceof Vector3)) {
             return false;
         }
 
         Vector3 other = (Vector3) obj;
-        return other.x == this.x && other.y == this.y && other.z == this.z;
+        return other.getX() == this.getX() && other.getZ() == this.getZ() && other.getY() == this.getY();
     }
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + Double.hashCode(x);
-        hash = 31 * hash + Double.hashCode(y);
-        hash = 31 * hash + Double.hashCode(z);
-        return hash;
+        return ((int) getX() ^ ((int) getZ() << 16)) ^ ((int) getY() << 30);
     }
 
     @Override
     public String toString() {
+        String x = (getX() == getBlockX() ? "" + getBlockX() : "" + getX());
+        String y = (getY() == getBlockY() ? "" + getBlockY() : "" + getY());
+        String z = (getZ() == getBlockZ() ? "" + getBlockZ() : "" + getZ());
         return "(" + x + ", " + y + ", " + z + ")";
     }
 

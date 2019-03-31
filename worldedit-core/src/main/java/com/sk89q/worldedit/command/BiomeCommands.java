@@ -150,11 +150,11 @@ public class BiomeCommands extends MethodCommands {
                 return;
             }
 
-            BaseBiome biome = player.getWorld().getBiome(blockPosition.toVector().toBlockPoint().toBlockVector2());
+            BaseBiome biome = player.getWorld().getBiome(blockPosition.toBlockPoint().toBlockVector2());
             biomes[biome.getId()]++;
             size = 1;
         } else if (args.hasFlag('p')) {
-            BaseBiome biome = player.getWorld().getBiome(player.getLocation().toVector().toBlockPoint().toBlockVector2());
+            BaseBiome biome = player.getWorld().getBiome(player.getLocation().toBlockPoint().toBlockVector2());
             biomes[biome.getId()]++;
             size = 1;
         } else {
@@ -219,7 +219,7 @@ public class BiomeCommands extends MethodCommands {
         Mask2D mask2d = mask != null ? mask.toMask2D() : null;
 
         if (atPosition) {
-            region = new CuboidRegion(player.getLocation().toVector().toBlockPoint(), player.getLocation().toVector().toBlockPoint());
+            region = new CuboidRegion(player.getLocation().toBlockPoint(), player.getLocation().toBlockPoint());
         } else {
             region = session.getSelection(world);
         }

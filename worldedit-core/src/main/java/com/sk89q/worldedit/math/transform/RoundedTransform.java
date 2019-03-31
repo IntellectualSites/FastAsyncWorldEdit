@@ -5,7 +5,7 @@ import com.sk89q.worldedit.math.Vector3;
 
 public class RoundedTransform implements Transform{
     private final Transform transform;
-//    private MutableBlockVector mutable = new MutableBlockVector();
+//    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public RoundedTransform(Transform transform) {
         this.transform = transform;

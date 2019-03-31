@@ -7,7 +7,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.io.IOException;
 public class NoXPattern extends AbstractPattern {
 
     private final Pattern pattern;
-//    private transient MutableBlockVector mutable = new MutableBlockVector();
+//    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public NoXPattern(Pattern pattern) {
         this.pattern = pattern;
@@ -25,7 +25,7 @@ public class NoXPattern extends AbstractPattern {
     public BaseBlock apply(BlockVector3 pos) {
 //        mutable.mutY((pos.getY()));
 //        mutable.mutZ((pos.getZ()));
-//        return pattern.apply(mutable.toBlockVector3());
+//        return pattern.apply(mutable);
     	return pattern.apply(pos);
     }
 
@@ -38,6 +38,6 @@ public class NoXPattern extends AbstractPattern {
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-//        mutable = new MutableBlockVector();
+//        mutable = new MutableBlockVector3();
     }
 }

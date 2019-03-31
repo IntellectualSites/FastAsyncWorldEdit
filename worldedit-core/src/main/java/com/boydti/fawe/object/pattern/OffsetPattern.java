@@ -7,7 +7,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.io.IOException;
 public class OffsetPattern extends AbstractPattern {
 
     private final int dx, dy, dz;
-//    private transient MutableBlockVector mutable = new MutableBlockVector();
+//    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private final Pattern pattern;
 
     public OffsetPattern(Pattern pattern, int dx, int dy, int dz) {
@@ -45,6 +45,6 @@ public class OffsetPattern extends AbstractPattern {
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-//        mutable = new MutableBlockVector();
+//        mutable = new MutableBlockVector3();
     }
 }

@@ -2,7 +2,7 @@ package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -117,7 +117,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             int x = offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21);
             int y = b1;
             int z = offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21);
-            return MutableBlockVector.get(x, y, z).toBlockVector3();
+            return MutableBlockVector3.get(x, y, z);
         }
         return null;
     }
@@ -127,7 +127,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return new Iterator<BlockVector3>() {
             int index = set.nextSetBit(0);
             int previous = -1;
-            MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+            MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
             @Override
             public void remove() {
@@ -151,7 +151,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
                     mutable.mutZ(offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21));
                     previous = index;
                     index = set.nextSetBit(index + 1);
-                    return mutable.toBlockVector3();
+                    return mutable;
                 }
                 return null;
             }
@@ -280,7 +280,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         boolean result = false;
         int size = size();
         int index = -1;
-        MutableBlockVector mVec = MutableBlockVector.get(0, 0, 0);
+        MutableBlockVector3 mVec = MutableBlockVector3.get(0, 0, 0);
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index + 1);
             int b1 = (index & 0xFF);
@@ -310,7 +310,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     public void forEach(BlockVectorSetVisitor visitor) {
         int size = size();
         int index = -1;
-        BlockVector3 mVec = MutableBlockVector.get(0, 0, 0).toBlockVector3();
+        BlockVector3 mVec = MutableBlockVector3.get(0, 0, 0);
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index + 1);
             int b1 = (index & 0xFF);

@@ -8,7 +8,7 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
@@ -60,7 +60,7 @@ public class SurfaceSpline implements Brush {
             tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, 0, maxY);
             if (tipy == -1) continue;
             if (radius == 0) {
-            	BlockVector3 set = MutableBlockVector.get(tipx, tipy, tipz).toBlockVector3();
+            	BlockVector3 set = MutableBlockVector3.get(tipx, tipy, tipz);
                 try {
                     pattern.apply(editSession, set, set);
                 } catch (WorldEditException e) {

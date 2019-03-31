@@ -18,7 +18,7 @@ public class BackwardsExtentBlockCopy implements Operation {
     private final RegionFunction function;
     private final BlockVector3 origin;
 
-//    private Vector mutable = new MutableBlockVector();
+//    private Vector mutable = new MutableBlockVector3();
 
     public BackwardsExtentBlockCopy(Extent source, Region region, Extent destination, BlockVector3 origin, Transform transform, RegionFunction function) {
         this.source = source;

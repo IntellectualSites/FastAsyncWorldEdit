@@ -67,20 +67,6 @@ public abstract class TaskManager {
      * @param runnables
      */
     public void parallel(Collection<Runnable> runnables) {
-//        if (!Fawe.get().isJava8()) {
-//            ExecutorCompletionService c = new ExecutorCompletionService(pool);
-//            for (Runnable run : runnables) {
-//                c.submit(run, null);
-//            }
-//            try {
-//                for (int i = 0; i < runnables.size(); i++) {
-//                    c.take();
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return;
-//        }
         for (Runnable run : runnables) {
             pool.submit(run);
         }

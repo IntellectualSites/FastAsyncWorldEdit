@@ -34,9 +34,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
-import com.sk89q.worldedit.*;
 
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -64,7 +62,6 @@ import com.sk89q.worldedit.math.convolution.HeightMapFilter;
 import com.sk89q.worldedit.math.noise.RandomNoise;
 import com.sk89q.worldedit.regions.*;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
@@ -172,7 +169,7 @@ public class RegionCommands extends MethodCommands {
             BBC.NO_BLOCK.send(player);
             return;
         }
-        CompoundTag nbt = editSession.getFullBlock(pos.toVector().toBlockPoint()).getNbtData();
+        CompoundTag nbt = editSession.getFullBlock(pos.toBlockPoint()).getNbtData();
         if (nbt != null) {
             player.print(nbt.getValue().toString());
         } else {

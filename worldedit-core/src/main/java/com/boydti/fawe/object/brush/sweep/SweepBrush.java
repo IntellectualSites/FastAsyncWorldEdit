@@ -13,7 +13,7 @@ import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableVector;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
@@ -95,10 +95,10 @@ public class SweepBrush implements Brush, ResettableTool {
                 double blockDistance = 1d / splineLength;
                 double step = blockDistance / quality;
                 double accumulation = 0;
-                MutableVector last = new MutableVector(0, 0, 0);
+                MutableVector3 last = new MutableVector3(0, 0, 0);
                 for (double pos = 0D; pos <= 1D; pos += step) {
                     Vector3 gradient = interpol.get1stDerivative(pos);
-                    if (last == null) last = new MutableVector(interpol.get1stDerivative(pos));
+                    if (last == null) last = new MutableVector3(interpol.get1stDerivative(pos));
                     double dist = MathMan.sqrtApprox(last.distanceSq(gradient));
                     last.mutX(gradient.getX());
                     last.mutY(gradient.getY());

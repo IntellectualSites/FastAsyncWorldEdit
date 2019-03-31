@@ -1,7 +1,5 @@
 package com.sk89q.worldedit.command.tool;
 
-import java.util.Set;
-
 import com.boydti.fawe.object.mask.IdMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -13,13 +11,6 @@ import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.LocalConfiguration;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -45,10 +36,10 @@ public class RecursivePickaxe implements BlockTool {
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
         World world = (World) clicked.getExtent();
-        final BlockVector3 pos = clicked.toVector().toBlockPoint();
+        final BlockVector3 pos = clicked.toBlockPoint();
 
         EditSession editSession = session.createEditSession(player);
-        BlockVector3 origin = clicked.toVector().toBlockPoint();
+        BlockVector3 origin = clicked.toBlockPoint();
         BlockType initialType = world.getBlock(origin).getBlockType();
 
         BlockStateHolder block = editSession.getBlock(pos);
@@ -74,8 +65,8 @@ public class RecursivePickaxe implements BlockTool {
         session.remember(editSession);
 //=======
 //            try {
-//                recurse(server, editSession, world, clicked.toVector().toBlockPoint(),
-//                        clicked.toVector().toBlockPoint(), range, initialType, new HashSet<>());
+//                recurse(server, editSession, world, clicked.toBlockPoint(),
+//                        clicked.toBlockPoint(), range, initialType, new HashSet<>());
 //            } catch (MaxChangedBlocksException e) {
 //                player.printError("Max blocks change limit reached.");
 //            } finally {

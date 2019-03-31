@@ -42,20 +42,6 @@ public class BlockVector3 {
     }
 
     public static BlockVector3 at(int x, int y, int z) {
-        // switch for efficiency on typical cases
-        // in MC y is rarely 0/1 on selections
-        switch (y) {
-            case 0:
-                if (x == 0 && z == 0) {
-                    return ZERO;
-                }
-                break;
-            case 1:
-                if (x == 1 && z == 1) {
-                    return ONE;
-                }
-                break;
-        }
         return new BlockVector3(x, y, z);
     }
 
@@ -80,7 +66,9 @@ public class BlockVector3 {
         return YzxOrderComparator.YZX_ORDER;
     }
 
-    private final int x, y, z;
+    protected int x, y, z;
+
+    protected BlockVector3(){}
 
     /**
      * Construct an instance.
@@ -89,10 +77,42 @@ public class BlockVector3 {
      * @param y the Y coordinate
      * @param z the Z coordinate
      */
-    private BlockVector3(int x, int y, int z) {
+    protected BlockVector3(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public MutableBlockVector3 setComponents(double x, double y, double z) {
+        return new MutableBlockVector3((int) x, (int) y, (int) z);
+    }
+
+    public MutableBlockVector3 setComponents(int x, int y, int z) {
+        return new MutableBlockVector3(x, y, z);
+    }
+
+    public MutableBlockVector3 mutX(double x) {
+        return new MutableBlockVector3((int) x, y, z);
+    }
+
+    public MutableBlockVector3 mutY(double y) {
+        return new MutableBlockVector3(x, (int) y, z);
+    }
+
+    public MutableBlockVector3 mutZ(double z) {
+        return new MutableBlockVector3(x, y, (int) z);
+    }
+
+    public MutableBlockVector3 mutX(int x) {
+        return new MutableBlockVector3(x, y, z);
+    }
+
+    public MutableBlockVector3 mutY(int y) {
+        return new MutableBlockVector3(x, y, z);
+    }
+
+    public MutableBlockVector3 mutZ(int z) {
+        return new MutableBlockVector3(x, y, z);
     }
 
     /**

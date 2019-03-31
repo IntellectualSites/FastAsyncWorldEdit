@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 /**
@@ -17,7 +17,7 @@ import com.sk89q.worldedit.math.Vector3;
  */
 public class AffineTransform implements Transform, Serializable {
 
-    private transient MutableBlockVector mutable = new MutableBlockVector();
+    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
 
     /**
      * coefficients for x coordinate.
@@ -324,7 +324,7 @@ public class AffineTransform implements Transform, Serializable {
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        mutable = new MutableBlockVector();
+        mutable = new MutableBlockVector3();
     }
 
 

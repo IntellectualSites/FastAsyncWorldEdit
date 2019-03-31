@@ -369,7 +369,7 @@ public class ForwardExtentCopy implements Operation {
             if (!entities.isEmpty()) {
                 ExtentEntityCopy entityCopy = new ExtentEntityCopy(from.toVector3(), destination, to.toVector3(), currentTransform);
 //            if (copyingEntities) {
-//                ExtentEntityCopy entityCopy = new ExtentEntityCopy(from.toVector3(), destination, to.toVector3(), currentTransform);
+//                ExtentEntityCopy entityCopy = new ExtentEntityCopy(from, destination, to, currentTransform);
                 entityCopy.setRemoving(removingEntities);
                 EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
                 Operations.completeBlindly(entityVisitor);

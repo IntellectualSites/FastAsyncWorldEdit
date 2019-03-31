@@ -7,14 +7,13 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class BlockTranslateExtent extends AbstractDelegateExtent {
     private final int dx, dy, dz;
-    private MutableBlockVector mutable = new MutableBlockVector();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public BlockTranslateExtent(Extent extent, int dx, int dy, int dz) {
         super(extent);
@@ -28,7 +27,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
         mutable.mutX((location.getX() + dx));
         mutable.mutY((location.getY() + dy));
         mutable.mutZ((location.getZ() + dz));
-        return getExtent().setBlock(mutable.toBlockVector3(), block);
+        return getExtent().setBlock(mutable, block);
     }
 
     @Override

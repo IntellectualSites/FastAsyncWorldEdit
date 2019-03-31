@@ -8,8 +8,6 @@ import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -25,7 +23,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -211,7 +209,7 @@ public class Schematic {
             BlockArrayClipboard bac = (BlockArrayClipboard) clipboard;
             if (copyBiomes) {
                 bac.IMP.forEach(new FaweClipboard.BlockReader() {
-                    MutableBlockVector2D mpos2d = new MutableBlockVector2D();
+                    MutableBlockVector2 mpos2d = new MutableBlockVector2();
                     {
                         mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
                     }
@@ -222,7 +220,7 @@ public class Schematic {
                             int zz = z + relz;
                             if (xx != mpos2d.getBlockX() || zz != mpos2d.getBlockZ()) {
                                 mpos2d.setComponents(xx, zz);
-                                extent.setBiome(mpos2d.toBlockVector2(), bac.IMP.getBiome(x, z));
+                                extent.setBiome(mpos2d, bac.IMP.getBiome(x, z));
                             }
                             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                                 return;
@@ -247,8 +245,8 @@ public class Schematic {
             final int rely = to.getBlockY() - origin.getBlockY();
             final int relz = to.getBlockZ() - origin.getBlockZ();
             RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-//                MutableBlockVector2D mpos2d_2 = new MutableBlockVector2D();
-                MutableBlockVector2D mpos2d = new MutableBlockVector2D();
+//                MutableBlockVector2 mpos2d_2 = new MutableBlockVector2();
+                MutableBlockVector2 mpos2d = new MutableBlockVector2();
                 {
                     mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
                 }
@@ -260,7 +258,7 @@ public class Schematic {
                     if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
                         mpos2d.setComponents(xx, zz);
 //                        extent.setBiome(mpos2d, clipboard.getBiome(mpos2d_2.setComponents(mutable.getBlockX(), mutable.getBlockZ())));
-                        extent.setBiome(mpos2d.toBlockVector2(), clipboard.getBiome(BlockVector2.at(mutable.getBlockX(), mutable.getBlockZ())));
+                        extent.setBiome(mpos2d, clipboard.getBiome(BlockVector2.at(mutable.getBlockX(), mutable.getBlockZ())));
                     }
                     if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                         return false;

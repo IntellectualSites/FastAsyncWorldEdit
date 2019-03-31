@@ -1,12 +1,11 @@
 package com.boydti.fawe.jnbt.anvil.generator;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 import java.util.Random;
 
@@ -20,7 +19,7 @@ public class OreGen extends Resource {
     private final Pattern pattern;
     private final Extent extent;
     private final Mask mask;
-    private MutableBlockVector mutable = new MutableBlockVector();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     private double ONE_2 = 1 / 2F;
     private double ONE_8 = 1 / 8F;
@@ -43,7 +42,7 @@ public class OreGen extends Resource {
     @Override
     public boolean spawn(Random rand, int x, int z) throws WorldEditException {
         int y = rand.nextInt(maxY - minY) + minY;
-        if (!mask.test(mutable.setComponents(x, y, z).toBlockVector3())) {
+        if (!mask.test(mutable.setComponents(x, y, z))) {
             return false;
         }
         double f = rand.nextDouble() * Math.PI;
@@ -106,8 +105,8 @@ public class OreGen extends Resource {
                                 double dz = (zz + 0.5D - d9) * id11o2;
                                 double dxyz2 = dxy2 + dz * dz;
                                 if ((dxyz2 < 1)) {
-                                    if (mask.test(mutable.toBlockVector3()))
-                                        pattern.apply(extent, mutable.toBlockVector3(), mutable.toBlockVector3());
+                                    if (mask.test(mutable))
+                                        pattern.apply(extent, mutable, mutable);
                                 }
                             }
                         }

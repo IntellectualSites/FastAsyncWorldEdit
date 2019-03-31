@@ -30,4 +30,3 @@ public interface FawePattern extends Pattern {
     @Override
     boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException;
 }
-

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.Player;
@@ -36,20 +35,12 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypeUtil;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.cui.CUIEvent;
-import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.TargetBlock;
-import com.sk89q.worldedit.util.auth.AuthorizationException;
 
 import java.io.File;
 
@@ -345,12 +336,12 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public Location getBlockIn() {
-        return getLocation().setPosition(getLocation().toVector().floor());
+        return getLocation().setPosition(getLocation().floor());
     }
 
     @Override
     public Location getBlockOn() {
-        return getLocation().setPosition(getLocation().setY(getLocation().getY() - 1).toVector().floor());
+        return getLocation().setPosition(getLocation().setY(getLocation().getY() - 1).floor());
     }
 
     @Override
@@ -425,7 +416,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         boolean inFree = false;
 
         while ((block = hitBlox.getNextBlock()) != null) {
-            boolean free = !world.getBlock(block.toVector().toBlockPoint()).getBlockType().getMaterial().isMovementBlocker();
+            boolean free = !world.getBlock(block.toBlockPoint()).getBlockType().getMaterial().isMovementBlocker();
 
             if (firstBlock) {
                 firstBlock = false;

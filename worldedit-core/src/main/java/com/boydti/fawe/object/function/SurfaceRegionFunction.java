@@ -5,7 +5,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 public class SurfaceRegionFunction implements FlatRegionFunction {
     private final Extent extent;
@@ -13,7 +13,7 @@ public class SurfaceRegionFunction implements FlatRegionFunction {
     private final int minY;
     private final int maxY;
     private int lastY;
-    private MutableBlockVector mutable = new MutableBlockVector();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public SurfaceRegionFunction(Extent extent, RegionFunction function, int minY, int maxY) {
         this.extent = extent;
@@ -30,7 +30,7 @@ public class SurfaceRegionFunction implements FlatRegionFunction {
         int layer = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY, false);
         if (layer != -1) {
             lastY = layer;
-            return function.apply(mutable.setComponents(x, layer, z).toBlockVector3());
+            return function.apply(mutable.setComponents(x, layer, z));
         }
         return false;
     }

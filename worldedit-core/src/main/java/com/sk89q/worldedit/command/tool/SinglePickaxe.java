@@ -44,7 +44,7 @@ public class SinglePickaxe implements BlockTool {
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
     	World world = (World) clicked.getExtent();
-        BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
+        BlockVector3 blockPoint = clicked.toBlockPoint();
         final BlockType blockType = world.getBlock(blockPoint).getBlockType();
         if (blockType == BlockTypes.BEDROCK
                 && !player.canDestroyBedrock()) {
@@ -61,7 +61,7 @@ public class SinglePickaxe implements BlockTool {
         try {
             if (editSession.setBlock(clicked.getBlockX(), clicked.getBlockY(), clicked.getBlockZ(), EditSession.nullBlock)) {
                 // TODO FIXME play effect
-//                world.playEffect(clicked.toVector(), 2001, blockType);
+//                world.playEffect(clicked, 2001, blockType);
             }
         } finally {
             editSession.flushQueue();

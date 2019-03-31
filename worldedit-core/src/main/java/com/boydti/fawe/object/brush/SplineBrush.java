@@ -17,7 +17,7 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableVector;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Node;
 import java.util.ArrayList;
@@ -151,13 +151,13 @@ public class SplineBrush implements Brush, ResettableTool {
     }
 
     private Vector3 getCentroid(Collection<BlockVector3> points) {
-    	MutableVector sum = new MutableVector();
+    	MutableVector3 sum = new MutableVector3();
         for (BlockVector3 p : points) {
             sum.mutX(sum.getX() + p.getX());
             sum.mutY(sum.getY() + p.getY());
             sum.mutZ(sum.getZ() + p.getZ());
         }
-        return sum.multiply(1.0 / points.size()).toVector3();
+        return sum.multiply(1.0 / points.size());
     }
 
     private BlockVector3 normal(Collection<BlockVector3> points, BlockVector3 centroid) {
@@ -179,7 +179,7 @@ public class SplineBrush implements Brush, ResettableTool {
         double yz = 0.0;
         double zz = 0.0;
 
-        MutableVector r = new MutableVector();
+        MutableVector3 r = new MutableVector3();
         for (BlockVector3 p : points) {
             r.mutX((p.getX() - centroid.getX()));
             r.mutY((p.getY() - centroid.getY()));

@@ -53,9 +53,9 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
         int range = this.range > -1 ? getRange() : MAX_RANGE;
         if (adjacent) {
             Location face = player.getBlockTraceFace(range, true);
-            return face.toVector().add(face.getDirection());
+            return face.add(face.getDirection());
         } else {
-            return player.getBlockTrace(getRange(), true).toVector();
+            return player.getBlockTrace(getRange(), true);
         }
     }
 

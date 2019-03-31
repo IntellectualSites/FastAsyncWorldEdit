@@ -10,10 +10,10 @@ import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 public class ShatterBrush extends ScatterBrush {
-    private final MutableBlockVector mutable = new MutableBlockVector();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public ShatterBrush(int count) {
         super(count, 1);
@@ -76,8 +76,8 @@ public class ShatterBrush extends ScatterBrush {
                             int dz = position.getBlockZ() - z2;
                             int dSqr = (dx * dx) + (dy * dy) + (dz * dz);
                             if (dSqr <= radius2) {
-                                MutableBlockVector v = mutable.setComponents(x2, y2, z2);
-                                BlockVector3 bv = v.toBlockVector3();
+                                MutableBlockVector3 v = mutable.setComponents(x2, y2, z2);
+                                BlockVector3 bv = v;
                                 if (surfaceTest.test(bv) && finalMask.test(bv)) {
                                     // (collision) If it's visited and part of another frontier, set the block
                                     if (!placed.add(x2, y2, z2)) {

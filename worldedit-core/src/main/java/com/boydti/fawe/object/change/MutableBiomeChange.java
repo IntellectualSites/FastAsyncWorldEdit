@@ -3,12 +3,12 @@ package com.boydti.fawe.object.change;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 
 public class MutableBiomeChange implements Change {
 
-    private MutableBlockVector2D mutable = new MutableBlockVector2D();
+    private MutableBlockVector2 mutable = new MutableBlockVector2();
     private BaseBiome from;
     private BaseBiome to;
 
@@ -25,11 +25,11 @@ public class MutableBiomeChange implements Change {
 
     @Override
     public void undo(UndoContext context) throws WorldEditException {
-        context.getExtent().setBiome(mutable.toBlockVector2(), from);
+        context.getExtent().setBiome(mutable, from);
     }
 
     @Override
     public void redo(UndoContext context) throws WorldEditException {
-        context.getExtent().setBiome(mutable.toBlockVector2(), to);
+        context.getExtent().setBiome(mutable, to);
     }
 }

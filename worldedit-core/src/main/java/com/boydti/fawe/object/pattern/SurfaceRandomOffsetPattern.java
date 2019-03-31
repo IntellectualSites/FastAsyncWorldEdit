@@ -5,7 +5,7 @@ import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -15,10 +15,10 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private final Pattern pattern;
     private int moves;
 
-    private transient MutableBlockVector cur;
-    private transient MutableBlockVector[] buffer;
-    private transient MutableBlockVector[] allowed;
-    private transient MutableBlockVector next;
+    private transient MutableBlockVector3 cur;
+    private transient MutableBlockVector3[] buffer;
+    private transient MutableBlockVector3[] allowed;
+    private transient MutableBlockVector3 next;
 
     public SurfaceRandomOffsetPattern(Pattern pattern, int distance) {
         this.pattern = pattern;
@@ -27,12 +27,12 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     }
 
     private void init() {
-        cur = new MutableBlockVector();
-        this.buffer = new MutableBlockVector[BreadthFirstSearch.DIAGONAL_DIRECTIONS.length];
+        cur = new MutableBlockVector3();
+        this.buffer = new MutableBlockVector3[BreadthFirstSearch.DIAGONAL_DIRECTIONS.length];
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = new MutableBlockVector();
+            buffer[i] = new MutableBlockVector3();
         }
-        allowed = new MutableBlockVector[buffer.length];
+        allowed = new MutableBlockVector3[buffer.length];
     }
 
     @Override
@@ -48,21 +48,21 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
                 next = buffer[i];
                 BlockVector3 dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
                 next.setComponents(cur.getBlockX() + dir.getBlockX(), cur.getBlockY() + dir.getBlockY(), cur.getBlockZ() + dir.getBlockZ());
-                if (allowed(next.toBlockVector3())) {
+                if (allowed(next)) {
                     allowed[index++] = next;
                 }
             }
             if (index == 0) {
-                return cur.toBlockVector3();
+                return cur;
             }
             next = allowed[ThreadLocalRandom.current().nextInt(index)];
             cur.setComponents(next.getBlockX(), next.getBlockY(), next.getBlockZ());
         }
-        return cur.toBlockVector3();
+        return cur;
     }
 
     private boolean allowed(BlockVector3 bv) {
-    	MutableBlockVector v = new MutableBlockVector(bv);
+    	MutableBlockVector3 v = new MutableBlockVector3(bv);
         BlockStateHolder block = pattern.apply(bv);
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return false;
@@ -71,34 +71,34 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         int y = v.getBlockY();
         int z = v.getBlockZ();
         v.mutY(y + 1);
-        if (canPassthrough(v.toBlockVector3())) {
+        if (canPassthrough(v)) {
             v.mutY(y);
             return true;
         }
         v.mutY(y - 1);
-        if (canPassthrough(v.toBlockVector3())) {
+        if (canPassthrough(v)) {
             v.mutY(y);
             return true;
         }
         v.mutY(y);
         v.mutX(x + 1);
-        if (canPassthrough(v.toBlockVector3())) {
+        if (canPassthrough(v)) {
             v.mutX(x);
             return true;
         }
         v.mutX(x - 1);
-        if (canPassthrough(v.toBlockVector3())) {
+        if (canPassthrough(v)) {
             v.mutX(x);
             return true;
         }
         v.mutX(x);
         v.mutZ(z + 1);
-        if (canPassthrough(v.toBlockVector3())) {
+        if (canPassthrough(v)) {
             v.mutZ(z);
             return true;
         }
         v.mutZ(z - 1);
-        if (canPassthrough(v.toBlockVector3())) {
+        if (canPassthrough(v)) {
             v.mutZ(z);
             return true;
         }

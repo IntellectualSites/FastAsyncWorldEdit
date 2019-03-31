@@ -14,7 +14,7 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 import java.util.ArrayDeque;
@@ -217,8 +217,8 @@ public abstract class BreadthFirstSearch implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        MutableBlockVector mutable = new MutableBlockVector();
-//        MutableBlockVector mutable2 = new MutableBlockVector();
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+//        MutableBlockVector3 mutable2 = new MutableBlockVector3();
         boolean shouldTrim = false;
         IntegerTrio[] dirs = getIntDirections();
         BlockVectorSet tempQueue = new BlockVectorSet();

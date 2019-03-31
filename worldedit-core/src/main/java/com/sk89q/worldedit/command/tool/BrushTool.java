@@ -1,7 +1,6 @@
 package com.sk89q.worldedit.command.tool;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal;
@@ -26,7 +25,6 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
@@ -40,7 +38,6 @@ import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
 import java.io.IOException;
@@ -53,7 +50,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 
 
-import static com.boydti.fawe.object.brush.TargetMode.TARGET_FACE_RANGE;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool, ResettableTool, Serializable {
@@ -385,7 +381,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         Location loc = player.getLocation();
         switch (targetMode) {
             case TARGET_BLOCK_RANGE:
-                return offset(trace(editSession, player, getRange(), true), loc.toVector()).toBlockPoint();
+                return offset(trace(editSession, player, getRange(), true), loc).toBlockPoint();
             case FOWARD_POINT_PITCH: {
                 int d = 0;
                 float pitch = loc.getPitch();
@@ -393,7 +389,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 d += (int) (Math.sin(Math.toRadians(pitch)) * 50);
                 final Vector3 vector = loc.getDirection().withY(0).normalize().multiply(d).add(loc.getX(), loc.getY(), loc.getZ());
 //                vector = vector.add(loc.getX(), loc.getY(), loc.getZ());
-                return offset(vector, loc.toVector()).toBlockPoint();
+                return offset(vector, loc).toBlockPoint();
             }
             case TARGET_POINT_HEIGHT: {
                 final int height = loc.getBlockY();
@@ -407,10 +403,10 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                     }
                 }
                 final int distance = (height - y) + 8;
-                return offset(trace(editSession, player, distance, true), loc.toVector()).toBlockPoint();
+                return offset(trace(editSession, player, distance, true), loc).toBlockPoint();
             }
             case TARGET_FACE_RANGE:
-                return offset(trace(editSession, player, getRange(), true), loc.toVector()).toBlockPoint();
+                return offset(trace(editSession, player, getRange(), true), loc).toBlockPoint();
             default:
                 return null;
         }
@@ -429,7 +425,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
             @Override
             public void run(Vector3 value) {
                 Location result = tb.getMaskedTargetBlock(useLastBlock);
-                this.value = result.toVector();
+                this.value = result;
             }
         });
     }
@@ -478,7 +474,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 editSession.setMask(newMask);
 //=======
 //            try {
-//                brush.build(editSession, target.toVector().toBlockPoint(), material, size);
+//                brush.build(editSession, target.toBlockPoint(), material, size);
 //            } catch (MaxChangedBlocksException e) {
 //                player.printError("Max blocks change limit reached.");
 //            } finally {

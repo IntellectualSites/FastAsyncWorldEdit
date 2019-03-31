@@ -7,7 +7,7 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -77,8 +77,8 @@ public abstract class DFSVisitor implements Operation {
         NodePair current;
         Node from;
         Node adjacent;
-//        MutableBlockVector mutable = new MutableBlockVector();
-//        MutableBlockVector mutable2 = new MutableBlockVector();
+//        MutableBlockVector3 mutable = new MutableBlockVector3();
+//        MutableBlockVector3 mutable2 = new MutableBlockVector3();
         int countAdd, countAttempt;
         IntegerTrio[] dirs = getIntDirections();
 

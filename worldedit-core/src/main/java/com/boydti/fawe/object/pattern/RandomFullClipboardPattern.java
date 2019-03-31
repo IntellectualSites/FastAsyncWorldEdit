@@ -9,7 +9,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RandomFullClipboardPattern extends AbstractPattern {
     private final Extent extent;
-    private final MutableBlockVector mutable = new MutableBlockVector();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private final List<ClipboardHolder> clipboards;
     private boolean randomRotate;
     private boolean randomFlip;

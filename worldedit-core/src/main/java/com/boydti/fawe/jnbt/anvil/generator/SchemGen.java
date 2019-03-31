@@ -2,7 +2,7 @@ package com.boydti.fawe.jnbt.anvil.generator;
 
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.schematic.Schematic;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -20,7 +20,7 @@ public class SchemGen extends Resource {
     private final boolean randomRotate;
     private final Mask mask;
 
-    private MutableBlockVector mutable = new MutableBlockVector();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public SchemGen(Mask mask, Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate) {
         this.mask = mask;
@@ -36,7 +36,7 @@ public class SchemGen extends Resource {
         int y = extent.getNearestSurfaceTerrainBlock(x, z, mutable.getBlockY(), 0, 255);
         if (y == -1) return false;
         mutable.mutY(y);
-        if (!mask.test(mutable.toBlockVector3())) {
+        if (!mask.test(mutable)) {
             return false;
         }
         mutable.mutY(y + 1);
@@ -48,9 +48,9 @@ public class SchemGen extends Resource {
         Schematic schematic = new Schematic(clipboard);
         Transform transform = holder.getTransform();
         if (transform.isIdentity()) {
-            schematic.paste(extent, mutable.toBlockVector3(), false);
+            schematic.paste(extent, mutable, false);
         } else {
-            schematic.paste(extent, mutable.toBlockVector3(), false, transform);
+            schematic.paste(extent, mutable, false, transform);
         }
         mutable.mutY(y);
         return true;

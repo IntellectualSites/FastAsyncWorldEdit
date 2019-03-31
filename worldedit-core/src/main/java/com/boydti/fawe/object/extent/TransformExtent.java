@@ -7,16 +7,14 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.math.MutableVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.registry.BlockRegistry;
 
 public class TransformExtent extends BlockTransformExtent {
 
-    private final MutableBlockVector mutable = new MutableBlockVector();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private BlockVector3 min;
     private int maxy;
 
@@ -58,7 +56,7 @@ public class TransformExtent extends BlockTransformExtent {
         mutable.mutX(((pos.getX() - min.getX())));
         mutable.mutY(((pos.getY() - min.getY())));
         mutable.mutZ(((pos.getZ() - min.getZ())));
-        MutableVector tmp = new MutableVector(getTransform().apply(mutable.toVector3()));
+        MutableVector3 tmp = new MutableVector3(getTransform().apply(mutable.toVector3()));
         tmp.mutX((tmp.getX() + min.getX()));
         tmp.mutY((tmp.getY() + min.getY()));
         tmp.mutZ((tmp.getZ() + min.getZ()));
@@ -72,7 +70,7 @@ public class TransformExtent extends BlockTransformExtent {
         mutable.mutX(((x - min.getX())));
         mutable.mutY(((y - min.getY())));
         mutable.mutZ(((z - min.getZ())));
-        MutableVector tmp = new MutableVector(getTransform().apply(mutable.toVector3()));
+        MutableVector3 tmp = new MutableVector3(getTransform().apply(mutable.toVector3()));
         tmp.mutX((tmp.getX() + min.getX()));
         tmp.mutY((tmp.getY() + min.getY()));
         tmp.mutZ((tmp.getZ() + min.getZ()));
@@ -104,7 +102,7 @@ public class TransformExtent extends BlockTransformExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.getBiome(getPos(mutable.toBlockVector3()).toBlockVector2());
+        return super.getBiome(getPos(mutable).toBlockVector2());
     }
 
     @Override
@@ -123,6 +121,6 @@ public class TransformExtent extends BlockTransformExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.setBiome(getPos(mutable.toBlockVector3()).toBlockVector2(), biome);
+        return super.setBiome(getPos(mutable).toBlockVector2(), biome);
     }
 }

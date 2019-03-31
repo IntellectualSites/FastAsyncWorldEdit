@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.util;
 
-import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -49,7 +48,7 @@ public class TargetBlock {
      */
     public TargetBlock(Player player) {
         this.world = player.getWorld();
-        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), 300, 1.65, 0.2);
+        this.setValues(player.getLocation(), player.getLocation().getYaw(), player.getLocation().getPitch(), 300, 1.65, 0.2);
     }
 
     /**
@@ -61,7 +60,7 @@ public class TargetBlock {
      */
     public TargetBlock(Player player, int maxDistance, double checkDistance) {
         this.world = player.getWorld();
-        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
+        this.setValues(player.getLocation(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
     }
 
     /**
@@ -189,12 +188,12 @@ public class TargetBlock {
 
     public Location getAnyTargetBlockFace() {
         getAnyTargetBlock();
-        return getCurrentBlock().setDirection(getCurrentBlock().toVector().subtract(getPreviousBlock().toVector()));
+        return getCurrentBlock().setDirection(getCurrentBlock().subtract(getPreviousBlock()));
     }
 
     public Location getTargetBlockFace() {
         getAnyTargetBlock();
-        return getCurrentBlock().setDirection(getCurrentBlock().toVector().subtract(getPreviousBlock().toVector()));
+        return getCurrentBlock().setDirection(getCurrentBlock().subtract(getPreviousBlock()));
     }
 
 }

@@ -18,7 +18,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -273,7 +273,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     default void forEachBlockInChunk(int cx, int cz, RunnableVal2<BlockVector3, BaseBlock> onEach) {
         int bx = cx << 4;
         int bz = cz << 4;
-        MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         for (int x = 0; x < 16; x++) {
             int xx = x + bx;
             mutable.mutX(xx);
@@ -290,9 +290,9 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                     mutable.mutY(y);
                     CompoundTag tile = getTileEntity(x, y, z);
                     if (tile != null) {
-                        onEach.run(mutable.toBlockVector3(), block.toBaseBlock(tile));
+                        onEach.run(mutable, block.toBaseBlock(tile));
                     } else {
-                        onEach.run(mutable.toBlockVector3(), block);
+                        onEach.run(mutable, block);
                     }
                 }
             }
@@ -302,7 +302,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     default void forEachTileInChunk(int cx, int cz, RunnableVal2<BlockVector3, BaseBlock> onEach) {
         int bx = cx << 4;
         int bz = cz << 4;
-        MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         for (int x = 0; x < 16; x++) {
             int xx = x + bx;
             for (int z = 0; z < 16; z++) {
@@ -320,7 +320,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                             mutable.mutZ(zz);
                             mutable.mutY(y);
                             BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
-                            onEach.run(mutable.toBlockVector3(), block);
+                            onEach.run(mutable, block);
                         }
                     }
                 }

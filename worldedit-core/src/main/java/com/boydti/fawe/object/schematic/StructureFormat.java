@@ -22,7 +22,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -168,7 +168,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         }
         Map<String, Object> structure = FaweCache.asMap("version", 1, "author", owner);
         // ignored: version / owner
-        MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         Int2ObjectArrayMap<Integer> indexes = new Int2ObjectArrayMap<>();
         // Size
         structure.put("size", Arrays.asList(width, height, length));

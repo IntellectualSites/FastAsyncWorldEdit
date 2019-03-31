@@ -27,7 +27,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
@@ -56,7 +56,7 @@ public class SchemVis extends ImmutableVirtualWorld {
     private final Long2ObjectOpenHashMap<Map.Entry<File, Long>> files;
     private final Long2ObjectOpenHashMap<MCAChunk> chunks; // TODO use soft references OR clear chunks outside view distance
 
-    private final MutableBlockVector2D lastPos = new MutableBlockVector2D();
+    private final MutableBlockVector2 lastPos = new MutableBlockVector2();
     private final FawePlayer player;
     private final Location origin;
     private final BlockVector2 chunkOffset;
@@ -322,10 +322,10 @@ public class SchemVis extends ImmutableVirtualWorld {
     private BlockVector2 registerAndGetChunkOffset(BlockVector2 schemDimensions, File file) {
         int chunkX = schemDimensions.getBlockX() >> 4;
         int chunkZ = schemDimensions.getBlockZ() >> 4;
-        MutableBlockVector2D pos2 = new MutableBlockVector2D();
-        MutableBlockVector2D curPos = lastPos;
+        MutableBlockVector2 pos2 = new MutableBlockVector2();
+        MutableBlockVector2 curPos = lastPos;
         // Find next free position
-        while (!isAreaFree(curPos.toBlockVector2(), pos2.setComponents(curPos.getBlockX() + chunkX, curPos.getBlockZ() + chunkZ).toBlockVector2())) {
+        while (!isAreaFree(curPos, pos2.setComponents(curPos.getBlockX() + chunkX, curPos.getBlockZ() + chunkZ))) {
 //            if (curPos == lastPos && !files.containsKey(MathMan.pairInt(curPos.getBlockX(), curPos.getBlockZ()))) {
 //                curPos = new MutableBlockVector2();
 //                curPos.setComponents(lastPos.getBlockX(), lastPos.getBlockZ());
@@ -345,7 +345,7 @@ public class SchemVis extends ImmutableVirtualWorld {
             }
         }
         for (int i = 0; i < Math.min(chunkX, chunkZ); i++) curPos.nextPosition();
-        return curPos.toBlockVector2();
+        return curPos;
     }
 
     private boolean isAreaFree(BlockVector2 chunkPos1, BlockVector2 chunkPos2 /* inclusive */) {
@@ -599,7 +599,7 @@ public class SchemVis extends ImmutableVirtualWorld {
         clear();
         chunks.clear();
         files.clear();
-        player.getPlayer().setPosition(origin.toVector(), origin.getPitch(), origin.getYaw());
+        player.getPlayer().setPosition(origin, origin.getPitch(), origin.getYaw());
         if (update) {
             FaweQueue packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
 

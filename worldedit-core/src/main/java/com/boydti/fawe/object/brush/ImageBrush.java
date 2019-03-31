@@ -6,16 +6,14 @@ import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableVector;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
@@ -89,7 +87,7 @@ public class ImageBrush implements Brush {
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();
 
         RecursiveVisitor visitor = new RecursiveVisitor(new Mask() {
-            private final MutableVector mutable = new MutableVector();
+            private final MutableVector3 mutable = new MutableVector3();
             @Override
             public boolean test(BlockVector3 vector) {
                 if (solid.test(vector)) {
@@ -97,11 +95,11 @@ public class ImageBrush implements Brush {
                     int dy = vector.getBlockY() - cy;
                     int dz = vector.getBlockZ() - cz;
 
-                    Vector3 pos1 = transform.apply(mutable.setComponents(dx - 0.5, dy - 0.5, dz - 0.5).toVector3());
+                    Vector3 pos1 = transform.apply(mutable.setComponents(dx - 0.5, dy - 0.5, dz - 0.5));
                     int x1 = (int) (pos1.getX() * scale + centerX);
                     int z1 = (int) (pos1.getZ() * scale + centerZ);
 
-                    Vector3 pos2 = transform.apply(mutable.setComponents(dx + 0.5, dy + 0.5, dz + 0.5).toVector3());
+                    Vector3 pos2 = transform.apply(mutable.setComponents(dx + 0.5, dy + 0.5, dz + 0.5));
                     int x2 = (int) (pos2.getX() * scale + centerX);
                     int z2 = (int) (pos2.getZ() * scale + centerZ);
                     if (x2 < x1) {

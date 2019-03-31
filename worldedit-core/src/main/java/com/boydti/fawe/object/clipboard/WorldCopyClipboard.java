@@ -1,21 +1,19 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.math.MutableBlockVector2D;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -29,7 +27,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     public final int mx, my, mz;
     private final boolean hasBiomes;
     private final boolean hasEntities;
-    private MutableBlockVector2D mutableBlockVector2D = new MutableBlockVector2D();
+    private MutableBlockVector2 MutableBlockVector2 = new MutableBlockVector2();
     public final Extent extent;
 
     public WorldCopyClipboard(Extent editSession, Region region) {
@@ -58,7 +56,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     @Override
     public BaseBiome getBiome(int x, int z) {
-        return extent.getBiome(mutableBlockVector2D.setComponents(mx + x, mz + z).toBlockVector2());
+        return extent.getBiome(MutableBlockVector2.setComponents(mx + x, mz + z));
     }
 
     @Override
@@ -76,7 +74,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     public void forEach(BlockReader task, boolean air) {
     	BlockVector3 min = region.getMinimumPoint();
     	BlockVector3 max = region.getMaximumPoint();
-        MutableBlockVector pos = new MutableBlockVector();
+        MutableBlockVector3 pos = new MutableBlockVector3();
         if (region instanceof CuboidRegion) {
             if (air) {
                 ((CuboidRegion) region).setUseOldIterator(true);
@@ -137,9 +135,9 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                     for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
                         pos.mutX(x);
                         int xx = pos.getBlockX() - mx;
-                        if (region.contains(pos.toBlockVector3())) {
+                        if (region.contains(pos)) {
 //                            BlockState block = getBlockAbs(x, y, z);
-                        	BaseBlock block = extent.getFullBlock(pos.toBlockVector3());
+                        	BaseBlock block = extent.getFullBlock(pos);
                             if (!air && block.getBlockType().getMaterial().isAir()) {
                                 continue;
                             }

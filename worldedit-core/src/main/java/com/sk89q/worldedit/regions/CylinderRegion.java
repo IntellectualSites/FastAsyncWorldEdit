@@ -306,7 +306,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         double dz = Math.abs(pz - center.getBlockZ()) * radiusInverse.getZ();
 
         return dx * dx + dz * dz <= 1;
-//        return position.toBlockVector2().subtract(center).toVector2().divide(radius).lengthSq() <= 1;
+//        return position.subtract(center).toVector2().divide(radius).lengthSq() <= 1;
     }
 
 

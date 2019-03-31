@@ -6,16 +6,15 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector;
-import com.sk89q.worldedit.math.MutableVector;
-import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class PositionTransformExtent extends ResettableExtent {
 
-    private transient MutableBlockVector mutable = new MutableBlockVector();
+    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private transient BlockVector3 min;
     private Transform transform;
 
@@ -26,7 +25,7 @@ public class PositionTransformExtent extends ResettableExtent {
 
     @Override
     public ResettableExtent setExtent(Extent extent) {
-        mutable = new MutableBlockVector();
+        mutable = new MutableBlockVector3();
         min = null;
         return super.setExtent(extent);
     }
@@ -42,7 +41,7 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutX(((pos.getX() - min.getX())));
         mutable.mutY(((pos.getY() - min.getY())));
         mutable.mutZ(((pos.getZ() - min.getZ())));
-        MutableVector tmp = new MutableVector(transform.apply(mutable.toVector3()));
+        MutableVector3 tmp = new MutableVector3(transform.apply(mutable.toVector3()));
         BlockVector3 result = min.add(tmp.toBlockPoint());
         return result;
     }
@@ -72,7 +71,7 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.getBiome(getPos(mutable.toBlockVector3()).toBlockVector2());
+        return super.getBiome(getPos(mutable).toBlockVector2());
     }
 
     @Override
@@ -91,7 +90,7 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.setBiome(getPos(mutable.toBlockVector3()).toBlockVector2(), biome);
+        return super.setBiome(getPos(mutable).toBlockVector2(), biome);
     }
 
     public void setTransform(Transform transform) {
