@@ -19,26 +19,24 @@
 
 package com.sk89q.worldedit.bukkit.adapter;
 
-import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
-
 import javax.annotation.Nullable;
+import java.util.Map;
 
 /**
  * An interface for adapters of various Bukkit implementations.
@@ -72,8 +70,6 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @return the block
      */
     BaseBlock getBlock(Location location);
-
-    boolean setBlock(Chunk chunk, int x, int y, int z, BlockStateHolder<?> state, boolean update);
 
     boolean isChunkInUse(Chunk chunk);
     /**

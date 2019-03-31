@@ -16,26 +16,20 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.entity.EntityTypes;
+import org.bukkit.*;
+import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.entity.EntityTypes;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Biome;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
 
 public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
 
@@ -251,8 +245,11 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                                 CompoundTag nbt = getTile(x, yy, z);
                                                 if (nbt != null) {
                                                     synchronized (BukkitChunk_All.this) {
+                                                        mutableLoc.setX(xx);
+                                                        mutableLoc.setY(yy);
+                                                        mutableLoc.setZ(zz);
                                                         BaseBlock state = BaseBlock.getFromInternalId(combined, nbt);
-                                                        adapter.setBlock(chunk, xx, yy, zz, state, update);
+                                                        adapter.setBlock(mutableLoc, state, update);
                                                     }
                                                     continue;
                                                 }
@@ -313,8 +310,11 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                     CompoundTag tile = getTile(x, y, z);
                                     if (tile != null) {
                                         synchronized (BukkitChunk_All.this) {
+                                            mutableLoc.setX(bx + x);
+                                            mutableLoc.setY(y);
+                                            mutableLoc.setZ(bz + z);
                                             BaseBlock state = BaseBlock.getFromInternalId(combined, tile);
-                                            adapter.setBlock(chunk, bx + x, y, bz + z, state, update);
+                                            adapter.setBlock(mutableLoc, state, update);
                                         }
                                         break;
                                     }
@@ -358,7 +358,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
     public void setBlock(BukkitImplAdapter adapter, Chunk chunk, Location location, int combinedId, boolean update) {
     	com.sk89q.worldedit.world.block.BaseBlock base = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId).toBaseBlock();
         if (adapter != null) {
-            adapter.setBlock(chunk, (int) location.getX(), (int) location.getY(), (int) location.getZ(), base, update);
+            adapter.setBlock(location, base, update);
         } else {
             Block block = location.getWorld().getBlockAt(location);
             block.setBlockData(BukkitAdapter.adapt(base), false);

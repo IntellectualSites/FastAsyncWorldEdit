@@ -22,9 +22,8 @@ package com.boydti.fawe.bukkit.adapter.v1_13_1;
 import com.boydti.fawe.Fawe;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import com.sk89q.jnbt.*;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.blocks.TileEntityBlock;
+import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
@@ -33,13 +32,9 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.*;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -51,16 +46,13 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -237,60 +229,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         CraftChunk craftChunk = (CraftChunk) chunk;
         PlayerChunkMap chunkMap = ((WorldServer) craftChunk.getHandle().getWorld()).getPlayerChunkMap();
         return chunkMap.isChunkInUse(chunk.getX(), chunk.getZ());
-    }
-
-    @Override
-    public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
-        CraftChunk craftChunk = (CraftChunk) chunk;
-        Chunk nmsChunk = craftChunk.getHandle();
-        World nmsWorld = nmsChunk.getWorld();
-
-        IBlockData blockData = ((BlockMaterial_1_13) state.getMaterial()).getState();
-        ChunkSection[] sections = nmsChunk.getSections();
-        int y4 = y >> 4;
-        ChunkSection section = sections[y4];
-
-        IBlockData existing;
-        if (section == null) {
-            existing = ((BlockMaterial_1_13) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
-        } else {
-            existing = section.getType(x & 15, y & 15, z & 15);
-        }
-        BlockPosition pos = null;
-        CompoundTag nativeTag = state instanceof BaseBlock ? ((BaseBlock)state).getNbtData() : null;
-        if (nativeTag != null || existing instanceof TileEntityBlock) {
-            pos = new BlockPosition(x, y, z);
-            nmsWorld.setTypeAndData(pos, blockData, 0);
-            // remove tile
-            if (nativeTag != null) {
-                // We will assume that the tile entity was created for us,
-                // though we do not do this on the Forge version
-                TileEntity tileEntity = nmsWorld.getTileEntity(pos);
-                if (tileEntity != null) {
-                    NBTTagCompound tag = (NBTTagCompound) fromNative(nativeTag);
-                    tag.set("x", new NBTTagInt(x));
-                    tag.set("y", new NBTTagInt(y));
-                    tag.set("z", new NBTTagInt(z));
-                    readTagIntoTileEntity(tag, tileEntity); // Load data
-                }
-            }
-        } else {
-            if (existing == blockData) return true;
-            if (section == null) {
-                if (blockData.isAir()) return true;
-                sections[y4] = section = new ChunkSection(y4 << 4, nmsWorld.worldProvider.g());
-            }
-            if (existing.e() != blockData.e() || existing.getMaterial().f() != blockData.getMaterial().f()) {
-            	nmsChunk.setType(pos = new BlockPosition(x, y, z), blockData, false);
-            } else {
-                section.setType(x & 15, y & 15, z & 15, blockData);
-            }
-        }
-        if (update) {
-            if (pos == null) pos = new BlockPosition(x, y, z);
-            nmsWorld.getMinecraftWorld().notify(pos, existing, blockData, 0);
-        }
-        return true;
     }
 
     @Override
@@ -538,22 +476,98 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 	@Override
 	public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
+  private static EnumDirection adapt(Direction face) {
+    switch (face) {
+        case NORTH: return EnumDirection.NORTH;
+        case SOUTH: return EnumDirection.SOUTH;
+        case WEST: return EnumDirection.WEST;
+        case EAST: return EnumDirection.EAST;
+        case DOWN: return EnumDirection.DOWN;
+        case UP:
+        default:
+            return EnumDirection.UP;
+    }
+  }
+
+	@SuppressWarnings("RedundantCast")
+  private IBlockData applyProperties(BlockStateList<Block, IBlockData> stateContainer, IBlockData newState, Map<Property<?>, Object> states) {
+    for (Map.Entry<Property<?>, Object> state : states.entrySet()) {
+        IBlockState<?> property = stateContainer.a(state.getKey().getName());
+        Comparable<?> value = (Comparable) state.getValue();
+        // we may need to adapt this value, depending on the source prop
+        if (property instanceof BlockStateDirection) {
+            Direction dir = (Direction) value;
+            value = adapt(dir);
+        } else if (property instanceof BlockStateEnum) {
+            String enumName = (String) value;
+            value = ((BlockStateEnum<?>) property).b((String) value).orElseGet(() -> {
+                throw new IllegalStateException("Enum property " + property.a() + " does not contain " + enumName);
+            });
+        }
+        newState = newState.set((IBlockState) property, (Comparable) value);
+    }
+    return newState;
+  }
 
 	@Override
 	public void notifyAndLightBlock(Location position, BlockState previousType) {
-		this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
+		this.setBlock(position, previousType, true);
 	}
 
 	@Override
-	public boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
-		return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
+	public boolean setBlock(Location location, BlockStateHolder state, boolean notifyAndLight) {
+      checkNotNull(location);
+      checkNotNull(state);
+
+      CraftWorld craftWorld = ((CraftWorld) location.getWorld());
+      int x = location.getBlockX();
+      int y = location.getBlockY();
+      int z = location.getBlockZ();
+
+      // First set the block
+      Chunk chunk = craftWorld.getHandle().getChunkAt(x >> 4, z >> 4);
+      BlockPosition pos = new BlockPosition(x, y, z);
+      IBlockData old = chunk.getBlockData(x, y, z);
+      Block mcBlock = IRegistry.BLOCK.get(MinecraftKey.a(state.getBlockType().getId()));
+      IBlockData newState = mcBlock.getBlockData();
+      Map<Property<?>, Object> states = state.getStates();
+      newState = applyProperties(mcBlock.getStates(), newState, states);
+      IBlockData successState = chunk.setType(pos, newState, false);
+      boolean successful = successState != null;
+
+      // Create the TileEntity
+      if (successful || old == newState) {
+          if (state instanceof BaseBlock) {
+              CompoundTag nativeTag = ((BaseBlock) state).getNbtData();
+              if (nativeTag != null) {
+                  // We will assume that the tile entity was created for us,
+                  // though we do not do this on the Forge version
+                  TileEntity tileEntity = craftWorld.getHandle().getTileEntity(pos);
+                  if (tileEntity != null) {
+                      NBTTagCompound tag = (NBTTagCompound) fromNative(nativeTag);
+                      tag.set("x", new NBTTagInt(x));
+                      tag.set("y", new NBTTagInt(y));
+                      tag.set("z", new NBTTagInt(z));
+                      readTagIntoTileEntity(tag, tileEntity); // Load data
+                  }
+              }
+          }
+      }
+
+      if (successful && notifyAndLight) {
+          // craftWorld.getHandle().r(pos); // server should do lighting for us
+          craftWorld.getHandle().notifyAndUpdatePhysics(pos, chunk, old, newState, newState, 1 | 2);
+      }
+
+      return successful;
 	}
 
 	@Override
 	public void sendFakeOP(Player player) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
