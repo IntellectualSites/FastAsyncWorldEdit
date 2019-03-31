@@ -246,24 +246,6 @@ public class Location extends Vector3 {
     }
 
     /**
-     * Get the X component of the position vector.
-     *
-     * @return the X component
-     */
-    public double getX() {
-        return this.getX();
-    }
-
-    /**
-     * Get the rounded X component of the position vector.
-     *
-     * @return the rounded X component
-     */
-    public int getBlockX() {
-        return (int) Math.floor(this.getX());
-    }
-
-    /**
      * Return a copy of this object with the X component of the new object
      * set to the given value.
      *
@@ -274,23 +256,6 @@ public class Location extends Vector3 {
         return new Location(extent, this.withX(x), yaw, pitch);
     }
 
-    /**
-     * Get the Y component of the position vector.
-     *
-     * @return the Y component
-     */
-    public double getY() {
-        return this.getY();
-    }
-
-    /**
-     * Get the rounded Y component of the position vector.
-     *
-     * @return the rounded Y component
-     */
-    public int getBlockY() {
-        return (int) Math.floor(this.getY());
-    }
 
     /**
      * Return a copy of this object with the Y component of the new object
@@ -301,24 +266,6 @@ public class Location extends Vector3 {
      */
     public Location setY(double y) {
         return new Location(extent, this.withY(y), yaw, pitch);
-    }
-
-    /**
-     * Get the Z component of the position vector.
-     *
-     * @return the Z component
-     */
-    public double getZ() {
-        return this.getZ();
-    }
-
-    /**
-     * Get the rounded Z component of the position vector.
-     *
-     * @return the rounded Z component
-     */
-    public int getBlockZ() {
-        return (int) Math.floor(this.getZ());
     }
 
     /**
