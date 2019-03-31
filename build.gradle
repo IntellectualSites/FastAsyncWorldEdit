@@ -27,7 +27,11 @@ plugins {
 apply plugin: 'java'
 clean { delete "target" }
 
-print new File('splash.txt').text
+
+def splashFile = new File('splash.txt')
+if (splashFile.exists()) {
+    print splashFile.text
+}
 
 group = 'com.boydti.fawe'
 
