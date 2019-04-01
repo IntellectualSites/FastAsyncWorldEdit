@@ -252,11 +252,10 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
         BlockPosition pos = new BlockPosition(x, y, z);
 
-        nmsChunk.d(pos);
+        nmsChunk.d(pos); // Force delete the old tile entity
 
         CompoundTag nativeTag = state instanceof BaseBlock ? ((BaseBlock)state).getNbtData() : null;
         if (nativeTag != null || existing instanceof TileEntityBlock) {
-            pos = new BlockPosition(x, y, z);
             nmsWorld.setTypeAndData(pos, blockData, 0);
             // remove tile
             if (nativeTag != null) {
@@ -284,7 +283,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             }
         }
         if (update) {
-            if (pos == null) pos = new BlockPosition(x, y, z);
             nmsWorld.getMinecraftWorld().notify(pos, existing, blockData, 0);
         }
         return true;
