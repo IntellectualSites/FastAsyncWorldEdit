@@ -113,7 +113,7 @@ public class ParametricCallable extends AParametricCallable {
                     }
                     // Special annotation bindings
                 } else if (parameter.getBinding() == null) {
-                    parameter.setBinding(builder.getBindings().get(annotation.annotationType()));
+                    parameter.setBinding(builder.getBindings());
                     parameter.setClassifier(annotation);
                 }
             }
@@ -127,7 +127,7 @@ public class ParametricCallable extends AParametricCallable {
 
             // No special @annotation binding... let's check for the type
             if (parameter.getBinding() == null) {
-                parameter.setBinding(builder.getBindings().get(type));
+                parameter.setBinding(builder.getBindings());
 
                 // Don't know how to parse for this type of value
                 if (parameter.getBinding() == null) {

@@ -42,7 +42,7 @@ import java.net.URI;
 import java.net.URL;
 import javax.annotation.Nullable;
 
-public class FawePrimitiveBinding extends BindingHelper {
+public class FawePrimitiveBinding {
     @BindingMatch(type = {Long.class, long.class},
             behavior = BindingBehavior.CONSUMES,
             consumedCount = 1,

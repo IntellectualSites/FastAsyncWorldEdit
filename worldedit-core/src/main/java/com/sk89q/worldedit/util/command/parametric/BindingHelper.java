@@ -22,6 +22,7 @@ package com.sk89q.worldedit.util.command.parametric;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.util.command.binding.Range;
+import com.sk89q.worldedit.util.command.binding.Validate;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -48,16 +49,17 @@ import java.util.List;
  * <p>Methods may throw any exception. Exceptions may be converted using a
  * {@link ExceptionConverter} registered with the {@link ParametricBuilder}.</p>
  */
+@Deprecated
 public class BindingHelper implements Binding {
     
-    private final List<BoundMethod> bindings;
+    private final List<BindingMap.BoundMethod> bindings;
     private final Type[] types;
     
     /**
      * Create a new instance.
      */
     public BindingHelper() {
-        List<BoundMethod> bindings = new ArrayList<>();
+        List<BindingMap.BoundMethod> bindings = new ArrayList<>();
         List<Type> types = new ArrayList<>();
         
         for (Method method : this.getClass().getMethods()) {
@@ -88,7 +90,7 @@ public class BindingHelper implements Binding {
                                 "A @BindingMatch needs either a type or classifier set");
                     }
                     
-                    BoundMethod handler = new BoundMethod(info, type, classifier, method);
+                    BindingMap.BoundMethod handler = new BindingMap.BoundMethod(info, type, classifier, method, this);
                     bindings.add(handler);
                 }
             }
@@ -110,8 +112,8 @@ public class BindingHelper implements Binding {
      * @param parameter the parameter
      * @return a binding
      */
-    private BoundMethod match(ParameterData parameter) {
-        for (BoundMethod binding : bindings) {
+    private BindingMap.BoundMethod match(ParameterData parameter) {
+        for (BindingMap.BoundMethod binding : bindings) {
             Annotation classifer = parameter.getClassifier();
             Type type = parameter.getType();
             
@@ -147,7 +149,7 @@ public class BindingHelper implements Binding {
     @Override
     public Object bind(ParameterData parameter, ArgumentStack scoped,
             boolean onlyConsume) throws ParameterException, CommandException, InvocationTargetException {
-        BoundMethod binding = match(parameter);
+        BindingMap.BoundMethod binding = match(parameter);
         List<Object> args = new ArrayList<>();
         args.add(scoped);
         
@@ -212,39 +214,88 @@ public class BindingHelper implements Binding {
         }
         return new ArrayList<>();
     }
-    
-    private static class BoundMethod implements Comparable<BoundMethod> {
-        private final BindingMatch annotation;
-        private final Type type;
-        private final Class<? extends Annotation> classifier;
-        private final Method method;
-        
-        BoundMethod(BindingMatch annotation, Type type, 
-                Class<? extends Annotation> classifier, Method method) {
-            this.annotation = annotation;
-            this.type = type;
-            this.classifier = classifier;
-            this.method = method;
-        }
 
-        @Override
-        public int compareTo(BoundMethod o) {
-            if (classifier != null && o.classifier == null) {
-                return -1;
-            } else if (classifier == null && o.classifier != null) {
-                return 1;
-            } else if (classifier != null && o.classifier != null) {
-                if (type != null && o.type == null) {
-                    return -1;
-                } else if (type == null && o.type != null) {
-                    return 1;
-                } else {
-                    return 0;
+    /**
+     * Validate a number value using relevant modifiers.
+     *
+     * @param number the number
+     * @param modifiers the list of modifiers to scan
+     * @throws ParameterException on a validation error
+     */
+    public static void validate(double number, Annotation[] modifiers)
+            throws ParameterException {
+        for (Annotation modifier : modifiers) {
+            if (modifier instanceof Range) {
+                Range range = (Range) modifier;
+                if (number < range.min()) {
+                    throw new ParameterException(
+                            String.format(
+                                    "A valid value is greater than or equal to %s " +
+                                            "(you entered %s)", range.min(), number));
+                } else if (number > range.max()) {
+                    throw new ParameterException(
+                            String.format(
+                                    "A valid value is less than or equal to %s " +
+                                            "(you entered %s)", range.max(), number));
                 }
-            } else {
-                return 0;
             }
         }
     }
 
+    /**
+     * Validate a number value using relevant modifiers.
+     *
+     * @param number the number
+     * @param modifiers the list of modifiers to scan
+     * @throws ParameterException on a validation error
+     */
+    public static void validate(int number, Annotation[] modifiers)
+            throws ParameterException {
+        for (Annotation modifier : modifiers) {
+            if (modifier instanceof Range) {
+                Range range = (Range) modifier;
+                if (number < range.min()) {
+                    throw new ParameterException(
+                            String.format(
+                                    "A valid value is greater than or equal to %s " +
+                                            "(you entered %s)", range.min(), number));
+                } else if (number > range.max()) {
+                    throw new ParameterException(
+                            String.format(
+                                    "A valid value is less than or equal to %s " +
+                                            "(you entered %s)", range.max(), number));
+                }
+            }
+        }
+    }
+
+    /**
+     * Validate a string value using relevant modifiers.
+     *
+     * @param string the string
+     * @param modifiers the list of modifiers to scan
+     * @throws ParameterException on a validation error
+     */
+    public static void validate(String string, Annotation[] modifiers)
+            throws ParameterException {
+        if (string == null) {
+            return;
+        }
+
+        for (Annotation modifier : modifiers) {
+            if (modifier instanceof Validate) {
+                Validate validate = (Validate) modifier;
+
+                if (!validate.regex().isEmpty()) {
+                    if (!string.matches(validate.regex())) {
+                        throw new ParameterException(
+                                String.format(
+                                        "The given text doesn't match the right " +
+                                                "format (technically speaking, the 'format' is %s)",
+                                        validate.regex()));
+                    }
+                }
+            }
+        }
+    }
 }

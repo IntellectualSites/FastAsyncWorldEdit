@@ -98,7 +98,6 @@ public class FaweSchematicHandler extends SchematicHandler {
             if (tag instanceof CompressedCompoundTag) {
                 CompressedCompoundTag cTag = (CompressedCompoundTag) tag;
                 if (cTag instanceof CompressedSchematicTag) {
-                    System.out.println("Write directly");
                     Clipboard clipboard = (Clipboard) cTag.getSource();
                     try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new BufferedOutputStream(new PGZIPOutputStream(stream)))) {
                         new SpongeSchematicWriter(output).write(clipboard);

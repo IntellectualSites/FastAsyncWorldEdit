@@ -64,7 +64,7 @@ import java.util.List;
 /**
  * Binds standard WorldEdit classes such as {@link Player} and {@link LocalSession}.
  */
-public class WorldEditBinding extends BindingHelper {
+public class WorldEditBinding {
 
     private final WorldEdit worldEdit;
 

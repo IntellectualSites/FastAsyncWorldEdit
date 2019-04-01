@@ -65,7 +65,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ParametricBuilder {
 
-    private final Map<Type, Binding> bindings = new HashMap<>();
+    private final BindingMap bindings;
     private final Paranamer paranamer = new FaweParanamer();
     private final List<InvokeListener> invokeListeners = new ArrayList<>();
     private final List<ExceptionConverter> exceptionConverters = new ArrayList<>();
@@ -79,8 +79,9 @@ public class ParametricBuilder {
      * {@link StandardBindings} and default bindings.</p>
      */
     public ParametricBuilder() {
-        addBinding(new FawePrimitiveBinding());
-        addBinding(new StandardBindings());
+        this.bindings = new BindingMap(this);
+        this.bindings.add(new FawePrimitiveBinding());
+        this.bindings.add(new StandardBindings());
     }
 
     /**
@@ -103,14 +104,17 @@ public class ParametricBuilder {
      * @param binding the binding
      * @param type    a list of types (if specified) to override the binding's types
      */
+    @Deprecated
     public void addBinding(Binding binding, Type... type) {
-        if (type == null || type.length == 0) {
-            type = binding.getTypes();
-        }
+        this.bindings.add(binding);
+    }
 
-        for (Type t : type) {
-            bindings.put(t, binding);
-        }
+    /**
+     * Add a binding (accepts @Command or @BindingMatch methods)
+     * @param binding
+     */
+    public void addBinding(Object binding) {
+        this.bindings.add(binding);
     }
 
     /**
@@ -175,21 +179,22 @@ public class ParametricBuilder {
      */
     public void registerMethodsAsCommands(Dispatcher dispatcher, Object object, CallableProcessor processor) throws ParametricException {
         for (Method method : object.getClass().getDeclaredMethods()) {
-            Command definition = method.getAnnotation(Command.class);
-            if (definition != null) {
-                definition = Commands.translate(method.getDeclaringClass(), definition);
-                CommandCallable callable = build(object, method, definition);
-                if (processor != null) {
-                    callable = new ProcessedCallable(callable, processor);
-                }
-                else if (object instanceof CallableProcessor) {
-                    callable = new ProcessedCallable(callable, (CallableProcessor) object);
-                }
-                if (object instanceof MethodCommands) {
-                    ((MethodCommands) object).register(method, callable, dispatcher);
-                }
-                dispatcher.registerCommand(callable, definition.aliases());
+            registerMethodAsCommands(method, dispatcher, object, processor);
+        }
+    }
+
+    public void registerMethodAsCommands(Method method, Dispatcher dispatcher, Object object, CallableProcessor processor) throws ParametricException {
+        Command definition = method.getAnnotation(Command.class);
+        if (definition != null) {
+            definition = Commands.translate(method.getDeclaringClass(), definition);
+            CommandCallable callable = build(object, method, definition);
+            if (processor != null) {
+                callable = new ProcessedCallable(callable, processor);
             }
+            else if (object instanceof CallableProcessor) {
+                callable = new ProcessedCallable(callable, (CallableProcessor) object);
+            }
+            dispatcher.registerCommand(callable, definition.aliases());
         }
     }
 
@@ -230,7 +235,7 @@ public class ParametricBuilder {
      *
      * @return the map of bindings
      */
-    public Map<Type, Binding> getBindings() {
+    public BindingMap getBindings() {
         return bindings;
     }
 

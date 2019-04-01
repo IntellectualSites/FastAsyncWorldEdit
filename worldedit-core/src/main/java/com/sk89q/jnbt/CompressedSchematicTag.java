@@ -19,7 +19,6 @@ public class CompressedSchematicTag extends CompressedCompoundTag<Clipboard> {
 
     @Override
     public DataInputStream adapt(Clipboard src) throws IOException {
-        System.out.println("Decompress");
         FastByteArrayOutputStream blocksOut = new FastByteArrayOutputStream();
         try (LZ4BlockOutputStream lz4out = new LZ4BlockOutputStream(blocksOut)) {
             NBTOutputStream nbtOut = new NBTOutputStream(lz4out);

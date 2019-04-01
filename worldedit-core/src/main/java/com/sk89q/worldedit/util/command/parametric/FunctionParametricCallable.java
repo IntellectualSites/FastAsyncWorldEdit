@@ -33,10 +33,8 @@ public class FunctionParametricCallable extends AParametricCallable {
 
         List<Object[]> paramParsables = new ArrayList<>();
         {
-            Map<Type, Binding> bindings = builder.getBindings();
             Map<String, Type> unqualified = new HashMap<>();
-            for (Map.Entry<Type, Binding> entry : bindings.entrySet()) {
-                Type type = entry.getKey();
+            for (Type type : builder.getBindings().getTypes()) {
                 String typeStr = type.getTypeName();
                 unqualified.put(typeStr, type);
                 unqualified.put(typeStr.substring(typeStr.lastIndexOf('.') + 1), type);
@@ -117,7 +115,7 @@ public class FunctionParametricCallable extends AParametricCallable {
 
             // No special @annotation binding... let's check for the type
             if (parameter.getBinding() == null) {
-                parameter.setBinding(builder.getBindings().get(type));
+                parameter.setBinding(builder.getBindings());
 
                 // Don't know how to parse for this type of value
                 if (parameter.getBinding() == null) {
