@@ -200,7 +200,6 @@ public class WorldEditCommands {
     @CommandPermissions("worldedit.debugpaste")
     public void debugpaste(Actor actor) throws WorldEditException, IOException {
         BBC.DOWNLOAD_LINK.send(actor, IncendoPaster.debugPaste());
-
     }
 
     @Command(

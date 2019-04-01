@@ -79,8 +79,6 @@ public class ScriptingCommands {
     }
 
     public static <T> T runScript(Actor actor, File f, String[] args, @Nullable Function<String, String> processor) throws WorldEditException {
-        Request.reset();
-
         String filename = f.getPath();
         int index = filename.lastIndexOf(".");
         String ext = filename.substring(index + 1, filename.length());
@@ -188,7 +186,7 @@ public class ScriptingCommands {
             player.printError("More info: https://github.com/boy0001/CraftScripts/");
             return;
         }
-        this.worldEdit.runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
+        runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
     }
 
     @Command(aliases = {".s"}, usage = "[args...]", desc = "Execute last CraftScript", min = 0, max = -1)

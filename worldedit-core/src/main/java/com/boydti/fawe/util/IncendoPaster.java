@@ -28,8 +28,8 @@ public final class IncendoPaster {
      * Valid paste applications
      */
     public static final Collection<String>
-            VALID_APPLICATIONS = Arrays
-            .asList("plotsquared", "fastasyncworldedit", "incendopermissions", "kvantum");
+        VALID_APPLICATIONS = Arrays
+        .asList("plotsquared", "fastasyncworldedit", "incendopermissions", "kvantum");
 
     private final Collection<PasteFile> files = new ArrayList<>();
     private final String pasteApplication;
@@ -45,7 +45,7 @@ public final class IncendoPaster {
         }
         if (!VALID_APPLICATIONS.contains(pasteApplication.toLowerCase(Locale.ENGLISH))) {
             throw new IllegalArgumentException(
-                    String.format("Unknown application name: %s", pasteApplication));
+                String.format("Unknown application name: %s", pasteApplication));
         }
         this.pasteApplication = pasteApplication;
     }
@@ -72,7 +72,7 @@ public final class IncendoPaster {
         for (final PasteFile pasteFile : this.files) {
             if (pasteFile.fileName.equalsIgnoreCase(file.getFileName())) {
                 throw new IllegalArgumentException(String.format("Found duplicate file with name %s",
-                        file.getFileName()));
+                    file.getFileName()));
             }
         }
         this.files.add(file);
@@ -99,7 +99,7 @@ public final class IncendoPaster {
         while (fileIterator.hasNext()) {
             final PasteFile file = fileIterator.next();
             builder.append("\"file-").append(file.getFileName()).append("\": \"")
-                    .append(file.getContent().replaceAll("\"", "\\\\\"")).append("\"");
+                .append(file.getContent().replaceAll("\"", "\\\\\"")).append("\"");
             if (fileIterator.hasNext()) {
                 builder.append(",\n");
             }
@@ -130,7 +130,7 @@ public final class IncendoPaster {
         }
         if (!httpURLConnection.getResponseMessage().contains("OK")) {
             throw new IllegalStateException(String.format("Server returned status: %d %s",
-                    httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
+                httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
         }
         final StringBuilder input = new StringBuilder();
         try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()))) {
@@ -191,9 +191,10 @@ public final class IncendoPaster {
 
         StringBuilder b = new StringBuilder();
         b.append(
-                "# Welcome to this paste\n# It is meant to provide us at IntellectualSites with better information about your "
-                        + "problem\n");
+            "# Welcome to this paste\n# It is meant to provide us at IntellectualSites with better information about your "
+                + "problem\n");
         b.append("\n# Server Information\n");
+        b.append("server.platform: ").append(Fawe.imp().getPlatform()).append('\n');
         b.append(Fawe.imp().getDebugInfo()).append('\n');
         b.append("\n\n# YAY! Now, let's see what we can find in your JVM\n");
         Runtime runtime = Runtime.getRuntime();
@@ -240,7 +241,7 @@ public final class IncendoPaster {
             return String.format("https://incendo.org/paste/view/%s", pasteId);
         } else {
             throw new IOException(String.format("Failed to upload files: %s",
-                    jsonObject.get("response").getAsString()));
+                jsonObject.get("response").getAsString()));
         }
     }
 
