@@ -221,10 +221,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         CuboidRegion region;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
             origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
-            region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
-        } else {
-            region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
         }
+        region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
         if (blocksOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(blocksOut.toByteArrays())))) {
                 int volume = width * height * length;
