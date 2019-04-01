@@ -357,7 +357,7 @@ public class ForwardExtentCopy implements Operation {
                     .stream()
                     .filter(entity -> entity.getState() != null &&
                             !entity.getState().getType().getId().equals("minecraft:player") &&
-                            region.contains(entity.getLocation().toVector()))
+                            region.contains(entity.getLocation().toBlockPoint()))
                     .collect(Collectors.toList());
         } else {
             entities = new ArrayList<>();

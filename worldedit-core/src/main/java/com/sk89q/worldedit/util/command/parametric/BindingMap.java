@@ -115,21 +115,26 @@ public class BindingMap implements Binding {
      */
     private BoundMethod match(ParameterData pd) {
         Type type = pd.getType();
+        BoundMethod result = null;
         while (type != null) {
             List<BoundMethod> methods = bindings.get(type);
             if (methods != null) {
                 for (BoundMethod binding : methods) {
                     if (binding.classifier != null) {
                         if (pd.getClassifier() != null && pd.getClassifier().annotationType().equals(binding.classifier)) {
-                            if (binding.type == null || binding.type.equals(type)) {
+                            if (binding.type == null) {
+                                result = binding;
+                            } else if (binding.type.equals(type)) {
                                 return binding;
                             }
+
                         }
                     } else if (binding.type.equals(type)) {
-                        return binding;
+                        if (result == null) result = binding;
                     }
                 }
             }
+            if (result != null) return result;
             type = (type instanceof Class) ? ((Class) type).getSuperclass() : null;
         }
         throw new RuntimeException("Unknown type " + pd.getType());
