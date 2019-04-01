@@ -22,12 +22,19 @@ package com.sk89q.worldedit.extent.clipboard.io;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.util.IOUtil;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.DoubleTag;
+import com.sk89q.jnbt.FloatTag;
 import com.sk89q.jnbt.IntArrayTag;
+import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -45,8 +52,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -203,7 +212,52 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             } else {
                 out.writeNamedEmptyList("TileEntities");
             }
+
+
+            // Entities
+            List<Tag> entities = new ArrayList<Tag>();
+            for (Entity entity : clipboard.getEntities()) {
+                BaseEntity state = entity.getState();
+
+                if (state != null) {
+                    Map<String, Tag> values = new HashMap<String, Tag>();
+
+                    // Put NBT provided data
+                    CompoundTag rawTag = state.getNbtData();
+                    if (rawTag != null) {
+                        values.putAll(rawTag.getValue());
+                    }
+
+                    // Store our location data, overwriting any
+                    values.put("id", new StringTag(state.getType().getId()));
+                    values.put("Pos", writeVector(entity.getLocation(), "Pos"));
+                    values.put("Rotation", writeRotation(entity.getLocation(), "Rotation"));
+
+                    CompoundTag entityTag = new CompoundTag(values);
+                    entities.add(entityTag);
+                }
+            }
+            if (entities.isEmpty()) {
+                out.writeNamedEmptyList("Entities");
+            } else {
+                out.writeNamedTag("Entities", new ListTag(CompoundTag.class, entities));
+            }
         });
+    }
+
+    private static Tag writeVector(Vector3 vector, String name) {
+        List<DoubleTag> list = new ArrayList<DoubleTag>();
+        list.add(new DoubleTag(vector.getX()));
+        list.add(new DoubleTag(vector.getY()));
+        list.add(new DoubleTag(vector.getZ()));
+        return new ListTag(DoubleTag.class, list);
+    }
+
+    private static Tag writeRotation(Location location, String name) {
+        List<FloatTag> list = new ArrayList<FloatTag>();
+        list.add(new FloatTag(location.getYaw()));
+        list.add(new FloatTag(location.getPitch()));
+        return new ListTag(FloatTag.class, list);
     }
 
     @Override
