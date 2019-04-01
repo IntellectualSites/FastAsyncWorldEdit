@@ -1,10 +1,14 @@
 package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
+import com.boydti.fawe.object.io.FastByteArrayOutputStream;
+import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.util.EditSessionBuilder;
+import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
@@ -15,12 +19,23 @@ import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.CompressedCompoundTag;
+import com.sk89q.jnbt.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -30,6 +45,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 
 public class FaweSchematicHandler extends SchematicHandler {
     @Override
@@ -62,10 +78,8 @@ public class FaweSchematicHandler extends SchematicHandler {
                 ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region);
 
                 Clipboard holder = new BlockArrayClipboard(region, clipboard);
-                // TODO FIXME
-//                com.sk89q.jnbt.CompoundTag weTag = SchematicWriter.writeTag(holder);
-//                CompoundTag tag = new CompoundTag((Map<String, Tag>) (Map<?, ?>) weTag.getValue());
-//                whenDone.run(tag);
+                CompressedSchematicTag tag = new CompressedSchematicTag(holder);
+                whenDone.run(tag);
             }
         });
     }
@@ -77,12 +91,29 @@ public class FaweSchematicHandler extends SchematicHandler {
             return false;
         }
         try {
+            PlotSquared.debug("Saving " + path);
             File tmp = MainUtil.getFile(PlotSquared.get().IMP.getDirectory(), path);
+            PlotSquared.debug(tmp);
             tmp.getParentFile().mkdirs();
-            com.sk89q.jnbt.CompoundTag weTag = (com.sk89q.jnbt.CompoundTag) FaweCache.asTag(tag);
-            try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new PGZIPOutputStream(stream))) {
-                Map<String, com.sk89q.jnbt.Tag> map = weTag.getValue();
-                output.writeNamedTag("Schematic", map.containsKey("Schematic") ? map.get("Schematic") : weTag);
+            if (tag instanceof CompressedCompoundTag) {
+                CompressedCompoundTag cTag = (CompressedCompoundTag) tag;
+                if (cTag instanceof CompressedSchematicTag) {
+                    System.out.println("Write directly");
+                    Clipboard clipboard = (Clipboard) cTag.getSource();
+                    try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new BufferedOutputStream(new PGZIPOutputStream(stream)))) {
+                        new SpongeSchematicWriter(output).write(clipboard);
+                    }
+                } else {
+                    try (OutputStream stream = new FileOutputStream(tmp); BufferedOutputStream output = new BufferedOutputStream(new PGZIPOutputStream(stream))) {
+                        DataInputStream is = cTag.adapt(cTag.getSource());
+                        IOUtil.copy(is, stream);
+                    }
+                }
+            } else {
+                try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new PGZIPOutputStream(stream))) {
+                    Map<String, com.sk89q.jnbt.Tag> map = tag.getValue();
+                    output.writeNamedTag("Schematic", map.containsKey("Schematic") ? map.get("Schematic") : tag);
+                }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

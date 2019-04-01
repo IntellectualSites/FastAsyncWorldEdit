@@ -216,12 +216,12 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         });
         streamer.readFully();
         if (fc == null) setupClipboard(length * width * height, uuid);
-        else fc.setDimensions(BlockVector3.at(width, height, length));
+        fc.setDimensions(BlockVector3.at(width, height, length));
         BlockVector3 origin = min;
         CuboidRegion region;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
             origin = origin.subtract(BlockVector3.at(offsetX, offsetY, offsetZ));
-            region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
+            region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
         } else {
             region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
         }

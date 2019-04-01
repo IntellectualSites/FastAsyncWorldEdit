@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * The {@code TAG_Compound} tag.
  */
-public final class CompoundTag extends Tag {
+public class CompoundTag extends Tag {
 
     private final Map<String, Tag> value;
 
@@ -57,7 +57,7 @@ public final class CompoundTag extends Tag {
      * @return true if the tag contains the given key
      */
     public boolean containsKey(String key) {
-        return value.containsKey(key);
+        return getValue().containsKey(key);
     }
 
     @Override
@@ -94,7 +94,7 @@ public final class CompoundTag extends Tag {
      * @return a byte array
      */
     public byte[] getByteArray(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ByteArrayTag) {
             return ((ByteArrayTag) tag).getValue();
         } else {
@@ -112,7 +112,7 @@ public final class CompoundTag extends Tag {
      * @return a byte
      */
     public byte getByte(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ByteTag) {
             return ((ByteTag) tag).getValue();
         } else {
@@ -130,7 +130,7 @@ public final class CompoundTag extends Tag {
      * @return a double
      */
     public double getDouble(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof DoubleTag) {
             return ((DoubleTag) tag).getValue();
         } else {
@@ -149,7 +149,7 @@ public final class CompoundTag extends Tag {
      * @return a double
      */
     public double asDouble(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ByteTag) {
             return ((ByteTag) tag).getValue();
 
@@ -183,7 +183,7 @@ public final class CompoundTag extends Tag {
      * @return a float
      */
     public float getFloat(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof FloatTag) {
             return ((FloatTag) tag).getValue();
         } else {
@@ -201,7 +201,7 @@ public final class CompoundTag extends Tag {
      * @return an int array
      */
     public int[] getIntArray(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof IntArrayTag) {
             return ((IntArrayTag) tag).getValue();
         } else {
@@ -219,7 +219,7 @@ public final class CompoundTag extends Tag {
      * @return an int
      */
     public int getInt(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof IntTag) {
             return ((IntTag) tag).getValue();
         } else {
@@ -238,7 +238,7 @@ public final class CompoundTag extends Tag {
      * @return an int
      */
     public int asInt(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ByteTag) {
             return ((ByteTag) tag).getValue();
 
@@ -272,7 +272,7 @@ public final class CompoundTag extends Tag {
      * @return a list of tags
      */
     public List<Tag> getList(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ListTag) {
             return ((ListTag) tag).getValue();
         } else {
@@ -290,7 +290,7 @@ public final class CompoundTag extends Tag {
      * @return a tag list instance
      */
     public ListTag getListTag(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ListTag) {
             return (ListTag) tag;
         } else {
@@ -313,7 +313,7 @@ public final class CompoundTag extends Tag {
      */
     @SuppressWarnings("unchecked")
     public <T extends Tag> List<T> getList(String key, Class<T> listType) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ListTag) {
             ListTag listTag = (ListTag) tag;
             if (listTag.getType().equals(listType)) {
@@ -336,7 +336,7 @@ public final class CompoundTag extends Tag {
      * @return an int array
      */
     public long[] getLongArray(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof LongArrayTag) {
             return ((LongArrayTag) tag).getValue();
         } else {
@@ -354,7 +354,7 @@ public final class CompoundTag extends Tag {
      * @return a long
      */
     public long getLong(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof LongTag) {
             return ((LongTag) tag).getValue();
         } else {
@@ -373,7 +373,7 @@ public final class CompoundTag extends Tag {
      * @return a long
      */
     public long asLong(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ByteTag) {
             return ((ByteTag) tag).getValue();
 
@@ -407,7 +407,7 @@ public final class CompoundTag extends Tag {
      * @return a short
      */
     public short getShort(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof ShortTag) {
             return ((ShortTag) tag).getValue();
         } else {
@@ -425,7 +425,7 @@ public final class CompoundTag extends Tag {
      * @return a string
      */
     public String getString(String key) {
-        Tag tag = value.get(key);
+        Tag tag = getValue().get(key);
         if (tag instanceof StringTag) {
             return ((StringTag) tag).getValue();
         } else {
@@ -436,8 +436,8 @@ public final class CompoundTag extends Tag {
     @Override
     public String toString() {
         StringBuilder bldr = new StringBuilder();
-        bldr.append("TAG_Compound").append(": ").append(value.size()).append(" entries\r\n{\r\n");
-        for (Map.Entry<String, Tag> entry : value.entrySet()) {
+        bldr.append("TAG_Compound").append(": ").append(getValue().size()).append(" entries\r\n{\r\n");
+        for (Map.Entry<String, Tag> entry : getValue().entrySet()) {
             bldr.append("   ").append(entry.getValue().toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
         }
         bldr.append("}");
