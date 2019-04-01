@@ -91,9 +91,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             return false;
         }
         try {
-            PlotSquared.debug("Saving " + path);
             File tmp = MainUtil.getFile(PlotSquared.get().IMP.getDirectory(), path);
-            PlotSquared.debug(tmp);
             tmp.getParentFile().mkdirs();
             if (tag instanceof CompressedCompoundTag) {
                 CompressedCompoundTag cTag = (CompressedCompoundTag) tag;
