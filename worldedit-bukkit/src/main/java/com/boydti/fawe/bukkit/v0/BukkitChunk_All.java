@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -157,7 +158,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                     HashSet<UUID> entsToRemove = this.getEntityRemoves();
                     if (!entsToRemove.isEmpty()) {
                         for (Entity entity : chunk.getEntities()) {
-                            if (entsToRemove.contains(entity.getUniqueId())) {
+                            if (entsToRemove.contains(entity.getUniqueId()) && !(entity instanceof Player)) {
                                 entity.remove();
                             }
                         }
