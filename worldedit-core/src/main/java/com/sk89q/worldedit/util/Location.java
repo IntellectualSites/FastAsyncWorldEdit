@@ -241,7 +241,7 @@ public class Location extends Vector3 {
      *
      * @return a vector
      */
-    public Vector3 vector() {
+    public Vector3 toVector() {
         return this;
     }
 
