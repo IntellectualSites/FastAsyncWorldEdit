@@ -104,7 +104,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
         int[][] sections = getCombinedIdArrays();
         final int bx = getX() << 4;
         final int bz = getZ() << 4;
-        boolean update = adapter != null ? adapter.isChunkInUse(chunk) : true;
+        boolean update = adapter == null || adapter.isChunkInUse(chunk);
         if (layer == -1) {
             if (adapter != null)
             {

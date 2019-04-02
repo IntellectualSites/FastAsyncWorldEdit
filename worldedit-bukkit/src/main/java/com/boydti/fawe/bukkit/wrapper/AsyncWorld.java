@@ -114,7 +114,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         this.parent = parent;
         this.queue = queue;
         if (queue instanceof BukkitQueue_0) {
-            this.adapter = (BukkitImplAdapter) ((BukkitQueue_0) queue).getAdapter();
+            this.adapter = BukkitQueue_0.getAdapter();
         } else {
             try {
                 this.adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
@@ -141,12 +141,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         if (queue != this.queue) {
             if (this.queue != null) {
                 final FaweQueue oldQueue = this.queue;
-                TaskManager.IMP.async(new Runnable() {
-                    @Override
-                    public void run() {
-                        oldQueue.flush();
-                    }
-                });
+                TaskManager.IMP.async(oldQueue::flush);
             }
             this.queue = queue;
         }
@@ -354,7 +349,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof World)) {
+        if (!(obj instanceof World)) {
             return false;
         }
         World other = (World) obj;
@@ -571,7 +566,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         return TaskManager.IMP.sync(new RunnableVal<Collection<T>>() {
             @Override
             public void run(Collection<T> value) {
-                this.value = (Collection<T>) parent.getEntitiesByClass(classes);
+                this.value = parent.getEntitiesByClass(classes);
             }
         });
     }
@@ -581,7 +576,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         return TaskManager.IMP.sync(new RunnableVal<Collection<T>>() {
             @Override
             public void run(Collection<T> value) {
-                this.value = (Collection<T>) parent.getEntitiesByClass(cls);
+                this.value = parent.getEntitiesByClass(cls);
             }
         });
     }
@@ -799,22 +794,12 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     @Deprecated
     public FallingBlock spawnFallingBlock(Location location, Material material, byte data) throws IllegalArgumentException {
-        return TaskManager.IMP.sync(new Supplier<FallingBlock>() {
-            @Override
-            public FallingBlock get() {
-                return parent.spawnFallingBlock(location, material, data);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, material, data));
     }
 
     @Override
     public FallingBlock spawnFallingBlock(Location location, BlockData blockData) throws IllegalArgumentException {
-        return TaskManager.IMP.sync(new Supplier<FallingBlock>() {
-            @Override
-            public FallingBlock get() {
-                return parent.spawnFallingBlock(location, blockData);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, blockData));
     }
 
     @Override

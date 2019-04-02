@@ -29,7 +29,7 @@ public class AsyncChunk implements Chunk {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Chunk)) {
+        if (!(obj instanceof Chunk)) {
             return false;
         }
         Chunk other = (Chunk) obj;
@@ -88,14 +88,14 @@ public class AsyncChunk implements Chunk {
             BukkitQueue_0 bq = (BukkitQueue_0) queue;
             if (world.isChunkLoaded(x, z)) {
                 long pair = MathMan.pairInt(x, z);
-                Long originalKeep = bq.keepLoaded.get(pair);
-                bq.keepLoaded.put(pair, Long.MAX_VALUE);
+                Long originalKeep = BukkitQueue_0.keepLoaded.get(pair);
+                BukkitQueue_0.keepLoaded.put(pair, Long.MAX_VALUE);
                 if (world.isChunkLoaded(x, z)) {
                     task.run();
                     if (originalKeep != null) {
-                        bq.keepLoaded.put(pair, originalKeep);
+                        BukkitQueue_0.keepLoaded.put(pair, originalKeep);
                     } else {
-                        bq.keepLoaded.remove(pair);
+                        BukkitQueue_0.keepLoaded.remove(pair);
                     }
                     return task.value;
                 }

@@ -103,7 +103,7 @@ public class BukkitImageListener implements Listener {
             if (event.getHand() == EquipmentSlot.OFF_HAND) return;
         } catch (NoSuchFieldError | NoSuchMethodError ignored) {}
 
-        List<Block> target = player.getLastTwoTargetBlocks((Set<Material>) null, 100);
+        List<Block> target = player.getLastTwoTargetBlocks(null, 100);
         if (target.isEmpty()) return;
 
         Block targetBlock = target.get(0);
@@ -151,7 +151,7 @@ public class BukkitImageListener implements Listener {
         if (generator == null) return null;
 
         ImageViewer viewer = generator.getImageViewer();
-        if (viewer == null || !(viewer instanceof BukkitImageViewer)) return null;
+        if (!(viewer instanceof BukkitImageViewer)) return null;
 
         BukkitImageViewer biv = (BukkitImageViewer) viewer;
         return biv;
@@ -185,12 +185,7 @@ public class BukkitImageListener implements Listener {
         if (frames == null || tool == null) {
             viewer.selectFrame(itemFrame);
             player.updateInventory();
-            TaskManager.IMP.laterAsync(new Runnable() {
-                @Override
-                public void run() {
-                    viewer.view(generator);
-                }
-            }, 1);
+            TaskManager.IMP.laterAsync(() -> viewer.view(generator), 1);
             return;
         }
 
@@ -250,26 +245,23 @@ public class BukkitImageListener implements Listener {
                     if (worldX < 0 || worldX > width || worldZ < 0 || worldZ > length) return;
 
 
-                    fp.runAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            BlockVector3 wPos = BlockVector3.at(worldX, 0, worldZ);
-                            viewer.refresh();
-                            int topY = generator.getNearestSurfaceTerrainBlock(wPos.getBlockX(), wPos.getBlockZ(), 255, 0, 255);
-                            wPos = wPos.withY(topY);
+                    fp.runAction(() -> {
+                        BlockVector3 wPos = BlockVector3.at(worldX, 0, worldZ);
+                        viewer.refresh();
+                        int topY = generator.getNearestSurfaceTerrainBlock(wPos.getBlockX(), wPos.getBlockZ(), 255, 0, 255);
+                        wPos = wPos.withY(topY);
 
-                            EditSession es = new EditSessionBuilder(fp.getWorld()).player(fp).combineStages(false).autoQueue(false).blockBag(null).limitUnlimited().build();
-                            ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();
-                            if (last.get() instanceof FastWorldEditExtent) last = last.previous();
-                            last.setNext(generator);
-                            try {
-                                brush.build(es, wPos, context.getMaterial(), context.getSize());
-                            } catch (WorldEditException e) {
-                                e.printStackTrace();
-                            }
-                            es.flushQueue();
-                            viewer.view(generator);
+                        EditSession es = new EditSessionBuilder(fp.getWorld()).player(fp).combineStages(false).autoQueue(false).blockBag(null).limitUnlimited().build();
+                        ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();
+                        if (last.get() instanceof FastWorldEditExtent) last = last.previous();
+                        last.setNext(generator);
+                        try {
+                            brush.build(es, wPos, context.getMaterial(), context.getSize());
+                        } catch (WorldEditException e) {
+                            e.printStackTrace();
                         }
+                        es.flushQueue();
+                        viewer.view(generator);
                     }, true, true);
 
 

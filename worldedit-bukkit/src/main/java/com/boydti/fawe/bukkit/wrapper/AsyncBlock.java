@@ -204,9 +204,10 @@ public class AsyncBlock implements Block {
     @Override
     public BlockFace getFace(Block block) {
         BlockFace[] directions = BlockFace.values();
-        for(int i = 0; i < directions.length; ++i) {
-            BlockFace face = directions[i];
-            if(this.getX() + face.getModX() == block.getX() && this.getY() + face.getModY() == block.getY() && this.getZ() + face.getModZ() == block.getZ()) {
+        for (BlockFace face : directions) {
+            if (this.getX() + face.getModX() == block.getX()
+                && this.getY() + face.getModY() == block.getY()
+                && this.getZ() + face.getModZ() == block.getZ()) {
                 return face;
             }
         }
@@ -272,14 +273,7 @@ public class AsyncBlock implements Block {
 
     @Override
     public boolean isEmpty() {
-        switch (getType()) {
-            case AIR:
-            case CAVE_AIR:
-            case VOID_AIR:
-                return true;
-            default:
-                return false;
-        }
+        return getType().isEmpty();
     }
 
     @Override

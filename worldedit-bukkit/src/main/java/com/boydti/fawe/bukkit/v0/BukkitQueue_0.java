@@ -113,14 +113,15 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
         WirePacket packet = null;
         int viewDistance = Bukkit.getViewDistance();
         try {
-            for (int i = 0; i < players.length; i++) {
+            for (FawePlayer fawePlayer : players) {
                 int cx = chunk.getX();
                 int cz = chunk.getZ();
 
-                Player player = ((BukkitPlayer) players[i]).parent;
+                Player player = ((BukkitPlayer) fawePlayer).parent;
                 Location loc = player.getLocation();
 
-                if (Math.abs((loc.getBlockX() >> 4) - cx) <= viewDistance && Math.abs((loc.getBlockZ() >> 4) - cz) <= viewDistance) {
+                if (Math.abs((loc.getBlockX() >> 4) - cx) <= viewDistance
+                    && Math.abs((loc.getBlockZ() >> 4) - cz) <= viewDistance) {
                     if (packet == null) {
                         byte[] data;
                         byte[] buffer = new byte[8192];
@@ -128,12 +129,12 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
                             chunk = (FaweChunk) chunk.getChunk();
                         }
                         // TODO FIXME
-//                        if (chunk instanceof MCAChunk) {
-//                            data = new MCAChunkPacket((MCAChunk) chunk, true, true, hasSky()).apply(buffer);
-//                        } else {
-//                            data = new FaweChunkPacket(chunk, true, true, hasSky()).apply(buffer);
-//                        }
-//                        packet = new WirePacket(PacketType.Play.Server.MAP_CHUNK, data);
+                        //                        if (chunk instanceof MCAChunk) {
+                        //                            data = new MCAChunkPacket((MCAChunk) chunk, true, true, hasSky()).apply(buffer);
+                        //                        } else {
+                        //                            data = new FaweChunkPacket(chunk, true, true, hasSky()).apply(buffer);
+                        //                        }
+                        //                        packet = new WirePacket(PacketType.Play.Server.MAP_CHUNK, data);
                     }
                     manager.sendWirePacket(player, packet);
                 }

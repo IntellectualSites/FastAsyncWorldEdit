@@ -90,17 +90,13 @@ public class CFIPacketListener implements Listener {
                     PlayerInventory inv = plr.getInventory();
                     ItemStack hand = enumHand == EnumWrappers.Hand.MAIN_HAND ? inv.getItemInMainHand() : inv.getItemInOffHand();
                     if (hand != null && hand.getType().isBlock()) {
-                        switch (hand.getType()) {
-                            case AIR:
-                            case CAVE_AIR:
-                            case VOID_AIR:
-                                break;
-                            default:
-                                BlockStateHolder block = BukkitAdapter.asBlockState(hand);
-                                if (block != null) {
-                                    gen.setBlock(pt, block);
-                                    return;
-                                }
+                        Material type = hand.getType();
+                        if (!type.isEmpty()) {
+                            BlockStateHolder block = BukkitAdapter.asBlockState(hand);
+                            if (block != null) {
+                                gen.setBlock(pt, block);
+                                return;
+                            }
                         }
                     }
                     pt = getRelPos(event, gen);
@@ -201,9 +197,7 @@ public class CFIPacketListener implements Listener {
                         reply.getIntegers().write(0, id);
                         try {
                             protocolmanager.recieveClientPacket(player, reply);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
+                        } catch (IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
                         }
                         event.setCancelled(true);

@@ -58,26 +58,23 @@ public abstract class ChunkListener implements Listener {
             Plugin plugin = Fawe.<FaweBukkit>imp().getPlugin();
             plm.registerEvents(this, plugin);
             try { plm.registerEvents(new ChunkListener_8Plus(this), plugin); } catch (Throwable ignore) {}
-            TaskManager.IMP.repeat(new Runnable() {
-                @Override
-                public void run() {
-                    rateLimit--;
-                    physicsFreeze = false;
-                    itemFreeze = false;
-                    lastZ = Integer.MIN_VALUE;
-                    physSkip = 0;
-                    physCancelPair = Long.MIN_VALUE;
-                    physCancel = false;
+            TaskManager.IMP.repeat(() -> {
+                rateLimit--;
+                physicsFreeze = false;
+                itemFreeze = false;
+                lastZ = Integer.MIN_VALUE;
+                physSkip = 0;
+                physCancelPair = Long.MIN_VALUE;
+                physCancel = false;
 
-                    counter.clear();
-                    for (Long2ObjectMap.Entry<Boolean> entry : badChunks.long2ObjectEntrySet()) {
-                        long key = entry.getLongKey();
-                        int x = MathMan.unpairIntX(key);
-                        int z = MathMan.unpairIntY(key);
-                        counter.put(key, badLimit);
-                    }
-                    badChunks.clear();
+                counter.clear();
+                for (Long2ObjectMap.Entry<Boolean> entry : badChunks.long2ObjectEntrySet()) {
+                    long key = entry.getLongKey();
+                    int x = MathMan.unpairIntX(key);
+                    int z = MathMan.unpairIntY(key);
+                    counter.put(key, badLimit);
                 }
+                badChunks.clear();
             }, Settings.IMP.TICK_LIMITER.INTERVAL);
         }
     }
