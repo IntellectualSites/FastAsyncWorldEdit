@@ -90,15 +90,15 @@ public class BlockMaskBuilder {
             charSequence.setString(input);
             charSequence.setSubstring(0, propStart);
 
-            BlockTypes type = null;
-            List<BlockTypes> blockTypeList = null;
+            BlockType type = null;
+            List<BlockType> blockTypeList = null;
             if (StringMan.isAlphanumericUnd(charSequence)) {
                 type = BlockTypes.parse(charSequence.toString());
                 add(type);
             } else {
                 String regex = charSequence.toString();
                 blockTypeList = new ArrayList<>();
-                for (BlockTypes myType : BlockTypes.values) {
+                for (BlockType myType : BlockTypes.values) {
                     if (myType.getId().matches(regex)) {
                         blockTypeList.add(myType);
                         add(myType);
@@ -135,14 +135,14 @@ public class BlockMaskBuilder {
                             filtered = filterRegexOrOperator(type, key, operator, charSequence);
                         }
                         else {
-                            for (BlockTypes myType : blockTypeList) {
+                            for (BlockType myType : blockTypeList) {
                                 filtered |= filterRegexOrOperator(myType, key, operator, charSequence);
                             }
                         }
                         if (!filtered) {
                             String value = charSequence.toString();
                             final PropertyKey fKey = key;
-                            Collection<BlockTypes> types = type != null ? Collections.singleton(type) : blockTypeList;
+                            Collection<BlockType> types = type != null ? Collections.singleton(type) : blockTypeList;
                             throw new SuggestInputParseException("No value for " + input, input, () -> {
                                 HashSet<String> values = new HashSet<>();
                                 types.forEach(t -> {
@@ -206,7 +206,7 @@ public class BlockMaskBuilder {
             if (StringMan.isAlphanumericUnd(input)) {
                 add(BlockTypes.parse(input));
             } else {
-                for (BlockTypes myType : BlockTypes.values) {
+                for (BlockType myType : BlockTypes.values) {
                     if (myType.getId().matches(input)) {
                         add(myType);
                     }
@@ -225,7 +225,7 @@ public class BlockMaskBuilder {
         return (states == BlockMask.ALL || FastBitSet.get(states, localI));
     }
 
-    private void suggest(String input, String property, Collection<BlockTypes> finalTypes) throws InputParseException {
+    private void suggest(String input, String property, Collection<BlockType> finalTypes) throws InputParseException {
         throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
             Set<PropertyKey> keys = new HashSet<>();
             finalTypes.forEach(t -> t.getProperties().stream().forEach(p -> keys.add(p.getKey())));
@@ -346,7 +346,7 @@ public class BlockMaskBuilder {
                 bitSets[i] = null;
                 continue;
             }
-            List<AbstractProperty> properties = (List<AbstractProperty>) type.getProperties();
+            List<AbstractProperty<?>> properties = (List<AbstractProperty<?>>) type.getProperties();
             for (AbstractProperty prop : properties) {
                 List values = prop.getValues();
                 for (int j = 0; j < values.size(); j++) {
@@ -425,7 +425,7 @@ public class BlockMaskBuilder {
             if (!typePredicate.test(type)) {
                 continue;
             }
-            for (AbstractProperty prop : (List<AbstractProperty>) type.getProperties()) {
+            for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
                 List values = prop.getValues();
                 for (int j = 0; j < values.size(); j++) {
                     int localI = j << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
@@ -533,7 +533,7 @@ public class BlockMaskBuilder {
                 }
                 int set = 0;
                 int clear = 0;
-                for (AbstractProperty prop : (List<AbstractProperty>) type.getProperties()) {
+                for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
                     List values = prop.getValues();
                     for (int j = 0; j < values.size(); j++) {
                         int localI = j << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;

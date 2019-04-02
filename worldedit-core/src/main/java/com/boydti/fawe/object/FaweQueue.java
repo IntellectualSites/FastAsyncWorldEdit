@@ -12,17 +12,18 @@ import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.File;
@@ -61,13 +62,13 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default Vector getMinimumPoint() {
-        return new Vector(-30000000, 0, -30000000);
+    default BlockVector3 getMinimumPoint() {
+        return BlockVector3.at(-30000000, 0, -30000000);
     }
 
     @Override
-    default Vector getMaximumPoint() {
-        return new Vector(30000000, getMaxY(), 30000000);
+    default BlockVector3 getMaximumPoint() {
+        return BlockVector3.at(30000000, getMaxY(), 30000000);
     }
 
     @Override
@@ -75,12 +76,6 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         int combinedId4Data = getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
         try {
             BlockState state = BlockState.getFromInternalId(combinedId4Data);
-            if (state.getMaterial().hasContainer()) {
-                CompoundTag tile = getTileEntity(x, y, z);
-                if (tile != null) {
-                    return BaseBlock.getFromInternalId(combinedId4Data, tile);
-                }
-            }
             return state;
         } catch (Throwable e) {
             MainUtil.handleError(e);
@@ -89,22 +84,35 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return setBlock(x, y, z, block.getInternalId(), block.getNbtData());
+    default <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return setBlock(x, y, z, block.getInternalId(), block instanceof BaseBlock ? ((BaseBlock)block).getNbtData() : null);
     }
 
     @Override
-    default BlockState getFullBlock(Vector position) {
-        return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+    default BaseBlock getFullBlock(BlockVector3 position) {
+        int combinedId4Data = getCachedCombinedId4Data(position.getBlockX(), position.getBlockY(), position.getBlockZ(), BlockTypes.AIR.getInternalId());
+        try {
+            BaseBlock block = BaseBlock.getFromInternalId(combinedId4Data, null);
+            if (block.getMaterial().hasContainer()) {
+                CompoundTag tile = getTileEntity(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+                if (tile != null) {
+                    return BaseBlock.getFromInternalId(combinedId4Data, tile);
+                }
+            }
+            return block;
+        } catch (Throwable e) {
+            MainUtil.handleError(e);
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        }
     }
 
     @Override
-    default BaseBiome getBiome(Vector2D position) {
+    default BaseBiome getBiome(BlockVector2 position) {
         return null;
     }
 
     @Override
-    default boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         return setBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
     }
 
@@ -119,7 +127,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default boolean setBiome(Vector2D position, BaseBiome biome) {
+    default boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return setBiome(position.getBlockX(), position.getBlockZ(), biome);
     }
 
@@ -262,10 +270,10 @@ public interface FaweQueue extends HasFaweQueue, Extent {
 
     void addTask(Runnable whenFree);
 
-    default void forEachBlockInChunk(int cx, int cz, RunnableVal2<Vector, BlockState> onEach) {
+    default void forEachBlockInChunk(int cx, int cz, RunnableVal2<BlockVector3, BaseBlock> onEach) {
         int bx = cx << 4;
         int bz = cz << 4;
-        MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         for (int x = 0; x < 16; x++) {
             int xx = x + bx;
             mutable.mutX(xx);
@@ -274,31 +282,27 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                 mutable.mutZ(zz);
                 for (int y = 0; y <= getMaxY(); y++) {
                     int combined = getCombinedId4Data(xx, y, zz);
-                    BlockState state = BlockState.getFromInternalId(combined);
-                    BlockTypes type = state.getBlockType();
-                    switch (type.getTypeEnum()) {
-                        case AIR:
-                        case VOID_AIR:
-                        case CAVE_AIR:
-                            continue;
+                    BaseBlock block = BlockState.getFromInternalId(combined).toBaseBlock();
+                    BlockType type = block.getBlockType();
+                    if (type.getMaterial().isAir()) {
+                        continue;
                     }
                     mutable.mutY(y);
                     CompoundTag tile = getTileEntity(x, y, z);
                     if (tile != null) {
-                        BaseBlock block = BaseBlock.getFromInternalId(combined, tile);
-                        onEach.run(mutable, block);
+                        onEach.run(mutable, block.toBaseBlock(tile));
                     } else {
-                        onEach.run(mutable, state);
+                        onEach.run(mutable, block);
                     }
                 }
             }
         }
     }
 
-    default void forEachTileInChunk(int cx, int cz, RunnableVal2<Vector, BlockState> onEach) {
+    default void forEachTileInChunk(int cx, int cz, RunnableVal2<BlockVector3, BaseBlock> onEach) {
         int bx = cx << 4;
         int bz = cz << 4;
-        MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         for (int x = 0; x < 16; x++) {
             int xx = x + bx;
             for (int z = 0; z < 16; z++) {
@@ -308,7 +312,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
                     if (combined == 0) {
                         continue;
                     }
-                    BlockTypes type = BlockTypes.getFromStateId(combined);
+                    BlockType type = BlockTypes.getFromStateId(combined);
                     if (type.getMaterial().hasContainer()) {
                         CompoundTag tile = getTileEntity(x, y, z);
                         if (tile != null) {

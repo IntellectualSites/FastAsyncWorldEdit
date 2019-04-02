@@ -5,26 +5,26 @@ import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.mask.SurfaceMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 
 public class ShatterBrush extends ScatterBrush {
-    private final MutableBlockVector mutable = new MutableBlockVector();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public ShatterBrush(int count) {
         super(count, 1);
     }
 
     @Override
-    public void apply(final EditSession editSession, final LocalBlockVectorSet placed, final Vector position, Pattern p, double size) throws MaxChangedBlocksException {
+    public void apply(final EditSession editSession, final LocalBlockVectorSet placed, final BlockVector3 position, Pattern p, double size) throws MaxChangedBlocksException {
     }
 
     @Override
-    public void finish(EditSession editSession, LocalBlockVectorSet placed, final Vector position, Pattern pattern, double size) {
+    public void finish(EditSession editSession, LocalBlockVectorSet placed, final BlockVector3 position, Pattern pattern, double size) {
         int radius2 = (int) (size * size);
         // Keep track of where we've visited
         LocalBlockVectorSet tmp = new LocalBlockVectorSet();
@@ -34,7 +34,7 @@ public class ShatterBrush extends ScatterBrush {
         LocalBlockVectorSet[] frontiersVisited = new LocalBlockVectorSet[placed.size()];
         // Initiate the frontier with the starting points
         int i = 0;
-        for (Vector pos : placed) {
+        for (BlockVector3 pos : placed) {
             LocalBlockVectorSet set = new LocalBlockVectorSet();
             set.add(pos);
             frontiers[i] = set;
@@ -66,7 +66,7 @@ public class ShatterBrush extends ScatterBrush {
                             return;
                         }
                         for (int i = 0; i < BreadthFirstSearch.DIAGONAL_DIRECTIONS.length; i++) {
-                            Vector direction = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
+                        	BlockVector3 direction = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
                             int x2 = x + direction.getBlockX();
                             int y2 = y + direction.getBlockY();
                             int z2 = z + direction.getBlockZ();
@@ -76,8 +76,9 @@ public class ShatterBrush extends ScatterBrush {
                             int dz = position.getBlockZ() - z2;
                             int dSqr = (dx * dx) + (dy * dy) + (dz * dz);
                             if (dSqr <= radius2) {
-                                MutableBlockVector v = mutable.setComponents(x2, y2, z2);
-                                if (surfaceTest.test(v) && finalMask.test(v)) {
+                                MutableBlockVector3 v = mutable.setComponents(x2, y2, z2);
+                                BlockVector3 bv = v;
+                                if (surfaceTest.test(bv) && finalMask.test(bv)) {
                                     // (collision) If it's visited and part of another frontier, set the block
                                     if (!placed.add(x2, y2, z2)) {
                                         if (!frontierVisited.contains(x2, y2, z2)) {

@@ -19,43 +19,67 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
-public abstract class BlockState implements BlockStateHolder<BlockState> {
+public class BlockState implements BlockStateHolder<BlockState> {
+    private final BlockType blockType;
+    private BaseBlock emptyBaseBlock;
+    
+    BlockState(BlockType blockType) {
+        this.blockType = blockType;
+        this.emptyBaseBlock = new BaseBlock(this);
+    }
+    
+    BlockState(BlockType blockType, BaseBlock baseBlock){
+    	this.blockType = blockType;
+    	this.emptyBaseBlock = baseBlock;
+    }
+    
+    /**
+     * Creates a fuzzy BlockState. This can be used for partial matching.
+     *
+     * @param blockType The block type
+     * @param values The block state values
+     */
+    private BlockState(BlockType blockType, Map<Property<?>, Object> values) {
+        this.blockType = blockType;
+//        this.values = values;
+//        this.fuzzy = true;
+    }
+    
     /**
      * Returns a temporary BlockState for a given internal id
      * @param combinedId
      * @deprecated magic number
      * @return BlockState
      */
+	
     @Deprecated
     public static BlockState getFromInternalId(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
@@ -200,39 +224,13 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    public Mask toMask(Extent extent) {
-        return new SingleBlockStateMask(extent, this);
-    }
-
-    @Override
-    public boolean apply(Extent extent, Vector get, Vector set) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return extent.setBlock(set, this);
     }
 
     @Override
-    public BlockState apply(Vector position) {
-        return this;
-    }
-
-    @Override
-    public boolean hasNbtData() {
-        return getNbtData() != null;
-    }
-
-    @Override
-    public String getNbtId() {
-        return "";
-    }
-
-    @Nullable
-    @Override
-    public CompoundTag getNbtData() {
-        return null;
-    }
-
-    @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {
-        throw new UnsupportedOperationException("This class is immutable.");
+    public BaseBlock apply(BlockVector3 position) {
+        return this.toBaseBlock();
     }
 
     /**
@@ -254,7 +252,7 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     @Override
     public <V> BlockState with(final Property<V> property, final V value) {
         try {
-            BlockTypes type = getBlockType();
+            BlockType type = getBlockType();
             int newState = ((AbstractProperty) property).modify(this.getInternalId(), value);
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
@@ -265,7 +263,7 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     @Override
     public <V> BlockState with(final PropertyKey property, final V value) {
         try {
-            BlockTypes type = getBlockType();
+            BlockType type = getBlockType();
             int newState = ((AbstractProperty) type.getProperty(property)).modify(this.getInternalId(), value);
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
@@ -298,13 +296,22 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
         return (Map<Property<?>, Object>) map;
     }
 
-    /**
-     * Deprecated, use masks - not try to this fuzzy/non fuzzy state nonsense
-     * @return
-     */
-    @Deprecated
-    public BlockState toFuzzy() {
-        return this;
+    @Override
+    public BaseBlock toBaseBlock() {
+        return this.emptyBaseBlock;
+    }
+
+    @Override
+    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+        if (compoundTag == null) {
+            return toBaseBlock();
+        }
+        return new BaseBlock(this, compoundTag);
+    }
+    
+    @Override
+    public BlockType getBlockType() {
+    	return this.blockType;
     }
 
     @Override
@@ -313,14 +320,37 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return this == obj;
-    }
+    public boolean equalsFuzzy(BlockStateHolder<?> o) {
+        if (this == o) {
+            // Added a reference equality check for
+            return true;
+        }
+        if (!getBlockType().equals(o.getBlockType())) {
+            return false;
+        }
 
-    @Override
-    @Deprecated
-    public boolean equalsFuzzy(BlockStateHolder o) {
-        return o.getOrdinal() == this.getOrdinal();
+        Set<Property<?>> differingProperties = new HashSet<>();
+        for (Object state : o.getStates().keySet()) {
+            if (getState((Property<?>) state) == null) {
+                differingProperties.add((Property<?>) state);
+            }
+        }
+        for (Property<?> property : getStates().keySet()) {
+            if (o.getState(property) == null) {
+                differingProperties.add(property);
+            }
+        }
+
+        for (Property<?> property : getStates().keySet()) {
+            if (differingProperties.contains(property)) {
+                continue;
+            }
+            if (!Objects.equals(getState(property), o.getState(property))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -331,5 +361,29 @@ public abstract class BlockState implements BlockStateHolder<BlockState> {
     @Override
     public String toString() {
         return getAsString();
+    }
+
+	@Override
+	public int getInternalId() {
+		return blockType.getInternalId();
+	}
+
+	@Override
+	public BlockMaterial getMaterial() {
+		return blockType.getMaterial();
+	}
+
+	@Override
+	public int getOrdinal() {
+		//?
+		return 0;
+	}
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BlockState)) {
+            return false;
+        }
+
+        return equalsFuzzy((BlockState) obj);
     }
 }

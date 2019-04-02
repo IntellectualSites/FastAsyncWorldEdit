@@ -1,7 +1,7 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.object.collection.IterableThreadLocal;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;

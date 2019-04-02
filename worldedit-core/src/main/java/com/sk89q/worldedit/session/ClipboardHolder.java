@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.session;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -26,9 +28,6 @@ import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import java.util.Collections;
 import java.util.List;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Holds the clipboard and the current transform on the clipboard.
@@ -46,8 +45,6 @@ public class ClipboardHolder {
         checkNotNull(clipboard);
         this.clipboard = clipboard;
     }
-
-    protected ClipboardHolder() {}
 
     /**
      * Get the clipboard.

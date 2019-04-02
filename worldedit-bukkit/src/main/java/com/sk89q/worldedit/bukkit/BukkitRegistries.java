@@ -31,6 +31,8 @@ class BukkitRegistries extends BundledRegistries {
     private final ItemRegistry itemRegistry = new BukkitItemRegistry();
     private final BiomeRegistry biomeRegistry = new BukkitBiomeRegistry();
     private final EntityRegistry entityRegistry = new BukkitEntityRegistry();
+    private final BlockCategoryRegistry blockCategoryRegistry = new BukkitBlockCategoryRegistry();
+    private final ItemCategoryRegistry itemCategoryRegistry = new BukkitItemCategoryRegistry();
 
     /**
      * Create a new instance.
@@ -42,6 +44,11 @@ class BukkitRegistries extends BundledRegistries {
     public BlockRegistry getBlockRegistry() {
         return blockRegistry;
     }
+    
+    @Override
+    public BlockCategoryRegistry getBlockCategoryRegistry() {
+    	return blockCategoryRegistry;
+    }
 
     @Override
     public BiomeRegistry getBiomeRegistry() {
@@ -51,6 +58,11 @@ class BukkitRegistries extends BundledRegistries {
     @Override
     public ItemRegistry getItemRegistry() {
         return itemRegistry;
+    }
+    
+    @Override
+    public ItemCategoryRegistry getItemCategoryRegistry() {
+    	return itemCategoryRegistry;
     }
 
     @Override

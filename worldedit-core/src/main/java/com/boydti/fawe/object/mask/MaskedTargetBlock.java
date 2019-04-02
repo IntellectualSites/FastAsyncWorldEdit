@@ -21,7 +21,7 @@ public class MaskedTargetBlock extends TargetBlock {
         Location lastBlock = null;
         while (getNextBlock() != null) {
             Location current = getCurrentBlock();
-            if (!mask.test(current.toVector())) {
+            if (!mask.test(current.toBlockPoint())) {
                 if (searchForLastBlock) {
                     lastBlock = current;
                     if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {

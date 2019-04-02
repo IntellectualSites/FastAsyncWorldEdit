@@ -148,7 +148,7 @@ public class StringMan {
     }
 
     public static List<String> split(String input, char delim) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         int start = 0;
         int bracket = 0;
         boolean inQuotes = false;

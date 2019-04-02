@@ -19,15 +19,19 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -46,7 +50,7 @@ public class PlayerProxy extends AbstractPlayerActor {
     private final Actor permActor;
     private final Actor cuiActor;
     private final World world;
-    private Vector offset = Vector.ZERO;
+    private Vector3 offset = Vector3.ZERO;
 
     public PlayerProxy(Player basePlayer, Actor permActor, Actor cuiActor, World world) {
         checkNotNull(basePlayer);
@@ -59,13 +63,13 @@ public class PlayerProxy extends AbstractPlayerActor {
         this.world = world;
     }
 
-    public void setOffset(Vector position) {
+    public void setOffset(Vector3 position) {
         this.offset = position;
     }
 
 
     @Override
-    public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
+    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
         return basePlayer.getBlockInHand(handSide);
     }
 
@@ -95,6 +99,11 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
+    public String getDisplayName() {
+        return basePlayer.getDisplayName();
+    }
+
+    @Override
     public BaseEntity getState() {
         throw new UnsupportedOperationException("Can't withPropertyId() on a player");
     }
@@ -102,11 +111,16 @@ public class PlayerProxy extends AbstractPlayerActor {
     @Override
     public Location getLocation() {
         Location loc = this.basePlayer.getLocation();
-        return new Location(loc.getExtent(), loc.toVector().add(offset), loc.getDirection());
+        return new Location(loc.getExtent(), loc.add(offset), loc.getDirection());
     }
 
     @Override
-    public void setPosition(Vector pos, float pitch, float yaw) {
+    public boolean setLocation(Location location) {
+        return basePlayer.setLocation(location);
+    }
+
+    @Override
+    public void setPosition(Vector3 pos, float pitch, float yaw) {
         basePlayer.setPosition(pos, pitch, yaw);
     }
 
@@ -170,4 +184,10 @@ public class PlayerProxy extends AbstractPlayerActor {
     public void setGameMode(GameMode gameMode) {
         basePlayer.setGameMode(gameMode);
     }
+
+    @Override
+    public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
+        basePlayer.sendFakeBlock(pos, block);
+    }
 }
+

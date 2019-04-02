@@ -22,6 +22,7 @@ package com.sk89q.worldedit.world.registry;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
@@ -43,7 +44,7 @@ public interface EntityRegistry {
      */
     @Nullable
     default BaseEntity createFromId(String id) {
-        EntityTypes entType = EntityTypes.get(id);
+        EntityType entType = EntityTypes.get(id);
         return entType == null ? null : new BaseEntity(entType);
     }
 

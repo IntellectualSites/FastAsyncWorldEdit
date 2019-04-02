@@ -14,12 +14,11 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.StringTag;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
@@ -27,6 +26,7 @@ import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -49,7 +49,7 @@ public class SchematicStreamer extends NBTStreamer {
     public SchematicStreamer(NBTInputStream stream, UUID uuid) {
         super(stream);
         this.uuid = uuid;
-        clipboard = new BlockArrayClipboard(new CuboidRegion(new Vector(0, 0, 0), new Vector(0, 0, 0)), fc);
+        clipboard = new BlockArrayClipboard(new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(0, 0, 0)), fc);
     }
 
     public void addBlockReaders() throws IOException {
@@ -133,39 +133,33 @@ public class SchematicStreamer extends NBTStreamer {
         addReader("Schematic.Biomes.#", biomeReader); // FAWE stores as a byte[] (4x smaller)
 
         // Tiles
-        addReader("Schematic.TileEntities.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag value) {
-                if (fc == null) {
-                    setupClipboard(0);
-                }
-                int x = value.getInt("x");
-                int y = value.getInt("y");
-                int z = value.getInt("z");
-                fc.setTile(x, y, z, value);
+        addReader("Schematic.TileEntities.#", (BiConsumer<Integer, CompoundTag>) (index, value) -> {
+            if (fc == null) {
+                setupClipboard(0);
             }
+            int x = value.getInt("x");
+            int y = value.getInt("y");
+            int z = value.getInt("z");
+            fc.setTile(x, y, z, value);
         });
         // Entities
-        addReader("Schematic.Entities.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag compound) {
-                if (fc == null) {
-                    setupClipboard(0);
-                }
-                String id = compound.getString("id");
-                if (id.isEmpty()) {
-                    return;
-                }
-                ListTag positionTag = compound.getListTag("Pos");
-                ListTag directionTag = compound.getListTag("Rotation");
-                EntityType type = EntityTypes.parse(id);
-                if (type != null) {
-                    compound.getValue().put("Id", new StringTag(type.getId()));
-                    BaseEntity state = new BaseEntity(type, compound);
-                    fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
-                } else {
-                    Fawe.debug("Invalid entity: " + id);
-                }
+        addReader("Schematic.Entities.#", (BiConsumer<Integer, CompoundTag>) (index, compound) -> {
+            if (fc == null) {
+                setupClipboard(0);
+            }
+            String id = compound.getString("id");
+            if (id.isEmpty()) {
+                return;
+            }
+            ListTag positionTag = compound.getListTag("Pos");
+            ListTag directionTag = compound.getListTag("Rotation");
+            EntityType type = EntityTypes.parse(id);
+            if (type != null) {
+                compound.getValue().put("Id", new StringTag(type.getId()));
+                BaseEntity state = new BaseEntity(type, compound);
+                fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
+            } else {
+                Fawe.debug("Invalid entity: " + id);
             }
         });
     }
@@ -180,7 +174,7 @@ public class SchematicStreamer extends NBTStreamer {
         FaweInputStream dataIn = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(dataOut.toByteArrays())));
 
         LegacyMapper remap = LegacyMapper.getInstance();
-        Vector dimensions = fc.getDimensions();
+        BlockVector3 dimensions = fc.getDimensions();
         int length = dimensions.getBlockX() * dimensions.getBlockY() * dimensions.getBlockZ();
         if (adds == null) {
             for (int i = 0; i < length; i++) {
@@ -200,47 +194,47 @@ public class SchematicStreamer extends NBTStreamer {
     private void fixStates() {
         fc.forEach(new FaweClipboard.BlockReader() {
             @Override
-            public void run(int x, int y, int z, BlockState block) {
-                BlockTypes type = block.getBlockType();
-                switch (type) {
-                    case ACACIA_STAIRS:
-                    case BIRCH_STAIRS:
-                    case BRICK_STAIRS:
-                    case COBBLESTONE_STAIRS:
-                    case DARK_OAK_STAIRS:
-                    case DARK_PRISMARINE_STAIRS:
-                    case JUNGLE_STAIRS:
-                    case NETHER_BRICK_STAIRS:
-                    case OAK_STAIRS:
-                    case PRISMARINE_BRICK_STAIRS:
-                    case PRISMARINE_STAIRS:
-                    case PURPUR_STAIRS:
-                    case QUARTZ_STAIRS:
-                    case RED_SANDSTONE_STAIRS:
-                    case SANDSTONE_STAIRS:
-                    case SPRUCE_STAIRS:
-                    case STONE_BRICK_STAIRS:
+            public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
+                BlockType type = block.getBlockType();
+                switch (type.getResource().toUpperCase()) {
+                    case "ACACIA_STAIRS":
+                    case "BIRCH_STAIRS":
+                    case "BRICK_STAIRS":
+                    case "COBBLESTONE_STAIRS":
+                    case "DARK_OAK_STAIRS":
+                    case "DARK_PRISMARINE_STAIRS":
+                    case "JUNGLE_STAIRS":
+                    case "NETHER_BRICK_STAIRS":
+                    case "OAK_STAIRS":
+                    case "PRISMARINE_BRICK_STAIRS":
+                    case "PRISMARINE_STAIRS":
+                    case "PURPUR_STAIRS":
+                    case "QUARTZ_STAIRS":
+                    case "RED_SANDSTONE_STAIRS":
+                    case "SANDSTONE_STAIRS":
+                    case "SPRUCE_STAIRS":
+                    case "STONE_BRICK_STAIRS":
                         Object half = block.getState(PropertyKey.HALF);
                         Direction facing = block.getState(PropertyKey.FACING);
 
-                        BlockVector forward = facing.toBlockVector();
+                        BlockVector3 forward = facing.toBlockVector();
                         Direction left = facing.getLeft();
                         Direction right = facing.getRight();
 
                         BlockStateHolder forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
-                        BlockTypes forwardType = forwardBlock.getBlockType();
+                        BlockType forwardType = forwardBlock.getBlockType();
                         if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
                             Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
                             if (forwardFacing == left) {
                                 BlockStateHolder rightBlock = fc.getBlock(x + right.getBlockX(), y + right.getBlockY(), z + right.getBlockZ());
-                                BlockTypes rightType = rightBlock.getBlockType();
+                                BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_left"));
                                 }
                                 return;
                             } else if (forwardFacing == right) {
                                 BlockStateHolder leftBlock = fc.getBlock(x + left.getBlockX(), y + left.getBlockY(), z + left.getBlockZ());
-                                BlockTypes leftType = leftBlock.getBlockType();
+                                BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
                                 }
@@ -249,19 +243,19 @@ public class SchematicStreamer extends NBTStreamer {
                         }
 
                         BlockStateHolder backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
-                        BlockTypes backwardsType = backwardsBlock.getBlockType();
+                        BlockType backwardsType = backwardsBlock.getBlockType();
                         if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
                             Direction backwardsFacing = (Direction) backwardsBlock.getState(PropertyKey.FACING);
                             if (backwardsFacing == left) {
                                 BlockStateHolder rightBlock = fc.getBlock(x + right.getBlockX(), y + right.getBlockY(), z + right.getBlockZ());
-                                BlockTypes rightType = rightBlock.getBlockType();
+                                BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_left"));
                                 }
                                 return;
                             } else if (backwardsFacing == right) {
                                 BlockStateHolder leftBlock = fc.getBlock(x + left.getBlockX(), y + left.getBlockY(), z + left.getBlockZ());
-                                BlockTypes leftType = leftBlock.getBlockType();
+                                BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_right"));
                                 }
@@ -301,43 +295,43 @@ public class SchematicStreamer extends NBTStreamer {
 
     private boolean merge(int group, int x, int y, int z) {
         BlockStateHolder block = fc.getBlock(x, y, z);
-        BlockTypes type = block.getBlockType();
+        BlockType type = block.getBlockType();
         return group(type) == group || fullCube.apply(type);
     }
 
-    private int group(BlockTypes type) {
-        switch (type) {
-            case ACACIA_FENCE:
-            case BIRCH_FENCE:
-            case DARK_OAK_FENCE:
-            case JUNGLE_FENCE:
-            case OAK_FENCE:
-            case SPRUCE_FENCE:
+    private int group(BlockType type) {
+        switch (type.getResource().toUpperCase()) {
+            case "ACACIA_FENCE":
+            case "BIRCH_FENCE":
+            case "DARK_OAK_FENCE":
+            case "JUNGLE_FENCE":
+            case "OAK_FENCE":
+            case "SPRUCE_FENCE":
                 return 0;
-            case NETHER_BRICK_FENCE:
+            case "NETHER_BRICK_FENCE":
                 return 1;
-            case COBBLESTONE_WALL:
-            case MOSSY_COBBLESTONE_WALL:
+            case "COBBLESTONE_WALL":
+            case "MOSSY_COBBLESTONE_WALL":
                 return 2;
-            case IRON_BARS:
-            case BLACK_STAINED_GLASS_PANE:
-            case BLUE_STAINED_GLASS_PANE:
-            case BROWN_MUSHROOM_BLOCK:
-            case BROWN_STAINED_GLASS_PANE:
-            case CYAN_STAINED_GLASS_PANE:
-            case GLASS_PANE:
-            case GRAY_STAINED_GLASS_PANE:
-            case GREEN_STAINED_GLASS_PANE:
-            case LIGHT_BLUE_STAINED_GLASS_PANE:
-            case LIGHT_GRAY_STAINED_GLASS_PANE:
-            case LIME_STAINED_GLASS_PANE:
-            case MAGENTA_STAINED_GLASS_PANE:
-            case ORANGE_STAINED_GLASS_PANE:
-            case PINK_STAINED_GLASS_PANE:
-            case PURPLE_STAINED_GLASS_PANE:
-            case RED_STAINED_GLASS_PANE:
-            case WHITE_STAINED_GLASS_PANE:
-            case YELLOW_STAINED_GLASS_PANE:
+            case "IRON_BARS":
+            case "BLACK_STAINED_GLASS_PANE":
+            case "BLUE_STAINED_GLASS_PANE":
+            case "BROWN_MUSHROOM_BLOCK":
+            case "BROWN_STAINED_GLASS_PANE":
+            case "CYAN_STAINED_GLASS_PANE":
+            case "GLASS_PANE":
+            case "GRAY_STAINED_GLASS_PANE":
+            case "GREEN_STAINED_GLASS_PANE":
+            case "LIGHT_BLUE_STAINED_GLASS_PANE":
+            case "LIGHT_GRAY_STAINED_GLASS_PANE":
+            case "LIME_STAINED_GLASS_PANE":
+            case "MAGENTA_STAINED_GLASS_PANE":
+            case "ORANGE_STAINED_GLASS_PANE":
+            case "PINK_STAINED_GLASS_PANE":
+            case "PURPLE_STAINED_GLASS_PANE":
+            case "RED_STAINED_GLASS_PANE":
+            case "WHITE_STAINED_GLASS_PANE":
+            case "YELLOW_STAINED_GLASS_PANE":
                 return 3;
             default:
                 return -1;
@@ -345,60 +339,23 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     public void addDimensionReaders() {
-        addReader("Schematic.Height", new BiConsumer<Integer, Short>() {
-            @Override
-            public void accept(Integer index, Short value) {
-                height = (value);
-            }
-        });
-        addReader("Schematic.Width", new BiConsumer<Integer, Short>() {
-            @Override
-            public void accept(Integer index, Short value) {
-                width = (value);
-            }
-        });
-        addReader("Schematic.Length", new BiConsumer<Integer, Short>() {
-            @Override
-            public void accept(Integer index, Short value) {
-                length = (value);
-            }
-        });
-        addReader("Schematic.WEOriginX", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                originX = (value);
-            }
-        });
-        addReader("Schematic.WEOriginY", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                originY = (value);
-            }
-        });
-        addReader("Schematic.WEOriginZ", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                originZ = (value);
-            }
-        });
-        addReader("Schematic.WEOffsetX", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                offsetX = (value);
-            }
-        });
-        addReader("Schematic.WEOffsetY", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                offsetY = (value);
-            }
-        });
-        addReader("Schematic.WEOffsetZ", new BiConsumer<Integer, Integer>() {
-            @Override
-            public void accept(Integer index, Integer value) {
-                offsetZ = (value);
-            }
-        });
+        addReader("Schematic.Height",
+            (BiConsumer<Integer, Short>) (index, value) -> height = (value));
+        addReader("Schematic.Width", (BiConsumer<Integer, Short>) (index, value) -> width = (value));
+        addReader("Schematic.Length",
+            (BiConsumer<Integer, Short>) (index, value) -> length = (value));
+        addReader("Schematic.WEOriginX",
+            (BiConsumer<Integer, Integer>) (index, value) -> originX = (value));
+        addReader("Schematic.WEOriginY",
+            (BiConsumer<Integer, Integer>) (index, value) -> originY = (value));
+        addReader("Schematic.WEOriginZ",
+            (BiConsumer<Integer, Integer>) (index, value) -> originZ = (value));
+        addReader("Schematic.WEOffsetX",
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetX = (value));
+        addReader("Schematic.WEOffsetY",
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetY = (value));
+        addReader("Schematic.WEOffsetZ",
+            (BiConsumer<Integer, Integer>) (index, value) -> offsetZ = (value));
     }
 
     private int height;
@@ -419,7 +376,7 @@ public class SchematicStreamer extends NBTStreamer {
     private FaweClipboard setupClipboard(int size) {
         if (fc != null) {
             if (fc.getDimensions().getX() == 0) {
-                fc.setDimensions(new Vector(size, 1, 1));
+                fc.setDimensions(BlockVector3.at(size, 1, 1));
             }
             return fc;
         }
@@ -432,16 +389,16 @@ public class SchematicStreamer extends NBTStreamer {
         }
     }
 
-    public Vector getOrigin() {
-        return new Vector(originX, originY, originZ);
+    public BlockVector3 getOrigin() {
+        return BlockVector3.at(originX, originY, originZ);
     }
 
-    public Vector getOffset() {
-        return new Vector(offsetX, offsetY, offsetZ);
+    public BlockVector3 getOffset() {
+        return BlockVector3.at(offsetX, offsetY, offsetZ);
     }
 
-    public Vector getDimensions() {
-        return new Vector(width, height, length);
+    public BlockVector3 getDimensions() {
+        return BlockVector3.at(width, height, length);
     }
 
     public void setClipboard(FaweClipboard clipboard) {
@@ -450,16 +407,17 @@ public class SchematicStreamer extends NBTStreamer {
 
     public Clipboard getClipboard() throws IOException {
         try {
+        	setupClipboard(0);
             addDimensionReaders();
             addBlockReaders();
             readFully();
-            Vector min = new Vector(originX, originY, originZ);
-            Vector offset = new Vector(offsetX, offsetY, offsetZ);
-            Vector origin = min.subtract(offset);
-            Vector dimensions = new Vector(width, height, length);
+            BlockVector3 min = BlockVector3.at(originX, originY, originZ);
+            BlockVector3 offset = BlockVector3.at(offsetX, offsetY, offsetZ);
+            BlockVector3 origin = min.subtract(offset);
+            BlockVector3 dimensions = BlockVector3.at(width, height, length);
             fc.setDimensions(dimensions);
             fixStates();
-            CuboidRegion region = new CuboidRegion(min, min.add(width, height, length).subtract(Vector.ONE));
+            CuboidRegion region = new CuboidRegion(min, min.add(width, height, length).subtract(BlockVector3.ONE));
             clipboard.init(region, fc);
             clipboard.setOrigin(origin);
             return clipboard;

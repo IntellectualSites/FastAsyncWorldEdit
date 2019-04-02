@@ -3,16 +3,22 @@ package com.sk89q.worldedit.function.mask;
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.extent.NullExtent;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -59,7 +65,7 @@ public class BlockMask extends AbstractExtentMask {
         for (int i = 0; i < bitSets.length; i++) {
             if (bitSets[i] != null) {
                 long[] set = bitSets[i];
-                BlockTypes type = BlockTypes.get(i);
+                BlockType type = BlockTypes.get(i);
                 if (set == ALL) {
                     strings.add(type.getId());
                 } else {
@@ -123,12 +129,18 @@ public class BlockMask extends AbstractExtentMask {
             return mask;
         }
     }
+//    public boolean test(BlockVector3 vector) {
+//        BlockStateHolder block = getExtent().getBlock(vector);
+//        for (BlockStateHolder testBlock : blocks) {
+//            if (testBlock.equalsFuzzy(block)) {
+//                return true;
+
 
     private Mask getOptimizedMask(BlockType type, long[] bitSet) {
         boolean single = true;
         int and = type.getInternalId();
         List<? extends Property> properties = type.getProperties();
-        for (AbstractProperty prop : (List<AbstractProperty>) type.getProperties()) {
+        for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
             List values = prop.getValues();
             int numSet = 0;
             for (int i = 0; i < values.size(); i++) {
@@ -218,7 +230,7 @@ public class BlockMask extends AbstractExtentMask {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         BlockStateHolder block = getExtent().getBlock(vector);
         long[] bitSet = bitSets[block.getInternalBlockTypeId()];
         if (bitSet == null) return false;

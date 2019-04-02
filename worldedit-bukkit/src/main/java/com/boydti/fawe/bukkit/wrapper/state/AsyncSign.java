@@ -14,6 +14,8 @@ public class AsyncSign extends AsyncBlockState implements Sign {
     public AsyncSign(AsyncBlock block, int combined) {
         super(block, combined);
     }
+    
+    private boolean isEditable = false;
 
     @Override
     public String[] getLines() {
@@ -51,4 +53,14 @@ public class AsyncSign extends AsyncBlockState implements Sign {
             map.put("Text" + (index + 1), new StringTag(toJson(line)));
         }
     }
+
+	@Override
+	public boolean isEditable() {
+		return this.isEditable;
+	}
+
+	@Override
+	public void setEditable(boolean arg0) {
+		this.isEditable = arg0;
+	}
 }

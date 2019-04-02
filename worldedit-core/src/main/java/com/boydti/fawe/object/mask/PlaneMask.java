@@ -1,8 +1,9 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask2D;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import javax.annotation.Nullable;
 
 /**
@@ -14,7 +15,7 @@ public class PlaneMask extends AbstractMask implements ResettableMask {
     private transient int originX = Integer.MAX_VALUE, originY = Integer.MAX_VALUE, originZ = Integer.MAX_VALUE;
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         switch (mode) {
             case -1:
                 originX = vector.getBlockX();

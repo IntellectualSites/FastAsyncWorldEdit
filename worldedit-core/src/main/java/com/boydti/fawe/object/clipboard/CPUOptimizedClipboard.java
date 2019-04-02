@@ -8,15 +8,16 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.ArrayList;
@@ -112,7 +113,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public void setDimensions(Vector dimensions) {
+    public void setDimensions(BlockVector3 dimensions) {
         width = dimensions.getBlockX();
         height = dimensions.getBlockY();
         length = dimensions.getBlockZ();
@@ -125,8 +126,8 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public Vector getDimensions() {
-        return new Vector(width, height, length);
+    public BlockVector3 getDimensions() {
+        return BlockVector3.at(width, height, length);
     }
 
     private int ylast;
@@ -139,23 +140,23 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
+    public BaseBlock getBlock(int x, int y, int z) {
         int index = getIndex(x, y, z);
         return getBlock(index);
     }
 
     @Override
-    public BlockState getBlock(int index) {
+    public BaseBlock getBlock(int index) {
         int combinedId = states[index];
-        BlockTypes type = BlockTypes.getFromStateId(combinedId);
-        BlockState state = type.withStateId(combinedId);
+        BlockType type = BlockTypes.getFromStateId(combinedId);
+        BaseBlock base = type.withStateId(combinedId).toBaseBlock();
         if (type.getMaterial().hasContainer()) {
             CompoundTag nbt = getTag(index);
             if (nbt != null) {
-                return new BaseBlock(state, nbt);
+                return base.toBaseBlock(nbt);
             }
         }
-        return state;
+        return base;
     }
 
     @Override
@@ -164,7 +165,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
             for (int y = 0, index = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++, index++) {
-                        BlockState block = getBlock(index);
+                        BaseBlock block = getBlock(index);
                         task.run(x, y, z, block);
                     }
                 }
@@ -173,14 +174,9 @@ public class CPUOptimizedClipboard extends FaweClipboard {
             for (int y = 0, index = 0; y < height; y++) {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++, index++) {
-                        BlockState block = getBlock(index);
-                        switch (block.getBlockType()) {
-                            case AIR:
-                            case CAVE_AIR:
-                            case VOID_AIR:
-                                continue;
-                            default:
-                                task.run(x, y, z, block);
+                        BaseBlock block = getBlock(index);
+                        if (!block.getMaterial().isAir()) {
+                            task.run(x, y, z, block);
                         }
                     }
                 }
@@ -236,16 +232,16 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return setBlock(getIndex(x, y, z), block);
     }
 
     @Override
-    public boolean setBlock(int index, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
         states[index] = block.getInternalId();
-        CompoundTag tile = block.getNbtData();
-        if (tile != null) {
-            setTile(index, tile);
+        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        if (hasNbt) {
+            setTile(index, ((BaseBlock)block).getNbtData());
         }
         return true;
     }

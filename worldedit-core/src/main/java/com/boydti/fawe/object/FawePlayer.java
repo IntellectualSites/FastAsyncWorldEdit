@@ -9,7 +9,6 @@ import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
-import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.*;
 import com.boydti.fawe.wrappers.FakePlayer;
@@ -17,13 +16,13 @@ import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.command.tool.BrushTool;
-import com.sk89q.worldedit.command.tool.Tool;
+
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.platform.*;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.*;
 import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
@@ -40,7 +39,6 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 public abstract class FawePlayer<T> extends Metadatable {
 
@@ -163,18 +161,10 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     private void setConfirmTask(@Nullable Runnable task, CommandContext context, String command) {
         if (task != null) {
-            Runnable newTask = new Runnable() {
-                @Override
-                public void run() {
-                    CommandManager.getInstance().handleCommandTask(new ThrowableSupplier<Throwable>() {
-                        @Override
-                        public Object get() throws Throwable {
-                            task.run();
-                            return null;
-                        }
-                    }, context.getLocals());
-                }
-            };
+            Runnable newTask = () -> CommandManager.getInstance().handleCommandTask(() -> {
+                task.run();
+                return null;
+            }, context.getLocals());
             setMeta("cmdConfirm", newTask);
         } else {
             setMeta("cmdConfirm", new CommandEvent(getPlayer(), command));
@@ -208,12 +198,13 @@ public abstract class FawePlayer<T> extends Metadatable {
     public void checkConfirmationStack(@Nullable Runnable task, String command, Region region, int times, CommandContext context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
-                Vector min = region.getMinimumPoint().toBlockVector();
-                Vector max = region.getMaximumPoint().toBlockVector();
+            	BlockVector3 min = region.getMinimumPoint();
+            	BlockVector3 max = region.getMaximumPoint();
                 long area = (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1)) * times;
                 if (area > 2 << 18) {
                     setConfirmTask(task, context, command);
-                    long volume = (long) max.subtract(min).add(Vector.ONE).volume() * times;
+                    BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
+                    long volume = (long) base.getX() * base.getZ() * base.getY() * times;
                     throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(min, max, command, NumberFormat.getNumberInstance().format(volume)));
                 }
             }
@@ -224,12 +215,13 @@ public abstract class FawePlayer<T> extends Metadatable {
     public void checkConfirmationRegion(@Nullable Runnable task, String command, Region region, CommandContext context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
-                Vector min = region.getMinimumPoint().toBlockVector();
-                Vector max = region.getMaximumPoint().toBlockVector();
+            	BlockVector3 min = region.getMinimumPoint();
+            	BlockVector3 max = region.getMaximumPoint();
                 long area = (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1));
                 if (area > 2 << 18) {
                     setConfirmTask(task, context, command);
-                    long volume = (long) max.subtract(min).add(Vector.ONE).volume();
+                    BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
+                    long volume = (long) base.getX() * base.getZ() * base.getY();
                     throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(min, max, command, NumberFormat.getNumberInstance().format(volume)));
                 }
             }
@@ -362,15 +354,15 @@ public abstract class FawePlayer<T> extends Metadatable {
                     }
                 } catch (EmptyClipboardException e) {
                 }
-                if (player != null && session != null) {
+                if (player != null) {
                     Clipboard clip = doc.toClipboard();
                     ClipboardHolder holder = new ClipboardHolder(clip);
                     getSession().setClipboard(holder);
                 }
             }
-        } catch (Exception ignore) {
+        } catch (Exception event) {
             Fawe.debug("====== INVALID CLIPBOARD ======");
-            MainUtil.handleError(ignore, false);
+            MainUtil.handleError(event, false);
             Fawe.debug("===============---=============");
             Fawe.debug("This shouldn't result in any failure");
             Fawe.debug("File: " + file.getName() + " (len:" + file.length() + ")");
@@ -561,8 +553,8 @@ public abstract class FawePlayer<T> extends Metadatable {
     @Deprecated
     public void setSelection(final RegionWrapper region) {
         final Player player = this.getPlayer();
-        Vector top = region.getMaximumPoint();
-        top.mutY(getWorld().getMaxY());
+        BlockVector3 top = region.getMaximumPoint();
+        top.withY(getWorld().getMaxY());
         final RegionSelector selector = new CuboidRegionSelector(player.getWorld(), region.getMinimumPoint(), top);
         this.getSession().setRegionSelector(player.getWorld(), selector);
     }
@@ -692,7 +684,7 @@ public abstract class FawePlayer<T> extends Metadatable {
 
         PlayerProxy proxy = new PlayerProxy(player, permActor, cuiActor, world);
         if (world instanceof VirtualWorld) {
-            proxy.setOffset(Vector.ZERO.subtract(((VirtualWorld) world).getOrigin()));
+            proxy.setOffset(Vector3.ZERO.subtract(((VirtualWorld) world).getOrigin()));
         }
         return proxy;
     }

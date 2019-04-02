@@ -20,35 +20,33 @@
 package com.sk89q.worldedit.function.pattern;
 
 import com.sk89q.minecraft.util.commands.Link;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.internal.expression.runtime.Return;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 
 /**
  * Returns a {@link BlockStateHolder} for a given position.
- * @deprecated Use FawePattern
  */
 @Link(clazz = UtilityCommands.class, value = "patterns")
-@Deprecated
-public interface Pattern extends com.sk89q.worldedit.patterns.Pattern{
+public interface Pattern{
 
-    @Override
-    default BaseBlock next(Vector position) {
-        return new BaseBlock(apply(position));
-    }
-
-    @Override
-    default BaseBlock next(int x, int y, int z) {
-        return new BaseBlock(apply(new Vector(x, y, z)));
-    }
+//    @Override
+//    default BaseBlock next(BlockVector3 position) {
+//        return new BaseBlock(apply(position));
+//    }
+//
+//    @Override
+//    default BaseBlock next(int x, int y, int z) {
+//        return new BaseBlock(apply(BlockVector3.at(x, y, z)));
+//    }
 
     /**
      * Return a {@link BlockStateHolder} for the given position.
@@ -56,10 +54,9 @@ public interface Pattern extends com.sk89q.worldedit.patterns.Pattern{
      * @param position the position
      * @return a block
      */
-    @Deprecated
-    BlockStateHolder apply(Vector position);
+    BaseBlock apply(BlockVector3 position);
 
-    default boolean apply(Extent extent, Vector get, Vector set) throws WorldEditException {
+    default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return extent.setBlock(set, apply(get));
     }
 }

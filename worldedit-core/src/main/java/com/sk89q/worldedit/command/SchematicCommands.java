@@ -45,6 +45,7 @@ import com.sk89q.worldedit.event.extent.PlayerSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
@@ -99,13 +100,13 @@ public class SchematicCommands extends MethodCommands {
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.web", "worldedit.schematic.load.asset"})
     public void loadall(final Player player, final LocalSession session, @Optional("schematic") final String formatName, final String filename, @Switch('r') boolean randomRotate) throws FilenameException {
-        final ClipboardFormat format = ClipboardFormat.findByAlias(formatName);
+        final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
             BBC.CLIPBOARD_INVALID_FORMAT.send(player, formatName);
             return;
         }
         try {
-            MultiClipboardHolder all = format.loadAllFromInput(player, filename, null, true);
+            MultiClipboardHolder all = ClipboardFormats.loadAllFromInput(player, filename, null, true);
             if (all != null) {
                 session.addClipboard(all);
                 BBC.SCHEMATIC_LOADED.send(player, filename);
@@ -175,7 +176,7 @@ public class SchematicCommands extends MethodCommands {
     @CommandPermissions({"worldedit.schematic.remap"})
     public void remap(final Player player, final LocalSession session) throws WorldEditException {
         ClipboardRemapper remapper;
-        if (Fawe.imp().getPlatform().equalsIgnoreCase("nukkit")) {
+        if (false) {
             remapper = new ClipboardRemapper(ClipboardRemapper.RemapPlatform.PC, ClipboardRemapper.RemapPlatform.PE);
         } else {
             remapper = new ClipboardRemapper(ClipboardRemapper.RemapPlatform.PE, ClipboardRemapper.RemapPlatform.PC);
@@ -192,7 +193,7 @@ public class SchematicCommands extends MethodCommands {
     @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.asset", "worldedit.schematic.load.web", "worldedit.schematic.load.other"})
     public void load(final Player player, final LocalSession session, @Optional() final String formatName, String filename) throws FilenameException {
         final LocalConfiguration config = this.worldEdit.getConfiguration();
-        ClipboardFormat format = formatName == null ? null : ClipboardFormat.findByAlias(formatName);
+        ClipboardFormat format = formatName == null ? null : ClipboardFormats.findByAlias(formatName);
         InputStream in = null;
         try {
             URI uri;
@@ -207,7 +208,7 @@ public class SchematicCommands extends MethodCommands {
                 ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 in = Channels.newInputStream(rbc);
                 uri = url.toURI();
-                if (format == null) format = ClipboardFormat.SCHEMATIC;
+                if (format == null) format = BuiltInClipboardFormat.MCEDIT_SCHEMATIC;
             } else {
                 if (!player.hasPermission("worldedit.schematic.load") && !player.hasPermission("worldedit.clipboard.load")) {
                     BBC.NO_PERM.send(player, "worldedit.clipboard.load");
@@ -235,7 +236,7 @@ public class SchematicCommands extends MethodCommands {
                     }
                     if (format == null && filename.matches(".*\\.[\\w].*")) {
                         String extension = filename.substring(filename.lastIndexOf('.') + 1, filename.length());
-                        format = ClipboardFormat.findByExtension(extension);
+                        format = ClipboardFormats.findByExtension(extension);
                     }
                     f = MainUtil.resolve(dir, filename, format, false);
                 }
@@ -250,7 +251,7 @@ public class SchematicCommands extends MethodCommands {
                     return;
                 }
                 if (format == null) {
-                    format = ClipboardFormat.findByFile(f);
+                    format = ClipboardFormats.findByFile(f);
                     if (format == null) {
                         BBC.CLIPBOARD_INVALID_FORMAT.send(player, f.getName());
                         return;
@@ -276,12 +277,12 @@ public class SchematicCommands extends MethodCommands {
         }
     }
 
-    @Command(aliases = {"save"}, usage = "[format] <filename>", desc = "Save a schematic into your clipboard")
+    @Command(aliases = {"save"}, usage = "[format] <filename>", desc = "Save a schematic into your clipboard", help = "The default format for 1.13 is schem")
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other"})
     public void save(final Player player, final LocalSession session, @Optional("schem") final String formatName, String filename, @Switch('g') boolean global) throws CommandException, WorldEditException {
         final LocalConfiguration config = this.worldEdit.getConfiguration();
-        final ClipboardFormat format = ClipboardFormat.findByAlias(formatName);
+        final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
             player.printError("Unknown schematic format: " + formatName);
             return;
@@ -298,14 +299,14 @@ public class SchematicCommands extends MethodCommands {
                 filename = filename.substring(3);
             }
         }
-        File f = this.worldEdit.getSafeSaveFile(player, dir, filename, format.getExtension(), format.getExtension());
-        if (f.getName().replaceAll("." + format.getExtension(), "").isEmpty()) {
+        File f = this.worldEdit.getSafeSaveFile(player, dir, filename, format.getPrimaryFileExtension(), format.getPrimaryFileExtension());
+        if (f.getName().replaceAll("." + format.getPrimaryFileExtension(), "").isEmpty()) {
             File directory = f.getParentFile();
             if (directory.exists()) {
                 int max = MainUtil.getMaxFileId(directory);
-                f = new File(directory, max + "." + format.getExtension());
+                f = new File(directory, max + "." + format.getPrimaryFileExtension());
             } else {
-                f = new File(directory, "1." + format.getExtension());
+                f = new File(directory, "1." + format.getPrimaryFileExtension());
             }
         }
         final File parent = f.getParentFile();
@@ -477,9 +478,9 @@ public class SchematicCommands extends MethodCommands {
         Message m = new Message(BBC.SCHEMATIC_FORMAT).newline();
         String baseCmd = Commands.getAlias(SchematicCommands.class, "schematic") + " " + Commands.getAlias(SchematicCommands.class, "save");
         boolean first = true;
-        for (final ClipboardFormat format : ClipboardFormat.values) {
+        for (final ClipboardFormat format : ClipboardFormats.getAll()) {
             StringBuilder builder = new StringBuilder();
-            builder.append(format.name()).append(": ");
+            builder.append(format.getName()).append(": ");
             for (final String lookupName : format.getAliases()) {
                 if (!first) {
                     builder.append(", ");
@@ -487,7 +488,7 @@ public class SchematicCommands extends MethodCommands {
                 builder.append(lookupName);
                 first = false;
             }
-            String cmd = baseCmd + " " + format.name() + " <filename>";
+            String cmd = baseCmd + " " + format.getName() + " <filename>";
             m.text(builder).suggestTip(cmd).newline();
             first = true;
         }

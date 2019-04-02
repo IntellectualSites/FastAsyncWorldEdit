@@ -23,9 +23,6 @@ package com.sk89q.jnbt;
  * The {@code TAG_End} tag.
  */
 public final class EndTag extends Tag {
-    public static final EndTag INSTANCE = new EndTag();
-
-    private EndTag() {}
 
     @Override
     public Object getValue() {

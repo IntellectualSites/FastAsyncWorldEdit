@@ -23,8 +23,8 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.util.gson.GsonUtil;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,7 +92,7 @@ public class SignBlock extends BaseBlock {
 
     @Override
     public CompoundTag getNbtData() {
-        Map<String, Tag> values = new HashMap<String, Tag>();
+        Map<String, Tag> values = new HashMap<>();
         values.put("Text1", new StringTag(text[0]));
         values.put("Text2", new StringTag(text[1]));
         values.put("Text3", new StringTag(text[2]));

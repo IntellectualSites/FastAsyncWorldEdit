@@ -18,8 +18,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -39,7 +42,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Consumer;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 /**
@@ -109,7 +114,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         this.parent = parent;
         this.queue = queue;
         if (queue instanceof BukkitQueue_0) {
-            this.adapter = (BukkitImplAdapter) ((BukkitQueue_0) queue).getAdapter();
+            this.adapter = BukkitQueue_0.getAdapter();
         } else {
             try {
                 this.adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
@@ -136,12 +141,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         if (queue != this.queue) {
             if (this.queue != null) {
                 final FaweQueue oldQueue = this.queue;
-                TaskManager.IMP.async(new Runnable() {
-                    @Override
-                    public void run() {
-                        oldQueue.flush();
-                    }
-                });
+                TaskManager.IMP.async(oldQueue::flush);
             }
             this.queue = queue;
         }
@@ -268,7 +268,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     public int getHighestBlockYAt(int x, int z) {
         for (int y = getMaxHeight() - 1; y >= 0; y--) {
             int stateId = queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
-            BlockTypes type = BlockTypes.getFromStateId(stateId);
+            BlockType type = BlockTypes.getFromStateId(stateId);
             if (!type.getMaterial().isAir()) return y;
         }
         return 0;
@@ -349,7 +349,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof World)) {
+        if (!(obj instanceof World)) {
             return false;
         }
         World other = (World) obj;
@@ -566,7 +566,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         return TaskManager.IMP.sync(new RunnableVal<Collection<T>>() {
             @Override
             public void run(Collection<T> value) {
-                this.value = (Collection<T>) parent.getEntitiesByClass(classes);
+                this.value = parent.getEntitiesByClass(classes);
             }
         });
     }
@@ -576,7 +576,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         return TaskManager.IMP.sync(new RunnableVal<Collection<T>>() {
             @Override
             public void run(Collection<T> value) {
-                this.value = (Collection<T>) parent.getEntitiesByClass(cls);
+                this.value = parent.getEntitiesByClass(cls);
             }
         });
     }
@@ -794,22 +794,12 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     @Deprecated
     public FallingBlock spawnFallingBlock(Location location, Material material, byte data) throws IllegalArgumentException {
-        return TaskManager.IMP.sync(new Supplier<FallingBlock>() {
-            @Override
-            public FallingBlock get() {
-                return parent.spawnFallingBlock(location, material, data);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, material, data));
     }
 
     @Override
     public FallingBlock spawnFallingBlock(Location location, BlockData blockData) throws IllegalArgumentException {
-        return TaskManager.IMP.sync(new Supplier<FallingBlock>() {
-            @Override
-            public FallingBlock get() {
-                return parent.spawnFallingBlock(location, blockData);
-            }
-        });
+        return TaskManager.IMP.sync(() -> parent.spawnFallingBlock(location, blockData));
     }
 
     @Override
@@ -1181,4 +1171,106 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
             }
         });
     }
+
+	@Override
+	public CompletableFuture<Chunk> getChunkAtAsync(int arg0, int arg1, boolean arg2) {
+		return parent.getChunkAtAsync(arg0, arg1, arg2);
+	}
+
+	@Override
+	public Collection<Entity> getNearbyEntities(BoundingBox arg0) {
+		return parent.getNearbyEntities(arg0);
+	}
+
+	@Override
+	public Collection<Entity> getNearbyEntities(BoundingBox arg0, Predicate<Entity> arg1) {
+		return parent.getNearbyEntities(arg0, arg1);
+	}
+
+	@Override
+	public Collection<Entity> getNearbyEntities(Location arg0, double arg1, double arg2, double arg3,
+			Predicate<Entity> arg4) {
+		return parent.getNearbyEntities(arg0, arg1, arg2, arg3, arg4);
+	}
+
+	@Override
+	public boolean isChunkForceLoaded(int arg0, int arg1) {
+		return parent.isChunkForceLoaded(arg0, arg1);
+	}
+
+	@Override
+	public boolean isDayTime() {
+		return parent.isDayTime();
+	}
+
+	@Override
+	public Location locateNearestStructure(Location arg0, StructureType arg1, int arg2, boolean arg3) {
+		return parent.locateNearestStructure(arg0, arg1, arg2, arg3);
+	}
+
+	@Override
+	public RayTraceResult rayTrace(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3, boolean arg4,
+			double arg5, Predicate<Entity> arg6) {
+		return parent.rayTrace(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+	}
+
+	@Override
+	public RayTraceResult rayTraceBlocks(Location arg0, Vector arg1, double arg2) {
+		return parent.rayTraceBlocks(arg0, arg1, arg2);
+	}
+
+	@Override
+	public RayTraceResult rayTraceBlocks(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3) {
+		return parent.rayTraceBlocks(arg0, arg1, arg2, arg3);
+	}
+
+	@Override
+	public RayTraceResult rayTraceBlocks(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3,
+			boolean arg4) {
+		return parent.rayTraceBlocks(arg0, arg1, arg2, arg3, arg4);
+	}
+
+	@Override
+	public RayTraceResult rayTraceEntities(Location arg0, Vector arg1, double arg2) {
+		return parent.rayTraceEntities(arg0, arg1, arg2);
+	}
+
+	@Override
+	public RayTraceResult rayTraceEntities(Location arg0, Vector arg1, double arg2, double arg3) {
+		return parent.rayTraceEntities(arg0, arg1, arg2, arg3);
+	}
+
+	@Override
+	public RayTraceResult rayTraceEntities(Location arg0, Vector arg1, double arg2, Predicate<Entity> arg3) {
+		return parent.rayTraceEntities(arg0, arg1, arg2, arg3);
+	}
+
+	@Override
+	public RayTraceResult rayTraceEntities(Location arg0, Vector arg1, double arg2, double arg3,
+			Predicate<Entity> arg4) {
+		return parent.rayTraceEntities(arg0, arg1, arg2, arg3, arg4);
+	}
+
+	@Override
+	public <T> void spawnParticle(Particle arg0, Location arg1, int arg2, double arg3, double arg4, double arg5,
+			double arg6, T arg7, boolean arg8) {
+		parent.spawnParticle(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+	}
+
+	@Override
+	public <T> void spawnParticle(Particle arg0, double arg1, double arg2, double arg3, int arg4, double arg5,
+			double arg6, double arg7, double arg8, T arg9, boolean arg10) {
+		parent.spawnParticle(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+		
+	}
+
+	@Override
+	public void setChunkForceLoaded(int x, int z, boolean forced) {
+		parent.setChunkForceLoaded(x, z, forced);
+	}
+
+	@Override
+	public Collection<Chunk> getForceLoadedChunks() {
+		return parent.getForceLoadedChunks();
+	}
 }

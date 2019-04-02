@@ -69,7 +69,7 @@ public class Expression {
 
     private static final ThreadLocal<ArrayDeque<Expression>> instance = ThreadLocal.withInitial(ArrayDeque::new);
 
-    private final Map<String, RValue> variables = new HashMap<String, RValue>();
+    private final Map<String, RValue> variables = new HashMap<>();
     private final String[] variableNames;
     private Variable[] variableArray;
     private RValue root;

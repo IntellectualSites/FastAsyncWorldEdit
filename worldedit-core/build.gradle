@@ -1,7 +1,7 @@
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 repositories {
-    maven {url "http://ci.athion.net/job/PlotSquared-Legacy/ws/mvn/"}
+    maven {url "http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/"}
 }
 dependencies {
     compile 'de.schlichtherle:truezip:6.8.3'
@@ -12,15 +12,15 @@ dependencies {
     compile 'com.thoughtworks.paranamer:paranamer:2.6'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.sk89q.lib:jlibnoise:1.0.0'
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
 
     // Fawe depends
     compile 'org.yaml:snakeyaml:1.19'
     compile 'net.fabiozumbi12:redprotect:1.9.6'
-    compile ("com.plotsquared:plotsquared-api:latest") {
+    compile ("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         transitive = false
     }
-//    compile 'org.primesoft:BlocksHub:2.0'
     compile 'com.github.luben:zstd-jni:1.1.1'
     compile 'co.aikar:fastutil-lite:1.0'
 }

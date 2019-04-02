@@ -16,12 +16,14 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.ClipboardPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.command.binding.Range;
@@ -45,7 +47,7 @@ public class PatternCommands extends MethodCommands {
     public PatternCommands(WorldEdit worldEdit) {
         super(worldEdit);
     }
-
+    
     @Command(
             aliases = {"#existing", "#*", "*", ".*"},
             desc = "Use the block that is already there",
@@ -190,7 +192,7 @@ public class PatternCommands extends MethodCommands {
                 clipboards = Collections.singletonList(clipboard);
                 break;
             default:
-                MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, location, null, true);
+                MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(player, location, null, true);
                 clipboards = multi != null ? multi.getHolders() : null;
                 break;
         }
@@ -266,7 +268,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern data(Actor actor, LocalSession session, Extent extent, BaseBiome biome) {
+    public Pattern biome(Actor actor, LocalSession session, Extent extent, BaseBiome biome) {
         return new BiomePattern(extent, biome);
     }
 
@@ -426,7 +428,7 @@ public class PatternCommands extends MethodCommands {
     )
     public Pattern expression(Actor actor, LocalSession session, Extent extent, String input) throws ExpressionException {
         Expression exp = Expression.compile(input, "x", "y", "z");
-        WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector.ONE, Vector.ZERO);
+        WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
         exp.setEnvironment(env);
         return new ExpressionPattern(exp);
     }

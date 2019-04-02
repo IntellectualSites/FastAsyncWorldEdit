@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.event.extent;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.Cancellable;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import java.net.URI;
 
 
@@ -35,11 +36,11 @@ public class PasteEvent extends Event implements Cancellable {
     private final Player player;
     private final Clipboard clipboard;
     private final URI uri;
-    private final Vector to;
+    private final BlockVector3 to;
     private final Extent extent;
     private boolean cancelled;
 
-    public PasteEvent(Player player, Clipboard clipboard, URI uri, Extent extent, Vector to) {
+    public PasteEvent(Player player, Clipboard clipboard, URI uri, Extent extent, BlockVector3 to) {
         this.player = player;
         this.clipboard = clipboard;
         this.uri = uri;
@@ -59,7 +60,7 @@ public class PasteEvent extends Event implements Cancellable {
         return uri;
     }
 
-    public Vector getPosition() {
+    public BlockVector3 getPosition() {
         return to;
     }
 

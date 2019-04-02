@@ -1,19 +1,19 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -27,7 +27,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     public final int mx, my, mz;
     private final boolean hasBiomes;
     private final boolean hasEntities;
-    private MutableBlockVector2D mutableBlockVector2D = new MutableBlockVector2D();
+    private MutableBlockVector2 MutableBlockVector2 = new MutableBlockVector2();
     public final Extent extent;
 
     public WorldCopyClipboard(Extent editSession, Region region) {
@@ -38,7 +38,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
         super(region);
         this.hasBiomes = hasBiomes;
         this.hasEntities = hasEntities;
-        final Vector origin = region.getMinimumPoint();
+        final BlockVector3 origin = region.getMinimumPoint();
         this.mx = origin.getBlockX();
         this.my = origin.getBlockY();
         this.mz = origin.getBlockZ();
@@ -46,17 +46,17 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
-        return extent.getLazyBlock(mx + x, my + y, mz + z);
+    public BaseBlock getBlock(int x, int y, int z) {
+        return extent.getFullBlock(BlockVector3.at(mx + x, my + y, mz + z));
     }
 
-    public BlockState getBlockAbs(int x, int y, int z) {
-        return extent.getLazyBlock(x, y, z);
+    public BaseBlock getBlockAbs(int x, int y, int z) {
+        return extent.getFullBlock(BlockVector3.at(x, y, z));
     }
 
     @Override
     public BaseBiome getBiome(int x, int z) {
-        return extent.getBiome(mutableBlockVector2D.setComponents(mx + x, mz + z));
+        return extent.getBiome(MutableBlockVector2.setComponents(mx + x, mz + z));
     }
 
     @Override
@@ -72,22 +72,21 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     @Override
     public void forEach(BlockReader task, boolean air) {
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
-        final Vector pos = new Vector();
+    	BlockVector3 min = region.getMinimumPoint();
+    	BlockVector3 max = region.getMaximumPoint();
+        MutableBlockVector3 pos = new MutableBlockVector3();
         if (region instanceof CuboidRegion) {
             if (air) {
                 ((CuboidRegion) region).setUseOldIterator(true);
                 RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
                     @Override
-                    public boolean apply(Vector pos) throws WorldEditException {
-                        BlockState block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                    public boolean apply(BlockVector3 pos) throws WorldEditException {
+                        BaseBlock block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
                         int x = pos.getBlockX() - mx;
                         int y = pos.getBlockY() - my;
                         int z = pos.getBlockZ() - mz;
-                        CompoundTag tag = block.getNbtData();
-                        if (tag != null) {
-                            Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+                        if (block.hasNbtData()) {
+                            Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
                             values.put("x", new IntTag(x));
                             values.put("y", new IntTag(y));
                             values.put("z", new IntTag(z));
@@ -102,15 +101,15 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                 cuboidEquivalent.setUseOldIterator(true);
                 RegionVisitor visitor = new RegionVisitor(cuboidEquivalent, new RegionFunction() {
                     @Override
-                    public boolean apply(Vector pos) throws WorldEditException {
+                    public boolean apply(BlockVector3 pos) throws WorldEditException {
                         int x = pos.getBlockX() - mx;
                         int y = pos.getBlockY() - my;
                         int z = pos.getBlockZ() - mz;
                         if (region.contains(pos)) {
-                            BlockState block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
-                            CompoundTag tag = block.getNbtData();
-                            if (tag != null) {
-                                Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+//                            BlockState block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                        	BaseBlock block = extent.getFullBlock(pos);
+                            if (block.hasNbtData()) {
+                                Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
                                 values.put("x", new IntTag(x));
                                 values.put("y", new IntTag(y));
                                 values.put("z", new IntTag(z));
@@ -137,13 +136,13 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                         pos.mutX(x);
                         int xx = pos.getBlockX() - mx;
                         if (region.contains(pos)) {
-                            BlockState block = getBlockAbs(x, y, z);
+//                            BlockState block = getBlockAbs(x, y, z);
+                        	BaseBlock block = extent.getFullBlock(pos);
                             if (!air && block.getBlockType().getMaterial().isAir()) {
                                 continue;
                             }
-                            CompoundTag tag = block.getNbtData();
-                            if (tag != null) {
-                                Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
+                            if (block.hasNbtData()) {
+                                Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
                                 values.put("x", new IntTag(xx));
                                 values.put("y", new IntTag(yy));
                                 values.put("z", new IntTag(zz));

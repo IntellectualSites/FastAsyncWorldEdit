@@ -1,6 +1,6 @@
 package com.boydti.fawe.util;
 
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -19,7 +19,7 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
-    public BlockTypes getNearestBlock(int color) {
+    public BlockType getNearestBlock(int color) {
         return parent.getNearestBlock(color);
     }
 
@@ -34,7 +34,7 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
-    public BlockTypes[] getNearestLayer(int color) {
+    public BlockType[] getNearestLayer(int color) {
         return parent.getNearestLayer(color);
     }
 

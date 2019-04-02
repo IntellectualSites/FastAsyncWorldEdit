@@ -2,9 +2,7 @@ package com.sk89q.worldedit.util.command.parametric;
 
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.util.chat.UsageMessage;
 import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.command.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -171,7 +169,7 @@ public abstract class AParametricCallable implements CommandCallable {
 
                 if (!found) {
                     if (unusedFlags == null) {
-                        unusedFlags = new HashSet<Character>();
+                        unusedFlags = new HashSet<>();
                     }
                     unusedFlags.add(flag);
                 }

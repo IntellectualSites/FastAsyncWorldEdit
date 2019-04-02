@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.collection;
 
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector2;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -13,9 +13,9 @@ import java.util.Set;
  * - All Vector2Ds must be within x[0,32768), y[0,32768)
  * - This will use 8 bytes for every 64 Vector2Ds (about 800x less than a HashSet)
  */
-public class LocalBlockVector2DSet implements Set<Vector2D> {
+public class LocalBlockVector2DSet implements Set<BlockVector2> {
     private final SparseBitSet set;
-    private final MutableBlockVector2D mutable = new MutableBlockVector2D();
+    private final MutableBlockVector2 mutable = new MutableBlockVector2();
 
     public LocalBlockVector2DSet() {
         this.set = new SparseBitSet();
@@ -41,8 +41,8 @@ public class LocalBlockVector2DSet implements Set<Vector2D> {
 
     @Override
     public boolean contains(Object o) {
-        if (o instanceof Vector2D) {
-            Vector2D v = (Vector2D) o;
+        if (o instanceof BlockVector2) {
+        	BlockVector2 v = (BlockVector2) o;
             return contains(v.getBlockX(), v.getBlockZ());
         }
         return false;
@@ -90,7 +90,7 @@ public class LocalBlockVector2DSet implements Set<Vector2D> {
         return false;
     }
 
-    public Vector2D getIndex(int getIndex) {
+    public BlockVector2 getIndex(int getIndex) {
         int size = size();
         if (getIndex > size) {
             return null;
@@ -108,8 +108,8 @@ public class LocalBlockVector2DSet implements Set<Vector2D> {
     }
 
     @Override
-    public Iterator<Vector2D> iterator() {
-        return new Iterator<Vector2D>() {
+    public Iterator<BlockVector2> iterator() {
+        return new Iterator<BlockVector2>() {
             int index = set.nextSetBit(0);
             int previous = -1;
 
@@ -124,7 +124,7 @@ public class LocalBlockVector2DSet implements Set<Vector2D> {
             }
 
             @Override
-            public Vector2D next() {
+            public BlockVector2 next() {
                 if (index != -1) {
                     int x = MathMan.unpairSearchCoordsX(index);
                     int y = MathMan.unpairSearchCoordsY(index);
@@ -147,14 +147,14 @@ public class LocalBlockVector2DSet implements Set<Vector2D> {
     public <T> T[] toArray(T[] array) {
         int size = size();
         if (array == null || array.length < size) {
-            array = (T[]) new BlockVector2D[size];
+            array = (T[]) new BlockVector2[size];
         }
         int index = 0;
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index);
             int x = MathMan.unpairSearchCoordsX(index);
             int y = MathMan.unpairSearchCoordsY(index);
-            array[i] = (T) new BlockVector2D(x, y);
+            array[i] = (T) BlockVector2.at(x, y);
             index++;
         }
         return array;
@@ -174,11 +174,11 @@ public class LocalBlockVector2DSet implements Set<Vector2D> {
     }
 
     @Override
-    public boolean add(Vector2D vector) {
+    public boolean add(BlockVector2 vector) {
         return add(vector.getBlockX(), vector.getBlockZ());
     }
 
-    private int getIndex(Vector2D vector) {
+    private int getIndex(BlockVector2 vector) {
         return MathMan.pairSearchCoords(vector.getBlockX(), vector.getBlockZ());
     }
 
@@ -200,8 +200,8 @@ public class LocalBlockVector2DSet implements Set<Vector2D> {
 
     @Override
     public boolean remove(Object o) {
-        if (o instanceof Vector2D) {
-            Vector2D v = (Vector2D) o;
+        if (o instanceof BlockVector2) {
+        	BlockVector2 v = (BlockVector2) o;
             return remove(v.getBlockX(), v.getBlockZ());
         }
         return false;
@@ -218,9 +218,9 @@ public class LocalBlockVector2DSet implements Set<Vector2D> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends Vector2D> c) {
+    public boolean addAll(Collection<? extends BlockVector2> c) {
         boolean result = false;
-        for (Vector2D v : c) {
+        for (BlockVector2 v : c) {
             result |= add(v);
         }
         return result;

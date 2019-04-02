@@ -36,9 +36,4 @@ public class NullItemCategoryRegistry implements ItemCategoryRegistry {
     public Set<ItemType> getAll(final Category<ItemType> category) {
         return Collections.emptySet();
     }
-
-    @Override
-    public Set<String> getCategories(ItemType categorised) {
-        return Collections.emptySet();
-    }
 }

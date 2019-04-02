@@ -9,10 +9,12 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
@@ -23,8 +25,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SweepBrush implements Brush, ResettableTool {
-    private List<Vector> positions;
-    private Vector position;
+    private List<BlockVector3> positions;
+    private BlockVector3 position;
     private int copies;
 
     private static final double tension = 0D;
@@ -37,7 +39,7 @@ public class SweepBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
         boolean visualization = editSession.getExtent() instanceof VisualExtent;
         if (visualization && positions.isEmpty()) {
             return;
@@ -59,7 +61,7 @@ public class SweepBrush implements Brush, ResettableTool {
 
         Interpolation interpol = new KochanekBartelsInterpolation();
         List<Node> nodes = positions.stream().map(v -> {
-            Node n = new Node(v);
+            Node n = new Node(v.toVector3());
             n.setTension(tension);
             n.setBias(bias);
             n.setContinuity(continuity);
@@ -74,7 +76,7 @@ public class SweepBrush implements Brush, ResettableTool {
         }
         Clipboard clipboard = holder.getClipboard();
 
-        Vector dimensions = clipboard.getDimensions();
+        BlockVector3 dimensions = clipboard.getDimensions();
         AffineTransform transform = new AffineTransform();
         if (dimensions.getBlockX() > dimensions.getBlockZ()) {
             transform = transform.rotateY(90);
@@ -93,10 +95,10 @@ public class SweepBrush implements Brush, ResettableTool {
                 double blockDistance = 1d / splineLength;
                 double step = blockDistance / quality;
                 double accumulation = 0;
-                Vector last = null;
+                MutableVector3 last = new MutableVector3(0, 0, 0);
                 for (double pos = 0D; pos <= 1D; pos += step) {
-                    Vector gradient = interpol.get1stDerivative(pos);
-                    if (last == null) last = new Vector(interpol.get1stDerivative(pos));
+                    Vector3 gradient = interpol.get1stDerivative(pos);
+                    if (last == null) last = new MutableVector3(interpol.get1stDerivative(pos));
                     double dist = MathMan.sqrtApprox(last.distanceSq(gradient));
                     last.mutX(gradient.getX());
                     last.mutY(gradient.getY());

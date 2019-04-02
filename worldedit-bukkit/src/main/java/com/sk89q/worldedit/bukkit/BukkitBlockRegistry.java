@@ -20,9 +20,9 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.bekvon.bukkit.residence.commands.material;
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.command.tool.BlockDataCyler;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -83,7 +83,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
 
     @Nullable
     @Override
-    public Map<String, ? extends Property> getProperties(BlockType blockType) {
+    public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.getProperties(blockType);

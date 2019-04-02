@@ -7,13 +7,12 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -31,7 +30,7 @@ public class VisualExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
@@ -62,7 +61,7 @@ public class VisualExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         // Do nothing
         return false;
     }

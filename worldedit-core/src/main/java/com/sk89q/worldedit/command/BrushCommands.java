@@ -39,17 +39,32 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Step;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.command.tool.brush.*;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.command.tool.brush.ButcherBrush;
+import com.sk89q.worldedit.command.tool.brush.ClipboardBrush;
+import com.sk89q.worldedit.command.tool.brush.CylinderBrush;
+import com.sk89q.worldedit.command.tool.brush.GravityBrush;
+import com.sk89q.worldedit.command.tool.brush.HollowCylinderBrush;
+import com.sk89q.worldedit.command.tool.brush.HollowSphereBrush;
+import com.sk89q.worldedit.command.tool.brush.SmoothBrush;
+import com.sk89q.worldedit.command.tool.brush.SphereBrush;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
-import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.command.InvalidUsageException;
 import com.sk89q.worldedit.util.command.binding.Range;
@@ -63,9 +78,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -268,8 +280,8 @@ public class BrushCommands extends BrushProcessor {
             max = 5
     )
     @CommandPermissions("worldedit.brush.rock")
-    public BrushSettings blobBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("10") Vector radius, @Optional("100") double sphericity, @Optional("30") double frequency, @Optional("50") double amplitude, CommandContext context) throws WorldEditException {
-        double max = MathMan.max(radius.getBlockX(), radius.getBlockY(), radius.getBlockZ());
+    public BrushSettings blobBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("10") Vector3 radius, @Optional("100") double sphericity, @Optional("30") double frequency, @Optional("50") double amplitude, CommandContext context) throws WorldEditException {
+        double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
         getWorldEdit().checkMaxBrushRadius(max);
         Brush brush = new BlobBrush(radius.divide(max), frequency / 100, amplitude / 100, sphericity / 100);
         return set(session, context,
@@ -458,7 +470,7 @@ public class BrushCommands extends BrushProcessor {
 
 
         try {
-            MultiClipboardHolder clipboards = ClipboardFormat.SCHEMATIC.loadAllFromInput(player, clipboard, null, true);
+            MultiClipboardHolder clipboards = ClipboardFormats.loadAllFromInput(player, clipboard, null, true);
             if (clipboards == null) {
                 BBC.SCHEMATIC_NOT_FOUND.send(player, clipboard);
                 return null;
@@ -600,7 +612,7 @@ public class BrushCommands extends BrushProcessor {
         ClipboardHolder holder = session.getClipboard();
         Clipboard clipboard = holder.getClipboard();
 
-        Vector size = clipboard.getDimensions();
+        BlockVector3 size = clipboard.getDimensions();
 
         getWorldEdit().checkMaxBrushRadius(size.getBlockX());
         getWorldEdit().checkMaxBrushRadius(size.getBlockY());

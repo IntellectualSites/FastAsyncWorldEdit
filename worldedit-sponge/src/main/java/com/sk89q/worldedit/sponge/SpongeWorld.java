@@ -24,18 +24,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
@@ -134,7 +136,7 @@ public abstract class SpongeWorld extends AbstractWorld {
     private static final BlockSnapshot.Builder builder = BlockSnapshot.builder();
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
         checkNotNull(position);
         checkNotNull(block);
 
@@ -162,12 +164,18 @@ public abstract class SpongeWorld extends AbstractWorld {
     }
 
     @Override
+    public boolean notifyAndLightBlock(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType) throws WorldEditException {
+        // TODO Move this to adapter
+        return false;
+    }
+
+    @Override
     public boolean regenerate(Region region, EditSession editSession) {
         return false;
     }
 
     @Override
-    public int getBlockLightLevel(Vector position) {
+    public int getBlockLightLevel(BlockVector3 position) {
         checkNotNull(position);
 
         BlockState state = getWorld().getBlock(new Vector3i(position.getX(), position.getY(), position.getZ()));
@@ -185,13 +193,13 @@ public abstract class SpongeWorld extends AbstractWorld {
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         checkNotNull(position);
         return new BaseBiome(SpongeWorldEdit.inst().getAdapter().resolve(getWorld().getBiome(position.getBlockX(), 0, position.getBlockZ())));
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         checkNotNull(position);
         checkNotNull(biome);
 
@@ -200,7 +208,7 @@ public abstract class SpongeWorld extends AbstractWorld {
     }
 
     @Override
-    public void dropItem(Vector position, BaseItemStack item) {
+    public void dropItem(Vector3 position, BaseItemStack item) {
         checkNotNull(position);
         checkNotNull(item);
 
@@ -218,7 +226,7 @@ public abstract class SpongeWorld extends AbstractWorld {
     }
 
     @Override
-    public void simulateBlockMine(Vector position) {
+    public void simulateBlockMine(BlockVector3 position) {
         // TODO
     }
 
@@ -247,7 +255,7 @@ public abstract class SpongeWorld extends AbstractWorld {
         List<Entity> entities = new ArrayList<>();
         for (org.spongepowered.api.entity.Entity entity : getWorld().getEntities()) {
             org.spongepowered.api.world.Location<World> loc = entity.getLocation();
-            if (region.contains(new Vector(loc.getX(), loc.getY(), loc.getZ()))) {
+            if (region.contains(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()))) {
                 entities.add(new SpongeEntity(entity));
             }
         }
@@ -279,7 +287,7 @@ public abstract class SpongeWorld extends AbstractWorld {
         }
 
         // Overwrite any data set by the NBT application
-        Vector dir = location.getDirection();
+        Vector3 dir = location.getDirection();
 
         newEnt.setLocationAndRotation(
                 new org.spongepowered.api.world.Location<>(getWorld(), pos),
@@ -311,6 +319,11 @@ public abstract class SpongeWorld extends AbstractWorld {
     @Override
     public void setWeather(WeatherType weatherType, long duration) {
         getWorld().setWeather(Sponge.getRegistry().getType(Weather.class, weatherType.getId()).get(), duration);
+    }
+
+    @Override
+    public BlockVector3 getSpawnPosition() {
+        return SpongeAdapter.asBlockVector(getWorld().getSpawnLocation());
     }
 
     /**

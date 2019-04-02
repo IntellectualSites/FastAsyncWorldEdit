@@ -57,7 +57,8 @@ public class ShellSetBrush extends Brush
             }
             else
             {
-                final ArrayList<AsyncBlock> blocks = new ArrayList<AsyncBlock>(((Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY)) / 2));
+                final ArrayList<AsyncBlock> blocks = new ArrayList<>(
+                    ((Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY)) / 2));
                 for (int y = lowY; y <= highY; y++)
                 {
                     for (int x = lowX; x <= highX; x++)

@@ -26,7 +26,7 @@ public class VoxelSniperListener implements Listener
 
     private static final String SNIPER_PERMISSION = "voxelsniper.sniper";
     private final VoxelSniper plugin;
-    private Map<String, VoxelCommand> commands = new HashMap<String, VoxelCommand>();
+    private Map<String, VoxelCommand> commands = new HashMap<>();
 
     /**
      * @param plugin
@@ -79,35 +79,32 @@ public class VoxelSniperListener implements Listener
         }
 
         FawePlayer fp = FawePlayer.wrap(player);
-        if (!fp.runAction(new Runnable() {
-            @Override
-            public void run() {
-                ExceptionConverter exceptionConverter = CommandManager.getInstance().getExceptionConverter();
+        if (!fp.runAction(() -> {
+            ExceptionConverter exceptionConverter = CommandManager.getInstance().getExceptionConverter();
+            try {
                 try {
-                    try {
-                        found.onCommand(player, split);
-                        return;
-                    } catch (Throwable t) {
-                        Throwable next = t;
+                    found.onCommand(player, split);
+                    return;
+                } catch (Throwable t) {
+                    Throwable next = t;
+                    exceptionConverter.convert(next);
+                    while (next.getCause() != null) {
+                        next = next.getCause();
                         exceptionConverter.convert(next);
-                        while (next.getCause() != null) {
-                            next = next.getCause();
-                            exceptionConverter.convert(next);
-                        }
-                        throw next;
                     }
-                } catch (CommandException e) {
-                    String message = e.getMessage();
-                    if (message != null) {
-                        fp.sendMessage(e.getMessage());
-                        return;
-                    }
-                    e.printStackTrace();
-                } catch (Throwable e) {
-                    e.printStackTrace();
+                    throw next;
                 }
-                fp.sendMessage("An unknown FAWE error has occurred! Please see console.");
+            } catch (CommandException e) {
+                String message = e.getMessage();
+                if (message != null) {
+                    fp.sendMessage(e.getMessage());
+                    return;
+                }
+                e.printStackTrace();
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
+            fp.sendMessage("An unknown FAWE error has occurred! Please see console.");
         }, false, true)) {
             BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
         }

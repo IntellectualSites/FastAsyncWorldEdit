@@ -36,9 +36,4 @@ public class NullBlockCategoryRegistry implements BlockCategoryRegistry {
     public Set<BlockType> getAll(final Category<BlockType> category) {
         return Collections.emptySet();
     }
-
-    @Override
-    public Set<String> getCategories(BlockType categorised) {
-        return Collections.emptySet();
-    }
 }

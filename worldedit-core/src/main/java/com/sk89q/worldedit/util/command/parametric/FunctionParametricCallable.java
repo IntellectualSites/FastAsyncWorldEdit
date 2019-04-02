@@ -15,9 +15,9 @@ public class FunctionParametricCallable extends AParametricCallable {
 
     private final ParametricBuilder builder;
     private final ParameterData[] parameters;
-    private final Set<Character> valueFlags = new HashSet<Character>();
+    private final Set<Character> valueFlags = new HashSet<>();
     private final boolean anyFlags;
-    private final Set<Character> legacyFlags = new HashSet<Character>();
+    private final Set<Character> legacyFlags = new HashSet<>();
     private final SimpleDescription description = new SimpleDescription();
     private final String permission;
     private final Command command;
@@ -33,10 +33,8 @@ public class FunctionParametricCallable extends AParametricCallable {
 
         List<Object[]> paramParsables = new ArrayList<>();
         {
-            Map<Type, Binding> bindings = builder.getBindings();
             Map<String, Type> unqualified = new HashMap<>();
-            for (Map.Entry<Type, Binding> entry : bindings.entrySet()) {
-                Type type = entry.getKey();
+            for (Type type : builder.getBindings().getTypes()) {
                 String typeStr = type.getTypeName();
                 unqualified.put(typeStr, type);
                 unqualified.put(typeStr.substring(typeStr.lastIndexOf('.') + 1), type);
@@ -81,7 +79,7 @@ public class FunctionParametricCallable extends AParametricCallable {
         }
 
         parameters = new ParameterData[paramParsables.size()];
-        List<Parameter> userParameters = new ArrayList<Parameter>();
+        List<Parameter> userParameters = new ArrayList<>();
 
         // This helps keep tracks of @Nullables that appear in the middle of a list
         // of parameters
@@ -117,7 +115,7 @@ public class FunctionParametricCallable extends AParametricCallable {
 
             // No special @annotation binding... let's check for the type
             if (parameter.getBinding() == null) {
-                parameter.setBinding(builder.getBindings().get(type));
+                parameter.setBinding(builder.getBindings());
 
                 // Don't know how to parse for this type of value
                 if (parameter.getBinding() == null) {

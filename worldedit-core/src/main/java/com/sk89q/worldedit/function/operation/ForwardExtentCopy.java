@@ -28,8 +28,10 @@ import com.boydti.fawe.object.function.block.CombinedBlockCopy;
 import com.boydti.fawe.object.function.block.SimpleBlockCopy;
 import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -38,6 +40,7 @@ import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskTestFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
+import com.sk89q.worldedit.function.block.ExtentBlockCopy;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
@@ -45,6 +48,7 @@ import com.sk89q.worldedit.function.visitor.EntityVisitor;
 import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
@@ -67,8 +71,8 @@ public class ForwardExtentCopy implements Operation {
     private final Extent source;
     private final Extent destination;
     private final Region region;
-    private final Vector from;
-    private final Vector to;
+    private final BlockVector3 from;
+    private final BlockVector3 to;
     private int repetitions = 1;
     private Mask sourceMask = Masks.alwaysTrue();
     private boolean removingEntities;
@@ -87,10 +91,10 @@ public class ForwardExtentCopy implements Operation {
      * @param source      the source extent
      * @param region      the region to copy
      * @param destination the destination extent
-     * @param to          the destination position
-     * @see #ForwardExtentCopy(Extent, Region, Vector, Extent, Vector) the main constructor
+     * @param to the destination position
+     * @see #ForwardExtentCopy(Extent, Region, BlockVector3, Extent, BlockVector3) the main constructor
      */
-    public ForwardExtentCopy(Extent source, Region region, Extent destination, Vector to) {
+    public ForwardExtentCopy(Extent source, Region region, Extent destination, BlockVector3 to) {
         this(source, region, region.getMinimumPoint(), destination, to);
     }
 
@@ -103,7 +107,7 @@ public class ForwardExtentCopy implements Operation {
      * @param destination the destination extent
      * @param to          the destination position
      */
-    public ForwardExtentCopy(Extent source, Region region, Vector from, Extent destination, Vector to) {
+    public ForwardExtentCopy(Extent source, Region region, BlockVector3 from, Extent destination, BlockVector3 to) {
         checkNotNull(source);
         checkNotNull(region);
         checkNotNull(from);
@@ -262,9 +266,9 @@ public class ForwardExtentCopy implements Operation {
         }
 
         Extent finalDest = destination;
-        Vector translation = to.subtract(from);
+        BlockVector3 translation = to.subtract(from);
 
-        if (!translation.equals(Vector.ZERO)) {
+        if (!translation.equals(BlockVector3.ZERO)) {
             finalDest = new BlockTranslateExtent(finalDest, translation.getBlockX(), translation.getBlockY(), translation.getBlockZ());
         }
 
@@ -301,29 +305,28 @@ public class ForwardExtentCopy implements Operation {
             RegionFunction maskFunc = null;
 
             if (sourceFunction != null) {
-                Vector disAbs = translation.positive();
-                Vector size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
+                BlockVector3 disAbs = translation.abs();
+                BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
                 boolean overlap = (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size.getBlockZ());
 
                 RegionFunction copySrcFunc = sourceFunction;
                 if (overlap && translation.length() != 0) {
-                    MutableBlockVector mutable = new MutableBlockVector();
 
                     int x = translation.getBlockX();
                     int y = translation.getBlockY();
                     int z = translation.getBlockZ();
 
                     maskFunc = position -> {
-                        mutable.setComponents(position.getBlockX() + x, position.getBlockY() + y, position.getBlockZ() + z);
-                        if (region.contains(mutable)) {
-                            return sourceFunction.apply(mutable);
+                        BlockVector3 bv = BlockVector3.at(position.getBlockX() + x, position.getBlockY() + y, position.getBlockZ() + z);
+                        if (region.contains(bv)) {
+                            return sourceFunction.apply(bv);
                         }
                         return false;
                     };
 
                     copySrcFunc = position -> {
-                        mutable.setComponents(position.getBlockX() - x, position.getBlockY() - y, position.getBlockZ() - z);
-                        if (!region.contains(mutable)) {
+                        BlockVector3 bv = BlockVector3.at(position.getBlockX() - x, position.getBlockY() - y, position.getBlockZ() - z);
+                        if (!region.contains(bv)) {
                             return sourceFunction.apply(position);
                         }
                         return false;
@@ -354,7 +357,7 @@ public class ForwardExtentCopy implements Operation {
                     .stream()
                     .filter(entity -> entity.getState() != null &&
                             !entity.getState().getType().getId().equals("minecraft:player") &&
-                            region.contains(entity.getLocation().toVector()))
+                            region.contains(entity.getLocation().toBlockPoint()))
                     .collect(Collectors.toList());
         } else {
             entities = new ArrayList<>();
@@ -365,7 +368,9 @@ public class ForwardExtentCopy implements Operation {
             Operations.completeBlindly(blockCopy);
 
             if (!entities.isEmpty()) {
-                ExtentEntityCopy entityCopy = new ExtentEntityCopy(from, destination, to, currentTransform);
+                ExtentEntityCopy entityCopy = new ExtentEntityCopy(from.toVector3(), destination, to.toVector3(), currentTransform);
+//            if (copyingEntities) {
+//                ExtentEntityCopy entityCopy = new ExtentEntityCopy(from, destination, to, currentTransform);
                 entityCopy.setRemoving(removingEntities);
                 EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
                 Operations.completeBlindly(entityVisitor);

@@ -21,22 +21,25 @@ package com.sk89q.worldedit;
 
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.MainUtil;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.command.ClipboardCommands;
 import com.sk89q.worldedit.command.FlattenedClipboardTransform;
 import com.sk89q.worldedit.command.SchematicCommands;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.DataException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -85,18 +88,18 @@ public class CuboidClipboard {
 
     private BlockArrayClipboard clipboard;
     private AffineTransform transform;
-    public Vector size;
+    public BlockVector3 size;
 
     /**
      * Constructs the clipboard.
      *
      * @param size the dimensions of the clipboard (should be at least 1 on every dimension)
      */
-    public CuboidClipboard(Vector size) {
+    public CuboidClipboard(BlockVector3 size) {
         checkNotNull(size);
         MainUtil.warnDeprecated(BlockArrayClipboard.class, ClipboardFormat.class);
         this.size = size;
-        this.clipboard = this.init(Vector.ZERO, Vector.ZERO);
+        this.clipboard = this.init(BlockVector3.ZERO, BlockVector3.ZERO);
     }
 
     public CuboidClipboard(BlockArrayClipboard clipboard) {
@@ -111,12 +114,12 @@ public class CuboidClipboard {
      * @param origin the origin point where the copy was made, which must be the
      *               {@link CuboidRegion#getMinimumPoint()} relative to the copy
      */
-    public CuboidClipboard(Vector size, Vector origin) {
+    public CuboidClipboard(BlockVector3 size, BlockVector3 origin) {
         checkNotNull(size);
         checkNotNull(origin);
         MainUtil.warnDeprecated(BlockArrayClipboard.class, ClipboardFormat.class);
         this.size = size;
-        this.clipboard = init(Vector.ZERO, origin);
+        this.clipboard = init(BlockVector3.ZERO, origin);
     }
 
     /**
@@ -127,7 +130,7 @@ public class CuboidClipboard {
      *               {@link CuboidRegion#getMinimumPoint()} relative to the copy
      * @param offset the offset from the minimum point of the copy where the user was
      */
-    public CuboidClipboard(Vector size, Vector origin, Vector offset) {
+    public CuboidClipboard(BlockVector3 size, BlockVector3 origin, BlockVector3 offset) {
         checkNotNull(size);
         checkNotNull(origin);
         checkNotNull(offset);
@@ -138,40 +141,41 @@ public class CuboidClipboard {
 
     /* ------------------------------------------------------------------------------------------------------------- */
 
-    private BlockArrayClipboard init(Vector offset, Vector min) {
-        Vector origin = min.subtract(offset);
-        CuboidRegion  region = new CuboidRegion(min, min.add(size).subtract(Vector.ONE));
+    private BlockArrayClipboard init(BlockVector3 offset, BlockVector3 min) {
+    	BlockVector3 origin = min.subtract(offset);
+        CuboidRegion  region = new CuboidRegion(min, min.add(size).subtract(BlockVector3.ONE));
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
         clipboard.setOrigin(origin);
         return clipboard;
     }
 
     private BaseBlock adapt(BlockState state) {
-        if (state instanceof BaseBlock) return (BaseBlock) state;
+//        if (state instanceof BaseBlock) return (BaseBlock) state;
         return new BaseBlock(state);
     }
 
     /* ------------------------------------------------------------------------------------------------------------- */
 
-    public BaseBlock getBlock(Vector position) {
+    public BaseBlock getBlock(BlockVector3 position) {
         return getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
 
     public BaseBlock getBlock(int x, int y, int z) {
-        return adapt(clipboard.IMP.getBlock(x, y, z));
+//        return adapt(clipboard.IMP.getBlock(x, y, z));
+    	return clipboard.IMP.getBlock(x, y, z);
     }
 
-    public BaseBlock getLazyBlock(Vector position) {
+    public BaseBlock getLazyBlock(BlockVector3 position) {
         return getBlock(position);
     }
 
-    public void setBlock(Vector location, BaseBlock block) {
+    public void setBlock(BlockVector3 location, BaseBlock block) {
         setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
     public boolean setBlock(int x, int y, int z, BaseBlock block) {
-        return setBlock(x, y, z, (BlockState) block);
+        return setBlock(x, y, z, block);
     }
 
     public boolean setBlock(int x, int y, int z, BlockState block) {
@@ -235,7 +239,7 @@ public class CuboidClipboard {
     public void flip(FlipDirection dir, boolean aroundPlayer) {
         checkNotNull(dir);
         Direction direction = dir.direction;
-        AffineTransform newTransform = new AffineTransform().scale(direction.toVector().positive().multiply(-2).add(1, 1, 1));
+        AffineTransform newTransform = new AffineTransform().scale(direction.toVector().abs().multiply(-2).add(1, 1, 1));
         this.transform = transform == null ? newTransform : newTransform.combine(transform);
     }
 
@@ -248,7 +252,7 @@ public class CuboidClipboard {
         for (int x = 0; x < size.getBlockX(); ++x) {
             for (int y = 0; y < size.getBlockY(); ++y) {
                 for (int z = 0; z < size.getBlockZ(); ++z) {
-                    setBlock(x, y, z, editSession.getBlock(new Vector(x, y, z).add(getOrigin())));
+                    setBlock(x, y, z, editSession.getBlock(BlockVector3.at(x, y, z).add(getOrigin())));
                 }
             }
         }
@@ -264,11 +268,11 @@ public class CuboidClipboard {
         for (int x = 0; x < size.getBlockX(); ++x) {
             for (int y = 0; y < size.getBlockY(); ++y) {
                 for (int z = 0; z < size.getBlockZ(); ++z) {
-                    final Vector pt = new Vector(x, y, z).add(getOrigin());
+                    final BlockVector3 pt = BlockVector3.at(x, y, z).add(getOrigin());
                     if (region.contains(pt)) {
                         setBlock(x, y, z, editSession.getBlock(pt));
                     } else {
-                        setBlock(x, y, z, null);
+                        setBlock(x, y, z, (BlockState)null);
                     }
                 }
             }
@@ -288,7 +292,7 @@ public class CuboidClipboard {
      * @param noAir       true to not copy air blocks in the source
      * @throws MaxChangedBlocksException thrown if too many blocks were changed
      */
-    public void paste(EditSession editSession, Vector newOrigin, boolean noAir) throws MaxChangedBlocksException {
+    public void paste(EditSession editSession, BlockVector3 newOrigin, boolean noAir) throws MaxChangedBlocksException {
         paste(editSession, newOrigin, noAir, false);
     }
 
@@ -306,7 +310,7 @@ public class CuboidClipboard {
      * @param entities    true to copy entities
      * @throws MaxChangedBlocksException thrown if too many blocks were changed
      */
-    public void paste(EditSession editSession, Vector newOrigin, boolean noAir, boolean entities) throws MaxChangedBlocksException {
+    public void paste(EditSession editSession, BlockVector3 newOrigin, boolean noAir, boolean entities) throws MaxChangedBlocksException {
         new Schematic(clipboard).paste(editSession, newOrigin, false, !noAir, entities, transform);
         editSession.flushQueue();
     }
@@ -324,7 +328,7 @@ public class CuboidClipboard {
      * @param noAir       true to not copy air blocks in the source
      * @throws MaxChangedBlocksException thrown if too many blocks were changed
      */
-    public void place(EditSession editSession, Vector newOrigin, boolean noAir) throws MaxChangedBlocksException {
+    public void place(EditSession editSession, BlockVector3 newOrigin, boolean noAir) throws MaxChangedBlocksException {
         paste(editSession, newOrigin, noAir, false);
     }
 
@@ -339,7 +343,7 @@ public class CuboidClipboard {
      * @deprecated use {@link #getBlock(Vector)} instead
      */
     @Deprecated
-    public BaseBlock getPoint(Vector position) throws ArrayIndexOutOfBoundsException {
+    public BaseBlock getPoint(BlockVector3 position) throws ArrayIndexOutOfBoundsException {
         final BaseBlock block = getBlock(position);
         if (block == null) {
             return new BaseBlock(BlockTypes.AIR);
@@ -355,7 +359,7 @@ public class CuboidClipboard {
      *
      * @return the origin
      */
-    public Vector getOrigin() {
+    public BlockVector3 getOrigin() {
         return clipboard.getMinimumPoint();
     }
 
@@ -366,14 +370,14 @@ public class CuboidClipboard {
      *
      * @param origin the origin to set
      */
-    public void setOrigin(Vector origin) {
+    public void setOrigin(BlockVector3 origin) {
         checkNotNull(origin);
         setOriginAndOffset(getOffset(), origin);
     }
 
-    public void setOriginAndOffset(Vector offset, Vector min) {
-        Vector origin = min.subtract(offset);
-        CuboidRegion  region = new CuboidRegion(min, min.add(size).subtract(Vector.ONE));
+    public void setOriginAndOffset(BlockVector3 offset, BlockVector3 min) {
+    	BlockVector3 origin = min.subtract(offset);
+        CuboidRegion  region = new CuboidRegion(min, min.add(size).subtract(BlockVector3.ONE));
         clipboard.setRegion(region);
         clipboard.setOrigin(origin);
     }
@@ -386,10 +390,10 @@ public class CuboidClipboard {
      *
      * @return the offset the offset
      */
-    public Vector getOffset() {
-        Vector min = clipboard.getMinimumPoint();
-        Vector origin = clipboard.getOrigin();
-        Vector offset = min.subtract(origin);
+    public BlockVector3 getOffset() {
+    	BlockVector3 min = clipboard.getMinimumPoint();
+    	BlockVector3 origin = clipboard.getOrigin();
+    	BlockVector3 offset = min.subtract(origin);
         return offset;
     }
 
@@ -401,7 +405,7 @@ public class CuboidClipboard {
      *
      * @param offset the new offset
      */
-    public void setOffset(Vector offset) {
+    public void setOffset(BlockVector3 offset) {
         checkNotNull(offset);
         setOriginAndOffset(offset, getOrigin());
     }
@@ -411,7 +415,7 @@ public class CuboidClipboard {
      *
      * @return the dimensions, where (1, 1, 1) is 1 wide, 1 across, 1 deep
      */
-    public Vector getSize() {
+    public BlockVector3 getSize() {
         return size;
     }
 
@@ -433,7 +437,7 @@ public class CuboidClipboard {
             Operations.completeLegacy(result.copyTo(target));
             this.clipboard = target;
         }
-        new Schematic(clipboard).save(path, ClipboardFormat.SPONGE_SCHEMATIC);
+        new Schematic(clipboard).save(path, BuiltInClipboardFormat.SPONGE_SCHEMATIC);
     }
 
     /**
@@ -448,7 +452,7 @@ public class CuboidClipboard {
     @Deprecated
     public static CuboidClipboard loadSchematic(File path) throws DataException, IOException {
         checkNotNull(path);
-        return new CuboidClipboard((Vector) ClipboardFormat.SCHEMATIC.load(path).getClipboard());
+        return new CuboidClipboard((BlockVector3) BuiltInClipboardFormat.MCEDIT_SCHEMATIC.load(path).getClipboard());
     }
 
     /**
@@ -476,7 +480,7 @@ public class CuboidClipboard {
         List<Countable<BaseBlock>> distribution = new ArrayList<>();
         List<Countable<BlockStateHolder>> distr = clipboard.getBlockDistributionWithData(clipboard.getRegion());
         for (Countable<BlockStateHolder> item : distr) {
-            distribution.add(new Countable<>(new BaseBlock(item.getID()), item.getAmount()));
+            distribution.add(new Countable<>(item.getID().toBaseBlock(), item.getAmount()));
         }
         return distribution;
     }

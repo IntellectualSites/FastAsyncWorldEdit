@@ -14,6 +14,9 @@ import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Iterator;
@@ -69,7 +72,7 @@ public class BukkitImageListener implements Listener {
             String name = player.getName().toLowerCase();
             if (!event.getMessage().toLowerCase().contains(name)) {
                 ArrayDeque<String> buffered = fp.getMeta("CFIBufferedMessages");
-                if (buffered == null) fp.setMeta("CFIBufferedMessaged", buffered = new ArrayDeque<String>());
+                if (buffered == null) fp.setMeta("CFIBufferedMessaged", buffered = new ArrayDeque<>());
                 String full = String.format(event.getFormat(), event.getPlayer().getDisplayName(), event.getMessage());
                 buffered.add(full);
                 iter.remove();
@@ -100,7 +103,7 @@ public class BukkitImageListener implements Listener {
             if (event.getHand() == EquipmentSlot.OFF_HAND) return;
         } catch (NoSuchFieldError | NoSuchMethodError ignored) {}
 
-        List<Block> target = player.getLastTwoTargetBlocks((Set<Material>) null, 100);
+        List<Block> target = player.getLastTwoTargetBlocks(null, 100);
         if (target.isEmpty()) return;
 
         Block targetBlock = target.get(0);
@@ -148,7 +151,7 @@ public class BukkitImageListener implements Listener {
         if (generator == null) return null;
 
         ImageViewer viewer = generator.getImageViewer();
-        if (viewer == null || !(viewer instanceof BukkitImageViewer)) return null;
+        if (!(viewer instanceof BukkitImageViewer)) return null;
 
         BukkitImageViewer biv = (BukkitImageViewer) viewer;
         return biv;
@@ -182,12 +185,7 @@ public class BukkitImageListener implements Listener {
         if (frames == null || tool == null) {
             viewer.selectFrame(itemFrame);
             player.updateInventory();
-            TaskManager.IMP.laterAsync(new Runnable() {
-                @Override
-                public void run() {
-                    viewer.view(generator);
-                }
-            }, 1);
+            TaskManager.IMP.laterAsync(() -> viewer.view(generator), 1);
             return;
         }
 
@@ -246,27 +244,24 @@ public class BukkitImageListener implements Listener {
 
                     if (worldX < 0 || worldX > width || worldZ < 0 || worldZ > length) return;
 
-                    Vector wPos = new Vector(worldX, 0, worldZ);
 
-                    fp.runAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            viewer.refresh();
-                            int topY = generator.getNearestSurfaceTerrainBlock(wPos.getBlockX(), wPos.getBlockZ(), 255, 0, 255);
-                            wPos.mutY(topY);
+                    fp.runAction(() -> {
+                        BlockVector3 wPos = BlockVector3.at(worldX, 0, worldZ);
+                        viewer.refresh();
+                        int topY = generator.getNearestSurfaceTerrainBlock(wPos.getBlockX(), wPos.getBlockZ(), 255, 0, 255);
+                        wPos = wPos.withY(topY);
 
-                            EditSession es = new EditSessionBuilder(fp.getWorld()).player(fp).combineStages(false).autoQueue(false).blockBag(null).limitUnlimited().build();
-                            ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();
-                            if (last.get() instanceof FastWorldEditExtent) last = last.previous();
-                            last.setNext(generator);
-                            try {
-                                brush.build(es, wPos, context.getMaterial(), context.getSize());
-                            } catch (WorldEditException e) {
-                                e.printStackTrace();
-                            }
-                            es.flushQueue();
-                            viewer.view(generator);
+                        EditSession es = new EditSessionBuilder(fp.getWorld()).player(fp).combineStages(false).autoQueue(false).blockBag(null).limitUnlimited().build();
+                        ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();
+                        if (last.get() instanceof FastWorldEditExtent) last = last.previous();
+                        last.setNext(generator);
+                        try {
+                            brush.build(es, wPos, context.getMaterial(), context.getSize());
+                        } catch (WorldEditException e) {
+                            e.printStackTrace();
                         }
+                        es.flushQueue();
+                        viewer.view(generator);
                     }, true, true);
 
 

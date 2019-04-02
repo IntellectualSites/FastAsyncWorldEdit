@@ -4,8 +4,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
 import com.boydti.fawe.object.number.MutableLong;
 import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -53,7 +52,7 @@ public class MappedReplacePatternFilter extends MCAFilterCounter {
 //        map[block.getCombined()] = pattern;
     }
 
-    private final MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+//    private final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
     @Override
     public void applyBlock(int x, int y, int z, BaseBlock block, MutableLong ignore) {

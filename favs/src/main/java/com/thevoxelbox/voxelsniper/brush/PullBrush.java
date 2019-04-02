@@ -14,7 +14,7 @@ import java.util.HashSet;
  */
 public class PullBrush extends Brush
 {
-    private final HashSet<BlockWrapper> surface = new HashSet<BlockWrapper>();
+    private final HashSet<BlockWrapper> surface = new HashSet<>();
     private int vh;
     private double c1 = 1;
     private double c2 = 0;

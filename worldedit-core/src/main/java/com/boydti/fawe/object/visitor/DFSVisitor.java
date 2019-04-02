@@ -2,12 +2,13 @@ package com.boydti.fawe.object.visitor;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.IntegerTrio;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class DFSVisitor implements Operation {
 
     private final RegionFunction function;
-    private final List<Vector> directions = new ArrayList<>();
+    private final List<BlockVector3> directions = new ArrayList<>();
     private final Map<Node, AtomicInteger> visited;
     private final ArrayDeque<NodePair> queue;
     private final HashSet<Node> hashQueue;
@@ -37,32 +38,32 @@ public abstract class DFSVisitor implements Operation {
         this.hashQueue = new LinkedHashSet<>();
         this.visited = new LinkedHashMap<>();
         this.function = function;
-        this.directions.add(new Vector(0, -1, 0));
-        this.directions.add(new Vector(0, 1, 0));
-        this.directions.add(new Vector(-1, 0, 0));
-        this.directions.add(new Vector(1, 0, 0));
-        this.directions.add(new Vector(0, 0, -1));
-        this.directions.add(new Vector(0, 0, 1));
+        this.directions.add(BlockVector3.at(0, -1, 0));
+        this.directions.add(BlockVector3.at(0, 1, 0));
+        this.directions.add(BlockVector3.at(-1, 0, 0));
+        this.directions.add(BlockVector3.at(1, 0, 0));
+        this.directions.add(BlockVector3.at(0, 0, -1));
+        this.directions.add(BlockVector3.at(0, 0, 1));
         this.maxDepth = maxDepth;
         this.maxBranch = maxBranching;
     }
 
-    public abstract boolean isVisitable(Vector from, Vector to);
+    public abstract boolean isVisitable(BlockVector3 from, BlockVector3 to);
 
-    public List<Vector> getDirections() {
+    public List<BlockVector3> getDirections() {
         return this.directions;
     }
 
     private IntegerTrio[] getIntDirections() {
         IntegerTrio[] array = new IntegerTrio[directions.size()];
         for (int i = 0; i < array.length; i++) {
-            Vector dir = directions.get(i);
+        	BlockVector3 dir = directions.get(i);
             array[i] = new IntegerTrio(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
         }
         return array;
     }
 
-    public void visit(final Vector pos) {
+    public void visit(final BlockVector3 pos) {
         Node node = new Node(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
         if (!this.hashQueue.contains(node)) {
             isVisitable(pos, pos); // Ignore this, just to initialize mask on this point
@@ -76,8 +77,8 @@ public abstract class DFSVisitor implements Operation {
         NodePair current;
         Node from;
         Node adjacent;
-        MutableBlockVector mutable = new MutableBlockVector();
-        Vector mutable2 = new Vector();
+//        MutableBlockVector3 mutable = new MutableBlockVector3();
+//        MutableBlockVector3 mutable2 = new MutableBlockVector3();
         int countAdd, countAttempt;
         IntegerTrio[] dirs = getIntDirections();
 
@@ -88,18 +89,20 @@ public abstract class DFSVisitor implements Operation {
             if (visited.containsKey(from)) {
                 continue;
             }
-            mutable.mutX(from.getX());
-            mutable.mutY(from.getY());
-            mutable.mutZ(from.getZ());
-            function.apply(mutable);
+//            mutable.mutX(from.getX());
+//            mutable.mutY(from.getY());
+//            mutable.mutZ(from.getZ());
+            BlockVector3 bv = BlockVector3.at(from.getX(), from.getY(), from.getZ());
+            function.apply(bv);
             countAdd = 0;
             countAttempt = 0;
             for (IntegerTrio direction : dirs) {
-                mutable2.mutX(from.getX() + direction.x);
-                mutable2.mutY(from.getY() + direction.y);
-                mutable2.mutZ(from.getZ() + direction.z);
-                if (isVisitable(mutable, mutable2)) {
-                    adjacent = new Node(mutable2.getBlockX(), mutable2.getBlockY(), mutable2.getBlockZ());
+//                mutable2.mutX(from.getX() + direction.x);
+//                mutable2.mutY(from.getY() + direction.y);
+//                mutable2.mutZ(from.getZ() + direction.z);
+            	BlockVector3 bv2 = BlockVector3.at(from.getX() + direction.x, from.getY() + direction.y, from.getZ() + direction.z);
+                if (isVisitable(bv, bv2)) {
+                    adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
                     if ((current.from == null || !adjacent.equals(current.from))) {
                         AtomicInteger adjacentCount = visited.get(adjacent);
                         if (adjacentCount == null) {

@@ -1,29 +1,18 @@
 package com.boydti.fawe.object.clipboard.remap;
 
-import com.boydti.fawe.FaweCache;
 import com.google.common.io.Resources;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.intellectualcrafters.plot.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItem;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import com.sk89q.worldedit.world.registry.BundledBlockData;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -504,7 +493,7 @@ public class ClipboardRemapper {
 //        }
     }
 
-    public BlockStateHolder remap(BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> B remap(B block) {
 //        int combined = block.getCombined();
 //        if (remap[combined]) {
 //            char value = remapCombined[combined];

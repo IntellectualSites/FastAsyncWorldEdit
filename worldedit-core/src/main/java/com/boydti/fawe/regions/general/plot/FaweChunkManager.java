@@ -2,15 +2,15 @@ package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
-import com.intellectualcrafters.plot.object.ChunkLoc;
-import com.intellectualcrafters.plot.object.Location;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.util.ChunkManager;
+import com.github.intellectualsites.plotsquared.plot.object.ChunkLoc;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 
@@ -50,8 +50,8 @@ public class FaweChunkManager extends ChunkManager {
                 synchronized (FaweChunkManager.class) {
                     EditSession sessionA = new EditSessionBuilder(pos1.getWorld()).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                     EditSession sessionB = new EditSessionBuilder(pos3.getWorld()).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
-                    CuboidRegion regionA = new CuboidRegion(new Vector(pos1.getX(), pos1.getY(), pos1.getZ()), new Vector(pos2.getX(), pos2.getY(), pos2.getZ()));
-                    CuboidRegion regionB = new CuboidRegion(new Vector(pos3.getX(), pos3.getY(), pos3.getZ()), new Vector(pos4.getX(), pos4.getY(), pos4.getZ()));
+                    CuboidRegion regionA = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
+                    CuboidRegion regionB = new CuboidRegion(BlockVector3.at(pos3.getX(), pos3.getY(), pos3.getZ()), BlockVector3.at(pos4.getX(), pos4.getY(), pos4.getZ()));
                     ForwardExtentCopy copyA = new ForwardExtentCopy(sessionA, regionA, sessionB, regionB.getMinimumPoint());
                     ForwardExtentCopy copyB = new ForwardExtentCopy(sessionB, regionB, sessionA, regionA.getMinimumPoint());
                     try {
@@ -76,8 +76,8 @@ public class FaweChunkManager extends ChunkManager {
                 synchronized (FaweChunkManager.class) {
                     EditSession from = new EditSessionBuilder(pos1.getWorld()).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                     EditSession to = new EditSessionBuilder(pos3.getWorld()).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
-                    CuboidRegion region = new CuboidRegion(new Vector(pos1.getX(), pos1.getY(), pos1.getZ()), new Vector(pos2.getX(), pos2.getY(), pos2.getZ()));
-                    ForwardExtentCopy copy = new ForwardExtentCopy(from, region, to, new Vector(pos3.getX(), pos3.getY(), pos3.getZ()));
+                    CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
+                    ForwardExtentCopy copy = new ForwardExtentCopy(from, region, to, BlockVector3.at(pos3.getX(), pos3.getY(), pos3.getZ()));
                     try {
                         Operations.completeLegacy(copy);
                         to.flushQueue();
@@ -99,7 +99,7 @@ public class FaweChunkManager extends ChunkManager {
                 synchronized (FaweChunkManager.class) {
                     EditSession editSession = new EditSessionBuilder(pos1.getWorld()).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                     World world = editSession.getWorld();
-                    CuboidRegion region = new CuboidRegion(new Vector(pos1.getX(), pos1.getY(), pos1.getZ()), new Vector(pos2.getX(), pos2.getY(), pos2.getZ()));
+                    CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
                     world.regenerate(region, editSession);
                     editSession.flushQueue();
                     TaskManager.IMP.task(whenDone);

@@ -19,20 +19,29 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.history.change.BiomeChange;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 
 import javax.annotation.Nullable;
+import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +68,17 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         BlockStateHolder previous = getBlock(location);
-        changeSet.add(new BlockChange(location.toBlockVector(), previous, block));
+        changeSet.add(new BlockChange(location, previous, block));
         return super.setBlock(location, block);
+    }
+
+    @Override
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+        BaseBiome previous = getBiome(position);
+        changeSet.add(new BiomeChange(position, previous, new BaseBiome(biome)));
+        return super.setBiome(position, biome);
     }
 
     @Nullable
@@ -108,6 +124,12 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
         @Override
         public Location getLocation() {
             return entity.getLocation();
+        }
+
+        @Override
+        public boolean setLocation(Location location) {
+            // TODO Add a changeset for this.
+            return entity.setLocation(location);
         }
 
         @Override

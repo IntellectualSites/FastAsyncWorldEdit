@@ -24,15 +24,13 @@ import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.session.SessionManager;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.item.ItemTypes;
+import com.sk89q.worldedit.util.report.Unreported;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * A less simple implementation of {@link LocalConfiguration}
@@ -40,8 +38,8 @@ import java.util.stream.Collectors;
  */
 public class YAMLConfiguration extends LocalConfiguration {
 
-    protected final YAMLProcessor config;
-    protected final Logger logger;
+    @Unreported protected final YAMLProcessor config;
+    @Unreported protected final Logger logger;
 
     public YAMLConfiguration(YAMLProcessor config, Logger logger) {
         this.config = config;
@@ -52,12 +50,12 @@ public class YAMLConfiguration extends LocalConfiguration {
     public void load() {
         try {
             config.load();
-        } catch (Throwable e) {
+        } catch (IOException e) {
             logger.log(Level.WARNING, "Error loading WorldEdit configuration", e);
         }
 
         profile = config.getBoolean("debug", profile);
-        wandItem = ItemTypes.parse(config.getString("wand-item", wandItem.getId()));
+        wandItem = convertLegacyItem(config.getString("wand-item", wandItem));
 
         defaultChangeLimit = Math.max(-1, config.getInt(
                 "limits.max-blocks-changed.default", defaultChangeLimit));
@@ -80,12 +78,9 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherDefaultRadius = Math.max(-1, config.getInt("limits.butcher-radius.default", butcherDefaultRadius));
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
-        disallowedBlocks =
-                new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(defaultDisallowedBlocks)))
-                .stream().map(e -> BlockTypes.parse(e)).collect(Collectors.toSet());
+        disallowedBlocks = new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks())));
         allowedDataCycleBlocks =
-                new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null))
-                .stream().map(e -> BlockTypes.parse(e)).collect(Collectors.toSet());
+                new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
 
         registerHelp = config.getBoolean("register-help", true);
         logCommands = config.getBoolean("logging.log-commands", logCommands);
@@ -105,7 +100,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         useInventoryCreativeOverride = config.getBoolean("use-inventory.creative-mode-overrides",
                 useInventoryCreativeOverride);
 
-        navigationWand = ItemTypes.parse(config.getString("navigation-wand.item", navigationWand.getId()));
+        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand));
         navigationWandMaxDistance = config.getInt("navigation-wand.max-distance", navigationWandMaxDistance);
         navigationUseGlass = config.getBoolean("navigation.use-glass", navigationUseGlass);
 

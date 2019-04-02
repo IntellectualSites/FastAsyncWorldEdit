@@ -40,8 +40,8 @@ public final class PaintingWrapper
     @SuppressWarnings("deprecation")
     public static void paint(final Player p, final boolean auto, final boolean back, final int choice)
     {
-        Location targetLocation = p.getTargetBlock((Set<Material>) null, 4).getLocation();
-        Chunk paintingChunk = p.getTargetBlock((Set<Material>) null, 4).getLocation().getChunk();
+        Location targetLocation = p.getTargetBlock(null, 4).getLocation();
+        Chunk paintingChunk = p.getTargetBlock(null, 4).getLocation().getChunk();
 
         Double bestDistanceMatch = 50D;
         Painting bestMatch = null;
@@ -66,7 +66,7 @@ public final class PaintingWrapper
             {
                 try
                 {
-                    final int i = bestMatch.getArt().getId() + (back ? -1 : 1) + Art.values().length % Art.values().length;
+                    final int i = bestMatch.getArt().getId() + (back ? -1 : 1);
                     Art art = Art.getById(i);
 
                     if (art == null)

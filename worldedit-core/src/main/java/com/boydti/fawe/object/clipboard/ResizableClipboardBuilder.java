@@ -3,12 +3,12 @@ package com.boydti.fawe.object.clipboard;
 import com.boydti.fawe.object.change.MutableBlockChange;
 import com.boydti.fawe.object.change.MutableTileChange;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.history.change.Change;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -60,8 +60,8 @@ public class ResizableClipboardBuilder extends MemoryOptimizedHistory {
     }
 
     public Clipboard build() {
-        Vector pos1 = new Vector(minX, minY, minZ);
-        Vector pos2 = new Vector(maxX, maxY, maxZ);
+    	BlockVector3 pos1 = BlockVector3.at(minX, minY, minZ);
+    	BlockVector3 pos2 = BlockVector3.at(maxX, maxY, maxZ);
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
         Iterator<Change> iter = getIterator(true);

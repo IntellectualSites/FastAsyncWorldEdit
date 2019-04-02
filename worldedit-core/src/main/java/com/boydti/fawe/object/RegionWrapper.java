@@ -1,6 +1,6 @@
 package com.boydti.fawe.object;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 @Deprecated
@@ -23,10 +23,10 @@ public class RegionWrapper extends CuboidRegion {
     }
 
     public RegionWrapper(final int minX, final int maxX, final int minY, final int maxY, final int minZ, final int maxZ) {
-        this(new Vector(minX, 0, minZ), new Vector(maxX, 255, maxZ));
+        this(BlockVector3.at(minX, 0, minZ), BlockVector3.at(maxX, 255, maxZ));
     }
 
-    public RegionWrapper(final Vector pos1, final Vector pos2) {
+    public RegionWrapper(final BlockVector3 pos1, final BlockVector3 pos2) {
         super(pos1, pos2);
         this.minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         this.minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
@@ -39,8 +39,8 @@ public class RegionWrapper extends CuboidRegion {
     @Override
     protected void recalculate() {
         super.recalculate();
-        Vector pos1 = getMinimumPoint();
-        Vector pos2 = getMaximumPoint();
+        BlockVector3 pos1 = getMinimumPoint();
+        BlockVector3 pos2 = getMaximumPoint();
         this.minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
         this.minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
         this.maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());

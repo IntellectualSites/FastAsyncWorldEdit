@@ -30,7 +30,7 @@ public class AreaPickaxe implements BlockTool {
         int ox = clicked.getBlockX();
         int oy = clicked.getBlockY();
         int oz = clicked.getBlockZ();
-        BlockType initialType = clicked.getExtent().getBlock(clicked.toVector()).getBlockType();
+        BlockType initialType = clicked.getExtent().getBlock(clicked.toBlockPoint()).getBlockType();
 
         if (initialType.getMaterial().isAir()) {
             return true;
@@ -48,6 +48,22 @@ public class AreaPickaxe implements BlockTool {
                 for (int y = oy + range; y >= oy - range; --y) {
                     if (initialType.equals(editSession.getLazyBlock(x, y, z))) {
                         continue;
+//        try (EditSession editSession = session.createEditSession(player)) {
+//            editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
+//
+//            try {
+//                for (int x = ox - range; x <= ox + range; ++x) {
+//                    for (int y = oy - range; y <= oy + range; ++y) {
+//                        for (int z = oz - range; z <= oz + range; ++z) {
+//                            BlockVector3 pos = new BlockVector3(x, y, z);
+//                            if (editSession.getBlock(pos).getBlockType() != initialType) {
+//                                continue;
+//                            }
+//
+//                            ((World) clicked.getExtent()).queueBlockBreakEffect(server, pos, initialType, clicked.toBlockPoint().distanceSq(pos));
+//
+//                            editSession.setBlock(pos, BlockTypes.AIR.getDefaultState());
+//                        }
                     }
                     editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
                 }

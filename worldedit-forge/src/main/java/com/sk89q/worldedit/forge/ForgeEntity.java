@@ -21,11 +21,11 @@ package com.sk89q.worldedit.forge;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NullWorld;
 import com.sk89q.worldedit.world.entity.EntityTypes;
@@ -66,7 +66,7 @@ class ForgeEntity implements Entity {
     public Location getLocation() {
         net.minecraft.entity.Entity entity = entityRef.get();
         if (entity != null) {
-            Vector position = new Vector(entity.posX, entity.posY, entity.posZ);
+            Vector3 position = Vector3.at(entity.posX, entity.posY, entity.posZ);
             float yaw = entity.rotationYaw;
             float pitch = entity.rotationPitch;
 
@@ -74,6 +74,12 @@ class ForgeEntity implements Entity {
         } else {
             return new Location(NullWorld.getInstance());
         }
+    }
+
+    @Override
+    public boolean setLocation(Location location) {
+        // TODO
+        return false;
     }
 
     @Override

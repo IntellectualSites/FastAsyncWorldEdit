@@ -20,18 +20,21 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
 
@@ -68,11 +71,29 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param location the location
      * @return the block
      */
-    BlockState getBlock(Location location);
+    BaseBlock getBlock(Location location);
 
-    boolean setBlock(Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update);
+    boolean setBlock(Chunk chunk, int x, int y, int z, BlockStateHolder<?> state, boolean update);
 
     boolean isChunkInUse(Chunk chunk);
+    /**
+     * Set the block at the given location.
+     *
+     * @param location the location
+     * @param state the block
+     * @param notifyAndLight notify and light if set
+     * @return true if a block was likely changed
+     */
+    boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight);
+
+    /**
+     * Notifies the simulation that the block at the given location has
+     * been changed and it must be re-lighted (and issue other events).
+     *
+     * @param position position of the block
+     * @param previousType the type of the previous block that was there
+     */
+    void notifyAndLightBlock(Location position, BlockState previousType);
 
     /**
      * Get the state for the given entity.
@@ -99,12 +120,12 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param blockType The block type
      * @return The properties map
      */
-    Map<String, ? extends Property> getProperties(BlockType blockType);
+    Map<String, ? extends Property<?>> getProperties(BlockType blockType);
 
     default BlockMaterial getMaterial(BlockType blockType) {
         return null;
     }
-
+    
     default BlockMaterial getMaterial(BlockState blockState) {
         return null;
     }
@@ -116,4 +137,21 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default T fromNative(Tag foreign) {
         return null;
     }
+    
+    /**
+     * Send the given NBT data to the player.
+     *
+     * @param player The player
+     * @param pos The position
+     * @param nbtData The NBT Data
+     */
+    void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData);
+
+    /**
+     * Make the client think it has operator status.
+     * This does not give them any operator capabilities.
+     *
+     * @param player The player
+     */
+    void sendFakeOP(Player player);
 }

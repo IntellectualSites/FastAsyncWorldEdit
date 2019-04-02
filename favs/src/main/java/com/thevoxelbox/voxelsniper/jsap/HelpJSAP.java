@@ -165,7 +165,7 @@ public class HelpJSAP extends JSAP
     {
         if (!(jsapResult.success()) || jsapResult.getBoolean("help"))
         {
-            List<String> returnValue = new LinkedList<String>();
+            List<String> returnValue = new LinkedList<>();
             // To avoid spurious missing argument errors we never print errors if help is required.
             if (!jsapResult.getBoolean("help"))
             {

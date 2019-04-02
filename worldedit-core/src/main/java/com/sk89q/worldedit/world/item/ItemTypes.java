@@ -16,948 +16,849 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.sk89q.worldedit.world.item;
 
-import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.util.ReflectionUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.entity.EntityTypes;
-import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.util.*;
+public final class ItemTypes {
 
-public enum ItemTypes implements ItemType {
-    /*
-     -----------------------------------------------------
-        Replaced at runtime by the item registry
-     -----------------------------------------------------
-     */
+    @Nullable public static final ItemType ACACIA_BOAT = register("minecraft:acacia_boat");
+    @Nullable public static final ItemType ACACIA_BUTTON = register("minecraft:acacia_button");
+    @Nullable public static final ItemType ACACIA_DOOR = register("minecraft:acacia_door");
+    @Nullable public static final ItemType ACACIA_FENCE = register("minecraft:acacia_fence");
+    @Nullable public static final ItemType ACACIA_FENCE_GATE = register("minecraft:acacia_fence_gate");
+    @Nullable public static final ItemType ACACIA_LEAVES = register("minecraft:acacia_leaves");
+    @Nullable public static final ItemType ACACIA_LOG = register("minecraft:acacia_log");
+    @Nullable public static final ItemType ACACIA_PLANKS = register("minecraft:acacia_planks");
+    @Nullable public static final ItemType ACACIA_PRESSURE_PLATE = register("minecraft:acacia_pressure_plate");
+    @Nullable public static final ItemType ACACIA_SAPLING = register("minecraft:acacia_sapling");
+    @Nullable public static final ItemType ACACIA_SLAB = register("minecraft:acacia_slab");
+    @Nullable public static final ItemType ACACIA_STAIRS = register("minecraft:acacia_stairs");
+    @Nullable public static final ItemType ACACIA_TRAPDOOR = register("minecraft:acacia_trapdoor");
+    @Nullable public static final ItemType ACACIA_WOOD = register("minecraft:acacia_wood");
+    @Nullable public static final ItemType ACTIVATOR_RAIL = register("minecraft:activator_rail");
+    @Nullable public static final ItemType AIR = register("minecraft:air");
+    @Nullable public static final ItemType ALLIUM = register("minecraft:allium");
+    @Nullable public static final ItemType ANDESITE = register("minecraft:andesite");
+    @Nullable public static final ItemType ANVIL = register("minecraft:anvil");
+    @Nullable public static final ItemType APPLE = register("minecraft:apple");
+    @Nullable public static final ItemType ARMOR_STAND = register("minecraft:armor_stand");
+    @Nullable public static final ItemType ARROW = register("minecraft:arrow");
+    @Nullable public static final ItemType AZURE_BLUET = register("minecraft:azure_bluet");
+    @Nullable public static final ItemType BAKED_POTATO = register("minecraft:baked_potato");
+    @Nullable public static final ItemType BARRIER = register("minecraft:barrier");
+    @Nullable public static final ItemType BAT_SPAWN_EGG = register("minecraft:bat_spawn_egg");
+    @Nullable public static final ItemType BEACON = register("minecraft:beacon");
+    @Nullable public static final ItemType BEDROCK = register("minecraft:bedrock");
+    @Nullable public static final ItemType BEEF = register("minecraft:beef");
+    @Nullable public static final ItemType BEETROOT = register("minecraft:beetroot");
+    @Nullable public static final ItemType BEETROOT_SEEDS = register("minecraft:beetroot_seeds");
+    @Nullable public static final ItemType BEETROOT_SOUP = register("minecraft:beetroot_soup");
+    @Nullable public static final ItemType BIRCH_BOAT = register("minecraft:birch_boat");
+    @Nullable public static final ItemType BIRCH_BUTTON = register("minecraft:birch_button");
+    @Nullable public static final ItemType BIRCH_DOOR = register("minecraft:birch_door");
+    @Nullable public static final ItemType BIRCH_FENCE = register("minecraft:birch_fence");
+    @Nullable public static final ItemType BIRCH_FENCE_GATE = register("minecraft:birch_fence_gate");
+    @Nullable public static final ItemType BIRCH_LEAVES = register("minecraft:birch_leaves");
+    @Nullable public static final ItemType BIRCH_LOG = register("minecraft:birch_log");
+    @Nullable public static final ItemType BIRCH_PLANKS = register("minecraft:birch_planks");
+    @Nullable public static final ItemType BIRCH_PRESSURE_PLATE = register("minecraft:birch_pressure_plate");
+    @Nullable public static final ItemType BIRCH_SAPLING = register("minecraft:birch_sapling");
+    @Nullable public static final ItemType BIRCH_SLAB = register("minecraft:birch_slab");
+    @Nullable public static final ItemType BIRCH_STAIRS = register("minecraft:birch_stairs");
+    @Nullable public static final ItemType BIRCH_TRAPDOOR = register("minecraft:birch_trapdoor");
+    @Nullable public static final ItemType BIRCH_WOOD = register("minecraft:birch_wood");
+    @Nullable public static final ItemType BLACK_BANNER = register("minecraft:black_banner");
+    @Nullable public static final ItemType BLACK_BED = register("minecraft:black_bed");
+    @Nullable public static final ItemType BLACK_CARPET = register("minecraft:black_carpet");
+    @Nullable public static final ItemType BLACK_CONCRETE = register("minecraft:black_concrete");
+    @Nullable public static final ItemType BLACK_CONCRETE_POWDER = register("minecraft:black_concrete_powder");
+    @Nullable public static final ItemType BLACK_GLAZED_TERRACOTTA = register("minecraft:black_glazed_terracotta");
+    @Nullable public static final ItemType BLACK_SHULKER_BOX = register("minecraft:black_shulker_box");
+    @Nullable public static final ItemType BLACK_STAINED_GLASS = register("minecraft:black_stained_glass");
+    @Nullable public static final ItemType BLACK_STAINED_GLASS_PANE = register("minecraft:black_stained_glass_pane");
+    @Nullable public static final ItemType BLACK_TERRACOTTA = register("minecraft:black_terracotta");
+    @Nullable public static final ItemType BLACK_WOOL = register("minecraft:black_wool");
+    @Nullable public static final ItemType BLAZE_POWDER = register("minecraft:blaze_powder");
+    @Nullable public static final ItemType BLAZE_ROD = register("minecraft:blaze_rod");
+    @Nullable public static final ItemType BLAZE_SPAWN_EGG = register("minecraft:blaze_spawn_egg");
+    @Nullable public static final ItemType BLUE_BANNER = register("minecraft:blue_banner");
+    @Nullable public static final ItemType BLUE_BED = register("minecraft:blue_bed");
+    @Nullable public static final ItemType BLUE_CARPET = register("minecraft:blue_carpet");
+    @Nullable public static final ItemType BLUE_CONCRETE = register("minecraft:blue_concrete");
+    @Nullable public static final ItemType BLUE_CONCRETE_POWDER = register("minecraft:blue_concrete_powder");
+    @Nullable public static final ItemType BLUE_GLAZED_TERRACOTTA = register("minecraft:blue_glazed_terracotta");
+    @Nullable public static final ItemType BLUE_ICE = register("minecraft:blue_ice");
+    @Nullable public static final ItemType BLUE_ORCHID = register("minecraft:blue_orchid");
+    @Nullable public static final ItemType BLUE_SHULKER_BOX = register("minecraft:blue_shulker_box");
+    @Nullable public static final ItemType BLUE_STAINED_GLASS = register("minecraft:blue_stained_glass");
+    @Nullable public static final ItemType BLUE_STAINED_GLASS_PANE = register("minecraft:blue_stained_glass_pane");
+    @Nullable public static final ItemType BLUE_TERRACOTTA = register("minecraft:blue_terracotta");
+    @Nullable public static final ItemType BLUE_WOOL = register("minecraft:blue_wool");
+    @Nullable public static final ItemType BONE = register("minecraft:bone");
+    @Nullable public static final ItemType BONE_BLOCK = register("minecraft:bone_block");
+    @Nullable public static final ItemType BONE_MEAL = register("minecraft:bone_meal");
+    @Nullable public static final ItemType BOOK = register("minecraft:book");
+    @Nullable public static final ItemType BOOKSHELF = register("minecraft:bookshelf");
+    @Nullable public static final ItemType BOW = register("minecraft:bow");
+    @Nullable public static final ItemType BOWL = register("minecraft:bowl");
+    @Nullable public static final ItemType BRAIN_CORAL = register("minecraft:brain_coral");
+    @Nullable public static final ItemType BRAIN_CORAL_BLOCK = register("minecraft:brain_coral_block");
+    @Nullable public static final ItemType BRAIN_CORAL_FAN = register("minecraft:brain_coral_fan");
+    @Nullable public static final ItemType BREAD = register("minecraft:bread");
+    @Nullable public static final ItemType BREWING_STAND = register("minecraft:brewing_stand");
+    @Nullable public static final ItemType BRICK = register("minecraft:brick");
+    @Nullable public static final ItemType BRICK_SLAB = register("minecraft:brick_slab");
+    @Nullable public static final ItemType BRICK_STAIRS = register("minecraft:brick_stairs");
+    @Nullable public static final ItemType BRICKS = register("minecraft:bricks");
+    @Nullable public static final ItemType BROWN_BANNER = register("minecraft:brown_banner");
+    @Nullable public static final ItemType BROWN_BED = register("minecraft:brown_bed");
+    @Nullable public static final ItemType BROWN_CARPET = register("minecraft:brown_carpet");
+    @Nullable public static final ItemType BROWN_CONCRETE = register("minecraft:brown_concrete");
+    @Nullable public static final ItemType BROWN_CONCRETE_POWDER = register("minecraft:brown_concrete_powder");
+    @Nullable public static final ItemType BROWN_GLAZED_TERRACOTTA = register("minecraft:brown_glazed_terracotta");
+    @Nullable public static final ItemType BROWN_MUSHROOM = register("minecraft:brown_mushroom");
+    @Nullable public static final ItemType BROWN_MUSHROOM_BLOCK = register("minecraft:brown_mushroom_block");
+    @Nullable public static final ItemType BROWN_SHULKER_BOX = register("minecraft:brown_shulker_box");
+    @Nullable public static final ItemType BROWN_STAINED_GLASS = register("minecraft:brown_stained_glass");
+    @Nullable public static final ItemType BROWN_STAINED_GLASS_PANE = register("minecraft:brown_stained_glass_pane");
+    @Nullable public static final ItemType BROWN_TERRACOTTA = register("minecraft:brown_terracotta");
+    @Nullable public static final ItemType BROWN_WOOL = register("minecraft:brown_wool");
+    @Nullable public static final ItemType BUBBLE_CORAL = register("minecraft:bubble_coral");
+    @Nullable public static final ItemType BUBBLE_CORAL_BLOCK = register("minecraft:bubble_coral_block");
+    @Nullable public static final ItemType BUBBLE_CORAL_FAN = register("minecraft:bubble_coral_fan");
+    @Nullable public static final ItemType BUCKET = register("minecraft:bucket");
+    @Nullable public static final ItemType CACTUS = register("minecraft:cactus");
+    @Nullable public static final ItemType CACTUS_GREEN = register("minecraft:cactus_green");
+    @Nullable public static final ItemType CAKE = register("minecraft:cake");
+    @Nullable public static final ItemType CARROT = register("minecraft:carrot");
+    @Nullable public static final ItemType CARROT_ON_A_STICK = register("minecraft:carrot_on_a_stick");
+    @Nullable public static final ItemType CARVED_PUMPKIN = register("minecraft:carved_pumpkin");
+    @Nullable public static final ItemType CAULDRON = register("minecraft:cauldron");
+    @Nullable public static final ItemType CAVE_SPIDER_SPAWN_EGG = register("minecraft:cave_spider_spawn_egg");
+    @Nullable public static final ItemType CHAIN_COMMAND_BLOCK = register("minecraft:chain_command_block");
+    @Nullable public static final ItemType CHAINMAIL_BOOTS = register("minecraft:chainmail_boots");
+    @Nullable public static final ItemType CHAINMAIL_CHESTPLATE = register("minecraft:chainmail_chestplate");
+    @Nullable public static final ItemType CHAINMAIL_HELMET = register("minecraft:chainmail_helmet");
+    @Nullable public static final ItemType CHAINMAIL_LEGGINGS = register("minecraft:chainmail_leggings");
+    @Nullable public static final ItemType CHARCOAL = register("minecraft:charcoal");
+    @Nullable public static final ItemType CHEST = register("minecraft:chest");
+    @Nullable public static final ItemType CHEST_MINECART = register("minecraft:chest_minecart");
+    @Nullable public static final ItemType CHICKEN = register("minecraft:chicken");
+    @Nullable public static final ItemType CHICKEN_SPAWN_EGG = register("minecraft:chicken_spawn_egg");
+    @Nullable public static final ItemType CHIPPED_ANVIL = register("minecraft:chipped_anvil");
+    @Nullable public static final ItemType CHISELED_QUARTZ_BLOCK = register("minecraft:chiseled_quartz_block");
+    @Nullable public static final ItemType CHISELED_RED_SANDSTONE = register("minecraft:chiseled_red_sandstone");
+    @Nullable public static final ItemType CHISELED_SANDSTONE = register("minecraft:chiseled_sandstone");
+    @Nullable public static final ItemType CHISELED_STONE_BRICKS = register("minecraft:chiseled_stone_bricks");
+    @Nullable public static final ItemType CHORUS_FLOWER = register("minecraft:chorus_flower");
+    @Nullable public static final ItemType CHORUS_FRUIT = register("minecraft:chorus_fruit");
+    @Nullable public static final ItemType CHORUS_PLANT = register("minecraft:chorus_plant");
+    @Nullable public static final ItemType CLAY = register("minecraft:clay");
+    @Nullable public static final ItemType CLAY_BALL = register("minecraft:clay_ball");
+    @Nullable public static final ItemType CLOCK = register("minecraft:clock");
+    @Nullable public static final ItemType COAL = register("minecraft:coal");
+    @Nullable public static final ItemType COAL_BLOCK = register("minecraft:coal_block");
+    @Nullable public static final ItemType COAL_ORE = register("minecraft:coal_ore");
+    @Nullable public static final ItemType COARSE_DIRT = register("minecraft:coarse_dirt");
+    @Nullable public static final ItemType COBBLESTONE = register("minecraft:cobblestone");
+    @Nullable public static final ItemType COBBLESTONE_SLAB = register("minecraft:cobblestone_slab");
+    @Nullable public static final ItemType COBBLESTONE_STAIRS = register("minecraft:cobblestone_stairs");
+    @Nullable public static final ItemType COBBLESTONE_WALL = register("minecraft:cobblestone_wall");
+    @Nullable public static final ItemType COBWEB = register("minecraft:cobweb");
+    @Nullable public static final ItemType COCOA_BEANS = register("minecraft:cocoa_beans");
+    @Nullable public static final ItemType COD = register("minecraft:cod");
+    @Nullable public static final ItemType COD_BUCKET = register("minecraft:cod_bucket");
+    @Nullable public static final ItemType COD_SPAWN_EGG = register("minecraft:cod_spawn_egg");
+    @Nullable public static final ItemType COMMAND_BLOCK = register("minecraft:command_block");
+    @Nullable public static final ItemType COMMAND_BLOCK_MINECART = register("minecraft:command_block_minecart");
+    @Nullable public static final ItemType COMPARATOR = register("minecraft:comparator");
+    @Nullable public static final ItemType COMPASS = register("minecraft:compass");
+    @Nullable public static final ItemType CONDUIT = register("minecraft:conduit");
+    @Nullable public static final ItemType COOKED_BEEF = register("minecraft:cooked_beef");
+    @Nullable public static final ItemType COOKED_CHICKEN = register("minecraft:cooked_chicken");
+    @Nullable public static final ItemType COOKED_COD = register("minecraft:cooked_cod");
+    @Nullable public static final ItemType COOKED_MUTTON = register("minecraft:cooked_mutton");
+    @Nullable public static final ItemType COOKED_PORKCHOP = register("minecraft:cooked_porkchop");
+    @Nullable public static final ItemType COOKED_RABBIT = register("minecraft:cooked_rabbit");
+    @Nullable public static final ItemType COOKED_SALMON = register("minecraft:cooked_salmon");
+    @Nullable public static final ItemType COOKIE = register("minecraft:cookie");
+    @Nullable public static final ItemType COW_SPAWN_EGG = register("minecraft:cow_spawn_egg");
+    @Nullable public static final ItemType CRACKED_STONE_BRICKS = register("minecraft:cracked_stone_bricks");
+    @Nullable public static final ItemType CRAFTING_TABLE = register("minecraft:crafting_table");
+    @Nullable public static final ItemType CREEPER_HEAD = register("minecraft:creeper_head");
+    @Nullable public static final ItemType CREEPER_SPAWN_EGG = register("minecraft:creeper_spawn_egg");
+    @Nullable public static final ItemType CUT_RED_SANDSTONE = register("minecraft:cut_red_sandstone");
+    @Nullable public static final ItemType CUT_SANDSTONE = register("minecraft:cut_sandstone");
+    @Nullable public static final ItemType CYAN_BANNER = register("minecraft:cyan_banner");
+    @Nullable public static final ItemType CYAN_BED = register("minecraft:cyan_bed");
+    @Nullable public static final ItemType CYAN_CARPET = register("minecraft:cyan_carpet");
+    @Nullable public static final ItemType CYAN_CONCRETE = register("minecraft:cyan_concrete");
+    @Nullable public static final ItemType CYAN_CONCRETE_POWDER = register("minecraft:cyan_concrete_powder");
+    @Nullable public static final ItemType CYAN_DYE = register("minecraft:cyan_dye");
+    @Nullable public static final ItemType CYAN_GLAZED_TERRACOTTA = register("minecraft:cyan_glazed_terracotta");
+    @Nullable public static final ItemType CYAN_SHULKER_BOX = register("minecraft:cyan_shulker_box");
+    @Nullable public static final ItemType CYAN_STAINED_GLASS = register("minecraft:cyan_stained_glass");
+    @Nullable public static final ItemType CYAN_STAINED_GLASS_PANE = register("minecraft:cyan_stained_glass_pane");
+    @Nullable public static final ItemType CYAN_TERRACOTTA = register("minecraft:cyan_terracotta");
+    @Nullable public static final ItemType CYAN_WOOL = register("minecraft:cyan_wool");
+    @Nullable public static final ItemType DAMAGED_ANVIL = register("minecraft:damaged_anvil");
+    @Nullable public static final ItemType DANDELION = register("minecraft:dandelion");
+    @Nullable public static final ItemType DANDELION_YELLOW = register("minecraft:dandelion_yellow");
+    @Nullable public static final ItemType DARK_OAK_BOAT = register("minecraft:dark_oak_boat");
+    @Nullable public static final ItemType DARK_OAK_BUTTON = register("minecraft:dark_oak_button");
+    @Nullable public static final ItemType DARK_OAK_DOOR = register("minecraft:dark_oak_door");
+    @Nullable public static final ItemType DARK_OAK_FENCE = register("minecraft:dark_oak_fence");
+    @Nullable public static final ItemType DARK_OAK_FENCE_GATE = register("minecraft:dark_oak_fence_gate");
+    @Nullable public static final ItemType DARK_OAK_LEAVES = register("minecraft:dark_oak_leaves");
+    @Nullable public static final ItemType DARK_OAK_LOG = register("minecraft:dark_oak_log");
+    @Nullable public static final ItemType DARK_OAK_PLANKS = register("minecraft:dark_oak_planks");
+    @Nullable public static final ItemType DARK_OAK_PRESSURE_PLATE = register("minecraft:dark_oak_pressure_plate");
+    @Nullable public static final ItemType DARK_OAK_SAPLING = register("minecraft:dark_oak_sapling");
+    @Nullable public static final ItemType DARK_OAK_SLAB = register("minecraft:dark_oak_slab");
+    @Nullable public static final ItemType DARK_OAK_STAIRS = register("minecraft:dark_oak_stairs");
+    @Nullable public static final ItemType DARK_OAK_TRAPDOOR = register("minecraft:dark_oak_trapdoor");
+    @Nullable public static final ItemType DARK_OAK_WOOD = register("minecraft:dark_oak_wood");
+    @Nullable public static final ItemType DARK_PRISMARINE = register("minecraft:dark_prismarine");
+    @Nullable public static final ItemType DARK_PRISMARINE_SLAB = register("minecraft:dark_prismarine_slab");
+    @Nullable public static final ItemType DARK_PRISMARINE_STAIRS = register("minecraft:dark_prismarine_stairs");
+    @Nullable public static final ItemType DAYLIGHT_DETECTOR = register("minecraft:daylight_detector");
+    @Nullable public static final ItemType DEAD_BRAIN_CORAL = register("minecraft:dead_brain_coral");
+    @Nullable public static final ItemType DEAD_BRAIN_CORAL_BLOCK = register("minecraft:dead_brain_coral_block");
+    @Nullable public static final ItemType DEAD_BRAIN_CORAL_FAN = register("minecraft:dead_brain_coral_fan");
+    @Nullable public static final ItemType DEAD_BUBBLE_CORAL = register("minecraft:dead_bubble_coral");
+    @Nullable public static final ItemType DEAD_BUBBLE_CORAL_BLOCK = register("minecraft:dead_bubble_coral_block");
+    @Nullable public static final ItemType DEAD_BUBBLE_CORAL_FAN = register("minecraft:dead_bubble_coral_fan");
+    @Nullable public static final ItemType DEAD_BUSH = register("minecraft:dead_bush");
+    @Nullable public static final ItemType DEAD_FIRE_CORAL = register("minecraft:dead_fire_coral");
+    @Nullable public static final ItemType DEAD_FIRE_CORAL_BLOCK = register("minecraft:dead_fire_coral_block");
+    @Nullable public static final ItemType DEAD_FIRE_CORAL_FAN = register("minecraft:dead_fire_coral_fan");
+    @Nullable public static final ItemType DEAD_HORN_CORAL = register("minecraft:dead_horn_coral");
+    @Nullable public static final ItemType DEAD_HORN_CORAL_BLOCK = register("minecraft:dead_horn_coral_block");
+    @Nullable public static final ItemType DEAD_HORN_CORAL_FAN = register("minecraft:dead_horn_coral_fan");
+    @Nullable public static final ItemType DEAD_TUBE_CORAL = register("minecraft:dead_tube_coral");
+    @Nullable public static final ItemType DEAD_TUBE_CORAL_BLOCK = register("minecraft:dead_tube_coral_block");
+    @Nullable public static final ItemType DEAD_TUBE_CORAL_FAN = register("minecraft:dead_tube_coral_fan");
+    @Nullable public static final ItemType DEBUG_STICK = register("minecraft:debug_stick");
+    @Nullable public static final ItemType DETECTOR_RAIL = register("minecraft:detector_rail");
+    @Nullable public static final ItemType DIAMOND = register("minecraft:diamond");
+    @Nullable public static final ItemType DIAMOND_AXE = register("minecraft:diamond_axe");
+    @Nullable public static final ItemType DIAMOND_BLOCK = register("minecraft:diamond_block");
+    @Nullable public static final ItemType DIAMOND_BOOTS = register("minecraft:diamond_boots");
+    @Nullable public static final ItemType DIAMOND_CHESTPLATE = register("minecraft:diamond_chestplate");
+    @Nullable public static final ItemType DIAMOND_HELMET = register("minecraft:diamond_helmet");
+    @Nullable public static final ItemType DIAMOND_HOE = register("minecraft:diamond_hoe");
+    @Nullable public static final ItemType DIAMOND_HORSE_ARMOR = register("minecraft:diamond_horse_armor");
+    @Nullable public static final ItemType DIAMOND_LEGGINGS = register("minecraft:diamond_leggings");
+    @Nullable public static final ItemType DIAMOND_ORE = register("minecraft:diamond_ore");
+    @Nullable public static final ItemType DIAMOND_PICKAXE = register("minecraft:diamond_pickaxe");
+    @Nullable public static final ItemType DIAMOND_SHOVEL = register("minecraft:diamond_shovel");
+    @Nullable public static final ItemType DIAMOND_SWORD = register("minecraft:diamond_sword");
+    @Nullable public static final ItemType DIORITE = register("minecraft:diorite");
+    @Nullable public static final ItemType DIRT = register("minecraft:dirt");
+    @Nullable public static final ItemType DISPENSER = register("minecraft:dispenser");
+    @Nullable public static final ItemType DOLPHIN_SPAWN_EGG = register("minecraft:dolphin_spawn_egg");
+    @Nullable public static final ItemType DONKEY_SPAWN_EGG = register("minecraft:donkey_spawn_egg");
+    @Nullable public static final ItemType DRAGON_BREATH = register("minecraft:dragon_breath");
+    @Nullable public static final ItemType DRAGON_EGG = register("minecraft:dragon_egg");
+    @Nullable public static final ItemType DRAGON_HEAD = register("minecraft:dragon_head");
+    @Nullable public static final ItemType DRIED_KELP = register("minecraft:dried_kelp");
+    @Nullable public static final ItemType DRIED_KELP_BLOCK = register("minecraft:dried_kelp_block");
+    @Nullable public static final ItemType DROPPER = register("minecraft:dropper");
+    @Nullable public static final ItemType DROWNED_SPAWN_EGG = register("minecraft:drowned_spawn_egg");
+    @Nullable public static final ItemType EGG = register("minecraft:egg");
+    @Nullable public static final ItemType ELDER_GUARDIAN_SPAWN_EGG = register("minecraft:elder_guardian_spawn_egg");
+    @Nullable public static final ItemType ELYTRA = register("minecraft:elytra");
+    @Nullable public static final ItemType EMERALD = register("minecraft:emerald");
+    @Nullable public static final ItemType EMERALD_BLOCK = register("minecraft:emerald_block");
+    @Nullable public static final ItemType EMERALD_ORE = register("minecraft:emerald_ore");
+    @Nullable public static final ItemType ENCHANTED_BOOK = register("minecraft:enchanted_book");
+    @Nullable public static final ItemType ENCHANTED_GOLDEN_APPLE = register("minecraft:enchanted_golden_apple");
+    @Nullable public static final ItemType ENCHANTING_TABLE = register("minecraft:enchanting_table");
+    @Nullable public static final ItemType END_CRYSTAL = register("minecraft:end_crystal");
+    @Nullable public static final ItemType END_PORTAL_FRAME = register("minecraft:end_portal_frame");
+    @Nullable public static final ItemType END_ROD = register("minecraft:end_rod");
+    @Nullable public static final ItemType END_STONE = register("minecraft:end_stone");
+    @Nullable public static final ItemType END_STONE_BRICKS = register("minecraft:end_stone_bricks");
+    @Nullable public static final ItemType ENDER_CHEST = register("minecraft:ender_chest");
+    @Nullable public static final ItemType ENDER_EYE = register("minecraft:ender_eye");
+    @Nullable public static final ItemType ENDER_PEARL = register("minecraft:ender_pearl");
+    @Nullable public static final ItemType ENDERMAN_SPAWN_EGG = register("minecraft:enderman_spawn_egg");
+    @Nullable public static final ItemType ENDERMITE_SPAWN_EGG = register("minecraft:endermite_spawn_egg");
+    @Nullable public static final ItemType EVOKER_SPAWN_EGG = register("minecraft:evoker_spawn_egg");
+    @Nullable public static final ItemType EXPERIENCE_BOTTLE = register("minecraft:experience_bottle");
+    @Nullable public static final ItemType FARMLAND = register("minecraft:farmland");
+    @Nullable public static final ItemType FEATHER = register("minecraft:feather");
+    @Nullable public static final ItemType FERMENTED_SPIDER_EYE = register("minecraft:fermented_spider_eye");
+    @Nullable public static final ItemType FERN = register("minecraft:fern");
+    @Nullable public static final ItemType FILLED_MAP = register("minecraft:filled_map");
+    @Nullable public static final ItemType FIRE_CHARGE = register("minecraft:fire_charge");
+    @Nullable public static final ItemType FIRE_CORAL = register("minecraft:fire_coral");
+    @Nullable public static final ItemType FIRE_CORAL_BLOCK = register("minecraft:fire_coral_block");
+    @Nullable public static final ItemType FIRE_CORAL_FAN = register("minecraft:fire_coral_fan");
+    @Nullable public static final ItemType FIREWORK_ROCKET = register("minecraft:firework_rocket");
+    @Nullable public static final ItemType FIREWORK_STAR = register("minecraft:firework_star");
+    @Nullable public static final ItemType FISHING_ROD = register("minecraft:fishing_rod");
+    @Nullable public static final ItemType FLINT = register("minecraft:flint");
+    @Nullable public static final ItemType FLINT_AND_STEEL = register("minecraft:flint_and_steel");
+    @Nullable public static final ItemType FLOWER_POT = register("minecraft:flower_pot");
+    @Nullable public static final ItemType FURNACE = register("minecraft:furnace");
+    @Nullable public static final ItemType FURNACE_MINECART = register("minecraft:furnace_minecart");
+    @Nullable public static final ItemType GHAST_SPAWN_EGG = register("minecraft:ghast_spawn_egg");
+    @Nullable public static final ItemType GHAST_TEAR = register("minecraft:ghast_tear");
+    @Nullable public static final ItemType GLASS = register("minecraft:glass");
+    @Nullable public static final ItemType GLASS_BOTTLE = register("minecraft:glass_bottle");
+    @Nullable public static final ItemType GLASS_PANE = register("minecraft:glass_pane");
+    @Nullable public static final ItemType GLISTERING_MELON_SLICE = register("minecraft:glistering_melon_slice");
+    @Nullable public static final ItemType GLOWSTONE = register("minecraft:glowstone");
+    @Nullable public static final ItemType GLOWSTONE_DUST = register("minecraft:glowstone_dust");
+    @Nullable public static final ItemType GOLD_BLOCK = register("minecraft:gold_block");
+    @Nullable public static final ItemType GOLD_INGOT = register("minecraft:gold_ingot");
+    @Nullable public static final ItemType GOLD_NUGGET = register("minecraft:gold_nugget");
+    @Nullable public static final ItemType GOLD_ORE = register("minecraft:gold_ore");
+    @Nullable public static final ItemType GOLDEN_APPLE = register("minecraft:golden_apple");
+    @Nullable public static final ItemType GOLDEN_AXE = register("minecraft:golden_axe");
+    @Nullable public static final ItemType GOLDEN_BOOTS = register("minecraft:golden_boots");
+    @Nullable public static final ItemType GOLDEN_CARROT = register("minecraft:golden_carrot");
+    @Nullable public static final ItemType GOLDEN_CHESTPLATE = register("minecraft:golden_chestplate");
+    @Nullable public static final ItemType GOLDEN_HELMET = register("minecraft:golden_helmet");
+    @Nullable public static final ItemType GOLDEN_HOE = register("minecraft:golden_hoe");
+    @Nullable public static final ItemType GOLDEN_HORSE_ARMOR = register("minecraft:golden_horse_armor");
+    @Nullable public static final ItemType GOLDEN_LEGGINGS = register("minecraft:golden_leggings");
+    @Nullable public static final ItemType GOLDEN_PICKAXE = register("minecraft:golden_pickaxe");
+    @Nullable public static final ItemType GOLDEN_SHOVEL = register("minecraft:golden_shovel");
+    @Nullable public static final ItemType GOLDEN_SWORD = register("minecraft:golden_sword");
+    @Nullable public static final ItemType GRANITE = register("minecraft:granite");
+    @Nullable public static final ItemType GRASS = register("minecraft:grass");
+    @Nullable public static final ItemType GRASS_BLOCK = register("minecraft:grass_block");
+    @Nullable public static final ItemType GRASS_PATH = register("minecraft:grass_path");
+    @Nullable public static final ItemType GRAVEL = register("minecraft:gravel");
+    @Nullable public static final ItemType GRAY_BANNER = register("minecraft:gray_banner");
+    @Nullable public static final ItemType GRAY_BED = register("minecraft:gray_bed");
+    @Nullable public static final ItemType GRAY_CARPET = register("minecraft:gray_carpet");
+    @Nullable public static final ItemType GRAY_CONCRETE = register("minecraft:gray_concrete");
+    @Nullable public static final ItemType GRAY_CONCRETE_POWDER = register("minecraft:gray_concrete_powder");
+    @Nullable public static final ItemType GRAY_DYE = register("minecraft:gray_dye");
+    @Nullable public static final ItemType GRAY_GLAZED_TERRACOTTA = register("minecraft:gray_glazed_terracotta");
+    @Nullable public static final ItemType GRAY_SHULKER_BOX = register("minecraft:gray_shulker_box");
+    @Nullable public static final ItemType GRAY_STAINED_GLASS = register("minecraft:gray_stained_glass");
+    @Nullable public static final ItemType GRAY_STAINED_GLASS_PANE = register("minecraft:gray_stained_glass_pane");
+    @Nullable public static final ItemType GRAY_TERRACOTTA = register("minecraft:gray_terracotta");
+    @Nullable public static final ItemType GRAY_WOOL = register("minecraft:gray_wool");
+    @Nullable public static final ItemType GREEN_BANNER = register("minecraft:green_banner");
+    @Nullable public static final ItemType GREEN_BED = register("minecraft:green_bed");
+    @Nullable public static final ItemType GREEN_CARPET = register("minecraft:green_carpet");
+    @Nullable public static final ItemType GREEN_CONCRETE = register("minecraft:green_concrete");
+    @Nullable public static final ItemType GREEN_CONCRETE_POWDER = register("minecraft:green_concrete_powder");
+    @Nullable public static final ItemType GREEN_GLAZED_TERRACOTTA = register("minecraft:green_glazed_terracotta");
+    @Nullable public static final ItemType GREEN_SHULKER_BOX = register("minecraft:green_shulker_box");
+    @Nullable public static final ItemType GREEN_STAINED_GLASS = register("minecraft:green_stained_glass");
+    @Nullable public static final ItemType GREEN_STAINED_GLASS_PANE = register("minecraft:green_stained_glass_pane");
+    @Nullable public static final ItemType GREEN_TERRACOTTA = register("minecraft:green_terracotta");
+    @Nullable public static final ItemType GREEN_WOOL = register("minecraft:green_wool");
+    @Nullable public static final ItemType GUARDIAN_SPAWN_EGG = register("minecraft:guardian_spawn_egg");
+    @Nullable public static final ItemType GUNPOWDER = register("minecraft:gunpowder");
+    @Nullable public static final ItemType HAY_BLOCK = register("minecraft:hay_block");
+    @Nullable public static final ItemType HEART_OF_THE_SEA = register("minecraft:heart_of_the_sea");
+    @Nullable public static final ItemType HEAVY_WEIGHTED_PRESSURE_PLATE = register("minecraft:heavy_weighted_pressure_plate");
+    @Nullable public static final ItemType HOPPER = register("minecraft:hopper");
+    @Nullable public static final ItemType HOPPER_MINECART = register("minecraft:hopper_minecart");
+    @Nullable public static final ItemType HORN_CORAL = register("minecraft:horn_coral");
+    @Nullable public static final ItemType HORN_CORAL_BLOCK = register("minecraft:horn_coral_block");
+    @Nullable public static final ItemType HORN_CORAL_FAN = register("minecraft:horn_coral_fan");
+    @Nullable public static final ItemType HORSE_SPAWN_EGG = register("minecraft:horse_spawn_egg");
+    @Nullable public static final ItemType HUSK_SPAWN_EGG = register("minecraft:husk_spawn_egg");
+    @Nullable public static final ItemType ICE = register("minecraft:ice");
+    @Nullable public static final ItemType INFESTED_CHISELED_STONE_BRICKS = register("minecraft:infested_chiseled_stone_bricks");
+    @Nullable public static final ItemType INFESTED_COBBLESTONE = register("minecraft:infested_cobblestone");
+    @Nullable public static final ItemType INFESTED_CRACKED_STONE_BRICKS = register("minecraft:infested_cracked_stone_bricks");
+    @Nullable public static final ItemType INFESTED_MOSSY_STONE_BRICKS = register("minecraft:infested_mossy_stone_bricks");
+    @Nullable public static final ItemType INFESTED_STONE = register("minecraft:infested_stone");
+    @Nullable public static final ItemType INFESTED_STONE_BRICKS = register("minecraft:infested_stone_bricks");
+    @Nullable public static final ItemType INK_SAC = register("minecraft:ink_sac");
+    @Nullable public static final ItemType IRON_AXE = register("minecraft:iron_axe");
+    @Nullable public static final ItemType IRON_BARS = register("minecraft:iron_bars");
+    @Nullable public static final ItemType IRON_BLOCK = register("minecraft:iron_block");
+    @Nullable public static final ItemType IRON_BOOTS = register("minecraft:iron_boots");
+    @Nullable public static final ItemType IRON_CHESTPLATE = register("minecraft:iron_chestplate");
+    @Nullable public static final ItemType IRON_DOOR = register("minecraft:iron_door");
+    @Nullable public static final ItemType IRON_HELMET = register("minecraft:iron_helmet");
+    @Nullable public static final ItemType IRON_HOE = register("minecraft:iron_hoe");
+    @Nullable public static final ItemType IRON_HORSE_ARMOR = register("minecraft:iron_horse_armor");
+    @Nullable public static final ItemType IRON_INGOT = register("minecraft:iron_ingot");
+    @Nullable public static final ItemType IRON_LEGGINGS = register("minecraft:iron_leggings");
+    @Nullable public static final ItemType IRON_NUGGET = register("minecraft:iron_nugget");
+    @Nullable public static final ItemType IRON_ORE = register("minecraft:iron_ore");
+    @Nullable public static final ItemType IRON_PICKAXE = register("minecraft:iron_pickaxe");
+    @Nullable public static final ItemType IRON_SHOVEL = register("minecraft:iron_shovel");
+    @Nullable public static final ItemType IRON_SWORD = register("minecraft:iron_sword");
+    @Nullable public static final ItemType IRON_TRAPDOOR = register("minecraft:iron_trapdoor");
+    @Nullable public static final ItemType ITEM_FRAME = register("minecraft:item_frame");
+    @Nullable public static final ItemType JACK_O_LANTERN = register("minecraft:jack_o_lantern");
+    @Nullable public static final ItemType JUKEBOX = register("minecraft:jukebox");
+    @Nullable public static final ItemType JUNGLE_BOAT = register("minecraft:jungle_boat");
+    @Nullable public static final ItemType JUNGLE_BUTTON = register("minecraft:jungle_button");
+    @Nullable public static final ItemType JUNGLE_DOOR = register("minecraft:jungle_door");
+    @Nullable public static final ItemType JUNGLE_FENCE = register("minecraft:jungle_fence");
+    @Nullable public static final ItemType JUNGLE_FENCE_GATE = register("minecraft:jungle_fence_gate");
+    @Nullable public static final ItemType JUNGLE_LEAVES = register("minecraft:jungle_leaves");
+    @Nullable public static final ItemType JUNGLE_LOG = register("minecraft:jungle_log");
+    @Nullable public static final ItemType JUNGLE_PLANKS = register("minecraft:jungle_planks");
+    @Nullable public static final ItemType JUNGLE_PRESSURE_PLATE = register("minecraft:jungle_pressure_plate");
+    @Nullable public static final ItemType JUNGLE_SAPLING = register("minecraft:jungle_sapling");
+    @Nullable public static final ItemType JUNGLE_SLAB = register("minecraft:jungle_slab");
+    @Nullable public static final ItemType JUNGLE_STAIRS = register("minecraft:jungle_stairs");
+    @Nullable public static final ItemType JUNGLE_TRAPDOOR = register("minecraft:jungle_trapdoor");
+    @Nullable public static final ItemType JUNGLE_WOOD = register("minecraft:jungle_wood");
+    @Nullable public static final ItemType KELP = register("minecraft:kelp");
+    @Nullable public static final ItemType KNOWLEDGE_BOOK = register("minecraft:knowledge_book");
+    @Nullable public static final ItemType LADDER = register("minecraft:ladder");
+    @Nullable public static final ItemType LAPIS_BLOCK = register("minecraft:lapis_block");
+    @Nullable public static final ItemType LAPIS_LAZULI = register("minecraft:lapis_lazuli");
+    @Nullable public static final ItemType LAPIS_ORE = register("minecraft:lapis_ore");
+    @Nullable public static final ItemType LARGE_FERN = register("minecraft:large_fern");
+    @Nullable public static final ItemType LAVA_BUCKET = register("minecraft:lava_bucket");
+    @Nullable public static final ItemType LEAD = register("minecraft:lead");
+    @Nullable public static final ItemType LEATHER = register("minecraft:leather");
+    @Nullable public static final ItemType LEATHER_BOOTS = register("minecraft:leather_boots");
+    @Nullable public static final ItemType LEATHER_CHESTPLATE = register("minecraft:leather_chestplate");
+    @Nullable public static final ItemType LEATHER_HELMET = register("minecraft:leather_helmet");
+    @Nullable public static final ItemType LEATHER_LEGGINGS = register("minecraft:leather_leggings");
+    @Nullable public static final ItemType LEVER = register("minecraft:lever");
+    @Nullable public static final ItemType LIGHT_BLUE_BANNER = register("minecraft:light_blue_banner");
+    @Nullable public static final ItemType LIGHT_BLUE_BED = register("minecraft:light_blue_bed");
+    @Nullable public static final ItemType LIGHT_BLUE_CARPET = register("minecraft:light_blue_carpet");
+    @Nullable public static final ItemType LIGHT_BLUE_CONCRETE = register("minecraft:light_blue_concrete");
+    @Nullable public static final ItemType LIGHT_BLUE_CONCRETE_POWDER = register("minecraft:light_blue_concrete_powder");
+    @Nullable public static final ItemType LIGHT_BLUE_DYE = register("minecraft:light_blue_dye");
+    @Nullable public static final ItemType LIGHT_BLUE_GLAZED_TERRACOTTA = register("minecraft:light_blue_glazed_terracotta");
+    @Nullable public static final ItemType LIGHT_BLUE_SHULKER_BOX = register("minecraft:light_blue_shulker_box");
+    @Nullable public static final ItemType LIGHT_BLUE_STAINED_GLASS = register("minecraft:light_blue_stained_glass");
+    @Nullable public static final ItemType LIGHT_BLUE_STAINED_GLASS_PANE = register("minecraft:light_blue_stained_glass_pane");
+    @Nullable public static final ItemType LIGHT_BLUE_TERRACOTTA = register("minecraft:light_blue_terracotta");
+    @Nullable public static final ItemType LIGHT_BLUE_WOOL = register("minecraft:light_blue_wool");
+    @Nullable public static final ItemType LIGHT_GRAY_BANNER = register("minecraft:light_gray_banner");
+    @Nullable public static final ItemType LIGHT_GRAY_BED = register("minecraft:light_gray_bed");
+    @Nullable public static final ItemType LIGHT_GRAY_CARPET = register("minecraft:light_gray_carpet");
+    @Nullable public static final ItemType LIGHT_GRAY_CONCRETE = register("minecraft:light_gray_concrete");
+    @Nullable public static final ItemType LIGHT_GRAY_CONCRETE_POWDER = register("minecraft:light_gray_concrete_powder");
+    @Nullable public static final ItemType LIGHT_GRAY_DYE = register("minecraft:light_gray_dye");
+    @Nullable public static final ItemType LIGHT_GRAY_GLAZED_TERRACOTTA = register("minecraft:light_gray_glazed_terracotta");
+    @Nullable public static final ItemType LIGHT_GRAY_SHULKER_BOX = register("minecraft:light_gray_shulker_box");
+    @Nullable public static final ItemType LIGHT_GRAY_STAINED_GLASS = register("minecraft:light_gray_stained_glass");
+    @Nullable public static final ItemType LIGHT_GRAY_STAINED_GLASS_PANE = register("minecraft:light_gray_stained_glass_pane");
+    @Nullable public static final ItemType LIGHT_GRAY_TERRACOTTA = register("minecraft:light_gray_terracotta");
+    @Nullable public static final ItemType LIGHT_GRAY_WOOL = register("minecraft:light_gray_wool");
+    @Nullable public static final ItemType LIGHT_WEIGHTED_PRESSURE_PLATE = register("minecraft:light_weighted_pressure_plate");
+    @Nullable public static final ItemType LILAC = register("minecraft:lilac");
+    @Nullable public static final ItemType LILY_PAD = register("minecraft:lily_pad");
+    @Nullable public static final ItemType LIME_BANNER = register("minecraft:lime_banner");
+    @Nullable public static final ItemType LIME_BED = register("minecraft:lime_bed");
+    @Nullable public static final ItemType LIME_CARPET = register("minecraft:lime_carpet");
+    @Nullable public static final ItemType LIME_CONCRETE = register("minecraft:lime_concrete");
+    @Nullable public static final ItemType LIME_CONCRETE_POWDER = register("minecraft:lime_concrete_powder");
+    @Nullable public static final ItemType LIME_DYE = register("minecraft:lime_dye");
+    @Nullable public static final ItemType LIME_GLAZED_TERRACOTTA = register("minecraft:lime_glazed_terracotta");
+    @Nullable public static final ItemType LIME_SHULKER_BOX = register("minecraft:lime_shulker_box");
+    @Nullable public static final ItemType LIME_STAINED_GLASS = register("minecraft:lime_stained_glass");
+    @Nullable public static final ItemType LIME_STAINED_GLASS_PANE = register("minecraft:lime_stained_glass_pane");
+    @Nullable public static final ItemType LIME_TERRACOTTA = register("minecraft:lime_terracotta");
+    @Nullable public static final ItemType LIME_WOOL = register("minecraft:lime_wool");
+    @Nullable public static final ItemType LINGERING_POTION = register("minecraft:lingering_potion");
+    @Nullable public static final ItemType LLAMA_SPAWN_EGG = register("minecraft:llama_spawn_egg");
+    @Nullable public static final ItemType MAGENTA_BANNER = register("minecraft:magenta_banner");
+    @Nullable public static final ItemType MAGENTA_BED = register("minecraft:magenta_bed");
+    @Nullable public static final ItemType MAGENTA_CARPET = register("minecraft:magenta_carpet");
+    @Nullable public static final ItemType MAGENTA_CONCRETE = register("minecraft:magenta_concrete");
+    @Nullable public static final ItemType MAGENTA_CONCRETE_POWDER = register("minecraft:magenta_concrete_powder");
+    @Nullable public static final ItemType MAGENTA_DYE = register("minecraft:magenta_dye");
+    @Nullable public static final ItemType MAGENTA_GLAZED_TERRACOTTA = register("minecraft:magenta_glazed_terracotta");
+    @Nullable public static final ItemType MAGENTA_SHULKER_BOX = register("minecraft:magenta_shulker_box");
+    @Nullable public static final ItemType MAGENTA_STAINED_GLASS = register("minecraft:magenta_stained_glass");
+    @Nullable public static final ItemType MAGENTA_STAINED_GLASS_PANE = register("minecraft:magenta_stained_glass_pane");
+    @Nullable public static final ItemType MAGENTA_TERRACOTTA = register("minecraft:magenta_terracotta");
+    @Nullable public static final ItemType MAGENTA_WOOL = register("minecraft:magenta_wool");
+    @Nullable public static final ItemType MAGMA_BLOCK = register("minecraft:magma_block");
+    @Nullable public static final ItemType MAGMA_CREAM = register("minecraft:magma_cream");
+    @Nullable public static final ItemType MAGMA_CUBE_SPAWN_EGG = register("minecraft:magma_cube_spawn_egg");
+    @Nullable public static final ItemType MAP = register("minecraft:map");
+    @Nullable public static final ItemType MELON = register("minecraft:melon");
+    @Nullable public static final ItemType MELON_SEEDS = register("minecraft:melon_seeds");
+    @Nullable public static final ItemType MELON_SLICE = register("minecraft:melon_slice");
+    @Nullable public static final ItemType MILK_BUCKET = register("minecraft:milk_bucket");
+    @Nullable public static final ItemType MINECART = register("minecraft:minecart");
+    @Nullable public static final ItemType MOOSHROOM_SPAWN_EGG = register("minecraft:mooshroom_spawn_egg");
+    @Nullable public static final ItemType MOSSY_COBBLESTONE = register("minecraft:mossy_cobblestone");
+    @Nullable public static final ItemType MOSSY_COBBLESTONE_WALL = register("minecraft:mossy_cobblestone_wall");
+    @Nullable public static final ItemType MOSSY_STONE_BRICKS = register("minecraft:mossy_stone_bricks");
+    @Nullable public static final ItemType MULE_SPAWN_EGG = register("minecraft:mule_spawn_egg");
+    @Nullable public static final ItemType MUSHROOM_STEM = register("minecraft:mushroom_stem");
+    @Nullable public static final ItemType MUSHROOM_STEW = register("minecraft:mushroom_stew");
+    @Nullable public static final ItemType MUSIC_DISC_11 = register("minecraft:music_disc_11");
+    @Nullable public static final ItemType MUSIC_DISC_13 = register("minecraft:music_disc_13");
+    @Nullable public static final ItemType MUSIC_DISC_BLOCKS = register("minecraft:music_disc_blocks");
+    @Nullable public static final ItemType MUSIC_DISC_CAT = register("minecraft:music_disc_cat");
+    @Nullable public static final ItemType MUSIC_DISC_CHIRP = register("minecraft:music_disc_chirp");
+    @Nullable public static final ItemType MUSIC_DISC_FAR = register("minecraft:music_disc_far");
+    @Nullable public static final ItemType MUSIC_DISC_MALL = register("minecraft:music_disc_mall");
+    @Nullable public static final ItemType MUSIC_DISC_MELLOHI = register("minecraft:music_disc_mellohi");
+    @Nullable public static final ItemType MUSIC_DISC_STAL = register("minecraft:music_disc_stal");
+    @Nullable public static final ItemType MUSIC_DISC_STRAD = register("minecraft:music_disc_strad");
+    @Nullable public static final ItemType MUSIC_DISC_WAIT = register("minecraft:music_disc_wait");
+    @Nullable public static final ItemType MUSIC_DISC_WARD = register("minecraft:music_disc_ward");
+    @Nullable public static final ItemType MUTTON = register("minecraft:mutton");
+    @Nullable public static final ItemType MYCELIUM = register("minecraft:mycelium");
+    @Nullable public static final ItemType NAME_TAG = register("minecraft:name_tag");
+    @Nullable public static final ItemType NAUTILUS_SHELL = register("minecraft:nautilus_shell");
+    @Nullable public static final ItemType NETHER_BRICK = register("minecraft:nether_brick");
+    @Nullable public static final ItemType NETHER_BRICK_FENCE = register("minecraft:nether_brick_fence");
+    @Nullable public static final ItemType NETHER_BRICK_SLAB = register("minecraft:nether_brick_slab");
+    @Nullable public static final ItemType NETHER_BRICK_STAIRS = register("minecraft:nether_brick_stairs");
+    @Nullable public static final ItemType NETHER_BRICKS = register("minecraft:nether_bricks");
+    @Nullable public static final ItemType NETHER_QUARTZ_ORE = register("minecraft:nether_quartz_ore");
+    @Nullable public static final ItemType NETHER_STAR = register("minecraft:nether_star");
+    @Nullable public static final ItemType NETHER_WART = register("minecraft:nether_wart");
+    @Nullable public static final ItemType NETHER_WART_BLOCK = register("minecraft:nether_wart_block");
+    @Nullable public static final ItemType NETHERRACK = register("minecraft:netherrack");
+    @Nullable public static final ItemType NOTE_BLOCK = register("minecraft:note_block");
+    @Nullable public static final ItemType OAK_BOAT = register("minecraft:oak_boat");
+    @Nullable public static final ItemType OAK_BUTTON = register("minecraft:oak_button");
+    @Nullable public static final ItemType OAK_DOOR = register("minecraft:oak_door");
+    @Nullable public static final ItemType OAK_FENCE = register("minecraft:oak_fence");
+    @Nullable public static final ItemType OAK_FENCE_GATE = register("minecraft:oak_fence_gate");
+    @Nullable public static final ItemType OAK_LEAVES = register("minecraft:oak_leaves");
+    @Nullable public static final ItemType OAK_LOG = register("minecraft:oak_log");
+    @Nullable public static final ItemType OAK_PLANKS = register("minecraft:oak_planks");
+    @Nullable public static final ItemType OAK_PRESSURE_PLATE = register("minecraft:oak_pressure_plate");
+    @Nullable public static final ItemType OAK_SAPLING = register("minecraft:oak_sapling");
+    @Nullable public static final ItemType OAK_SLAB = register("minecraft:oak_slab");
+    @Nullable public static final ItemType OAK_STAIRS = register("minecraft:oak_stairs");
+    @Nullable public static final ItemType OAK_TRAPDOOR = register("minecraft:oak_trapdoor");
+    @Nullable public static final ItemType OAK_WOOD = register("minecraft:oak_wood");
+    @Nullable public static final ItemType OBSERVER = register("minecraft:observer");
+    @Nullable public static final ItemType OBSIDIAN = register("minecraft:obsidian");
+    @Nullable public static final ItemType OCELOT_SPAWN_EGG = register("minecraft:ocelot_spawn_egg");
+    @Nullable public static final ItemType ORANGE_BANNER = register("minecraft:orange_banner");
+    @Nullable public static final ItemType ORANGE_BED = register("minecraft:orange_bed");
+    @Nullable public static final ItemType ORANGE_CARPET = register("minecraft:orange_carpet");
+    @Nullable public static final ItemType ORANGE_CONCRETE = register("minecraft:orange_concrete");
+    @Nullable public static final ItemType ORANGE_CONCRETE_POWDER = register("minecraft:orange_concrete_powder");
+    @Nullable public static final ItemType ORANGE_DYE = register("minecraft:orange_dye");
+    @Nullable public static final ItemType ORANGE_GLAZED_TERRACOTTA = register("minecraft:orange_glazed_terracotta");
+    @Nullable public static final ItemType ORANGE_SHULKER_BOX = register("minecraft:orange_shulker_box");
+    @Nullable public static final ItemType ORANGE_STAINED_GLASS = register("minecraft:orange_stained_glass");
+    @Nullable public static final ItemType ORANGE_STAINED_GLASS_PANE = register("minecraft:orange_stained_glass_pane");
+    @Nullable public static final ItemType ORANGE_TERRACOTTA = register("minecraft:orange_terracotta");
+    @Nullable public static final ItemType ORANGE_TULIP = register("minecraft:orange_tulip");
+    @Nullable public static final ItemType ORANGE_WOOL = register("minecraft:orange_wool");
+    @Nullable public static final ItemType OXEYE_DAISY = register("minecraft:oxeye_daisy");
+    @Nullable public static final ItemType PACKED_ICE = register("minecraft:packed_ice");
+    @Nullable public static final ItemType PAINTING = register("minecraft:painting");
+    @Nullable public static final ItemType PAPER = register("minecraft:paper");
+    @Nullable public static final ItemType PARROT_SPAWN_EGG = register("minecraft:parrot_spawn_egg");
+    @Nullable public static final ItemType PEONY = register("minecraft:peony");
+    @Nullable public static final ItemType PETRIFIED_OAK_SLAB = register("minecraft:petrified_oak_slab");
+    @Nullable public static final ItemType PHANTOM_MEMBRANE = register("minecraft:phantom_membrane");
+    @Nullable public static final ItemType PHANTOM_SPAWN_EGG = register("minecraft:phantom_spawn_egg");
+    @Nullable public static final ItemType PIG_SPAWN_EGG = register("minecraft:pig_spawn_egg");
+    @Nullable public static final ItemType PINK_BANNER = register("minecraft:pink_banner");
+    @Nullable public static final ItemType PINK_BED = register("minecraft:pink_bed");
+    @Nullable public static final ItemType PINK_CARPET = register("minecraft:pink_carpet");
+    @Nullable public static final ItemType PINK_CONCRETE = register("minecraft:pink_concrete");
+    @Nullable public static final ItemType PINK_CONCRETE_POWDER = register("minecraft:pink_concrete_powder");
+    @Nullable public static final ItemType PINK_DYE = register("minecraft:pink_dye");
+    @Nullable public static final ItemType PINK_GLAZED_TERRACOTTA = register("minecraft:pink_glazed_terracotta");
+    @Nullable public static final ItemType PINK_SHULKER_BOX = register("minecraft:pink_shulker_box");
+    @Nullable public static final ItemType PINK_STAINED_GLASS = register("minecraft:pink_stained_glass");
+    @Nullable public static final ItemType PINK_STAINED_GLASS_PANE = register("minecraft:pink_stained_glass_pane");
+    @Nullable public static final ItemType PINK_TERRACOTTA = register("minecraft:pink_terracotta");
+    @Nullable public static final ItemType PINK_TULIP = register("minecraft:pink_tulip");
+    @Nullable public static final ItemType PINK_WOOL = register("minecraft:pink_wool");
+    @Nullable public static final ItemType PISTON = register("minecraft:piston");
+    @Nullable public static final ItemType PLAYER_HEAD = register("minecraft:player_head");
+    @Nullable public static final ItemType PODZOL = register("minecraft:podzol");
+    @Nullable public static final ItemType POISONOUS_POTATO = register("minecraft:poisonous_potato");
+    @Nullable public static final ItemType POLAR_BEAR_SPAWN_EGG = register("minecraft:polar_bear_spawn_egg");
+    @Nullable public static final ItemType POLISHED_ANDESITE = register("minecraft:polished_andesite");
+    @Nullable public static final ItemType POLISHED_DIORITE = register("minecraft:polished_diorite");
+    @Nullable public static final ItemType POLISHED_GRANITE = register("minecraft:polished_granite");
+    @Nullable public static final ItemType POPPED_CHORUS_FRUIT = register("minecraft:popped_chorus_fruit");
+    @Nullable public static final ItemType POPPY = register("minecraft:poppy");
+    @Nullable public static final ItemType PORKCHOP = register("minecraft:porkchop");
+    @Nullable public static final ItemType POTATO = register("minecraft:potato");
+    @Nullable public static final ItemType POTION = register("minecraft:potion");
+    @Nullable public static final ItemType POWERED_RAIL = register("minecraft:powered_rail");
+    @Nullable public static final ItemType PRISMARINE = register("minecraft:prismarine");
+    @Nullable public static final ItemType PRISMARINE_BRICK_SLAB = register("minecraft:prismarine_brick_slab");
+    @Nullable public static final ItemType PRISMARINE_BRICK_STAIRS = register("minecraft:prismarine_brick_stairs");
+    @Nullable public static final ItemType PRISMARINE_BRICKS = register("minecraft:prismarine_bricks");
+    @Nullable public static final ItemType PRISMARINE_CRYSTALS = register("minecraft:prismarine_crystals");
+    @Nullable public static final ItemType PRISMARINE_SHARD = register("minecraft:prismarine_shard");
+    @Nullable public static final ItemType PRISMARINE_SLAB = register("minecraft:prismarine_slab");
+    @Nullable public static final ItemType PRISMARINE_STAIRS = register("minecraft:prismarine_stairs");
+    @Nullable public static final ItemType PUFFERFISH = register("minecraft:pufferfish");
+    @Nullable public static final ItemType PUFFERFISH_BUCKET = register("minecraft:pufferfish_bucket");
+    @Nullable public static final ItemType PUFFERFISH_SPAWN_EGG = register("minecraft:pufferfish_spawn_egg");
+    @Nullable public static final ItemType PUMPKIN = register("minecraft:pumpkin");
+    @Nullable public static final ItemType PUMPKIN_PIE = register("minecraft:pumpkin_pie");
+    @Nullable public static final ItemType PUMPKIN_SEEDS = register("minecraft:pumpkin_seeds");
+    @Nullable public static final ItemType PURPLE_BANNER = register("minecraft:purple_banner");
+    @Nullable public static final ItemType PURPLE_BED = register("minecraft:purple_bed");
+    @Nullable public static final ItemType PURPLE_CARPET = register("minecraft:purple_carpet");
+    @Nullable public static final ItemType PURPLE_CONCRETE = register("minecraft:purple_concrete");
+    @Nullable public static final ItemType PURPLE_CONCRETE_POWDER = register("minecraft:purple_concrete_powder");
+    @Nullable public static final ItemType PURPLE_DYE = register("minecraft:purple_dye");
+    @Nullable public static final ItemType PURPLE_GLAZED_TERRACOTTA = register("minecraft:purple_glazed_terracotta");
+    @Nullable public static final ItemType PURPLE_SHULKER_BOX = register("minecraft:purple_shulker_box");
+    @Nullable public static final ItemType PURPLE_STAINED_GLASS = register("minecraft:purple_stained_glass");
+    @Nullable public static final ItemType PURPLE_STAINED_GLASS_PANE = register("minecraft:purple_stained_glass_pane");
+    @Nullable public static final ItemType PURPLE_TERRACOTTA = register("minecraft:purple_terracotta");
+    @Nullable public static final ItemType PURPLE_WOOL = register("minecraft:purple_wool");
+    @Nullable public static final ItemType PURPUR_BLOCK = register("minecraft:purpur_block");
+    @Nullable public static final ItemType PURPUR_PILLAR = register("minecraft:purpur_pillar");
+    @Nullable public static final ItemType PURPUR_SLAB = register("minecraft:purpur_slab");
+    @Nullable public static final ItemType PURPUR_STAIRS = register("minecraft:purpur_stairs");
+    @Nullable public static final ItemType QUARTZ = register("minecraft:quartz");
+    @Nullable public static final ItemType QUARTZ_BLOCK = register("minecraft:quartz_block");
+    @Nullable public static final ItemType QUARTZ_PILLAR = register("minecraft:quartz_pillar");
+    @Nullable public static final ItemType QUARTZ_SLAB = register("minecraft:quartz_slab");
+    @Nullable public static final ItemType QUARTZ_STAIRS = register("minecraft:quartz_stairs");
+    @Nullable public static final ItemType RABBIT = register("minecraft:rabbit");
+    @Nullable public static final ItemType RABBIT_FOOT = register("minecraft:rabbit_foot");
+    @Nullable public static final ItemType RABBIT_HIDE = register("minecraft:rabbit_hide");
+    @Nullable public static final ItemType RABBIT_SPAWN_EGG = register("minecraft:rabbit_spawn_egg");
+    @Nullable public static final ItemType RABBIT_STEW = register("minecraft:rabbit_stew");
+    @Nullable public static final ItemType RAIL = register("minecraft:rail");
+    @Nullable public static final ItemType RED_BANNER = register("minecraft:red_banner");
+    @Nullable public static final ItemType RED_BED = register("minecraft:red_bed");
+    @Nullable public static final ItemType RED_CARPET = register("minecraft:red_carpet");
+    @Nullable public static final ItemType RED_CONCRETE = register("minecraft:red_concrete");
+    @Nullable public static final ItemType RED_CONCRETE_POWDER = register("minecraft:red_concrete_powder");
+    @Nullable public static final ItemType RED_GLAZED_TERRACOTTA = register("minecraft:red_glazed_terracotta");
+    @Nullable public static final ItemType RED_MUSHROOM = register("minecraft:red_mushroom");
+    @Nullable public static final ItemType RED_MUSHROOM_BLOCK = register("minecraft:red_mushroom_block");
+    @Nullable public static final ItemType RED_NETHER_BRICKS = register("minecraft:red_nether_bricks");
+    @Nullable public static final ItemType RED_SAND = register("minecraft:red_sand");
+    @Nullable public static final ItemType RED_SANDSTONE = register("minecraft:red_sandstone");
+    @Nullable public static final ItemType RED_SANDSTONE_SLAB = register("minecraft:red_sandstone_slab");
+    @Nullable public static final ItemType RED_SANDSTONE_STAIRS = register("minecraft:red_sandstone_stairs");
+    @Nullable public static final ItemType RED_SHULKER_BOX = register("minecraft:red_shulker_box");
+    @Nullable public static final ItemType RED_STAINED_GLASS = register("minecraft:red_stained_glass");
+    @Nullable public static final ItemType RED_STAINED_GLASS_PANE = register("minecraft:red_stained_glass_pane");
+    @Nullable public static final ItemType RED_TERRACOTTA = register("minecraft:red_terracotta");
+    @Nullable public static final ItemType RED_TULIP = register("minecraft:red_tulip");
+    @Nullable public static final ItemType RED_WOOL = register("minecraft:red_wool");
+    @Nullable public static final ItemType REDSTONE = register("minecraft:redstone");
+    @Nullable public static final ItemType REDSTONE_BLOCK = register("minecraft:redstone_block");
+    @Nullable public static final ItemType REDSTONE_LAMP = register("minecraft:redstone_lamp");
+    @Nullable public static final ItemType REDSTONE_ORE = register("minecraft:redstone_ore");
+    @Nullable public static final ItemType REDSTONE_TORCH = register("minecraft:redstone_torch");
+    @Nullable public static final ItemType REPEATER = register("minecraft:repeater");
+    @Nullable public static final ItemType REPEATING_COMMAND_BLOCK = register("minecraft:repeating_command_block");
+    @Nullable public static final ItemType ROSE_BUSH = register("minecraft:rose_bush");
+    @Nullable public static final ItemType ROSE_RED = register("minecraft:rose_red");
+    @Nullable public static final ItemType ROTTEN_FLESH = register("minecraft:rotten_flesh");
+    @Nullable public static final ItemType SADDLE = register("minecraft:saddle");
+    @Nullable public static final ItemType SALMON = register("minecraft:salmon");
+    @Nullable public static final ItemType SALMON_BUCKET = register("minecraft:salmon_bucket");
+    @Nullable public static final ItemType SALMON_SPAWN_EGG = register("minecraft:salmon_spawn_egg");
+    @Nullable public static final ItemType SAND = register("minecraft:sand");
+    @Nullable public static final ItemType SANDSTONE = register("minecraft:sandstone");
+    @Nullable public static final ItemType SANDSTONE_SLAB = register("minecraft:sandstone_slab");
+    @Nullable public static final ItemType SANDSTONE_STAIRS = register("minecraft:sandstone_stairs");
+    @Nullable public static final ItemType SCUTE = register("minecraft:scute");
+    @Nullable public static final ItemType SEA_LANTERN = register("minecraft:sea_lantern");
+    @Nullable public static final ItemType SEA_PICKLE = register("minecraft:sea_pickle");
+    @Nullable public static final ItemType SEAGRASS = register("minecraft:seagrass");
+    @Nullable public static final ItemType SHEARS = register("minecraft:shears");
+    @Nullable public static final ItemType SHEEP_SPAWN_EGG = register("minecraft:sheep_spawn_egg");
+    @Nullable public static final ItemType SHIELD = register("minecraft:shield");
+    @Nullable public static final ItemType SHULKER_BOX = register("minecraft:shulker_box");
+    @Nullable public static final ItemType SHULKER_SHELL = register("minecraft:shulker_shell");
+    @Nullable public static final ItemType SHULKER_SPAWN_EGG = register("minecraft:shulker_spawn_egg");
+    @Nullable public static final ItemType SIGN = register("minecraft:sign");
+    @Nullable public static final ItemType SILVERFISH_SPAWN_EGG = register("minecraft:silverfish_spawn_egg");
+    @Nullable public static final ItemType SKELETON_HORSE_SPAWN_EGG = register("minecraft:skeleton_horse_spawn_egg");
+    @Nullable public static final ItemType SKELETON_SKULL = register("minecraft:skeleton_skull");
+    @Nullable public static final ItemType SKELETON_SPAWN_EGG = register("minecraft:skeleton_spawn_egg");
+    @Nullable public static final ItemType SLIME_BALL = register("minecraft:slime_ball");
+    @Nullable public static final ItemType SLIME_BLOCK = register("minecraft:slime_block");
+    @Nullable public static final ItemType SLIME_SPAWN_EGG = register("minecraft:slime_spawn_egg");
+    @Nullable public static final ItemType SMOOTH_QUARTZ = register("minecraft:smooth_quartz");
+    @Nullable public static final ItemType SMOOTH_RED_SANDSTONE = register("minecraft:smooth_red_sandstone");
+    @Nullable public static final ItemType SMOOTH_SANDSTONE = register("minecraft:smooth_sandstone");
+    @Nullable public static final ItemType SMOOTH_STONE = register("minecraft:smooth_stone");
+    @Nullable public static final ItemType SNOW = register("minecraft:snow");
+    @Nullable public static final ItemType SNOW_BLOCK = register("minecraft:snow_block");
+    @Nullable public static final ItemType SNOWBALL = register("minecraft:snowball");
+    @Nullable public static final ItemType SOUL_SAND = register("minecraft:soul_sand");
+    @Nullable public static final ItemType SPAWNER = register("minecraft:spawner");
+    @Nullable public static final ItemType SPECTRAL_ARROW = register("minecraft:spectral_arrow");
+    @Nullable public static final ItemType SPIDER_EYE = register("minecraft:spider_eye");
+    @Nullable public static final ItemType SPIDER_SPAWN_EGG = register("minecraft:spider_spawn_egg");
+    @Nullable public static final ItemType SPLASH_POTION = register("minecraft:splash_potion");
+    @Nullable public static final ItemType SPONGE = register("minecraft:sponge");
+    @Nullable public static final ItemType SPRUCE_BOAT = register("minecraft:spruce_boat");
+    @Nullable public static final ItemType SPRUCE_BUTTON = register("minecraft:spruce_button");
+    @Nullable public static final ItemType SPRUCE_DOOR = register("minecraft:spruce_door");
+    @Nullable public static final ItemType SPRUCE_FENCE = register("minecraft:spruce_fence");
+    @Nullable public static final ItemType SPRUCE_FENCE_GATE = register("minecraft:spruce_fence_gate");
+    @Nullable public static final ItemType SPRUCE_LEAVES = register("minecraft:spruce_leaves");
+    @Nullable public static final ItemType SPRUCE_LOG = register("minecraft:spruce_log");
+    @Nullable public static final ItemType SPRUCE_PLANKS = register("minecraft:spruce_planks");
+    @Nullable public static final ItemType SPRUCE_PRESSURE_PLATE = register("minecraft:spruce_pressure_plate");
+    @Nullable public static final ItemType SPRUCE_SAPLING = register("minecraft:spruce_sapling");
+    @Nullable public static final ItemType SPRUCE_SLAB = register("minecraft:spruce_slab");
+    @Nullable public static final ItemType SPRUCE_STAIRS = register("minecraft:spruce_stairs");
+    @Nullable public static final ItemType SPRUCE_TRAPDOOR = register("minecraft:spruce_trapdoor");
+    @Nullable public static final ItemType SPRUCE_WOOD = register("minecraft:spruce_wood");
+    @Nullable public static final ItemType SQUID_SPAWN_EGG = register("minecraft:squid_spawn_egg");
+    @Nullable public static final ItemType STICK = register("minecraft:stick");
+    @Nullable public static final ItemType STICKY_PISTON = register("minecraft:sticky_piston");
+    @Nullable public static final ItemType STONE = register("minecraft:stone");
+    @Nullable public static final ItemType STONE_AXE = register("minecraft:stone_axe");
+    @Nullable public static final ItemType STONE_BRICK_SLAB = register("minecraft:stone_brick_slab");
+    @Nullable public static final ItemType STONE_BRICK_STAIRS = register("minecraft:stone_brick_stairs");
+    @Nullable public static final ItemType STONE_BRICKS = register("minecraft:stone_bricks");
+    @Nullable public static final ItemType STONE_BUTTON = register("minecraft:stone_button");
+    @Nullable public static final ItemType STONE_HOE = register("minecraft:stone_hoe");
+    @Nullable public static final ItemType STONE_PICKAXE = register("minecraft:stone_pickaxe");
+    @Nullable public static final ItemType STONE_PRESSURE_PLATE = register("minecraft:stone_pressure_plate");
+    @Nullable public static final ItemType STONE_SHOVEL = register("minecraft:stone_shovel");
+    @Nullable public static final ItemType STONE_SLAB = register("minecraft:stone_slab");
+    @Nullable public static final ItemType STONE_SWORD = register("minecraft:stone_sword");
+    @Nullable public static final ItemType STRAY_SPAWN_EGG = register("minecraft:stray_spawn_egg");
+    @Nullable public static final ItemType STRING = register("minecraft:string");
+    @Nullable public static final ItemType STRIPPED_ACACIA_LOG = register("minecraft:stripped_acacia_log");
+    @Nullable public static final ItemType STRIPPED_ACACIA_WOOD = register("minecraft:stripped_acacia_wood");
+    @Nullable public static final ItemType STRIPPED_BIRCH_LOG = register("minecraft:stripped_birch_log");
+    @Nullable public static final ItemType STRIPPED_BIRCH_WOOD = register("minecraft:stripped_birch_wood");
+    @Nullable public static final ItemType STRIPPED_DARK_OAK_LOG = register("minecraft:stripped_dark_oak_log");
+    @Nullable public static final ItemType STRIPPED_DARK_OAK_WOOD = register("minecraft:stripped_dark_oak_wood");
+    @Nullable public static final ItemType STRIPPED_JUNGLE_LOG = register("minecraft:stripped_jungle_log");
+    @Nullable public static final ItemType STRIPPED_JUNGLE_WOOD = register("minecraft:stripped_jungle_wood");
+    @Nullable public static final ItemType STRIPPED_OAK_LOG = register("minecraft:stripped_oak_log");
+    @Nullable public static final ItemType STRIPPED_OAK_WOOD = register("minecraft:stripped_oak_wood");
+    @Nullable public static final ItemType STRIPPED_SPRUCE_LOG = register("minecraft:stripped_spruce_log");
+    @Nullable public static final ItemType STRIPPED_SPRUCE_WOOD = register("minecraft:stripped_spruce_wood");
+    @Nullable public static final ItemType STRUCTURE_BLOCK = register("minecraft:structure_block");
+    @Nullable public static final ItemType STRUCTURE_VOID = register("minecraft:structure_void");
+    @Nullable public static final ItemType SUGAR = register("minecraft:sugar");
+    @Nullable public static final ItemType SUGAR_CANE = register("minecraft:sugar_cane");
+    @Nullable public static final ItemType SUNFLOWER = register("minecraft:sunflower");
+    @Nullable public static final ItemType TALL_GRASS = register("minecraft:tall_grass");
+    @Nullable public static final ItemType TERRACOTTA = register("minecraft:terracotta");
+    @Nullable public static final ItemType TIPPED_ARROW = register("minecraft:tipped_arrow");
+    @Nullable public static final ItemType TNT = register("minecraft:tnt");
+    @Nullable public static final ItemType TNT_MINECART = register("minecraft:tnt_minecart");
+    @Nullable public static final ItemType TORCH = register("minecraft:torch");
+    @Nullable public static final ItemType TOTEM_OF_UNDYING = register("minecraft:totem_of_undying");
+    @Nullable public static final ItemType TRAPPED_CHEST = register("minecraft:trapped_chest");
+    @Nullable public static final ItemType TRIDENT = register("minecraft:trident");
+    @Nullable public static final ItemType TRIPWIRE_HOOK = register("minecraft:tripwire_hook");
+    @Nullable public static final ItemType TROPICAL_FISH = register("minecraft:tropical_fish");
+    @Nullable public static final ItemType TROPICAL_FISH_BUCKET = register("minecraft:tropical_fish_bucket");
+    @Nullable public static final ItemType TROPICAL_FISH_SPAWN_EGG = register("minecraft:tropical_fish_spawn_egg");
+    @Nullable public static final ItemType TUBE_CORAL = register("minecraft:tube_coral");
+    @Nullable public static final ItemType TUBE_CORAL_BLOCK = register("minecraft:tube_coral_block");
+    @Nullable public static final ItemType TUBE_CORAL_FAN = register("minecraft:tube_coral_fan");
+    @Nullable public static final ItemType TURTLE_EGG = register("minecraft:turtle_egg");
+    @Nullable public static final ItemType TURTLE_HELMET = register("minecraft:turtle_helmet");
+    @Nullable public static final ItemType TURTLE_SPAWN_EGG = register("minecraft:turtle_spawn_egg");
+    @Nullable public static final ItemType VEX_SPAWN_EGG = register("minecraft:vex_spawn_egg");
+    @Nullable public static final ItemType VILLAGER_SPAWN_EGG = register("minecraft:villager_spawn_egg");
+    @Nullable public static final ItemType VINDICATOR_SPAWN_EGG = register("minecraft:vindicator_spawn_egg");
+    @Nullable public static final ItemType VINE = register("minecraft:vine");
+    @Nullable public static final ItemType WATER_BUCKET = register("minecraft:water_bucket");
+    @Nullable public static final ItemType WET_SPONGE = register("minecraft:wet_sponge");
+    @Nullable public static final ItemType WHEAT = register("minecraft:wheat");
+    @Nullable public static final ItemType WHEAT_SEEDS = register("minecraft:wheat_seeds");
+    @Nullable public static final ItemType WHITE_BANNER = register("minecraft:white_banner");
+    @Nullable public static final ItemType WHITE_BED = register("minecraft:white_bed");
+    @Nullable public static final ItemType WHITE_CARPET = register("minecraft:white_carpet");
+    @Nullable public static final ItemType WHITE_CONCRETE = register("minecraft:white_concrete");
+    @Nullable public static final ItemType WHITE_CONCRETE_POWDER = register("minecraft:white_concrete_powder");
+    @Nullable public static final ItemType WHITE_GLAZED_TERRACOTTA = register("minecraft:white_glazed_terracotta");
+    @Nullable public static final ItemType WHITE_SHULKER_BOX = register("minecraft:white_shulker_box");
+    @Nullable public static final ItemType WHITE_STAINED_GLASS = register("minecraft:white_stained_glass");
+    @Nullable public static final ItemType WHITE_STAINED_GLASS_PANE = register("minecraft:white_stained_glass_pane");
+    @Nullable public static final ItemType WHITE_TERRACOTTA = register("minecraft:white_terracotta");
+    @Nullable public static final ItemType WHITE_TULIP = register("minecraft:white_tulip");
+    @Nullable public static final ItemType WHITE_WOOL = register("minecraft:white_wool");
+    @Nullable public static final ItemType WITCH_SPAWN_EGG = register("minecraft:witch_spawn_egg");
+    @Nullable public static final ItemType WITHER_SKELETON_SKULL = register("minecraft:wither_skeleton_skull");
+    @Nullable public static final ItemType WITHER_SKELETON_SPAWN_EGG = register("minecraft:wither_skeleton_spawn_egg");
+    @Nullable public static final ItemType WOLF_SPAWN_EGG = register("minecraft:wolf_spawn_egg");
+    @Nullable public static final ItemType WOODEN_AXE = register("minecraft:wooden_axe");
+    @Nullable public static final ItemType WOODEN_HOE = register("minecraft:wooden_hoe");
+    @Nullable public static final ItemType WOODEN_PICKAXE = register("minecraft:wooden_pickaxe");
+    @Nullable public static final ItemType WOODEN_SHOVEL = register("minecraft:wooden_shovel");
+    @Nullable public static final ItemType WOODEN_SWORD = register("minecraft:wooden_sword");
+    @Nullable public static final ItemType WRITABLE_BOOK = register("minecraft:writable_book");
+    @Nullable public static final ItemType WRITTEN_BOOK = register("minecraft:written_book");
+    @Nullable public static final ItemType YELLOW_BANNER = register("minecraft:yellow_banner");
+    @Nullable public static final ItemType YELLOW_BED = register("minecraft:yellow_bed");
+    @Nullable public static final ItemType YELLOW_CARPET = register("minecraft:yellow_carpet");
+    @Nullable public static final ItemType YELLOW_CONCRETE = register("minecraft:yellow_concrete");
+    @Nullable public static final ItemType YELLOW_CONCRETE_POWDER = register("minecraft:yellow_concrete_powder");
+    @Nullable public static final ItemType YELLOW_GLAZED_TERRACOTTA = register("minecraft:yellow_glazed_terracotta");
+    @Nullable public static final ItemType YELLOW_SHULKER_BOX = register("minecraft:yellow_shulker_box");
+    @Nullable public static final ItemType YELLOW_STAINED_GLASS = register("minecraft:yellow_stained_glass");
+    @Nullable public static final ItemType YELLOW_STAINED_GLASS_PANE = register("minecraft:yellow_stained_glass_pane");
+    @Nullable public static final ItemType YELLOW_TERRACOTTA = register("minecraft:yellow_terracotta");
+    @Nullable public static final ItemType YELLOW_WOOL = register("minecraft:yellow_wool");
+    @Nullable public static final ItemType ZOMBIE_HEAD = register("minecraft:zombie_head");
+    @Nullable public static final ItemType ZOMBIE_HORSE_SPAWN_EGG = register("minecraft:zombie_horse_spawn_egg");
+    @Nullable public static final ItemType ZOMBIE_PIGMAN_SPAWN_EGG = register("minecraft:zombie_pigman_spawn_egg");
+    @Nullable public static final ItemType ZOMBIE_SPAWN_EGG = register("minecraft:zombie_spawn_egg");
+    @Nullable public static final ItemType ZOMBIE_VILLAGER_SPAWN_EGG = register("minecraft:zombie_villager_spawn_egg");
 
-    __RESERVED__,
-    ACACIA_BOAT,
-    ACACIA_BUTTON,
-    ACACIA_DOOR,
-    ACACIA_FENCE,
-    ACACIA_FENCE_GATE,
-    ACACIA_LEAVES,
-    ACACIA_LOG,
-    ACACIA_PLANKS,
-    ACACIA_PRESSURE_PLATE,
-    ACACIA_SAPLING,
-    ACACIA_SLAB,
-    ACACIA_STAIRS,
-    ACACIA_TRAPDOOR,
-    ACACIA_WOOD,
-    ACTIVATOR_RAIL,
-    AIR,
-    ALLIUM,
-    ANDESITE,
-    ANVIL,
-    APPLE,
-    ARMOR_STAND,
-    ARROW,
-    AZURE_BLUET,
-    BAKED_POTATO,
-    BARRIER,
-    BAT_SPAWN_EGG,
-    BEACON,
-    BEDROCK,
-    BEEF,
-    BEETROOT,
-    BEETROOT_SEEDS,
-    BEETROOT_SOUP,
-    BIRCH_BOAT,
-    BIRCH_BUTTON,
-    BIRCH_DOOR,
-    BIRCH_FENCE,
-    BIRCH_FENCE_GATE,
-    BIRCH_LEAVES,
-    BIRCH_LOG,
-    BIRCH_PLANKS,
-    BIRCH_PRESSURE_PLATE,
-    BIRCH_SAPLING,
-    BIRCH_SLAB,
-    BIRCH_STAIRS,
-    BIRCH_TRAPDOOR,
-    BIRCH_WOOD,
-    BLACK_BANNER,
-    BLACK_BED,
-    BLACK_CARPET,
-    BLACK_CONCRETE,
-    BLACK_CONCRETE_POWDER,
-    BLACK_GLAZED_TERRACOTTA,
-    BLACK_SHULKER_BOX,
-    BLACK_STAINED_GLASS,
-    BLACK_STAINED_GLASS_PANE,
-    BLACK_TERRACOTTA,
-    BLACK_WOOL,
-    BLAZE_POWDER,
-    BLAZE_ROD,
-    BLAZE_SPAWN_EGG,
-    BLUE_BANNER,
-    BLUE_BED,
-    BLUE_CARPET,
-    BLUE_CONCRETE,
-    BLUE_CONCRETE_POWDER,
-    BLUE_GLAZED_TERRACOTTA,
-    BLUE_ICE,
-    BLUE_ORCHID,
-    BLUE_SHULKER_BOX,
-    BLUE_STAINED_GLASS,
-    BLUE_STAINED_GLASS_PANE,
-    BLUE_TERRACOTTA,
-    BLUE_WOOL,
-    BONE,
-    BONE_BLOCK,
-    BONE_MEAL,
-    BOOK,
-    BOOKSHELF,
-    BOW,
-    BOWL,
-    BRAIN_CORAL,
-    BRAIN_CORAL_BLOCK,
-    BRAIN_CORAL_FAN,
-    BREAD,
-    BREWING_STAND,
-    BRICK,
-    BRICKS,
-    BRICK_SLAB,
-    BRICK_STAIRS,
-    BROWN_BANNER,
-    BROWN_BED,
-    BROWN_CARPET,
-    BROWN_CONCRETE,
-    BROWN_CONCRETE_POWDER,
-    BROWN_GLAZED_TERRACOTTA,
-    BROWN_MUSHROOM,
-    BROWN_MUSHROOM_BLOCK,
-    BROWN_SHULKER_BOX,
-    BROWN_STAINED_GLASS,
-    BROWN_STAINED_GLASS_PANE,
-    BROWN_TERRACOTTA,
-    BROWN_WOOL,
-    BUBBLE_CORAL,
-    BUBBLE_CORAL_BLOCK,
-    BUBBLE_CORAL_FAN,
-    BUCKET,
-    CACTUS,
-    CACTUS_GREEN,
-    CAKE,
-    CARROT,
-    CARROT_ON_A_STICK,
-    CARVED_PUMPKIN,
-    CAULDRON,
-    CAVE_SPIDER_SPAWN_EGG,
-    CHAINMAIL_BOOTS,
-    CHAINMAIL_CHESTPLATE,
-    CHAINMAIL_HELMET,
-    CHAINMAIL_LEGGINGS,
-    CHAIN_COMMAND_BLOCK,
-    CHARCOAL,
-    CHEST,
-    CHEST_MINECART,
-    CHICKEN,
-    CHICKEN_SPAWN_EGG,
-    CHIPPED_ANVIL,
-    CHISELED_QUARTZ_BLOCK,
-    CHISELED_RED_SANDSTONE,
-    CHISELED_SANDSTONE,
-    CHISELED_STONE_BRICKS,
-    CHORUS_FLOWER,
-    CHORUS_FRUIT,
-    CHORUS_PLANT,
-    CLAY,
-    CLAY_BALL,
-    CLOCK,
-    COAL,
-    COAL_BLOCK,
-    COAL_ORE,
-    COARSE_DIRT,
-    COBBLESTONE,
-    COBBLESTONE_SLAB,
-    COBBLESTONE_STAIRS,
-    COBBLESTONE_WALL,
-    COBWEB,
-    COCOA_BEANS,
-    COD,
-    COD_BUCKET,
-    COD_SPAWN_EGG,
-    COMMAND_BLOCK,
-    COMMAND_BLOCK_MINECART,
-    COMPARATOR,
-    COMPASS,
-    CONDUIT,
-    COOKED_BEEF,
-    COOKED_CHICKEN,
-    COOKED_COD,
-    COOKED_MUTTON,
-    COOKED_PORKCHOP,
-    COOKED_RABBIT,
-    COOKED_SALMON,
-    COOKIE,
-    COW_SPAWN_EGG,
-    CRACKED_STONE_BRICKS,
-    CRAFTING_TABLE,
-    CREEPER_HEAD,
-    CREEPER_SPAWN_EGG,
-    CUT_RED_SANDSTONE,
-    CUT_SANDSTONE,
-    CYAN_BANNER,
-    CYAN_BED,
-    CYAN_CARPET,
-    CYAN_CONCRETE,
-    CYAN_CONCRETE_POWDER,
-    CYAN_DYE,
-    CYAN_GLAZED_TERRACOTTA,
-    CYAN_SHULKER_BOX,
-    CYAN_STAINED_GLASS,
-    CYAN_STAINED_GLASS_PANE,
-    CYAN_TERRACOTTA,
-    CYAN_WOOL,
-    DAMAGED_ANVIL,
-    DANDELION,
-    DANDELION_YELLOW,
-    DARK_OAK_BOAT,
-    DARK_OAK_BUTTON,
-    DARK_OAK_DOOR,
-    DARK_OAK_FENCE,
-    DARK_OAK_FENCE_GATE,
-    DARK_OAK_LEAVES,
-    DARK_OAK_LOG,
-    DARK_OAK_PLANKS,
-    DARK_OAK_PRESSURE_PLATE,
-    DARK_OAK_SAPLING,
-    DARK_OAK_SLAB,
-    DARK_OAK_STAIRS,
-    DARK_OAK_TRAPDOOR,
-    DARK_OAK_WOOD,
-    DARK_PRISMARINE,
-    DARK_PRISMARINE_SLAB,
-    DARK_PRISMARINE_STAIRS,
-    DAYLIGHT_DETECTOR,
-    DEAD_BRAIN_CORAL,
-    DEAD_BRAIN_CORAL_BLOCK,
-    DEAD_BRAIN_CORAL_FAN,
-    DEAD_BUBBLE_CORAL,
-    DEAD_BUBBLE_CORAL_BLOCK,
-    DEAD_BUBBLE_CORAL_FAN,
-    DEAD_BUSH,
-    DEAD_FIRE_CORAL,
-    DEAD_FIRE_CORAL_BLOCK,
-    DEAD_FIRE_CORAL_FAN,
-    DEAD_HORN_CORAL,
-    DEAD_HORN_CORAL_BLOCK,
-    DEAD_HORN_CORAL_FAN,
-    DEAD_TUBE_CORAL,
-    DEAD_TUBE_CORAL_BLOCK,
-    DEAD_TUBE_CORAL_FAN,
-    DEBUG_STICK,
-    DETECTOR_RAIL,
-    DIAMOND,
-    DIAMOND_AXE,
-    DIAMOND_BLOCK,
-    DIAMOND_BOOTS,
-    DIAMOND_CHESTPLATE,
-    DIAMOND_HELMET,
-    DIAMOND_HOE,
-    DIAMOND_HORSE_ARMOR,
-    DIAMOND_LEGGINGS,
-    DIAMOND_ORE,
-    DIAMOND_PICKAXE,
-    DIAMOND_SHOVEL,
-    DIAMOND_SWORD,
-    DIORITE,
-    DIRT,
-    DISPENSER,
-    DOLPHIN_SPAWN_EGG,
-    DONKEY_SPAWN_EGG,
-    DRAGON_BREATH,
-    DRAGON_EGG,
-    DRAGON_HEAD,
-    DRIED_KELP,
-    DRIED_KELP_BLOCK,
-    DROPPER,
-    DROWNED_SPAWN_EGG,
-    EGG,
-    ELDER_GUARDIAN_SPAWN_EGG,
-    ELYTRA,
-    EMERALD,
-    EMERALD_BLOCK,
-    EMERALD_ORE,
-    ENCHANTED_BOOK,
-    ENCHANTED_GOLDEN_APPLE,
-    ENCHANTING_TABLE,
-    ENDERMAN_SPAWN_EGG,
-    ENDERMITE_SPAWN_EGG,
-    ENDER_CHEST,
-    ENDER_EYE,
-    ENDER_PEARL,
-    END_CRYSTAL,
-    END_PORTAL_FRAME,
-    END_ROD,
-    END_STONE,
-    END_STONE_BRICKS,
-    EVOKER_SPAWN_EGG,
-    EXPERIENCE_BOTTLE,
-    FARMLAND,
-    FEATHER,
-    FERMENTED_SPIDER_EYE,
-    FERN,
-    FILLED_MAP,
-    FIREWORK_ROCKET,
-    FIREWORK_STAR,
-    FIRE_CHARGE,
-    FIRE_CORAL,
-    FIRE_CORAL_BLOCK,
-    FIRE_CORAL_FAN,
-    FISHING_ROD,
-    FLINT,
-    FLINT_AND_STEEL,
-    FLOWER_POT,
-    FURNACE,
-    FURNACE_MINECART,
-    GHAST_SPAWN_EGG,
-    GHAST_TEAR,
-    GLASS,
-    GLASS_BOTTLE,
-    GLASS_PANE,
-    GLISTERING_MELON_SLICE,
-    GLOWSTONE,
-    GLOWSTONE_DUST,
-    GOLDEN_APPLE,
-    GOLDEN_AXE,
-    GOLDEN_BOOTS,
-    GOLDEN_CARROT,
-    GOLDEN_CHESTPLATE,
-    GOLDEN_HELMET,
-    GOLDEN_HOE,
-    GOLDEN_HORSE_ARMOR,
-    GOLDEN_LEGGINGS,
-    GOLDEN_PICKAXE,
-    GOLDEN_SHOVEL,
-    GOLDEN_SWORD,
-    GOLD_BLOCK,
-    GOLD_INGOT,
-    GOLD_NUGGET,
-    GOLD_ORE,
-    GRANITE,
-    GRASS,
-    GRASS_BLOCK,
-    GRASS_PATH,
-    GRAVEL,
-    GRAY_BANNER,
-    GRAY_BED,
-    GRAY_CARPET,
-    GRAY_CONCRETE,
-    GRAY_CONCRETE_POWDER,
-    GRAY_DYE,
-    GRAY_GLAZED_TERRACOTTA,
-    GRAY_SHULKER_BOX,
-    GRAY_STAINED_GLASS,
-    GRAY_STAINED_GLASS_PANE,
-    GRAY_TERRACOTTA,
-    GRAY_WOOL,
-    GREEN_BANNER,
-    GREEN_BED,
-    GREEN_CARPET,
-    GREEN_CONCRETE,
-    GREEN_CONCRETE_POWDER,
-    GREEN_GLAZED_TERRACOTTA,
-    GREEN_SHULKER_BOX,
-    GREEN_STAINED_GLASS,
-    GREEN_STAINED_GLASS_PANE,
-    GREEN_TERRACOTTA,
-    GREEN_WOOL,
-    GUARDIAN_SPAWN_EGG,
-    GUNPOWDER,
-    HAY_BLOCK,
-    HEART_OF_THE_SEA,
-    HEAVY_WEIGHTED_PRESSURE_PLATE,
-    HOPPER,
-    HOPPER_MINECART,
-    HORN_CORAL,
-    HORN_CORAL_BLOCK,
-    HORN_CORAL_FAN,
-    HORSE_SPAWN_EGG,
-    HUSK_SPAWN_EGG,
-    ICE,
-    INFESTED_CHISELED_STONE_BRICKS,
-    INFESTED_COBBLESTONE,
-    INFESTED_CRACKED_STONE_BRICKS,
-    INFESTED_MOSSY_STONE_BRICKS,
-    INFESTED_STONE,
-    INFESTED_STONE_BRICKS,
-    INK_SAC,
-    IRON_AXE,
-    IRON_BARS,
-    IRON_BLOCK,
-    IRON_BOOTS,
-    IRON_CHESTPLATE,
-    IRON_DOOR,
-    IRON_HELMET,
-    IRON_HOE,
-    IRON_HORSE_ARMOR,
-    IRON_INGOT,
-    IRON_LEGGINGS,
-    IRON_NUGGET,
-    IRON_ORE,
-    IRON_PICKAXE,
-    IRON_SHOVEL,
-    IRON_SWORD,
-    IRON_TRAPDOOR,
-    ITEM_FRAME,
-    JACK_O_LANTERN,
-    JUKEBOX,
-    JUNGLE_BOAT,
-    JUNGLE_BUTTON,
-    JUNGLE_DOOR,
-    JUNGLE_FENCE,
-    JUNGLE_FENCE_GATE,
-    JUNGLE_LEAVES,
-    JUNGLE_LOG,
-    JUNGLE_PLANKS,
-    JUNGLE_PRESSURE_PLATE,
-    JUNGLE_SAPLING,
-    JUNGLE_SLAB,
-    JUNGLE_STAIRS,
-    JUNGLE_TRAPDOOR,
-    JUNGLE_WOOD,
-    KELP,
-    KNOWLEDGE_BOOK,
-    LADDER,
-    LAPIS_BLOCK,
-    LAPIS_LAZULI,
-    LAPIS_ORE,
-    LARGE_FERN,
-    LAVA_BUCKET,
-    LEAD,
-    LEATHER,
-    LEATHER_BOOTS,
-    LEATHER_CHESTPLATE,
-    LEATHER_HELMET,
-    LEATHER_LEGGINGS,
-    LEVER,
-    LIGHT_BLUE_BANNER,
-    LIGHT_BLUE_BED,
-    LIGHT_BLUE_CARPET,
-    LIGHT_BLUE_CONCRETE,
-    LIGHT_BLUE_CONCRETE_POWDER,
-    LIGHT_BLUE_DYE,
-    LIGHT_BLUE_GLAZED_TERRACOTTA,
-    LIGHT_BLUE_SHULKER_BOX,
-    LIGHT_BLUE_STAINED_GLASS,
-    LIGHT_BLUE_STAINED_GLASS_PANE,
-    LIGHT_BLUE_TERRACOTTA,
-    LIGHT_BLUE_WOOL,
-    LIGHT_GRAY_BANNER,
-    LIGHT_GRAY_BED,
-    LIGHT_GRAY_CARPET,
-    LIGHT_GRAY_CONCRETE,
-    LIGHT_GRAY_CONCRETE_POWDER,
-    LIGHT_GRAY_DYE,
-    LIGHT_GRAY_GLAZED_TERRACOTTA,
-    LIGHT_GRAY_SHULKER_BOX,
-    LIGHT_GRAY_STAINED_GLASS,
-    LIGHT_GRAY_STAINED_GLASS_PANE,
-    LIGHT_GRAY_TERRACOTTA,
-    LIGHT_GRAY_WOOL,
-    LIGHT_WEIGHTED_PRESSURE_PLATE,
-    LILAC,
-    LILY_PAD,
-    LIME_BANNER,
-    LIME_BED,
-    LIME_CARPET,
-    LIME_CONCRETE,
-    LIME_CONCRETE_POWDER,
-    LIME_DYE,
-    LIME_GLAZED_TERRACOTTA,
-    LIME_SHULKER_BOX,
-    LIME_STAINED_GLASS,
-    LIME_STAINED_GLASS_PANE,
-    LIME_TERRACOTTA,
-    LIME_WOOL,
-    LINGERING_POTION,
-    LLAMA_SPAWN_EGG,
-    MAGENTA_BANNER,
-    MAGENTA_BED,
-    MAGENTA_CARPET,
-    MAGENTA_CONCRETE,
-    MAGENTA_CONCRETE_POWDER,
-    MAGENTA_DYE,
-    MAGENTA_GLAZED_TERRACOTTA,
-    MAGENTA_SHULKER_BOX,
-    MAGENTA_STAINED_GLASS,
-    MAGENTA_STAINED_GLASS_PANE,
-    MAGENTA_TERRACOTTA,
-    MAGENTA_WOOL,
-    MAGMA_BLOCK,
-    MAGMA_CREAM,
-    MAGMA_CUBE_SPAWN_EGG,
-    MAP,
-    MELON,
-    MELON_SEEDS,
-    MELON_SLICE,
-    MILK_BUCKET,
-    MINECART,
-    MOOSHROOM_SPAWN_EGG,
-    MOSSY_COBBLESTONE,
-    MOSSY_COBBLESTONE_WALL,
-    MOSSY_STONE_BRICKS,
-    MULE_SPAWN_EGG,
-    MUSHROOM_STEM,
-    MUSHROOM_STEW,
-    MUSIC_DISC_11,
-    MUSIC_DISC_13,
-    MUSIC_DISC_BLOCKS,
-    MUSIC_DISC_CAT,
-    MUSIC_DISC_CHIRP,
-    MUSIC_DISC_FAR,
-    MUSIC_DISC_MALL,
-    MUSIC_DISC_MELLOHI,
-    MUSIC_DISC_STAL,
-    MUSIC_DISC_STRAD,
-    MUSIC_DISC_WAIT,
-    MUSIC_DISC_WARD,
-    MUTTON,
-    MYCELIUM,
-    NAME_TAG,
-    NAUTILUS_SHELL,
-    NETHERRACK,
-    NETHER_BRICK,
-    NETHER_BRICKS,
-    NETHER_BRICK_FENCE,
-    NETHER_BRICK_SLAB,
-    NETHER_BRICK_STAIRS,
-    NETHER_QUARTZ_ORE,
-    NETHER_STAR,
-    NETHER_WART,
-    NETHER_WART_BLOCK,
-    NOTE_BLOCK,
-    OAK_BOAT,
-    OAK_BUTTON,
-    OAK_DOOR,
-    OAK_FENCE,
-    OAK_FENCE_GATE,
-    OAK_LEAVES,
-    OAK_LOG,
-    OAK_PLANKS,
-    OAK_PRESSURE_PLATE,
-    OAK_SAPLING,
-    OAK_SLAB,
-    OAK_STAIRS,
-    OAK_TRAPDOOR,
-    OAK_WOOD,
-    OBSERVER,
-    OBSIDIAN,
-    OCELOT_SPAWN_EGG,
-    ORANGE_BANNER,
-    ORANGE_BED,
-    ORANGE_CARPET,
-    ORANGE_CONCRETE,
-    ORANGE_CONCRETE_POWDER,
-    ORANGE_DYE,
-    ORANGE_GLAZED_TERRACOTTA,
-    ORANGE_SHULKER_BOX,
-    ORANGE_STAINED_GLASS,
-    ORANGE_STAINED_GLASS_PANE,
-    ORANGE_TERRACOTTA,
-    ORANGE_TULIP,
-    ORANGE_WOOL,
-    OXEYE_DAISY,
-    PACKED_ICE,
-    PAINTING,
-    PAPER,
-    PARROT_SPAWN_EGG,
-    PEONY,
-    PETRIFIED_OAK_SLAB,
-    PHANTOM_MEMBRANE,
-    PHANTOM_SPAWN_EGG,
-    PIG_SPAWN_EGG,
-    PINK_BANNER,
-    PINK_BED,
-    PINK_CARPET,
-    PINK_CONCRETE,
-    PINK_CONCRETE_POWDER,
-    PINK_DYE,
-    PINK_GLAZED_TERRACOTTA,
-    PINK_SHULKER_BOX,
-    PINK_STAINED_GLASS,
-    PINK_STAINED_GLASS_PANE,
-    PINK_TERRACOTTA,
-    PINK_TULIP,
-    PINK_WOOL,
-    PISTON,
-    PLAYER_HEAD,
-    PODZOL,
-    POISONOUS_POTATO,
-    POLAR_BEAR_SPAWN_EGG,
-    POLISHED_ANDESITE,
-    POLISHED_DIORITE,
-    POLISHED_GRANITE,
-    POPPED_CHORUS_FRUIT,
-    POPPY,
-    PORKCHOP,
-    POTATO,
-    POTION,
-    POWERED_RAIL,
-    PRISMARINE,
-    PRISMARINE_BRICKS,
-    PRISMARINE_BRICK_SLAB,
-    PRISMARINE_BRICK_STAIRS,
-    PRISMARINE_CRYSTALS,
-    PRISMARINE_SHARD,
-    PRISMARINE_SLAB,
-    PRISMARINE_STAIRS,
-    PUFFERFISH,
-    PUFFERFISH_BUCKET,
-    PUFFERFISH_SPAWN_EGG,
-    PUMPKIN,
-    PUMPKIN_PIE,
-    PUMPKIN_SEEDS,
-    PURPLE_BANNER,
-    PURPLE_BED,
-    PURPLE_CARPET,
-    PURPLE_CONCRETE,
-    PURPLE_CONCRETE_POWDER,
-    PURPLE_DYE,
-    PURPLE_GLAZED_TERRACOTTA,
-    PURPLE_SHULKER_BOX,
-    PURPLE_STAINED_GLASS,
-    PURPLE_STAINED_GLASS_PANE,
-    PURPLE_TERRACOTTA,
-    PURPLE_WOOL,
-    PURPUR_BLOCK,
-    PURPUR_PILLAR,
-    PURPUR_SLAB,
-    PURPUR_STAIRS,
-    QUARTZ,
-    QUARTZ_BLOCK,
-    QUARTZ_PILLAR,
-    QUARTZ_SLAB,
-    QUARTZ_STAIRS,
-    RABBIT,
-    RABBIT_FOOT,
-    RABBIT_HIDE,
-    RABBIT_SPAWN_EGG,
-    RABBIT_STEW,
-    RAIL,
-    REDSTONE,
-    REDSTONE_BLOCK,
-    REDSTONE_LAMP,
-    REDSTONE_ORE,
-    REDSTONE_TORCH,
-    RED_BANNER,
-    RED_BED,
-    RED_CARPET,
-    RED_CONCRETE,
-    RED_CONCRETE_POWDER,
-    RED_GLAZED_TERRACOTTA,
-    RED_MUSHROOM,
-    RED_MUSHROOM_BLOCK,
-    RED_NETHER_BRICKS,
-    RED_SAND,
-    RED_SANDSTONE,
-    RED_SANDSTONE_SLAB,
-    RED_SANDSTONE_STAIRS,
-    RED_SHULKER_BOX,
-    RED_STAINED_GLASS,
-    RED_STAINED_GLASS_PANE,
-    RED_TERRACOTTA,
-    RED_TULIP,
-    RED_WOOL,
-    REPEATER,
-    REPEATING_COMMAND_BLOCK,
-    ROSE_BUSH,
-    ROSE_RED,
-    ROTTEN_FLESH,
-    SADDLE,
-    SALMON,
-    SALMON_BUCKET,
-    SALMON_SPAWN_EGG,
-    SAND,
-    SANDSTONE,
-    SANDSTONE_SLAB,
-    SANDSTONE_STAIRS,
-    SCUTE,
-    SEAGRASS,
-    SEA_LANTERN,
-    SEA_PICKLE,
-    SHEARS,
-    SHEEP_SPAWN_EGG,
-    SHIELD,
-    SHULKER_BOX,
-    SHULKER_SHELL,
-    SHULKER_SPAWN_EGG,
-    SIGN,
-    SILVERFISH_SPAWN_EGG,
-    SKELETON_HORSE_SPAWN_EGG,
-    SKELETON_SKULL,
-    SKELETON_SPAWN_EGG,
-    SLIME_BALL,
-    SLIME_BLOCK,
-    SLIME_SPAWN_EGG,
-    SMOOTH_QUARTZ,
-    SMOOTH_RED_SANDSTONE,
-    SMOOTH_SANDSTONE,
-    SMOOTH_STONE,
-    SNOW,
-    SNOWBALL,
-    SNOW_BLOCK,
-    SOUL_SAND,
-    SPAWNER,
-    SPECTRAL_ARROW,
-    SPIDER_EYE,
-    SPIDER_SPAWN_EGG,
-    SPLASH_POTION,
-    SPONGE,
-    SPRUCE_BOAT,
-    SPRUCE_BUTTON,
-    SPRUCE_DOOR,
-    SPRUCE_FENCE,
-    SPRUCE_FENCE_GATE,
-    SPRUCE_LEAVES,
-    SPRUCE_LOG,
-    SPRUCE_PLANKS,
-    SPRUCE_PRESSURE_PLATE,
-    SPRUCE_SAPLING,
-    SPRUCE_SLAB,
-    SPRUCE_STAIRS,
-    SPRUCE_TRAPDOOR,
-    SPRUCE_WOOD,
-    SQUID_SPAWN_EGG,
-    STICK,
-    STICKY_PISTON,
-    STONE,
-    STONE_AXE,
-    STONE_BRICKS,
-    STONE_BRICK_SLAB,
-    STONE_BRICK_STAIRS,
-    STONE_BUTTON,
-    STONE_HOE,
-    STONE_PICKAXE,
-    STONE_PRESSURE_PLATE,
-    STONE_SHOVEL,
-    STONE_SLAB,
-    STONE_SWORD,
-    STRAY_SPAWN_EGG,
-    STRING,
-    STRIPPED_ACACIA_LOG,
-    STRIPPED_ACACIA_WOOD,
-    STRIPPED_BIRCH_LOG,
-    STRIPPED_BIRCH_WOOD,
-    STRIPPED_DARK_OAK_LOG,
-    STRIPPED_DARK_OAK_WOOD,
-    STRIPPED_JUNGLE_LOG,
-    STRIPPED_JUNGLE_WOOD,
-    STRIPPED_OAK_LOG,
-    STRIPPED_OAK_WOOD,
-    STRIPPED_SPRUCE_LOG,
-    STRIPPED_SPRUCE_WOOD,
-    STRUCTURE_BLOCK,
-    STRUCTURE_VOID,
-    SUGAR,
-    SUGAR_CANE,
-    SUNFLOWER,
-    TALL_GRASS,
-    TERRACOTTA,
-    TIPPED_ARROW,
-    TNT,
-    TNT_MINECART,
-    TORCH,
-    TOTEM_OF_UNDYING,
-    TRAPPED_CHEST,
-    TRIDENT,
-    TRIPWIRE_HOOK,
-    TROPICAL_FISH,
-    TROPICAL_FISH_BUCKET,
-    TROPICAL_FISH_SPAWN_EGG,
-    TUBE_CORAL,
-    TUBE_CORAL_BLOCK,
-    TUBE_CORAL_FAN,
-    TURTLE_EGG,
-    TURTLE_HELMET,
-    TURTLE_SPAWN_EGG,
-    VEX_SPAWN_EGG,
-    VILLAGER_SPAWN_EGG,
-    VINDICATOR_SPAWN_EGG,
-    VINE,
-    WATER_BUCKET,
-    WET_SPONGE,
-    WHEAT,
-    WHEAT_SEEDS,
-    WHITE_BANNER,
-    WHITE_BED,
-    WHITE_CARPET,
-    WHITE_CONCRETE,
-    WHITE_CONCRETE_POWDER,
-    WHITE_GLAZED_TERRACOTTA,
-    WHITE_SHULKER_BOX,
-    WHITE_STAINED_GLASS,
-    WHITE_STAINED_GLASS_PANE,
-    WHITE_TERRACOTTA,
-    WHITE_TULIP,
-    WHITE_WOOL,
-    WITCH_SPAWN_EGG,
-    WITHER_SKELETON_SKULL,
-    WITHER_SKELETON_SPAWN_EGG,
-    WOLF_SPAWN_EGG,
-    WOODEN_AXE,
-    WOODEN_HOE,
-    WOODEN_PICKAXE,
-    WOODEN_SHOVEL,
-    WOODEN_SWORD,
-    WRITABLE_BOOK,
-    WRITTEN_BOOK,
-    YELLOW_BANNER,
-    YELLOW_BED,
-    YELLOW_CARPET,
-    YELLOW_CONCRETE,
-    YELLOW_CONCRETE_POWDER,
-    YELLOW_GLAZED_TERRACOTTA,
-    YELLOW_SHULKER_BOX,
-    YELLOW_STAINED_GLASS,
-    YELLOW_STAINED_GLASS_PANE,
-    YELLOW_TERRACOTTA,
-    YELLOW_WOOL,
-    ZOMBIE_HEAD,
-    ZOMBIE_HORSE_SPAWN_EGG,
-    ZOMBIE_PIGMAN_SPAWN_EGG,
-    ZOMBIE_SPAWN_EGG,
-    ZOMBIE_VILLAGER_SPAWN_EGG,
-
-    ;
-
-    /*
-     -----------------------------------------------------
-                    Instance
-     -----------------------------------------------------
-     */
-
-    private BlockTypes blockType;
-    private String id;
-    private BaseItem defaultState;
-    private int internalId;
-
-    ItemTypes() {
-        this(null);
+    private ItemTypes() {
     }
 
-    ItemTypes(String id) {
-        init(id);
+    private static ItemType register(final String id) {
+        return register(new ItemType(id));
     }
 
-    private void init(String id) {
-        if (id == null) id = "minecraft:" + name().toLowerCase();
-            // If it has no namespace, assume minecraft.
-        else if (!id.contains(":")) {
-            id = "minecraft:" + id;
-        }
-        this.id = id;
-        this.defaultState = new BaseItemStack(this, 1);
-        this.internalId = ordinal();
+    public static ItemType register(final ItemType item) {
+    	if(sortedRegistry == null)
+    		sortedRegistry = new ArrayList<>();
+    	if(!sortedRegistry.contains(item))sortedRegistry.add(item);
+//        return ItemType.REGISTRY.register(item.getId(), item);
+    	return internalRegister(item);
     }
 
-    private void setBlockType(BlockTypes type) {
-        this.blockType = type;
+    public static @Nullable ItemType get(final String id) {
+        return ItemType.REGISTRY.get(id);
+    }
+    
+    private static ArrayList<ItemType> sortedRegistry;
+    
+    public static ItemType[] values() {
+    	return sortedRegistry.toArray(new ItemType[sortedRegistry.size()]);
     }
 
-    @Override
-    public BaseItem getDefaultState() {
-        return defaultState;
-    }
-
-    public String getId() {
-        return this.id;
-    }
-
-    @Deprecated
-    public int getInternalId() {
-        return this.internalId;
-    }
-
-    /**
-     * Gets the name of this item, or the ID if the name cannot be found.
-     *
-     * @return The name, or ID
-     */
-    public String getName() {
-        BundledItemData.ItemEntry entry = BundledItemData.getInstance().findById(this.id);
-        if (entry == null) {
-            return getId();
-        } else {
-            return entry.localizedName;
-        }
-    }
-
-
-    /**
-     * Gets whether this item type has a block representation.
-     *
-     * @return If it has a block
-     */
-    public boolean hasBlockType() {
-        return getBlockType() != null;
-    }
-
-    /**
-     * Gets the block representation of this item type, if it exists.
-     *
-     * @return The block representation
-     */
     @Nullable
-    public BlockTypes getBlockType() {
-        return blockType;
-    }
-
-    @Override
-    public String toString() {
-        return getId();
-    }
-
-    /*
-     -----------------------------------------------------
-                    Static Initializer
-     -----------------------------------------------------
-     */
-    private static final Map<String, ItemTypes> $REGISTRY = new HashMap<>();
-    private static int $LENGTH;
-    public static final ItemTypes[] values;
-
-    static {
-        try {
-            Collection<String> items = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getItemRegistry().registerItems();
-            ItemTypes[] oldValues = values();
-            $LENGTH = oldValues.length;
-            LinkedHashSet<ItemTypes> newValues = new LinkedHashSet<>(Arrays.asList(oldValues));
-            if (!items.isEmpty()) { // No types found - use defaults
-                for (String item : items) {
-                    ItemTypes registered = register(item);
-                    if (!newValues.contains(registered)) newValues.add(registered);
-                }
-            }
-            // Cache the values
-            values = newValues.toArray(new ItemTypes[newValues.size()]);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static ItemTypes parse(String input) {
+    public static ItemType parse(String input) {
         input = input.toLowerCase();
         if (!Character.isAlphabetic(input.charAt(0))) {
             try {
-                ItemTypes legacy = LegacyMapper.getInstance().getItemFromLegacy(input);
+                ItemType legacy = LegacyMapper.getInstance().getItemFromLegacy(input);
                 if (legacy != null) return legacy;
             } catch (NumberFormatException e) {
                 e.printStackTrace();
@@ -965,40 +866,18 @@ public enum ItemTypes implements ItemType {
         }
 
         if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
-        ItemTypes result = $REGISTRY.get(input);
-        if (result != null) return result;
-        return null;
+        ItemType result = get(input);
+        return result;
     }
 
-    private static ItemTypes register(final String id) {
-        // Get the enum name (remove namespace if minecraft:)
-        int propStart = id.indexOf('[');
-        String typeName = id.substring(0, propStart == -1 ? id.length() : propStart);
-        String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase();
-        // Check existing
-        ItemTypes existing = null;
-        try { existing = valueOf(enumName.toUpperCase()); } catch (IllegalArgumentException ignore) {}
-        if (existing == null) {
-            existing = ReflectionUtils.addEnum(ItemTypes.class, enumName);
-        }
-        int internalId = existing.ordinal();
-        if (existing.id == null) {
-            existing.init(null);
-        }
-        if (internalId == 0 && existing != __RESERVED__) {
-            existing.internalId = $LENGTH++;
-        }
-        if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
-        $REGISTRY.put(typeName, existing);
-        return existing;
+    private static ItemType internalRegister(final ItemType type) {
+        type.setInternalId(sortedRegistry.indexOf(type));
+        type.setDefaultState(new BaseItemStack(type, 1));
+        return ItemType.REGISTRY.register(type.getId(), type);
     }
 
-    public static final @Nullable ItemTypes get(final String id) {
-        return $REGISTRY.get(id);
-    }
-
-    public static final @Nullable ItemTypes get(BlockTypes type) {
-        ItemTypes item = $REGISTRY.get(type.getId());
+    public static final @Nullable ItemType get(BlockType type) {
+        ItemType item = get(type.getId());
         if (item != null && item.getBlockType() == null) {
             item.setBlockType(type);
         }
@@ -1006,11 +885,11 @@ public enum ItemTypes implements ItemType {
     }
 
     @Deprecated
-    public static final ItemTypes get(final int ordinal) {
-        return values[ordinal];
+    public static final ItemType get(final int ordinal) {
+        return values()[ordinal];
     }
 
     public static int size() {
-        return values.length;
+        return values().length;
     }
 }

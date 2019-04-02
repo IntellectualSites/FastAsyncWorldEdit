@@ -3,7 +3,7 @@ package com.boydti.fawe.object;
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -21,7 +21,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
     private int x, z;
     public static int HEIGHT = 256;
 
-    private final ArrayDeque<Runnable> tasks = new ArrayDeque<Runnable>(0);
+    private final ArrayDeque<Runnable> tasks = new ArrayDeque<>(0);
 
     /**
      * A FaweSections object represents a chunk and the blocks that you wish to change in it.
@@ -107,10 +107,10 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
      */
     public abstract int getBlockCombinedId(int x, int y, int z);
 
-    public void setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> void setBlock(int x, int y, int z, B block) {
         setBlock(x, y, z, block.getInternalId());
-        if (block.hasNbtData()) {
-            setTile(x & 15, y, z & 15, block.getNbtData());
+        if (block instanceof BaseBlock && ((BaseBlock)block).hasNbtData()) {
+            setTile(x & 15, y, z & 15, ((BaseBlock)block).getNbtData());
         }
     }
 
@@ -120,7 +120,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
         try {
             CompoundTag tile = getTile(x & 15, y, z & 15);
             if (tile != null) {
-                return BaseBlock.getFromInternalId(combined, tile);
+                return BaseBlock.getFromInternalId(combined, tile).toImmutableState();
             }
         } catch (Throwable e) {
             MainUtil.handleError(e);

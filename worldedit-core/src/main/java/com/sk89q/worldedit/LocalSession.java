@@ -20,7 +20,6 @@
 package com.sk89q.worldedit;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweLimit;
@@ -40,8 +39,9 @@ import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;
 import com.sk89q.jchronic.utils.Time;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.tool.*;
@@ -49,12 +49,13 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.internal.cui.CUIRegion;
 import com.sk89q.worldedit.internal.cui.SelectionShapeEvent;
+import com.sk89q.worldedit.internal.cui.ServerCUIHandler;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
@@ -63,7 +64,6 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
@@ -128,16 +128,17 @@ public class LocalSession implements TextureHolder {
     private transient TextureUtil texture;
     private transient ResettableExtent transform = null;
     private transient TimeZone timezone = TimeZone.getDefault();
-
     private transient World currentWorld;
     private transient UUID uuid;
     private transient volatile long historySize = 0;
 
     private transient VirtualWorld virtual;
+    private transient BlockVector3 cuiTemporaryBlock;
 
     // Saved properties
     private String lastScript;
     private RegionSelectorType defaultSelector;
+    private boolean useServerCUI = false; // Save this to not annoy players.
 
     /**
      * Construct the object.
@@ -870,10 +871,10 @@ public class LocalSession implements TextureHolder {
      * @return the position to use
      * @throws IncompleteRegionException thrown if a region is not fully selected
      */
-    public Vector getPlacementPosition(Player player) throws IncompleteRegionException {
+    public BlockVector3 getPlacementPosition(Player player) throws IncompleteRegionException {
         checkNotNull(player);
         if (!placeAtPos1) {
-            return player.getBlockIn();
+            return player.getBlockIn().toBlockPoint();
         }
 
         return selector.getPrimaryPosition();
@@ -1025,12 +1026,12 @@ public class LocalSession implements TextureHolder {
     }
 
     public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {
-        ItemTypes type = item.getType();
+        ItemType type = item.getType();
         if (type.hasBlockType() && type.getBlockType().getMaterial().isAir()) {
             throw new InvalidToolBindException(type, "Blocks can't be used");
-        } else if (type == config.wandItem) {
+        } else if (type.getId().equalsIgnoreCase(config.wandItem)) {
             throw new InvalidToolBindException(type, "Already used for the wand");
-        } else if (type == config.navigationWand) {
+        } else if (type.getId().equalsIgnoreCase(config.navigationWand)) {
             throw new InvalidToolBindException(type, "Already used for the navigation wand");
         }
         Tool previous;
@@ -1105,6 +1106,62 @@ public class LocalSession implements TextureHolder {
     public void tellVersion(Actor player) {
     }
 
+
+    public boolean shouldUseServerCUI() {
+        return this.useServerCUI;
+    }
+
+    public void setUseServerCUI(boolean useServerCUI) {
+        this.useServerCUI = useServerCUI;
+        setDirty();
+    }
+
+    /**
+     * Update server-side WorldEdit CUI.
+     *
+     * @param actor The player
+     */
+    public void updateServerCUI(Actor actor) {
+        if (!actor.isPlayer()) {
+            return; // This is for players only.
+        }
+
+        if (!config.serverSideCUI) {
+            return; // Disabled in config.
+        }
+
+        Player player = (Player) actor;
+
+        if (!useServerCUI || hasCUISupport) {
+            if (cuiTemporaryBlock != null) {
+                player.sendFakeBlock(cuiTemporaryBlock, null);
+                cuiTemporaryBlock = null;
+            }
+            return; // If it's not enabled, ignore this.
+        }
+
+        BaseBlock block = ServerCUIHandler.createStructureBlock(player);
+        if (block != null) {
+            // If it's null, we don't need to do anything. The old was already removed.
+            Map<String, Tag> tags = block.getNbtData().getValue();
+            BlockVector3 tempCuiTemporaryBlock = BlockVector3.at(
+                    ((IntTag) tags.get("x")).getValue(),
+                    ((IntTag) tags.get("y")).getValue(),
+                    ((IntTag) tags.get("z")).getValue()
+            );
+            if (cuiTemporaryBlock != null && !tempCuiTemporaryBlock.equals(cuiTemporaryBlock)) {
+                // Update the existing block if it's the same location
+                player.sendFakeBlock(cuiTemporaryBlock, null);
+            }
+            cuiTemporaryBlock = tempCuiTemporaryBlock;
+            player.sendFakeBlock(cuiTemporaryBlock, block);
+        } else if (cuiTemporaryBlock != null) {
+            // Remove the old block
+            player.sendFakeBlock(cuiTemporaryBlock, null);
+            cuiTemporaryBlock = null;
+        }
+    }
+
     /**
      * Dispatch a CUI event but only if the actor has CUI support.
      *
@@ -1141,6 +1198,12 @@ public class LocalSession implements TextureHolder {
      */
     public void dispatchCUISelection(Actor actor) {
         checkNotNull(actor);
+
+        if (!hasCUISupport && useServerCUI) {
+            updateServerCUI(actor);
+            return;
+        }
+
         if (selector instanceof CUIRegion) {
             CUIRegion tempSel = (CUIRegion) selector;
 

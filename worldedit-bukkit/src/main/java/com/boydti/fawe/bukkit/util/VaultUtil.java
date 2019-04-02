@@ -8,7 +8,8 @@ public class VaultUtil {
     public final Permission permission;
 
     public VaultUtil() {
-        final RegisteredServiceProvider<Permission> permissionProvider = Bukkit.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        final RegisteredServiceProvider<Permission> permissionProvider =
+            Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
         if (permissionProvider != null) {
             this.permission = permissionProvider.getProvider();
         } else {

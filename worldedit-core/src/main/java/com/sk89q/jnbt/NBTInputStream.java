@@ -21,12 +21,15 @@ package com.sk89q.jnbt;
 
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.RunnableVal2;
+import com.boydti.fawe.util.StringMan;
+
 import java.io.Closeable;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -375,7 +378,7 @@ public final class NBTInputStream implements Closeable {
                     childType = NBTConstants.TYPE_COMPOUND;
                 }
                 length = is.readInt();
-                List<Tag> tagList = new ArrayList<Tag>();
+                List<Tag> tagList = new ArrayList<>();
                 for (int i = 0; i < length; ++i) {
                     Tag tag = readTagPayload(childType, depth + 1);
                     if (tag instanceof EndTag) {
@@ -385,7 +388,7 @@ public final class NBTInputStream implements Closeable {
                 }
                 return (tagList);
             case NBTConstants.TYPE_COMPOUND:
-                Map<String, Tag> tagMap = new HashMap<String, Tag>();
+                Map<String, Tag> tagMap = new HashMap<>();
                 while (true) {
                     NamedTag namedTag = readNamedTag(depth + 1);
                     Tag tag = namedTag.getTag();
@@ -407,7 +410,7 @@ public final class NBTInputStream implements Closeable {
                     int toRead = Math.min(length << 2, buf.length);
                     is.readFully(buf, 0, toRead);
                     for (int i = 0; i < toRead; i += 4, index++) {
-                        data[index] = ((buf[i] << 24) + (buf[i + 1] << 16) + (buf[i + 2] << 8) + (buf[i + 3]));
+                        data[index] = ((buf[i + 0] & 0xFF) << 24) + ((buf[i + 1] & 0xFF) << 16) + ((buf[i + 2] & 0xFF) << 8) + (buf[i + 3] & 0xFF);
                     }
                     length -= toRead;
                 }
@@ -424,7 +427,7 @@ public final class NBTInputStream implements Closeable {
                     int toRead = Math.min(length << 3, buf.length);
                     is.readFully(buf, 0, toRead);
                     for (int i = 0; i < toRead; i += 8, index++) {
-                        data[index] = (((long) buf[i] << 56) | ((long) buf[i + 1] << 48) | ((long) buf[i + 2] << 40) | ((long) buf[i + 3] << 32) | (buf[i + 4] << 24) | (buf[i + 5] << 16) | (buf[i + 6] << 8) | (buf[i + 7]));
+                        data[index] = (((long) buf[i] << 56) | ((long) (buf[i + 1] & 255) << 48) | ((long) (buf[i + 2] & 255) << 40) | ((long) (buf[i + 3] & 255) << 32) | ((long) (buf[i + 4] & 255) << 24) | ((buf[i + 5] & 255) << 16) | ((buf[i + 6] & 255) << 8) | (buf[i + 7] & 255));
                     }
                     length -= toRead;
                 }
@@ -532,7 +535,7 @@ public final class NBTInputStream implements Closeable {
                     throw new IOException(
                             "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
-                    return EndTag.INSTANCE;
+                    return new EndTag();
                 }
             case NBTConstants.TYPE_BYTE:
                 return new ByteTag(is.readByte());
@@ -562,7 +565,7 @@ public final class NBTInputStream implements Closeable {
                     childType = NBTConstants.TYPE_COMPOUND;
                 }
                 length = is.readInt();
-                List<Tag> tagList = new ArrayList<Tag>();
+                List<Tag> tagList = new ArrayList<>();
                 for (int i = 0; i < length; ++i) {
                     Tag tag = readTagPayload(childType, depth + 1);
                     if (tag instanceof EndTag) {
@@ -573,7 +576,7 @@ public final class NBTInputStream implements Closeable {
 
                 return new ListTag(NBTUtils.getTypeClass(childType), tagList);
             case NBTConstants.TYPE_COMPOUND:
-                Map<String, Tag> tagMap = new HashMap<String, Tag>();
+                Map<String, Tag> tagMap = new HashMap<>();
                 while (true) {
                     NamedTag namedTag = readNamedTag(depth + 1);
                     Tag tag = namedTag.getTag();

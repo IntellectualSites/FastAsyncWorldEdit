@@ -2,12 +2,12 @@ package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -22,17 +22,17 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
+    public BaseBlock getBlock(int x, int y, int z) {
         return parent.getBlock(x, y, z);
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return parent.setBlock(x, y, z, block);
     }
 
     @Override
-    public boolean setBlock(int index, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
         return parent.setBlock(index, block);
     }
 
@@ -57,7 +57,7 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public BlockState getBlock(int index) {
+    public BaseBlock getBlock(int index) {
         return parent.getBlock(index);
     }
 
@@ -87,12 +87,12 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public void setOrigin(Vector offset) {
+    public void setOrigin(BlockVector3 offset) {
         parent.setOrigin(offset);
     }
 
     @Override
-    public void setDimensions(Vector dimensions) {
+    public void setDimensions(BlockVector3 dimensions) {
         parent.setDimensions(dimensions);
     }
 
@@ -107,7 +107,7 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public Vector getDimensions() {
+    public BlockVector3 getDimensions() {
         return parent.getDimensions();
     }
 

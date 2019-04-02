@@ -24,13 +24,12 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.PlayerDirection;
 import com.sk89q.worldedit.UnknownDirectionException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.NoMatchException;
@@ -42,6 +41,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.Selection;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
@@ -64,7 +64,7 @@ import java.util.List;
 /**
  * Binds standard WorldEdit classes such as {@link Player} and {@link LocalSession}.
  */
-public class WorldEditBinding extends BindingHelper {
+public class WorldEditBinding {
 
     private final WorldEdit worldEdit;
 
@@ -202,10 +202,10 @@ public class WorldEditBinding extends BindingHelper {
         return result instanceof BlockState ? (BlockState) result : result.toImmutableState();
     }
 
-    @BindingMatch(type = BaseBlock.class,
+    @BindingMatch(type = {BaseBlock.class, BlockState.class, BlockStateHolder.class},
             behavior = BindingBehavior.CONSUMES,
             consumedCount = 1)
-    public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, WorldEditException {
+public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, WorldEditException {
         return new BaseBlock(getBlockState(context));
     }
 
@@ -306,13 +306,17 @@ public class WorldEditBinding extends BindingHelper {
      * @throws UnknownDirectionException on an unknown direction
      */
     @BindingMatch(classifier = Direction.class,
-            type = Vector.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
-    public Vector getDirection(ArgumentStack context, Direction direction)
+                  type = BlockVector3.class,
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1)
+    public BlockVector3 getDirection(ArgumentStack context, Direction direction) 
             throws ParameterException, UnknownDirectionException {
         Player sender = getPlayer(context);
-        return worldEdit.getDirection(sender, context.next());
+        if (direction.includeDiagonals()) {
+            return worldEdit.getDiagonalDirection(sender, context.next());
+        } else {
+            return worldEdit.getDirection(sender, context.next());
+        }
     }
 
     /**
@@ -356,7 +360,6 @@ public class WorldEditBinding extends BindingHelper {
         String input = context.next();
         if (input != null) {
             if (MathMan.isInteger(input)) return new BaseBiome(Integer.parseInt(input));
-
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
             List<BaseBiome> knownBiomes = biomeRegistry.getBiomes();

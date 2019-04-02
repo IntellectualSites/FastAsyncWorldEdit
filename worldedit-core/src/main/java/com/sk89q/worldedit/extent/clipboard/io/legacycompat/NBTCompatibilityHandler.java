@@ -20,11 +20,12 @@
 package com.sk89q.worldedit.extent.clipboard.io.legacycompat;
 
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Map;
 
 public interface NBTCompatibilityHandler {
-    boolean isAffectedBlock(BlockStateHolder block);
-    void updateNBT(BlockStateHolder block, Map<String, Tag> values);
+    <B extends BlockStateHolder<B>> boolean isAffectedBlock(B block);
+    <B extends BlockStateHolder<B>> void updateNBT(B block, Map<String, Tag> values);
 }

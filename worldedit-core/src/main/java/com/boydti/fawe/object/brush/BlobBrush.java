@@ -4,20 +4,21 @@ import com.boydti.fawe.object.random.SimplexNoise;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlobBrush implements Brush {
     private final double amplitude;
     private final double frequency;
-    private final Vector radius;
+    private final Vector3 radius;
     private final double sphericity;
 
-    public BlobBrush(Vector radius, double frequency, double amplitude, double sphericity) {
+    public BlobBrush(Vector3 radius, double frequency, double amplitude, double sphericity) {
         this.frequency = frequency;
         this.amplitude = amplitude;
         this.radius = radius;
@@ -25,7 +26,7 @@ public class BlobBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
         double seedX = ThreadLocalRandom.current().nextDouble();
         double seedY = ThreadLocalRandom.current().nextDouble();
         double seedZ = ThreadLocalRandom.current().nextDouble();
@@ -70,7 +71,7 @@ public class BlobBrush implements Brush {
             double manScaleY = (1.25 + seedY * 0.5);
             double manScaleZ = (1.25 + seedZ * 0.5);
 
-            MutableBlockVector mutable = new MutableBlockVector();
+            MutableVector3 mutable = new MutableVector3();
             double roughness = 1 - sphericity;
             for (int xr = -sizeInt; xr <= sizeInt; xr++) {
                 mutable.mutX(xr);
@@ -78,10 +79,10 @@ public class BlobBrush implements Brush {
                     mutable.mutY(yr);
                     for (int zr = -sizeInt; zr <= sizeInt; zr++) {
                         mutable.mutZ(zr);
-                        Vector pt = transform.apply(mutable);
-                        int x = MathMan.roundInt(pt.getBlockX());
-                        int y = MathMan.roundInt(pt.getBlockY());
-                        int z = MathMan.roundInt(pt.getBlockZ());
+                        Vector3 pt = transform.apply(mutable);
+                        int x = MathMan.roundInt(pt.getX());
+                        int y = MathMan.roundInt(pt.getY());
+                        int z = MathMan.roundInt(pt.getZ());
 
                         double xScaled = Math.abs(x) * modX;
                         double yScaled = Math.abs(y) * modY;

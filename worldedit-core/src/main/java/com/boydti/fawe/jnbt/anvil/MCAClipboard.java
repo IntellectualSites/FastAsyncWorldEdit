@@ -1,14 +1,14 @@
 package com.boydti.fawe.jnbt.anvil;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 public class MCAClipboard {
     private final MCAQueue queue;
     private final CuboidRegion region;
-    private final Vector origin;
+    private final BlockVector3 origin;
 
-    public MCAClipboard(MCAQueue queue, CuboidRegion region, Vector origin) {
+    public MCAClipboard(MCAQueue queue, CuboidRegion region, BlockVector3 origin) {
         this.queue = queue;
         this.region = region;
         this.origin = origin;
@@ -22,7 +22,7 @@ public class MCAClipboard {
         return region;
     }
 
-    public Vector getOrigin() {
+    public BlockVector3 getOrigin() {
         return origin;
     }
 }

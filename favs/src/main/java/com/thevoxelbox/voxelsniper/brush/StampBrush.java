@@ -52,10 +52,10 @@ public class StampBrush extends Brush
         NO_AIR, FILL, DEFAULT
     }
 
-    protected HashSet<BlockWrapper> clone = new HashSet<BlockWrapper>();
-    protected HashSet<BlockWrapper> fall = new HashSet<BlockWrapper>();
-    protected HashSet<BlockWrapper> drop = new HashSet<BlockWrapper>();
-    protected HashSet<BlockWrapper> solid = new HashSet<BlockWrapper>();
+    protected HashSet<BlockWrapper> clone = new HashSet<>();
+    protected HashSet<BlockWrapper> fall = new HashSet<>();
+    protected HashSet<BlockWrapper> drop = new HashSet<>();
+    protected HashSet<BlockWrapper> solid = new HashSet<>();
     protected Undo undo;
     protected boolean sorted = false;
 

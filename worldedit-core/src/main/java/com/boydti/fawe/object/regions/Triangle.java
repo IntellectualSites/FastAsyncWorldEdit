@@ -3,7 +3,8 @@ package com.boydti.fawe.object.regions;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.base.Preconditions;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.polyhedron.Edge;
 
 public class Triangle {
@@ -23,10 +24,10 @@ public class Triangle {
     private final double[] vmin = new double[3];
     private final double[] vmax = new double[3];
 
-    private final Vector normalVec;
+    private final BlockVector3 normalVec;
     private final double b;
 
-    public Triangle(Vector pos1, Vector pos2, Vector pos3) {
+    public Triangle(BlockVector3 pos1, BlockVector3 pos2, BlockVector3 pos3) {
         verts[0] = new double[]{pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ()};
         verts[1] = new double[]{pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ()};
         verts[2] = new double[]{pos3.getBlockX(), pos3.getBlockY(), pos3.getBlockZ()};
@@ -37,16 +38,16 @@ public class Triangle {
         this.b = Math.max(Math.max(this.normalVec.dot(pos1), this.normalVec.dot(pos2)), this.normalVec.dot(pos3));
     }
 
-    public boolean above(Vector pt) {
+    public boolean above(BlockVector3 pt) {
         Preconditions.checkNotNull(pt);
         return this.normalVec.dot(pt) > this.b;
     }
 
     public Edge getEdge(int index) {
         if (index == this.verts.length - 1) {
-            return new Edge(new Vector(this.verts[index]), new Vector(this.verts[0]));
+            return new Edge(Vector3.at(this.verts[index][0], this.verts[index][1],this.verts[index][2]), Vector3.at(this.verts[0][0], this.verts[0][1], this.verts[0][2]));
         } else {
-            return new Edge(new Vector(this.verts[index]), new Vector(this.verts[index + 1]));
+            return new Edge(Vector3.at(this.verts[index][0], this.verts[index][1],this.verts[index][2]), Vector3.at(this.verts[index + 1][0], this.verts[index + 1][1], this.verts[index + 1][2]));
         }
     }
 
@@ -55,11 +56,11 @@ public class Triangle {
         return StringMan.getString(verts);
     }
 
-    public Vector getVertex(int index) {
-        return new Vector(verts[index]);
+    public Vector3 getVertex(int index) {
+        return Vector3.at(verts[index][0], verts[index][1], verts[index][2]);
     }
 
-    public boolean contains(Vector pos) {
+    public boolean contains(BlockVector3 pos) {
         center[0] = pos.getBlockX() + RADIUS;
         center[1] = pos.getBlockY() + RADIUS;
         center[2] = pos.getBlockZ() + RADIUS;

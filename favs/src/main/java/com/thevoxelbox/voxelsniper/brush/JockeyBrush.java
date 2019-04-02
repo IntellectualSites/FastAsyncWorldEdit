@@ -83,11 +83,11 @@ public class JockeyBrush extends Brush
             {
                 if (jockeyType == JockeyType.INVERSE_PLAYER_ONLY || jockeyType == JockeyType.INVERSE_ALL_ENTITIES)
                 {
-                    player.setPassenger(closest);
+                    player.addPassenger(closest);
                 }
                 else
                 {
-                    closest.setPassenger(player);
+                    closest.addPassenger(player);
                     jockeyedEntity = closest;
                 }
                 v.sendMessage(ChatColor.GREEN + "You are now saddles on entity: " + closest.getEntityId());
@@ -113,7 +113,7 @@ public class JockeyBrush extends Brush
             {
                 if (jockeyType == JockeyType.STACK_ALL_ENTITIES)
                 {
-                    lastEntity.setPassenger(entity);
+                    lastEntity.addPassenger(entity);
                     lastEntity = entity;
                     stackHeight++;
                 }
@@ -121,7 +121,7 @@ public class JockeyBrush extends Brush
                 {
                     if (entity instanceof Player)
                     {
-                        lastEntity.setPassenger(entity);
+                        lastEntity.addPassenger(entity);
                         lastEntity = entity;
                         stackHeight++;
                     }

@@ -73,7 +73,7 @@ public class CommandUsageBox extends StyledFragment {
         CommandListBox box = new CommandListBox(BBC.HELP_HEADER_SUBCOMMANDS.f());
         String prefix = !commandString.isEmpty() ? commandString + " " : "";
 
-        List<CommandMapping> list = new ArrayList<CommandMapping>(dispatcher.getCommands());
+        List<CommandMapping> list = new ArrayList<>(dispatcher.getCommands());
         Collections.sort(list, new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
 
         for (CommandMapping mapping : list) {

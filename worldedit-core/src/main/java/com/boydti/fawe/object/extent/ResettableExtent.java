@@ -2,9 +2,9 @@ package com.boydti.fawe.object.extent;
 
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,7 +18,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
         super(parent);
     }
 
-    public final void init(Vector pos) {
+    public final void init(BlockVector3 pos) {
         Extent extent = getExtent();
         if (extent instanceof ResettableExtent && extent != this) {
             ((ResettableExtent) extent).init(pos);
@@ -26,7 +26,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
         setOrigin(pos);
     }
 
-    protected void setOrigin(Vector pos) {
+    protected void setOrigin(BlockVector3 pos) {
 
     }
 

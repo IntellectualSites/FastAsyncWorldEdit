@@ -1,20 +1,19 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class BlockTranslateExtent extends AbstractDelegateExtent {
     private final int dx, dy, dz;
-    private MutableBlockVector mutable = new MutableBlockVector();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public BlockTranslateExtent(Extent extent, int dx, int dy, int dz) {
         super(extent);
@@ -24,7 +23,7 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
         mutable.mutX((location.getX() + dx));
         mutable.mutY((location.getY() + dy));
         mutable.mutZ((location.getZ() + dz));
@@ -32,15 +31,12 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        mutable.mutX(x + dx);
-        mutable.mutY(y + dy);
-        mutable.mutZ(z + dz);
-        return getExtent().setBlock(mutable, block);
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+        return this.setBlock(BlockVector3.at(x, y, z), block);
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return super.setBiome(position.add(dx, dz), biome);
     }
 
@@ -50,22 +46,27 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return super.getBiome(position.add(dx, dz));
     }
 
     @Override
-    public BlockState getBlock(Vector location) {
+    public BlockState getBlock(BlockVector3 location) {
         return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override
-    public BlockState getLazyBlock(Vector location) {
+    public BlockState getLazyBlock(BlockVector3 location) {
         return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
         return super.getLazyBlock(x + dx, y + dy, z + dz);
+    }
+    
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 pos) {
+    	return super.getFullBlock(pos.add(dx, dy, dz));
     }
 }

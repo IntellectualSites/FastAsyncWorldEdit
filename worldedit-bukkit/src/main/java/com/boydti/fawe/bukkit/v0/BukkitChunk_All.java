@@ -13,7 +13,6 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -23,6 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -103,7 +104,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
         int[][] sections = getCombinedIdArrays();
         final int bx = getX() << 4;
         final int bz = getZ() << 4;
-        boolean update = adapter != null ? adapter.isChunkInUse(chunk) : true;
+        boolean update = adapter == null || adapter.isChunkInUse(chunk);
         if (layer == -1) {
             if (adapter != null)
             {
@@ -157,7 +158,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                     HashSet<UUID> entsToRemove = this.getEntityRemoves();
                     if (!entsToRemove.isEmpty()) {
                         for (Entity entity : chunk.getEntities()) {
-                            if (entsToRemove.contains(entity.getUniqueId())) {
+                            if (entsToRemove.contains(entity.getUniqueId()) && !(entity instanceof Player)) {
                                 entity.remove();
                             }
                         }
@@ -232,43 +233,40 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                 if (combined == 0) continue;
                                 int xx = bx + x;
 
-                                BlockTypes type = BlockTypes.getFromStateId(combined);
+                                BlockType type = BlockTypes.getFromStateId(combined);
                                 if (type == BlockTypes.__RESERVED__) continue;
-                                switch (type) {
-                                    case AIR:
-                                    case CAVE_AIR:
-                                    case VOID_AIR:
-                                        if (!place) {
-                                            mutableLoc.setX(xx);
-                                            mutableLoc.setY(yy);
-                                            mutableLoc.setZ(zz);
+                                String s = type.getResource().toUpperCase();
+                                if (type.getMaterial().isAir()) {
+                                    if (!place) {
+                                        mutableLoc.setX(xx);
+                                        mutableLoc.setY(yy);
+                                        mutableLoc.setZ(zz);
+                                        setBlock(adapter, chunk, mutableLoc, combined, update);
+                                    }
+                                    continue;
+                                }
+                                if (place) {
+                                    if (type.getMaterial().hasContainer() && adapter != null) {
+                                        CompoundTag nbt = getTile(x, yy, z);
+                                        if (nbt != null) {
+                                            synchronized (BukkitChunk_All.this) {
+                                                BaseBlock state =
+                                                    BaseBlock.getFromInternalId(combined, nbt);
+                                                adapter.setBlock(chunk, xx, yy, zz, state, update);
+                                            }
+                                            continue;
+                                        }
+                                    }
+                                    if (type.getMaterial().isTicksRandomly()) {
+                                        synchronized (BukkitChunk_All.this) {
                                             setBlock(adapter, chunk, mutableLoc, combined, update);
                                         }
-                                        continue;
-                                    default:
-                                        if (place) {
-                                            if (type.getMaterial().hasContainer() && adapter != null) {
-                                                CompoundTag nbt = getTile(x, yy, z);
-                                                if (nbt != null) {
-                                                    synchronized (BukkitChunk_All.this) {
-                                                        BaseBlock state = BaseBlock.getFromInternalId(combined, nbt);
-                                                        adapter.setBlock(chunk, xx, yy, zz, state, update);
-                                                    }
-                                                    continue;
-                                                }
-                                            }
-                                            if (type.getMaterial().isTicksRandomly()) {
-                                                synchronized (BukkitChunk_All.this) {
-                                                    setBlock(adapter, chunk, mutableLoc, combined, update);
-                                                }
-                                            } else {
-                                                mutableLoc.setX(xx);
-                                                mutableLoc.setY(yy);
-                                                mutableLoc.setZ(zz);
-                                                setBlock(adapter, chunk, mutableLoc, combined, update);
-                                            }
-                                        }
-                                        continue;
+                                    } else {
+                                        mutableLoc.setX(xx);
+                                        mutableLoc.setY(yy);
+                                        mutableLoc.setZ(zz);
+                                        setBlock(adapter, chunk, mutableLoc, combined, update);
+                                    }
                                 }
                             }
                         }
@@ -277,65 +275,61 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                     for (;index < 4096; index++) {
                         int j = place ? index : 4095 - index;
                         int combined = newArray[j];
-                        BlockTypes type = BlockTypes.getFromStateId(combined);
+                        BlockType type = BlockTypes.getFromStateId(combined);
                         if (type == BlockTypes.__RESERVED__) continue;
-                        switch (type) {
-                            case AIR:
-                            case CAVE_AIR:
-                            case VOID_AIR:
-                                if (!place) {
-                                    int x = cacheX[j];
-                                    int z = cacheZ[j];
-                                    int y = cacheY[j];
-                                    mutableLoc.setX(bx + x);
-                                    mutableLoc.setY(y);
-                                    mutableLoc.setZ(bz + z);
-                                    setBlock(adapter, chunk, mutableLoc, combined, update);
-                                }
-                                break;
-                            default:
-                                boolean light = type.getMaterial().getLightValue() > 0;
-                                if (light) {
-                                    if (place) {
-                                        continue;
-                                    }
-                                    light = light && getParent().getSettings().LIGHTING.MODE != 0;
-                                    if (light) {
-                                        parent.enableLighting(disableResult);
-                                    }
-                                } else if (!place) {
-                                    continue;
-                                }
+                        if (type.getMaterial().isAir()) {
+                            if (!place) {
                                 int x = cacheX[j];
                                 int z = cacheZ[j];
                                 int y = cacheY[j];
-                                if (type.getMaterial().hasContainer() && adapter != null) {
-                                    CompoundTag tile = getTile(x, y, z);
-                                    if (tile != null) {
-                                        synchronized (BukkitChunk_All.this) {
-                                            BaseBlock state = BaseBlock.getFromInternalId(combined, tile);
-                                            adapter.setBlock(chunk, bx + x, y, bz + z, state, update);
-                                        }
-                                        break;
-                                    }
+                                mutableLoc.setX(bx + x);
+                                mutableLoc.setY(y);
+                                mutableLoc.setZ(bz + z);
+                                setBlock(adapter, chunk, mutableLoc, combined, update);
+                            }
+                            continue;
+                        } else {
+                            boolean light = type.getMaterial().getLightValue() > 0;
+                            if (light) {
+                                if (place) {
+                                    continue;
                                 }
-                                if (type.getMaterial().isTicksRandomly()) {
+                                light = light && getParent().getSettings().LIGHTING.MODE != 0;
+                                if (light) {
+                                    parent.enableLighting(disableResult);
+                                }
+                            } else if (!place) {
+                                continue;
+                            }
+                            int x = cacheX[j];
+                            int z = cacheZ[j];
+                            int y = cacheY[j];
+                            if (type.getMaterial().hasContainer() && adapter != null) {
+                                CompoundTag tile = getTile(x, y, z);
+                                if (tile != null) {
                                     synchronized (BukkitChunk_All.this) {
-                                        mutableLoc.setX(bx + x);
-                                        mutableLoc.setY(y);
-                                        mutableLoc.setZ(bz + z);
-                                        setBlock(adapter, chunk, mutableLoc, combined, update);
+                                        BaseBlock state = BaseBlock.getFromInternalId(combined, tile);
+                                        adapter.setBlock(chunk, bx + x, y, bz + z, state, update);
                                     }
-                                } else {
+                                    break;
+                                }
+                            }
+                            if (type.getMaterial().isTicksRandomly()) {
+                                synchronized (BukkitChunk_All.this) {
                                     mutableLoc.setX(bx + x);
                                     mutableLoc.setY(y);
                                     mutableLoc.setZ(bz + z);
                                     setBlock(adapter, chunk, mutableLoc, combined, update);
                                 }
-                                if (light) {
-                                    parent.disableLighting(disableResult);
-                                }
-                                break;
+                            } else {
+                                mutableLoc.setX(bx + x);
+                                mutableLoc.setY(y);
+                                mutableLoc.setZ(bz + z);
+                                setBlock(adapter, chunk, mutableLoc, combined, update);
+                            }
+                            if (light) {
+                                parent.disableLighting(disableResult);
+                            }
                         }
                         if (System.currentTimeMillis() - start > recommended) {
                             index++;
@@ -356,12 +350,12 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
     }
 
     public void setBlock(BukkitImplAdapter adapter, Chunk chunk, Location location, int combinedId, boolean update) {
-        com.sk89q.worldedit.world.block.BlockState state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId);
+    	com.sk89q.worldedit.world.block.BaseBlock base = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId).toBaseBlock();
         if (adapter != null) {
-            adapter.setBlock(chunk, (int) location.getX(), (int) location.getY(), (int) location.getZ(), state, update);
+            adapter.setBlock(chunk, (int) location.getX(), (int) location.getY(), (int) location.getZ(), base, update);
         } else {
             Block block = location.getWorld().getBlockAt(location);
-            block.setBlockData(BukkitAdapter.adapt(state), false);
+            block.setBlockData(BukkitAdapter.adapt(base), false);
         }
     }
 }

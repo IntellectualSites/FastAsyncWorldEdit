@@ -4,8 +4,6 @@ import com.boydti.fawe.object.mask.RadiusMask;
 import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.block.BlockReplace;
@@ -14,6 +12,7 @@ import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class RecurseBrush implements Brush {
@@ -25,7 +24,7 @@ public class RecurseBrush implements Brush {
     }
 
     @Override
-    public void build(final EditSession editSession, final Vector position, Pattern to, double size) throws MaxChangedBlocksException {
+    public void build(final EditSession editSession, final BlockVector3 position, Pattern to, double size) throws MaxChangedBlocksException {
         Mask mask = editSession.getMask();
         if (mask == null) {
             mask = Masks.alwaysTrue();
@@ -42,7 +41,7 @@ public class RecurseBrush implements Brush {
             final Mask radMask = new RadiusMask(0, (int) size);
             DFSRecursiveVisitor visitor = new DFSRecursiveVisitor(mask, replace, Integer.MAX_VALUE, Integer.MAX_VALUE) {
                 @Override
-                public boolean isVisitable(Vector from, Vector to) {
+                public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
                     int y = to.getBlockY();
                     return y >= y && y < maxY && radMask.test(to) && super.isVisitable(from, to);
                 }
@@ -52,7 +51,7 @@ public class RecurseBrush implements Brush {
         } else {
             RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, radius, editSession) {
                 @Override
-                public boolean isVisitable(Vector from, Vector to) {
+                public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
                     int y = to.getBlockY();
                     return y >= y && y < maxY && super.isVisitable(from, to);
                 }

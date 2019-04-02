@@ -1,19 +1,22 @@
 package com.sk89q.worldedit.world.block;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BlockMaterial;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 public class BlockStateImpl extends BlockState {
     private final int internalId;
     private final int ordinal;
-    private final BlockTypes type;
+    private final BlockType type;
     private BlockMaterial material;
+    private BaseBlock baseBlock;
 
-    protected BlockStateImpl(BlockTypes type, int internalId, int ordinal) {
+    protected BlockStateImpl(BlockType type, int internalId, int ordinal) {
+    	super(type);
         this.type = type;
         this.internalId = internalId;
         this.ordinal = ordinal;
+        this.baseBlock = new BaseBlock(this);
     }
 
     public BlockMaterial getMaterial() {
@@ -41,7 +44,12 @@ public class BlockStateImpl extends BlockState {
     }
 
     @Override
-    public final BlockTypes getBlockType() {
+    public final BlockType getBlockType() {
         return type;
     }
+
+	@Override
+	public BaseBlock toBaseBlock() {
+		return this.baseBlock;
+	}
 }

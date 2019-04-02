@@ -19,15 +19,16 @@
 
 package com.sk89q.worldedit.world.chunk;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.DataException;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
  * A 16 by 16 block chunk.
  */
 public interface Chunk {
-    
+
     /**
      * Get a block;
      *
@@ -35,6 +36,6 @@ public interface Chunk {
      * @return block the block
      * @throws DataException thrown on data error
      */
-    BlockStateHolder getBlock(Vector position) throws DataException;
+    BaseBlock getBlock(BlockVector3 position) throws DataException;
 
 }

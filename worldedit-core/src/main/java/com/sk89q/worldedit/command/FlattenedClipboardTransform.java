@@ -19,12 +19,16 @@
 
 package com.sk89q.worldedit.command;
 
-import com.sk89q.worldedit.Vector;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.CombinedTransform;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -67,8 +71,8 @@ public class FlattenedClipboardTransform {
      */
     public Region getTransformedRegion() {
         Region region = original.getRegion();
-        Vector minimum = region.getMinimumPoint();
-        Vector maximum = region.getMaximumPoint();
+        Vector3 minimum = region.getMinimumPoint().toVector3();
+        Vector3 maximum = region.getMaximumPoint().toVector3();
 
         Transform transformAround =
                 new CombinedTransform(
@@ -76,28 +80,27 @@ public class FlattenedClipboardTransform {
                         transform,
                         new AffineTransform().translate(original.getOrigin()));
 
-        // new Vector(minimum.getX(), minimum.getY(), minimum.getZ())
-        // new Vector(maximum.getX(), maximum.getY(), maximum.getZ())
-        Vector[] corners = new Vector[]{
+        Vector3[] corners = new Vector3[] {
                 minimum,
                 maximum,
-                new Vector(maximum.getX(), minimum.getY(), minimum.getZ()),
-                new Vector(minimum.getX(), maximum.getY(), minimum.getZ()),
-                new Vector(minimum.getX(), minimum.getY(), maximum.getZ()),
-                new Vector(minimum.getX(), maximum.getY(), maximum.getZ()),
-                new Vector(maximum.getX(), minimum.getY(), maximum.getZ()),
-                new Vector(maximum.getX(), maximum.getY(), minimum.getZ())};
+                minimum.withX(maximum.getX()),
+                minimum.withY(maximum.getY()),
+                minimum.withZ(maximum.getZ()),
+                maximum.withX(minimum.getX()),
+                maximum.withY(minimum.getY()),
+                maximum.withZ(minimum.getZ()) };
 
         for (int i = 0; i < corners.length; i++) {
-            corners[i] = transformAround.apply(new Vector(corners[i]));
+            corners[i] = transformAround.apply(corners[i]);
         }
 
-        Vector newMinimum = corners[0];
-        Vector newMaximum = corners[0];
-
+        MutableVector3 newMinimum = new MutableVector3(corners[0]);
+        MutableVector3 newMaximum = new MutableVector3(corners[0]);
+//        MutableVector3 cbv = new MutableVector3();
         for (int i = 1; i < corners.length; i++) {
-            newMinimum = Vector.getMinimum(newMinimum, corners[i]);
-            newMaximum = Vector.getMaximum(newMaximum, corners[i]);
+        	MutableVector3 cbv = new MutableVector3(corners[i]);
+            newMinimum = newMinimum.setComponents(newMinimum.getMinimum(cbv));
+            newMaximum = newMaximum.setComponents(newMaximum.getMaximum(cbv));
         }
 
         // After transformation, the points may not really sit on a block,
@@ -106,7 +109,7 @@ public class FlattenedClipboardTransform {
         newMinimum.mutY(Math.ceil(Math.floor(newMinimum.getY())));
         newMinimum.mutZ(Math.ceil(Math.floor(newMinimum.getZ())));
 
-        return new CuboidRegion(newMinimum, newMaximum);
+        return new CuboidRegion(BlockVector3.at(newMinimum.getX(), newMinimum.getY(), newMinimum.getZ()), BlockVector3.at(newMaximum.getX(), newMaximum.getY(), newMaximum.getZ()));
     }
 
     /**

@@ -207,7 +207,7 @@ public final class IncendoPaster {
         b.append("os.name: '").append(System.getProperty("os.name")).append("'\n");
         b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
         b.append("# Okay :D Great. You are now ready to create your bug report!");
-        b.append("\n# You can do so at https://github.com/boy0001/FastAsyncWorldedit/issues");
+        b.append("\n# You can do so at https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues");
         b.append("\n# or via our Discord at https://discord.gg/ngZCzbU");
         incendoPaster.addFile(new IncendoPaster.PasteFile("information", b.toString()));
 
@@ -224,6 +224,7 @@ public final class IncendoPaster {
         }
 
         incendoPaster.addFile(new PasteFile("config.yml", readFile(new File(Fawe.imp().getDirectory(), "config.yml"))));
+        incendoPaster.addFile(new PasteFile("config-legacy.yml", readFile(new File(Fawe.imp().getDirectory(), "config-legacy.yml"))));
         incendoPaster.addFile(new PasteFile("message.yml", readFile(new File(Fawe.imp().getDirectory(), "message.yml"))));
         incendoPaster.addFile(new PasteFile("commands.yml", readFile(new File(Fawe.imp().getDirectory(), "commands.yml"))));
 

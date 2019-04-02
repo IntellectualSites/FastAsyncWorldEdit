@@ -2,7 +2,7 @@ package com.boydti.fawe.object.mask;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.PseudoRandom;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import java.util.Set;
 
@@ -63,7 +63,6 @@ public abstract class FaweBlockMatcher {
 //            return setBlock(blocks.iterator().next());
 //        }
 //        final BaseBlock[] array = blocks.toArray(new BaseBlock[blocks.size()]);
-//        final PseudoRandom random = new PseudoRandom(System.nanoTime());
 //        final int size = array.length;
 //        return new FaweBlockMatcher() {
 //            @Override

@@ -26,8 +26,9 @@ import com.sk89q.worldedit.blocks.MobSpawnerBlock;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
  * Looks up information about a block.
@@ -44,13 +45,14 @@ public class QueryTool implements BlockTool {
 
         World world = (World) clicked.getExtent();
         EditSession editSession = session.createEditSession(player);
-        BlockStateHolder block = editSession.getFullBlock(clicked.toVector());
+        BlockVector3 blockPoint = clicked.toBlockPoint();
+        BaseBlock block = editSession.getFullBlock(blockPoint);
 
-        player.print("\u00A79@" + clicked.toVector() + ": " + "\u00A7e"
+        player.print("\u00A79@" + clicked + ": " + "\u00A7e"
                 + block.getBlockType().getName() + "\u00A77" + " ("
                 + block.toString() + ") "
                 + "\u00A7f"
-                + " (" + world.getBlockLightLevel(clicked.toVector()) + "/" + world.getBlockLightLevel(clicked.toVector().add(0, 1, 0)) + ")");
+                + " (" + world.getBlockLightLevel(blockPoint) + "/" + world.getBlockLightLevel(blockPoint.add(0, 1, 0)) + ")");
 
         if (block instanceof MobSpawnerBlock) {
             player.printRaw("\u00A7e" + "Mob Type: "

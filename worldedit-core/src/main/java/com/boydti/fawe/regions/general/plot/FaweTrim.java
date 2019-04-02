@@ -1,14 +1,14 @@
 package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.util.TaskManager;
-import com.intellectualcrafters.plot.commands.CommandCategory;
-import com.intellectualcrafters.plot.commands.RequiredType;
-import com.intellectualcrafters.plot.commands.SubCommand;
-import com.intellectualcrafters.plot.config.C;
-import com.intellectualcrafters.plot.object.Location;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import com.intellectualcrafters.plot.util.WorldUtil;
-import com.plotsquared.general.commands.CommandDeclaration;
+import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
+import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
+import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
+import com.github.intellectualsites.plotsquared.plot.commands.SubCommand;
+import com.github.intellectualsites.plotsquared.plot.config.Captions;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 
 @CommandDeclaration(
         command = "trimchunks",
@@ -33,7 +33,7 @@ public class FaweTrim extends SubCommand {
             return false;
         }
         if (!WorldUtil.IMP.isWorld(strings[0])) {
-            C.NOT_VALID_PLOT_WORLD.send(plotPlayer, strings[0]);
+            Captions.NOT_VALID_PLOT_WORLD.send(plotPlayer, strings[0]);
             return false;
         }
         ran = true;

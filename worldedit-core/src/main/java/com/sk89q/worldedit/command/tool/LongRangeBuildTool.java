@@ -28,9 +28,9 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
  * A tool that can place (or remove) blocks at a distance.
@@ -56,14 +56,20 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         Location pos = getTargetFace(player);
         if (pos == null) return false;
         EditSession eS = session.createEditSession(player);
-
-        BlockStateHolder applied = secondary.apply(pos.toVector());
-        if (applied.getBlockType().getMaterial().isAir()) {
-            eS.setBlock(pos.toVector(), secondary);
-        } else {
-            eS.setBlock(pos.add(pos.getDirection()), secondary);
+        try {
+//            eS.disableBuffering();
+            BlockVector3 blockPoint = pos.toBlockPoint();
+            BaseBlock applied = secondary.apply(blockPoint);
+            if (applied.getBlockType().getMaterial().isAir()) {
+                eS.setBlock(blockPoint, secondary);
+            } else {
+                eS.setBlock(pos.subtract(pos.getDirection()).toBlockPoint(), secondary);
+            }
+            return true;
+        } catch (MaxChangedBlocksException e) {
+            // one block? eat it
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -71,11 +77,19 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         Location pos = getTargetFace(player);
         if (pos == null) return false;
         EditSession eS = session.createEditSession(player);
-        BlockStateHolder applied = primary.apply(pos.toVector());
-        if (applied.getBlockType().getMaterial().isAir()) {
-            eS.setBlock(pos.toVector(), primary);
-        } else {
-            eS.setBlock(pos.add(pos.getDirection()), primary);
+
+        try {
+//            eS.disableBuffering();
+            BlockVector3 blockPoint = pos.toBlockPoint();
+            BaseBlock applied = primary.apply(blockPoint);
+            if (applied.getBlockType().getMaterial().isAir()) {
+                eS.setBlock(blockPoint, primary);
+            } else {
+                eS.setBlock(pos.subtract(pos.getDirection()).toBlockPoint(), primary);
+            }
+            return true;
+        } catch (MaxChangedBlocksException e) {
+            // one block? eat it
         }
         return true;
     }

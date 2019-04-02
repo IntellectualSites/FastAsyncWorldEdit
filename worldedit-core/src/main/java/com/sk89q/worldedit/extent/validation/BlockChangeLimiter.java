@@ -22,7 +22,7 @@ package com.sk89q.worldedit.extent.validation;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -77,7 +77,7 @@ public class BlockChangeLimiter extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (limit >= 0) {
             if (count >= limit) {
                 throw new MaxChangedBlocksException(limit);

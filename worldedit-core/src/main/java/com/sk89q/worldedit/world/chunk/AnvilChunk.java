@@ -26,14 +26,14 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
@@ -52,7 +52,7 @@ public class AnvilChunk implements Chunk {
     private int rootX;
     private int rootZ;
 
-    private Map<BlockVector, Map<String,Tag>> tileEntities;
+    private Map<BlockVector3, Map<String,Tag>> tileEntities;
 
     /**
      * Construct the chunk with a compound tag.
@@ -119,10 +119,10 @@ public class AnvilChunk implements Chunk {
         }
     }
     
-    private int getBlockID(Vector position) throws DataException {
-        int x = position.getBlockX() - rootX * 16;
-        int y = position.getBlockY();
-        int z = position.getBlockZ() - rootZ * 16;
+    private int getBlockID(BlockVector3 position) throws DataException {
+        int x = position.getX() - rootX * 16;
+        int y = position.getY();
+        int z = position.getZ() - rootZ * 16;
 
         int section = y >> 4;
         if (section < 0 || section >= blocks.length) {
@@ -152,10 +152,10 @@ public class AnvilChunk implements Chunk {
         }
     }
 
-    private int getBlockData(Vector position) throws DataException {
-        int x = position.getBlockX() - rootX * 16;
-        int y = position.getBlockY();
-        int z = position.getBlockZ() - rootZ * 16;
+    private int getBlockData(BlockVector3 position) throws DataException {
+        int x = position.getX() - rootX * 16;
+        int y = position.getY();
+        int z = position.getZ() - rootZ * 16;
 
         int section = y >> 4;
         int yIndex = y & 0x0F;
@@ -225,7 +225,7 @@ public class AnvilChunk implements Chunk {
                 values.put(entry.getKey(), entry.getValue());
             }
 
-            BlockVector vec = new BlockVector(x, y, z);
+            BlockVector3 vec = BlockVector3.at(x, y, z);
             tileEntities.put(vec, values);
         }
     }
@@ -240,12 +240,12 @@ public class AnvilChunk implements Chunk {
      * @throws DataException thrown if there is a data error
      */
     @Nullable
-    private CompoundTag getBlockTileEntity(Vector position) throws DataException {
+    private CompoundTag getBlockTileEntity(BlockVector3 position) throws DataException {
         if (tileEntities == null) {
             populateTileEntities();
         }
 
-        Map<String, Tag> values = tileEntities.get(new BlockVector(position));
+        Map<String, Tag> values = tileEntities.get(position);
         if (values == null) {
             return null;
         }
@@ -254,22 +254,22 @@ public class AnvilChunk implements Chunk {
     }
 
     @Override
-    public BlockStateHolder getBlock(Vector position) throws DataException {
+    public BaseBlock getBlock(BlockVector3 position) throws DataException {
         int id = getBlockID(position);
         int data = getBlockData(position);
 
         BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
         if (state == null) {
             WorldEdit.logger.warning("Unknown legacy block " + id + ":" + data + " found when loading legacy anvil chunk.");
-            return BlockTypes.AIR.getDefaultState();
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         if (state.getMaterial().hasContainer()) {
             CompoundTag tileEntity = getBlockTileEntity(position);
             if (tileEntity != null) {
-                return new BaseBlock(state, tileEntity);
+                return state.toBaseBlock(tileEntity);
             }
         }
-        return state;
+        return state.toBaseBlock();
     }
 
 }

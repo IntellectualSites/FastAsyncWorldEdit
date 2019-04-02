@@ -20,7 +20,8 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.google.common.base.Function;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,7 +59,7 @@ public class MaskUnion extends MaskIntersection {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         for (Mask mask : getMasksArray()) {
             if (mask.test(vector)) {
                 return true;
@@ -71,7 +72,7 @@ public class MaskUnion extends MaskIntersection {
     @Nullable
     @Override
     public Mask2D toMask2D() {
-        List<Mask2D> mask2dList = new ArrayList<Mask2D>();
+        List<Mask2D> mask2dList = new ArrayList<>();
         for (Mask mask : getMasks()) {
             Mask2D mask2d = mask.toMask2D();
             if (mask2d != null) {

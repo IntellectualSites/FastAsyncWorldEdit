@@ -22,7 +22,7 @@ package com.sk89q.worldedit.world.storage;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
 
@@ -46,7 +46,7 @@ public abstract class LegacyChunkStore extends ChunkStore {
      * @param separator folder separator character
      * @return pathname
      */
-    public static String getFilename(Vector2D position, String separator) {
+    public static String getFilename(BlockVector2 position, String separator) {
         int x = position.getBlockX();
         int z = position.getBlockZ();
 
@@ -65,12 +65,12 @@ public abstract class LegacyChunkStore extends ChunkStore {
      * @param position chunk position
      * @return pathname
      */
-    public static String getFilename(Vector2D position) {
+    public static String getFilename(BlockVector2 position) {
         return getFilename(position, File.separator);
     }
 
     @Override
-    public CompoundTag getChunkTag(Vector2D position, World world) throws DataException, IOException {
+    public CompoundTag getChunkTag(BlockVector2 position, World world) throws DataException, IOException {
         int x = position.getBlockX();
         int z = position.getBlockZ();
 

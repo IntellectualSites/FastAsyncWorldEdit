@@ -7,12 +7,11 @@ import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.OffsetFaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.Blocks;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -23,14 +22,14 @@ public class ErodeBrush implements Brush {
 
     private PseudoRandom rand = new PseudoRandom();
 
-    private static final Vector[] FACES_TO_CHECK = {new Vector(0, 0, 1), new Vector(0, 0, -1), new Vector(0, 1, 0), new Vector(0, -1, 0), new Vector(1, 0, 0), new Vector(-1, 0, 0)};
+    private static final BlockVector3[] FACES_TO_CHECK = {BlockVector3.at(0, 0, 1), BlockVector3.at(0, 0, -1), BlockVector3.at(0, 1, 0), BlockVector3.at(0, -1, 0), BlockVector3.at(1, 0, 0), BlockVector3.at(-1, 0, 0)};
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
         this.erosion(editSession, 2, 1, 5, 1, position, size);
     }
 
-    public void erosion(final EditSession es, int erodeFaces, int erodeRec, int fillFaces, int fillRec, Vector target, double size) {
+    public void erosion(final EditSession es, int erodeFaces, int erodeRec, int fillFaces, int fillRec, BlockVector3 target, double size) {
         int brushSize = (int) size + 1;
         int brushSizeSquared = (int) (size * size);
         int dimension = brushSize * 2 + 1;
@@ -68,7 +67,7 @@ public class ErodeBrush implements Brush {
 
         finalBuffer.forEach(new FaweClipboard.BlockReader() {
             @Override
-            public void run(int x, int y, int z, BlockState block) {
+            public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                 es.setBlock(x + bx, y + by, z + bz, block);
             }
         }, true);
@@ -98,7 +97,7 @@ public class ErodeBrush implements Brush {
                     } else {
                         Arrays.fill(frequency, 0);
                     }
-                    for (Vector offs : FACES_TO_CHECK) {
+                    for (BlockVector3 offs : FACES_TO_CHECK) {
                         BlockStateHolder next = current.getBlock(x + offs.getBlockX(), y + offs.getBlockY(), z + offs.getBlockZ());
                         if (!next.getBlockType().getMaterial().isMovementBlocker()) {
                             continue;
@@ -142,7 +141,7 @@ public class ErodeBrush implements Brush {
                     } else {
                         Arrays.fill(frequency, 0);
                     }
-                    for (Vector offs : FACES_TO_CHECK) {
+                    for (BlockVector3 offs : FACES_TO_CHECK) {
                         BlockStateHolder next = current.getBlock(x + offs.getBlockX(), y + offs.getBlockY(), z + offs.getBlockZ());
                         if (next.getBlockType().getMaterial().isMovementBlocker()) {
                             continue;

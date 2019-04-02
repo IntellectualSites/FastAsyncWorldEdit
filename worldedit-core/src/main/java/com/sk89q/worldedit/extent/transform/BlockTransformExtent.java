@@ -1,265 +1,277 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.extent.transform;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.ReflectionUtils;
+import com.google.common.collect.Sets;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.helper.MCDirections;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
-import com.sk89q.worldedit.registry.state.AbstractProperty;
+import com.sk89q.worldedit.registry.state.BooleanProperty;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
+import com.sk89q.worldedit.registry.state.EnumProperty;
+import com.sk89q.worldedit.registry.state.IntegerProperty;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
-import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 /**
  * Transforms blocks themselves (but not their position) according to a
  * given transform.
  */
 public class BlockTransformExtent extends ResettableExtent {
-    private Transform transform;
-    private Transform transformInverse;
-    private int[] BLOCK_ROTATION_BITMASK;
-    private int[][] BLOCK_TRANSFORM;
-    private int[][] BLOCK_TRANSFORM_INVERSE;
-    private int[] ALL = new int[0];
 
+    private Transform transform;
+
+    
     public BlockTransformExtent(Extent parent) {
         this(parent, new AffineTransform());
     }
 
-    public BlockTransformExtent(Extent parent, Transform transform) {
-        super(parent);
+    /**
+     * Create a new instance.
+     *
+     * @param extent the extent
+     */
+    public BlockTransformExtent(Extent extent, Transform transform) {
+        super(extent);
+        checkNotNull(transform);
         this.transform = transform;
-        this.transformInverse = this.transform.inverse();
-        cache();
     }
 
-    private List<Direction> getDirections(AbstractProperty property) {
-        if (property instanceof DirectionalProperty) {
-            DirectionalProperty directional = (DirectionalProperty) property;
-            directional.getValues();
-        } else {
-            switch (property.getKey()) {
-                case HALF:
+    /**
+     * Get the transform.
+     *
+     * @return the transform
+     */
+    public Transform getTransform() {
+        return transform;
+    }
+    
+    /**
+     * Set the transform
+     * @param affine
+     */
+    public void setTransform(Transform affine) {
+        this.transform = affine;
+    }
 
-                case ROTATION:
 
-                case AXIS:
+    /**
+     * Transform a block without making a copy.
+     *
+     * @param block the block
+     * @param reverse true to transform in the opposite direction
+     * @return the same block
+     */
+    protected <T extends BlockStateHolder<T>> T transformBlock(T block, boolean reverse) {
+        return transform(block, reverse ? transform.inverse() : transform);
+    }
+    
+    @Override
+    public BlockState getLazyBlock(BlockVector3 position) {
+    	return transformBlock(super.getLazyBlock(position), false).toImmutableState();
+    }
+    
+    @Override
+    public BlockState getLazyBlock(int x, int y, int z) {
+        return transformBlock(super.getLazyBlock(x, y, z), false).toImmutableState();
+    }
 
-                case FACING:
+    @Override
+    public BlockState getBlock(BlockVector3 position) {
+        return transformBlock(super.getBlock(position), false).toImmutableState();
+    }
 
-                case SHAPE:
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return transformBlock(super.getFullBlock(position), false);
+    }
+    
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return super.setBlock(x, y, z, transformBlock(block, true));
+    }
 
-                case NORTH:
-                case EAST:
-                case SOUTH:
-                case WEST:
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+        return super.setBlock(location, transformBlock(block, true));
+    }
+    
+    private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
+
+
+
+    /**
+     * Transform the given block using the given transform.
+     *
+     * <p>The provided block is <em>not</em> modified.</p>
+     *
+     * @param block the block
+     * @param transform the transform
+     * @return the same block
+     */
+    public static <B extends BlockStateHolder<B>> B transform(B block, Transform transform) {
+        checkNotNull(block);
+        checkNotNull(transform);
+        B result = block;
+        List<? extends Property<?>> properties = block.getBlockType().getProperties();
+
+        for (Property<?> property : properties) {
+            if (property instanceof DirectionalProperty) {
+                DirectionalProperty dirProp = (DirectionalProperty) property;
+                Direction value = (Direction) block.getState(property);
+                if (value != null) {
+                    Vector3 newValue = getNewStateValue(dirProp.getValues(), transform, value.toVector());
+                    if (newValue != null) {
+                        result = result.with(dirProp, Direction.findClosest(newValue, Direction.Flag.ALL));
+                    }
+                }
+            } else if (property instanceof EnumProperty) {
+                EnumProperty enumProp = (EnumProperty) property;
+                if (property.getName().equals("axis")) {
+                    // We have an axis - this is something we can do the rotations to :sunglasses:
+                    Direction value = null;
+                    switch ((String) block.getState(property)) {
+                        case "x":
+                            value = Direction.EAST;
+                            break;
+                        case "y":
+                            value = Direction.UP;
+                            break;
+                        case "z":
+                            value = Direction.NORTH;
+                            break;
+                    }
+                    if (value != null) {
+                        Vector3 newValue = getNewStateValue(Direction.valuesOf(Direction.Flag.UPRIGHT | Direction.Flag.CARDINAL), transform, value.toVector());
+                        if (newValue != null) {
+                            String axis = null;
+                            Direction newDir = Direction.findClosest(newValue, Direction.Flag.UPRIGHT | Direction.Flag.CARDINAL);
+                            if (newDir == Direction.NORTH || newDir == Direction.SOUTH) {
+                                axis = "z";
+                            } else if (newDir == Direction.EAST || newDir == Direction.WEST) {
+                                axis = "x";
+                            } else if (newDir == Direction.UP || newDir == Direction.DOWN) {
+                                axis = "y";
+                            }
+                            if (axis != null) {
+                                result = result.with(enumProp, axis);
+                            }
+                        }
+                    }
+                }
+            } else if (property instanceof IntegerProperty) {
+                IntegerProperty intProp = (IntegerProperty) property;
+                if (property.getName().equals("rotation")) {
+                    if (intProp.getValues().size() == 16) {
+                        Optional<Direction> direction = Direction.fromRotationIndex(block.getState(intProp));
+                        int horizontalFlags = Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL;
+                        if (direction.isPresent()) {
+                            Vector3 vec = getNewStateValue(Direction.valuesOf(horizontalFlags), transform, direction.get().toVector());
+                            if (vec != null) {
+                                OptionalInt newRotation = Direction.findClosest(vec, horizontalFlags).toRotationIndex();
+                                if (newRotation.isPresent()) {
+                                    result = result.with(intProp, newRotation.getAsInt());
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-        return null;
+
+        List<String> directionalProperties = properties.stream()
+                .filter(prop -> prop instanceof BooleanProperty)
+                .filter(prop -> directionNames.contains(prop.getName()))
+                .filter(property -> (Boolean) block.getState(property))
+                .map(Property::getName)
+                .map(String::toUpperCase)
+                .map(Direction::valueOf)
+                .map(dir -> Direction.findClosest(transform.apply(dir.toVector()), Direction.Flag.CARDINAL))
+                .filter(Objects::nonNull)
+                .map(Direction::name)
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
+
+        if (directionalProperties.size() > 0) {
+            for (String directionName : directionNames) {
+                result = result.with(block.getBlockType().getProperty(directionName), directionalProperties.contains(directionName));
+            }
+        }
+        return result;
     }
 
+    /**
+     * Get the new value with the transformed direction.
+     *
+     * @param allowedStates the allowed states
+     * @param transform the transform
+     * @param oldDirection the old direction to transform
+     * @return a new state or null if none could be found
+     */
     @Nullable
-    private static Integer getNewStateIndex(Transform transform, List<Direction> directions, int oldIndex) {
-        Direction oldDirection = directions.get(oldIndex);
-        Vector oldVector = oldDirection.toVector();
-        Vector newVector = transform.apply(oldVector).subtract(transform.apply(Vector.ZERO)).normalize();
-        int newIndex = oldIndex;
-        double closest = oldVector.toVector().normalize().dot(newVector);
+    private static Vector3 getNewStateValue(List<Direction> allowedStates, Transform transform, Vector3 oldDirection) {
+        Vector3 newDirection = transform.apply(oldDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
+        Vector3 newValue = null;
+        double closest = -2;
         boolean found = false;
 
-        for (int i = 0; i < directions.size(); i++) {
-            Direction v = directions.get(i);
-            double dot = v.toVector().normalize().dot(newVector);
-            if (dot > closest) {
+        for (Direction v : allowedStates) {
+            double dot = v.toVector().normalize().dot(newDirection);
+            if (dot >= closest) {
                 closest = dot;
-                newIndex = i;
+                newValue = v.toVector();
                 found = true;
             }
         }
 
         if (found) {
-            return newIndex;
+            return newValue;
         } else {
             return null;
         }
     }
-
-    private void cache() {
-        BLOCK_ROTATION_BITMASK = new int[BlockTypes.size()];
-        BLOCK_TRANSFORM = new int[BlockTypes.size()][];
-        BLOCK_TRANSFORM_INVERSE = new int[BlockTypes.size()][];
-        outer:
-        for (int i = 0; i < BLOCK_TRANSFORM.length; i++) {
-            BLOCK_TRANSFORM[i] = ALL;
-            BLOCK_TRANSFORM_INVERSE[i] = ALL;
-            BlockTypes type = BlockTypes.get(i);
-            int bitMask = 0;
-            for (AbstractProperty property : (Collection<AbstractProperty>) type.getProperties()) {
-                Collection<Direction> directions = getDirections(property);
-                if (directions != null) {
-                    BLOCK_TRANSFORM[i] = null;
-                    BLOCK_TRANSFORM_INVERSE[i] = null;
-                    bitMask |= property.getBitMask();
-                }
-            }
-            if (bitMask != 0) {
-                BLOCK_ROTATION_BITMASK[i] = bitMask;
-            }
-        }
-    }
-
-    @Override
-    public ResettableExtent setExtent(Extent extent) {
-        return super.setExtent(extent);
-    }
-
-    public Transform getTransform() {
-        return transform;
-    }
-
-    public void setTransform(Transform affine) {
-        this.transform = affine;
-        this.transformInverse = this.transform.inverse();
-        cache();
-    }
-
-    private final BlockState transform(BlockState state, int[][] transformArray, Transform transform) {
-        int typeId = state.getInternalBlockTypeId();
-        int[] arr = transformArray[typeId];
-        if (arr == ALL) return state;
-        if (arr == null) {
-            arr = transformArray[typeId] = new int[state.getBlockType().getMaxStateId() + 1];
-            Arrays.fill(arr, -1);
-        }
-        int mask = BLOCK_ROTATION_BITMASK[typeId];
-        int internalId = state.getInternalId();
-
-        int maskedId = internalId & mask;
-        int newMaskedId = arr[maskedId];
-        if (newMaskedId != -1) {
-            return BlockState.getFromInternalId(newMaskedId | (internalId & (~mask)));
-        }
-        newMaskedId = state.getInternalId();
-
-        BlockTypes type = state.getBlockType();
-        for (AbstractProperty property : (Collection<AbstractProperty>) type.getProperties()) {
-            List<Direction> directions = getDirections(property);
-            if (directions != null) {
-                Integer newIndex = getNewStateIndex(transform, directions, property.getIndex(state.getInternalId()));
-                if (newIndex != null) {
-                    newMaskedId = property.modifyIndex(newMaskedId, newIndex);
-                }
-            }
-        }
-        arr[maskedId] = newMaskedId & mask;
-        return BlockState.getFromInternalId(newMaskedId);
-    }
-
-    public final BlockState transformFast(BlockState block) {
-        BlockState transformed = transform(block, BLOCK_TRANSFORM, transform);
-        if (block.hasNbtData()) {
-            CompoundTag tag = block.getNbtData();
-            if (tag.containsKey("Rot")) {
-                int rot = tag.asInt("Rot");
-
-                Direction direction = MCDirections.fromRotation(rot);
-
-                if (direction != null) {
-                    Vector applyAbsolute = transform.apply(direction.toVector());
-                    Vector applyOrigin = transform.apply(Vector.ZERO);
-                    applyAbsolute.mutX(applyAbsolute.getX() - applyOrigin.getX());
-                    applyAbsolute.mutY(applyAbsolute.getY() - applyOrigin.getY());
-                    applyAbsolute.mutZ(applyAbsolute.getZ() - applyOrigin.getZ());
-
-                    Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
-
-                    if (newDirection != null) {
-                        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
-                        values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
-                    }
-                }
-                transformed = new BaseBlock(transformed, tag);
-            }
-        }
-        return transformed;
-    }
-
-    public final BlockState transformFastInverse(BlockState block) {
-        BlockState transformed = transform(block, BLOCK_TRANSFORM_INVERSE, transformInverse);
-        if (block.hasNbtData()) {
-            CompoundTag tag = block.getNbtData();
-            if (tag.containsKey("Rot")) {
-                int rot = tag.asInt("Rot");
-
-                Direction direction = MCDirections.fromRotation(rot);
-
-                if (direction != null) {
-                    Vector applyAbsolute = transformInverse.apply(direction.toVector());
-                    Vector applyOrigin = transformInverse.apply(Vector.ZERO);
-                    applyAbsolute.mutX(applyAbsolute.getX() - applyOrigin.getX());
-                    applyAbsolute.mutY(applyAbsolute.getY() - applyOrigin.getY());
-                    applyAbsolute.mutZ(applyAbsolute.getZ() - applyOrigin.getZ());
-
-                    Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
-
-                    if (newDirection != null) {
-                        Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
-                        values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
-                    }
-                }
-            }
-            transformed = new BaseBlock(transformed, tag);
-        }
-        return transformed;
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
-        return transformFast(super.getLazyBlock(x, y, z));
-    }
-
-    @Override
-    public BlockState getLazyBlock(Vector position) {
-        return transformFast(super.getLazyBlock(position));
-    }
-
-    @Override
-    public BlockState getBlock(Vector position) {
-        return transformFast(super.getBlock(position));
-    }
-
-    @Override
-    public BaseBiome getBiome(Vector2D position) {
-        return super.getBiome(position);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(x, y, z, transformFastInverse((BlockState) block));
-    }
-
-
-    @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(location, transformFastInverse((BlockState) block));
-    }
-
 
 }

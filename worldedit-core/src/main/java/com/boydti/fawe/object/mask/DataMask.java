@@ -1,9 +1,10 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask2D;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import javax.annotation.Nullable;
 
 public class DataMask extends AbstractExtentMask implements ResettableMask {
@@ -15,7 +16,7 @@ public class DataMask extends AbstractExtentMask implements ResettableMask {
     private transient int data = -1;
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         Extent extent = getExtent();
         if (data != -1) {
             return extent.getLazyBlock(vector).getInternalPropertiesId() == data;

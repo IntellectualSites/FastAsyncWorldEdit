@@ -20,15 +20,16 @@
 package com.sk89q.worldedit.regions.selector;
 
 import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.BlockVector2D;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.cui.CUIRegion;
 import com.sk89q.worldedit.internal.cui.SelectionPointEvent;
 import com.sk89q.worldedit.internal.cui.SelectionPolygonEvent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
@@ -48,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion {
 
     private final transient ConvexPolyhedralRegion region;
-    private transient BlockVector pos1;
+    private transient BlockVector3 pos1;
 
     /**
      * Create a new selector with a {@code null} world.
@@ -98,9 +99,9 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
             region = new ConvexPolyhedralRegion(oldRegion.getWorld());
 
-            for (final BlockVector2D pt : new ArrayList<BlockVector2D>(oldRegion.polygonize(Integer.MAX_VALUE))) {
-                region.addVertex(pt.toVector(minY));
-                region.addVertex(pt.toVector(maxY));
+            for (final BlockVector2 pt : new ArrayList<>(oldRegion.polygonize(Integer.MAX_VALUE))) {
+                region.addVertex(pt.toBlockVector3(minY));
+                region.addVertex(pt.toBlockVector3(maxY));
             }
 
             learnChanges();
@@ -108,7 +109,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     }
 
     @Override
-    public List<Vector> getVerticies() {
+    public List<BlockVector3> getVerticies() {
         return new ArrayList<>(region.getVertices());
     }
 
@@ -124,15 +125,15 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     }
 
     @Override
-    public boolean selectPrimary(Vector position, SelectorLimits limits) {
+    public boolean selectPrimary(BlockVector3 position, SelectorLimits limits) {
         checkNotNull(position);
         clear();
-        pos1 = position.toBlockVector();
+        pos1 = position;
         return region.addVertex(position);
     }
 
     @Override
-    public boolean selectSecondary(Vector position, SelectorLimits limits) {
+    public boolean selectSecondary(BlockVector3 position, SelectorLimits limits) {
         checkNotNull(position);
 
         Optional<Integer> vertexLimit = limits.getPolyhedronVertexLimit();
@@ -145,7 +146,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     }
 
     @Override
-    public BlockVector getPrimaryPosition() throws IncompleteRegionException {
+    public BlockVector3 getPrimaryPosition() throws IncompleteRegionException {
         return pos1;
     }
 
@@ -175,7 +176,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
     @Override
     public void learnChanges() {
-        pos1 = region.getVertices().iterator().next().toBlockVector();
+        pos1 = region.getVertices().iterator().next();
     }
 
     @Override
@@ -190,7 +191,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
     @Override
     public List<String> getInformationLines() {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
 
         ret.add("Vertices: "+region.getVertices().size());
         ret.add("Triangles: "+region.getTriangles().size());
@@ -200,7 +201,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
 
     @Override
-    public void explainPrimarySelection(Actor player, LocalSession session, Vector pos) {
+    public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
         checkNotNull(player);
         checkNotNull(session);
         checkNotNull(pos);
@@ -211,7 +212,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     }
 
     @Override
-    public void explainSecondarySelection(Actor player, LocalSession session, Vector pos) {
+    public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
         checkNotNull(player);
         checkNotNull(session);
         checkNotNull(pos);
@@ -243,12 +244,12 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         checkNotNull(player);
         checkNotNull(session);
 
-        Collection<Vector> vertices = region.getVertices();
+        Collection<BlockVector3> vertices = region.getVertices();
         Collection<Triangle> triangles = region.getTriangles();
 
-        Map<Vector, Integer> vertexIds = new HashMap<Vector, Integer>(vertices.size());
+        Map<BlockVector3, Integer> vertexIds = new HashMap<>(vertices.size());
         int lastVertexId = -1;
-        for (Vector vertex : vertices) {
+        for (BlockVector3 vertex : vertices) {
             vertexIds.put(vertex, ++lastVertexId);
             session.dispatchCUIEvent(player, new SelectionPointEvent(lastVertexId, vertex, getArea()));
         }
@@ -256,7 +257,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         for (Triangle triangle : triangles) {
             final int[] v = new int[3];
             for (int i = 0; i < 3; ++i) {
-                v[i] = vertexIds.get(triangle.getVertex(i));
+                v[i] = vertexIds.get(triangle.getVertex(i).toBlockPoint());
             }
             session.dispatchCUIEvent(player, new SelectionPolygonEvent(v));
         }

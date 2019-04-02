@@ -1,26 +1,24 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.PseudoRandom;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private final Pattern pattern;
     private int moves;
 
-    private transient MutableBlockVector cur;
-    private transient MutableBlockVector[] buffer;
-    private transient MutableBlockVector[] allowed;
-    private transient MutableBlockVector next;
+    private transient MutableBlockVector3 cur;
+    private transient MutableBlockVector3[] buffer;
+    private transient MutableBlockVector3[] allowed;
+    private transient MutableBlockVector3 next;
 
     public SurfaceRandomOffsetPattern(Pattern pattern, int distance) {
         this.pattern = pattern;
@@ -29,26 +27,26 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     }
 
     private void init() {
-        cur = new MutableBlockVector();
-        this.buffer = new MutableBlockVector[BreadthFirstSearch.DIAGONAL_DIRECTIONS.length];
+        cur = new MutableBlockVector3();
+        this.buffer = new MutableBlockVector3[BreadthFirstSearch.DIAGONAL_DIRECTIONS.length];
         for (int i = 0; i < buffer.length; i++) {
-            buffer[i] = new MutableBlockVector();
+            buffer[i] = new MutableBlockVector3();
         }
-        allowed = new MutableBlockVector[buffer.length];
+        allowed = new MutableBlockVector3[buffer.length];
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BaseBlock apply(BlockVector3 position) {
         return pattern.apply(travel(position));
     }
 
-    private Vector travel(Vector pos) {
+    private BlockVector3 travel(BlockVector3 pos) {
         cur.setComponents(pos);
         for (int move = 0; move < moves; move++) {
             int index = 0;
             for (int i = 0; i < allowed.length; i++) {
                 next = buffer[i];
-                Vector dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
+                BlockVector3 dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
                 next.setComponents(cur.getBlockX() + dir.getBlockX(), cur.getBlockY() + dir.getBlockY(), cur.getBlockZ() + dir.getBlockZ());
                 if (allowed(next)) {
                     allowed[index++] = next;
@@ -57,14 +55,15 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
             if (index == 0) {
                 return cur;
             }
-            next = allowed[PseudoRandom.random.nextInt(index)];
+            next = allowed[ThreadLocalRandom.current().nextInt(index)];
             cur.setComponents(next.getBlockX(), next.getBlockY(), next.getBlockZ());
         }
         return cur;
     }
 
-    private boolean allowed(Vector v) {
-        BlockStateHolder block = pattern.apply(v);
+    private boolean allowed(BlockVector3 bv) {
+    	MutableBlockVector3 v = new MutableBlockVector3(bv);
+        BlockStateHolder block = pattern.apply(bv);
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return false;
         }
@@ -107,7 +106,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         return false;
     }
 
-    private boolean canPassthrough(Vector v) {
+    private boolean canPassthrough(BlockVector3 v) {
         BlockStateHolder block = pattern.apply(v);
         return !block.getBlockType().getMaterial().isMovementBlocker();
     }

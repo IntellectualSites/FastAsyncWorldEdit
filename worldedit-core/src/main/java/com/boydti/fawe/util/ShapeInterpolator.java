@@ -167,7 +167,7 @@ public class ShapeInterpolator {
             bezierCoordinates[0] = curX = movX = coordinates[0];
             bezierCoordinates[1] = curY = movY = coordinates[1];
             float newX, newY;
-            final Vector<Point2D.Float> savedPathEndPoints = new Vector<Point2D.Float>();
+            final Vector<Point2D.Float> savedPathEndPoints = new Vector<>();
             numCoordinates = 2;
             while (!pi.isDone()) {
                 switch (pi.currentSegment(coordinates)) {

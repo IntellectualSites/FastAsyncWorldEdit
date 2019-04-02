@@ -7,7 +7,7 @@ load: STARTUP
 database: false
 depend: [WorldEdit]
 api-version: 1.13
-#softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
+#softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PreciousStones]
 commands:
   '/p':
     description: VoxelSniper perform command
@@ -146,6 +146,7 @@ permissions:
       voxelsniper.brush.ellipsoid: true
       voxelsniper.brush.eraser: true
       voxelsniper.brush.erode: true
+      voxelsniper.brush.erodeblend: true
       voxelsniper.brush.extrude: true
       voxelsniper.brush.filldown: true
       voxelsniper.brush.flatocean: true
@@ -190,6 +191,7 @@ permissions:
       voxelsniper.brush.voxeldisc: true
       voxelsniper.brush.voxeldiscface: true
       voxelsniper.brush.warp: true
+      voxelsniper.brush.wallsider: true
       voxelsniper.goto: true
       voxelsniper.sniper: true
   voxelsniper.sniper:
@@ -228,6 +230,7 @@ permissions:
       voxelsniper.brush.entityremoval: true
       voxelsniper.brush.eraser: true
       voxelsniper.brush.erode: true
+      voxelsniper.brush.erodeblend: true
       voxelsniper.brush.extrude: true
       voxelsniper.brush.filldown: true
       voxelsniper.brush.flatocean: true
@@ -279,6 +282,7 @@ permissions:
       voxelsniper.brush.voxeldisc: true
       voxelsniper.brush.voxeldiscface: true
       voxelsniper.brush.warp: true
+      voxelsniper.brush.wallsider: true
   voxelsniper.brush.ball:
     default: op
   voxelsniper.brush.biome:
@@ -332,6 +336,8 @@ permissions:
   voxelsniper.brush.eraser:
     default: op
   voxelsniper.brush.erode:
+    default: op
+  voxelsniper.brush.erodeblend:
     default: op
   voxelsniper.brush.extrude:
     default: op
@@ -432,6 +438,8 @@ permissions:
   voxelsniper.brush.voxeldisc:
     default: op
   voxelsniper.brush.voxeldiscface:
+    default: op
+  voxelsniper.brush.wallsider:
     default: op
   voxelsniper.brush.warp:
     default: op

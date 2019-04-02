@@ -158,12 +158,9 @@ public class Message
         }
         else
         {
-            StringBuilder returnValueBuilder = new StringBuilder();
-            returnValueBuilder.append(ChatColor.DARK_GREEN);
-            returnValueBuilder.append("Block Types Selected: ");
-            returnValueBuilder.append(ChatColor.AQUA);
-            returnValueBuilder.append(snipeData.getVoxelList());
-            snipeData.sendMessage(returnValueBuilder.toString());
+            String returnValueBuilder = ChatColor.DARK_GREEN + "Block Types Selected: " + ChatColor.AQUA
+                    + snipeData.getVoxelList();
+            snipeData.sendMessage(returnValueBuilder);
         }
     }
 }

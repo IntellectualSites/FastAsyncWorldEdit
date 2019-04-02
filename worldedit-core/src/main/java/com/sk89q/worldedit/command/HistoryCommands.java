@@ -39,6 +39,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.binding.Range;
@@ -112,7 +113,7 @@ public class HistoryCommands extends MethodCommands {
                                         RollbackOptimizedHistory rollback = new RollbackOptimizedHistory(world, uuid, Integer.parseInt(name.substring(0, name.length() - 3)));
                                         DiskStorageHistory.DiskStorageSummary summary = rollback.summarize(RegionWrapper.GLOBAL(), false);
                                         if (summary != null) {
-                                            rollback.setDimensions(new Vector(summary.minX, 0, summary.minZ), new Vector(summary.maxX, 255, summary.maxZ));
+                                            rollback.setDimensions(BlockVector3.at(summary.minX, 0, summary.minZ), BlockVector3.at(summary.maxX, 255, summary.maxZ));
                                             rollback.setTime(historyFile.lastModified());
                                             RollbackDatabase db = DBHandler.IMP.getDatabase(world);
                                             db.logEdit(rollback);
@@ -165,10 +166,12 @@ public class HistoryCommands extends MethodCommands {
         radius = Math.max(Math.min(500, radius), 0);
         final World world = player.getWorld();
         Location origin = player.getLocation();
-        Vector bot = origin.toVector().subtract(radius, radius, radius);
-        bot.mutY(Math.max(0, bot.getY()));
-        Vector top = origin.toVector().add(radius, radius, radius);
-        top.mutY(Math.min(255, top.getY()));
+        BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
+        bot = bot.withY(Math.max(0, bot.getY()));
+//        bot.mutY(Math.max(0, bot.getY()));
+        BlockVector3 top = origin.toBlockPoint().add(radius, radius, radius);
+        bot = bot.withY(Math.min(255, top.getY()));
+//        top.mutY(Math.min(255, top.getY()));
         RollbackDatabase database = DBHandler.IMP.getDatabase(world);
         final AtomicInteger count = new AtomicInteger();
         final FawePlayer fp = FawePlayer.wrap(player);

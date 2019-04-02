@@ -9,8 +9,9 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.BrushProcessor;
-import com.sk89q.worldedit.extension.factory.DefaultMaskParser;
-import com.sk89q.worldedit.extension.factory.HashTagPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
 import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.util.command.ProcessedCallable;
 import com.sk89q.worldedit.util.command.parametric.FunctionParametricCallable;
@@ -75,7 +76,7 @@ public class CommandScriptLoader {
                             }
                             return;
                         case "patterns":
-                            parser = FaweAPI.getParser(HashTagPatternParser.class);
+                            parser = FaweAPI.getParser(DefaultPatternParser.class);
                             break;
                         case "masks":
                             parser = FaweAPI.getParser(DefaultMaskParser.class);

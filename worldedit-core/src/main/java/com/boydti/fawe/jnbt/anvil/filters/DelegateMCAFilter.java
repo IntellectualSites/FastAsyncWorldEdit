@@ -4,7 +4,7 @@ import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAFile;
 import com.boydti.fawe.jnbt.anvil.MCAFilter;
 import com.boydti.fawe.jnbt.anvil.MCAQueue;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;

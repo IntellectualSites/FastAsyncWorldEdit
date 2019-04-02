@@ -8,13 +8,13 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.SetQueue;
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.object.ChunkLoc;
-import com.intellectualcrafters.plot.object.Location;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotArea;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import com.intellectualcrafters.plot.util.expiry.ExpireManager;
+import com.github.intellectualsites.plotsquared.plot.PlotSquared;
+import com.github.intellectualsites.plotsquared.plot.object.ChunkLoc;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpireManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class PlotTrim {
                 }
             });
             ArrayList<Plot> plots = new ArrayList<>();
-            plots.addAll(PS.get().getPlots(area));
+            plots.addAll(PlotSquared.get().getPlots(area));
             if (ExpireManager.IMP != null) {
                 plots.removeAll(ExpireManager.IMP.getPendingExpired());
             }

@@ -11,6 +11,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class MutableFullBlockChange implements Change {
@@ -60,9 +61,9 @@ public class MutableFullBlockChange implements Change {
     }
 
     public void perform(FaweQueue queue) {
-        BlockTypes idFrom = BlockTypes.getFromStateId(from);
+        BlockType idFrom = BlockTypes.getFromStateId(from);
         if (blockBag != null) {
-            BlockTypes idTo = BlockTypes.getFromStateId(to);
+            BlockType idTo = BlockTypes.getFromStateId(to);
             if (idFrom != idTo) {
                 if (allowFetch && from != 0) {
                     try {

@@ -53,9 +53,9 @@ public class GeneralCommands {
 
     @Command(
         aliases = { "/limit" },
-        usage = "<limit>",
+        usage = "[limit]",
         desc = "Modify block change limit",
-        min = 1,
+        min = 0,
         max = 1
     )
     @CommandPermissions("worldedit.limit")
@@ -64,7 +64,7 @@ public class GeneralCommands {
         LocalConfiguration config = worldEdit.getConfiguration();
         boolean mayDisable = player.hasPermission("worldedit.limit.unrestricted");
 
-        int limit = Math.max(-1, args.getInteger(0));
+        int limit = args.argsLength() == 0 ? config.defaultChangeLimit : Math.max(-1, args.getInteger(0));
         if (!mayDisable && config.maxChangeLimit > -1) {
             if (limit > config.maxChangeLimit) {
                 player.printError("Your maximum allowable limit is " + config.maxChangeLimit + ".");
@@ -164,7 +164,7 @@ public class GeneralCommands {
         boolean blocksOnly = args.hasFlag('b');
         boolean itemsOnly = args.hasFlag('i');
 
-        ItemType type = ItemTypes.parse(query);
+        ItemType type = ItemTypes.get(query);
 
         if (type != null) {
             actor.print(type.getId() + " (" + type.getName() + ")");
@@ -187,7 +187,7 @@ public class GeneralCommands {
 
             int found = 0;
 
-            for (ItemType searchType : ItemTypes.values) {
+            for (ItemType searchType : ItemTypes.values()) {
                 if (found >= 15) {
                     actor.print(BBC.getPrefix() + "Too many results!");
                     break;

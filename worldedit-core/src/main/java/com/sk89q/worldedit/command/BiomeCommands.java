@@ -30,8 +30,6 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
@@ -45,6 +43,8 @@ import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -150,11 +150,11 @@ public class BiomeCommands extends MethodCommands {
                 return;
             }
 
-            BaseBiome biome = player.getWorld().getBiome(blockPosition.toVector().toVector2D());
+            BaseBiome biome = player.getWorld().getBiome(blockPosition.toBlockPoint().toBlockVector2());
             biomes[biome.getId()]++;
             size = 1;
         } else if (args.hasFlag('p')) {
-            BaseBiome biome = player.getWorld().getBiome(player.getLocation().toVector().toVector2D());
+            BaseBiome biome = player.getWorld().getBiome(player.getLocation().toBlockPoint().toBlockVector2());
             biomes[biome.getId()]++;
             size = 1;
         } else {
@@ -162,15 +162,15 @@ public class BiomeCommands extends MethodCommands {
             Region region = session.getSelection(world);
 
             if (region instanceof FlatRegion) {
-                for (Vector2D pt : new Fast2DIterator(((FlatRegion) region).asFlatRegion(), editSession)) {
+                for (BlockVector2 pt : new Fast2DIterator(((FlatRegion) region).asFlatRegion(), editSession)) {
                     biomes[editSession.getBiome(pt).getId()]++;
                     size++;
                 }
             } else {
                 RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
                     @Override
-                    public boolean apply(Vector position) throws WorldEditException {
-                        biomes[editSession.getBiome(position.toVector2D()).getId()]++;
+                    public boolean apply(BlockVector3 position) throws WorldEditException {
+                        biomes[editSession.getBiome(position.toBlockVector2()).getId()]++;
                         return true;
                     }
                 }, editSession);
@@ -185,7 +185,7 @@ public class BiomeCommands extends MethodCommands {
         for (int i = 0; i < biomes.length; i++) {
             int count = biomes[i];
             if (count != 0) {
-                distribution.add(new Countable<BaseBiome>(new BaseBiome(i), count));
+                distribution.add(new Countable<>(new BaseBiome(i), count));
             }
         }
         Collections.sort(distribution);
@@ -219,7 +219,7 @@ public class BiomeCommands extends MethodCommands {
         Mask2D mask2d = mask != null ? mask.toMask2D() : null;
 
         if (atPosition) {
-            region = new CuboidRegion(player.getLocation().toVector(), player.getLocation().toVector());
+            region = new CuboidRegion(player.getLocation().toBlockPoint(), player.getLocation().toBlockPoint());
         } else {
             region = session.getSelection(world);
         }

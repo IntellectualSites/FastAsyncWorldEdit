@@ -6,16 +6,15 @@ import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -64,15 +63,15 @@ public class ImageBrush implements Brush {
     }
 
     private interface ColorFunction {
-        int call(int x1, int z1, int x2, int z2, Extent extent, Vector pos);
+        int call(int x1, int z1, int x2, int z2, Extent extent, BlockVector3 pos);
     }
 
     private interface BlockFunction {
-        void apply(int color, Extent extent, Vector pos);
+        void apply(int color, Extent extent, BlockVector3 pos);
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
         TextureUtil texture = session.getTextureUtil();
 
         final int cx = position.getBlockX();
@@ -88,19 +87,19 @@ public class ImageBrush implements Brush {
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();
 
         RecursiveVisitor visitor = new RecursiveVisitor(new Mask() {
-            private final Vector mutable = new Vector();
+            private final MutableVector3 mutable = new MutableVector3();
             @Override
-            public boolean test(Vector vector) {
+            public boolean test(BlockVector3 vector) {
                 if (solid.test(vector)) {
                     int dx = vector.getBlockX() - cx;
                     int dy = vector.getBlockY() - cy;
                     int dz = vector.getBlockZ() - cz;
 
-                    Vector pos1 = transform.apply(mutable.setComponents(dx - 0.5, dy - 0.5, dz - 0.5));
+                    Vector3 pos1 = transform.apply(mutable.setComponents(dx - 0.5, dy - 0.5, dz - 0.5));
                     int x1 = (int) (pos1.getX() * scale + centerX);
                     int z1 = (int) (pos1.getZ() * scale + centerZ);
 
-                    Vector pos2 = transform.apply(mutable.setComponents(dx + 0.5, dy + 0.5, dz + 0.5));
+                    Vector3 pos2 = transform.apply(mutable.setComponents(dx + 0.5, dy + 0.5, dz + 0.5));
                     int x2 = (int) (pos2.getX() * scale + centerX);
                     int z2 = (int) (pos2.getZ() * scale + centerZ);
                     if (x2 < x1) {

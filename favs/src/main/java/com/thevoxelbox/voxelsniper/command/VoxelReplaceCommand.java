@@ -2,6 +2,7 @@ package com.thevoxelbox.voxelsniper.command;
 
 import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.RangeBlockHelper;
 import com.thevoxelbox.voxelsniper.SnipeData;
@@ -39,7 +40,7 @@ public class VoxelReplaceCommand extends VoxelCommand
             return true;
         }
 
-        BlockTypes weType = BlockTypes.parse(args[0]);
+        BlockType weType = BlockTypes.parse(args[0]);
         if (weType != null)
         {
             snipeData.setReplaceId(weType.getInternalId());

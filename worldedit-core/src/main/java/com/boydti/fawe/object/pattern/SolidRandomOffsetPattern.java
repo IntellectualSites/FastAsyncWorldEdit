@@ -1,16 +1,13 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.FaweCache;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -21,7 +18,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     private final Pattern pattern;
 
     private transient int dx2, dy2, dz2;
-    private transient MutableBlockVector mutable;
+    private transient MutableBlockVector3 mutable;
     private transient boolean[] solid;
     private SplittableRandom r;
 
@@ -40,15 +37,15 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         this.dz2 = dz * 2 + 1;
         solid = SolidBlockMask.getTypes();
         this.r = new SplittableRandom();
-        this.mutable = new MutableBlockVector();
+        this.mutable = new MutableBlockVector3();
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BaseBlock apply(BlockVector3 position) {
         mutable.mutX((position.getX() + r.nextInt(dx2) - dx));
         mutable.mutY((position.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((position.getZ() + r.nextInt(dz2) - dz));
-        BlockStateHolder block = pattern.apply(mutable);
+        BaseBlock block = pattern.apply(mutable);
         if (solid[block.getInternalBlockTypeId()]) {
             return block;
         } else {
@@ -57,7 +54,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
         mutable.mutX((get.getX() + r.nextInt(dx2) - dx));
         mutable.mutY((get.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((get.getZ() + r.nextInt(dz2) - dz));

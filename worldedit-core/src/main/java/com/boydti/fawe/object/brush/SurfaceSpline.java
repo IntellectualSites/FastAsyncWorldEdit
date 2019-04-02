@@ -7,6 +7,9 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
 import java.util.ArrayList;
@@ -22,17 +25,17 @@ public class SurfaceSpline implements Brush {
         this.quality = quality;
     }
 
-    private ArrayList<Vector> path = new ArrayList<>();
+    private ArrayList<Vector3> path = new ArrayList<>();
 
     @Override
-    public void build(EditSession editSession, Vector pos, Pattern pattern, double radius) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 pos, Pattern pattern, double radius) throws MaxChangedBlocksException {
         int maxY = editSession.getMaxY();
         boolean vis = editSession.getExtent() instanceof VisualExtent;
         if (path.isEmpty() || !pos.equals(path.get(path.size() - 1))) {
             int max = editSession.getNearestSurfaceTerrainBlock(pos.getBlockX(), pos.getBlockZ(), pos.getBlockY(), 0, editSession.getMaxY());
             if (max == -1) return;
-            pos.mutY(max);
-            path.add(pos);
+//            pos.mutY(max);
+            path.add(Vector3.at(pos.getBlockX(), max, pos.getBlockZ()));
             editSession.getPlayer().sendMessage(BBC.getPrefix() + BBC.BRUSH_SPLINE_PRIMARY_2.s());
             if (!vis) return;
         }
@@ -40,7 +43,7 @@ public class SurfaceSpline implements Brush {
         final List<Node> nodes = new ArrayList<>(path.size());
         final KochanekBartelsInterpolation interpol = new KochanekBartelsInterpolation();
 
-        for (final Vector nodevector : path) {
+        for (final Vector3 nodevector : path) {
             final Node n = new Node(nodevector);
             n.setTension(tension);
             n.setBias(bias);
@@ -50,14 +53,14 @@ public class SurfaceSpline implements Brush {
         interpol.setNodes(nodes);
         final double splinelength = interpol.arcLength(0, 1);
         for (double loop = 0; loop <= 1; loop += 1D / splinelength / quality) {
-            final Vector tipv = interpol.getPosition(loop);
+            final Vector3 tipv = interpol.getPosition(loop);
             final int tipx = MathMan.roundInt(tipv.getX());
             final int tipz = (int) tipv.getZ();
             int tipy = MathMan.roundInt(tipv.getY());
             tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, 0, maxY);
             if (tipy == -1) continue;
             if (radius == 0) {
-                Vector set = MutableBlockVector.get(tipx, tipy, tipz);
+            	BlockVector3 set = MutableBlockVector3.get(tipx, tipy, tipz);
                 try {
                     pattern.apply(editSession, set, set);
                 } catch (WorldEditException e) {
@@ -71,7 +74,7 @@ public class SurfaceSpline implements Brush {
             double radius2 = (radius * radius);
             LocalBlockVectorSet newSet = new LocalBlockVectorSet();
             final int ceilrad = (int) Math.ceil(radius);
-            for (final Vector v : vset) {
+            for (final BlockVector3 v : vset) {
                 final int tipx = v.getBlockX(), tipy = v.getBlockY(), tipz = v.getBlockZ();
                 for (int loopx = tipx - ceilrad; loopx <= (tipx + ceilrad); loopx++) {
                     for (int loopz = tipz - ceilrad; loopz <= (tipz + ceilrad); loopz++) {

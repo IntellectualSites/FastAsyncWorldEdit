@@ -20,9 +20,12 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.object.HasFaweQueue;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import java.util.Collection;
 
 /**
@@ -43,13 +46,13 @@ public class NonRisingVisitor extends RecursiveVisitor {
 
     public NonRisingVisitor(Mask mask, RegionFunction function, int depth, HasFaweQueue hasFaweQueue) {
         super(mask, function, depth, hasFaweQueue);
-        final Collection<Vector> directions = this.getDirections();
+        Collection<BlockVector3> directions = getDirections();
         directions.clear();
-        directions.add(new Vector(1, 0, 0));
-        directions.add(new Vector(-1, 0, 0));
-        directions.add(new Vector(0, 0, 1));
-        directions.add(new Vector(0, 0, -1));
-        directions.add(new Vector(0, -1, 0));
+        directions.add(BlockVector3.at(1, 0, 0));
+        directions.add(BlockVector3.at(-1, 0, 0));
+        directions.add(BlockVector3.at(0, 0, 1));
+        directions.add(BlockVector3.at(0, 0, -1));
+        directions.add(BlockVector3.at(0, -1, 0));
     }
 
 

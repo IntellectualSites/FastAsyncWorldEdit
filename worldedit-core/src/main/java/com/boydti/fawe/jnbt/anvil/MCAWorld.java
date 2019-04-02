@@ -6,14 +6,16 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector2;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.SimpleWorld;
@@ -48,18 +50,18 @@ public class MCAWorld implements SimpleWorld {
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         return extent.setBlock(position, block);
     }
 
     @Override
-    public int getBlockLightLevel(Vector position) {
+    public int getBlockLightLevel(BlockVector3 position) {
         return queue.getEmmittedLight(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
     @Override
-    public boolean clearContainerBlockContents(Vector position) {
-        BlockStateHolder block = extent.getLazyBlock(position);
+    public boolean clearContainerBlockContents(BlockVector3 position) {
+        BaseBlock block = extent.getFullBlock(position);
         if (block.hasNbtData()) {
             Map<String, Tag> nbt = ReflectionUtils.getMap(block.getNbtData().getValue());
             if (nbt.containsKey("Items")) {
@@ -75,7 +77,7 @@ public class MCAWorld implements SimpleWorld {
     }
 
     @Override
-    public void dropItem(Vector position, BaseItemStack item) {
+    public void dropItem(Vector3 position, BaseItemStack item) {
 
     }
 
@@ -101,17 +103,34 @@ public class MCAWorld implements SimpleWorld {
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         return extent.getLazyBlock(position);
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return extent.getBiome(position);
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return extent.setBiome(position, biome);
     }
+
+	@Override
+	public boolean playEffect(Vector3 position, int type, int data) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public BlockVector3 getSpawnPosition() {
+		return queue.getWEWorld().getSpawnPosition();
+	}
 }

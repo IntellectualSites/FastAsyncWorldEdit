@@ -7,23 +7,23 @@ import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.SimpleRegion;
 import com.boydti.fawe.regions.general.RegionFilter;
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.commands.MainCommand;
-import com.intellectualcrafters.plot.config.Settings;
-import com.intellectualcrafters.plot.database.DBFunc;
-import com.intellectualcrafters.plot.flag.Flags;
-import com.intellectualcrafters.plot.generator.HybridPlotManager;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotArea;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import com.intellectualcrafters.plot.object.RegionWrapper;
-import com.intellectualcrafters.plot.util.ChunkManager;
-import com.intellectualcrafters.plot.util.SchematicHandler;
-import com.intellectualcrafters.plot.util.UUIDHandler;
-import com.intellectualcrafters.plot.util.block.GlobalBlockQueue;
-import com.intellectualcrafters.plot.util.block.QueueProvider;
-import com.plotsquared.listener.WEManager;
-import com.sk89q.worldedit.BlockVector;
+import com.github.intellectualsites.plotsquared.plot.PlotSquared;
+import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
+import com.github.intellectualsites.plotsquared.plot.config.Settings;
+import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
+import com.github.intellectualsites.plotsquared.plot.flag.Flags;
+import com.github.intellectualsites.plotsquared.plot.generator.HybridPlotManager;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
+import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;
+import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
+import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
+import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
+import com.github.intellectualsites.plotsquared.plot.util.block.QueueProvider;
+import com.github.intellectualsites.plotsquared.plot.listener.WEManager;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import java.util.HashSet;
@@ -33,7 +33,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
         Fawe.debug("Optimizing PlotSquared");
-        PS.get().worldedit = null;
+//        PlotSquared.get().worldedit = null;
         setupBlockQueue();
         setupSchematicHandler();
         setupChunkManager();
@@ -44,10 +44,10 @@ public class PlotSquaredFeature extends FaweMaskManager {
             new PlotSetBiome();
         }
         try {
-            new MoveTo512();
+//            new MoveTo512();
             if (Settings.Enabled_Components.WORLDS) {
                 new ReplaceAll();
-                new CFIRedirect();
+//                new CFIRedirect();
             }
         } catch (Throwable e) {
             Fawe.debug("You need to update PlotSquared to access the CFI and REPLACEALL commands");
@@ -94,7 +94,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
             return false;
         }
         UUID uid = fp.getUUID();
-        return !Flags.NO_WORLDEDIT.isTrue(plot) && ((plot.isOwner(uid) || (type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.everyone)  || ((plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.everyone)) && fp.hasPermission("fawe.plotsquared.member"))))) || fp.hasPermission("fawe.plotsquared.admin"));
+        return !Flags.NO_WORLDEDIT.isTrue(plot) && ((plot.isOwner(uid) || (type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)  || ((plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) && fp.hasPermission("fawe.plotsquared.member"))))) || fp.hasPermission("fawe.plotsquared.admin"));
     }
 
     @Override
@@ -125,8 +125,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
             faweRegions.add(new com.boydti.fawe.object.RegionWrapper(current.minX, current.maxX, min, max, current.minZ, current.maxZ));
         }
         final RegionWrapper region = regions.iterator().next();
-        final BlockVector pos1 = new BlockVector(region.minX, min, region.minZ);
-        final BlockVector pos2 = new BlockVector(region.maxX, max, region.maxZ);
+        final BlockVector3 pos1 = BlockVector3.at(region.minX, min, region.minZ);
+        final BlockVector3 pos2 = BlockVector3.at(region.maxX, max, region.maxZ);
         final Plot finalPlot = plot;
         if (Settings.Done.RESTRICT_BUILDING && Flags.DONE.isSet(finalPlot) || regions.isEmpty()) {
             return null;
@@ -162,7 +162,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
     @Override
     public RegionFilter getFilter(String world) {
-        PlotArea area = PS.get().getPlotArea(world, null);
+        PlotArea area = PlotSquared.get().getPlotArea(world, null);
         if (area != null) return new PlotRegionFilter(area);
         return null;
     }

@@ -19,13 +19,15 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BlockMapEntryPlacer implements Operation {
 
     private final Extent extent;
-    private final Iterator<Map.Entry<BlockVector, BlockStateHolder>> iterator;
+    private final Iterator<Map.Entry<BlockVector3, BlockStateHolder>> iterator;
 
     /**
      * Create a new instance.
@@ -48,7 +50,7 @@ public class BlockMapEntryPlacer implements Operation {
      * @param extent the extent to set the blocks on
      * @param iterator the iterator
      */
-    public BlockMapEntryPlacer(Extent extent, Iterator<Map.Entry<BlockVector, BlockStateHolder>> iterator) {
+    public BlockMapEntryPlacer(Extent extent, Iterator<Map.Entry<BlockVector3, BlockStateHolder>> iterator) {
         checkNotNull(extent);
         checkNotNull(iterator);
         this.extent = extent;
@@ -58,7 +60,7 @@ public class BlockMapEntryPlacer implements Operation {
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         while (iterator.hasNext()) {
-            Map.Entry<BlockVector, BlockStateHolder> entry = iterator.next();
+            Map.Entry<BlockVector3, BlockStateHolder> entry = iterator.next();
             extent.setBlock(entry.getKey(), entry.getValue());
         }
 

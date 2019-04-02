@@ -1,22 +1,21 @@
 package com.boydti.fawe.object.extent;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.registry.BlockRegistry;
 
 public class TransformExtent extends BlockTransformExtent {
 
-    private final MutableBlockVector mutable = new MutableBlockVector();
-    private Vector min;
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
+    private BlockVector3 min;
     private int maxy;
 
     public TransformExtent(Extent parent) {
@@ -32,91 +31,96 @@ public class TransformExtent extends BlockTransformExtent {
     }
 
     @Override
-    public Vector getMinimumPoint() {
-        Vector pos1 = new MutableBlockVector(getPos(super.getMinimumPoint()));
-        Vector pos2 = new MutableBlockVector(getPos(super.getMaximumPoint()));
-        return Vector.getMinimum(pos1, pos2);
+    public BlockVector3 getMinimumPoint() {
+    	BlockVector3 pos1 = getPos(super.getMinimumPoint());
+    	BlockVector3 pos2 = getPos(super.getMaximumPoint());
+        return pos1.getMinimum(pos2);
     }
 
     @Override
-    public Vector getMaximumPoint() {
-        Vector pos1 = new MutableBlockVector(getPos(super.getMinimumPoint()));
-        Vector pos2 = new MutableBlockVector(getPos(super.getMaximumPoint()));
-        return Vector.getMaximum(pos1, pos2);
+    public BlockVector3 getMaximumPoint() {
+    	BlockVector3 pos1 = getPos(super.getMinimumPoint());
+    	BlockVector3 pos2 = getPos(super.getMaximumPoint());
+        return pos1.getMaximum(pos2);
     }
 
     @Override
-    public void setOrigin(Vector pos) {
+    public void setOrigin(BlockVector3 pos) {
         this.min = pos;
     }
 
-    public Vector getPos(Vector pos) {
+    public BlockVector3 getPos(BlockVector3 pos) {
         if (min == null) {
-            min = new Vector(pos);
+            min = pos;
         }
         mutable.mutX(((pos.getX() - min.getX())));
         mutable.mutY(((pos.getY() - min.getY())));
         mutable.mutZ(((pos.getZ() - min.getZ())));
-        Vector tmp = getTransform().apply(mutable);
+        MutableVector3 tmp = new MutableVector3(getTransform().apply(mutable.toVector3()));
         tmp.mutX((tmp.getX() + min.getX()));
         tmp.mutY((tmp.getY() + min.getY()));
         tmp.mutZ((tmp.getZ() + min.getZ()));
-        return tmp;
+        return tmp.toBlockPoint();
     }
 
-    public Vector getPos(int x, int y, int z) {
+    public BlockVector3 getPos(int x, int y, int z) {
         if (min == null) {
-            min = new Vector(x, y, z);
+            min = BlockVector3.at(x, y, z);
         }
         mutable.mutX(((x - min.getX())));
         mutable.mutY(((y - min.getY())));
         mutable.mutZ(((z - min.getZ())));
-        Vector tmp = getTransform().apply(mutable);
+        MutableVector3 tmp = new MutableVector3(getTransform().apply(mutable.toVector3()));
         tmp.mutX((tmp.getX() + min.getX()));
         tmp.mutY((tmp.getY() + min.getY()));
         tmp.mutZ((tmp.getZ() + min.getZ()));
-        return tmp;
+        return tmp.toBlockPoint();
     }
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return transformFast(super.getLazyBlock(getPos(x, y, z)));
+        return transformBlock(super.getLazyBlock(getPos(x, y, z)), false).toImmutableState();
     }
 
     @Override
-    public BlockState getLazyBlock(Vector position) {
-        return transformFast(super.getLazyBlock(getPos(position)));
+    public BlockState getLazyBlock(BlockVector3 position) {
+        return transformBlock(super.getLazyBlock(getPos(position)), false).toImmutableState();
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
-        return transformFast(super.getBlock(getPos(position)));
+    public BlockState getBlock(BlockVector3 position) {
+        return transformBlock(super.getBlock(getPos(position)), false).toImmutableState();
+    }
+    
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+    	return transformBlock(super.getFullBlock(getPos(position)), false);
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.getBiome(getPos(mutable).toVector2D());
+        return super.getBiome(getPos(mutable).toBlockVector2());
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(getPos(x, y, z), transformFastInverse((BlockState) block));
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return super.setBlock(getPos(x, y, z), transformBlock((BlockState)block, false));
     }
 
 
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(getPos(location), transformFastInverse((BlockState) block));
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+        return super.setBlock(getPos(location), transformBlock((BlockState)block, false));
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
-        return super.setBiome(getPos(mutable).toVector2D(), biome);
+        return super.setBiome(getPos(mutable).toBlockVector2(), biome);
     }
 }

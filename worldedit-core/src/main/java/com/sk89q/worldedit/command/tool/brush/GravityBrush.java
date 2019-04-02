@@ -21,12 +21,11 @@ package com.sk89q.worldedit.command.tool.brush;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class GravityBrush implements Brush {
@@ -38,7 +37,7 @@ public class GravityBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
         Mask mask = editSession.getMask();
         if (mask == Masks.alwaysTrue() || mask == Masks.alwaysTrue2D()) {
             mask = null;
@@ -47,7 +46,6 @@ public class GravityBrush implements Brush {
         int endY = position.getBlockY() + size;
         int startPerformY = Math.max(0, position.getBlockY() - size);
         int startCheckY = fullHeight ? 0 : startPerformY;
-        Vector mutablePos = new Vector(0, 0, 0);
         for (int x = position.getBlockX() + size; x > position.getBlockX() - size; --x) {
             for (int z = position.getBlockZ() + size; z > position.getBlockZ() - size; --z) {
                 int freeSpot = startCheckY;

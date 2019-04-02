@@ -1,7 +1,7 @@
 package com.boydti.fawe.regions.general;
 
 import com.boydti.fawe.object.collection.LongHashSet;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.math.BlockVector2;
 
 public abstract class CuboidRegionFilter implements RegionFilter {
 
@@ -18,7 +18,7 @@ public abstract class CuboidRegionFilter implements RegionFilter {
      */
     public abstract void calculateRegions();
 
-    public void add(Vector2D pos1, Vector2D pos2) {
+    public void add(BlockVector2 pos1, BlockVector2 pos2) {
         int ccx1 = pos1.getBlockX() >> 9;
         int ccz1 = pos1.getBlockZ() >> 9;
         int ccx2 = pos2.getBlockX() >> 9;

@@ -24,13 +24,11 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.util.image.ImageViewer;
-import com.boydti.fawe.util.metrics.BStats;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
+import org.bstats.bukkit.BStats;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
@@ -41,7 +39,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
@@ -73,8 +70,6 @@ public class FaweBukkit implements IFawe, Listener {
     public VaultUtil getVault() {
         return this.vault;
     }
-
-    private List<org.bukkit.util.Vector> locations = Arrays.asList(new Vector(0, 5, 0));
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
@@ -110,28 +105,25 @@ public class FaweBukkit implements IFawe, Listener {
         }
 
         // Registered delayed Event Listeners
-        TaskManager.IMP.task(new Runnable() {
-            @Override
-            public void run() {
-                // This class
-                Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
+        TaskManager.IMP.task(() -> {
+            // This class
+            Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 
-                // The tick limiter
-                try {
-                    Class.forName("sun.misc.SharedSecrets");
-                    new ChunkListener_8();
-                } catch (ClassNotFoundException e) {
-                    new ChunkListener_9();
-                }
-
-                /*try {
-                	Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
-                    new AsyncTabCompleteListener(WorldEditPlugin.getInstance());
-                } catch (Throwable ignore)
-                {
-                    Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-                }*/
+            // The tick limiter
+            try {
+                Class.forName("sun.misc.SharedSecrets");
+                new ChunkListener_8();
+            } catch (ClassNotFoundException e) {
+                new ChunkListener_9();
             }
+
+            /*try {
+            Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
+                new AsyncTabCompleteListener(WorldEditPlugin.getInstance());
+            } catch (Throwable ignore)
+            {
+                Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
+            }*/
         });
     }
 
@@ -265,42 +257,8 @@ public class FaweBukkit implements IFawe, Listener {
         }
     }
 
-    @Override
-    public void startMetrics() {
-        Metrics metrics = new Metrics(plugin);
-        metrics.start();
-        TaskManager.IMP.task(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<Class<?>> services = new ArrayList(Bukkit.getServicesManager().getKnownServices());
-                services.forEach(service -> {
-                    try {
-                        service.getField("B_STATS_VERSION");
-                        ArrayList<RegisteredServiceProvider<?>> providers = new ArrayList(Bukkit.getServicesManager().getRegistrations(service));
-                        for (RegisteredServiceProvider<?> provider : providers) {
-                            Object instance = provider.getProvider();
-
-                            // Link it to FAWE's metrics instead
-                            BStats.linkMetrics(instance);
-
-                            // Disable the other metrics
-                            Bukkit.getServicesManager().unregister(service, instance);
-                            try {
-                                Class<? extends Object> clazz = instance.getClass();
-                                Field logFailedRequests = ReflectionUtils.findField(clazz, boolean.class);
-                                logFailedRequests.set(null, false);
-                                Field url = null;
-                                try { url = clazz.getDeclaredField("URL"); } catch (NoSuchFieldException ignore) {
-                                for (Field field : clazz.getDeclaredFields()) if (ReflectionUtils.setAccessible(field).get(null).toString().startsWith("http")) { url = field; break; }
-                                }
-                                if (url != null) ReflectionUtils.setFailsafeFieldValue(url, null, null);
-                            } catch (NoSuchFieldError | IllegalAccessException ignore) {}
-                            catch (Throwable e) {}
-                        }
-                    } catch (NoSuchFieldException ignored) { }
-                });
-            }
-        });
+    @Override public void startMetrics() {
+        BStats bStats = new BStats(plugin);
     }
 
     public ItemUtil getItemUtil() {
@@ -335,11 +293,11 @@ public class FaweBukkit implements IFawe, Listener {
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
         List<String> pl = new ArrayList<>();
-        msg.append("server.plugins: \n");
+        msg.append("server.version: " + Bukkit.getVersion() + " / " + Bukkit.getBukkitVersion() + "\n");
+        msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
             msg.append(" - " + p.getName() + ": " + p.getDescription().getVersion() + "\n");
         }
-        msg.append("server.version: " + Bukkit.getVersion() + " / " + Bukkit.getBukkitVersion() + "\n");
         return msg.toString();
     }
 
@@ -387,12 +345,8 @@ public class FaweBukkit implements IFawe, Listener {
                 debug("=======================================");
                 ignore.printStackTrace();
                 debug("=======================================");
-                TaskManager.IMP.laterAsync(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainUtil.sendAdmin("&cNo NMS placer found, see console!");
-                    }
-                }, 1);
+                TaskManager.IMP.laterAsync(
+                    () -> MainUtil.sendAdmin("&cNo NMS placer found, see console!"), 1);
                 hasNMS = false;
             }
             return new BukkitQueue_All(world);
@@ -443,12 +397,8 @@ public class FaweBukkit implements IFawe, Listener {
                 debug("=======================================");
                 error.printStackTrace();
                 debug("=======================================");
-                TaskManager.IMP.laterAsync(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainUtil.sendAdmin("&cNo NMS placer found, see console!");
-                    }
-                }, 1);
+                TaskManager.IMP.laterAsync(
+                    () -> MainUtil.sendAdmin("&cNo NMS placer found, see console!"), 1);
                 hasNMS = false;
             }
         }
@@ -476,15 +426,6 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new Worldguard(worldguardPlugin, this));
                 managers.add(new WorldguardFlag(worldguardPlugin, this));
                 Fawe.debug("Plugin 'WorldGuard' found. Using it now.");
-            } catch (final Throwable e) {
-                MainUtil.handleError(e);
-            }
-        }
-        final Plugin plotmePlugin = Bukkit.getServer().getPluginManager().getPlugin("PlotMe");
-        if ((plotmePlugin != null) && plotmePlugin.isEnabled()) {
-            try {
-                managers.add(new PlotMeFeature(plotmePlugin, this));
-                Fawe.debug("Plugin 'PlotMe' found. Using it now.");
             } catch (final Throwable e) {
                 MainUtil.handleError(e);
             }

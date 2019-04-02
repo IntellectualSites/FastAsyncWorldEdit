@@ -69,8 +69,8 @@ public class BaseItem implements NbtValued {
      *
      * @return the type
      */
-    public ItemTypes getType() {
-        return (ItemTypes) this.itemType;
+    public ItemType getType() {
+        return this.itemType;
     }
 
     /**

@@ -27,7 +27,11 @@ plugins {
 apply plugin: 'java'
 clean { delete "target" }
 
-print new File('splash.txt').text
+
+def splashFile = new File('splash.txt')
+if (splashFile.exists()) {
+    print splashFile.text
+}
 
 group = 'com.boydti.fawe'
 
@@ -78,11 +82,10 @@ subprojects {
         maven { url "http://maven.sk89q.com/repo/" }
         maven { url "http://repo.maven.apache.org/maven2" }
         // Fawe
-        maven {url "http://ci.athion.net/job/FAWE-WorldGuard-1.13/ws/mvn/"}
         maven {url "https://mvnrepository.com/artifact/"}
         maven {url "http://repo.dmulloy2.net/content/groups/public/"}
         maven {url "https://repo.destroystokyo.com/repository/maven-public//"}
-        maven {url "http://ci.athion.net/job/PlotSquared-Legacy/ws/mvn/"}
+        maven {url "http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/"}
         mavenLocal()
         maven {url "http://empcraft.com/maven2"}
         maven {url "https://hub.spigotmc.org/nexus/content/groups/public/"}

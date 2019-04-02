@@ -1,16 +1,16 @@
 package com.boydti.fawe.object.pattern;
 
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import java.io.IOException;
 
 public class BiomePattern extends ExistingPattern {
-    private transient MutableBlockVector2D mutable = new MutableBlockVector2D();
+    private transient MutableBlockVector2 mutable = new MutableBlockVector2();
     private final BaseBiome biome;
 
     public BiomePattern(Extent extent, BaseBiome biome) {
@@ -19,12 +19,12 @@ public class BiomePattern extends ExistingPattern {
     }
 
     @Override
-    public BaseBlock apply(Vector position) {
+    public BaseBlock apply(BlockVector3 position) {
         throw new BiomePatternException();
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector getPosition) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 getPosition) throws WorldEditException {
         return extent.setBiome(set.getBlockX(), set.getBlockY(), set.getBlockZ(), biome);
     }
 
@@ -48,6 +48,6 @@ public class BiomePattern extends ExistingPattern {
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        mutable = new MutableBlockVector2D();
+        mutable = new MutableBlockVector2();
     }
 }

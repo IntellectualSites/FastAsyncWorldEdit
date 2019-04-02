@@ -44,7 +44,7 @@ public class HeatRayBrush extends Brush
     private static final double REQUIRED_FIRE_DENSITY = -0.25;
     private static final double REQUIRED_AIR_DENSITY = 0;
 
-    private static final ArrayList<Material> FLAMABLE_BLOCKS = new ArrayList<Material>();
+    private static final ArrayList<Material> FLAMABLE_BLOCKS = new ArrayList<>();
 
     private int octaves = 5;
     private double frequency = 1;

@@ -26,7 +26,7 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.Logging;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -102,13 +102,13 @@ public class CommandLoggingHandler extends AbstractInvokeListener implements Inv
         }
         
         if (logMode != null && sender.isPlayer()) {
-            Vector position = player.getLocation().toVector();
+            Vector3 position = player.getLocation();
             LocalSession session = worldEdit.getSessionManager().get(player);
             
             switch (logMode) {
             case PLACEMENT:
                 try {
-                    position = session.getPlacementPosition(player);
+                    position = session.getPlacementPosition(player).toVector3();
                 } catch (IncompleteRegionException e) {
                     break;
                 }

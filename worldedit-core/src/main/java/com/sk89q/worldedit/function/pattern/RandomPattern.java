@@ -3,12 +3,14 @@ package com.sk89q.worldedit.function.pattern;
 import com.boydti.fawe.object.collection.RandomCollection;
 import com.boydti.fawe.object.random.SimpleRandom;
 import com.boydti.fawe.object.random.TrueRandom;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -63,12 +65,12 @@ public class RandomPattern extends AbstractPattern {
     }
 
     @Override
-    public BlockStateHolder apply(Vector get) {
+    public BaseBlock apply(BlockVector3 get) {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(get);
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, set, get);
     }
 

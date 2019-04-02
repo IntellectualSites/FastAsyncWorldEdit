@@ -6,10 +6,9 @@ import com.boydti.fawe.object.extent.MultiRegionExtent;
 import com.boydti.fawe.object.extent.SingleRegionExtent;
 import com.boydti.fawe.object.queue.DelegateFaweQueue;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -73,7 +72,7 @@ public class MaskedFaweQueue extends DelegateFaweQueue {
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         if (region.contains(position.getBlockX(), position.getBlockZ())) {
             return super.setBlock(position, block);
         }
@@ -89,7 +88,7 @@ public class MaskedFaweQueue extends DelegateFaweQueue {
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         if (region.contains(position.getBlockX(), position.getBlockZ())) {
             return super.setBiome(position, biome);
         }

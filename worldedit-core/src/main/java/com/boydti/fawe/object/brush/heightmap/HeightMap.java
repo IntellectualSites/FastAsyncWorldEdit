@@ -4,9 +4,8 @@ import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.convolution.GaussianKernel;
 import com.sk89q.worldedit.math.convolution.HeightMapFilter;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -19,19 +18,19 @@ public interface HeightMap {
     public void setSize(int size);
 
 
-    default void perform(EditSession session, Mask mask, Vector pos, int size, int rotationMode, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
+    default void perform(EditSession session, Mask mask, BlockVector3 pos, int size, int rotationMode, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
         int[][] data = generateHeightData(session, mask, pos, size, rotationMode, yscale, smooth, towards, layers);
         applyHeightMapData(data, session, mask, pos, size, rotationMode, yscale, smooth, towards, layers);
     }
 
-    default void applyHeightMapData(int[][] data, EditSession session, Mask mask, Vector pos, int size, int rotationMode, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
-        Vector top = session.getMaximumPoint();
+    default void applyHeightMapData(int[][] data, EditSession session, Mask mask, BlockVector3 pos, int size, int rotationMode, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
+    	BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
         int diameter = 2 * size + 1;
         int iterations = 1;
-        Location min = new Location(session.getWorld(), pos.subtract(size, maxY, size));
-        Vector max = pos.add(size, maxY, size);
-        Region region = new CuboidRegion(session.getWorld(), min, max);
+        Location min = new Location(session.getWorld(), pos.subtract(size, maxY, size).toVector3());
+        BlockVector3 max = pos.add(size, maxY, size);
+        Region region = new CuboidRegion(session.getWorld(), min.toBlockPoint(), max);
         com.sk89q.worldedit.math.convolution.HeightMap heightMap = new com.sk89q.worldedit.math.convolution.HeightMap(session, region, data[0], layers);
         if (smooth) {
             try {
@@ -52,8 +51,8 @@ public interface HeightMap {
         }
     }
 
-    default int[][] generateHeightData(EditSession session, Mask mask, Vector pos, int size, final int rotationMode, double yscale, boolean smooth, boolean towards, final boolean layers) {
-        Vector top = session.getMaximumPoint();
+    default int[][] generateHeightData(EditSession session, Mask mask, BlockVector3 pos, int size, final int rotationMode, double yscale, boolean smooth, boolean towards, final boolean layers) {
+    	BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
         int diameter = 2 * size + 1;
         int centerX = pos.getBlockX();
@@ -67,14 +66,14 @@ public interface HeightMap {
             centerY <<= 3;
             maxY <<= 3;
         }
-        Vector mutablePos = new Vector(0, 0, 0);
+//        Vector mutablePos = new Vector(0, 0, 0);
         if (towards) {
             double sizePowInv = 1d / Math.pow(size, yscale);
             int targetY = pos.getBlockY();
             int tmpY = targetY;
             for (int x = -size; x <= size; x++) {
                 int xx = centerX + x;
-                mutablePos.mutX(xx);
+//                mutablePos.mutX(xx);
                 for (int z = -size; z <= size; z++) {
                     int index = (z + size) * diameter + (x + size);
                     int zz = centerZ + z;
@@ -118,7 +117,7 @@ public interface HeightMap {
             int height = pos.getBlockY();
             for (int x = -size; x <= size; x++) {
                 int xx = centerX + x;
-                mutablePos.mutX(xx);
+//                mutablePos.mutX(xx);
                 for (int z = -size; z <= size; z++) {
                     int index = (z + size) * diameter + (x + size);
                     int zz = centerZ + z;

@@ -49,10 +49,8 @@ public class ShellVoxelBrush extends Brush
         {
             for (int y = 0; y <= brushSizeSquared; y++)
             {
-                for (int z = 0; z <= brushSizeSquared; z++)
-                {
-                    newMaterials[x][y][z] = oldMaterials[x + 1][y + 1][z + 1];
-                }
+                System.arraycopy(oldMaterials[x + 1][y + 1], 1, newMaterials[x][y], 0,
+                    brushSizeSquared + 1);
             }
         }
         int temp;

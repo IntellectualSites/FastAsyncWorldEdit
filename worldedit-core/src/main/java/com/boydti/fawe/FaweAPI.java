@@ -19,47 +19,38 @@ import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.sk89q.jnbt.ByteArrayTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.ShortTag;
-import com.sk89q.jnbt.Tag;
+import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extension.factory.DefaultMaskParser;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
-import com.sk89q.worldedit.extension.factory.HashTagPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.zip.GZIPInputStream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -112,7 +103,7 @@ public class FaweAPI {
      * @see com.sk89q.worldedit.command.PatternCommands
      */
     public static boolean registerPatterns(Object methods) {
-        HashTagPatternParser parser = getParser(HashTagPatternParser.class);
+        DefaultPatternParser parser = getParser(DefaultPatternParser.class);
         if (parser != null) parser.register(methods);
         return parser != null;
     }
@@ -202,12 +193,12 @@ public class FaweAPI {
         List<? extends World> worlds = platform.getWorlds();
         for (World current : worlds) {
             if (Fawe.imp().getWorldName(current).equals(worldName)) {
-                return WorldWrapper.wrap((AbstractWorld) current);
+                return WorldWrapper.wrap(current);
             }
         }
         for (World current : worlds) {
             if (current.getName().equals(worldName)) {
-                return WorldWrapper.wrap((AbstractWorld) current);
+                return WorldWrapper.wrap(current);
             }
         }
         return null;
@@ -233,7 +224,7 @@ public class FaweAPI {
      * @see com.boydti.fawe.object.schematic.Schematic
      */
     public static Schematic load(File file) throws IOException {
-        return ClipboardFormat.SCHEMATIC.load(file);
+        return ClipboardFormats.findByFile(file).load(file);
     }
 
     /**
@@ -257,11 +248,10 @@ public class FaweAPI {
     /**
      * Use ThreadLocalRandom instead
      *
-     * @return
      */
     @Deprecated
     public static PseudoRandom getFastRandom() {
-        return new PseudoRandom();
+        throw new UnsupportedOperationException("Please Use ThreadLocalRandom instead.");
     }
 
     /**
@@ -375,20 +365,17 @@ public class FaweAPI {
             }
         }
         World world = origin.getWorld();
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File a, File b) {
-                String aName = a.getName();
-                String bName = b.getName();
-                int aI = Integer.parseInt(aName.substring(0, aName.length() - 3));
-                int bI = Integer.parseInt(bName.substring(0, bName.length() - 3));
-                long value = aI - bI;
-                return value == 0 ? 0 : value < 0 ? -1 : 1;
-            }
+        files.sort((a, b) -> {
+            String aName = a.getName();
+            String bName = b.getName();
+            int aI = Integer.parseInt(aName.substring(0, aName.length() - 3));
+            int bI = Integer.parseInt(bName.substring(0, bName.length() - 3));
+            long value = aI - bI;
+            return value == 0 ? 0 : value < 0 ? -1 : 1;
         });
         RegionWrapper bounds = new RegionWrapper(origin.x - radius, origin.x + radius, origin.z - radius, origin.z + radius);
         RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
-        HashSet<RegionWrapper> regionSet = new HashSet<RegionWrapper>(Arrays.asList(bounds));
+        HashSet<RegionWrapper> regionSet = Sets.<RegionWrapper>newHashSet(bounds);
         ArrayList<DiskStorageHistory> result = new ArrayList<>();
         for (File file : files) {
             UUID uuid = UUID.fromString(file.getParentFile().getName());
@@ -468,8 +455,8 @@ public class FaweAPI {
      * @return
      */
     public static int fixLighting(World world, Region selection, @Nullable FaweQueue queue, final FaweQueue.RelightMode mode) {
-        final Vector bot = selection.getMinimumPoint();
-        final Vector top = selection.getMaximumPoint();
+        final BlockVector3 bot = selection.getMinimumPoint();
+        final BlockVector3 top = selection.getMaximumPoint();
 
         final int minX = bot.getBlockX() >> 4;
         final int minZ = bot.getBlockZ() >> 4;

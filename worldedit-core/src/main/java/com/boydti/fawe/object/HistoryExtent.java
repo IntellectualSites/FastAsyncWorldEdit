@@ -5,13 +5,16 @@ import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -57,19 +60,19 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        BlockStateHolder previous = queue.getLazyBlock(x, y, z);
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        BaseBlock previous = queue.getFullBlock(BlockVector3.at(x, y, z)).toBaseBlock();
         if (previous.getInternalId() == block.getInternalId()) {
-            if (!previous.hasNbtData() && !block.hasNbtData()) {
+            if (!previous.hasNbtData() && (block instanceof BaseBlock && !((BaseBlock)block).hasNbtData())) {
                 return false;
             }
         }
-        this.changeSet.add(x, y, z, previous, block);
+        this.changeSet.add(x, y, z, previous, block.toBaseBlock());
         return getExtent().setBlock(x, y, z, block);
     }
 
     @Override
-    public boolean setBlock(final Vector location, final BlockStateHolder block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
@@ -94,7 +97,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     private List<? extends Entity> wrapEntities(final List<? extends Entity> entities) {
-        final List<Entity> newList = new ArrayList<Entity>(entities.size());
+        final List<Entity> newList = new ArrayList<>(entities.size());
         for (final Entity entity : entities) {
             newList.add(new TrackedEntity(entity));
         }
@@ -102,7 +105,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome newBiome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome newBiome) {
         BaseBiome oldBiome = this.getBiome(position);
         if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(position.getBlockX(), position.getBlockZ(), oldBiome, newBiome);
@@ -114,7 +117,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBiome(int x, int y, int z, BaseBiome newBiome) {
-        BaseBiome oldBiome = this.getBiome(MutableBlockVector2D.get(x, z));
+        BaseBiome oldBiome = this.getBiome(BlockVector2.at(x, z));
         if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(x, z, oldBiome, newBiome);
             return getExtent().setBiome(x, y, z, newBiome);
@@ -161,5 +164,10 @@ public class HistoryExtent extends AbstractDelegateExtent {
         public <T> T getFacet(final Class<? extends T> cls) {
             return this.entity.getFacet(cls);
         }
+
+		@Override
+		public boolean setLocation(Location location) {
+			return this.entity.setLocation(location);
+		}
     }
 }

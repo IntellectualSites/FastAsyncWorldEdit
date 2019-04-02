@@ -4,8 +4,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

@@ -69,7 +69,7 @@ public class ItemUtil {
                     if (nativeTag != null) return (CompoundTag) nativeTag;
                 }
                 Tag nativeTag = BukkitQueue_0.toNative(nmsTag);
-                map.put(nmsTag.hashCode(), new WeakReference<Tag>(nativeTag));
+                map.put(nmsTag.hashCode(), new WeakReference<>(nativeTag));
                 return null;
             }
         } catch (Throwable e) {

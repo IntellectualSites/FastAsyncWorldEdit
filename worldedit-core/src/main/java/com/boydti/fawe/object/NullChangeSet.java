@@ -72,4 +72,16 @@ public class NullChangeSet extends FaweChangeSet {
     public final int size() {
         return 0;
     }
+
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
+		
+	}
 }

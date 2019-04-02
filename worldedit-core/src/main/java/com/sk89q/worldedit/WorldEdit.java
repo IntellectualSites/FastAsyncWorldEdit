@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit;
 
-import static com.sk89q.worldedit.event.platform.Interaction.HIT;
-import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -38,14 +35,18 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.runtime.Constant;
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
 import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
 import com.sk89q.worldedit.session.SessionManager;
 import com.sk89q.worldedit.session.request.Request;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
@@ -53,17 +54,24 @@ import com.sk89q.worldedit.util.io.file.FilenameException;
 import com.sk89q.worldedit.util.io.file.FilenameResolutionException;
 import com.sk89q.worldedit.util.io.file.InvalidFilenameException;
 import com.sk89q.worldedit.util.logging.WorldEditPrefixHandler;
+import com.sk89q.worldedit.util.task.SimpleSupervisor;
+import com.sk89q.worldedit.util.task.Supervisor;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
+import javax.annotation.Nullable;
+import javax.script.ScriptException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -71,7 +79,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.script.ScriptException;
+import static com.sk89q.worldedit.event.platform.Interaction.HIT;
+import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
 
 /**
  * The entry point and container for a working implementation of WorldEdit.
@@ -86,7 +95,7 @@ import javax.script.ScriptException;
  * method {@link WorldEdit#getInstance()}, which is shared among all
  * platforms within the same classloader hierarchy.</p>
  */
-public class WorldEdit {
+public final class WorldEdit {
 
     public static final Logger logger = Logger.getLogger(WorldEdit.class.getCanonicalName());
 
@@ -97,6 +106,7 @@ public class WorldEdit {
     private final PlatformManager platformManager = new PlatformManager(this);
     private final EditSessionFactory editSessionFactory = new EditSessionFactory.EditSessionFactoryImpl(eventBus);
     private final SessionManager sessions = new SessionManager(this);
+    private final Supervisor supervisor = new SimpleSupervisor();
 
     private final BlockFactory blockFactory = new BlockFactory(this);
     private final ItemFactory itemFactory = new ItemFactory(this);
@@ -147,6 +157,15 @@ public class WorldEdit {
     }
 
     /**
+     * Get the supervisor.
+     *
+     * @return the supervisor
+     */
+    public Supervisor getSupervisor() {
+        return supervisor;
+    }
+
+    /**
      * Get the block factory from which new {@link BlockStateHolder}s can be
      * constructed.
      *
@@ -167,7 +186,7 @@ public class WorldEdit {
     }
 
     /**
-     * Get the mask factory from which new {@link com.sk89q.worldedit.function.mask.Mask}s
+     * Get the mask factory from which new {@link Mask}s
      * can be constructed.
      *
      * @return the mask factory
@@ -177,7 +196,7 @@ public class WorldEdit {
     }
 
     /**
-     * Get the pattern factory from which new {@link com.sk89q.worldedit.function.pattern.Pattern}s
+     * Get the pattern factory from which new {@link Pattern}s
      * can be constructed.
      *
      * @return the pattern factory
@@ -243,12 +262,12 @@ public class WorldEdit {
      * @return a file
      * @throws FilenameException thrown if the filename is invalid
      */
-    private File getSafeFile(Player player, File dir, String filename, String defaultExt, String[] extensions, boolean isSave) throws FilenameException {
+    private File getSafeFile(@Nullable Player player, File dir, String filename, String defaultExt, String[] extensions, boolean isSave) throws FilenameException {
         if (extensions != null && (extensions.length == 1 && extensions[0] == null)) extensions = null;
 
         File f;
 
-        if (filename.equals("#")) {
+        if (filename.equals("#") && player != null) {
             if (isSave) {
                 f = player.openFileSaveDialog(extensions);
             } else {
@@ -260,22 +279,27 @@ public class WorldEdit {
             }
         } else {
             List<String> exts = extensions == null ? ImmutableList.of(defaultExt) : Lists.asList(defaultExt, extensions);
-            return getSafeFileWithExtensions(dir, filename,  exts, isSave);
+            f = getSafeFileWithExtensions(dir, filename, exts, isSave);
         }
 
         try {
-            String filePath = f.getCanonicalPath();
-            String dirPath = dir.getCanonicalPath();
+            Path filePath = Paths.get(f.toURI()).normalize();
+            Path dirPath = Paths.get(dir.toURI()).normalize();
 
-            if (!filePath.substring(0, dirPath.length()).equals(dirPath) && !getConfiguration().allowSymlinks) {
-                throw new FilenameResolutionException(filename,
-                        "Path is outside allowable root");
+            boolean inDir = filePath.startsWith(dirPath);
+            Path existingParent = filePath;
+            do {
+                existingParent = existingParent.getParent();
+            } while (existingParent != null && !existingParent.toFile().exists());
+
+            boolean isSym = existingParent != null && !existingParent.toRealPath().equals(existingParent);
+            if (!inDir || (!getConfiguration().allowSymlinks && isSym)) {
+                throw new FilenameResolutionException(filename, "Path is outside allowable root");
             }
 
-            return f;
+            return filePath.toFile();
         } catch (IOException e) {
-            throw new FilenameResolutionException(filename,
-                    "Failed to resolve path");
+            throw new FilenameResolutionException(filename, "Failed to resolve path");
         }
     }
 
@@ -287,7 +311,7 @@ public class WorldEdit {
             }
         }
         File result = null;
-        for (Iterator<String> iter = exts.iterator(); iter.hasNext() && (result == null || !result.exists());) {
+        for (Iterator<String> iter = exts.iterator(); iter.hasNext() && (result == null || (!isSave && !result.exists()));) {
             result = getSafeFileWithExtension(dir, filename, iter.next());
         }
         if (result == null) {
@@ -297,8 +321,11 @@ public class WorldEdit {
     }
 
     private File getSafeFileWithExtension(File dir, String filename, String extension) {
-        if (extension != null && filename.lastIndexOf('.') == -1) {
-            filename += "." + extension;
+        if (extension != null) {
+            int dot = filename.lastIndexOf('.');
+            if (dot < 0 || !filename.substring(dot).equalsIgnoreCase(extension)) {
+                filename += "." + extension;
+            }
         }
 
         if (!checkFilename(filename)) {
@@ -379,23 +406,37 @@ public class WorldEdit {
      * @return a direction vector
      * @throws UnknownDirectionException thrown if the direction is not known
      */
-    public Vector getDirection(Player player, String dirStr) throws UnknownDirectionException {
+    public BlockVector3 getDirection(Player player, String dirStr) throws UnknownDirectionException {
         dirStr = dirStr.toLowerCase();
 
-        final PlayerDirection dir = getPlayerDirection(player, dirStr);
+        final Direction dir = getPlayerDirection(player, dirStr);
 
-        switch (dir) {
-        case WEST:
-        case EAST:
-        case SOUTH:
-        case NORTH:
-        case UP:
-        case DOWN:
-            return dir.vector();
-
-        default:
+        if (dir.isUpright() || dir.isCardinal()) {
+            return dir.toBlockVector();
+        } else {
             throw new UnknownDirectionException(dir.name());
         }
+    }
+
+    /**
+     * Get the direction vector for a player's direction. May return
+     * null if a direction could not be found.
+     *
+     * @param player the player
+     * @param dirStr the direction string
+     * @return a direction vector
+     * @throws UnknownDirectionException thrown if the direction is not known
+     */
+    public BlockVector3 getDiagonalDirection(Player player, String dirStr) throws UnknownDirectionException {
+        dirStr = dirStr.toLowerCase();
+
+        final Direction dir = getPlayerDirection(player, dirStr);
+
+        if (dir.isCardinal() || dir.isOrdinal() || dir.isUpright()) {
+            return dir.toBlockVector();
+        }
+
+        throw new UnknownDirectionException(dir.name());
     }
 
     /**
@@ -407,46 +448,46 @@ public class WorldEdit {
      * @return a direction enum value
      * @throws UnknownDirectionException thrown if the direction is not known
      */
-    private PlayerDirection getPlayerDirection(Player player, String dirStr) throws UnknownDirectionException {
-        final PlayerDirection dir;
+    private Direction getPlayerDirection(Player player, String dirStr) throws UnknownDirectionException {
+        final Direction dir;
 
         switch (dirStr.charAt(0)) {
         case 'w':
-            dir = PlayerDirection.WEST;
+            dir = Direction.WEST;
             break;
 
         case 'e':
-            dir = PlayerDirection.EAST;
+            dir = Direction.EAST;
             break;
 
         case 's':
             if (dirStr.indexOf('w') > 0) {
-                return PlayerDirection.SOUTH_WEST;
+                return Direction.SOUTHWEST;
             }
 
             if (dirStr.indexOf('e') > 0) {
-                return PlayerDirection.SOUTH_EAST;
+                return Direction.SOUTHEAST;
             }
-            dir = PlayerDirection.SOUTH;
+            dir = Direction.SOUTH;
             break;
 
         case 'n':
             if (dirStr.indexOf('w') > 0) {
-                return PlayerDirection.NORTH_WEST;
+                return Direction.NORTHWEST;
             }
 
             if (dirStr.indexOf('e') > 0) {
-                return PlayerDirection.NORTH_EAST;
+                return Direction.NORTHEAST;
             }
-            dir = PlayerDirection.NORTH;
+            dir = Direction.NORTH;
             break;
 
         case 'u':
-            dir = PlayerDirection.UP;
+            dir = Direction.UP;
             break;
 
         case 'd':
-            dir = PlayerDirection.DOWN;
+            dir = Direction.DOWN;
             break;
 
         case 'm': // me
@@ -568,8 +609,6 @@ public class WorldEdit {
      * @throws WorldEditException
      */
     public void runScript(Player player, File f, String[] args) throws WorldEditException {
-        Request.reset();
-
         String filename = f.getPath();
         int index = filename.lastIndexOf('.');
         String ext = filename.substring(index + 1);
@@ -599,7 +638,7 @@ public class WorldEdit {
             byte[] data = new byte[in.available()];
             in.readFully(data);
             in.close();
-            script = new String(data, 0, data.length, "utf-8");
+            script = new String(data, 0, data.length, StandardCharsets.UTF_8);
         } catch (IOException e) {
             player.printError("Script read error: " + e.getMessage());
             return;

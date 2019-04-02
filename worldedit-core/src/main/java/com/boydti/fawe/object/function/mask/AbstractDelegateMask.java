@@ -1,9 +1,10 @@
 package com.boydti.fawe.object.function.mask;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import javax.annotation.Nullable;
 
 public class AbstractDelegateMask extends AbstractMask {
@@ -19,7 +20,7 @@ public class AbstractDelegateMask extends AbstractMask {
     }
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         return mask.test(vector);
     }
 

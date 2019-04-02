@@ -2,6 +2,7 @@ package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -20,12 +21,12 @@ public class OffsetFaweClipboard extends AbstractDelegateFaweClipboard {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
+    public BaseBlock getBlock(int x, int y, int z) {
         return super.getBlock(x + ox, y + oy, z + oz);
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return super.setBlock(ox + x, oy + y, oz + z, block);
     }
 
@@ -48,7 +49,7 @@ public class OffsetFaweClipboard extends AbstractDelegateFaweClipboard {
     public void forEach(final BlockReader task, boolean air) {
         super.forEach(new BlockReader() {
             @Override
-            public void run(int x, int y, int z, BlockState block) {
+            public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                 task.run(x - ox, y - oy, z - oz, block);
             }
         }, air);

@@ -20,17 +20,18 @@
 package com.sk89q.worldedit.forge;
 
 import com.sk89q.util.StringUtil;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import io.netty.buffer.Unpooled;
+
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -44,6 +45,8 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
+
+import io.netty.buffer.Unpooled;
 
 public class ForgePlayer extends AbstractPlayerActor {
 
@@ -77,12 +80,18 @@ public class ForgePlayer extends AbstractPlayerActor {
 
     @Override
     public Location getLocation() {
-        Vector position = new Vector(this.player.posX, this.player.posY, this.player.posZ);
+        Vector3 position = Vector3.at(this.player.posX, this.player.posY, this.player.posZ);
         return new Location(
                 ForgeWorldEdit.inst.getWorld(this.player.world),
                 position,
                 this.player.rotationYaw,
                 this.player.rotationPitch);
+    }
+
+    @Override
+    public boolean setLocation(Location location) {
+        // TODO
+        return false;
     }
 
     @Override
@@ -139,7 +148,7 @@ public class ForgePlayer extends AbstractPlayerActor {
     }
 
     @Override
-    public void setPosition(Vector pos, float pitch, float yaw) {
+    public void setPosition(Vector3 pos, float pitch, float yaw) {
         this.player.connection.setPlayerLocation(pos.getX(), pos.getY(), pos.getZ(), yaw, pitch);
     }
 
@@ -165,6 +174,31 @@ public class ForgePlayer extends AbstractPlayerActor {
     }
 
     @Override
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    public void sendFakeBlock(BlockVector3 pos, BlockStateHolder block) {
+=======
+    public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
+>>>>>>> 3fefcbf9... Remove all raw usages of BSH, improve API generics
+        BlockPos loc = ForgeAdapter.toBlockPos(pos);
+        if (block == null) {
+            // TODO
+//            player.sendBlockChange(loc, player.getWorld().getBlockAt(loc).getBlockData());
+        } else {
+            // TODO
+//            player.sendBlockChange(loc, BukkitAdapter.adapt(block));
+            if (block instanceof BaseBlock && ((BaseBlock) block).hasNbtData()) {
+                player.connection.sendPacket(new SPacketUpdateTileEntity(
+                        new BlockPos(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()), 7,
+                        NBTConverter.toNative(((BaseBlock) block).getNbtData()))
+                );
+            }
+        }
+    }
+
+    @Override
+>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     public SessionKey getSessionKey() {
         return new SessionKeyImpl(player.getUniqueID(), player.getName());
     }

@@ -37,6 +37,28 @@ public final class Blocks {
     }
 
     /**
+     * HashSet for shouldPlaceLate.
+     */
+    private static final Set<BlockType> shouldPlaceLate = new HashSet<>();
+    static {
+        shouldPlaceLate.add(BlockTypes.WATER);
+        shouldPlaceLate.add(BlockTypes.LAVA);
+        shouldPlaceLate.add(BlockTypes.GRAVEL);
+        shouldPlaceLate.add(BlockTypes.SAND);
+    }
+    /**
+     * Checks to see whether a block should be placed in the final queue.
+     *
+     * This applies to blocks that can be attached to other blocks that have an attachment.
+     *
+     * @param type the type of the block
+     * @return whether the block is in the late queue
+     */
+    public static boolean shouldPlaceLate(BlockType type) {
+        return shouldPlaceLate.contains(type);
+    }
+
+    /**
      * HashSet for shouldPlaceLast.
      */
     private static final Set<BlockType> shouldPlaceLast = new HashSet<>();
@@ -158,9 +180,9 @@ public final class Blocks {
      * @param o the block
      * @return true if the collection contains the given block
      */
-    public static boolean containsFuzzy(Collection<? extends BlockStateHolder> collection, BlockStateHolder o) {
+    public static <B extends BlockStateHolder<B>> boolean containsFuzzy(Collection<? extends BlockStateHolder<?>> collection, B o) {
         // Allow masked data in the searchBlocks to match various types
-        for (BlockStateHolder b : collection) {
+        for (BlockStateHolder<?> b : collection) {
             if (b.equalsFuzzy(o)) {
                 return true;
             }

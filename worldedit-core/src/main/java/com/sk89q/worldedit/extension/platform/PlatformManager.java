@@ -28,12 +28,21 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.tool.BlockTool;
+import com.sk89q.worldedit.command.tool.DoubleActionBlockTool;
+import com.sk89q.worldedit.command.tool.DoubleActionTraceTool;
+import com.sk89q.worldedit.command.tool.Tool;
+import com.sk89q.worldedit.command.tool.TraceTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.*;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
@@ -62,8 +71,8 @@ public class PlatformManager {
 
     private final WorldEdit worldEdit;
     private final CommandManager commandManager;
-    private final List<Platform> platforms = new ArrayList<Platform>();
-    private final Map<Capability, Platform> preferences = new EnumMap<Capability, Platform>(Capability.class);
+    private final List<Platform> platforms = new ArrayList<>();
+    private final Map<Capability, Platform> preferences = new EnumMap<>(Capability.class);
     private @Nullable String firstSeenVersion;
     private final AtomicBoolean initialized = new AtomicBoolean();
     private final AtomicBoolean configured = new AtomicBoolean();
@@ -159,8 +168,13 @@ public class PlatformManager {
         if (platform != null) {
             return platform;
         } else {
-            if (preferences.isEmpty() && !platforms.isEmpty()) {
-                return platforms.get(0); // Use the first available if preferences have not been decided yet.
+            if (preferences.isEmpty()) {
+                // Use the first available if preferences have not been decided yet.
+                if (platforms.isEmpty()) {
+                    // No platforms registered, this is being called too early!
+                    throw new NoCapablePlatformException("No platforms have been registered yet! Please wait until WorldEdit is initialized.");
+                }
+                return platforms.get(0);
             }
             throw new NoCapablePlatformException("No platform was found supporting " + capability.name());
         }
@@ -214,7 +228,7 @@ public class PlatformManager {
      * @return a list of platforms
      */
     public synchronized List<Platform> getPlatforms() {
-        return new ArrayList<Platform>(platforms);
+        return new ArrayList<>(platforms);
     }
 
     /**
@@ -294,7 +308,7 @@ public class PlatformManager {
         final Actor actor = createProxyActor(event.getCause());
         try {
             final Location location = event.getLocation();
-            final Vector vector = location.toVector();
+            final BlockVector3 vector = location.toBlockPoint();
 
             // At this time, only handle interaction from players
             if (actor instanceof Player) {
@@ -308,7 +322,7 @@ public class PlatformManager {
                 }
 
                 if (event.getType() == Interaction.HIT) {
-                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().wandItem)) {
+                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
                         FawePlayer<?> fp = FawePlayer.wrap(playerActor);
                         if (!actor.hasPermission("worldedit.selection.pos")) {
                             return;
@@ -318,7 +332,7 @@ public class PlatformManager {
                         fp.runAction(new Runnable() {
                             @Override
                             public void run() {
-                                if (selector.selectPrimary(location.toVector(), ActorSelectorLimits.forActor(player))) {
+                                if (selector.selectPrimary(vector, ActorSelectorLimits.forActor(player))) {
                                     selector.explainPrimarySelection(actor, session, vector);
                                 }
                             }
@@ -342,6 +356,7 @@ public class PlatformManager {
                             return;
                         }
                     }
+//<<<<<<< HEAD
                     final Tool tool = session.getTool(playerActor);
                     if (tool != null && tool instanceof DoubleActionBlockTool) {
                         if (tool.canUse(playerActor)) {
@@ -356,9 +371,17 @@ public class PlatformManager {
                             event.setCancelled(true);
                             return;
                         }
+//=======
+//
+//                    RegionSelector selector = session.getRegionSelector(player.getWorld());
+//
+//                    BlockVector3 blockPoint = vector.toBlockPoint();
+//                    if (selector.selectPrimary(blockPoint, ActorSelectorLimits.forActor(player))) {
+//                        selector.explainPrimarySelection(actor, session, blockPoint);
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 } else if (event.getType() == Interaction.OPEN) {
-                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().equals(getConfiguration().wandItem)) {
+                    if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
                         FawePlayer<?> fp = FawePlayer.wrap(playerActor);
                         if (!actor.hasPermission("worldedit.selection.pos")) {
                             return;
@@ -379,6 +402,7 @@ public class PlatformManager {
                         return;
                     }
 
+//<<<<<<< HEAD
                     final Tool tool = session.getTool(playerActor);
                     if (tool != null && tool instanceof BlockTool) {
                         if (tool.canUse(playerActor)) {
@@ -399,6 +423,23 @@ public class PlatformManager {
                                 return;
                             }
                         }
+//=======
+//                    RegionSelector selector = session.getRegionSelector(player.getWorld());
+//                    BlockVector3 blockPoint = vector.toBlockPoint();
+//                    if (selector.selectSecondary(blockPoint, ActorSelectorLimits.forActor(player))) {
+//                        selector.explainSecondarySelection(actor, session, blockPoint);
+//                    }
+//
+//                    event.setCancelled(true);
+//                    return;
+//                }
+//
+//                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+//                if (tool instanceof BlockTool) {
+//                    if (tool.canUse(player)) {
+//                        ((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
+//                        event.setCancelled(true);
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 }
             }

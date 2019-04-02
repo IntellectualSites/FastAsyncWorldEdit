@@ -1,13 +1,13 @@
 package com.boydti.fawe.object.pattern;
 
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -20,24 +20,24 @@ public class NoZPattern extends AbstractPattern {
         this.pattern = pattern;
     }
 
-    private transient MutableBlockVector mutable = new MutableBlockVector();
+//    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
-    public BlockStateHolder apply(Vector pos) {
-        mutable.mutX((pos.getX()));
-        mutable.mutY((pos.getY()));
-        return pattern.apply(mutable);
+    public BaseBlock apply(BlockVector3 pos) {
+//        mutable.mutX((pos.getX()));
+//        mutable.mutY((pos.getY()));
+        return pattern.apply(pos);
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
-        mutable.mutX((get.getX()));
-        mutable.mutY((get.getY()));
-        return pattern.apply(extent, set, mutable);
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
+//        mutable.mutX((get.getX()));
+//        mutable.mutY((get.getY()));
+        return pattern.apply(extent, set, get);
     }
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        mutable = new MutableBlockVector();
+//        mutable = new MutableBlockVector3();
     }
 }

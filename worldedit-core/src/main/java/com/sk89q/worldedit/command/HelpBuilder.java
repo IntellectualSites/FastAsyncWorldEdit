@@ -51,14 +51,14 @@ public abstract class HelpBuilder implements Runnable {
             }
 
             boolean isRootLevel = true;
-            List<String> visited = new ArrayList<String>();
+            List<String> visited = new ArrayList<>();
 
             // Create the message
             if (callable instanceof Dispatcher) {
                 Dispatcher dispatcher = (Dispatcher) callable;
 
                 // Get a list of aliases
-                List<CommandMapping> aliases = new ArrayList<CommandMapping>(dispatcher.getCommands());
+                List<CommandMapping> aliases = new ArrayList<>(dispatcher.getCommands());
                 List<String> prefixes = Collections.nCopies(aliases.size(), "");
                 // Group by callable
 
@@ -174,7 +174,7 @@ public abstract class HelpBuilder implements Runnable {
                                 return;
                             }
                             dispatcher = (Dispatcher) callable;
-                            aliases = new ArrayList<CommandMapping>(dispatcher.getCommands());
+                            aliases = new ArrayList<>(dispatcher.getCommands());
                             prefixes = Collections.nCopies(aliases.size(), "");
                         } else {
                             aliases = new ArrayList<>();

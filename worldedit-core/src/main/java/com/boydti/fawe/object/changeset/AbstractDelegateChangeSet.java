@@ -4,14 +4,14 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -154,12 +154,12 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void add(Vector loc, BlockStateHolder from, BlockStateHolder to) {
+    public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
         parent.add(loc, from, to);
     }
 
     @Override
-    public void add(int x, int y, int z, BlockStateHolder from, BlockStateHolder to) {
+    public void add(int x, int y, int z, BaseBlock from, BaseBlock to) {
         parent.add(x, y, z, from, to);
     }
 
@@ -172,4 +172,16 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     public void add(int x, int y, int z, int combinedFrom, BaseBlock to) {
         parent.add(x, y, z, combinedFrom, to);
     }
+
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -34,6 +34,7 @@ import com.sk89q.worldedit.sponge.adapter.SpongeImplAdapter;
 import com.sk89q.worldedit.sponge.adapter.SpongeImplLoader;
 import com.sk89q.worldedit.sponge.config.SpongeConfiguration;
 import com.sk89q.worldedit.world.item.ItemTypes;
+import org.bstats.sponge.Metrics2;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -74,6 +75,9 @@ public class SpongeWorldEdit {
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private Metrics2 metrics;
 
     public static final String MOD_ID = "worldedit";
 
@@ -135,11 +139,17 @@ public class SpongeWorldEdit {
 
         for (BlockType blockType : Sponge.getRegistry().getAllOf(BlockType.class)) {
             // TODO Handle blockstate stuff
-            com.sk89q.worldedit.world.block.BlockTypes.register(new com.sk89q.worldedit.world.block.BlockType(blockType.getId()));
+            String id = blockType.getId();
+            if (!com.sk89q.worldedit.world.block.BlockType.REGISTRY.keySet().contains(id)) {
+                com.sk89q.worldedit.world.block.BlockTypes.register(new com.sk89q.worldedit.world.block.BlockType(id));
+            }
         }
 
         for (ItemType itemType : Sponge.getRegistry().getAllOf(ItemType.class)) {
-            ItemTypes.register(new com.sk89q.worldedit.world.item.ItemType(itemType.getId()));
+            String id = itemType.getId();
+            if (!com.sk89q.worldedit.world.item.ItemType.REGISTRY.keySet().contains(id)) {
+                ItemTypes.register(new com.sk89q.worldedit.world.item.ItemType(id));
+            }
         }
 
         WorldEdit.getInstance().getPlatformManager().register(platform);
@@ -211,7 +221,7 @@ public class SpongeWorldEdit {
 
         BlockType interactedType = targetBlock.getState().getType();
         if (event instanceof InteractBlockEvent.Primary) {
-            if (!interactedType.getMaterial().isAir()) {
+            if (interactedType != BlockTypes.AIR) {
                 if (!optLoc.isPresent()) {
                     return;
                 }
@@ -233,7 +243,7 @@ public class SpongeWorldEdit {
                 }
             }
         } else if (event instanceof InteractBlockEvent.Secondary) {
-        if (!interactedType.getMaterial().isAir()) {
+        if (interactedType != BlockTypes.AIR) {
                 if (!optLoc.isPresent()) {
                     return;
                 }

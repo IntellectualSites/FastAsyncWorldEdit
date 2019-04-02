@@ -2,7 +2,6 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
@@ -10,9 +9,7 @@ import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -22,11 +19,13 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class CopyPastaBrush implements Brush, ResettableTool {
 
@@ -50,7 +49,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(final EditSession editSession, Vector position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(final EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
         FawePlayer fp = editSession.getPlayer();
         ClipboardHolder clipboard = session.getExistingClipboard();
         if (clipboard == null) {
@@ -66,11 +65,11 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             final int minY = position.getBlockY();
             mask = new AbstractDelegateMask(mask) {
                 @Override
-                public boolean test(Vector vector) {
+                public boolean test(BlockVector3 vector) {
                     if (super.test(vector) && vector.getBlockY() >= minY) {
-                        BlockStateHolder block = editSession.getLazyBlock(vector);
+                    	BaseBlock block = editSession.getFullBlock(position);
                         if (!block.getBlockType().getMaterial().isAir()) {
-                            builder.add(vector, EditSession.nullBlock, block);
+                            builder.add(vector, EditSession.nullBlock.toBaseBlock(), block);
                             return true;
                         }
                     }
@@ -94,7 +93,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             AffineTransform transform = null;
             if (randomRotate) {
                 if (transform == null) transform = new AffineTransform();
-                int rotate = 90 * PseudoRandom.random.nextInt(4);
+                int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
                 transform = transform.rotateY(rotate);
             }
             if (autoRotate) {

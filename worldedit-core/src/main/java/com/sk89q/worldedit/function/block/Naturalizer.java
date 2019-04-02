@@ -21,7 +21,6 @@ package com.sk89q.worldedit.function.block;
 
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -32,6 +31,8 @@ import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 /**
  * Makes a layer of grass on top, three layers of dirt below, and smooth stone
@@ -65,12 +66,12 @@ public class Naturalizer implements LayerFunction {
     }
 
     @Override
-    public boolean isGround(Vector position) {
+    public boolean isGround(BlockVector3 position) {
         return mask.test(position);
     }
 
     @Override
-    public boolean apply(Vector position, int depth) throws WorldEditException {
+    public boolean apply(BlockVector3 position, int depth) throws WorldEditException {
         if (mask.test(position)) {
             affected++;
             switch (depth) {

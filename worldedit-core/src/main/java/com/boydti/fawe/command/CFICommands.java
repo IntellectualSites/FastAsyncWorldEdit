@@ -12,35 +12,38 @@ import com.boydti.fawe.object.pattern.PatternExtent;
 import com.boydti.fawe.util.*;
 import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.intellectualcrafters.plot.PS;
-import com.intellectualcrafters.plot.commands.Auto;
-import com.intellectualcrafters.plot.config.C;
-import com.intellectualcrafters.plot.config.Settings;
-import com.intellectualcrafters.plot.database.DBFunc;
-import com.intellectualcrafters.plot.object.Plot;
-import com.intellectualcrafters.plot.object.PlotArea;
-import com.intellectualcrafters.plot.object.PlotId;
-import com.intellectualcrafters.plot.object.PlotPlayer;
-import com.intellectualcrafters.plot.object.worlds.PlotAreaManager;
-import com.intellectualcrafters.plot.object.worlds.SinglePlotArea;
-import com.intellectualcrafters.plot.object.worlds.SinglePlotAreaManager;
-import com.intellectualcrafters.plot.util.MathMan;
+import com.github.intellectualsites.plotsquared.plot.PlotSquared;
+import com.github.intellectualsites.plotsquared.plot.commands.Auto;
+import com.github.intellectualsites.plotsquared.plot.config.Captions;
+import com.github.intellectualsites.plotsquared.plot.config.Settings;
+import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotId;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
+import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
+import com.github.intellectualsites.plotsquared.plot.util.MathMan;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.command.MethodCommands;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
@@ -85,7 +88,7 @@ public class CFICommands extends MethodCommands {
     }
 
     private File getFolder(String worldName) {
-        return new File(PS.imp().getWorldContainer(), worldName + File.separator + "region");
+        return new File(PlotSquared.imp().getWorldContainer(), worldName + File.separator + "region");
     }
 
     @Command(
@@ -172,7 +175,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Deprecated
-    public static void autoClaimFromDatabase(PlotPlayer player, PlotArea area, PlotId start, com.intellectualcrafters.plot.object.RunnableVal<Plot> whenDone) {
+    public static void autoClaimFromDatabase(PlotPlayer player, PlotArea area, PlotId start, com.github.intellectualsites.plotsquared.plot.object.RunnableVal<Plot> whenDone) {
         final Plot plot = area.getNextFreePlot(player, start);
         if (plot == null) {
             whenDone.run(null);
@@ -197,7 +200,7 @@ public class CFICommands extends MethodCommands {
     public void done(FawePlayer fp) throws ParameterException, IOException {
         CFISettings settings = assertSettings(fp);
 
-        PlotAreaManager manager = PS.get().getPlotAreaManager();
+        PlotAreaManager manager = PlotSquared.get().getPlotAreaManager();
         if (manager instanceof SinglePlotAreaManager) {
             SinglePlotAreaManager sManager = (SinglePlotAreaManager) manager;
             SinglePlotArea area = sManager.getArea();
@@ -210,7 +213,7 @@ public class CFICommands extends MethodCommands {
                     int currentPlots = Settings.Limit.GLOBAL ? player.getPlotCount() : player.getPlotCount(area.worldname);
                     int diff = player.getAllowedPlots() - currentPlots;
                     if (diff < 1) {
-                        C.CANT_CLAIM_MORE_PLOTS_NUM.send(player, -diff);
+                        Captions.CANT_CLAIM_MORE_PLOTS_NUM.send(player, -diff);
                         return;
                     }
 
@@ -421,7 +424,7 @@ public class CFICommands extends MethodCommands {
                 ClipboardHolder holder = fp.getSession().getClipboard();
                 Clipboard clipboard = holder.getClipboard();
                 boolean[] ids = new boolean[BlockTypes.size()];
-                for (Vector pt : clipboard.getRegion()) {
+                for (BlockVector3 pt : clipboard.getRegion()) {
                     ids[clipboard.getBlock(pt).getInternalBlockTypeId()] = true;
                 }
                 blocks = new HashSet<>();
@@ -447,7 +450,7 @@ public class CFICommands extends MethodCommands {
                     BlockType type = BlockTypes.get(typeId);
                     BlockStateHolder block = type.getDefaultState();
                     pattern.setBlock(block);
-                    if (mask.test(Vector.ZERO)) blocks.add(type);
+                    if (mask.test(BlockVector3.ZERO)) blocks.add(type);
                 }
                 break;
             }
@@ -501,7 +504,7 @@ public class CFICommands extends MethodCommands {
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
 
         World world = fp.getWorld();
-        MultiClipboardHolder multi = ClipboardFormat.SCHEMATIC.loadAllFromInput(fp.getPlayer(), schematic, null, true);
+        MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(fp.getPlayer(), schematic, null, true);
         if (multi == null) {
             return;
         }
@@ -663,7 +666,7 @@ public class CFICommands extends MethodCommands {
     public void tp(FawePlayer fp) throws ParameterException, WorldEditException {
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         msg("Teleporting...").send(fp);
-        Vector origin = gen.getOrigin();
+        Vector3 origin = gen.getOrigin();
         Player player = fp.getPlayer();
         player.setPosition(origin.subtract(16, 0, 16));
         player.findFreePosition();

@@ -4,13 +4,13 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.util.FaweTimer;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -33,12 +33,12 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
+    public BaseBlock apply(BlockVector3 position) {
         return pattern.apply(position);
     }
 
     @Override
-    public boolean apply(Extent extent, Vector setPosition, Vector getPosition) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
         long now = timer.getTick();
         try {
             if (!set(setPosition)) {
@@ -50,7 +50,7 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
         return false;
     }
 
-    public boolean set(Vector pos) {
+    public boolean set(BlockVector3 pos) {
         return set.add(pos);
     }
 

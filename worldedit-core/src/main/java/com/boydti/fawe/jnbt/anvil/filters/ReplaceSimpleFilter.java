@@ -3,7 +3,7 @@ package com.boydti.fawe.jnbt.anvil.filters;
 import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
 import com.boydti.fawe.object.mask.FaweBlockMatcher;
 import com.boydti.fawe.object.number.MutableLong;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
 public class ReplaceSimpleFilter extends MCAFilterCounter {

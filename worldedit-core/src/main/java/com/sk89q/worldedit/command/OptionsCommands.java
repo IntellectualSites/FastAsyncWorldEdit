@@ -13,7 +13,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -284,7 +284,7 @@ public class OptionsCommands {
 
             int found = 0;
 
-            for (ItemType searchType : ItemTypes.values) {
+            for (ItemType searchType : ItemTypes.values()) {
                 if (found >= 15) {
                     actor.print(BBC.getPrefix() + "Too many results!");
                     break;

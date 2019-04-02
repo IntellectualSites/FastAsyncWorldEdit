@@ -19,8 +19,9 @@
 
 package com.sk89q.worldedit.util;
 
-import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 
 /**
@@ -35,10 +36,10 @@ public class TargetBlock {
     private World world;
     private int maxDistance;
     private double checkDistance, curDistance;
-    private Vector targetPos = new Vector();
-    private Vector targetPosDouble = new Vector();
-    private Vector prevPos = new Vector();
-    private Vector offset = new Vector();
+    private BlockVector3 targetPos = BlockVector3.ZERO;
+    private Vector3 targetPosDouble = Vector3.ZERO;
+    private BlockVector3 prevPos = BlockVector3.ZERO;
+    private Vector3 offset = Vector3.ZERO;
 
     /**
      * Constructor requiring a player, uses default values
@@ -47,7 +48,7 @@ public class TargetBlock {
      */
     public TargetBlock(Player player) {
         this.world = player.getWorld();
-        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), 300, 1.65, 0.2);
+        this.setValues(player.getLocation(), player.getLocation().getYaw(), player.getLocation().getPitch(), 300, 1.65, 0.2);
     }
 
     /**
@@ -59,7 +60,7 @@ public class TargetBlock {
      */
     public TargetBlock(Player player, int maxDistance, double checkDistance) {
         this.world = player.getWorld();
-        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
+        this.setValues(player.getLocation(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
     }
 
     /**
@@ -72,8 +73,7 @@ public class TargetBlock {
      * @param viewHeight where the view is positioned in y-axis
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
-    private void setValues(Vector loc, double xRotation, double yRotation,
-                           int maxDistance, double viewHeight, double checkDistance) {
+    private void setValues(Vector3 loc, double xRotation, double yRotation, int maxDistance, double viewHeight, double checkDistance) {
         this.maxDistance = maxDistance;
         this.checkDistance = checkDistance;
         this.curDistance = 0;
@@ -82,9 +82,9 @@ public class TargetBlock {
 
         double h = (checkDistance * Math.cos(Math.toRadians(yRotation)));
 
-        offset = new Vector((h * Math.cos(Math.toRadians(xRotation))),
-                (checkDistance * Math.sin(Math.toRadians(yRotation))),
-                (h * Math.sin(Math.toRadians(xRotation))));
+        offset = Vector3.at((h * Math.cos(Math.toRadians(xRotation))),
+                            (checkDistance * Math.sin(Math.toRadians(yRotation))),
+                            (h * Math.sin(Math.toRadians(xRotation))));
 
         targetPosDouble = loc.add(0, viewHeight, 0);
         targetPos = targetPosDouble.toBlockPoint();
@@ -101,7 +101,7 @@ public class TargetBlock {
         boolean searchForLastBlock = true;
         Location lastBlock = null;
         while (getNextBlock() != null) {
-            if (world.getBlockType(getCurrentBlock().toVector()).getMaterial().isAir()) {
+            if (world.getBlock(targetPos).getBlockType().getMaterial().isAir()) {
                 if (searchForLastBlock) {
                     lastBlock = getCurrentBlock();
                     if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
@@ -123,7 +123,7 @@ public class TargetBlock {
      * @return Block
      */
     public Location getTargetBlock() {
-        while (getNextBlock() != null && world.getBlockType(getCurrentBlock().toVector()).getMaterial().isAir()) ;
+        while (getNextBlock() != null && world.getBlock(targetPos).getBlockType().getMaterial().isAir()) ;
         return getCurrentBlock();
     }
 
@@ -134,7 +134,7 @@ public class TargetBlock {
      * @return Block
      */
     public Location getSolidTargetBlock() {
-        while (getNextBlock() != null && !world.getBlockType(getCurrentBlock().toVector()).getMaterial().isMovementBlocker()) ;
+        while (getNextBlock() != null && !world.getBlock(targetPos).getBlockType().getMaterial().isMovementBlocker()) ;
         return getCurrentBlock();
     }
 
@@ -161,7 +161,7 @@ public class TargetBlock {
             return null;
         }
 
-        return new Location(world, targetPos);
+        return new Location(world, targetPos.toVector3());
     }
 
     /**
@@ -173,7 +173,7 @@ public class TargetBlock {
         if (curDistance > maxDistance) {
             return null;
         } else {
-            return new Location(world, targetPos);
+            return new Location(world, targetPos.toVector3());
         }
     }
 
@@ -183,17 +183,17 @@ public class TargetBlock {
      * @return block position
      */
     public Location getPreviousBlock() {
-        return new Location(world, prevPos);
+        return new Location(world, prevPos.toVector3());
     }
 
     public Location getAnyTargetBlockFace() {
         getAnyTargetBlock();
-        return getCurrentBlock().setDirection(getCurrentBlock().toVector().subtract(getPreviousBlock().toVector()));
+        return getCurrentBlock().setDirection(getCurrentBlock().subtract(getPreviousBlock()));
     }
 
     public Location getTargetBlockFace() {
         getAnyTargetBlock();
-        return getCurrentBlock().setDirection(getCurrentBlock().toVector().subtract(getPreviousBlock().toVector()));
+        return getCurrentBlock().setDirection(getCurrentBlock().subtract(getPreviousBlock()));
     }
 
 }

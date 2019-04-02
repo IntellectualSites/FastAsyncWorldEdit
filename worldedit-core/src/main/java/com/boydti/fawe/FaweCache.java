@@ -76,7 +76,7 @@ public class FaweCache {
     }
 
     public static Map<String, Object> asMap(Object... pairs) {
-        HashMap<String, Object> map = new HashMap<String, Object>(pairs.length >> 1);
+        HashMap<String, Object> map = new HashMap<>(pairs.length >> 1);
         for (int i = 0; i < pairs.length; i += 2) {
             String key = (String) pairs[i];
             Object value = pairs[i + 1];
@@ -174,7 +174,7 @@ public class FaweCache {
             if (clazz.getName().startsWith("com.intellectualcrafters.jnbt")) {
                 try {
                     if (clazz.getName().equals("com.intellectualcrafters.jnbt.EndTag")) {
-                        return EndTag.INSTANCE;
+                        return new EndTag();
                     }
                     Field field = clazz.getDeclaredField("value");
                     field.setAccessible(true);

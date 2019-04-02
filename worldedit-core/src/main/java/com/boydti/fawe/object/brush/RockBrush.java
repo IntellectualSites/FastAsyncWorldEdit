@@ -3,24 +3,26 @@ package com.boydti.fawe.object.brush;
 import com.boydti.fawe.object.random.SimplexNoise;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RockBrush implements Brush {
     private final double amplitude;
     private final double frequency;
-    private final Vector radius;
+    private final Vector3 radius;
 
-    public RockBrush(Vector radius, double frequency, double amplitude) {
+    public RockBrush(Vector3 radius, double frequency, double amplitude) {
         this.frequency = frequency;
         this.amplitude = amplitude;
         this.radius = radius;
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
         double seedX = ThreadLocalRandom.current().nextDouble();
         double seedY = ThreadLocalRandom.current().nextDouble();
         double seedZ = ThreadLocalRandom.current().nextDouble();

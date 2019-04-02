@@ -33,9 +33,9 @@ public final class TypeDescription {
     public TypeDescription(Class<? extends Object> clazz, Tag tag) {
         this.type = clazz;
         this.tag = tag;
-        listProperties = new HashMap<String, Class<? extends Object>>();
-        keyProperties = new HashMap<String, Class<? extends Object>>();
-        valueProperties = new HashMap<String, Class<? extends Object>>();
+        listProperties = new HashMap<>();
+        keyProperties = new HashMap<>();
+        valueProperties = new HashMap<>();
     }
 
     public TypeDescription(Class<? extends Object> clazz, String tag) {

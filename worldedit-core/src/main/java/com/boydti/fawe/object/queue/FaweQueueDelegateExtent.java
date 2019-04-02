@@ -3,13 +3,14 @@ package com.boydti.fawe.object.queue;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.MutableBlockVector2D;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -18,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FaweQueueDelegateExtent extends DelegateFaweQueue {
     private final FaweQueue parentQueue;
     private final Extent parentExtent;
-    private final MutableBlockVector2D mutable2d = new MutableBlockVector2D();
+//    private final MutableBlockVector2 mutable2d = new MutableBlockVector2();
 
     public FaweQueueDelegateExtent(FaweQueue parentQueue, Extent parentExtent) {
         super(parentQueue);
@@ -53,31 +54,31 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
 
     @Override
     public CompoundTag getTileEntity(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return getLazyBlock(x, y, z).getNbtData();
+        return getFullBlock(BlockVector3.at(x, y, z)).getNbtData();
     }
 
     @Override
     public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
-        return parentExtent.getBiome(mutable2d.setComponents(x, z)).getId();
+        return parentExtent.getBiome(BlockVector2.at(x, z)).getId();
     }
 
     @Override
-    public boolean setBiome(Vector2D position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
         return parentExtent.setBiome(position, biome);
     }
 
     @Override
-    public BlockState getBlock(Vector position) {
+    public BlockState getBlock(BlockVector3 position) {
         return parentExtent.getBlock(position);
     }
 
     @Override
-    public BaseBiome getBiome(Vector2D position) {
+    public BaseBiome getBiome(BlockVector2 position) {
         return parentExtent.getBiome(position);
     }
 
     @Override
-    public boolean setBlock(Vector position, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         return parentExtent.setBlock(position, block);
     }
 
@@ -87,7 +88,7 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
     }
 
     @Override
-    public BlockState getLazyBlock(Vector position) {
+    public BlockState getLazyBlock(BlockVector3 position) {
         return parentExtent.getLazyBlock(position);
     }
 

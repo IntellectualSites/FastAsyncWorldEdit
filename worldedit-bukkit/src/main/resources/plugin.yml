@@ -4,17 +4,15 @@ version: "${internalVersion}"
 api-version: 1.13
 description: Fast Async WorldEdit plugin
 authors: [Empire92]
-loadbefore: [WorldEdit,AsyncWorldEdit,AsyncWorldEditInjector,WorldGuard]
 load: STARTUP
+loadbefore: [BannerBoard, WorldGuard, PlotSquared, AsyncWorldEdit, AsyncWorldEditInjector]
 database: false
-#softdepend: [WorldGuard, PlotSquared, MCore, Factions, GriefPrevention, Residence, Towny, PlotMe, PreciousStones]
+softdepend: [MCore, Factions, GriefPrevention, Residence, Towny, PreciousStones]
 permissions:
   fawe.plotsquared:
       default: true
       children:
         fawe.plotsquared.trusted: true
-  fawe.plotme:
-    default: true
   fawe.bypass.regions:
     default: false
   fawe.bypass:
@@ -60,7 +58,6 @@ permissions:
       worldedit.generation.pumpkins: true
       worldedit.generation.pyramid: true
       worldedit.generation.shape: true
-      worldedit.biome.set: true
       worldedit.history.undo: true
       worldedit.history.redo: true
       worldedit.history.rollback: true

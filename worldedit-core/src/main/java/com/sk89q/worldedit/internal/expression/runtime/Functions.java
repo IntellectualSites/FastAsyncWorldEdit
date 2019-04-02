@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.internal.expression.runtime;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.runtime.Function.Dynamic;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.noise.PerlinNoise;
 import com.sk89q.worldedit.math.noise.RidgedMultiFractalNoise;
 import com.sk89q.worldedit.math.noise.VoronoiNoise;
@@ -124,7 +124,7 @@ public final class Functions {
         throw new NoSuchMethodException(); // TODO: return null (check for side-effects first)
     }
 
-    private static final Map<String, List<Overload>> functions = new HashMap<String, List<Overload>>();
+    private static final Map<String, List<Overload>> functions = new HashMap<>();
 
     static {
         for (Method method : Functions.class.getMethods()) {
@@ -143,7 +143,7 @@ public final class Functions {
 
         List<Overload> overloads = functions.get(methodName);
         if (overloads == null) {
-            functions.put(methodName, overloads = new ArrayList<Overload>());
+            functions.put(methodName, overloads = new ArrayList<>());
         }
 
         overloads.add(overload);
@@ -281,8 +281,8 @@ public final class Functions {
     }
 
 
-    private static final Map<Integer, double[]> gmegabuf = new HashMap<Integer, double[]>();
-    private final Map<Integer, double[]> megabuf = new HashMap<Integer, double[]>();
+    private static final Map<Integer, double[]> gmegabuf = new HashMap<>();
+    private final Map<Integer, double[]> megabuf = new HashMap<>();
 
     public Map<Integer, double[]> getMegabuf() {
         return megabuf;
@@ -397,7 +397,7 @@ public final class Functions {
         } catch (IllegalArgumentException e) {
             throw new EvaluationException(0, "Perlin noise error: " + e.getMessage());
         }
-        return perlin.noise(new Vector(x.getValue(), y.getValue(), z.getValue()));
+        return perlin.noise(Vector3.at(x.getValue(), y.getValue(), z.getValue()));
     }
 
     private static final ThreadLocal<VoronoiNoise> localVoronoi = ThreadLocal.withInitial(VoronoiNoise::new);
@@ -410,7 +410,7 @@ public final class Functions {
         } catch (IllegalArgumentException e) {
             throw new EvaluationException(0, "Voronoi error: " + e.getMessage());
         }
-        return voronoi.noise(new Vector(x.getValue(), y.getValue(), z.getValue()));
+        return voronoi.noise(Vector3.at(x.getValue(), y.getValue(), z.getValue()));
     }
 
     private static final ThreadLocal<RidgedMultiFractalNoise> localRidgedMulti = ThreadLocal.withInitial(RidgedMultiFractalNoise::new);
@@ -424,7 +424,7 @@ public final class Functions {
         } catch (IllegalArgumentException e) {
             throw new EvaluationException(0, "Ridged multi error: " + e.getMessage());
         }
-        return ridgedMulti.noise(new Vector(x.getValue(), y.getValue(), z.getValue()));
+        return ridgedMulti.noise(Vector3.at(x.getValue(), y.getValue(), z.getValue()));
     }
 
     private static double queryInternal(RValue type, RValue data, double typeId, double dataValue) throws EvaluationException {

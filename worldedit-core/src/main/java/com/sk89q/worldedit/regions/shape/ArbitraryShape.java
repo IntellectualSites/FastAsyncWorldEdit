@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.regions.shape;
 
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
  * Generates solid and hollow shapes according to materials returned by the
@@ -51,7 +51,7 @@ public abstract class ArbitraryShape {
      * @param defaultMaterial The material returned by the pattern for the current block.
      * @return material to place or null to not place anything.
      */
-    protected abstract BlockStateHolder getMaterial(int x, int y, int z, BlockStateHolder defaultMaterial);
+    protected abstract BaseBlock getMaterial(int x, int y, int z, BaseBlock defaultMaterial);
 
     /**
      * Generates the shape.
@@ -65,13 +65,13 @@ public abstract class ArbitraryShape {
     public int generate(EditSession editSession, Pattern pattern, boolean hollow) throws MaxChangedBlocksException {
         int affected = 0;
 
-        for (BlockVector position : getExtent()) {
+        for (BlockVector3 position : getExtent()) {
             int x = position.getBlockX();
             int y = position.getBlockY();
             int z = position.getBlockZ();
 
             if (!hollow) {
-                final BlockStateHolder material = getMaterial(x, y, z, pattern.apply(position));
+                BaseBlock material = getMaterial(x, y, z, pattern.apply(position));
                 if (material != null && editSession.setBlock(position, material)) {
                     ++affected;
                 }
@@ -79,7 +79,7 @@ public abstract class ArbitraryShape {
                 continue;
             }
 
-            final BlockStateHolder material = getMaterial(x, y, z, pattern.apply(position));
+            BaseBlock material = getMaterial(x, y, z, pattern.apply(position));
             if (material == null) {
                 continue;
             }

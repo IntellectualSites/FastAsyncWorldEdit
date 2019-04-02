@@ -1,42 +1,42 @@
 package com.boydti.fawe.regions;
 
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.World;
 
 public abstract class SimpleRegion extends AbstractRegion {
-    private final Vector max;
-    private final Vector min;
+    private final BlockVector3 max;
+    private final BlockVector3 min;
 
-    public SimpleRegion(World world, Vector min, Vector max) {
+    public SimpleRegion(World world, BlockVector3 min, BlockVector3 max) {
         super(world);
         this.min = min;
         this.max = max;
     }
 
     @Override
-    public Vector getMinimumPoint() {
+    public BlockVector3 getMinimumPoint() {
         return min;
     }
 
     @Override
-    public Vector getMaximumPoint() {
+    public BlockVector3 getMaximumPoint() {
         return max;
     }
 
     @Override
-    public void expand(Vector... changes) throws RegionOperationException {
+    public void expand(BlockVector3... changes) throws RegionOperationException {
         throw new UnsupportedOperationException("Region is immutable");
     }
 
     @Override
-    public void contract(Vector... changes) throws RegionOperationException {
+    public void contract(BlockVector3... changes) throws RegionOperationException {
         throw new UnsupportedOperationException("Region is immutable");
     }
 
     @Override
-    public boolean contains(Vector p) {
+    public boolean contains(BlockVector3 p) {
         return contains(p.getBlockX(), p.getBlockY(), p.getBlockZ());
     }
 

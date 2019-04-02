@@ -79,42 +79,42 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
     private BukkitConfiguration config;
 
     private static Map<String, Plugin> lookupNames;
-    static {
-        {   // Disable AWE as otherwise both fail to load
-            PluginManager manager = Bukkit.getPluginManager();
-            try {
-                Field pluginsField = manager.getClass().getDeclaredField("plugins");
-                Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
-                pluginsField.setAccessible(true);
-                lookupNamesField.setAccessible(true);
-                List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
-                lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
-                pluginsField.set(manager, plugins = new ArrayList<Plugin>(plugins) {
-                    @Override
-                    public boolean add(Plugin plugin) {
-                        if (plugin.getName().startsWith("AsyncWorldEdit")) {
-                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
-                        } else if (plugin.getName().startsWith("BetterShutdown")) {
-                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
-                        } else {
-                            return super.add(plugin);
-                        }
-                        return false;
-                    }
-                });
-                lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
-                    @Override
-                    public Plugin put(String key, Plugin plugin) {
-                        if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
-                            return null;
-                        }
-                        return super.put(key, plugin);
-                    }
-                });
-            } catch (Throwable ignore) {}
-        }
-    }
-
+//    static {
+//        {   // Disable AWE as otherwise both fail to load
+//            PluginManager manager = Bukkit.getPluginManager();
+//            try {
+//                Field pluginsField = manager.getClass().getDeclaredField("plugins");
+//                Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
+//                pluginsField.setAccessible(true);
+//                lookupNamesField.setAccessible(true);
+//                List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
+//                lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
+//                pluginsField.set(manager, plugins = new ArrayList<Plugin>(plugins) {
+//                    @Override
+//                    public boolean add(Plugin plugin) {
+//                        if (plugin.getName().startsWith("AsyncWorldEdit")) {
+//                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
+//                        } else if (plugin.getName().startsWith("BetterShutdown")) {
+//                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
+//                        } else {
+//                            return super.add(plugin);
+//                        }
+//                        return false;
+//                    }
+//                });
+//                lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
+//                    @Override
+//                    public Plugin put(String key, Plugin plugin) {
+//                        if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
+//                            return null;
+//                        }
+//                        return super.put(key, plugin);
+//                    }
+//                });
+//            } catch (Throwable ignore) {}
+//        }
+//    }
+//
     public WorldEditPlugin() {
         init();
     }
@@ -145,6 +145,7 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
     @SuppressWarnings("AccessStaticViaInstance")
     @Override
     public void onEnable() {
+    	rename();
         this.INSTANCE = this;
         FaweBukkit imp = new FaweBukkit(this);
 
@@ -348,41 +349,27 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
     protected void createDefaultConfiguration(String name) {
         File actual = new File(getDataFolder(), name);
         if (!actual.exists()) {
-            InputStream input = null;
-            try {
-                JarFile file = new JarFile(getFile());
+            try (JarFile file = new JarFile(getFile())) {
                 ZipEntry copy = file.getEntry("defaults/" + name);
                 if (copy == null) throw new FileNotFoundException();
-                input = file.getInputStream(copy);
+                copyDefaultConfig(file.getInputStream(copy), actual, name);
             } catch (IOException e) {
                 getLogger().severe("Unable to read default configuration: " + name);
             }
-            if (input != null) {
-                FileOutputStream output = null;
+        }
+    }
 
-                try {
-                    output = new FileOutputStream(actual);
-                    byte[] buf = new byte[8192];
-                    int length;
-                    while ((length = input.read(buf)) > 0) {
-                        output.write(buf, 0, length);
-                    }
-
-                    getLogger().info("Default configuration file written: " + name);
-                } catch (IOException e) {
-                    getLogger().log(Level.WARNING, "Failed to write default config file", e);
-                } finally {
-                    try {
-                        input.close();
-                    } catch (IOException ignored) {}
-
-                    try {
-                        if (output != null) {
-                            output.close();
-                        }
-                    } catch (IOException ignored) {}
-                }
+    private void copyDefaultConfig(InputStream input, File actual, String name) {
+        try (FileOutputStream output = new FileOutputStream(actual)) {
+            byte[] buf = new byte[8192];
+            int length;
+            while ((length = input.read(buf)) > 0) {
+                output.write(buf, 0, length);
             }
+
+            getLogger().info("Default configuration file written: " + name);
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Failed to write default config file", e);
         }
     }
 

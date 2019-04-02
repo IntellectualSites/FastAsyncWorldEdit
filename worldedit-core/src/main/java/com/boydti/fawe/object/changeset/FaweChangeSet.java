@@ -13,10 +13,8 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
@@ -24,6 +22,7 @@ import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
@@ -197,23 +196,23 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public void add(BlockChange change) {
         try {
-            BlockVector loc = change.getPosition();
-            BlockStateHolder from = change.getPrevious();
-            BlockStateHolder to = change.getCurrent();
+            BlockVector3 loc = change.getPosition();
+            BaseBlock from = change.getPrevious();
+            BaseBlock to = change.getCurrent();
             add(loc, from, to);
         } catch (Exception e) {
             MainUtil.handleError(e);
         }
     }
 
-    public void add(Vector loc, BlockStateHolder from, BlockStateHolder to) {
+    public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
         int x = loc.getBlockX();
         int y = loc.getBlockY();
         int z = loc.getBlockZ();
         add(x, y, z, from, to);
     }
 
-    public void add(int x, int y, int z, BlockStateHolder from, BlockStateHolder to) {
+    public void add(int x, int y, int z, BaseBlock from, BaseBlock to) {
         try {
             if (from.hasNbtData()) {
                 CompoundTag nbt = from.getNbtData();

@@ -28,33 +28,42 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DelegateConsumer;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.chat.UsageMessage;
-import com.boydti.fawe.util.gui.FormBuilder;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
+
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.Logging;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
-import com.sk89q.worldedit.extension.factory.DefaultMaskParser;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
-import com.sk89q.worldedit.extension.factory.HashTagPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -64,6 +73,7 @@ import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -73,6 +83,7 @@ import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.imageio.ImageIO;
@@ -114,7 +125,7 @@ public class UtilityCommands extends MethodCommands {
             queued = false
     )
     public void patterns(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-        displayModifierHelp(player, HashTagPatternParser.class, args);
+        displayModifierHelp(player, DefaultPatternParser.class, args);
     }
 
     @Command(
@@ -185,33 +196,30 @@ public class UtilityCommands extends MethodCommands {
         File maxImages = new File(webSrc, "images" + File.separator + "max");
         final int sub = srcFolder.getAbsolutePath().length();
         List<String> images = new ArrayList<>();
-        MainUtil.iterateFiles(srcFolder, new Consumer<File>() {
-            @Override
-            public void accept(File file) {
-                switch (file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase()) {
-                    case ".png":
-                    case ".jpeg":
-                        break;
-                    default:
-                        return;
-                }
-                try {
-                    String name = file.getAbsolutePath().substring(sub);
-                    if (name.startsWith(File.separator)) name = name.replaceFirst(java.util.regex.Pattern.quote(File.separator), "");
-                    BufferedImage img = MainUtil.readImage(file);
-                    BufferedImage minImg = ImageUtil.getScaledInstance(img, min, min, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                    BufferedImage maxImg = max == -1 ? img : ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                    player.sendMessage("Writing " + name);
-                    File minFile = new File(minImages, name);
-                    File maxFile = new File(maxImages, name);
-                    minFile.getParentFile().mkdirs();
-                    maxFile.getParentFile().mkdirs();
-                    ImageIO.write(minImg, "png", minFile);
-                    ImageIO.write(maxImg, "png", maxFile);
-                    images.add(name);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        MainUtil.iterateFiles(srcFolder, file -> {
+            switch (file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase()) {
+                case ".png":
+                case ".jpeg":
+                    break;
+                default:
+                    return;
+            }
+            try {
+                String name = file.getAbsolutePath().substring(sub);
+                if (name.startsWith(File.separator)) name = name.replaceFirst(java.util.regex.Pattern.quote(File.separator), "");
+                BufferedImage img = MainUtil.readImage(file);
+                BufferedImage minImg = ImageUtil.getScaledInstance(img, min, min, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+                BufferedImage maxImg = max == -1 ? img : ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
+                player.sendMessage("Writing " + name);
+                File minFile = new File(minImages, name);
+                File maxFile = new File(maxImages, name);
+                minFile.getParentFile().mkdirs();
+                maxFile.getParentFile().mkdirs();
+                ImageIO.write(minImg, "png", minFile);
+                ImageIO.write(maxImg, "png", maxFile);
+                images.add(name);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
         StringBuilder config = new StringBuilder();
@@ -252,9 +260,9 @@ public class UtilityCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.fill")
     @Logging(PLACEMENT)
-    public void fill(Player player, LocalSession session, EditSession editSession, Pattern pattern, double radius, @Optional("1") double depth, @Optional("down") @Direction Vector direction) throws WorldEditException {
+    public void fill(Player player, LocalSession session, EditSession editSession, Pattern pattern, double radius, @Optional("1") double depth, @Optional("down") @Direction BlockVector3 direction) throws WorldEditException {
         worldEdit.checkMaxRadius(radius);
-        Vector pos = session.getPlacementPosition(player);
+        BlockVector3 pos = session.getPlacementPosition(player);
         int affected;
         affected = editSession.fillDirection(pos, pattern, radius, (int) depth, direction);
         player.print(BBC.getPrefix() + affected + " block(s) have been created.");
@@ -271,10 +279,32 @@ public class UtilityCommands extends MethodCommands {
     @Logging(PLACEMENT)
     public void fillr(Player player, LocalSession session, EditSession editSession, Pattern pattern, double radius, @Optional("-1") double depth) throws WorldEditException {
         worldEdit.checkMaxRadius(radius);
-        Vector pos = session.getPlacementPosition(player);
+        BlockVector3 pos = session.getPlacementPosition(player);
         if (depth == -1) depth = Integer.MAX_VALUE;
         int affected = editSession.fillXZ(pos, pattern, radius, (int) depth, true);
         player.print(BBC.getPrefix() + affected + " block(s) have been created.");
+//=======
+//    public void fillr(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+//
+//        ParserContext context = new ParserContext();
+//        context.setActor(player);
+//        context.setWorld(player.getWorld());
+//        context.setSession(session);
+//        Pattern pattern = we.getPatternFactory().parseFromInput(args.getString(0), context);
+//
+//        double radius = Math.max(1, args.getDouble(1));
+//        we.checkMaxRadius(radius);
+//        int depth = args.argsLength() > 2 ? Math.max(1, args.getInteger(2)) : Integer.MAX_VALUE;
+//
+//        BlockVector3 pos = session.getPlacementPosition(player);
+//        int affected = 0;
+//        if (pattern instanceof BlockPattern) {
+//            affected = editSession.fillXZ(pos, ((BlockPattern) pattern).getBlock(), radius, depth, true);
+//        } else {
+//            affected = editSession.fillXZ(pos, pattern, radius, depth, true);
+//        }
+//        player.print(affected + " block(s) have been created.");
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Command(
@@ -385,9 +415,10 @@ public class UtilityCommands extends MethodCommands {
         if (from == null) {
             from = new ExistingBlockMask(editSession);
         }
-        Vector base = session.getPlacementPosition(player);
-        Vector min = base.subtract(size, size, size);
-        Vector max = base.add(size, size, size);
+
+        BlockVector3 base = session.getPlacementPosition(player);
+        BlockVector3 min = base.subtract((int)size, (int)size, (int)size);
+        BlockVector3 max = base.add((int)size, (int)size, (int)size);
         Region region = new CuboidRegion(player.getWorld(), min, max);
 
         int affected = editSession.replaceBlocks(region, from, to);
@@ -517,13 +548,13 @@ public class UtilityCommands extends MethodCommands {
         CreatureButcher flags = new CreatureButcher(actor);
         flags.fromCommand(args);
 
-        List<EntityVisitor> visitors = new ArrayList<EntityVisitor>();
+        List<EntityVisitor> visitors = new ArrayList<>();
         LocalSession session = null;
         EditSession editSession = null;
 
         if (player != null) {
             session = worldEdit.getSessionManager().get(player);
-            Vector center = session.getPlacementPosition(player);
+            BlockVector3 center = session.getPlacementPosition(player);
             editSession = session.createEditSession(player);
             List<? extends Entity> entities;
             if (radius >= 0) {
@@ -577,13 +608,13 @@ public class UtilityCommands extends MethodCommands {
         EntityRemover remover = new EntityRemover();
         remover.fromString(typeStr);
 
-        List<EntityVisitor> visitors = new ArrayList<EntityVisitor>();
+        List<EntityVisitor> visitors = new ArrayList<>();
         LocalSession session = null;
         EditSession editSession = null;
 
         if (player != null) {
             session = worldEdit.getSessionManager().get(player);
-            Vector center = session.getPlacementPosition(player);
+            BlockVector3 center = session.getPlacementPosition(player);
             editSession = session.createEditSession(player);
             List<? extends Entity> entities;
             if (radius >= 0) {
@@ -627,20 +658,12 @@ public class UtilityCommands extends MethodCommands {
             final Expression expression = Expression.compile(input);
 
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            Future<Double> futureResult = executor.submit(new Callable<Double>() {
-                @Override
-                public Double call() throws Exception {
-
-                    return expression.evaluate();
-                }
-            });
+            Future<Double> futureResult = executor.submit((Callable<Double>) expression::evaluate);
 
             Double result = Double.NaN;
             try {
                 result = futureResult.get(limit.MAX_EXPRESSION_MS, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             } catch (TimeoutException e) {
                 futureResult.cancel(true);
@@ -741,26 +764,25 @@ public class UtilityCommands extends MethodCommands {
 
         final int sortType = args.hasFlag('d') ? -1 : args.hasFlag('n') ? 1 : 0;
         // cleanup file list
-        Collections.sort(fileList, new Comparator<File>() {
-            @Override
-            public int compare(File f1, File f2) {
-                boolean dir1 = f1.isDirectory();
-                boolean dir2 = f2.isDirectory();
-                if (dir1 != dir2) return dir1 ? -1 : 1;
-                int res;
-                if (sortType == 0) { // use name by default
-                    int p = f1.getParent().compareTo(f2.getParent());
-                    if (p == 0) { // same parent, compare names
-                        res = f1.getName().compareTo(f2.getName());
-                    } else { // different parent, sort by that
-                        res = p;
-                    }
-                } else {
-                    res = Long.valueOf(f1.lastModified()).compareTo(f2.lastModified()); // use date if there is a flag
-                    if (sortType == 1) res = -res; // flip date for newest first instead of oldest first
+        fileList.sort((f1, f2) -> {
+            boolean dir1 = f1.isDirectory();
+            boolean dir2 = f2.isDirectory();
+            if (dir1 != dir2)
+                return dir1 ? -1 : 1;
+            int res;
+            if (sortType == 0) { // use name by default
+                int p = f1.getParent().compareTo(f2.getParent());
+                if (p == 0) { // same parent, compare names
+                    res = f1.getName().compareTo(f2.getName());
+                } else { // different parent, sort by that
+                    res = p;
                 }
-                return res;
+            } else {
+                res = Long.compare(f1.lastModified(), f2.lastModified()); // use date if there is a flag
+                if (sortType == 1)
+                    res = -res; // flip date for newest first instead of oldest first
             }
+            return res;
         });
 
         int offset = (page - 1) * perPage;
@@ -852,7 +874,7 @@ public class UtilityCommands extends MethodCommands {
                     UUID uuid = UUID.fromString(f.getName());
                     return false;
                 }
-            } catch (IllegalArgumentException exception) {}
+            } catch (IllegalArgumentException ignored) {}
             return true;
         };
 
@@ -867,7 +889,7 @@ public class UtilityCommands extends MethodCommands {
         }
 
         if (formatName != null) {
-            final ClipboardFormat cf = ClipboardFormat.findByAlias(formatName);
+            final ClipboardFormat cf = ClipboardFormats.findByAlias(formatName);
             forEachFile = new DelegateConsumer<File>(forEachFile) {
                 @Override
                 public void accept(File file) {
@@ -977,7 +999,7 @@ public class UtilityCommands extends MethodCommands {
             dir = root;
         }
 
-        ClipboardFormat format = ClipboardFormat.findByFile(file);
+        ClipboardFormat format = ClipboardFormats.findByFile(file);
         URI relative = dir.toURI().relativize(file.toURI());
         StringBuilder name = new StringBuilder();
         if (relative.isAbsolute()) {
@@ -990,269 +1012,6 @@ public class UtilityCommands extends MethodCommands {
 
     public static void help(CommandContext args, WorldEdit we, Actor actor) {
         help(args, we, actor, "/", null);
-    }
-
-    @Command(
-            aliases = {"/gui"},
-            desc = "Open the GUI"
-    )
-    @Logging(PLACEMENT)
-    public void gui(Actor actor, FawePlayer fp, LocalSession session, CommandContext args) throws WorldEditException, CommandException {
-        FormBuilder gui = Fawe.imp().getFormBuilder();
-        if (gui == null) throw new CommandException("Only supported on Pocket Edition");
-
-        Dispatcher callable = worldEdit.getPlatformManager().getCommandManager().getDispatcher();
-        CommandLocals locals = args.getLocals();
-
-        String prefix = Commands.getAlias(UtilityCommands.class, "/gui");
-
-        // TODO sort commands by most used
-
-        new HelpBuilder(callable, args, prefix, Integer.MAX_VALUE) {
-            @Override
-            public void displayFailure(String message) {
-                gui.setTitle("Error");
-                gui.addLabel(message);
-            }
-
-            @Override
-            public void displayUsage(CommandCallable callable, String commandString) {
-                gui.setTitle(commandString);
-
-                if (callable instanceof Dispatcher) {
-                    Dispatcher dispathcer = (Dispatcher) callable;
-                    dispathcer.getCommands();
-                    gui.addLabel("Dispatcher not implemented for " + commandString);
-                } else {
-                    Description cmdDesc = callable.getDescription();
-
-
-
-                    List<Parameter> params = cmdDesc.getParameters();
-                    String[] suggested = new String[params.size()];
-                    if (cmdDesc.getUsage() != null) {
-                        String[] usageArgs = cmdDesc.getUsage().split(" ", params.size());
-                        for (int i = 0; i < usageArgs.length; i++) {
-                            String arg = usageArgs[i];
-                            String[] splitSug = arg.split("=");
-                            if (splitSug.length == 2) {
-                                suggested[i] = splitSug[1];
-                            }
-                        }
-                    }
-                    for (int i = 0 ; i < params.size(); i++) {
-                        String[] def = params.get(i).getDefaultValue();
-                        if (def != null && def.length != 0) {
-                            suggested[i] = def[0];
-                        }
-                    }
-
-                    String help = cmdDesc.getHelp();
-                    if (help == null || help.isEmpty()) help = cmdDesc.getDescription();
-
-                    gui.addLabel(BBC.color("&2" + help + "\n"));
-
-                    List<String> flags = new ArrayList<>();
-
-                    for (int i = 0; i < params.size(); i++) {
-                        Parameter param = params.get(i);
-                        String name = param.getName();
-                        boolean optional = param.isValueFlag() || param.isOptional();
-                        String[] def = param.getDefaultValue();
-
-                        if (param.getFlag() != null) {
-                            flags.add("-" + param.getFlag() + " ");
-                        } else {
-                            flags.add("");
-                        }
-
-                        if (param instanceof ParameterData) {
-                            ParameterData pd = (ParameterData) param;
-                            Type type = pd.getType();
-                            String suggestion = suggested[i];
-
-                            String color = optional ? "3" : "c";
-                            StringBuilder label = new StringBuilder(BBC.color("&" + color + name + ": "));
-//                            if (suggested[i] != null) label.append(" e.g. " + suggestion);
-                            Range range = MainUtil.getOf(pd.getModifiers(), Range.class);
-                            double min = 0;
-                            double max = 100;
-                            if (range != null) {
-                                min = range.min();
-                                max = range.max();
-                            } else {
-                                SuggestedRange suggestedRange = MainUtil.getOf(pd.getModifiers(), SuggestedRange.class);
-                                if (suggestedRange != null) {
-                                    min = suggestedRange.min();
-                                    max = suggestedRange.max();
-                                } else  if (name.equalsIgnoreCase("radius") || name.equalsIgnoreCase("size")) {
-                                    max = WorldEdit.getInstance().getConfiguration().maxBrushRadius;
-                                }
-                            }
-                            int step = 1;
-                            Step stepSizeAnn = MainUtil.getOf(pd.getModifiers(), Step.class);
-                            if (stepSizeAnn != null) {
-                                double stepVal = stepSizeAnn.value();
-                                step = Math.max(1, (int) stepVal);
-                            }
-                            /*
-                            BaseBiome
-                            Vector
-                            Vector2D
-                             */
-
-                            switch (type.getTypeName()) {
-                                case "double":
-                                case "java.lang.Double": {
-                                    double value = suggestion != null ? Double.parseDouble(suggestion) : min;
-                                    gui.addSlider("\n" + label.toString(), min, max, 1, value);
-                                    break;
-                                }
-                                case "int":
-                                case "java.lang.Integer": {
-                                    int value = suggestion != null ? Integer.parseInt(suggestion) : (int) min;
-                                    gui.addSlider("\n" + label.toString(), min, max, 1, value);
-                                    break;
-                                }
-                                case "boolean":
-                                case "java.lang.Boolean": {
-                                    boolean value = suggestion != null ? Boolean.parseBoolean(suggestion) : false;
-                                    gui.addToggle(label.toString(), value);
-                                    break;
-                                }
-                                case "com.sk89q.worldedit.patterns.Pattern": {
-                                    gui.addInput("\n" + label.toString(), "stone", "wood");
-                                    break;
-                                }
-                                case "com.sk89q.worldedit.blocks.BaseBlock": {
-                                    gui.addInput("\n" + label.toString(), "stone", "wood");
-                                    break;
-                                }
-                                case "com.sk89q.worldedit.function.mask.Mask": {
-                                    gui.addInput("\n" + label.toString(), "stone", "wood");
-                                    break;
-                                }
-                                default:
-                                case "java.lang.String": {
-                                    // TODO
-                                    // clipboard
-                                    // schematic
-                                    // image
-                                    if (suggestion == null) suggestion = "";
-                                    gui.addInput("\n" + label.toString(), suggestion, suggestion);
-                                    break;
-                                }
-                            }
-                        } else {
-                            throw new UnsupportedOperationException("Unsupported callable: " + callable.getClass() + " | " + param.getClass());
-                        }
-                    }
-
-                    gui.setResponder(new Consumer<Map<Integer, Object>>() {
-                        @Override
-                        public void accept(Map<Integer, Object> response) {
-                            int index = 0;
-                            StringBuilder command = new StringBuilder(commandString);
-                            for (Map.Entry<Integer, Object> arg : response.entrySet()) {
-                                String argValue = arg.getValue().toString();
-                                String flag = flags.get(index);
-                                if (!flag.isEmpty()) {
-                                    if (argValue.equalsIgnoreCase("false")) continue;
-                                    if (argValue.equalsIgnoreCase("true")) argValue = "";
-                                }
-                                command.append(" " + flag + argValue);
-                                index++;
-                            }
-                            CommandEvent event = new CommandEvent(actor, command.toString());
-                            CommandManager.getInstance().handleCommand(event);
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void displayCategories(Map<String, Map<CommandMapping, String>> categories) {
-                gui.setTitle(BBC.HELP_HEADER_CATEGORIES.s());
-                List<String> categoryList = new ArrayList<>();
-                for (Map.Entry<String, Map<CommandMapping, String>> categoryEntry : categories.entrySet()) {
-                    String category = categoryEntry.getKey();
-                    categoryList.add(category);
-                    Map<CommandMapping, String> commandMap = categoryEntry.getValue();
-                    int size = commandMap.size();
-
-                    String plural = size == 1 ? "command" : "commands";
-                    gui.addButton(BBC.HELP_ITEM_ALLOWED.f(category, "(" + size + " " + plural + ")"), null);
-                }
-
-                gui.setResponder(new Consumer<Map<Integer, Object>>() {
-                    @Override
-                    public void accept(Map<Integer, Object> response) {
-                        if (response.isEmpty()) {
-                            // ??
-                            throw new IllegalArgumentException("No response for categories");
-                        } else {
-                            Map.Entry<Integer, Object> clicked = response.entrySet().iterator().next();
-                            String category = categoryList.get(clicked.getKey());
-                            String arguments = prefix + " " + category;
-                            CommandEvent event = new CommandEvent(actor, arguments);
-                            CommandManager.getInstance().handleCommand(event);
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void displayCommands(Map<CommandMapping, String> commandMap, String visited, int page, int pageTotal, int effectiveLength) {
-                gui.setTitle(BBC.HELP_HEADER_SUBCOMMANDS.s());
-
-                String baseCommand = prefix;
-                if (effectiveLength > 0) baseCommand += " " + args.getString(0, effectiveLength - 1);
-
-                CommandLocals locals = args.getLocals();
-                if (!visited.isEmpty()) {
-                    visited = visited + " ";
-                }
-
-                List<String> commands = new ArrayList<>();
-
-                for (Map.Entry<CommandMapping, String> cmdEntry : commandMap.entrySet()) {
-                    CommandMapping mapping = cmdEntry.getKey();
-                    String subPrefix = cmdEntry.getValue();
-
-                    StringBuilder helpCmd = new StringBuilder();
-                    helpCmd.append(prefix);
-                    helpCmd.append(" ");
-                    helpCmd.append(subPrefix);
-                    CommandCallable c = mapping.getCallable();
-                    helpCmd.append(visited);
-                    helpCmd.append(mapping.getPrimaryAlias());
-                    String s2 = mapping.getDescription().getDescription();
-                    if (c.testPermission(locals)) {
-//                        gui.addLabel(s2);
-                        gui.addButton(helpCmd.toString(), null);
-                        commands.add(helpCmd.toString());
-                    }
-                }
-
-                gui.setResponder(new Consumer<Map<Integer, Object>>() {
-                    @Override
-                    public void accept(Map<Integer, Object> response) {
-                        if (response.isEmpty()) {
-                            // ??
-                            throw new IllegalArgumentException("No response for command list: " + prefix);
-                        } else {
-                            Map.Entry<Integer, Object> clicked = response.entrySet().iterator().next();
-                            int index = clicked.getKey();
-                            String cmd = commands.get(index);
-                            CommandEvent event = new CommandEvent(actor, cmd);
-                            CommandManager.getInstance().handleCommand(event);
-                        }
-                    }
-                });
-            }
-        }.run();
-
-        gui.display(fp);
     }
 
     public static void help(CommandContext args, WorldEdit we, Actor actor, String prefix, CommandCallable callable) {

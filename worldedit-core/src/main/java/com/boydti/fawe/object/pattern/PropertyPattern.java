@@ -4,14 +4,15 @@ import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
+
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -61,7 +62,7 @@ public class PropertyPattern extends AbstractExtentPattern {
         }
     }
 
-    private void add(BlockTypes type, PropertyKey key, Operator operator, MutableCharSequence value, boolean wrap) {
+    private void add(BlockType type, PropertyKey key, Operator operator, MutableCharSequence value, boolean wrap) {
         if (!type.hasProperty(key)) return;
         AbstractProperty property = (AbstractProperty) type.getProperty(key);
         BlockState defaultState = type.getDefaultState();
@@ -128,14 +129,14 @@ public class PropertyPattern extends AbstractExtentPattern {
             charSequence.setString(input);
             charSequence.setSubstring(0, propStart);
 
-            BlockTypes type = null;
-            List<BlockTypes> blockTypeList = null;
+            BlockType type = null;
+            List<BlockType> blockTypeList = null;
             if (StringMan.isAlphanumericUnd(charSequence)) {
                 type = BlockTypes.get(charSequence);
             } else {
                 String regex = charSequence.toString();
                 blockTypeList = new ArrayList<>();
-                for (BlockTypes myType : BlockTypes.values) {
+                for (BlockType myType : BlockTypes.values) {
                     if (myType.getId().matches(regex)) {
                         blockTypeList.add(myType);
                     }
@@ -163,7 +164,7 @@ public class PropertyPattern extends AbstractExtentPattern {
                         char firstChar = input.charAt(last + 1);
                         if (type != null) add(type, key, operator, charSequence, wrap);
                         else {
-                            for (BlockTypes myType : blockTypeList) {
+                            for (BlockType myType : blockTypeList) {
                                 add(myType, key, operator, charSequence, wrap);
                             }
                         }
@@ -191,25 +192,25 @@ public class PropertyPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
-        BlockState block = getExtent().getBlock(position);
+    public BaseBlock apply(BlockVector3 position) {
+        BaseBlock block = getExtent().getFullBlock(position);
         return apply(block, block);
     }
 
-    public BlockState apply(BlockState block, BlockState orDefault) {
+    public BaseBlock apply(BaseBlock block, BaseBlock orDefault) {
         int ordinal = block.getOrdinal();
         int newOrdinal = transformed[ordinal];
         if (newOrdinal != ordinal) {
             CompoundTag nbt = block.getNbtData();
             BlockState newState = BlockState.getFromOrdinal(newOrdinal);
-            return nbt != null ? new BaseBlock(newState, nbt) : newState;
+            return nbt != null ? new BaseBlock(newState, nbt) : newState.toBaseBlock();
         }
         return orDefault;
     }
 
     @Override
-    public boolean apply(Extent extent, Vector set, Vector get) throws WorldEditException {
-        BlockState block = getExtent().getBlock(get);
+    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
+        BaseBlock block = getExtent().getFullBlock(get);
         block = apply(block, null);
         if (block != null) {
             return extent.setBlock(set, block);

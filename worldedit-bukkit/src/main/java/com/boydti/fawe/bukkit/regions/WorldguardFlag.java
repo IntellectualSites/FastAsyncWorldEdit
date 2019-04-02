@@ -5,7 +5,7 @@ import com.boydti.fawe.bukkit.filter.WorldGuardFilter;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.RegionFilter;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -65,45 +65,45 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
         }
 
         @Override
-        public Vector getMinimumPoint() {
-            Vector point = null;
+        public BlockVector3 getMinimumPoint() {
+        	BlockVector3 point = null;
             for (Map.Entry<String, ProtectedRegion> entry : manager.getRegions().entrySet()) {
-                Vector p = entry.getValue().getMinimumPoint();
+            	BlockVector3 p = entry.getValue().getMinimumPoint();
                 if (point == null) {
                     point = p;
                     continue;
                 }
-                point = Vector.getMinimum(point, p);
+                point = point.getMinimum(p);
             }
             return point;
         }
 
         @Override
-        public Vector getMaximumPoint() {
-            Vector point = null;
+        public BlockVector3 getMaximumPoint() {
+        	BlockVector3 point = null;
             for (Map.Entry<String, ProtectedRegion> entry : manager.getRegions().entrySet()) {
-                Vector p = entry.getValue().getMaximumPoint();
+            	BlockVector3 p = entry.getValue().getMaximumPoint();
                 if (point == null) {
                     point = p;
                     continue;
                 }
-                point = Vector.getMaximum(point, p);
+                point = point.getMaximum(p);
             }
             return point;
         }
 
         @Override
-        public void expand(Vector... changes) {
+        public void expand(BlockVector3... changes) {
             throw new UnsupportedOperationException("Region is immutable");
         }
 
         @Override
-        public void contract(Vector... changes) {
+        public void contract(BlockVector3... changes) {
             throw new UnsupportedOperationException("Region is immutable");
         }
 
         @Override
-        public boolean contains(Vector position) {
+        public boolean contains(BlockVector3 position) {
             // Make sure that all these flags are not denied. Denies override allows. WorldGuardExtraFlags can add Flags.WORLDEDIT
             return  manager.getApplicableRegions(position).testState(localplayer, Flags.BUILD, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK);
         }

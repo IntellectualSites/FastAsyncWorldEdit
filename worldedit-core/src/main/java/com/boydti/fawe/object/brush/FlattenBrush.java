@@ -4,11 +4,12 @@ import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.object.brush.heightmap.ScalableHeightMap;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import java.io.InputStream;
 
 public class FlattenBrush extends HeightBrush {
@@ -18,7 +19,7 @@ public class FlattenBrush extends HeightBrush {
     }
 
     @Override
-    public void build(EditSession editSession, Vector position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
         int size = (int) sizeDouble;
         Mask mask = editSession.getMask();
         if (mask == Masks.alwaysTrue() || mask == Masks.alwaysTrue2D()) {

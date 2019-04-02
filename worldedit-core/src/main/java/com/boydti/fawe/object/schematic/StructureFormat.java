@@ -13,9 +13,7 @@ import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -23,6 +21,8 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -77,14 +77,14 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         int length = size.getInt(2);
 
         // Init clipboard
-        Vector origin = new Vector(0, 0, 0);
-        CuboidRegion region = new CuboidRegion(origin, origin.add(width, height, length).subtract(Vector.ONE));
+        BlockVector3 origin = BlockVector3.at(0, 0, 0);
+        CuboidRegion region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region, clipboardId);
         // Blocks
         ListTag blocks = (ListTag) tags.get("blocks");
         if (blocks != null) {
             // Palette
-            List<CompoundTag> palette = (List<CompoundTag>) (List<?>) tags.get("palette").getValue();
+            List<CompoundTag> palette = (List<CompoundTag>) tags.get("palette").getValue();
             BlockState[] combinedArray = new BlockState[palette.size()];
             for (int i = 0; i < palette.size(); i++) {
                 CompoundTag compound = palette.get(i);
@@ -108,7 +108,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
                 combinedArray[i] = state;
             }
             // Populate blocks
-            List<CompoundTag> blocksList = (List<CompoundTag>) (List<?>) tags.get("blocks").getValue();
+            List<CompoundTag> blocksList = (List<CompoundTag>) tags.get("blocks").getValue();
             try {
                 for (CompoundTag compound : blocksList) {
                     Map<String, Tag> blockMap = compound.getValue();
@@ -168,33 +168,28 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         }
         Map<String, Object> structure = FaweCache.asMap("version", 1, "author", owner);
         // ignored: version / owner
-        MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
+        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         Int2ObjectArrayMap<Integer> indexes = new Int2ObjectArrayMap<>();
         // Size
         structure.put("size", Arrays.asList(width, height, length));
         // Palette
         {
             ArrayList<HashMap<String, Object>> palette = new ArrayList<>();
-            for (Vector point : region) {
+            for (BlockVector3 point : region) {
                 BlockStateHolder block = clipboard.getBlock(point);
                 int combined = block.getInternalId();
-                BlockTypes type = block.getBlockType();
+                BlockType type = block.getBlockType();
 
-                switch (type) {
-                    case STRUCTURE_VOID:
-                        continue;
-                    default:
-                }
-                if (indexes.containsKey(combined)) {
+                if (type == BlockTypes.STRUCTURE_VOID || indexes.containsKey(combined)) {
                     continue;
                 }
 
-                indexes.put((int) combined, (Integer) palette.size());
+                indexes.put(combined, (Integer) palette.size());
                 HashMap<String, Object> paletteEntry = new HashMap<>();
                 paletteEntry.put("Name", type.getId());
                 if (block.getInternalId() != type.getInternalId()) {
                     Map<String, Object> properties = null;
-                    for (AbstractProperty property : (List<AbstractProperty>) type.getProperties()) {
+                    for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
                         int propIndex = property.getIndex(block.getInternalId());
                         if (propIndex != 0) {
                             if (properties == null) properties = new HashMap<>();
@@ -215,21 +210,20 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         // Blocks
         {
             ArrayList<Map<String, Object>> blocks = new ArrayList<>();
-            Vector min = region.getMinimumPoint();
-            for (Vector point : region) {
-                BlockStateHolder block = clipboard.getBlock(point);
-                switch (block.getBlockType()) {
-                    case STRUCTURE_VOID:
-                        continue;
-                    default:
-                        int combined = block.getInternalId();
-                        int index = indexes.get(combined);
-                        List<Integer> pos = Arrays.asList((int) (point.getX() - min.getX()), (int) (point.getY() - min.getY()), (int) (point.getZ() - min.getZ()));
-                        if (!block.hasNbtData()) {
-                            blocks.add(FaweCache.asMap("state", index, "pos", pos));
-                        } else {
-                            blocks.add(FaweCache.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
-                        }
+            BlockVector3 min = region.getMinimumPoint();
+            for (BlockVector3 point : region) {
+                BaseBlock block = clipboard.getFullBlock(point);
+                if (block.getBlockType() != BlockTypes.STRUCTURE_VOID) {
+                    int combined = block.getInternalId();
+                    int index = indexes.get(combined);
+                    List<Integer> pos = Arrays.asList(point.getX() - min.getX(),
+                        point.getY() - min.getY(), point.getZ() - min.getZ());
+                    if (!block.hasNbtData()) {
+                        blocks.add(FaweCache.asMap("state", index, "pos", pos));
+                    } else {
+                        blocks.add(
+                            FaweCache.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
+                    }
                 }
             }
             if (!blocks.isEmpty()) {
@@ -272,8 +266,8 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
         }
     }
 
-    private Tag writeVector(Vector vector, String name) {
-        List<DoubleTag> list = new ArrayList<DoubleTag>();
+    private Tag writeVector(BlockVector3 vector, String name) {
+        List<DoubleTag> list = new ArrayList<>();
         list.add(new DoubleTag(vector.getX()));
         list.add(new DoubleTag(vector.getY()));
         list.add(new DoubleTag(vector.getZ()));
@@ -281,7 +275,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
     }
 
     private Tag writeRotation(Location location, String name) {
-        List<FloatTag> list = new ArrayList<FloatTag>();
+        List<FloatTag> list = new ArrayList<>();
         list.add(new FloatTag(location.getYaw()));
         list.add(new FloatTag(location.getPitch()));
         return new ListTag(FloatTag.class, list);

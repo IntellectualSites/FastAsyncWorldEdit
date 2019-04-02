@@ -45,7 +45,7 @@ public @interface BindingMatch {
      * @return the type, or {@link Class} if not set
      */
     Class<?>[] type() default Class.class;
-    
+
     /**
      * The binding behavior.
      * 
@@ -67,5 +67,10 @@ public @interface BindingMatch {
      * @return true to provide modifiers
      */
     boolean provideModifiers() default false;
+
+    /**
+     * If the type should be passed to the method
+     */
+    boolean provideType() default false;
 
 }

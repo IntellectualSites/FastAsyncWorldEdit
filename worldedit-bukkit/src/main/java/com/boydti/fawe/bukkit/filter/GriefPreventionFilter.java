@@ -1,9 +1,10 @@
 package com.boydti.fawe.bukkit.filter;
 
+import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
-import com.intellectualcrafters.plot.object.RunnableVal;
-import com.intellectualcrafters.plot.util.TaskManager;
-import com.sk89q.worldedit.BlockVector2D;
+import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.math.BlockVector2;
+
 import java.util.ArrayDeque;
 import java.util.Collection;
 import me.ryanhamshire.GriefPrevention.Claim;
@@ -34,8 +35,8 @@ public class GriefPreventionFilter extends CuboidRegionFilter {
             org.bukkit.Location bot = claim.getGreaterBoundaryCorner();
             if (world.equals(bot.getWorld())) {
                 org.bukkit.Location top = claim.getGreaterBoundaryCorner();
-                BlockVector2D pos1 = new BlockVector2D(bot.getBlockX(), bot.getBlockZ());
-                BlockVector2D pos2 = new BlockVector2D(top.getBlockX(), top.getBlockZ());
+                BlockVector2 pos1 = BlockVector2.at(bot.getBlockX(), bot.getBlockZ());
+                BlockVector2 pos2 = BlockVector2.at(top.getBlockX(), top.getBlockZ());
                 add(pos1, pos2);
             }
         }

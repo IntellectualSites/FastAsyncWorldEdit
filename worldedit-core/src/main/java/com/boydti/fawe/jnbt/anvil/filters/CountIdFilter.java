@@ -4,7 +4,6 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
 import com.boydti.fawe.object.number.MutableLong;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;

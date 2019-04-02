@@ -19,24 +19,25 @@
 
 package com.sk89q.worldedit.extent.reorder;
 
-import com.google.common.collect.Iterators;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.Blocks;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.operation.BlockMapEntryPlacer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
 import com.sk89q.worldedit.function.operation.RunContext;
+import com.sk89q.worldedit.function.operation.SetLocatedBlocks;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.util.collection.TupleArrayList;
+import com.sk89q.worldedit.util.LocatedBlock;
+import com.sk89q.worldedit.util.collection.LocatedBlockList;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,10 +51,20 @@ import java.util.Set;
  */
 public class MultiStageReorder extends AbstractDelegateExtent implements ReorderingExtent {
 
-    private TupleArrayList<BlockVector, BlockStateHolder> stage1 = new TupleArrayList<>();
-    private TupleArrayList<BlockVector, BlockStateHolder> stage2 = new TupleArrayList<>();
-    private TupleArrayList<BlockVector, BlockStateHolder> stage3 = new TupleArrayList<>();
+    private static final int STAGE_COUNT = 4;
+
+    private List<LocatedBlockList> stages = new ArrayList<>();
+
     private boolean enabled;
+
+    /**
+     * Create a new instance when the re-ordering is enabled.
+     *
+     * @param extent the extent
+     */
+    public MultiStageReorder(Extent extent) {
+        this(extent, true);
+    }
 
     /**
      * Create a new instance.
@@ -64,15 +75,10 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
     public MultiStageReorder(Extent extent, boolean enabled) {
         super(extent);
         this.enabled = enabled;
-    }
 
-    /**
-     * Create a new instance when the re-ordering is enabled.
-     *
-     * @param extent the extent
-     */
-    public MultiStageReorder(Extent extent) {
-        this(extent, true);
+        for (int i = 0; i < STAGE_COUNT; ++i) {
+            stages.add(new LocatedBlockList());
+        }
     }
 
     /**
@@ -93,62 +99,84 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
         this.enabled = enabled;
     }
 
-    @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
-        BlockStateHolder existing = getBlock(location);
+    public boolean commitRequired() {
+        return stages.stream().anyMatch(stage -> stage.size() > 0);
+    }
 
+    /**
+     * Gets the stage priority of the block.
+     *
+     * @param block The block
+     * @return The priority
+     */
+    public <B extends BlockStateHolder<B>> int getPlacementPriority(B block) {
+        if (Blocks.shouldPlaceLate(block.getBlockType())) {
+            return 1;
+        } else if (Blocks.shouldPlaceLast(block.getBlockType())) {
+            // Place torches, etc. last
+            return 2;
+        } else if (Blocks.shouldPlaceFinal(block.getBlockType())) {
+            // Place signs, reed, etc even later
+            return 3;
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (!enabled) {
             return super.setBlock(location, block);
         }
 
-        if (Blocks.shouldPlaceLast(block.getBlockType())) {
-            // Place torches, etc. last
-            stage2.put(location.toBlockVector(), block);
-            return !existing.equalsFuzzy(block);
-        } else if (Blocks.shouldPlaceFinal(block.getBlockType())) {
-            // Place signs, reed, etc even later
-            stage3.put(location.toBlockVector(), block);
-            return !existing.equalsFuzzy(block);
-        } else if (Blocks.shouldPlaceLast(existing.getBlockType())) {
+        BlockState existing = getBlock(location);
+        int priority = getPlacementPriority(block);
+        int srcPriority = getPlacementPriority(existing);
+
+        if (srcPriority == 1 || srcPriority == 2) {
             // Destroy torches, etc. first
             super.setBlock(location, BlockTypes.AIR.getDefaultState());
             return super.setBlock(location, block);
-        } else {
-            stage1.put(location.toBlockVector(), block);
-            return !existing.equalsFuzzy(block);
         }
+
+        stages.get(priority).add(location, block);
+        return !existing.equalsFuzzy(block);
     }
 
     @Override
     public Operation commitBefore() {
-        return new OperationQueue(
-                new BlockMapEntryPlacer(
-                        getExtent(),
-                        Iterators.concat(stage1.iterator(), stage2.iterator())),
-                new Stage3Committer());
+        List<Operation> operations = new ArrayList<>();
+        for (int i = 0; i < stages.size() - 1; ++i) {
+            operations.add(new SetLocatedBlocks(getExtent(), stages.get(i)));
+        }
+
+        operations.add(new FinalStageCommitter());
+        return new OperationQueue(operations);
     }
 
-    private class Stage3Committer implements Operation {
+    private class FinalStageCommitter implements Operation {
+        private Extent extent = getExtent();
+
+        private final Set<BlockVector3> blocks = new HashSet<>();
+        private final Map<BlockVector3, BlockStateHolder> blockTypes = new HashMap<>();
+
+        public FinalStageCommitter() {
+            for (LocatedBlock entry : stages.get(stages.size() - 1)) {
+                final BlockVector3 pt = entry.getLocation();
+                blocks.add(pt);
+                blockTypes.put(pt, entry.getBlock());
+            }
+        }
 
         @Override
         public Operation resume(RunContext run) throws WorldEditException {
-            Extent extent = getExtent();
-
-            final Set<BlockVector> blocks = new HashSet<>();
-            final Map<BlockVector, BlockStateHolder> blockTypes = new HashMap<>();
-            for (Map.Entry<BlockVector, BlockStateHolder> entry : stage3) {
-                final BlockVector pt = entry.getKey();
-                blocks.add(pt);
-                blockTypes.put(pt, entry.getValue());
-            }
-
             while (!blocks.isEmpty()) {
-                BlockVector current = blocks.iterator().next();
+                BlockVector3 current = blocks.iterator().next();
                 if (!blocks.contains(current)) {
                     continue;
                 }
 
-                final Deque<BlockVector> walked = new LinkedList<>();
+                final Deque<BlockVector3> walked = new LinkedList<>();
 
                 while (true) {
                     walked.addFirst(current);
@@ -161,13 +189,13 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
                         Property<Object> halfProperty = blockStateHolder.getBlockType().getProperty("half");
                         if (blockStateHolder.getState(halfProperty).equals("lower")) {
                             // Deal with lower door halves being attached to the floor AND the upper half
-                            BlockVector upperBlock = current.add(0, 1, 0).toBlockVector();
+                            BlockVector3 upperBlock = current.add(0, 1, 0);
                             if (blocks.contains(upperBlock) && !walked.contains(upperBlock)) {
                                 walked.addFirst(upperBlock);
                             }
                         }
                     } else if (BlockCategories.RAILS.contains(blockStateHolder.getBlockType())) {
-                        BlockVector lowerBlock = current.add(0, -1, 0).toBlockVector();
+                        BlockVector3 lowerBlock = current.add(0, -1, 0);
                         if (blocks.contains(lowerBlock) && !walked.contains(lowerBlock)) {
                             walked.addFirst(lowerBlock);
                         }
@@ -191,17 +219,20 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
                     }
                 }
 
-                for (BlockVector pt : walked) {
+                for (BlockVector3 pt : walked) {
                     extent.setBlock(pt, blockTypes.get(pt));
                     blocks.remove(pt);
                 }
             }
 
-            stage1.clear();
-            stage2.clear();
-            stage3.clear();
+            if (blocks.isEmpty()) {
+                for (LocatedBlockList stage : stages) {
+                    stage.clear();
+                }
+                return null;
+            }
 
-            return null;
+            return this;
         }
 
         @Override

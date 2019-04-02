@@ -19,12 +19,11 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.extent.Extent;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
  * Returns the blocks from {@link Extent}, repeating when out of bounds.
@@ -32,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RepeatingExtentPattern extends AbstractPattern {
 
     private Extent extent;
-    private Vector offset;
+    private BlockVector3 offset;
 
     /**
      * Create a new instance.
@@ -40,7 +39,7 @@ public class RepeatingExtentPattern extends AbstractPattern {
      * @param extent the extent
      * @param offset the offset
      */
-    public RepeatingExtentPattern(Extent extent, Vector offset) {
+    public RepeatingExtentPattern(Extent extent, BlockVector3 offset) {
         setExtent(extent);
         setOffset(offset);
     }
@@ -69,7 +68,7 @@ public class RepeatingExtentPattern extends AbstractPattern {
      *
      * @return the offset
      */
-    public Vector getOffset() {
+    public BlockVector3 getOffset() {
         return offset;
     }
 
@@ -78,18 +77,18 @@ public class RepeatingExtentPattern extends AbstractPattern {
      *
      * @param offset the offset
      */
-    public void setOffset(Vector offset) {
+    public void setOffset(BlockVector3 offset) {
         checkNotNull(offset);
         this.offset = offset;
     }
 
     @Override
-    public BlockStateHolder apply(Vector position) {
-        Vector base = position.add(offset);
-        Vector size = extent.getMaximumPoint().subtract(extent.getMinimumPoint()).add(1, 1, 1);
+    public BaseBlock apply(BlockVector3 position) {
+        BlockVector3 base = position.add(offset);
+        BlockVector3 size = extent.getMaximumPoint().subtract(extent.getMinimumPoint()).add(1, 1, 1);
         int x = base.getBlockX() % size.getBlockX();
         int y = base.getBlockY() % size.getBlockY();
         int z = base.getBlockZ() % size.getBlockZ();
-        return extent.getBlock(new Vector(x, y, z));
+        return extent.getFullBlock(BlockVector3.at(x, y, z));
     }
 }

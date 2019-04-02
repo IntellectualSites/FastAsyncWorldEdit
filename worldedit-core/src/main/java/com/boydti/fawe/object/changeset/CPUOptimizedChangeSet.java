@@ -107,4 +107,16 @@ public class CPUOptimizedChangeSet extends FaweChangeSet {
     public int size() {
         return changes.size() * 65536; // num chunks * 65536 (guess of 65536 changes per chunk)
     }
+
+	@Override
+	public boolean isRecordingChanges() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setRecordChanges(boolean recordChanges) {
+		// TODO Auto-generated method stub
+		
+	}
 }

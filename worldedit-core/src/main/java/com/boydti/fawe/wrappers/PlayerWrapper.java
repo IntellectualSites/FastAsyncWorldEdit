@@ -6,17 +6,19 @@ import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.SessionKey;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
@@ -50,7 +52,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public BlockState getBlockInHand(HandSide handSide) throws WorldEditException {
+    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
         return parent.getBlockInHand(handSide);
     }
 
@@ -90,7 +92,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public void setPosition(Vector pos, float pitch, float yaw) {
+    public void setPosition(Vector3 pos, float pitch, float yaw) {
         parent.setPosition(pos, pitch, yaw);
     }
 
@@ -233,13 +235,13 @@ public class PlayerWrapper extends AbstractPlayerActor {
         Extent world = getLocation().getExtent();
 
         // No free space above
-        if (!world.getBlock(new Vector(x, y, z)).getBlockType().getMaterial().isAir()) {
+        if (!world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isAir()) {
             return false;
         }
 
         while (y <= world.getMaximumPoint().getY()) {
             // Found a ceiling!
-            if (world.getBlock(new Vector(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
                 floatAt(x, platformY + 1, z, alwaysGlass);
                 return true;
@@ -267,7 +269,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
         final Extent world = getLocation().getExtent();
 
         while (y <= world.getMaximumPoint().getY() + 2) {
-            if (world.getBlock(new Vector(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 break; // Hit something
             } else if (y > maxY + 1) {
                 break;
@@ -287,7 +289,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
         RuntimeException caught = null;
         try {
             EditSession edit = new EditSessionBuilder(parent.getWorld()).player(FawePlayer.wrap(this)).build();
-            edit.setBlock(new Vector(x, y - 1, z), BlockTypes.GLASS);
+            edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
             edit.flushQueue();
             LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);
             if (session != null) {
@@ -299,7 +301,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
-                setPosition(new Vector(x + 0.5, y, z + 0.5));
+                setPosition(Vector3.at(x + 0.5, y, z + 0.5));
             }
         });
         if (caught != null) {
@@ -341,7 +343,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public PlayerDirection getCardinalDirection() {
+    public Direction getCardinalDirection() {
         return parent.getCardinalDirection();
     }
 
@@ -359,7 +361,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
                 boolean inFree = false;
 
                 while ((block = hitBlox.getNextBlock()) != null) {
-                    boolean free = !world.getBlock(block.toVector()).getBlockType().getMaterial().isMovementBlocker();
+                    boolean free = !world.getBlock(BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ())).getBlockType().getMaterial().isMovementBlocker();
 
                     if (firstBlock) {
                         firstBlock = false;
@@ -418,4 +420,9 @@ public class PlayerWrapper extends AbstractPlayerActor {
     public File openFileSaveDialog(String[] extensions) {
         return parent.openFileSaveDialog(extensions);
     }
+
+	@Override
+	public boolean setLocation(Location location) {
+		return parent.setLocation(location);
+	}
 }

@@ -1,11 +1,11 @@
 package com.boydti.fawe.object.clipboard;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -144,7 +144,7 @@ public class MultiClipboardHolder extends URIClipboardHolder {
             case 1: return available[0];
         }
 
-        int index = PseudoRandom.random.nextInt(available.length);
+        int index = ThreadLocalRandom.current().nextInt(available.length);
         return available[index];
     }
 

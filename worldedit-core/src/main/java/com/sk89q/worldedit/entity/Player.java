@@ -19,18 +19,21 @@
 
 package com.sk89q.worldedit.entity;
 
-import com.sk89q.worldedit.PlayerDirection;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
+
+import javax.annotation.Nullable;
 
 /**
  * Represents a player
@@ -57,7 +60,7 @@ public interface Player extends Entity, Actor {
      *
      * @return the direction
      */
-    PlayerDirection getCardinalDirection(int yawOffset);
+    Direction getCardinalDirection(int yawOffset);
 
     /**
      * Get the item that the player is holding.
@@ -71,7 +74,7 @@ public interface Player extends Entity, Actor {
      *
      * @return the item id of the item the player is holding
      */
-    BlockState getBlockInHand(HandSide handSide) throws WorldEditException;
+    BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException;
 
     /**
      * Gives the player an item.
@@ -237,7 +240,7 @@ public interface Player extends Entity, Actor {
      *
      * @return the direction
      */
-    PlayerDirection getCardinalDirection();
+    Direction getCardinalDirection();
 
     /**
      * Pass through the wall that you are looking at.
@@ -254,13 +257,24 @@ public interface Player extends Entity, Actor {
      * @param pitch the pitch (up/down) of the player's view in degrees
      * @param yaw the yaw (left/right) of the player's view in degrees
      */
-    void setPosition(Vector pos, float pitch, float yaw);
+    void setPosition(Vector3 pos, float pitch, float yaw);
 
     /**
      * Move the player.
      *
      * @param pos where to move them
      */
-    void setPosition(Vector pos);
+    void setPosition(Vector3 pos);
 
+    /**
+     * Sends a fake block to the client.
+     *
+     * <p>
+     *     This block isn't real.
+     * </p>
+     *
+     * @param pos The position of the block
+     * @param block The block to send, null to reset
+     */
+    <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
 }

@@ -2,6 +2,7 @@ package com.thevoxelbox.voxelsniper.brush;
 
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
@@ -95,19 +96,15 @@ public class SnowConeBrush extends Brush
 
                             if (snowData > snowconeData[x][z])
                             {
-                                switch (BlockTypes.get(snowcone[x][z]))
-                                {
-                                    case AIR:
-                                    case CAVE_AIR:
-                                    case VOID_AIR:
-                                        snowconeData[x][z] = snowData;
-                                        snowcone[x][z] = BlockTypes.SNOW.getInternalId();
-                                    case SNOW_BLOCK:
-                                        snowconeData[x][z] = snowData;
-                                        break;
-                                    default:
-                                        break;
+                                BlockType blockType =
+                                    BlockTypes.get(snowcone[x][z]);
+                                if (blockType.getMaterial().isAir()) {
+                                    snowconeData[x][z] = snowData;
+                                    snowcone[x][z] = BlockTypes.SNOW.getInternalId();
 
+                                    snowconeData[x][z] = snowData;
+                                } else if (blockType == BlockTypes.SNOW_BLOCK) {
+                                    snowconeData[x][z] = snowData;
                                 }
                             }
                             else if (yOffset[x][z] > 0 && snowcone[x][z] == BlockTypes.SNOW.getInternalId())
@@ -152,22 +149,17 @@ public class SnowConeBrush extends Brush
     @Override
     protected final void powder(final SnipeData v)
     {
-        switch (getTargetBlock().getType())
-        {
-            case SNOW:
-                this.addSnow(v, this.getTargetBlock());
-                break;
-            default:
-                Block blockAbove = getTargetBlock().getRelative(BlockFace.UP);
-                if (blockAbove != null && BukkitAdapter.adapt(blockAbove.getType()).getMaterial().isAir())
-                {
-                    addSnow(v, blockAbove);
-                }
-                else
-                {
-                    v.owner().getPlayer().sendMessage(ChatColor.RED + "Error: Center block neither snow nor air.");
-                }
-                break;
+        if (getTargetBlock().getType() == Material.SNOW) {
+            this.addSnow(v, this.getTargetBlock());
+        } else {
+            Block blockAbove = getTargetBlock().getRelative(BlockFace.UP);
+            if (blockAbove != null && BukkitAdapter.adapt(blockAbove.getType()).getMaterial()
+                .isAir()) {
+                addSnow(v, blockAbove);
+            } else {
+                v.owner().getPlayer()
+                    .sendMessage(ChatColor.RED + "Error: Center block neither snow nor air.");
+            }
         }
     }
 

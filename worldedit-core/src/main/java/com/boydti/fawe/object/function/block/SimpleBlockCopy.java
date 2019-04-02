@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.function.block;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.math.BlockVector3;
 
 public class SimpleBlockCopy implements RegionFunction {
 
@@ -16,7 +16,7 @@ public class SimpleBlockCopy implements RegionFunction {
     }
 
     @Override
-    public boolean apply(Vector position) throws WorldEditException {
-        return destination.setBlock(position, source.getBlock(position));
+    public boolean apply(BlockVector3 position) throws WorldEditException {
+        return destination.setBlock(position, source.getFullBlock(position));
     }
 }

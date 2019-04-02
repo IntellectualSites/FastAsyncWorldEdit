@@ -1,7 +1,7 @@
 package com.boydti.fawe.regions;
 
 import com.boydti.fawe.object.FawePlayer;
-import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.IDelegateRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -11,12 +11,12 @@ public class FaweMask implements IDelegateRegion {
     private String description = null;
 
     @Deprecated
-    public FaweMask(final BlockVector pos1, final BlockVector pos2, final String id) {
+    public FaweMask(final BlockVector3 pos1, final BlockVector3 pos2, final String id) {
         this(new CuboidRegion(pos1, pos2), id);
     }
 
     @Deprecated
-    public FaweMask(final BlockVector pos1, final BlockVector pos2) {
+    public FaweMask(final BlockVector3 pos1, final BlockVector3 pos2) {
         this(pos1, pos2, null);
         if ((pos1 == null) || (pos2 == null)) {
             throw new IllegalArgumentException("BlockVectors cannot be null!");

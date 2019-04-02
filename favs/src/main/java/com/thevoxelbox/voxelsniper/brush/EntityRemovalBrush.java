@@ -16,7 +16,7 @@ import java.util.regex.PatternSyntaxException;
  */
 public class EntityRemovalBrush extends Brush
 {
-    private final List<String> exemptions = new ArrayList<String>(3);
+    private final List<String> exemptions = new ArrayList<>(3);
 
     /**
      *
@@ -82,7 +82,7 @@ public class EntityRemovalBrush extends Brush
     private boolean isClassInExemptionList(Class<? extends Entity> entityClass) throws PatternSyntaxException
     {
         // Create a list of superclasses and interfaces implemented by the current entity type
-        final List<String> entityClassHierarchy = new ArrayList<String>();
+        final List<String> entityClassHierarchy = new ArrayList<>();
 
         Class<?> currentClass = entityClass;
         while (currentClass != null && !currentClass.equals(Object.class))

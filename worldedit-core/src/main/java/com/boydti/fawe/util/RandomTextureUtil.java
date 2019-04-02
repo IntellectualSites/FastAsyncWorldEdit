@@ -1,11 +1,10 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.io.FileNotFoundException;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomTextureUtil extends CachedTextureUtil {
 
@@ -33,9 +32,10 @@ public class RandomTextureUtil extends CachedTextureUtil {
 
     private int random(int i) {
         if (i < 0) {
-            return -PseudoRandom.random.nextInt((-i));
+            int i1 = (-i);
+            return -ThreadLocalRandom.current().nextInt(i1);
         } else {
-            return PseudoRandom.random.nextInt(i);
+            return ThreadLocalRandom.current().nextInt(i);
         }
     }
 
@@ -79,14 +79,14 @@ public class RandomTextureUtil extends CachedTextureUtil {
     }
 
     @Override
-    public BlockTypes getNearestBlock(int color) {
+    public BlockType getNearestBlock(int color) {
         int offsetColor = offsets.getOrDefault(color, 0);
         if (offsetColor != 0) {
             offsetColor = addRandomColor(color, offsetColor);
         } else {
             offsetColor = color;
         }
-        BlockTypes res = super.getNearestBlock(offsetColor);
+        BlockType res = super.getNearestBlock(offsetColor);
         if (res == null) return null;
         int newColor = getColor(res);
         {

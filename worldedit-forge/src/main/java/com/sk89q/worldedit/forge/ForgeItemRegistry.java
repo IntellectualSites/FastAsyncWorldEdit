@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.forge;
 
+<<<<<<< HEAD
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.ItemRegistry;
@@ -37,5 +38,18 @@ public class ForgeItemRegistry implements ItemRegistry {
         } else {
             return null;
         }
+=======
+import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.registry.BundledItemRegistry;
+
+import javax.annotation.Nullable;
+
+public class ForgeItemRegistry extends BundledItemRegistry {
+
+    @Nullable
+    @Override
+    public String getName(ItemType itemType) {
+        return super.getName(itemType); // TODO
+>>>>>>> b75d5149... Fixed the bundle being directly used outside of the registry system.
     }
 }

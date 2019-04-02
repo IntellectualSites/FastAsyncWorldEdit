@@ -17,7 +17,7 @@ public class BlockTypeSwitchBuilder<T> {
     }
 
     public BlockTypeSwitchBuilder<T> add(Predicate<BlockType> predicate, T task) {
-        for (BlockTypes type : BlockTypes.values) {
+        for (BlockType type : BlockTypes.values) {
             if (predicate.test(type)) {
                 this.runnables[type.getInternalId()] = task;
             }

@@ -17,7 +17,6 @@ import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -57,8 +56,8 @@ public class UsageMessage extends Message {
         text(BBC.HELP_HEADER_SUBCOMMANDS.f());
         String prefix = !commandString.isEmpty() ? commandString + " " : "";
 
-        List<CommandMapping> list = new ArrayList<CommandMapping>(dispatcher.getCommands());
-        Collections.sort(list, new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
+        List<CommandMapping> list = new ArrayList<>(dispatcher.getCommands());
+        list.sort(new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
 
         for (CommandMapping mapping : list) {
             boolean perm = locals == null || mapping.getCallable().testPermission(locals);
@@ -110,7 +109,6 @@ public class UsageMessage extends Message {
 
             StringBuilder tooltip = new StringBuilder();
             String command = null;
-            String webpage = null;
 
             tooltip.append("Name: " + param.getName());
             if (param instanceof ParameterData) {
@@ -129,23 +127,21 @@ public class UsageMessage extends Message {
                 if (type instanceof Class) {
                     Link link = (Link) ((Class) type).getAnnotation(Link.class);
                     if (link != null) {
-                        if (link.value().startsWith("http")) webpage = link.value();
-                        else command = Commands.getAlias(link.clazz(), link.value());
+                        command = Commands.getAlias(link.clazz(), link.value());
                     }
                 }
             }
             tooltip.append("\nOptional: " + (param.isOptional() || param.isValueFlag()));
-            if (param.getDefaultValue() != null && param.getDefaultValue().length >= 0) {
+            if (param.getDefaultValue() != null) {
                 tooltip.append("\nDefault: " + param.getDefaultValue()[0]);
             } else if (argStr.contains("=")) {
                 tooltip.append("\nDefault: " + argStr.split("[=|\\]|>]")[1]);
             }
-            if (command != null || webpage != null) {
+            if (command != null) {
                 tooltip.append("\nClick for more info");
             }
             tooltip(tooltip.toString());
             if (command != null) command(command);
-            if (webpage != null) link(webpage);
         }
 
         newline();

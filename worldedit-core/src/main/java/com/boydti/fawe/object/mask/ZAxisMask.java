@@ -1,8 +1,9 @@
 package com.boydti.fawe.object.mask;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask2D;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import javax.annotation.Nullable;
 
 /**
@@ -13,7 +14,7 @@ public class ZAxisMask extends AbstractMask implements ResettableMask {
     private transient int layer = -1;
 
     @Override
-    public boolean test(Vector vector) {
+    public boolean test(BlockVector3 vector) {
         if (layer == -1) {
             layer = vector.getBlockZ();
         }

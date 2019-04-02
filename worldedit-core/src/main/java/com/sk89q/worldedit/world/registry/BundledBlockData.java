@@ -22,8 +22,7 @@ package com.sk89q.worldedit.world.registry;
 import com.google.common.io.Resources;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BlockMaterial;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 
 import java.io.IOException;
@@ -74,7 +73,8 @@ public class BundledBlockData {
      */
     private void loadFromResource() throws IOException {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Vector.class, new VectorAdapter());
+//<<<<<<< HEAD
+        gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
         gsonBuilder.registerTypeAdapter(int.class, new JsonDeserializer<Integer>() {
             @Override
             public Integer deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -87,6 +87,9 @@ public class BundledBlockData {
                 return primitive.getAsInt();
             }
         });
+//=======
+//        gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
+//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         Gson gson = gsonBuilder.create();
         URL url = BundledBlockData.class.getResource("blocks.json");
         if (url == null) {

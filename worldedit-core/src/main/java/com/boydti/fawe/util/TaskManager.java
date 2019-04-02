@@ -67,20 +67,6 @@ public abstract class TaskManager {
      * @param runnables
      */
     public void parallel(Collection<Runnable> runnables) {
-//        if (!Fawe.get().isJava8()) {
-//            ExecutorCompletionService c = new ExecutorCompletionService(pool);
-//            for (Runnable run : runnables) {
-//                c.submit(run, null);
-//            }
-//            try {
-//                for (int i = 0; i < runnables.size(); i++) {
-//                    c.take();
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            return;
-//        }
         for (Runnable run : runnables) {
             pool.submit(run);
         }
@@ -124,14 +110,10 @@ public abstract class TaskManager {
         }
         for (i = 0; i < threads.length; i++) {
             final Runnable[] toRun = split[i];
-            Thread thread = threads[i] = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int j = 0; j < toRun.length; j++) {
-                        Runnable run = toRun[j];
-                        if (run != null) {
-                            run.run();
-                        }
+            Thread thread = threads[i] = new Thread(() -> {
+                for (Runnable run : toRun) {
+                    if (run != null) {
+                        run.run();
                     }
                 }
             });
@@ -420,7 +402,7 @@ public abstract class TaskManager {
         } catch (InterruptedException e) {
             MainUtil.handleError(e);
         }
-        if (run.value != null && run.value instanceof RuntimeException) {
+        if (run.value instanceof RuntimeException) {
             throw (RuntimeException) run.value;
         }
         return (T) run.value;

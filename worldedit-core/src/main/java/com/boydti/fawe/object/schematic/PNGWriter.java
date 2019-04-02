@@ -2,10 +2,10 @@ package com.boydti.fawe.object.schematic;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.TextureUtil;
-import com.sk89q.worldedit.MutableBlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -68,12 +68,13 @@ public class PNGWriter implements ClipboardWriter {
 
         boolean fill = length * 4 < imageSize && width * 4 < imageSize;
 
-        MutableBlockVector mutable = new MutableBlockVector(0, 0, 0);
-        Vector mutableTop = new Vector(0, 0, 0);
-        Vector mutableRight = new Vector(0, 0, 0);
-        Vector mutableLeft = new Vector(0, 0, 0);
+        MutableBlockVector3 mutable, mutableTop, mutableRight, mutableLeft;
+        mutable = mutableTop = mutableRight = mutableLeft = new MutableBlockVector3(0, 0, 0);
+//        Vector mutableTop = new Vector(0, 0, 0);
+//        Vector mutableRight = new Vector(0, 0, 0);
+//        Vector mutableLeft = new Vector(0, 0, 0);
 
-        Vector min = clipboard.getMinimumPoint();
+        BlockVector3 min = clipboard.getMinimumPoint();
         int y0 = min.getBlockY();
         int z0 = min.getBlockZ();
         int x0 = min.getBlockX();

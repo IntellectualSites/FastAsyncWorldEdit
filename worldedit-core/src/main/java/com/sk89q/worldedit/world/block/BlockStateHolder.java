@@ -19,25 +19,23 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.sk89q.worldedit.blocks.BlockMaterial;
-import com.sk89q.worldedit.blocks.TileEntityBlock;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface BlockStateHolder<T extends BlockStateHolder> extends FawePattern, TileEntityBlock {
+public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePattern {
 
     /**
      * Get the block type
      *
      * @return The type
      */
-    BlockTypes getBlockType();
+    BlockType getBlockType();
 
     /**
      * Magic number (legacy uses)
@@ -45,9 +43,7 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
      * @return
      */
     @Deprecated
-    default BlockStateHolder withPropertyId(int propertyId) {
-        return getBlockType().withPropertyId(propertyId);
-    }
+    B withPropertyId(int propertyId);
 
     /**
      * Get combined id (legacy uses)
@@ -59,18 +55,13 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
     @Deprecated
     int getOrdinal();
 
-    default BlockMaterial getMaterial() {
-        return getBlockType().getMaterial();
-    }
-
+    BlockMaterial getMaterial();
     /**
      * Get type id (legacy uses)
      * @return
      */
     @Deprecated
-    default int getInternalBlockTypeId() {
-        return getBlockType().getInternalId();
-    }
+    int getInternalBlockTypeId();
 
     /**
      * Get the block data (legacy uses)
@@ -79,16 +70,14 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
     @Deprecated
     int getInternalPropertiesId();
 
-    Mask toMask(Extent extent);
-
     /**
-     * Returns a BlockStateHolder with the given state and value applied.
+     * Returns a BlockState with the given state and value applied.
      *
      * @param property The state
      * @param value The value
      * @return The modified state, or same if could not be applied
      */
-    <V> T with(final Property<V> property, final V value);
+    <V> B with(final Property<V> property, final V value);
 
     /**
      * Returns a BlockStateHolder with the given state and value applied.
@@ -97,7 +86,7 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
      * @param value The value
      * @return The modified state, or same if could not be applied
      */
-    <V> BlockStateHolder with(final PropertyKey property, final V value);
+    <V> B with(final PropertyKey property, final V value);
 
     /**
      * Gets the value at the given state
@@ -123,25 +112,42 @@ public interface BlockStateHolder<T extends BlockStateHolder> extends FawePatter
     Map<Property<?>, Object> getStates();
 
     /**
-     * @deprecated use masks - not try to this fuzzy/non fuzzy state nonsense
+     * Checks if the type is the same, and if the matched states are the same.
+     *
      * @param o other block
      * @return true if equal
      */
-    @Deprecated
-    boolean equalsFuzzy(BlockStateHolder o);
+    boolean equalsFuzzy(BlockStateHolder<?> o);
 
     /**
-     * Returns an immutable BlockStateHolder from this BlockStateHolder.
+     * Returns an immutable {@link BlockState} from this BlockStateHolder.
      *
      * @return A BlockState
      */
     BlockState toImmutableState();
 
+    /**
+     * Gets a {@link BaseBlock} from this BlockStateHolder.
+     *
+     * @return The BaseBlock
+     */
+    BaseBlock toBaseBlock();
+
+    /**
+     * Gets a {@link BaseBlock} from this BlockStateHolder.
+     *
+     * @param compoundTag The NBT Data to apply
+     * @return The BaseBlock
+     */
+    BaseBlock toBaseBlock(CompoundTag compoundTag);
+
     default String getAsString() {
         if (getStates().isEmpty()) {
             return this.getBlockType().getId();
         } else {
-            String properties = getStates().entrySet().stream().map(entry -> entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase()).collect(Collectors.joining(","));
+            String properties =
+                    getStates().entrySet().stream().map(entry -> entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase()).collect(Collectors.joining(
+                    ","));
             return this.getBlockType().getId() + "[" + properties + "]";
         }
     }

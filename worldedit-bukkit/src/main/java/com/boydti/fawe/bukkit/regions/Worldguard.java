@@ -7,8 +7,8 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.RegionFilter;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
@@ -61,7 +61,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         if (global != null && isAllowed(player, global)) {
             return global;
         }
-        final ApplicableRegionSet regions = manager.getApplicableRegions(new Vector(loc.getX(), loc.getY(), loc.getZ()));
+        final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()));
         for (final ProtectedRegion region : regions) {
             if (isAllowed(player, region)) {
                 return region;
@@ -145,27 +145,27 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         }
 
         @Override
-        public Vector getMinimumPoint() {
+        public BlockVector3 getMinimumPoint() {
             return region.getMinimumPoint();
         }
 
         @Override
-        public Vector getMaximumPoint() {
+        public BlockVector3 getMaximumPoint() {
             return region.getMaximumPoint();
         }
 
         @Override
-        public void expand(Vector... changes) {
+        public void expand(BlockVector3... changes) {
             throw new UnsupportedOperationException("Region is immutable");
         }
 
         @Override
-        public void contract(Vector... changes) {
+        public void contract(BlockVector3... changes) {
             throw new UnsupportedOperationException("Region is immutable");
         }
 
         @Override
-        public boolean contains(Vector position) {
+        public boolean contains(BlockVector3 position) {
             return region.contains(position);
         }
     }
@@ -179,8 +179,8 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         }
         if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion casted = (ProtectedPolygonalRegion) region;
-            BlockVector max = region.getMaximumPoint();
-            BlockVector min = region.getMinimumPoint();
+            BlockVector3 max = region.getMaximumPoint();
+            BlockVector3 min = region.getMinimumPoint();
             return new Polygonal2DRegion(null, casted.getPoints(), min.getBlockY(), max.getBlockY());
         }
         return new AdaptedRegion(region);

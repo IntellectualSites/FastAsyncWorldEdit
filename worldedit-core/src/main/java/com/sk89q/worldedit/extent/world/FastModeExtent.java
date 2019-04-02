@@ -21,16 +21,18 @@ package com.sk89q.worldedit.extent.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.BlockVector2D;
-import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -40,8 +42,10 @@ import java.util.Set;
 public class FastModeExtent extends AbstractDelegateExtent {
 
     private final World world;
-    private final Set<BlockVector2D> dirtyChunks = new HashSet<>();
+    private final Set<BlockVector3> positions = new HashSet<>();
+    private final Set<BlockVector2> dirtyChunks = new HashSet<>();
     private boolean enabled = true;
+    private boolean postEditSimulation;
 
     /**
      * Create a new instance with fast mode enabled.
@@ -63,6 +67,9 @@ public class FastModeExtent extends AbstractDelegateExtent {
         checkNotNull(world);
         this.world = world;
         this.enabled = enabled;
+        if (enabled) {
+            this.postEditSimulation = true;
+        }
     }
 
     /**
@@ -83,14 +90,34 @@ public class FastModeExtent extends AbstractDelegateExtent {
         this.enabled = enabled;
     }
 
+    public boolean isPostEditSimulationEnabled() {
+        return postEditSimulation;
+    }
+
+    public void setPostEditSimulationEnabled(boolean enabled) {
+        this.postEditSimulation = enabled;
+    }
+
     @Override
-    public boolean setBlock(Vector location, BlockStateHolder block) throws WorldEditException {
-        if (enabled) {
-            dirtyChunks.add(new BlockVector2D(location.getBlockX() >> 4, location.getBlockZ() >> 4));
-            return world.setBlock(location, block, false);
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+        if (enabled || postEditSimulation) {
+            dirtyChunks.add(BlockVector2.at(location.getBlockX() >> 4, location.getBlockZ() >> 4));
+
+            if (world.setBlock(location, block, false)) {
+                if (postEditSimulation) {
+                    positions.add(location);
+                }
+                return true;
+            }
+
+            return false;
         } else {
             return world.setBlock(location, block, true);
         }
+    }
+
+    public boolean commitRequired() {
+        return !dirtyChunks.isEmpty() || !positions.isEmpty();
     }
 
     @Override
@@ -101,6 +128,18 @@ public class FastModeExtent extends AbstractDelegateExtent {
                 if (!dirtyChunks.isEmpty()) {
                     world.fixAfterFastMode(dirtyChunks);
                 }
+
+                if (postEditSimulation) {
+                    Iterator<BlockVector3> positionIterator = positions.iterator();
+                    while (run.shouldContinue() && positionIterator.hasNext()) {
+                        BlockVector3 position = positionIterator.next();
+                        world.notifyAndLightBlock(position, BlockTypes.AIR.getDefaultState());
+                        positionIterator.remove();
+                    }
+
+                    return !positions.isEmpty() ? this : null;
+                }
+
                 return null;
             }
 

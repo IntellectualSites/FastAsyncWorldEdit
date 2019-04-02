@@ -6,46 +6,47 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
+
 import java.util.Iterator;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class FastIterator implements Iterable<Vector> {
+public class FastIterator implements Iterable<BlockVector3> {
 
-    private final Iterable<? extends Vector> iterable;
+    private final Iterable<? extends BlockVector3> iterable;
     private final MappedFaweQueue queue;
 
-    public FastIterator(@Nonnull Iterable<? extends Vector> iter, @Nullable EditSession extent) {
+    public FastIterator(@Nonnull Iterable<? extends BlockVector3> iter, @Nullable EditSession extent) {
         this(iter, (HasFaweQueue) extent);
     }
 
-    public FastIterator(@Nonnull Iterable<? extends Vector> iter, @Nullable Extent extent) {
+    public FastIterator(@Nonnull Iterable<? extends BlockVector3> iter, @Nullable Extent extent) {
         this(iter, (HasFaweQueue) (extent != null ? (extent instanceof HasFaweQueue ? extent : new ExtentTraverser(extent).findAndGet(HasFaweQueue.class)) : null));
     }
 
-    public FastIterator(@Nonnull Iterable<? extends Vector> iter, @Nullable HasFaweQueue editSession) {
+    public FastIterator(@Nonnull Iterable<? extends BlockVector3> iter, @Nullable HasFaweQueue editSession) {
         this(iter, (FaweQueue) (editSession != null ? editSession.getQueue() : null));
     }
 
-    public FastIterator(@Nonnull Iterable<? extends Vector> iter, @Nullable FaweQueue faweQueue) {
+    public FastIterator(@Nonnull Iterable<? extends BlockVector3> iter, @Nullable FaweQueue faweQueue) {
         this.iterable = iter;
         this.queue = faweQueue != null && faweQueue instanceof MappedFaweQueue ? (MappedFaweQueue) faweQueue : null;
     }
 
-    public Iterable<? extends Vector> getIterable() {
+    public Iterable<? extends BlockVector3> getIterable() {
         return iterable;
     }
 
     @Override
-    public Iterator<Vector> iterator() {
+    public Iterator<BlockVector3> iterator() {
         if (queue == null || Settings.IMP.QUEUE.PRELOAD_CHUNKS <= 1) {
-            return (Iterator<Vector>) iterable.iterator();
+            return (Iterator<BlockVector3>) iterable.iterator();
         }
-        return new Iterator<Vector>() {
-            Iterator<? extends Vector> trailIter = iterable.iterator();
-            Iterator<? extends Vector> leadIter = iterable.iterator();
+        return new Iterator<BlockVector3>() {
+            Iterator<? extends BlockVector3> trailIter = iterable.iterator();
+            Iterator<? extends BlockVector3> leadIter = iterable.iterator();
             int lastTrailChunkX = Integer.MIN_VALUE;
             int lastTrailChunkZ = Integer.MIN_VALUE;
             int lastLeadChunkX = Integer.MIN_VALUE;
@@ -64,8 +65,8 @@ public class FastIterator implements Iterable<Vector> {
             }
 
             @Override
-            public Vector next() {
-                Vector pt = trailIter.next();
+            public BlockVector3 next() {
+                BlockVector3 pt = trailIter.next();
                 if (lastTrailChunkX != (lastTrailChunkX = pt.getBlockX() >> 4) || lastTrailChunkZ != (lastTrailChunkZ = pt.getBlockZ() >> 4)) {
                     if (leadIter.hasNext()) {
                         try {
@@ -78,7 +79,7 @@ public class FastIterator implements Iterable<Vector> {
                                 amount = 1;
                             }
                             for (int count = 0; count < amount; ) {
-                                Vector v = leadIter.next();
+                                BlockVector3 v = leadIter.next();
                                 int vcx = v.getBlockX() >> 4;
                                 int vcz = v.getBlockZ() >> 4;
                                 if (vcx != lastLeadChunkX || vcz != lastLeadChunkZ) {

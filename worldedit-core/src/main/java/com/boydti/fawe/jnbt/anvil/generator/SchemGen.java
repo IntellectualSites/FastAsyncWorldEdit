@@ -2,7 +2,7 @@ package com.boydti.fawe.jnbt.anvil.generator;
 
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.schematic.Schematic;
-import com.sk89q.worldedit.MutableBlockVector;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -20,7 +20,7 @@ public class SchemGen extends Resource {
     private final boolean randomRotate;
     private final Mask mask;
 
-    private MutableBlockVector mutable = new MutableBlockVector();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public SchemGen(Mask mask, Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate) {
         this.mask = mask;

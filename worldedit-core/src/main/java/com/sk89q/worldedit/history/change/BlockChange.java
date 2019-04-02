@@ -21,10 +21,11 @@ package com.sk89q.worldedit.history.change;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.history.UndoContext;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 /**
@@ -36,9 +37,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
  */
 public class BlockChange implements Change {
 
-    private final BlockVector position;
-    private final BlockStateHolder previous;
-    private final BlockStateHolder current;
+    private final BlockVector3 position;
+    private final BaseBlock previous;
+    private final BaseBlock current;
 
     /**
      * Create a new block change.
@@ -47,13 +48,13 @@ public class BlockChange implements Change {
      * @param previous the previous block
      * @param current the current block
      */
-    public BlockChange(BlockVector position, BlockStateHolder previous, BlockStateHolder current) {
+    public <BP extends BlockStateHolder<BP>, BC extends BlockStateHolder<BC>> BlockChange(BlockVector3 position, BP previous, BC current) {
         checkNotNull(position);
         checkNotNull(previous);
         checkNotNull(current);
         this.position = position;
-        this.previous = previous;
-        this.current = current;
+        this.previous = previous.toBaseBlock();
+        this.current = current.toBaseBlock();
     }
 
     /**
@@ -61,7 +62,7 @@ public class BlockChange implements Change {
      *
      * @return the position
      */
-    public BlockVector getPosition() {
+    public BlockVector3 getPosition() {
         return position;
     }
 
@@ -70,7 +71,7 @@ public class BlockChange implements Change {
      *
      * @return the previous block
      */
-    public BlockStateHolder getPrevious() {
+    public BaseBlock getPrevious() {
         return previous;
     }
 
@@ -79,7 +80,7 @@ public class BlockChange implements Change {
      *
      * @return the current block
      */
-    public BlockStateHolder getCurrent() {
+    public BaseBlock getCurrent() {
         return current;
     }
 

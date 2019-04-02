@@ -3,6 +3,7 @@ package com.boydti.fawe.object.clipboard.remap;
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.clipboard.AbstractDelegateFaweClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -16,21 +17,21 @@ public class RemappedClipboard extends AbstractDelegateFaweClipboard {
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
-        return (BlockState) remapper.remap(super.getBlock(x, y, z));
+    public BaseBlock getBlock(int x, int y, int z) {
+        return remapper.remap(super.getBlock(x, y, z));
     }
 
     @Override
-    public BlockState getBlock(int index) {
-        return (BlockState) remapper.remap(super.getBlock(index));
+    public BaseBlock getBlock(int index) {
+        return remapper.remap(super.getBlock(index));
     }
 
     @Override
     public void forEach(BlockReader task, boolean air) {
         super.forEach(new BlockReader() {
             @Override
-            public void run(int x, int y, int z, BlockState block) {
-                task.run(x, y, z, (BlockState) remapper.remap(block));
+            public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
+                task.run(x, y, z, remapper.remap(block));
             }
         }, air);
     }

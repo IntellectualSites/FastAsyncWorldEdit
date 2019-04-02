@@ -5,8 +5,8 @@ import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.queue.NullFaweQueue;
 import com.boydti.fawe.regions.FaweMask;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -55,8 +55,8 @@ public class FreeBuildRegion extends BukkitMaskManager {
         World bukkitWorld = player.parent.getWorld();
         AsyncWorld asyncWorld = AsyncWorld.wrap(bukkitWorld);
 
-        Vector vec1 = new Vector(0, 0, 0);
-        Vector vec2 = vec1;
+        BlockVector3 vec1 = BlockVector3.at(0, 0, 0);
+        BlockVector3 vec2 = vec1;
         Location pos1 = BukkitAdapter.adapt(bukkitWorld, vec1);
         Location pos2 = BukkitAdapter.adapt(bukkitWorld, vec2);
 
