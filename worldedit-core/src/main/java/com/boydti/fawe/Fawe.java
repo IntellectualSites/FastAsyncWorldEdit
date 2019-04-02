@@ -86,8 +86,6 @@ public class Fawe {
     private DefaultTransformParser transformParser;
     private ChatManager chatManager = new PlainChatManager();
 
-    private BStats stats;
-
     /**
      * Get the implementation specific class
      *
@@ -166,15 +164,6 @@ public class Fawe {
             MainUtil.deleteOlder(MainUtil.getFile(IMP.getDirectory(), Settings.IMP.PATHS.CLIPBOARD), TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS), false);
         });
 
-        if (Settings.IMP.METRICS) {
-            try {
-                this.stats = new BStats();
-                this.IMP.startMetrics();
-                TaskManager.IMP.later(() -> stats.start(), 1);
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        }
         /*
          * Instance independent stuff
          */
@@ -219,9 +208,6 @@ public class Fawe {
     }
 
     public void onDisable() {
-        if (stats != null) {
-            stats.close();
-        }
     }
 
     private boolean update() {
