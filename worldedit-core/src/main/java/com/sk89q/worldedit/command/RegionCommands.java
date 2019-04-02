@@ -227,7 +227,7 @@ public class RegionCommands extends MethodCommands {
 
     @Command(
             aliases = {"/line"},
-            usage = "<pattern> [thickness]",
+            usage = "<block> [thickness]",
             desc = "Draws a line segment between cuboid selection corners",
             help =
                     "Draws a line segment between cuboid selection corners.\n" +
@@ -261,7 +261,7 @@ public class RegionCommands extends MethodCommands {
 
     @Command(
             aliases = {"/curve", "/spline"},
-            usage = "<pattern> [thickness]",
+            usage = "<block> [thickness]",
             desc = "Draws a spline through selected points",
             help =
                     "Draws a spline through selected points.\n" +
@@ -297,8 +297,8 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/replace", "/re", "/rep", "/r"},
-            usage = "[from-mask] <to-pattern>",
+        aliases = { "/replace", "/re", "/rep" },
+        usage = "[from-block] <to-block>",
             desc = "Replace all blocks in the selection with another",
             flags = "f",
             min = 1,
@@ -343,7 +343,7 @@ public class RegionCommands extends MethodCommands {
 
     @Command(
             aliases = {"/overlay"},
-            usage = "<pattern>",
+            usage = "<block>",
             desc = "Set a block on top of blocks in the region",
             min = 1,
             max = 1
@@ -393,7 +393,7 @@ public class RegionCommands extends MethodCommands {
 
     @Command(
             aliases = {"/center", "/middle"},
-            usage = "<pattern>",
+            usage = "<block>",
             desc = "Set the center block(s)",
             min = 1,
             max = 1
@@ -423,7 +423,7 @@ public class RegionCommands extends MethodCommands {
 
     @Command(
             aliases = {"/walls"},
-            usage = "<pattern>",
+            usage = "<block>",
             desc = "Build the four sides of the selection",
             min = 1,
             max = 1
@@ -439,7 +439,7 @@ public class RegionCommands extends MethodCommands {
 
     @Command(
             aliases = {"/faces", "/outline"},
-            usage = "<pattern>",
+            usage = "<block>",
             desc = "Build the walls, ceiling, and floor of a selection",
             min = 1,
             max = 1
@@ -527,7 +527,7 @@ public class RegionCommands extends MethodCommands {
             desc = "Move the contents of the selection",
             help =
                     "Moves the contents of the selection.\n" +
-                            "  -s flag shifts the selection to the target location.\n" +
+                            "The -s flag shifts the selection to the target location.\n" +
                             "  -b also copies biomes\n" +
                             "  -e ignores entities\n" +
                             "  -a ignores air\n" +
@@ -621,7 +621,7 @@ public class RegionCommands extends MethodCommands {
             if (moveSelection) {
                 try {
                     final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-                    BlockVector3 shiftVector = BlockVector3.at(direction.getX() * size.getX() * count, direction.getY() * size.getY() * count, direction.getZ() * size.getZ() * count);
+                    final BlockVector3 shiftVector = BlockVector3.at(direction.getX() * size.getX() * count, direction.getY() * size.getY() * count, direction.getZ() * size.getZ() * count);
                     region.shift(shiftVector);
 
                     session.getRegionSelector(player.getWorld()).learnChanges();
@@ -735,7 +735,7 @@ public class RegionCommands extends MethodCommands {
 
     @Command(
             aliases = {"/hollow"},
-            usage = "[<thickness>[ <pattern>]]",
+            usage = "[<thickness>[ <block>]]",
             desc = "Hollows out the object contained in this selection",
             help =
                     "Hollows out the object contained in this selection.\n" +
