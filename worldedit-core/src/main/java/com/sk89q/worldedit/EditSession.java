@@ -2718,21 +2718,14 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     this.changes++;
                     for (int y = basePosition.getBlockY(); y >= (basePosition.getBlockY() - 10); --y) {
                         BlockType type = getBlockType(x, y, z);
-                        switch (type.getResource().toUpperCase()) {
-                            case "GRASS":
-                            case "DIRT":
-                                treeType.generate(this, BlockVector3.at(x, y + 1, z));
-                                this.changes++;
-                                break;
-                            case "SNOW":
-                                setBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
-                                break;
-                            case "AIR":
-                            case "CAVE_AIR":
-                            case "VOID_AIR":
-                                continue;
-                            default:
-                                break;
+                        String s = type.getResource().toUpperCase();
+                        if (type == BlockTypes.GRASS || type == BlockTypes.DIRT) {
+                            treeType.generate(this, BlockVector3.at(x, y + 1, z));
+                            this.changes++;
+                        } else if (type == BlockTypes.SNOW) {
+                            setBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
+                        } else if (type.getMaterial().isAir()) {
+                            continue;
                         }
 //    public int makeForest(BlockVector3 basePosition, int size, double density, TreeGenerator.TreeType treeType) throws MaxChangedBlocksException {
 //        int affected = 0;

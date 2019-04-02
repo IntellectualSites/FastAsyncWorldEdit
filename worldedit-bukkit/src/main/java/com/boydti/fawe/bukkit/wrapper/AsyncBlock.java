@@ -217,10 +217,9 @@ public class AsyncBlock implements Block {
     public AsyncBlockState getState() {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combined);
-        switch (type.getResource().toUpperCase()) {
-            case "SIGN":
-            case "WALL_SIGN":
-                return new AsyncSign(this, combined);
+        String s = type.getResource().toUpperCase();
+        if (type == BlockTypes.SIGN || type == BlockTypes.WALL_SIGN) {
+            return new AsyncSign(this, combined);
         }
         return new AsyncBlockState(this, combined);
     }

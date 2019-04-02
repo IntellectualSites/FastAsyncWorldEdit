@@ -6,6 +6,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -174,11 +175,9 @@ public class CavesGen extends GenBase {
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D)) {
                                 BlockStateHolder material = chunk.getLazyBlock(bx + local_x, local_y, bz + local_z);
                                 BlockStateHolder materialAbove = chunk.getLazyBlock(bx + local_x, local_y + 1, bz + local_z);
-                                switch (material.getBlockType().getResource().toUpperCase()) {
-                                    case "GRASS":
-                                    case "MYCELIUM":
-                                        grassFound = true;
-                                        break;
+                                BlockType blockType = material.getBlockType();
+                                if (blockType == BlockTypes.MYCELIUM || blockType == BlockTypes.GRASS) {
+                                    grassFound = true;
                                 }
                                 if (this.isSuitableBlock(material, materialAbove)) {
                                     if (local_y - 1 < 10) {

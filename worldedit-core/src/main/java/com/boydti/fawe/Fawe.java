@@ -10,7 +10,6 @@ import com.boydti.fawe.util.*;
 import com.boydti.fawe.util.chat.ChatManager;
 import com.boydti.fawe.util.chat.PlainChatManager;
 import com.boydti.fawe.util.cui.CUI;
-import com.boydti.fawe.util.metrics.BStats;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -18,9 +17,7 @@ import com.sk89q.worldedit.session.request.Request;
 
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
-import javax.management.Notification;
 import javax.management.NotificationEmitter;
-import javax.management.NotificationListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

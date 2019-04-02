@@ -2,6 +2,7 @@ package com.thevoxelbox.voxelsniper.brush;
 
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
@@ -95,19 +96,15 @@ public class SnowConeBrush extends Brush
 
                             if (snowData > snowconeData[x][z])
                             {
-                                switch (BlockTypes.get(snowcone[x][z]).getResource().toUpperCase())
-                                {
-                                    case "AIR":
-                                    case "CAVE_AIR":
-                                    case "VOID_AIR":
-                                        snowconeData[x][z] = snowData;
-                                        snowcone[x][z] = BlockTypes.SNOW.getInternalId();
-                                    case "SNOW_BLOCK":
-                                        snowconeData[x][z] = snowData;
-                                        break;
-                                    default:
-                                        break;
+                                BlockType blockType =
+                                    BlockTypes.get(snowcone[x][z]);
+                                if (blockType.getMaterial().isAir()) {
+                                    snowconeData[x][z] = snowData;
+                                    snowcone[x][z] = BlockTypes.SNOW.getInternalId();
 
+                                    snowconeData[x][z] = snowData;
+                                } else if (blockType == BlockTypes.SNOW_BLOCK) {
+                                    snowconeData[x][z] = snowData;
                                 }
                             }
                             else if (yOffset[x][z] > 0 && snowcone[x][z] == BlockTypes.SNOW.getInternalId())

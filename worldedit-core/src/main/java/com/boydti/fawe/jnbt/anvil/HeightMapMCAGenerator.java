@@ -445,20 +445,17 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     private final void setLayerHeight(int index, int blockHeight, int layerHeight) {
         int floorState = floor.get()[index];
-        switch (BlockTypes.getFromStateId(floorState).getResource().toUpperCase()) {
-            case "SNOW":
-            case "SNOW_BLOCK":
-                if (layerHeight != 0) {
-                    this.heights.setByte(index, (byte) (blockHeight + 1));
-                    this.floor.setInt(index, (BlockTypes.SNOW.getInternalId() + layerHeight));
-                } else {
-                    this.heights.setByte(index, (byte) (blockHeight));
-                    this.floor.setInt(index, (BlockTypes.SNOW_BLOCK.getInternalId()));
-                }
-                break;
-            default:
+        BlockType type = BlockTypes.getFromStateId(floorState);
+        if (type == BlockTypes.SNOW || type == BlockTypes.SNOW_BLOCK) {
+            if (layerHeight != 0) {
+                this.heights.setByte(index, (byte) (blockHeight + 1));
+                this.floor.setInt(index, (BlockTypes.SNOW.getInternalId() + layerHeight));
+            } else {
                 this.heights.setByte(index, (byte) (blockHeight));
-                break;
+                this.floor.setInt(index, (BlockTypes.SNOW_BLOCK.getInternalId()));
+            }
+        } else {
+            this.heights.setByte(index, (byte) (blockHeight));
         }
     }
 
@@ -470,20 +467,17 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     private final void setLayerHeightRaw(int index, int blockHeight, int layerHeight) {
         int floorState = floor.get()[index];
-        switch (BlockTypes.getFromStateId(floorState).getResource().toUpperCase()) {
-            case "SNOW":
-            case "SNOW_BLOCK":
-                if (layerHeight != 0) {
-                    this.heights.getByteArray()[index] = (byte) (blockHeight + 1);
-                    this.floor.getIntArray()[index] = (BlockTypes.SNOW.getInternalId() + layerHeight);
-                } else {
-                    this.heights.getByteArray()[index] = (byte) (blockHeight);
-                    this.floor.getIntArray()[index] = (BlockTypes.SNOW_BLOCK.getInternalId());
-                }
-                break;
-            default:
+        BlockType type = BlockTypes.getFromStateId(floorState);
+        if (type == BlockTypes.SNOW || type == BlockTypes.SNOW_BLOCK) {
+            if (layerHeight != 0) {
+                this.heights.getByteArray()[index] = (byte) (blockHeight + 1);
+                this.floor.getIntArray()[index] = (BlockTypes.SNOW.getInternalId() + layerHeight);
+            } else {
                 this.heights.getByteArray()[index] = (byte) (blockHeight);
-                break;
+                this.floor.getIntArray()[index] = (BlockTypes.SNOW_BLOCK.getInternalId());
+            }
+        } else {
+            this.heights.getByteArray()[index] = (byte) (blockHeight);
         }
     }
 

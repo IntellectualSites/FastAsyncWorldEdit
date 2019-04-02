@@ -70,11 +70,9 @@ public class OverlayBrush extends PerformBrush {
 
     @SuppressWarnings("deprecation") private boolean isIgnoredBlock(int materialId) {
         BlockType type = BlockTypes.get(materialId);
-        switch (type.getResource().toUpperCase()) {
-            case "WATER":
-            case "LAVA":
-            case "CACTUS":
-                return true;
+        String s = type.getResource().toUpperCase();
+        if (type == BlockTypes.WATER || type == BlockTypes.LAVA || type == BlockTypes.CACTUS) {
+            return true;
         }
         BlockMaterial mat = type.getMaterial();
         return mat.isTranslucent();
