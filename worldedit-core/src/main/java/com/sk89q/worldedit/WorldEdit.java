@@ -61,6 +61,8 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
@@ -76,8 +78,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.sk89q.worldedit.event.platform.Interaction.HIT;
 import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
@@ -97,9 +97,9 @@ import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
  */
 public final class WorldEdit {
 
-    public static final Logger logger = Logger.getLogger(WorldEdit.class.getCanonicalName());
+    public static final Logger logger = LoggerFactory.getLogger(WorldEdit.class);
 
-    private final static WorldEdit instance = new WorldEdit();
+    private static final WorldEdit instance = new WorldEdit();
     private static String version;
 
     private final EventBus eventBus = new EventBus();
@@ -670,13 +670,13 @@ public final class WorldEdit {
         } catch (ScriptException e) {
             player.printError("Failed to execute:");
             player.printRaw(e.getMessage());
-            logger.log(Level.WARNING, "Failed to execute script", e);
+            logger.warn("Failed to execute script", e);
         } catch (NumberFormatException | WorldEditException e) {
             throw e;
         } catch (Throwable e) {
             player.printError("Failed to execute (see console):");
             player.printRaw(e.getClass().getCanonicalName());
-            logger.log(Level.WARNING, "Failed to execute script", e);
+            logger.warn("Failed to execute script", e);
         } finally {
             for (EditSession editSession : scriptContext.getEditSessions()) {
                 editSession.flushQueue();

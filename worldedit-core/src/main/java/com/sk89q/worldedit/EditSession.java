@@ -95,6 +95,8 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.weather.WeatherType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -108,12 +110,15 @@ import static com.sk89q.worldedit.regions.Regions.*;
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
  * block re-ordering, and much more. Most operations in WorldEdit use this class.
- * <p>
+ *
  * <p>Most of the actual functionality is implemented with a number of other
  * {@link Extent}s that are chained together. For example, history is logged
  * using the {@link ChangeSetExtent}.</p>
  */
 public class EditSession extends AbstractDelegateExtent implements HasFaweQueue, SimpleWorld, AutoCloseable {
+
+    private static final Logger log = LoggerFactory.getLogger(EditSession.class);
+
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
      * determine which {@link Extent}s should be bypassed.
@@ -2901,8 +2906,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     return BlockTypes.get((int) typeVariable.getValue()).withPropertyId((int) dataVariable.getValue()).toBaseBlock();
-                } catch (final Exception e) {
-                    Fawe.debug("Failed to create shape: " + e);
+                } catch (Exception e) {
+                    log.warn("Failed to create shape", e);
                     return null;
                 }
             }
@@ -3299,8 +3304,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     return defaultBiomeType;
-                } catch (final Exception e) {
-                    Fawe.debug("Failed to create shape: " + e);
+                } catch (Exception e) {
+                    log.warn("Failed to create shape", e);
                     return null;
                 }
             }

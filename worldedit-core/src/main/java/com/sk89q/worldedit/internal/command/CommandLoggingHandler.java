@@ -40,6 +40,8 @@ import java.lang.reflect.Method;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Logs called commands to a logger.
  */

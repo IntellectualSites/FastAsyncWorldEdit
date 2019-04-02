@@ -27,13 +27,17 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.session.storage.JsonFileSessionStore;
 import com.sk89q.worldedit.session.storage.SessionStore;
 import com.sk89q.worldedit.session.storage.VoidStore;
 import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.Reference;
@@ -41,29 +45,26 @@ import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.Nullable;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Session manager for WorldEdit.
- * <p>
+ *
  * <p>Get a reference to one from {@link WorldEdit}.</p>
- * <p>
+ *
  * <p>While this class is thread-safe, the returned session may not be.</p>
  */
 public class SessionManager {
 
-    @Deprecated
     public static int EXPIRATION_GRACE = 600000;
 
     private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5));
-    private static final Logger log = Logger.getLogger(SessionManager.class.getCanonicalName());
+    private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
     private final Timer timer = new Timer();
     private final WorldEdit worldEdit;
     private final Map<UUID, SessionHolder> sessions = new ConcurrentHashMap<>(8, 0.9f, 1);
@@ -179,8 +180,8 @@ public class SessionManager {
             try {
                 session = store.load(getKey(sessionKey));
                 session.postLoad();
-            } catch (Throwable e) {
-                log.log(Level.WARNING, "Failed to load saved session", e);
+            } catch (IOException e) {
+                log.warn("Failed to load saved session", e);
                 session = new LocalSession();
             }
 
@@ -239,7 +240,7 @@ public class SessionManager {
                     }
                 }
             } catch (IOException e) {
-                log.log(Level.WARNING, "Failed to write session for UUID " + getKey(key), e);
+                log.warn("Failed to write session for UUID " + getKey(key), e);
             }
         }
     }

@@ -58,8 +58,13 @@ import com.sk89q.worldedit.util.command.fluent.CommandGraph;
 import com.sk89q.worldedit.util.command.fluent.DispatcherNode;
 import com.sk89q.worldedit.util.command.parametric.*;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
+import com.sk89q.worldedit.util.formatting.component.CommandUsageBox;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
+import com.sk89q.worldedit.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -69,10 +74,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -80,14 +83,15 @@ import static com.sk89q.worldedit.util.command.composition.LegacyCommandAdapter.
 
 /**
  * Handles the registration and invocation of commands.
- * <p>
+ *
  * <p>This class is primarily for internal usage.</p>
  */
 public final class CommandManager {
 
     public static final Pattern COMMAND_CLEAN_PATTERN = Pattern.compile("^[/]+");
-    private static final Logger log = Logger.getLogger(CommandManager.class.getCanonicalName());
-    private static final Logger commandLog = Logger.getLogger(CommandManager.class.getCanonicalName() + ".CommandLog");
+    private static final Logger log = LoggerFactory.getLogger(CommandManager.class);
+    private static final java.util.logging.Logger commandLog =
+        java.util.logging.Logger.getLogger(CommandManager.class.getCanonicalName() + ".CommandLog");
     private static final Pattern numberFormatExceptionPattern = Pattern.compile("^For input string: \"(.*)\"$");
 
     private final WorldEdit worldEdit;
@@ -124,6 +128,7 @@ public final class CommandManager {
         commandLog.addHandler(dynamicHandler);
         dynamicHandler.setFormatter(new LogFormat());
 
+        // Set up the commands manager
         builder = new ParametricBuilder();
         builder.setAuthorizer(new ActorAuthorizer());
         builder.setDefaultCompleter(new UserCommandCompleter(platformManager));
@@ -297,7 +302,7 @@ public final class CommandManager {
     }
 
     public void register(Platform platform) {
-        log.log(Level.FINE, "Registering commands with " + platform.getClass().getCanonicalName());
+        log.info("Registering commands with " + platform.getClass().getCanonicalName());
         this.platform = null;
 
         try {
@@ -318,12 +323,12 @@ public final class CommandManager {
             File file = new File(config.getWorkingDirectory(), path);
             commandLog.setLevel(Level.ALL);
 
-            log.log(Level.INFO, "Logging WorldEdit commands to " + file.getAbsolutePath());
+            log.info("Logging WorldEdit commands to " + file.getAbsolutePath());
 
             try {
                 dynamicHandler.setHandler(new FileHandler(file.getAbsolutePath(), true));
             } catch (IOException e) {
-                log.log(Level.WARNING, "Could not use command log file " + path + ": " + e.getMessage());
+                log.warn("Could not use command log file " + path + ": " + e.getMessage());
             }
         }
 
@@ -418,7 +423,8 @@ public final class CommandManager {
         return handleCommandTask(task, locals, null, null, null, null);
     }
 
-    private Object handleCommandTask(ThrowableSupplier<Throwable> task, CommandLocals locals, @Nullable Actor actor, @Nullable LocalSession session, @Nullable Set<String> failedPermissions, @Nullable FawePlayer fp) {
+    private Object handleCommandTask(ThrowableSupplier<Throwable> task, CommandLocals locals, @Nullable
+        Actor actor, @Nullable LocalSession session, @Nullable Set<String> failedPermissions, @Nullable FawePlayer fp) {
         Request.reset();
         if (actor == null) actor = locals.get(Actor.class);
         if (session == null) session = locals.get(LocalSession.class);
@@ -474,8 +480,8 @@ public final class CommandManager {
             if (message != null) {
                 actor.printError(BBC.getPrefix() + e.getMessage());
             } else {
-                actor.printError(BBC.getPrefix() + "An unknown FAWE error has occurred! Please see console.");
-                log.log(Level.SEVERE, "An unknown FAWE error occurred", e);
+                actor.printError("An unknown error has occurred! Please see console.");
+                log.error("An unknown error occurred", e);
             }
         } catch (Throwable e) {
             Exception faweException = FaweException.get(e);
@@ -485,7 +491,7 @@ public final class CommandManager {
             } else {
                 actor.printError(BBC.getPrefix() + "There was an error handling a FAWE command: [See console]");
                 actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
-                log.log(Level.SEVERE, "An unexpected error occurred while handling a FAWE command", e);
+                log.error("An unexpected error occurred while handling a FAWE command", e);
             }
         } finally {
             final EditSession editSession = locals.get(EditSession.class);
@@ -552,7 +558,7 @@ public final class CommandManager {
         return dispatcher;
     }
 
-    public static Logger getLogger() {
+    public static java.util.logging.Logger getLogger() {
         return commandLog;
     }
 

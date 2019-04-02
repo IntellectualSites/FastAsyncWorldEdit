@@ -183,7 +183,7 @@ public class OldChunk implements Chunk {
 
         BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(id, dataVal);
         if (state == null) {
-            WorldEdit.logger.warning("Unknown legacy block " + id + ":" + dataVal + " found when loading legacy anvil chunk.");
+            WorldEdit.logger.warn("Unknown legacy block " + id + ":" + dataVal + " found when loading legacy anvil chunk.");
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         if (state.getBlockType().getMaterial().hasContainer()) {

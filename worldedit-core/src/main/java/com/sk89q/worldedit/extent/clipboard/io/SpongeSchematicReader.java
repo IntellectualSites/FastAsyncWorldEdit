@@ -60,6 +60,8 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -70,7 +72,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -86,7 +87,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         // If NBT Compat handlers are needed - add them here.
     }
 
-    private static final Logger log = Logger.getLogger(SpongeSchematicReader.class.getCanonicalName());
+    private static final Logger log = LoggerFactory.getLogger(SpongeSchematicReader.class);
     private final NBTInputStream inputStream;
 
     /**

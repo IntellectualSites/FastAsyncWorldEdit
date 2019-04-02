@@ -48,6 +48,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -56,8 +57,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BukkitWorld extends AbstractWorld {
@@ -118,9 +118,9 @@ public class BukkitWorld extends AbstractWorld {
                     return null;
                 }
             } catch (Exception e) {
-                logger.warning("Corrupt entity found when creating: " + entity.getType().getId());
+                logger.warn("Corrupt entity found when creating: " + entity.getType().getId());
                 if (entity.getNbtData() != null) {
-                    logger.warning(entity.getNbtData().toString());
+                    logger.warn(entity.getNbtData().toString());
                 }
                 e.printStackTrace();
                 return null;
@@ -183,7 +183,7 @@ public class BukkitWorld extends AbstractWorld {
             try {
                 getWorld().regenerateChunk(chunk.getBlockX(), chunk.getBlockZ());
             } catch (Throwable t) {
-                logger.log(Level.WARNING, "Chunk generation via Bukkit raised an error", t);
+                logger.warn("Chunk generation via Bukkit raised an error", t);
             }
 
             // Then restore
@@ -280,7 +280,7 @@ public class BukkitWorld extends AbstractWorld {
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_MUSHROOM, TreeType.BROWN_MUSHROOM);
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             if (treeTypeMapping.get(type) == null) {
-                WorldEdit.logger.severe("No TreeType mapping for TreeGenerator.TreeType." + type);
+                WorldEdit.logger.error("No TreeType mapping for TreeGenerator.TreeType." + type);
             }
         }
     }
@@ -425,9 +425,9 @@ public class BukkitWorld extends AbstractWorld {
             try {
                 return adapter.setBlock(BukkitAdapter.adapt(getWorld(), position), block, notifyAndLight);
             } catch (Exception e) {
-                if (block instanceof BaseBlock && ((BaseBlock)block).getNbtData() != null) {
-                    logger.warning("Tried to set a corrupt tile entity at " + position.toString());
-                    logger.warning(((BaseBlock)block).getNbtData().toString());
+                if (block instanceof BaseBlock && ((BaseBlock) block).getNbtData() != null) {
+                    logger.warn("Tried to set a corrupt tile entity at " + position.toString());
+                    logger.warn(((BaseBlock) block).getNbtData().toString());
                 }
                 e.printStackTrace();
                 Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());

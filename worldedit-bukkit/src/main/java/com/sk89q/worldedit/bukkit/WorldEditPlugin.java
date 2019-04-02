@@ -33,24 +33,46 @@ import com.sk89q.worldedit.bukkit.adapter.AdapterLoadException;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
 import com.sk89q.worldedit.event.platform.CommandEvent;
+import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.NoCapablePlatformException;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockCategory;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.FuzzyBlockState;
+import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.item.ItemCategory;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.*;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +81,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -67,10 +88,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Plugin for Bukkit.
  */
-public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
-{
+public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
-    private static final Logger log = Logger.getLogger("FastAsyncWorldEdit");
+    private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
 
@@ -220,18 +240,18 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
                 }
             }
         }
-        {
-            Logger logger = getLogger();
-            if (logger != null) {
-                try {
-                    Field nameField = Logger.class.getDeclaredField("name");
-                    nameField.setAccessible(true);
-                    nameField.set(logger, "FastAsyncWorldEdit");
-                } catch (Throwable ignore) {
-                    ignore.printStackTrace();
-                }
-            }
-        }
+//        {
+//            Logger logger = getLogger();
+//            if (logger != null) {
+//                try {
+//                    Field nameField = Logger.class.getDeclaredField("name");
+//                    nameField.setAccessible(true);
+//                    nameField.set(logger, "FastAsyncWorldEdit");
+//                } catch (Throwable ignore) {
+//                    ignore.printStackTrace();
+//                }
+//            }
+//        }
         {
             File pluginsFolder = MainUtil.getJarFile().getParentFile();
             for (File file : pluginsFolder.listFiles()) {
@@ -245,7 +265,7 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
                     e.printStackTrace();
                 }
             }
-            log.log(Level.INFO, "Please restart the server if you have any plugins which depend on FAWE.");
+            getLogger().info("Please restart the server if you have any plugins which depend on FAWE.");
         }
     }
 
@@ -253,7 +273,7 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
         try {
             run.run();
         } catch (Throwable e) {
-            log.log(Level.SEVERE, message);
+            getLogger().severe(message);
             e.printStackTrace();
         }
     }
@@ -264,7 +284,7 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
             config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "config-legacy.yml"), true), this);
             config.load();
         } catch (Throwable e) {
-            log.log(Level.SEVERE, "Failed to load config.yml");
+            getLogger().severe("Failed to load config.yml");
             e.printStackTrace();
         }
         // Create schematics folder
@@ -280,37 +300,33 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
         try {
             adapterLoader.addClass(Spigot_v1_13_R2.class);
-        } catch (Throwable ignore) {
-            ignore.printStackTrace();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
         }
 
         try {
             adapterLoader.addFromPath(getClass().getClassLoader());
         } catch (IOException e) {
-            log.log(Level.WARNING, "Failed to search path for Bukkit adapters");
+            log.warn("Failed to search path for Bukkit adapters");
         }
 
         try {
             adapterLoader.addFromJar(getFile());
         } catch (IOException e) {
-            log.log(Level.WARNING, "Failed to search " + getFile() + " for Bukkit adapters", e);
+            log.warn("Failed to search " + getFile() + " for Bukkit adapters", e);
         }
         try {
             bukkitAdapter = adapterLoader.loadAdapter();
-            log.log(Level.INFO, "Using " + bukkitAdapter.getClass().getCanonicalName() + " as the Bukkit adapter");
+            log.info("Using " + bukkitAdapter.getClass().getCanonicalName() + " as the Bukkit adapter");
         } catch (AdapterLoadException e) {
-            try {
-                Platform platform = worldEdit.getPlatformManager().queryCapability(Capability.WORLD_EDITING);
-                if (platform instanceof BukkitServerInterface) {
-                    log.log(Level.WARNING, e.getMessage());
-                    return;
-                } else {
-                    log.log(Level.INFO, "WorldEdit could not find a Bukkit adapter for this MC version, " +
-                            "but it seems that you have another implementation of WorldEdit installed (" + platform.getPlatformName() + ") " +
-                            "that handles the world editing.");
-                }
-            } catch (NoCapablePlatformException ignore) {}
-            log.log(Level.INFO, "WorldEdit could not find a Bukkit adapter for this MC version");
+            Platform platform = worldEdit.getPlatformManager().queryCapability(Capability.WORLD_EDITING);
+            if (platform instanceof BukkitServerInterface) {
+                log.warn(e.getMessage());
+            } else {
+                log.info("WorldEdit could not find a Bukkit adapter for this MC version, " +
+                        "but it seems that you have another implementation of WorldEdit installed (" + platform.getPlatformName() + ") " +
+                        "that handles the world editing.");
+            }
         }
     }
 

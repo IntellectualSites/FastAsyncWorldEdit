@@ -49,25 +49,25 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Manages registered {@link Platform}s for WorldEdit. Platforms are
  * implementations of WorldEdit.
- * <p>
+ *
  * <p>This class is thread-safe.</p>
  */
 public class PlatformManager {
 
-    private static final Logger logger = Logger.getLogger(PlatformManager.class.getCanonicalName());
+    private static final Logger logger = LoggerFactory.getLogger(PlatformManager.class);
 
     private final WorldEdit worldEdit;
     private final CommandManager commandManager;
@@ -99,7 +99,7 @@ public class PlatformManager {
     public synchronized void register(Platform platform) {
         checkNotNull(platform);
 
-        logger.log(Level.FINE, "Got request to register " + platform.getClass() + " with WorldEdit [" + super.toString() + "]");
+        logger.info("Got request to register " + platform.getClass() + " with WorldEdit [" + super.toString() + "]");
 
         // Just add the platform to the list of platforms: we'll pick favorites
         // once all the platforms have been loaded
@@ -108,9 +108,9 @@ public class PlatformManager {
         // Make sure that versions are in sync
         if (firstSeenVersion != null) {
             if (!firstSeenVersion.equals(platform.getVersion())) {
-                logger.log(Level.WARNING, "Multiple ports of WorldEdit are installed but they report different versions ({0} and {1}). " +
+                logger.warn("Multiple ports of WorldEdit are installed but they report different versions ({0} and {1}). " +
                                 "If these two versions are truly different, then you may run into unexpected crashes and errors.",
-                        new Object[]{firstSeenVersion, platform.getVersion()});
+                        new Object[]{ firstSeenVersion, platform.getVersion() });
             }
         } else {
             firstSeenVersion = platform.getVersion();
@@ -119,7 +119,7 @@ public class PlatformManager {
 
     /**
      * Unregister a platform from WorldEdit.
-     * <p>
+     *
      * <p>If the platform has been chosen for any capabilities, then a new
      * platform will be found.</p>
      *
@@ -131,7 +131,7 @@ public class PlatformManager {
         boolean removed = platforms.remove(platform);
 
         if (removed) {
-            logger.log(Level.FINE, "Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
+            logger.info("Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
 
             boolean choosePreferred = false;
 
@@ -222,7 +222,7 @@ public class PlatformManager {
 
     /**
      * Get a list of loaded platforms.
-     * <p>
+     *
      * <p>The returned list is a copy of the original and is mutable.</p>
      *
      * @return a list of platforms
@@ -497,7 +497,7 @@ public class PlatformManager {
                         return;
                     }
 
-                    final Tool tool = session.getTool(player);
+                    Tool tool = session.getTool(player);
                     if (tool != null && tool instanceof DoubleActionTraceTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
@@ -532,7 +532,7 @@ public class PlatformManager {
                         return;
                     }
 
-                    final Tool tool = session.getTool(player);
+                    Tool tool = session.getTool(player);
                     if (tool != null && tool instanceof TraceTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);

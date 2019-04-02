@@ -53,7 +53,8 @@ public final class WorldEditPrefixHandler extends Handler {
      * @param name the logger name
      */
     public static void register(String name) {
-        Logger.getLogger(name).addHandler(new WorldEditPrefixHandler());
+        //todo fix this
+        //Logger.getLogger(name).addHandler(new WorldEditPrefixHandler());
     }
 
 }

@@ -81,7 +81,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LocalSession implements TextureHolder {
 
-    @Deprecated
     public transient static int MAX_HISTORY_SIZE = 15;
 
     // Non-session related fields
@@ -1260,7 +1259,7 @@ public class LocalSession implements TextureHolder {
                 String msg = e.getMessage();
                 if (msg != null && msg.length() > 256) msg = msg.substring(0, 256);
                 this.failedCuiAttempts++;
-                WorldEdit.logger.warning("Error while reading CUI init message for player " + uuid + ": " + msg);
+                WorldEdit.logger.warn("Error while reading CUI init message: " + e.getMessage());
 
             }
         }

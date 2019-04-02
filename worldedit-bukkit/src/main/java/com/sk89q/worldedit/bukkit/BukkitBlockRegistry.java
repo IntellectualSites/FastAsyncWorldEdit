@@ -54,18 +54,18 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
             BlockMaterial result = adapter.getMaterial(blockType);
             if (result != null) return result;
         }
-        Material type = BukkitAdapter.adapt(blockType);
-        if (type == null) {
+        Material mat = BukkitAdapter.adapt(blockType);
+        if (mat == null) {
             if (blockType == BlockTypes.__RESERVED__) return new PassthroughBlockMaterial(super.getMaterial(BlockTypes.AIR));
             return new PassthroughBlockMaterial(null);
         }
         if (materialMap == null) {
             materialMap = new BukkitBlockMaterial[Material.values().length];
         }
-        BukkitBlockMaterial result = materialMap[type.ordinal()];
+        BukkitBlockMaterial result = materialMap[mat.ordinal()];
         if (result == null) {
-            result = new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), type);
-            materialMap[type.ordinal()] = result;
+            result = new BukkitBlockMaterial(BukkitBlockRegistry.super.getMaterial(blockType), mat);
+            materialMap[mat.ordinal()] = result;
         }
         return result;
     }
@@ -84,9 +84,8 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
     @Nullable
     @Override
     public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
-        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-        if (adapter != null) {
-            return adapter.getProperties(blockType);
+        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
+            return WorldEditPlugin.getInstance().getBukkitImplAdapter().getProperties(blockType);
         }
         return super.getProperties(blockType);
     }

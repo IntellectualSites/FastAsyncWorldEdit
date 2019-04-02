@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
+
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.util.MathMan;
@@ -34,10 +37,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.World;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
 
 /**
  * Commands for moving the player around.
@@ -58,11 +57,11 @@ public class NavigationCommands {
     }
 
     @Command(
-            aliases = {"unstuck", "!"},
-            usage = "",
-            desc = "Escape from being stuck inside a block",
-            min = 0,
-            max = 0
+        aliases = { "unstuck", "!" },
+        usage = "",
+        desc = "Escape from being stuck inside a block",
+        min = 0,
+        max = 0
     )
     @CommandPermissions("worldedit.navigation.unstuck")
     public void unstuck(Player player) throws WorldEditException {

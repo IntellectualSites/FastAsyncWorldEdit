@@ -33,13 +33,13 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.snapshot.InvalidSnapshotException;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Snapshot commands.
@@ -47,7 +47,6 @@ import java.util.logging.Logger;
 @Command(aliases = {"snapshot", "snap"}, desc = "List, load and view information related to snapshots")
 public class SnapshotCommands {
 
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldEdit");
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
     private final WorldEdit we;
@@ -93,10 +92,10 @@ public class SnapshotCommands {
                 File dir = config.snapshotRepo.getDirectory();
 
                 try {
-                    logger.info("WorldEdit found no snapshots: looked in: "
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
                             + dir.getCanonicalPath());
                 } catch (IOException e) {
-                    logger.info("WorldEdit found no snapshots: looked in "
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
                             + "(NON-RESOLVABLE PATH - does it exist?): "
                             + dir.getPath());
                 }
@@ -107,7 +106,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"use"},
+            aliases = { "use" },
             usage = "<snapshot>",
             desc = "Choose a snapshot to use",
             min = 1,
@@ -150,7 +149,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"sel"},
+            aliases = { "sel" },
             usage = "<index>",
             desc = "Choose the snapshot based on the list id",
             min = 1,
@@ -197,7 +196,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"before"},
+            aliases = { "before" },
             usage = "<date>",
             desc = "Choose the nearest snapshot before a date",
             min = 1,
@@ -236,7 +235,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"after"},
+            aliases = { "after" },
             usage = "<date>",
             desc = "Choose the nearest snapshot after a date",
             min = 1,
@@ -261,7 +260,8 @@ public class SnapshotCommands {
                 Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, player.getWorld().getName());
                 if (snapshot == null) {
                     dateFormat.setTimeZone(session.getTimeZone());
-                    player.printError("Couldn't find a snapshot after " + dateFormat.format(date.getTime()) + ".");
+                    player.printError("Couldn't find a snapshot after "
+                            + dateFormat.format(date.getTime()) + ".");
                 } else {
                     session.setSnapshot(snapshot);
                     BBC.SNAPSHOT_SET.send(player, snapshot.getName());
@@ -271,4 +271,5 @@ public class SnapshotCommands {
             }
         }
     }
+
 }

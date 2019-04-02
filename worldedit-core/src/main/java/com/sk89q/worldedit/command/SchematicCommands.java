@@ -48,15 +48,18 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldedit.util.io.file.FilenameException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -66,12 +69,10 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-
 import static com.boydti.fawe.util.ReflectionUtils.as;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Commands that work with schematic files.
@@ -79,7 +80,7 @@ import static com.boydti.fawe.util.ReflectionUtils.as;
 @Command(aliases = {"schematic", "schem", "/schematic", "/schem", "clipboard", "/clipboard"}, desc = "Commands that work with schematic files")
 public class SchematicCommands extends MethodCommands {
 
-    private static final Logger log = Logger.getLogger(SchematicCommands.class.getCanonicalName());
+    private static final Logger log = LoggerFactory.getLogger(SchematicCommands.class);
 
     /**
      * Create a new instance.
@@ -266,7 +267,7 @@ public class SchematicCommands extends MethodCommands {
             player.printError("Unknown filename: " + filename);
         } catch (URISyntaxException | IOException e) {
             player.printError("File could not be read or it does not exist: " + e.getMessage());
-            log.log(Level.WARNING, "Failed to load a saved clipboard", e);
+            log.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {
                 try {
@@ -363,7 +364,7 @@ public class SchematicCommands extends MethodCommands {
         } catch (IOException e) {
             e.printStackTrace();
             player.printError("Schematic could not written: " + e.getMessage());
-            log.log(Level.WARNING, "Failed to write a saved clipboard", e);
+            log.warn("Failed to write a saved clipboard", e);
         }
     }
 

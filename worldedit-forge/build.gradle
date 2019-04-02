@@ -16,6 +16,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 dependencies {
     compile project(':worldedit-core')
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.2'
     compile 'org.spongepowered:spongeapi:6.0.0-SNAPSHOT'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.9.0-rc1'
 }

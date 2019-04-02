@@ -81,20 +81,25 @@ public class SelectionCommand extends SimpleCommand<Operation> {
         if (!testPermission(locals)) {
             throw new CommandPermissionsException();
         }
+
         Contextual<? extends Operation> operationFactory = delegate.call(args, locals);
+
         Actor actor = locals.get(Actor.class);
         if (actor instanceof Player) {
             try {
                 Player player = (Player) actor;
                 LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
                 Region selection = session.getSelection(player.getWorld());
+
                 EditSession editSession = session.createEditSession(player);
                 editSession.enableQueue();
                 locals.put(EditSession.class, editSession);
                 session.tellVersion(player);
+
                 EditContext editContext = new EditContext();
                 editContext.setDestination(locals.get(EditSession.class));
                 editContext.setRegion(selection);
+
                 Operation operation = operationFactory.createFromContext(editContext);
                 // Shortcut
                 if (selection instanceof CuboidRegion && editSession.hasFastMode() && operation instanceof RegionVisitor) {
