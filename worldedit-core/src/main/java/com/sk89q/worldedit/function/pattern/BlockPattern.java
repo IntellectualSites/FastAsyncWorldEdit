@@ -27,8 +27,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 /**
  * A pattern that returns the same {@link BaseBlock} each time.
  */
-@Deprecated
-public class BlockPattern implements Pattern {
+public class BlockPattern extends AbstractPattern {
 
     private BaseBlock block;
 
