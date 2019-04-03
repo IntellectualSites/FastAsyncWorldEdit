@@ -352,7 +352,7 @@
 //    }
 //
 //    @Override
-//    public int getBiomeId(Biome biome) {
+//    public BiomeType getBiomeType(Biome biome) {
 //        try {
 //            Object biomeBase = biomeToBiomeBase.invoke(null, biome);
 //            if (biomeBase != null) return (int) biomeBaseToTypeId.invoke(null, biomeBase);

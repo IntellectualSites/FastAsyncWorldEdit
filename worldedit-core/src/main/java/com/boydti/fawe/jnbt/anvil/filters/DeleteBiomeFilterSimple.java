@@ -9,7 +9,7 @@ public class DeleteBiomeFilterSimple extends MCAFilterCounter {
     private final int id;
 
     public DeleteBiomeFilterSimple(BiomeType biome) {
-        this.id = biome.getId();
+        this.id = biome.getInternalId();
     }
 
     @Override

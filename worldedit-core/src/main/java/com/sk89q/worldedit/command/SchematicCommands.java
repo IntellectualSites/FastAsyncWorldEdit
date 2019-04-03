@@ -65,8 +65,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -79,6 +81,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.regex.Pattern;
 
+import static com.boydti.fawe.util.ReflectionUtils.as;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -92,7 +95,6 @@ public class SchematicCommands extends MethodCommands {
      */
     private static final int SCHEMATICS_PER_PAGE = 9;
     private static final Logger log = LoggerFactory.getLogger(SchematicCommands.class);
-    private final WorldEdit worldEdit;
 
     /**
      * Create a new instance.
@@ -279,7 +281,7 @@ public class SchematicCommands extends MethodCommands {
             player.printError("Unknown filename: " + filename);
         } catch (URISyntaxException | IOException e) {
             player.printError("File could not be read or it does not exist: " + e.getMessage());
-            log.log(Level.WARNING, "Failed to load a saved clipboard", e);
+            log.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {
                 try {

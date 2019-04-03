@@ -29,6 +29,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -52,31 +53,17 @@ import java.util.Set;
  */
 @SuppressWarnings("unchecked")
 public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
-    private final BlockType blockType;
+    private BlockMaterial material;
+    private BlockType blockType;
+    private int internalId, ordinal;
     private BaseBlock emptyBaseBlock;
     
-    BlockState(BlockType blockType) {
+    BlockState(BlockType blockType, int internalId, int ordinal) {
         this.blockType = blockType;
-        this.emptyBaseBlock = new BaseBlock(this);
+        this.internalId = internalId;
+        this.ordinal = ordinal;
     }
-    
-    BlockState(BlockType blockType, BaseBlock baseBlock){
-    	this.blockType = blockType;
-    	this.emptyBaseBlock = baseBlock;
-    }
-    
-    /**
-     * Creates a fuzzy BlockState. This can be used for partial matching.
-     *
-     * @param blockType The block type
-     * @param values The block state values
-     */
-    private BlockState(BlockType blockType, Map<Property<?>, Object> values) {
-        this.blockType = blockType;
-//        this.values = values;
-//        this.fuzzy = true;
-    }
-    
+
     /**
      * Returns a temporary BlockState for a given internal id
      * @param combinedId
@@ -364,13 +351,22 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
 	@Override
 	public BlockMaterial getMaterial() {
-		return blockType.getMaterial();
+        if (this.material == null) {
+            if (blockType == BlockTypes.__RESERVED__) {
+                return this.material = blockType.getMaterial();
+            }
+            if (this.material == null) {
+                this.material = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
+            }
+        }
+        return material;
 	}
 
 	@Override
 	public int getOrdinal() {
-		get ordinal
+		return this.ordinal;
 	}
+
     /**
      * Internal method used for creating the initial BlockState.
      *
@@ -398,8 +394,6 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
         return equalsFuzzy((BlockState) obj);
     }
-
-    private Integer hashCodeCache = null;
 
     @Override
     public int hashCode() {

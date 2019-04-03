@@ -233,7 +233,7 @@ public class LegacyMapper {
     		try {
     			return BlockTypes.get(plotBlock.toString()).getDefaultState().toBaseBlock();
     		}catch(Throwable failed) {
-    			log.severe("Unable to convert StringPlotBlock " + plotBlock + " to BaseBlock!");
+    			log.error("Unable to convert StringPlotBlock " + plotBlock + " to BaseBlock!");
     			failed.printStackTrace();
     			return null;
     		}
@@ -241,12 +241,12 @@ public class LegacyMapper {
     		try {
     			return new BaseBlock(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData());
     		}catch(Throwable failed) {
-    			log.severe("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
+    			log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
     			failed.printStackTrace();
     			return null;
     		}
     	}else {
-			log.severe("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
+			log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
 			return null;
     	}
     }

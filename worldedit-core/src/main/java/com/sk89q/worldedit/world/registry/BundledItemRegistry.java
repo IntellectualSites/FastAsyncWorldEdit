@@ -51,11 +51,4 @@ public class BundledItemRegistry implements ItemRegistry {
     public Collection<String> registerItems() {
         return Collections.emptyList();
     }
-
-    @Nullable
-    @Override
-    public String getName(ItemType itemType) {
-        BundledItemData.ItemEntry itemEntry = BundledItemData.getInstance().findById(itemType.getId());
-        return itemEntry != null ? itemEntry.localizedName : null;
-    }
 }

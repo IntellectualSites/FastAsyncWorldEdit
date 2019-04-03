@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -859,7 +858,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public Biome getBiome(int x, int z) {
-        return adapter.getBiome(queue.getBiomeId(x, z));
+        return adapter.getBiome(queue.getBiomeType(x, z));
     }
 
     @Override

@@ -27,6 +27,10 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
@@ -70,7 +74,8 @@ public class FloatingTreeRemover implements BlockTool {
             Player player, LocalSession session, Location clicked) {
 
         final World world = (World) clicked.getExtent();
-        final BlockState state = world.getBlock(clicked.toBlockPoint());
+        BlockVector3 pos = clicked.toBlockPoint();
+        final BlockState state = world.getBlock(pos);
 
         if (!isTreeBlock(state.getBlockType())) {
             player.printError("That's not a tree.");

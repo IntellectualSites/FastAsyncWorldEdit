@@ -232,7 +232,7 @@ public class AsyncBlock implements Block {
 
     @Override
     public Biome getBiome() {
-        return world.getAdapter().getBiome(queue.getBiomeId(x, z));
+        return world.getAdapter().getBiome(queue.getBiomeType(x, z));
     }
 
     @Override

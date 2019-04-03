@@ -53,6 +53,7 @@ import com.sk89q.worldedit.function.visitor.LayerVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.convolution.GaussianKernel;
@@ -66,6 +67,11 @@ import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.biome.Biomes;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -704,7 +710,7 @@ public class RegionCommands extends MethodCommands {
             BiomeType biome = null;
             if (context.argsLength() >= 1) {
                 BiomeRegistry biomeRegistry = worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
-                List<BiomeType> knownBiomes = biomeRegistry.getBiomes();
+                List<BiomeType> knownBiomes = BiomeTypes.values();
                 biome = Biomes.findBiomeByName(knownBiomes, context.getString(0), biomeRegistry);
             }
             Long seed = context.argsLength() != 2 || !MathMan.isInteger(context.getString(1)) ? null : Long.parseLong(context.getString(1));

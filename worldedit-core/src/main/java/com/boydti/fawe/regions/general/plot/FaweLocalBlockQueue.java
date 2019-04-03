@@ -12,6 +12,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -94,7 +95,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
             if (reg == null) {
                 reg = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.USER_COMMANDS).getRegistries().getBiomeRegistry();
             }
-            List<BiomeType> biomes = reg.getBiomes();
+            List<BiomeType> biomes = BiomeTypes.values();
             lastBiome = biome;
             this.biome = Biomes.findBiomeByName(biomes, biome, reg);
         }

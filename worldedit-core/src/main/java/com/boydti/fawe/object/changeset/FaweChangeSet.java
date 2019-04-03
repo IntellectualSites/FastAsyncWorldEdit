@@ -268,16 +268,16 @@ public abstract class FaweChangeSet implements ChangeSet {
                             synchronized (FaweChangeSet.this) {
                                 // Biome changes
                                 if (previous.getBiomeArray() != null) {
-                                    byte[] previousBiomes = previous.getBiomeArray();
-                                    byte[] nextBiomes = next.getBiomeArray();
+                                    BiomeType[] previousBiomes = previous.getBiomeArray();
+                                    BiomeType[] nextBiomes = next.getBiomeArray();
                                     int index = 0;
                                     for (int z = 0; z < 16; z++) {
                                         int zz = bz + z;
                                         for (int x = 0; x < 16; x++) {
-                                            byte idFrom = previousBiomes[index];
-                                            byte idTo = nextBiomes[index];
-                                            if (idFrom != idTo && idTo != 0) {
-                                                addBiomeChange(bx + x, zz, FaweCache.getBiome(idFrom & 0xFF), FaweCache.getBiome(idTo & 0xFF));
+                                            BiomeType idFrom = previousBiomes[index];
+                                            BiomeType idTo = nextBiomes[index];
+                                            if (idFrom != idTo && idTo != null) {
+                                                addBiomeChange(bx + x, zz, idFrom, idTo);
                                             }
                                             index++;
                                         }

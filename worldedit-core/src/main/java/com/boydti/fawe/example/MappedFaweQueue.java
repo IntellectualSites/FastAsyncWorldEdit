@@ -753,7 +753,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     }
 
     @Override
-    public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
+    public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         int cx = x >> 4;
         int cz = z >> 4;
         lastSectionY = -1;

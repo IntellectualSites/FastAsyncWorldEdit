@@ -343,8 +343,8 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
-        return getQueue().getBiomeId(x, z);
+    default BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
+        return getQueue().getBiomeType(x, z);
     }
 
     @Override

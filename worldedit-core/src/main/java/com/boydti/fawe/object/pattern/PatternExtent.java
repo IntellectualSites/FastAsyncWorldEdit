@@ -103,7 +103,7 @@ public class PatternExtent extends AbstractPattern implements Extent {
 
     @Override
     public BiomeType getBiome(BlockVector2 position) {
-        return new BiomeType(0);
+        return null;
     }
 
     @Override

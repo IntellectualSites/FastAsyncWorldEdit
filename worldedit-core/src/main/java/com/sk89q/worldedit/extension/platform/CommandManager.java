@@ -44,6 +44,7 @@ import com.sk89q.worldedit.command.composition.DeformCommand;
 import com.sk89q.worldedit.command.composition.PaintCommand;
 import com.sk89q.worldedit.command.composition.ShapedBrushCommand;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.extent.Extent;
@@ -486,7 +487,7 @@ public final class CommandManager {
                 actor.printError(BBC.getPrefix() + e.getMessage());
             } else {
                 actor.printError(BBC.getPrefix() + "An unknown FAWE error has occurred! Please see console.");
-                log.log(Level.SEVERE, "An unknown FAWE error occurred", e);
+                log.error("An unknown FAWE error occurred", e);
             }
         } catch (Throwable e) {
             Exception faweException = FaweException.get(e);
@@ -496,7 +497,7 @@ public final class CommandManager {
             } else {
                 actor.printError(BBC.getPrefix() + "There was an error handling a FAWE command: [See console]");
                 actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
-                log.log(Level.SEVERE, "An unexpected error occurred while handling a FAWE command", e);
+                log.error("An unexpected error occurred while handling a FAWE command", e);
             }
         } finally {
             final EditSession editSession = locals.get(EditSession.class);

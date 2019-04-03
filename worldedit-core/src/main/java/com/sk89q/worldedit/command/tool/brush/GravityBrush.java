@@ -21,14 +21,11 @@ package com.sk89q.worldedit.command.tool.brush;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class GravityBrush implements Brush {
 

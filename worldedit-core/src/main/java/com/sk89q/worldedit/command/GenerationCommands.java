@@ -54,7 +54,17 @@ import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockType;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.*;
+
 
 /**
  * Commands for the generation of shapes and other objects.
@@ -427,7 +437,8 @@ public class GenerationCommands extends MethodCommands {
                               @Switch('h') boolean hollow,
                               @Switch('r') boolean useRawCoords,
                               @Switch('o') boolean offset,
-                              @Switch('c') boolean offsetCenter) throws WorldEditException {
+                              @Switch('c') boolean offsetCenter,
+                              CommandContext context) throws WorldEditException {
         final Vector3 zero;
         Vector3 unit;
 

@@ -9,6 +9,7 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -62,7 +63,7 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
 
     @Override
     public BiomeType getBiome(BlockVector2 position) {
-        return FaweCache.getBiome(0);
+        return BiomeTypes.FOREST;
     }
 
     @Override

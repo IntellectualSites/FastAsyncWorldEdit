@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.event.extent;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.event.Cancellable;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;

@@ -60,6 +60,7 @@ import com.sk89q.worldedit.regions.selector.RegionSelectorType;
 import com.sk89q.worldedit.regions.selector.SphereRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
 import com.sk89q.worldedit.util.formatting.Style;
@@ -103,7 +104,7 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.selection.pos")
     public void pos1(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
-        Location pos;
+        BlockVector3 pos;
 
         if (args.argsLength() == 1) {
             if (args.getString(0).matches("-?\\d+,-?\\d+,-?\\d+")) {
@@ -136,7 +137,7 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.selection.pos")
     public void pos2(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
-        Location pos;
+        BlockVector3 pos;
         if (args.argsLength() == 1) {
             if (args.getString(0).matches("-?\\d+,-?\\d+,-?\\d+")) {
                 String[] coords = args.getString(0).split(",");
@@ -735,7 +736,7 @@ public class SelectionCommands {
             min = 0,
             max = 1
     )
-    public void select(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void select(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
         final World world = player.getWorld();
         if (args.argsLength() == 0) {
             session.getRegionSelector(world).clear();

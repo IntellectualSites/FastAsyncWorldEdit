@@ -45,9 +45,9 @@ public class ChangeSetFaweQueue extends DelegateFaweQueue {
     @Override
     public boolean setBiome(int x, int z, BiomeType biome) {
         if (super.setBiome(x, z, biome)) {
-            int oldBiome = getParent().getBiomeId(x, z);
-            if (oldBiome != biome.getId()) {
-                set.addBiomeChange(x, z, FaweCache.getBiome(oldBiome), biome);
+            BiomeType oldBiome = getParent().getBiomeType(x, z);
+            if (oldBiome != biome) {
+                set.addBiomeChange(x, z, oldBiome, biome);
                 return true;
             }
         }

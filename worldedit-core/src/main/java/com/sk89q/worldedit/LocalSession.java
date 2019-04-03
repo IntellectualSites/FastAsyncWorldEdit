@@ -1409,23 +1409,23 @@ public class LocalSession implements TextureHolder {
         this.fastMode = fastMode;
     }
 
-    /**
-     * Gets the reorder mode of the session.
-     *
-     * @return The reorder mode
-     */
-    public EditSession.ReorderMode getReorderMode() {
-        return reorderMode;
-    }
-
-    /**
-     * Sets the reorder mode of the session.
-     *
-     * @param reorderMode The reorder mode
-     */
-    public void setReorderMode(EditSession.ReorderMode reorderMode) {
-        this.reorderMode = reorderMode;
-    }
+//    /**
+//     * Gets the reorder mode of the session.
+//     *
+//     * @return The reorder mode
+//     */
+//    public EditSession.ReorderMode getReorderMode() {
+//        return reorderMode;
+//    }
+//
+//    /**
+//     * Sets the reorder mode of the session.
+//     *
+//     * @param reorderMode The reorder mode
+//     */
+//    public void setReorderMode(EditSession.ReorderMode reorderMode) {
+//        this.reorderMode = reorderMode;
+//    }
 
     /**
      * Get the mask.

@@ -1,7 +1,6 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.example.SimpleIntFaweChunk;
 import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
@@ -17,6 +16,7 @@ import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -744,7 +744,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public boolean setBiome(int x, int z, BiomeType biome) {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) return false;
-        biomes.setByte(index, (byte) biome.getId());
+        biomes.setByte(index, (byte) biome.getInternalId());
         return true;
     }
 
@@ -920,7 +920,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
+    public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) index = Math.floorMod(index, getArea());
         return biomes.getByte(index) & 0xFF;
@@ -1011,7 +1011,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public BiomeType getBiome(BlockVector2 position) {
-        return FaweCache.CACHE_BIOME[getBiomeId(position.getBlockX(), position.getBlockZ())];
+        return BiomeTypes.get(getBiomeType(position.getBlockX(), position.getBlockZ()));
     }
 
     @Override
@@ -1069,9 +1069,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return heights.getByte(index) & 0xFF;
     }
 
-    public void setBiome(BufferedImage img, byte biome, boolean white) {
+    public void setBiome(BufferedImage img, BiomeType biome, boolean white) {
         if (img.getWidth() != getWidth() || img.getHeight() != getLength())
             throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
+        byte biomeByte = (byte) biome.getInternalId();
         biomes.record(new Runnable() {
             @Override
             public void run() {
@@ -1082,7 +1083,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
                             .nextInt(256) <= height) {
-                            biomeArr[index] = biome;
+                            biomeArr[index] = biomeByte;
                         }
                     }
                 }
@@ -1317,8 +1318,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         }));
     }
 
-    public void setBiome(Mask mask, byte biome) {
+    public void setBiome(Mask mask, BiomeType biome) {
         int index = 0;
+        byte biomeByte = (byte) biome.getInternalId();
         for (int z = 0; z < getLength(); z++) {
             mutable.mutZ(z);
             for (int x = 0; x < getWidth(); x++, index++) {
@@ -1326,7 +1328,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 mutable.mutX(x);
                 mutable.mutY(y);
                 if (mask.test(mutable)) {
-                    biomes.setByte(index, biome);
+                    biomes.setByte(index, biomeByte);
                 }
             }
         }
@@ -1528,8 +1530,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         }
     }
 
-    public void setBiome(int biome) {
-        biomes.record(() -> Arrays.fill(biomes.get(), (byte) biome));
+    public void setBiome(BiomeType biome) {
+        biomes.record(() -> Arrays.fill(biomes.get(), (byte) biome.getInternalId()));
     }
 
     public void setFloor(Pattern value) {

@@ -578,7 +578,7 @@ public class SchemVis extends ImmutableVirtualWorld {
     public void sendChunk(int x, int z, int bitMask) { /* do nothing - never used*/ }
 
     @Override
-    public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
+    public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         // TODO later (currently not used)
         return 0;
     }

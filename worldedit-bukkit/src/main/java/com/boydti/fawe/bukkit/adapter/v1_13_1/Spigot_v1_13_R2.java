@@ -189,7 +189,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
     // ------------------------------------------------------------------------
 
     @Override
-    public int getBiomeId(Biome biome) {
+    public BiomeType getBiomeId(Biome biome) {
         BiomeBase mcBiome = CraftBlock.biomeToBiomeBase(biome);
         return mcBiome != null ? IRegistry.BIOME.a(mcBiome) : 0;
     }

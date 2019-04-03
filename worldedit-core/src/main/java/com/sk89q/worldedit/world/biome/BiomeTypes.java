@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.world.biome;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Stores a list of common Biome String IDs.
@@ -120,5 +122,9 @@ public class BiomeTypes {
 
     public static BiomeType get(int parseInt) {
         // TODO
+    }
+
+    public static List<BiomeType> values() {
+
     }
 }

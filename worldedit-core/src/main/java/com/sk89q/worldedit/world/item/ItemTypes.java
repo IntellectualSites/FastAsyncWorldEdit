@@ -872,6 +872,10 @@ public final class ItemTypes {
         return ItemType.REGISTRY.register(type.getId(), type);
     }
 
+    public static final @Nullable ItemType get(String id) {
+
+    }
+
     public static final @Nullable ItemType get(BlockType type) {
         ItemType item = get(type.getId());
         if (item != null && item.getBlockType() == null) {

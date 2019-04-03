@@ -167,7 +167,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
         return null;
     }
 
-    public abstract byte[] getBiomeArray();
+    public abstract BiomeType[] getBiomeArray();
 
     public void forEachQueuedBlock(FaweChunkVisitor onEach) {
         for (int y = 0; y < HEIGHT; y++) {
@@ -290,7 +290,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
     public abstract CompoundTag getTile(int x, int y, int z);
 
     public void setBiome(final int x, final int z, final BiomeType biome) {
-        setBiome(x, z, (byte) biome.getId());
+        setBiome(x, z, biome);
     }
 
     public abstract void setBiome(final int x, final int z, final byte biome);

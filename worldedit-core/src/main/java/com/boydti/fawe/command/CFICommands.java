@@ -529,9 +529,9 @@ public class CFICommands extends MethodCommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void biome(FawePlayer fp, BiomeType biome, @Optional FawePrimitiveBinding.ImageUri image, @Optional Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
-        if (image != null) gen.setBiome(load(image), (byte) biome.getId(), !disableWhiteOnly);
-        else if (mask != null) gen.setBiome(mask, (byte) biome.getId());
-        else gen.setBiome((byte) biome.getId());
+        if (image != null) gen.setBiome(load(image), biome, !disableWhiteOnly);
+        else if (mask != null) gen.setBiome(mask, biome);
+        else gen.setBiome(biome);
         msg("Set biome!").send(fp);
         assertSettings(fp).resetComponent();
         component(fp);

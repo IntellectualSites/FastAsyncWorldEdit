@@ -61,7 +61,7 @@ import javax.annotation.Nullable;
  */
 public class BlockTransformExtent extends ResettableExtent {
 
-    private final Transform transform;
+    private Transform transform;
 
     
     public BlockTransformExtent(Extent parent) {
@@ -138,9 +138,6 @@ public class BlockTransformExtent extends ResettableExtent {
         return super.setBlock(location, transformBlock(block, true));
     }
     
-    private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
-
-
     private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
 
     /**

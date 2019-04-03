@@ -29,24 +29,7 @@ public class FaweCache {
      */
     public final static byte[][] CACHE_Z = new byte[16][];
 
-    /**
-     * Immutable biome cache
-     */
-    public final static BiomeType[] CACHE_BIOME = new BiomeType[256];
-
-    public static final BiomeType getBiome(int id) {
-        return CACHE_BIOME[id];
-    }
-
     static {
-        for (int i = 0; i < 256; i++) {
-            CACHE_BIOME[i] = new BiomeType(i) {
-                @Override
-                public void setId(int id) {
-                    throw new IllegalStateException("Cannot set id");
-                }
-            };
-        }
         CACHE_X[0] = new byte[4096];
         CACHE_Z[0] = new byte[4096];
         for (int y = 0; y < 16; y++) {

@@ -33,7 +33,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     private int area;
     private int volume;
 
-    private byte[] biomes = null;
+    private BiomeType[] biomes = null;
     private int[] states;
 
     private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
@@ -65,11 +65,11 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public void setBiome(int index, int biome) {
+    public void setBiome(int index, BiomeType biome) {
         if (biomes == null) {
-            biomes = new byte[area];
+            biomes = new BiomeType[area];
         }
-        biomes[index] = (byte) biome;
+        biomes[index] = biome;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
         if (!hasBiomes()) {
             return null;
         }
-        return FaweCache.CACHE_BIOME[biomes[index] & 0xFF];
+        return biomes[index];
     }
 
     @Override

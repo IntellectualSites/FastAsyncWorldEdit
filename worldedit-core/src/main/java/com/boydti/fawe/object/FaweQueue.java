@@ -400,7 +400,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         return getCombinedId4Data(x, y, z) != 0;
     }
 
-    int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException;
+    BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException;
 
     int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException;
 
