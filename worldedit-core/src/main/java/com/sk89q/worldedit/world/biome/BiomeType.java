@@ -27,11 +27,16 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 public class BiomeType {
 
     public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type");
+    private final int internalId;
+    private final String id;
 
-    private String id;
-
-    public BiomeType(String id) {
+    protected BiomeType(String id, int internalId) {
         this.id = id;
+        this.internalId = internalId;
+    }
+
+    public int getInternalId() {
+        return internalId;
     }
 
     /**
@@ -50,7 +55,7 @@ public class BiomeType {
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return this.internalId;
     }
 
     @Override

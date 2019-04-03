@@ -103,8 +103,11 @@ public class BiomeTypes {
     private BiomeTypes() {
     }
 
+    private static int index = 0;
+
     private static BiomeType register(final String id) {
-        return register(new BiomeType(id));
+        // TODO implement registry
+        return register(new BiomeType(id, index++));
     }
 
     public static BiomeType register(final BiomeType biome) {

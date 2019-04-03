@@ -149,11 +149,6 @@ public class CuboidClipboard {
         return clipboard;
     }
 
-    private BaseBlock adapt(BlockState state) {
-//        if (state instanceof BaseBlock) return (BaseBlock) state;
-        return new BaseBlock(state);
-    }
-
     /* ------------------------------------------------------------------------------------------------------------- */
 
     public BaseBlock getBlock(BlockVector3 position) {
