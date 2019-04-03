@@ -49,6 +49,7 @@ import com.sk89q.worldedit.util.command.parametric.BindingMatch;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -358,7 +359,7 @@ public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, 
         String input = context.next();
         if (input != null) {
 
-            if (MathMan.isInteger(input)) return new BiomeType(Integer.parseInt(input)); TODO FIXME
+            if (MathMan.isInteger(input)) return BiomeTypes.get(Integer.parseInt(input));
 
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();

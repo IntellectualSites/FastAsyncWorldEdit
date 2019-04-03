@@ -32,6 +32,8 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BlockTool;
+import com.sk89q.worldedit.command.tool.BrushTool;
+import com.sk89q.worldedit.command.tool.DoubleActionBlockTool;
 import com.sk89q.worldedit.command.tool.DoubleActionTraceTool;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.command.tool.TraceTool;
@@ -42,7 +44,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.request.Request;
+import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +57,8 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -131,9 +138,9 @@ public class PlatformManager {
 
             // Check whether this platform was chosen to be the preferred one
             // for any capability and be sure to remove it
-            Iterator<Entry<Capability, Platform>> it = preferences.entrySet().iterator();
+            Iterator<Map.Entry<Capability, Platform>> it = preferences.entrySet().iterator();
             while (it.hasNext()) {
-                Entry<Capability, Platform> entry = it.next();
+                Map.Entry<Capability, Platform> entry = it.next();
                 if (entry.getValue().equals(platform)) {
                     entry.getKey().unload(this, entry.getValue());
                     it.remove();
@@ -409,11 +416,11 @@ public class PlatformManager {
                         }
                     }
                 }
-            } finally {
-                Request.reset();
             }
         } catch (Throwable e) {
             handleThrowable(e, actor);
+        } finally {
+            Request.reset();
         }
     }
 

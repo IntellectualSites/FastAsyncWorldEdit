@@ -27,6 +27,8 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -330,11 +332,11 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param region a region
      * @return the results
      */
-    default List<Countable<BlockStateHolder>> getBlockDistributionWithData(final Region region) {
+    default List<Countable<BlockState>> getBlockDistributionWithData(final Region region) {
         int[][] counter = new int[BlockTypes.size()][];
 
         for (final BlockVector3 pt : region) {
-            BlockStateHolder blk = this.getBlock(pt);
+            BlockState blk = this.getBlock(pt);
             BlockType type = blk.getBlockType();
             int[] stateCounter = counter[type.getInternalId()];
             if (stateCounter == null) {
@@ -342,7 +344,7 @@ public interface Extent extends InputExtent, OutputExtent {
             }
             stateCounter[blk.getInternalPropertiesId()]++;
         }
-        List<Countable<BlockStateHolder>> distribution = new ArrayList<>();
+        List<Countable<BlockState>> distribution = new ArrayList<>();
         for (int typeId = 0; typeId < counter.length; typeId++) {
             BlockType type = BlockTypes.get(typeId);
             int[] stateCount = counter[typeId];
@@ -350,7 +352,7 @@ public interface Extent extends InputExtent, OutputExtent {
                 for (int propId = 0; propId < stateCount.length; propId++) {
                     int count = stateCount[propId];
                     if (count != 0) {
-                        BlockStateHolder state = type.withPropertyId(propId);
+                        BlockState state = type.withPropertyId(propId);
                         distribution.add(new Countable<>(state, count));
                     }
 

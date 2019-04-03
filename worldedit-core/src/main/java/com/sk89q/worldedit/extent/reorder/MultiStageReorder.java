@@ -168,6 +168,7 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
     public MultiStageReorder(Extent extent, boolean enabled) {
         super(extent);
         this.enabled = enabled;
+
         for (PlacementPriority priority : PlacementPriority.values()) {
             stages.put(priority, new LocatedBlockList());
         }
@@ -229,7 +230,6 @@ public class MultiStageReorder extends AbstractDelegateExtent implements Reorder
                     stages.get(PlacementPriority.CLEAR_LAST).add(location, replacement);
                     break;
             }
-        }
 
             if (block.getBlockType().getMaterial().isAir()) {
                 return !existing.equalsFuzzy(block);

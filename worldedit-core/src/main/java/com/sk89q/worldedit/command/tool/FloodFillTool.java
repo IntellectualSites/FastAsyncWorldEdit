@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.object.mask.IdMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -26,7 +27,12 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
@@ -71,8 +77,11 @@ public class FloodFillTool implements BlockTool {
 
         try (EditSession editSession = session.createEditSession(player)) {
             try {
-                TODO fillDirection (but replace)
-                recurse(editSession, origin, origin, range, initialType, new HashSet<>());
+                Mask mask = initialType.toMask(editSession);
+                BlockReplace function = new BlockReplace(editSession, pattern);
+                RecursiveVisitor visitor = new RecursiveVisitor(mask, function, range, editSession.getQueue());
+                visitor.visit(origin);
+                Operations.completeLegacy(visitor);
             } catch (MaxChangedBlocksException e) {
                 player.printError("Max blocks change limit reached.");
             } finally {

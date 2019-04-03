@@ -30,6 +30,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
@@ -50,7 +51,7 @@ import java.util.Set;
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
-public class BlockState implements BlockStateHolder<BlockState> {
+public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     private final BlockType blockType;
     private BaseBlock emptyBaseBlock;
     
@@ -354,11 +355,6 @@ public class BlockState implements BlockStateHolder<BlockState> {
     @Override
     public BlockState toImmutableState() {
         return this;
-    }
-
-    @Override
-    public BaseBlock toBaseBlock() {
-        return this.emptyBaseBlock;
     }
 
 	@Override

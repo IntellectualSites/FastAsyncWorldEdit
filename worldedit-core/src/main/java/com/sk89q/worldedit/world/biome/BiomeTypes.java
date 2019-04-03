@@ -117,4 +117,8 @@ public class BiomeTypes {
     public static @Nullable BiomeType get(final String id) {
         return BiomeType.REGISTRY.get(id);
     }
+
+    public static BiomeType get(int parseInt) {
+        // TODO
+    }
 }

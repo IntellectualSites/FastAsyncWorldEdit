@@ -478,6 +478,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         } else {
                             x = cbx;
                             z = cbz;
+                        }
                     } else {
                         x = cbx;
                     }

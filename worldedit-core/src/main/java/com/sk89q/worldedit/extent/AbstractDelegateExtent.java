@@ -37,6 +37,8 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
@@ -44,9 +46,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class AbstractDelegateExtent implements LightingExtent {
-
     private transient final Extent extent;
-//    private MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
+    private MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
     /**
      * Create a new instance.
@@ -73,11 +74,6 @@ public class AbstractDelegateExtent implements LightingExtent {
     @Override
     public BlockType getBlockType(BlockVector3 position) {
         return extent.getBlockType(position);
-    }
-
-    @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return extent.getFullBlock(position);
     }
 
 

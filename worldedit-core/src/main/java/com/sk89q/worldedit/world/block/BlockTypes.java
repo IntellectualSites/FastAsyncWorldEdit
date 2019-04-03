@@ -60,6 +60,7 @@ import java.util.stream.Stream;
  */
 public final class BlockTypes {
 
+    @Nullable public static final BlockType __RESERVED__ = get("minecraft:__reserved__");
     @Nullable public static final BlockType ACACIA_BUTTON = get("minecraft:acacia_button");
     @Nullable public static final BlockType ACACIA_DOOR = get("minecraft:acacia_door");
     @Nullable public static final BlockType ACACIA_FENCE = get("minecraft:acacia_fence");

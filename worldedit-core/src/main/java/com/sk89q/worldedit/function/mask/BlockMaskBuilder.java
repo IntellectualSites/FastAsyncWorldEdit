@@ -387,7 +387,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder addBlocks(Collection<BlockStateHolder> blocks) {
+    public <T extends BlockStateHolder> BlockMaskBuilder addBlocks(Collection<T> blocks) {
         for (BlockStateHolder block : blocks) add(block);
         return this;
     }
@@ -397,7 +397,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder addBlocks(BlockStateHolder... blocks) {
+    public <T extends BlockStateHolder> BlockMaskBuilder addBlocks(T... blocks) {
         for (BlockStateHolder block : blocks) add(block);
         return this;
     }

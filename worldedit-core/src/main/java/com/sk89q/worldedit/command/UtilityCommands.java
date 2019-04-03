@@ -113,8 +113,11 @@ import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
  */
 @Command(aliases = {}, desc = "Various utility commands: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Utilities)")
 public class UtilityCommands extends MethodCommands {
+    private final WorldEdit we;
+
     public UtilityCommands(WorldEdit we) {
         super(we);
+        this.we = we;
     }
 
     @Command(
@@ -536,15 +539,19 @@ public class UtilityCommands extends MethodCommands {
         EditSession editSession = null;
 
         if (player != null) {
-            session = worldEdit.getSessionManager().get(player);
+            session = we.getSessionManager().get(player);
             BlockVector3 center = session.getPlacementPosition(player);
             editSession = session.createEditSession(player);
             List<? extends Entity> entities;
             if (radius >= 0) {
                 CylinderRegion region = CylinderRegion.createRadius(editSession, center, radius);
+                entities = editSession.getEntities(region);
             } else {
+                entities = editSession.getEntities();
+            }
+            visitors.add(new EntityVisitor(entities.iterator(), flags.createFunction()));
         } else {
-            Platform platform = worldEdit.getPlatformManager().queryCapability(Capability.WORLD_EDITING);
+            Platform platform = we.getPlatformManager().queryCapability(Capability.WORLD_EDITING);
             for (World world : platform.getWorlds()) {
                 List<? extends Entity> entities = world.getEntities();
                 visitors.add(new EntityVisitor(entities.iterator(), flags.createFunction()));

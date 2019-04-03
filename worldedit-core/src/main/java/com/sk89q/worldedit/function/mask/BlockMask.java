@@ -39,6 +39,13 @@ public class BlockMask extends AbstractExtentMask {
     protected final static long[] ALL = new long[0];
 
     @Deprecated
+    public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
+        super(extent);
+        MainUtil.warnDeprecated(BlockMaskBuilder.class);
+        this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
+    }
+
+    @Deprecated
     public BlockMask(Extent extent, BaseBlock... blocks) {
         super(extent);
         MainUtil.warnDeprecated(BlockMaskBuilder.class);
