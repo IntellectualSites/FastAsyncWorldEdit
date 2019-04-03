@@ -80,7 +80,10 @@ task copyFiles {
 
 shadowJar {
     dependencies {
+        relocate "org.slf4j", "com.sk89q.worldedit.slf4j"
         include(dependency(':worldedit-core'))
+        include(dependency('org.slf4j:slf4j-api'))
+        include(dependency("org.slf4j:slf4j-jdk14"))
     }
     archiveName = "${parent.name}-${project.name.replaceAll("worldedit-", "")}-${parent.version}.jar"
     destinationDir = file '../target'
