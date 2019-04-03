@@ -16,7 +16,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BaseBiome getBiome(final BlockVector2 position) {
+    public BiomeType getBiome(final BlockVector2 position) {
         return super.getBiome(position);
     }
 
@@ -116,7 +116,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(final BlockVector2 position, final BaseBiome biome) {
+    public boolean setBiome(final BlockVector2 position, final BiomeType biome) {
         if (!limit.MAX_CHANGES()) {
             WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
             return false;

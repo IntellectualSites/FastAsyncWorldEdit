@@ -23,7 +23,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import java.util.HashSet;
@@ -55,8 +55,8 @@ public class PlotSetBiome extends Command {
         checkTrue(args.length == 1, Captions.COMMAND_SYNTAX, getUsage());
         final HashSet<RegionWrapper> regions = plot.getRegions();
         BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
-        List<BaseBiome> knownBiomes = biomeRegistry.getBiomes();
-        final BaseBiome biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
+        List<BiomeType> knownBiomes = biomeRegistry.getBiomes();
+        final BiomeType biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
         if (biome == null) {
             String biomes = StringMan.join(WorldUtil.IMP.getBiomeList(), Captions.BLOCK_LIST_SEPARATER.s());
             Captions.NEED_BIOME.send(player);

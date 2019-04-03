@@ -52,7 +52,7 @@ import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -527,7 +527,7 @@ public class CFICommands extends MethodCommands {
                     " - If a mask is used, the biome will be set anywhere the mask applies"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void biome(FawePlayer fp, BaseBiome biome, @Optional FawePrimitiveBinding.ImageUri image, @Optional Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void biome(FawePlayer fp, BiomeType biome, @Optional FawePrimitiveBinding.ImageUri image, @Optional Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) gen.setBiome(load(image), (byte) biome.getId(), !disableWhiteOnly);
         else if (mask != null) gen.setBiome(mask, (byte) biome.getId());

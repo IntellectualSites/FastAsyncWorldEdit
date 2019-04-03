@@ -6,7 +6,7 @@ import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.sk89q.jnbt.CompoundTag;
 
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Map;
@@ -171,7 +171,7 @@ public abstract class LazyFaweChunk<T extends FaweChunk> extends FaweChunk {
     }
 
     @Override
-    public void setBiome(int x, int z, BaseBiome biome) {
+    public void setBiome(int x, int z, BiomeType biome) {
         internalGetOrCacheChunk().setBiome(x, z, biome);
     }
 

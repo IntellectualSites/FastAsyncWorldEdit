@@ -14,7 +14,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Collection;
@@ -79,7 +79,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
@@ -90,7 +90,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(int x, int y, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
@@ -101,12 +101,12 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
             }
-            return EditSession.nullBiome;
+            return null;
         }
         return super.getBiome(position);
     }

@@ -19,7 +19,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -140,9 +140,9 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public BaseBiome getBiome(int index) {
+    public BiomeType getBiome(int index) {
         if (!hasBiomes()) {
-            return EditSession.nullBiome;
+            return null;
         }
         int biomeId = mbb.get(HEADER_SIZE + (volume << 2) + index) & 0xFF;
         return FaweCache.CACHE_BIOME[biomeId];
@@ -162,7 +162,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public BaseBiome getBiome(int x, int z) {
+    public BiomeType getBiome(int x, int z) {
         return getBiome(getIndex(x, 0, z));
     }
 

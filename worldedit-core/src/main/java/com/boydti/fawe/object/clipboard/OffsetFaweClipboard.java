@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -36,7 +36,7 @@ public class OffsetFaweClipboard extends AbstractDelegateFaweClipboard {
     }
 
     @Override
-    public BaseBiome getBiome(int x, int z) {
+    public BiomeType getBiome(int x, int z) {
         return super.getBiome(ox + x, oz + z);
     }
 

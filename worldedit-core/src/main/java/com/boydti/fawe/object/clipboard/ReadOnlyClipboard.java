@@ -10,7 +10,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -51,7 +51,7 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
     }
 
     @Override
-    public BaseBiome getBiome(int index) {
+    public BiomeType getBiome(int index) {
         throw new UnsupportedOperationException("World based clipboards do not provide index access");
     }
 
@@ -80,7 +80,7 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
     public abstract BaseBlock getBlock(int x, int y, int z);
 
     @Override
-    public abstract BaseBiome getBiome(int x, int z);
+    public abstract BiomeType getBiome(int x, int z);
 
     @Override
     public abstract List<? extends Entity> getEntities();

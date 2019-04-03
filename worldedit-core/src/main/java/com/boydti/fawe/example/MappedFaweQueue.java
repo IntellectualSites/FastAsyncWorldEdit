@@ -17,7 +17,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.ArrayDeque;
@@ -119,7 +119,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
 
     public abstract WORLD getImpWorld();
 
-    public abstract boolean regenerateChunk(WORLD world, int x, int z, BaseBiome biome, Long seed);
+    public abstract boolean regenerateChunk(WORLD world, int x, int z, BiomeType biome, Long seed);
 
     @Override
     public abstract FaweChunk getFaweChunk(int x, int z);
@@ -140,7 +140,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     }
 
     @Override
-    public boolean regenerateChunk(int x, int z, BaseBiome biome, Long seed) {
+    public boolean regenerateChunk(int x, int z, BiomeType biome, Long seed) {
         return regenerateChunk(getWorld(), x, z, biome, seed);
     }
 
@@ -193,7 +193,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     }
 
     @Override
-    public boolean setBiome(int x, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         int cx = x >> 4;
         int cz = z >> 4;
         FaweChunk chunk = map.getFaweChunk(cx, cz);

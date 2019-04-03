@@ -16,7 +16,7 @@ import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.EOFException;
@@ -325,7 +325,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void addBiomeChange(int x, int z, BaseBiome from, BaseBiome to) {
+    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
         blockSize++;
         try {
             OutputStream os = getBiomeOS();

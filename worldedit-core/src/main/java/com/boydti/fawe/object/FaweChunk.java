@@ -5,7 +5,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.ArrayDeque;
@@ -289,7 +289,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
      */
     public abstract CompoundTag getTile(int x, int y, int z);
 
-    public void setBiome(final int x, final int z, final BaseBiome biome) {
+    public void setBiome(final int x, final int z, final BiomeType biome) {
         setBiome(x, z, (byte) biome.getId());
     }
 

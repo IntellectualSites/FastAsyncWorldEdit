@@ -19,7 +19,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -246,12 +246,12 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         return parent.getBiome(position);
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return parent.setBiome(position, biome);
     }
 

@@ -1,7 +1,7 @@
 package com.boydti.fawe;
 
 import com.sk89q.jnbt.*;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -32,15 +32,15 @@ public class FaweCache {
     /**
      * Immutable biome cache
      */
-    public final static BaseBiome[] CACHE_BIOME = new BaseBiome[256];
+    public final static BiomeType[] CACHE_BIOME = new BiomeType[256];
 
-    public static final BaseBiome getBiome(int id) {
+    public static final BiomeType getBiome(int id) {
         return CACHE_BIOME[id];
     }
 
     static {
         for (int i = 0; i < 256; i++) {
-            CACHE_BIOME[i] = new BaseBiome(i) {
+            CACHE_BIOME[i] = new BiomeType(i) {
                 @Override
                 public void setId(int id) {
                     throw new IllegalStateException("Cannot set id");

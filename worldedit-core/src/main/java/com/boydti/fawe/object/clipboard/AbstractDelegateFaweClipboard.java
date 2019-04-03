@@ -8,7 +8,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -47,12 +47,12 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public BaseBiome getBiome(int x, int z) {
+    public BiomeType getBiome(int x, int z) {
         return parent.getBiome(x, z);
     }
 
     @Override
-    public BaseBiome getBiome(int index) {
+    public BiomeType getBiome(int index) {
         return parent.getBiome(index);
     }
 

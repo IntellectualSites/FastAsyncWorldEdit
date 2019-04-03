@@ -6,7 +6,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.SplittableRandom;
@@ -26,7 +26,7 @@ public class RandomOffsetTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 pos, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 pos, BiomeType biome) {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
         return getExtent().setBiome(mutable.setComponents(x, z), biome);

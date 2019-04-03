@@ -79,17 +79,17 @@ public abstract class ArbitraryBiomeShape {
      *
      * @param x X coordinate to be queried
      * @param z Z coordinate to be queried
-     * @param defaultBaseBiome The default biome for the current column.
+     * @param defaultBiomeType The default biome for the current column.
      * @return material to place or null to not place anything.
      */
-    protected abstract BiomeType getBiome(int x, int z, BiomeType defaultBaseBiome);
+    protected abstract BiomeType getBiome(int x, int z, BiomeType defaultBiomeType);
 
-    private BiomeType getBiomeCached(int x, int z, BiomeType baseBiome) {
+    private BiomeType getBiomeCached(int x, int z, BiomeType BiomeType) {
         final int index = (z - cacheOffsetZ) + (x - cacheOffsetX) * cacheSizeZ;
 
         final BiomeType cacheEntry = cache[index];
         if (cacheEntry == null) {// unknown, fetch material
-            final BiomeType material = getBiome(x, z, baseBiome);
+            final BiomeType material = getBiome(x, z, BiomeType);
             if (material == null) {
                 // outside
                 cache[index] = BiomeTypes.THE_VOID;
@@ -108,13 +108,13 @@ public abstract class ArbitraryBiomeShape {
         return cacheEntry;
     }
 
-    private boolean isInsideCached(int x, int z, BiomeType baseBiome) {
+    private boolean isInsideCached(int x, int z, BiomeType BiomeType) {
         final int index = (z - cacheOffsetZ) + (x - cacheOffsetX) * cacheSizeZ;
 
         final BiomeType cacheEntry = cache[index];
         if (cacheEntry == null) {
             // unknown block, meaning they must be outside the extent at this stage, but might still be inside the shape
-            return getBiomeCached(x, z, baseBiome) != null;
+            return getBiomeCached(x, z, BiomeType) != null;
         }
 
         return cacheEntry != BiomeTypes.THE_VOID;
@@ -124,11 +124,11 @@ public abstract class ArbitraryBiomeShape {
      * Generates the shape.
      *
      * @param editSession The EditSession to use.
-     * @param baseBiome The default biome type.
+     * @param BiomeType The default biome type.
      * @param hollow Specifies whether to generate a hollow shape.
      * @return number of affected blocks.
      */
-    public int generate(EditSession editSession, BiomeType baseBiome, boolean hollow) {
+    public int generate(EditSession editSession, BiomeType BiomeType, boolean hollow) {
         int affected = 0;
 
         for (BlockVector2 position : getExtent()) {
@@ -136,7 +136,7 @@ public abstract class ArbitraryBiomeShape {
             int z = position.getBlockZ();
 
             if (!hollow) {
-                final BiomeType material = getBiome(x, z, baseBiome);
+                final BiomeType material = getBiome(x, z, BiomeType);
                 if (material != null && material != BiomeTypes.THE_VOID) {
                     editSession.getWorld().setBiome(position, material);
                     ++affected;
@@ -145,26 +145,26 @@ public abstract class ArbitraryBiomeShape {
                 continue;
             }
 
-            final BiomeType material = getBiomeCached(x, z, baseBiome);
+            final BiomeType material = getBiomeCached(x, z, BiomeType);
             if (material == null) {
                 continue;
             }
 
             boolean draw = false;
             do {
-                if (!isInsideCached(x + 1, z, baseBiome)) {
+                if (!isInsideCached(x + 1, z, BiomeType)) {
                     draw = true;
                     break;
                 }
-                if (!isInsideCached(x - 1, z, baseBiome)) {
+                if (!isInsideCached(x - 1, z, BiomeType)) {
                     draw = true;
                     break;
                 }
-                if (!isInsideCached(x, z + 1, baseBiome)) {
+                if (!isInsideCached(x, z + 1, BiomeType)) {
                     draw = true;
                     break;
                 }
-                if (!isInsideCached(x, z - 1, baseBiome)) {
+                if (!isInsideCached(x, z - 1, BiomeType)) {
                     draw = true;
                     break;
                 }

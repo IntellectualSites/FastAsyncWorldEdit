@@ -28,7 +28,7 @@ import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.parametric.Optional;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Collections;
@@ -268,7 +268,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern biome(Actor actor, LocalSession session, Extent extent, BaseBiome biome) {
+    public Pattern biome(Actor actor, LocalSession session, Extent extent, BiomeType biome) {
         return new BiomePattern(extent, biome);
     }
 

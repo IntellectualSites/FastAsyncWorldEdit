@@ -32,7 +32,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -291,7 +291,7 @@ public class AnvilCommands {
             desc = "Delete chunks matching a specific biome"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
-    public void deleteBiome(Player player, String folder, BaseBiome biome, @Switch('u') boolean unsafe) {
+    public void deleteBiome(Player player, String folder, BiomeType biome, @Switch('u') boolean unsafe) {
         DeleteBiomeFilterSimple filter = new DeleteBiomeFilterSimple(biome);
         DeleteBiomeFilterSimple result = runWithWorld(player, folder, filter, true, unsafe);
         if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));

@@ -25,7 +25,7 @@ import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Iterator;
@@ -141,7 +141,7 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public abstract void addEntityCreate(CompoundTag tag);
 
-    public abstract void addBiomeChange(int x, int z, BaseBiome from, BaseBiome to);
+    public abstract void addBiomeChange(int x, int z, BiomeType from, BiomeType to);
 
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return getIterator(redo);

@@ -12,7 +12,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -865,7 +865,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     @Override
     public void setBiome(int x, int z, Biome bio) {
         int id = adapter.getBiomeId(bio);
-        queue.setBiome(x, z, new BaseBiome(id));
+        queue.setBiome(x, z, new BiomeType(id));
     }
 
     @Override

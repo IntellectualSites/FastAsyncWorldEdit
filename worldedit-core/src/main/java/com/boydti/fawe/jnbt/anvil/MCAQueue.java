@@ -17,7 +17,7 @@ import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -643,7 +643,7 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
     }
 
     @Override
-    public boolean regenerateChunk(FaweQueue faweQueue, int x, int z, BaseBiome biome, Long seed) {
+    public boolean regenerateChunk(FaweQueue faweQueue, int x, int z, BiomeType biome, Long seed) {
         throw new UnsupportedOperationException("Not supported");
     }
 

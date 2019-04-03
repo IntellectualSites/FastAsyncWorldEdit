@@ -6,14 +6,14 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.IOException;
 
 public class BiomePattern extends ExistingPattern {
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
-    private final BaseBiome biome;
+    private final BiomeType biome;
 
-    public BiomePattern(Extent extent, BaseBiome biome) {
+    public BiomePattern(Extent extent, BiomeType biome) {
         super(extent);
         this.biome = biome;
     }
@@ -36,7 +36,7 @@ public class BiomePattern extends ExistingPattern {
             return BiomePattern.this;
         }
 
-        public BaseBiome getBiome() {
+        public BiomeType getBiome() {
             return biome;
         }
 

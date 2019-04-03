@@ -9,7 +9,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class TransformExtent extends BlockTransformExtent {
@@ -98,7 +98,7 @@ public class TransformExtent extends BlockTransformExtent {
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
@@ -117,7 +117,7 @@ public class TransformExtent extends BlockTransformExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);

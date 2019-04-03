@@ -630,7 +630,6 @@ public abstract class FawePlayer<T> extends Metadatable {
         cancel(true);
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
             session = getSession();
-            WorldEdit.getInstance().getSessionManager().remove(toWorldEditPlayer());
             session.setClipboard(null);
             session.clearHistory();
             session.unregisterTools(getPlayer());

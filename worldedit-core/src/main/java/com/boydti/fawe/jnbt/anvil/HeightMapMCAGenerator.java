@@ -33,7 +33,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -689,7 +689,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return this.setBiome(position.getBlockX(), position.getBlockZ(), biome);
     }
 
@@ -741,7 +741,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean setBiome(int x, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) return false;
         biomes.setByte(index, (byte) biome.getId());
@@ -829,7 +829,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean regenerateChunk(int x, int z, @Nullable BaseBiome biome, @Nullable Long seed) {
+    public boolean regenerateChunk(int x, int z, @Nullable BiomeType biome, @Nullable Long seed) {
         // Unsupported
         return false;
     }
@@ -1010,7 +1010,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         return FaweCache.CACHE_BIOME[getBiomeId(position.getBlockX(), position.getBlockZ())];
     }
 

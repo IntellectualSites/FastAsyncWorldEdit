@@ -11,7 +11,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class MaskedFaweQueue extends DelegateFaweQueue {
@@ -88,7 +88,7 @@ public class MaskedFaweQueue extends DelegateFaweQueue {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         if (region.contains(position.getBlockX(), position.getBlockZ())) {
             return super.setBiome(position, biome);
         }
@@ -96,7 +96,7 @@ public class MaskedFaweQueue extends DelegateFaweQueue {
     }
 
     @Override
-    public boolean setBiome(int x, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         if (region.contains(x, z)) {
             return super.setBiome(x, z, biome);
         }

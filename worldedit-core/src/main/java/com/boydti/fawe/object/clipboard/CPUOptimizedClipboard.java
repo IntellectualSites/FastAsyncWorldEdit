@@ -14,7 +14,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -84,15 +84,15 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public BaseBiome getBiome(int index) {
+    public BiomeType getBiome(int index) {
         if (!hasBiomes()) {
-            return EditSession.nullBiome;
+            return null;
         }
         return FaweCache.CACHE_BIOME[biomes[index] & 0xFF];
     }
 
     @Override
-    public BaseBiome getBiome(int x, int z) {
+    public BiomeType getBiome(int x, int z) {
         return getBiome(getIndex(x, 0, z));
     }
 

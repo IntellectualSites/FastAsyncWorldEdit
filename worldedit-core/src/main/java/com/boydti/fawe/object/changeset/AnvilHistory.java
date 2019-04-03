@@ -8,7 +8,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.history.change.Change;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -79,7 +79,7 @@ public class AnvilHistory extends FaweChangeSet implements IAnvilHistory {
     }
 
     @Override
-    public void addBiomeChange(int x, int z, BaseBiome from, BaseBiome to) {
+    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
         throw new UnsupportedOperationException("Only anvil operations are supported");
     }
 

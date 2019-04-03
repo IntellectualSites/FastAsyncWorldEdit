@@ -8,7 +8,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -59,7 +59,7 @@ public class CPUOptimizedChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void addBiomeChange(int x, int z, BaseBiome from, BaseBiome to) {
+    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
         throw new UnsupportedOperationException("Invalid mode");
     }
 

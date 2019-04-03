@@ -18,7 +18,7 @@ import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.request.RequestSelection;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 
 import java.util.function.Predicate;
@@ -414,7 +414,7 @@ public class MaskCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Mask biome(Extent extent, BaseBiome biome) throws ExpressionException {
+    public Mask biome(Extent extent, BiomeType biome) throws ExpressionException {
         return new BiomeMask(extent, biome);
     }
 

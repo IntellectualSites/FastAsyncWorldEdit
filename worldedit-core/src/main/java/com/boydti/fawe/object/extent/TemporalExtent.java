@@ -7,7 +7,7 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 
@@ -16,7 +16,7 @@ public class TemporalExtent extends AbstractDelegateExtent {
     private BlockStateHolder<?> block = EditSession.nullBlock;
 
     private int bx, bz = Integer.MAX_VALUE;
-    private BaseBiome biome = EditSession.nullBiome;
+    private BiomeType biome = null;
 
     /**
      * Create a new instance.
@@ -35,7 +35,7 @@ public class TemporalExtent extends AbstractDelegateExtent {
         this.block = block;
     }
 
-    public void set(int x, int z, BaseBiome biome) {
+    public void set(int x, int z, BiomeType biome) {
         this.bx = x;
         this.bz = z;
         this.biome = biome;
@@ -86,7 +86,7 @@ public class TemporalExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         if (position.getX() == bx && position.getZ() == bz) {
             return biome;
         }

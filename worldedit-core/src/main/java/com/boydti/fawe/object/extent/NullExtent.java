@@ -14,7 +14,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
@@ -48,7 +48,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public BaseBiome getBiome(final BlockVector2 arg0) {
+    public BiomeType getBiome(final BlockVector2 arg0) {
         if(reason != null) {
         	throw new FaweException(reason);
         }else {
@@ -75,7 +75,7 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public boolean setBiome(final BlockVector2 arg0, final BaseBiome arg1) {
+    public boolean setBiome(final BlockVector2 arg0, final BiomeType arg1) {
         if(reason != null) {
         	throw new FaweException(reason);
         }else {
