@@ -7,7 +7,7 @@
 |  |    /  _____  \  \    /\    /    |  |____
 |__|   /__/     \__\  \__/  \__/     |_______|
 
-======= By Empire92 and WorldEdit team =======
+======== Authors https://git.io/fjIDU ========
 
 If you encounter trouble:
  - Run `build` in a separate Gradle run
