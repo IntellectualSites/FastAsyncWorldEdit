@@ -27,7 +27,6 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
-
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.DataException;
@@ -260,7 +259,7 @@ public class AnvilChunk implements Chunk {
 
         BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
         if (state == null) {
-            WorldEdit.logger.warning("Unknown legacy block " + id + ":" + data + " found when loading legacy anvil chunk.");
+            WorldEdit.logger.warn("Unknown legacy block " + id + ":" + data + " found when loading legacy anvil chunk.");
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         if (state.getMaterial().hasContainer()) {

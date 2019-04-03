@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -75,80 +76,26 @@ public class FloatingTreeRemover implements BlockTool {
             player.printError("That's not a tree.");
             return true;
         }
-        final EditSession editSession = session.createEditSession(player);
-        try /*(EditSession editSession = session.createEditSession(player))*/ {
-                final Set<BlockVector3> blockSet = bfs(world, clicked.toBlockPoint());
-                if (blockSet == null) {
-                    player.printError("That's not a floating tree.");
-                    return true;
-                }
 
-                for (BlockVector3 blockVector : blockSet) {
-                    final BlockState otherState = editSession.getBlock(blockVector);
-                    if (isTreeBlock(otherState.getBlockType())) {
-                        editSession.setBlock(blockVector, BlockTypes.AIR.getDefaultState());
-                    }
-                }
-        } catch (MaxChangedBlocksException e) {
-            player.printError("Max blocks change limit reached.");
-        } finally {
-            session.remember(editSession);
+        try (EditSession editSession = session.createEditSession(player)) {
+            try {
+                Pattern replace = BlockTypes.AIR;
+                RecursiveVisitor visitor = new RecursiveVisitor(new BlockMask(editSession, logs, leaves), replace, 64, editSession);
+                visitor.visit(pos);
+                Operations.completeBlindly(visitor);
+            } finally {
+                session.remember(editSession);
+            }
         }
 
         return true;
     }
 
     private BlockVector3[] recurseDirections = {
-            Direction.NORTH.toBlockVector(),
             Direction.EAST.toBlockVector(),
             Direction.SOUTH.toBlockVector(),
             Direction.WEST.toBlockVector(),
             Direction.UP.toBlockVector(),
             Direction.DOWN.toBlockVector(),
     };
-
-    /**
-     * Helper method.
-     *
-     * @param world the world that contains the tree
-     * @param origin any point contained in the floating tree
-     * @return a set containing all blocks in the tree/shroom or null if this is not a floating tree/shroom.
-     */
-    private Set<BlockVector3> bfs(World world, BlockVector3 origin) throws MaxChangedBlocksException {
-        final Set<BlockVector3> visited = new HashSet<>();
-        final LinkedList<BlockVector3> queue = new LinkedList<>();
-
-        queue.addLast(origin);
-        visited.add(origin);
-
-        while (!queue.isEmpty()) {
-            final BlockVector3 current = queue.removeFirst();
-            for (BlockVector3 recurseDirection : recurseDirections) {
-                final BlockVector3 next = current.add(recurseDirection);
-                if (origin.distanceSq(next) > rangeSq) {
-                    // Maximum range exceeded => stop walking
-                    continue;
-                }
-
-                if (visited.add(next)) {
-                    BlockState state = world.getBlock(next);
-                    if (state.getBlockType().getMaterial().isAir() || state.getBlockType() == BlockTypes.SNOW) {
-                        continue;
-                    }
-                    if (isTreeBlock(state.getBlockType())) {
-                        queue.addLast(next);
-                    } else {
-                        // we hit something solid - evaluate where we came from
-                        final BlockType currentType = world.getBlock(current).getBlockType();
-                        if (!BlockCategories.LEAVES.contains(currentType) && currentType != BlockTypes.VINE) {
-                            // log/shroom touching a wall/the ground => this is not a floating tree, bail out
-                            return null;
-                        }
-                    }
-                }
-            }
-        }
-
-        return visited;
-    }
 }

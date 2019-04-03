@@ -67,11 +67,16 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.Nonnull;
+
 import javax.annotation.Nullable;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -118,6 +123,7 @@ public class LocalSession implements TextureHolder {
     private transient Tool[] tools = new Tool[ItemTypes.size()];
 
     private transient int maxBlocksChanged = -1;
+    private transient int maxTimeoutTime;
     private transient boolean useInventory;
     private transient Snapshot snapshot;
     private transient boolean hasCUISupport = false;
@@ -831,6 +837,24 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
+     * Get the maximum time allowed for certain executions to run before cancelling them, such as expressions.
+     *
+     * @return timeout time, in milliseconds
+     */
+    public int getTimeout() {
+        return maxTimeoutTime;
+    }
+
+    /**
+     * Set the maximum number of blocks that can be changed.
+     *
+     * @param timeout the time, in milliseconds, to limit certain executions to, or -1 to disable
+     */
+    public void setTimeout(int timeout) {
+        this.maxTimeoutTime = timeout;
+    }
+
+    /**
      * Checks whether the super pick axe is enabled.
      *
      * @return status
@@ -1260,7 +1284,7 @@ public class LocalSession implements TextureHolder {
                 String msg = e.getMessage();
                 if (msg != null && msg.length() > 256) msg = msg.substring(0, 256);
                 this.failedCuiAttempts++;
-                WorldEdit.logger.warning("Error while reading CUI init message for player " + uuid + ": " + msg);
+                WorldEdit.logger.warn("Error while reading CUI init message for player " + uuid + ": " + msg);
 
             }
         }
@@ -1373,6 +1397,24 @@ public class LocalSession implements TextureHolder {
      */
     public void setFastMode(boolean fastMode) {
         this.fastMode = fastMode;
+    }
+
+    /**
+     * Gets the reorder mode of the session.
+     *
+     * @return The reorder mode
+     */
+    public EditSession.ReorderMode getReorderMode() {
+        return reorderMode;
+    }
+
+    /**
+     * Sets the reorder mode of the session.
+     *
+     * @param reorderMode The reorder mode
+     */
+    public void setReorderMode(EditSession.ReorderMode reorderMode) {
+        this.reorderMode = reorderMode;
     }
 
     /**

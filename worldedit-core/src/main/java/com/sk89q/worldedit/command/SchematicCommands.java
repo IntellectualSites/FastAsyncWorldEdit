@@ -32,6 +32,7 @@ import com.boydti.fawe.object.schematic.StructureFormat;
 import com.boydti.fawe.object.schematic.visualizer.SchemVis;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.chat.Message;
+import com.google.common.collect.Multimap;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -55,23 +56,30 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.io.file.FilenameException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-
-import static com.boydti.fawe.util.ReflectionUtils.as;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Commands that work with schematic files.
@@ -79,7 +87,12 @@ import static com.boydti.fawe.util.ReflectionUtils.as;
 @Command(aliases = {"schematic", "schem", "/schematic", "/schem", "clipboard", "/clipboard"}, desc = "Commands that work with schematic files")
 public class SchematicCommands extends MethodCommands {
 
-    private static final Logger log = Logger.getLogger(SchematicCommands.class.getCanonicalName());
+    /**
+     * 9 schematics per page fits in the MC chat window.
+     */
+    private static final int SCHEMATICS_PER_PAGE = 9;
+    private static final Logger log = LoggerFactory.getLogger(SchematicCommands.class);
+    private final WorldEdit worldEdit;
 
     /**
      * Create a new instance.
@@ -280,7 +293,7 @@ public class SchematicCommands extends MethodCommands {
     @Command(aliases = {"save"}, usage = "[format] <filename>", desc = "Save a schematic into your clipboard", help = "The default format for 1.13 is schem")
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other"})
-    public void save(final Player player, final LocalSession session, @Optional("schem") final String formatName, String filename, @Switch('g') boolean global) throws CommandException, WorldEditException {
+    public void save(final Player player, final LocalSession session, @Optional("schem") final String formatName, String filename, @Switch('g') boolean global, @Switch('f') boolean allowOverwrite) throws CommandException, WorldEditException {
         final LocalConfiguration config = this.worldEdit.getConfiguration();
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
@@ -324,6 +337,8 @@ public class SchematicCommands extends MethodCommands {
         try {
             if (!f.exists()) {
                 f.createNewFile();
+            } else if (!allowOverwrite) {
+                BBC.SCHEMATIC_MOVE_EXISTS.send(player, f.getName());
             }
             try (FileOutputStream fos = new FileOutputStream(f)) {
                 final ClipboardHolder holder = session.getClipboard();
@@ -363,7 +378,7 @@ public class SchematicCommands extends MethodCommands {
         } catch (IOException e) {
             e.printStackTrace();
             player.printError("Schematic could not written: " + e.getMessage());
-            log.log(Level.WARNING, "Failed to write a saved clipboard", e);
+            log.warn("Failed to write a saved clipboard", e);
         }
     }
 
@@ -645,6 +660,4 @@ public class SchematicCommands extends MethodCommands {
             }
         });
     }
-
-
 }

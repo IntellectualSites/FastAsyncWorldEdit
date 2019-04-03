@@ -22,7 +22,9 @@ package com.sk89q.worldedit.command;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -48,7 +50,7 @@ public class ToolUtilCommands {
         max = 1
     )
     @CommandPermissions("worldedit.superpickaxe")
-    public void togglePickaxe(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+    public void togglePickaxe(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
         String newState = args.getString(0, null);
         if (session.hasSuperPickAxe()) {
@@ -78,7 +80,7 @@ public class ToolUtilCommands {
         max = -1
     )
     @CommandPermissions("worldedit.brush.options.mask")
-    public void mask(Player player, LocalSession session, EditSession editSession, @Optional Mask mask) throws WorldEditException {
+    public void mask(Player player, LocalSession session, @Optional Mask mask) throws WorldEditException {
         if (mask == null) {
             session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setMask(null);
             player.print("Brush mask disabled.");
@@ -96,7 +98,7 @@ public class ToolUtilCommands {
         max = 1
     )
     @CommandPermissions("worldedit.brush.options.material")
-    public void material(Player player, LocalSession session, EditSession editSession, Pattern pattern) throws WorldEditException {
+    public void material(Player player, LocalSession session, Pattern pattern) throws WorldEditException {
         session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setFill(pattern);
         player.print("Brush material set.");
     }
@@ -109,7 +111,7 @@ public class ToolUtilCommands {
             max = 1
         )
     @CommandPermissions("worldedit.brush.options.range")
-    public void range(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+    public void range(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         int range = args.getInteger(0);
         session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setRange(range);
         player.print("Brush range set.");
@@ -123,7 +125,9 @@ public class ToolUtilCommands {
         max = 1
     )
     @CommandPermissions("worldedit.brush.options.size")
-    public void size(Player player, LocalSession session, EditSession editSession, Expression radius) throws WorldEditException {
+    public void size(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+
+        int radius = args.getInteger(0);
         we.checkMaxBrushRadius(radius);
         session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(radius);
         player.print("Brush size set.");

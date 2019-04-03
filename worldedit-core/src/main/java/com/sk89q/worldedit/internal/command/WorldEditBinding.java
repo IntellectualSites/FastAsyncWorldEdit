@@ -27,9 +27,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.UnknownDirectionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.NoMatchException;
@@ -51,15 +48,15 @@ import com.sk89q.worldedit.util.command.parametric.BindingHelper;
 import com.sk89q.worldedit.util.command.parametric.BindingMatch;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.Biomes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Binds standard WorldEdit classes such as {@link Player} and {@link LocalSession}.
@@ -107,7 +104,7 @@ public class WorldEditBinding {
         Player sender = getPlayer(context);
         LocalSession session = worldEdit.getSessionManager().get(sender);
         EditSession editSession = session.createEditSession(sender);
-        editSession.enableQueue();
+        editSession.enableStandardMode();
         context.getContext().getLocals().put(EditSession.class, editSession);
         session.tellVersion(sender);
         return editSession;
@@ -338,7 +335,8 @@ public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, 
                 return type;
             } else {
                 throw new ParameterException(
-                        String.format("Can't recognize tree type '%s' -- choose from: %s", input, Arrays.toString(TreeType.values())));
+                        String.format("Can't recognize tree type '%s' -- choose from: %s", input,
+                                TreeType.getPrimaryAliases()));
             }
         } else {
             return TreeType.TREE;
@@ -346,24 +344,26 @@ public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, 
     }
 
     /**
-     * Gets an {@link BaseBiome} from a {@link ArgumentStack}.
+     * Gets an {@link BiomeType} from a {@link ArgumentStack}.
      *
      * @param context the context
      * @return a pattern
      * @throws ParameterException on error
      * @throws WorldEditException on error
      */
-    @BindingMatch(type = BaseBiome.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
-    public BaseBiome getBiomeType(ArgumentStack context) throws ParameterException, WorldEditException {
+    @BindingMatch(type = BiomeType.class,
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1)
+    public BiomeType getBiomeType(ArgumentStack context) throws ParameterException, WorldEditException {
         String input = context.next();
         if (input != null) {
-            if (MathMan.isInteger(input)) return new BaseBiome(Integer.parseInt(input));
+
+            if (MathMan.isInteger(input)) return new BiomeType(Integer.parseInt(input)); TODO FIXME
+
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
-            List<BaseBiome> knownBiomes = biomeRegistry.getBiomes();
-            BaseBiome biome = Biomes.findBiomeByName(knownBiomes, input, biomeRegistry);
+            Collection<BiomeType> knownBiomes = BiomeType.REGISTRY.values();
+            BiomeType biome = Biomes.findBiomeByName(knownBiomes, input, biomeRegistry);
             if (biome != null) {
                 return biome;
             } else {

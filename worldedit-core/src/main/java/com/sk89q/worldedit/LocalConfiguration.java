@@ -38,6 +38,7 @@ import java.util.Set;
 public abstract class LocalConfiguration {
 
     public boolean profile = false;
+    public boolean traceUnflushedSessions = false;
     public Set<String> disallowedBlocks = new HashSet<>();
     public int defaultChangeLimit = -1;
     public int maxChangeLimit = -1;
@@ -65,6 +66,8 @@ public abstract class LocalConfiguration {
     public String navigationWand = "minecraft:compass";
     public int navigationWandMaxDistance = 50;
     public int scriptTimeout = 3000;
+    public int calculationTimeout = 100;
+    public int maxCalculationTimeout = 300;
     public Set<String> allowedDataCycleBlocks = new HashSet<>();
     public String saveDir = "schematics";
     public String scriptsDir = "craftscripts";

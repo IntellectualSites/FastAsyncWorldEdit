@@ -37,15 +37,11 @@ import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.internal.expression.Expression;
-import com.sk89q.worldedit.internal.expression.runtime.Constant;
-import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
 import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
 import com.sk89q.worldedit.session.SessionManager;
-import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.eventbus.EventBus;
@@ -53,7 +49,6 @@ import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
 import com.sk89q.worldedit.util.io.file.FilenameException;
 import com.sk89q.worldedit.util.io.file.FilenameResolutionException;
 import com.sk89q.worldedit.util.io.file.InvalidFilenameException;
-import com.sk89q.worldedit.util.logging.WorldEditPrefixHandler;
 import com.sk89q.worldedit.util.task.SimpleSupervisor;
 import com.sk89q.worldedit.util.task.Supervisor;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -61,6 +56,8 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
@@ -97,9 +94,9 @@ import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
  */
 public final class WorldEdit {
 
-    public static final Logger logger = Logger.getLogger(WorldEdit.class.getCanonicalName());
+    public static final Logger logger = LoggerFactory.getLogger(WorldEdit.class);
 
-    private final static WorldEdit instance = new WorldEdit();
+    private static final WorldEdit instance = new WorldEdit();
     private static String version;
 
     private final EventBus eventBus = new EventBus();
@@ -114,7 +111,6 @@ public final class WorldEdit {
     private final PatternFactory patternFactory = new PatternFactory(this);
 
     static {
-        WorldEditPrefixHandler.register("com.sk89q.worldedit");
         getVersion();
     }
 
@@ -670,16 +666,16 @@ public final class WorldEdit {
         } catch (ScriptException e) {
             player.printError("Failed to execute:");
             player.printRaw(e.getMessage());
-            logger.log(Level.WARNING, "Failed to execute script", e);
+            logger.warn("Failed to execute script", e);
         } catch (NumberFormatException | WorldEditException e) {
             throw e;
         } catch (Throwable e) {
             player.printError("Failed to execute (see console):");
             player.printRaw(e.getClass().getCanonicalName());
-            logger.log(Level.WARNING, "Failed to execute script", e);
+            logger.warn("Failed to execute script", e);
         } finally {
             for (EditSession editSession : scriptContext.getEditSessions()) {
-                editSession.flushQueue();
+                editSession.flushSession();
                 session.remember(editSession);
             }
         }

@@ -21,7 +21,6 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
 import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
 import com.sk89q.worldedit.EditSession;
@@ -106,7 +105,7 @@ public class ChunkCommands {
     )
     @CommandPermissions("worldedit.delchunks")
     @Logging(REGION)
-    public void deleteChunks(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void deleteChunks(Player player, LocalSession session) throws WorldEditException {
         player.print(BBC.getPrefix() + "Note that this command does not yet support the mcregion format.");
         LocalConfiguration config = worldEdit.getConfiguration();
 

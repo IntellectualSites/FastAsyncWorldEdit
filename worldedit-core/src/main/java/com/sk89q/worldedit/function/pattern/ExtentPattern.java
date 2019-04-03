@@ -17,29 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.forge.gui;
+package com.sk89q.worldedit.function.pattern;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.IGuiHandler;
+import com.sk89q.worldedit.extent.Extent;
 
-public class GuiHandler implements IGuiHandler {
+public interface ExtentPattern extends Pattern {
 
-    public static final int REFERENCE_ID = 0;
-
-    @Override
-    public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-        return null;
-    }
-
-    @Override
-    public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-        switch (id) {
-            case REFERENCE_ID:
-                return new GuiReferenceCard();
-        }
-
-        return null;
-    }
-
+    /**
+     * Get the extent associated with this pattern.
+     *
+     * @return the extent for this pattern
+     */
+    public Extent getExtent();
 }

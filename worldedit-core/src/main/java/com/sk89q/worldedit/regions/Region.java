@@ -108,7 +108,6 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
      */
     void shift(BlockVector3 change) throws RegionOperationException;
 
-
     default boolean contains(int x, int y, int z) {
         return contains(BlockVector3.at(x, y, z));
     }
@@ -128,6 +127,12 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
 	 * @param position the position
 	 * @return true if contained
 	 */
+    /**
+     * Returns true based on whether the region contains the point.
+     *
+     * @param position the position
+     * @return true if contained
+     */
     boolean contains(BlockVector3 position);
 
     /**

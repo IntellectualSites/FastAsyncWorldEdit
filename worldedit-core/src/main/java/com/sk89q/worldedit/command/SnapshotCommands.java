@@ -39,7 +39,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Snapshot commands.
@@ -47,7 +46,6 @@ import java.util.logging.Logger;
 @Command(aliases = {"snapshot", "snap"}, desc = "List, load and view information related to snapshots")
 public class SnapshotCommands {
 
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldEdit");
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
     private final WorldEdit we;
@@ -64,7 +62,7 @@ public class SnapshotCommands {
             max = 1
     )
     @CommandPermissions("worldedit.snapshots.list")
-    public void list(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void list(Player player, CommandContext args) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
@@ -93,10 +91,10 @@ public class SnapshotCommands {
                 File dir = config.snapshotRepo.getDirectory();
 
                 try {
-                    logger.info("WorldEdit found no snapshots: looked in: "
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
                             + dir.getCanonicalPath());
                 } catch (IOException e) {
-                    logger.info("WorldEdit found no snapshots: looked in "
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
                             + "(NON-RESOLVABLE PATH - does it exist?): "
                             + dir.getPath());
                 }

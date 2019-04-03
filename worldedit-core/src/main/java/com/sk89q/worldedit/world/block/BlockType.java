@@ -39,11 +39,13 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -222,6 +224,10 @@ public class BlockType implements FawePattern {
         return new FuzzyBlockState(this);
     }
 
+    public FuzzyBlockState getFuzzyMatcher() {
+        return updateField(emptyFuzzy, () -> new FuzzyBlockState(this));
+    }
+
     /**
      * Slow
      * @return collection of states
@@ -311,7 +317,7 @@ public class BlockType implements FawePattern {
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return this.getSettings().defaultState.ordinal();
     }
 
     @Override

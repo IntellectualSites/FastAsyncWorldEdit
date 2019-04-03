@@ -264,17 +264,6 @@ public abstract class BreadthFirstSearch implements Operation {
                         }
                     }
                 }
-//=======
-//        BlockVector3 position;
-//        
-//        while ((position = queue.poll()) != null) {
-//            if (function.apply(position)) {
-//                affected++;
-//            }
-//
-//            for (BlockVector3 dir : directions) {
-//                visit(position, position.add(dir));
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
             if (currentDepth == maxDepth) {
                 break;

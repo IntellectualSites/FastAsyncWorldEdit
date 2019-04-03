@@ -34,13 +34,7 @@ public class SingleBlockPatternParser extends InputParser<Pattern> {
 
     @Override
     public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
-        String[] items = input.split(",");
-
-        if (items.length == 1) {
-            return new BlockPattern(worldEdit.getBlockFactory().parseFromInput(items[0], context));
-        } else {
-            return null;
-        }
+        return new BlockPattern(worldEdit.getBlockFactory().parseFromInput(input, context));
     }
 
 }

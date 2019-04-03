@@ -153,7 +153,6 @@ public class OldChunk implements Chunk {
     }
 
     @Override
-
     public BaseBlock getBlock(BlockVector3 position) throws DataException {
         if(position.getY() >= 128) return BlockTypes.VOID_AIR.getDefaultState().toBaseBlock();
         int id, dataVal;
@@ -183,7 +182,7 @@ public class OldChunk implements Chunk {
 
         BlockState state = LegacyMapper.getInstance().getBlockFromLegacy(id, dataVal);
         if (state == null) {
-            WorldEdit.logger.warning("Unknown legacy block " + id + ":" + dataVal + " found when loading legacy anvil chunk.");
+            WorldEdit.logger.warn("Unknown legacy block " + id + ":" + dataVal + " found when loading legacy anvil chunk.");
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         if (state.getBlockType().getMaterial().hasContainer()) {

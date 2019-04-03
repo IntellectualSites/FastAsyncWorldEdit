@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.world.item;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.world.block.BlockType;

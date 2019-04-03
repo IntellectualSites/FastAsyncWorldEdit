@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extension.factory;
 
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.extension.factory.parser.DefaultBlockParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;

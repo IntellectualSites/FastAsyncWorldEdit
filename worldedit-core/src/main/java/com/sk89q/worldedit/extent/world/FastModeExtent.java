@@ -21,12 +21,12 @@ package com.sk89q.worldedit.extent.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -104,7 +104,7 @@ public class FastModeExtent extends AbstractDelegateExtent {
             dirtyChunks.add(BlockVector2.at(location.getBlockX() >> 4, location.getBlockZ() >> 4));
 
             if (world.setBlock(location, block, false)) {
-                if (postEditSimulation) {
+                if (!enabled && postEditSimulation) {
                     positions.add(location);
                 }
                 return true;
@@ -117,11 +117,14 @@ public class FastModeExtent extends AbstractDelegateExtent {
     }
 
     public boolean commitRequired() {
-        return !dirtyChunks.isEmpty() || !positions.isEmpty();
+        return enabled || postEditSimulation;
     }
 
     @Override
     protected Operation commitBefore() {
+        if (!commitRequired()) {
+            return null;
+        }
         return new Operation() {
             @Override
             public Operation resume(RunContext run) throws WorldEditException {
@@ -129,7 +132,7 @@ public class FastModeExtent extends AbstractDelegateExtent {
                     world.fixAfterFastMode(dirtyChunks);
                 }
 
-                if (postEditSimulation) {
+                if (!enabled && postEditSimulation) {
                     Iterator<BlockVector3> positionIterator = positions.iterator();
                     while (run.shouldContinue() && positionIterator.hasNext()) {
                         BlockVector3 position = positionIterator.next();

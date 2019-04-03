@@ -129,12 +129,6 @@ public class BlockMask extends AbstractExtentMask {
             return mask;
         }
     }
-//    public boolean test(BlockVector3 vector) {
-//        BlockStateHolder block = getExtent().getBlock(vector);
-//        for (BlockStateHolder testBlock : blocks) {
-//            if (testBlock.equalsFuzzy(block)) {
-//                return true;
-
 
     private Mask getOptimizedMask(BlockType type, long[] bitSet) {
         boolean single = true;

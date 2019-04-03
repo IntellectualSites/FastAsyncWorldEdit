@@ -43,9 +43,10 @@ import com.sk89q.worldedit.command.composition.ApplyCommand;
 import com.sk89q.worldedit.command.composition.DeformCommand;
 import com.sk89q.worldedit.command.composition.PaintCommand;
 import com.sk89q.worldedit.command.composition.ShapedBrushCommand;
-import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Deform.Mode;
 import com.sk89q.worldedit.internal.command.*;
@@ -60,6 +61,9 @@ import com.sk89q.worldedit.util.command.parametric.*;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
+import com.sk89q.worldedit.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -72,7 +76,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -86,8 +89,9 @@ import static com.sk89q.worldedit.util.command.composition.LegacyCommandAdapter.
 public final class CommandManager {
 
     public static final Pattern COMMAND_CLEAN_PATTERN = Pattern.compile("^[/]+");
-    private static final Logger log = Logger.getLogger(CommandManager.class.getCanonicalName());
-    private static final Logger commandLog = Logger.getLogger(CommandManager.class.getCanonicalName() + ".CommandLog");
+    private static final Logger log = LoggerFactory.getLogger(CommandManager.class);
+    private static final java.util.logging.Logger commandLog =
+        java.util.logging.Logger.getLogger(CommandManager.class.getCanonicalName() + ".CommandLog");
     private static final Pattern numberFormatExceptionPattern = Pattern.compile("^For input string: \"(.*)\"$");
 
     private final WorldEdit worldEdit;
@@ -297,7 +301,7 @@ public final class CommandManager {
     }
 
     public void register(Platform platform) {
-        log.log(Level.FINE, "Registering commands with " + platform.getClass().getCanonicalName());
+        log.info("Registering commands with " + platform.getClass().getCanonicalName());
         this.platform = null;
 
         try {
@@ -318,12 +322,12 @@ public final class CommandManager {
             File file = new File(config.getWorkingDirectory(), path);
             commandLog.setLevel(Level.ALL);
 
-            log.log(Level.INFO, "Logging WorldEdit commands to " + file.getAbsolutePath());
+            log.info("Logging WorldEdit commands to " + file.getAbsolutePath());
 
             try {
                 dynamicHandler.setHandler(new FileHandler(file.getAbsolutePath(), true));
             } catch (IOException e) {
-                log.log(Level.WARNING, "Could not use command log file " + path + ": " + e.getMessage());
+                log.warn("Could not use command log file " + path + ": " + e.getMessage());
             }
         }
 
@@ -371,6 +375,13 @@ public final class CommandManager {
             actor = FakePlayer.wrap(actor.getName(), actor.getUniqueId(), actor);
         }
         final LocalSession session = worldEdit.getSessionManager().get(actor);
+        Request.request().setSession(session);
+        if (actor instanceof Entity) {
+            Extent extent = ((Entity) actor).getExtent();
+            if (extent instanceof World) {
+                Request.request().setWorld(((World) extent));
+            }
+        }
         LocalConfiguration config = worldEdit.getConfiguration();
         final CommandLocals locals = new CommandLocals();
         final FawePlayer fp = FawePlayer.wrap(actor);
@@ -497,8 +508,8 @@ public final class CommandManager {
                 if (time > 1000) {
                     BBC.ACTION_COMPLETE.send(actor, (time / 1000d));
                 }
-                Request.reset();
             }
+            Request.reset();
         }
         return null;
     }
@@ -552,7 +563,7 @@ public final class CommandManager {
         return dispatcher;
     }
 
-    public static Logger getLogger() {
+    public static java.util.logging.Logger getLogger() {
         return commandLog;
     }
 

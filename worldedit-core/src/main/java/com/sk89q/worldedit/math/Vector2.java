@@ -485,7 +485,7 @@ public class Vector2 {
         }
 
         Vector2 other = (Vector2) obj;
-        return other.getX() == this.getX() && other.getZ() == this.getZ();
+        return other.x == this.x && other.z == this.z;
 
     }
 
@@ -496,7 +496,7 @@ public class Vector2 {
 
     @Override
     public String toString() {
-        return "(" + getX() + ", " + getZ() + ")";
+        return "(" + x + ", " + z + ")";
     }
 
 }

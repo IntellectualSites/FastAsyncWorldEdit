@@ -24,7 +24,6 @@ import com.boydti.fawe.object.brush.InspectBrush;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -67,7 +66,7 @@ public class ToolCommands {
             max = 0
     )
     @CommandPermissions("worldedit.tool.info")
-    public void info(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void info(Player player, LocalSession session) throws WorldEditException {
         session.setTool(new QueryTool(), player);
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         BBC.TOOL_INFO.send(player, itemStack.getType().getName());
@@ -123,7 +122,7 @@ public class ToolCommands {
             max = 0
     )
     @CommandPermissions("worldedit.tool.data-cycler")
-    public void cycler(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void cycler(Player player, LocalSession session) throws WorldEditException {
 
         session.setTool(new BlockDataCyler(), player);
         BBC.TOOL_CYCLER.send(player, player.getItemInHand(HandSide.MAIN_HAND).getType().getName());

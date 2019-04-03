@@ -622,13 +622,12 @@ public class Vector3 {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
         if (!(obj instanceof Vector3)) {
             return false;
         }
 
         Vector3 other = (Vector3) obj;
-        return other.getX() == this.getX() && other.getZ() == this.getZ() && other.getY() == this.getY();
+        return other.x == this.x && other.y == this.y && other.z == this.z;
     }
 
     @Override

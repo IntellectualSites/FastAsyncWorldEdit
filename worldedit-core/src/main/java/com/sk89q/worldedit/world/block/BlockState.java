@@ -22,8 +22,11 @@ package com.sk89q.worldedit.world.block;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;
@@ -315,14 +318,9 @@ public class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    public int hashCode() {
-        return getOrdinal();
-    }
-
-    @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
         if (this == o) {
-            // Added a reference equality check for
+            // Added a reference equality check for speediness
             return true;
         }
         if (!getBlockType().equals(o.getBlockType())) {
@@ -359,8 +357,8 @@ public class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    public String toString() {
-        return getAsString();
+    public BaseBlock toBaseBlock() {
+        return this.emptyBaseBlock;
     }
 
 	@Override
@@ -375,9 +373,27 @@ public class BlockState implements BlockStateHolder<BlockState> {
 
 	@Override
 	public int getOrdinal() {
-		//?
-		return 0;
+		get ordinal
 	}
+    /**
+     * Internal method used for creating the initial BlockState.
+     *
+     * Sets a value. DO NOT USE THIS.
+     *
+     * @param property The state
+     * @param value The value
+     * @return The blockstate, for chaining
+     */
+    BlockState setState(final Property<?> property, final Object value) {
+        this.values.put(property, value);
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return getAsString();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof BlockState)) {
@@ -385,5 +401,12 @@ public class BlockState implements BlockStateHolder<BlockState> {
         }
 
         return equalsFuzzy((BlockState) obj);
+    }
+
+    private Integer hashCodeCache = null;
+
+    @Override
+    public int hashCode() {
+        return getOrdinal();
     }
 }

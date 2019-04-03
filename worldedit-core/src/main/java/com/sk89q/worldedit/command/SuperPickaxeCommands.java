@@ -48,7 +48,7 @@ public class SuperPickaxeCommands {
             max = 0
     )
     @CommandPermissions("worldedit.superpickaxe")
-    public void single(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void single(Player player, LocalSession session) throws WorldEditException {
 
         session.setSuperPickaxe(new SinglePickaxe());
         session.enableSuperPickAxe();

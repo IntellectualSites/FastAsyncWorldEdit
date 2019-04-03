@@ -4,14 +4,17 @@ apply plugin: 'maven'
 
 repositories {
     maven { url "https://hub.spigotmc.org/nexus/content/groups/public" }
+    maven { url "https://repo.codemc.org/repository/maven-public" }
+    maven { url 'https://papermc.io/repo/repository/maven-public/' }
 }
 
 dependencies {
     compile project(':worldedit-core')
+
     compile 'net.milkbowl.vault:VaultAPI:1.7'
     compile 'com.sk89q:dummypermscompat:1.10'
     compile 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
-    compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
+    compile 'org.slf4j:slf4j-jdk14:1.7.26'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
     compile 'com.massivecraft:factions:2.8.0'
     compile 'com.drtshock:factions:1.6.9.5'
@@ -77,7 +80,10 @@ task copyFiles {
 
 shadowJar {
     dependencies {
+        relocate "org.slf4j", "com.sk89q.worldedit.slf4j"
         include(dependency(':worldedit-core'))
+        include(dependency('org.slf4j:slf4j-api'))
+        include(dependency("org.slf4j:slf4j-jdk14"))
     }
     archiveName = "${parent.name}-${project.name.replaceAll("worldedit-", "")}-${parent.version}.jar"
     destinationDir = file '../target'

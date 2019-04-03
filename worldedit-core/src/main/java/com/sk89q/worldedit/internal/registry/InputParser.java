@@ -24,6 +24,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,6 +49,6 @@ public abstract class InputParser<E> {
      * @return a list of suggestions
      */
     public List<String> getSuggestions() {
-        return Lists.newArrayList();
+        return Collections.emptyList();
     }
 }

@@ -192,8 +192,9 @@ public class ScriptingCommands {
     @Command(aliases = {".s"}, usage = "[args...]", desc = "Execute last CraftScript", min = 0, max = -1)
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void executeLast(final Player player, final LocalSession session, final CommandContext args) throws WorldEditException {
-        final String lastScript = session.getLastScript();
+    public void executeLast(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+        
+        String lastScript = session.getLastScript();
 
         if (!player.hasPermission("worldedit.scripting.execute." + lastScript)) {
             player.printError("You don't have permission to use that script.");

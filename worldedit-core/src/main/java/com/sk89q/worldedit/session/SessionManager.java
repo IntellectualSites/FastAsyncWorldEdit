@@ -19,7 +19,8 @@
 
 package com.sk89q.worldedit.session;
 
-import com.boydti.fawe.object.collection.SoftHashMap;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -27,50 +28,46 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.session.storage.JsonFileSessionStore;
 import com.sk89q.worldedit.session.storage.SessionStore;
 import com.sk89q.worldedit.session.storage.VoidStore;
 import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.Nullable;
-
+import java.util.concurrent.Callable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Session manager for WorldEdit.
- * <p>
+ *
  * <p>Get a reference to one from {@link WorldEdit}.</p>
- * <p>
+ *
  * <p>While this class is thread-safe, the returned session may not be.</p>
  */
 public class SessionManager {
 
-    @Deprecated
-    public static int EXPIRATION_GRACE = 600000;
-
+    public static int EXPIRATION_GRACE = 0;
+    private static final int FLUSH_PERIOD = 1000 * 60;
     private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5));
-    private static final Logger log = Logger.getLogger(SessionManager.class.getCanonicalName());
+    private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
     private final Timer timer = new Timer();
     private final WorldEdit worldEdit;
-    private final Map<UUID, SessionHolder> sessions = new ConcurrentHashMap<>(8, 0.9f, 1);
-    private final Map<UUID, Reference<SessionHolder>> softSessions = new SoftHashMap<>();
-
+    private final Map<UUID, SessionHolder> sessions = new HashMap<>();
     private SessionStore store = new VoidStore();
-    private File path;
 
     /**
      * Create a new session manager.
@@ -82,6 +79,7 @@ public class SessionManager {
         this.worldEdit = worldEdit;
 
         worldEdit.getEventBus().register(this);
+        timer.schedule(new SessionTracker(), FLUSH_PERIOD, FLUSH_PERIOD);
     }
 
     /**
@@ -92,7 +90,7 @@ public class SessionManager {
      */
     public synchronized boolean contains(SessionOwner owner) {
         checkNotNull(owner);
-        return sessions.containsKey(getKey(owner)) || softSessions.containsKey(owner);
+        return sessions.containsKey(getKey(owner));
     }
 
     /**
@@ -110,24 +108,7 @@ public class SessionManager {
                 return holder.session;
             }
         }
-        Iterator<Map.Entry<UUID, Reference<SessionHolder>>> iter = softSessions.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<UUID, Reference<SessionHolder>> entry = iter.next();
-            UUID key = entry.getKey();
-            SessionHolder holder = entry.getValue().get();
-            if (holder == null) {
-                iter.remove();
-                continue;
-            }
-            String test = holder.key.getName();
-            if (test != null && name.equals(test)) {
-//                if (holder.key.isActive()) {
-                iter.remove();
-                sessions.put(key, holder);
-//                }
-                return holder.session;
-            }
-        }
+
         return null;
     }
 
@@ -141,24 +122,12 @@ public class SessionManager {
     @Nullable
     public synchronized LocalSession getIfPresent(SessionOwner owner) {
         checkNotNull(owner);
-        UUID key = getKey(owner);
-        SessionHolder stored = sessions.get(key);
+        SessionHolder stored = sessions.get(getKey(owner));
         if (stored != null) {
             return stored.session;
         } else {
-            Reference<SessionHolder> reference = softSessions.get(key);
-            if (reference != null) {
-                stored = reference.get();
-                if (stored != null) {
-//                if (stored.key.isActive()) {
-                    softSessions.remove(key);
-                    sessions.put(key, stored);
-//                }
-                    return stored.session;
-                }
-            }
+            return null;
         }
-        return null;
     }
 
     /**
@@ -179,36 +148,26 @@ public class SessionManager {
             try {
                 session = store.load(getKey(sessionKey));
                 session.postLoad();
-            } catch (Throwable e) {
-                log.log(Level.WARNING, "Failed to load saved session", e);
+            } catch (IOException e) {
+                log.warn("Failed to load saved session", e);
                 session = new LocalSession();
             }
+            Request.request().setSession(session);
 
             session.setConfiguration(config);
             session.setBlockChangeLimit(config.defaultChangeLimit);
+            session.setTimeout(config.calculationTimeout);
 
+            // Remember the session regardless of if it's currently active or not.
+            // And have the SessionTracker FLUSH inactive sessions.
             sessions.put(getKey(owner), new SessionHolder(sessionKey, session));
         }
 
-        // Set the limit on the number of blocks that an operation can
-        // change at once, or don't if the owner has an override or there
-        // is no limit. There is also a default limit
-        int currentChangeLimit = session.getBlockChangeLimit();
-
-        if (!owner.hasPermission("worldedit.limit.unrestricted") && config.maxChangeLimit > -1) {
-            // If the default limit is infinite but there is a maximum
-            // limit, make sure to not have it be overridden
-            if (config.defaultChangeLimit < 0) {
-                if (currentChangeLimit < 0 || currentChangeLimit > config.maxChangeLimit) {
-                    session.setBlockChangeLimit(config.maxChangeLimit);
-                }
-            } else {
-                // Bound the change limit
-                int maxChangeLimit = config.maxChangeLimit;
-                if (currentChangeLimit == -1 || currentChangeLimit > maxChangeLimit) {
-                    session.setBlockChangeLimit(maxChangeLimit);
-                }
-            }
+        if (shouldBoundLimit(owner, "worldedit.limit.unrestricted", session.getBlockChangeLimit(), config.maxChangeLimit)) {
+            session.setBlockChangeLimit(config.maxChangeLimit);
+        }
+        if (shouldBoundLimit(owner, "worldedit.timeout.unrestricted", session.getTimeout(), config.maxCalculationTimeout)) {
+            session.setTimeout(config.maxCalculationTimeout);
         }
 
         // Have the session use inventory if it's enabled and the owner
@@ -221,27 +180,49 @@ public class SessionManager {
         return session;
     }
 
-    private void save(SessionHolder holder) {
-        SessionKey key = holder.key;
-        holder.session.setClipboard(null);
-        if (key.isPersistent()) {
-            try {
-                if (holder.session.compareAndResetDirty()) {
-                    if (holder.session.save()) {
-                        store.save(getKey(key), holder.session);
-                    } else if (path != null) {
-                        File file = new File(path, getKey(key) + ".json");
-                        if (file.exists()) {
-                            if (!file.delete()) {
-                                file.deleteOnExit();
-                            }
-                        }
+    private boolean shouldBoundLimit(SessionOwner owner, String permission, int currentLimit, int maxLimit) {
+        if (maxLimit > -1) { // if max is finite
+            return (currentLimit < 0 || currentLimit > maxLimit) // make sure current is finite and less than max
+                    && !owner.hasPermission(permission); // unless user has unlimited permission
+        }
+        return false;
+    }
+
+    /**
+     * Save a map of sessions to disk.
+     *
+     * @param sessions a map of sessions to save
+     * @return a future that completes on save or error
+     */
+    private ListenableFuture<?> commit(final Map<SessionKey, LocalSession> sessions) {
+        checkNotNull(sessions);
+
+        if (sessions.isEmpty()) {
+            return Futures.immediateFuture(sessions);
+        }
+
+        return executorService.submit((Callable<Object>) () -> {
+            Exception exception = null;
+
+            for (Map.Entry<SessionKey, LocalSession> entry : sessions.entrySet()) {
+                SessionKey key = entry.getKey();
+
+                if (key.isPersistent()) {
+                    try {
+                        store.save(getKey(key), entry.getValue());
+                    } catch (IOException e) {
+                        log.warn("Failed to write session for UUID " + getKey(key), e);
+                        exception = e;
                     }
                 }
-            } catch (IOException e) {
-                log.log(Level.WARNING, "Failed to write session for UUID " + getKey(key), e);
             }
-        }
+
+            if (exception != null) {
+                throw exception;
+            }
+
+            return sessions;
+        });
     }
 
     /**
@@ -277,30 +258,52 @@ public class SessionManager {
      */
     public synchronized void remove(SessionOwner owner) {
         checkNotNull(owner);
-        SessionHolder session = sessions.remove(getKey(owner));
-        if (session != null) {
-            save(session);
-        }
+        sessions.remove(getKey(owner));
     }
 
-    public synchronized void forget(SessionOwner owner) {
-        checkNotNull(owner);
-        UUID key = getKey(owner);
-        SessionHolder holder = sessions.remove(key);
-        if (holder != null) {
-            softSessions.put(key, new SoftReference(holder));
-            save(holder);
-        }
+    /**
+     * Called to unload this session manager.
+     */
+    public synchronized void unload() {
+        clear();
     }
 
     /**
      * Remove all sessions.
      */
     public synchronized void clear() {
-        for (Map.Entry<UUID, SessionHolder> entry : sessions.entrySet()) {
-            save(entry.getValue());
-        }
+        saveChangedSessions();
         sessions.clear();
+    }
+
+    private synchronized void saveChangedSessions() {
+        long now = System.currentTimeMillis();
+        Iterator<SessionHolder> it = sessions.values().iterator();
+        Map<SessionKey, LocalSession> saveQueue = new HashMap<>();
+
+        while (it.hasNext()) {
+            SessionHolder stored = it.next();
+            if (stored.key.isActive()) {
+                stored.lastActive = now;
+
+                if (stored.session.compareAndResetDirty()) {
+                    // Don't save unless player disconnects
+//                    saveQueue.put(stored.key, stored.session);
+                }
+            } else {
+                if (now - stored.lastActive > EXPIRATION_GRACE) {
+                    if (stored.session.compareAndResetDirty()) {
+                        saveQueue.put(stored.key, stored.session);
+                    }
+
+                    it.remove();
+                }
+            }
+        }
+
+        if (!saveQueue.isEmpty()) {
+            commit(saveQueue);
+        }
     }
 
     @Subscribe
@@ -308,13 +311,12 @@ public class SessionManager {
         LocalConfiguration config = event.getConfiguration();
         File dir = new File(config.getWorkingDirectory(), "sessions");
         store = new JsonFileSessionStore(dir);
-        this.path = dir;
     }
 
     /**
      * Stores the owner of a session, the session, and the last active time.
      */
-    private static class SessionHolder {
+    private static final class SessionHolder {
         private final SessionKey key;
         private final LocalSession session;
         private long lastActive = System.currentTimeMillis();
@@ -325,7 +327,17 @@ public class SessionManager {
         }
     }
 
-
-
+    /**
+     * Removes inactive sessions after they have been inactive for a period
+     * of time. Commits them as well.
+     */
+    private class SessionTracker extends TimerTask {
+        @Override
+        public void run() {
+            synchronized (SessionManager.this) {
+                saveChangedSessions();
+            }
+        }
+    }
 
 }

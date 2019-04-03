@@ -6,6 +6,9 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -40,33 +43,21 @@ public class AreaPickaxe implements BlockTool {
             return true;
         }
 
-        EditSession editSession = session.createEditSession(player);
-        editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
+        try (EditSession editSession = session.createEditSession(player)) {
+            editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
 
         for (int x = ox - range; x <= ox + range; ++x) {
             for (int z = oz - range; z <= oz + range; ++z) {
                 for (int y = oy + range; y >= oy - range; --y) {
                     if (initialType.equals(editSession.getLazyBlock(x, y, z))) {
                         continue;
-//        try (EditSession editSession = session.createEditSession(player)) {
-//            editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
-//
-//            try {
-//                for (int x = ox - range; x <= ox + range; ++x) {
-//                    for (int y = oy - range; y <= oy + range; ++y) {
-//                        for (int z = oz - range; z <= oz + range; ++z) {
-//                            BlockVector3 pos = new BlockVector3(x, y, z);
-//                            if (editSession.getBlock(pos).getBlockType() != initialType) {
-//                                continue;
-//                            }
-//
-//                            ((World) clicked.getExtent()).queueBlockBreakEffect(server, pos, initialType, clicked.toBlockPoint().distanceSq(pos));
-//
-//                            editSession.setBlock(pos, BlockTypes.AIR.getDefaultState());
-//                        }
                     }
                     editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
                 }
+            } catch (MaxChangedBlocksException e) {
+                player.printError("Max blocks change limit reached.");
+            } finally {
+                session.remember(editSession);
             }
         }
         editSession.flushQueue();

@@ -25,8 +25,6 @@ import com.sk89q.worldedit.WorldEditException;
 
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.world.biome.BaseBiome;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -78,12 +76,12 @@ public class MaskingExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return mask.test(position.toBlockVector3()) && super.setBiome(position, biome);
     }
 
     @Override
-    public boolean setBiome(int x, int y, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return mask.test(BlockVector3.at(x, y, z)) && super.setBiome(x, y, z, biome);
     }
 

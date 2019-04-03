@@ -77,8 +77,12 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.command.*;
 import com.sk89q.worldedit.util.command.binding.Range;
+import com.sk89q.worldedit.session.SessionOwner;
+import com.sk89q.worldedit.util.command.CommandCallable;
+import com.sk89q.worldedit.util.command.CommandMapping;
+import com.sk89q.worldedit.util.command.Dispatcher;
+import com.sk89q.worldedit.util.command.PrimaryAliasComparator;
 import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
@@ -283,28 +287,6 @@ public class UtilityCommands extends MethodCommands {
         if (depth == -1) depth = Integer.MAX_VALUE;
         int affected = editSession.fillXZ(pos, pattern, radius, (int) depth, true);
         player.print(BBC.getPrefix() + affected + " block(s) have been created.");
-//=======
-//    public void fillr(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-//
-//        ParserContext context = new ParserContext();
-//        context.setActor(player);
-//        context.setWorld(player.getWorld());
-//        context.setSession(session);
-//        Pattern pattern = we.getPatternFactory().parseFromInput(args.getString(0), context);
-//
-//        double radius = Math.max(1, args.getDouble(1));
-//        we.checkMaxRadius(radius);
-//        int depth = args.argsLength() > 2 ? Math.max(1, args.getInteger(2)) : Integer.MAX_VALUE;
-//
-//        BlockVector3 pos = session.getPlacementPosition(player);
-//        int affected = 0;
-//        if (pattern instanceof BlockPattern) {
-//            affected = editSession.fillXZ(pos, ((BlockPattern) pattern).getBlock(), radius, depth, true);
-//        } else {
-//            affected = editSession.fillXZ(pos, pattern, radius, depth, true);
-//        }
-//        player.print(affected + " block(s) have been created.");
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
     }
 
     @Command(
@@ -435,8 +417,8 @@ public class UtilityCommands extends MethodCommands {
     @CommandPermissions("worldedit.snow")
     @Logging(PLACEMENT)
     public void snow(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-
         double size = args.argsLength() > 0 ? Math.max(1, args.getDouble(0)) : 10;
+        we.checkMaxRadius(size);
 
         int affected = editSession.simulateSnow(session.getPlacementPosition(player), size);
         player.print(BBC.getPrefix() + affected + " surfaces covered. Let it snow~");
@@ -452,8 +434,8 @@ public class UtilityCommands extends MethodCommands {
     @CommandPermissions("worldedit.thaw")
     @Logging(PLACEMENT)
     public void thaw(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-
         double size = args.argsLength() > 0 ? Math.max(1, args.getDouble(0)) : 10;
+        we.checkMaxRadius(size);
 
         int affected = editSession.thaw(session.getPlacementPosition(player), size);
         player.print(BBC.getPrefix() + affected + " surfaces thawed.");
@@ -463,6 +445,7 @@ public class UtilityCommands extends MethodCommands {
             aliases = {"/green", "green"},
             usage = "[radius]",
             desc = "Greens the area",
+            help = "Converts dirt to grass blocks. -f also converts coarse dirt.",
             flags = "f",
             min = 0,
             max = 1
@@ -470,8 +453,8 @@ public class UtilityCommands extends MethodCommands {
     @CommandPermissions("worldedit.green")
     @Logging(PLACEMENT)
     public void green(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-
         final double size = args.argsLength() > 0 ? Math.max(1, args.getDouble(0)) : 10;
+        we.checkMaxRadius(size);
         final boolean onlyNormalDirt = !args.hasFlag('f');
 
         final int affected = editSession.green(session.getPlacementPosition(player), size);
@@ -559,11 +542,7 @@ public class UtilityCommands extends MethodCommands {
             List<? extends Entity> entities;
             if (radius >= 0) {
                 CylinderRegion region = CylinderRegion.createRadius(editSession, center, radius);
-                entities = editSession.getEntities(region);
             } else {
-                entities = editSession.getEntities();
-            }
-            visitors.add(new EntityVisitor(entities.iterator(), flags.createFunction()));
         } else {
             Platform platform = worldEdit.getPlatformManager().queryCapability(Capability.WORLD_EDITING);
             for (World world : platform.getWorlds()) {
@@ -582,7 +561,7 @@ public class UtilityCommands extends MethodCommands {
 
         if (editSession != null) {
             session.remember(editSession);
-            editSession.flushQueue();
+            editSession.flushSession();
         }
     }
 
@@ -642,7 +621,7 @@ public class UtilityCommands extends MethodCommands {
 
         if (editSession != null) {
             session.remember(editSession);
-            editSession.flushQueue();
+            editSession.flushSession();
         }
     }
 
@@ -674,10 +653,10 @@ public class UtilityCommands extends MethodCommands {
             actor.print(BBC.getPrefix() + "= " + result);
         } catch (EvaluationException e) {
             actor.printError(String.format(
-                    "'%s' could not be parsed as a valid expression", input));
+                    "'%s' could not be evaluated (error: %s)", input, e.getMessage()));
         } catch (ExpressionException e) {
             actor.printError(String.format(
-                    "'%s' could not be evaluated (error: %s)", input, e.getMessage()));
+                    "'%s' could not be parsed as a valid expression", input));
         }
     }
 

@@ -265,7 +265,6 @@ public class HistoryCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.history.redo")
     public void redo(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-
         int times = Math.max(1, args.getInteger(0, 1));
 
         EditSession redone = null;

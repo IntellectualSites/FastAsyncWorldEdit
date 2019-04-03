@@ -28,7 +28,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.jnbt.CompoundTagBuilder;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.internal.helper.MCDirections;
@@ -37,13 +36,9 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import java.util.Map;
-
 
 import static com.google.common.base.Preconditions.checkNotNull;
-//import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
  * Copies blocks from one extent to another.

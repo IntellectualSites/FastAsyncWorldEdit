@@ -28,14 +28,10 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.sk89q.worldedit.command.tool.*;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BlockTool;
-import com.sk89q.worldedit.command.tool.DoubleActionBlockTool;
 import com.sk89q.worldedit.command.tool.DoubleActionTraceTool;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.command.tool.TraceTool;
@@ -43,31 +39,29 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.*;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.request.Request;
-import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
-import com.sk89q.worldedit.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Manages registered {@link Platform}s for WorldEdit. Platforms are
  * implementations of WorldEdit.
- * <p>
  * <p>This class is thread-safe.</p>
  */
 public class PlatformManager {
 
-    private static final Logger logger = Logger.getLogger(PlatformManager.class.getCanonicalName());
+    private static final Logger logger = LoggerFactory.getLogger(PlatformManager.class);
 
     private final WorldEdit worldEdit;
     private final CommandManager commandManager;
@@ -99,7 +93,7 @@ public class PlatformManager {
     public synchronized void register(Platform platform) {
         checkNotNull(platform);
 
-        logger.log(Level.FINE, "Got request to register " + platform.getClass() + " with WorldEdit [" + super.toString() + "]");
+        logger.info("Got request to register " + platform.getClass() + " with WorldEdit [" + super.toString() + "]");
 
         // Just add the platform to the list of platforms: we'll pick favorites
         // once all the platforms have been loaded
@@ -108,7 +102,7 @@ public class PlatformManager {
         // Make sure that versions are in sync
         if (firstSeenVersion != null) {
             if (!firstSeenVersion.equals(platform.getVersion())) {
-                logger.log(Level.WARNING, "Multiple ports of WorldEdit are installed but they report different versions ({0} and {1}). " +
+                logger.warn("Multiple ports of WorldEdit are installed but they report different versions ({0} and {1}). " +
                                 "If these two versions are truly different, then you may run into unexpected crashes and errors.",
                         new Object[]{firstSeenVersion, platform.getVersion()});
             }
@@ -131,7 +125,7 @@ public class PlatformManager {
         boolean removed = platforms.remove(platform);
 
         if (removed) {
-            logger.log(Level.FINE, "Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
+            logger.info("Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
 
             boolean choosePreferred = false;
 
@@ -356,7 +350,6 @@ public class PlatformManager {
                             return;
                         }
                     }
-//<<<<<<< HEAD
                     final Tool tool = session.getTool(playerActor);
                     if (tool != null && tool instanceof DoubleActionBlockTool) {
                         if (tool.canUse(playerActor)) {
@@ -371,14 +364,6 @@ public class PlatformManager {
                             event.setCancelled(true);
                             return;
                         }
-//=======
-//
-//                    RegionSelector selector = session.getRegionSelector(player.getWorld());
-//
-//                    BlockVector3 blockPoint = vector.toBlockPoint();
-//                    if (selector.selectPrimary(blockPoint, ActorSelectorLimits.forActor(player))) {
-//                        selector.explainPrimarySelection(actor, session, blockPoint);
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 } else if (event.getType() == Interaction.OPEN) {
                     if (session.isToolControlEnabled() && playerActor.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
@@ -402,7 +387,6 @@ public class PlatformManager {
                         return;
                     }
 
-//<<<<<<< HEAD
                     final Tool tool = session.getTool(playerActor);
                     if (tool != null && tool instanceof BlockTool) {
                         if (tool.canUse(playerActor)) {
@@ -423,25 +407,10 @@ public class PlatformManager {
                                 return;
                             }
                         }
-//=======
-//                    RegionSelector selector = session.getRegionSelector(player.getWorld());
-//                    BlockVector3 blockPoint = vector.toBlockPoint();
-//                    if (selector.selectSecondary(blockPoint, ActorSelectorLimits.forActor(player))) {
-//                        selector.explainSecondarySelection(actor, session, blockPoint);
-//                    }
-//
-//                    event.setCancelled(true);
-//                    return;
-//                }
-//
-//                Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
-//                if (tool instanceof BlockTool) {
-//                    if (tool.canUse(player)) {
-//                        ((BlockTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session, location);
-//                        event.setCancelled(true);
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
                     }
                 }
+            } finally {
+                Request.reset();
             }
         } catch (Throwable e) {
             handleThrowable(e, actor);
@@ -559,6 +528,8 @@ public class PlatformManager {
                 player.printRaw(e.getClass().getName() + ": " + e.getMessage());
                 MainUtil.handleError(e);
             }
+        } finally {
+            Request.reset();
         }
     }
 

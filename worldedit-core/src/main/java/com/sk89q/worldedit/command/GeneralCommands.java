@@ -59,7 +59,7 @@ public class GeneralCommands {
         max = 1
     )
     @CommandPermissions("worldedit.limit")
-    public void limit(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+    public void limit(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         
         LocalConfiguration config = worldEdit.getConfiguration();
         boolean mayDisable = player.hasPermission("worldedit.limit.unrestricted");
@@ -74,10 +74,40 @@ public class GeneralCommands {
 
         session.setBlockChangeLimit(limit);
 
-        if (limit != -1) {
-            player.print("Block change limit set to " + limit + ". (Use //limit -1 to go back to the default.)");
+        if (limit != config.defaultChangeLimit) {
+            player.print("Block change limit set to " + limit + ". (Use //limit to go back to the default.)");
         } else {
             player.print("Block change limit set to " + limit + ".");
+        }
+    }
+
+    @Command(
+            aliases = { "/timeout" },
+            usage = "[time]",
+            desc = "Modify evaluation timeout time.",
+            min = 0,
+            max = 1
+    )
+    @CommandPermissions("worldedit.timeout")
+    public void timeout(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+
+        LocalConfiguration config = worldEdit.getConfiguration();
+        boolean mayDisable = player.hasPermission("worldedit.timeout.unrestricted");
+
+        int limit = args.argsLength() == 0 ? config.calculationTimeout : Math.max(-1, args.getInteger(0));
+        if (!mayDisable && config.maxCalculationTimeout > -1) {
+            if (limit > config.maxCalculationTimeout) {
+                player.printError("Your maximum allowable timeout is " + config.maxCalculationTimeout + " ms.");
+                return;
+            }
+        }
+
+        session.setTimeout(limit);
+
+        if (limit != config.calculationTimeout) {
+            player.print("Timeout time set to " + limit + " ms. (Use //timeout to go back to the default.)");
+        } else {
+            player.print("Timeout time set to " + limit + " ms.");
         }
     }
 
@@ -89,7 +119,7 @@ public class GeneralCommands {
         max = 1
     )
     @CommandPermissions("worldedit.fast")
-    public void fast(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+    public void fast(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
         String newState = args.getString(0, null);
         if (session.hasFastMode()) {
@@ -112,6 +142,41 @@ public class GeneralCommands {
     }
 
     @Command(
+            aliases = { "/drawsel" },
+            usage = "[on|off]",
+            desc = "Toggle drawing the current selection",
+            min = 0,
+            max = 1
+    )
+    @CommandPermissions("worldedit.drawsel")
+    public void drawSelection(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+
+        if (!WorldEdit.getInstance().getConfiguration().serverSideCUI) {
+            throw new DisallowedUsageException("This functionality is disabled in the configuration!");
+        }
+        String newState = args.getString(0, null);
+        if (session.shouldUseServerCUI()) {
+            if ("on".equals(newState)) {
+                player.printError("Server CUI already enabled.");
+                return;
+            }
+
+            session.setUseServerCUI(false);
+            session.updateServerCUI(player);
+            player.print("Server CUI disabled.");
+        } else {
+            if ("off".equals(newState)) {
+                player.printError("Server CUI already disabled.");
+                return;
+            }
+
+            session.setUseServerCUI(true);
+            session.updateServerCUI(player);
+            player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.");
+        }
+    }
+
+    @Command(
         aliases = { "/gmask", "gmask" },
         usage = "[mask]",
         desc = "Set the global mask",
@@ -119,7 +184,7 @@ public class GeneralCommands {
         max = -1
     )
     @CommandPermissions("worldedit.global-mask")
-    public void gmask(Player player, LocalSession session, EditSession editSession, @Optional Mask mask) throws WorldEditException {
+    public void gmask(Player player, LocalSession session, @Optional Mask mask) throws WorldEditException {
         if (mask == null) {
             session.setMask((Mask) null);
             player.print("Global mask disabled.");
@@ -136,7 +201,7 @@ public class GeneralCommands {
         min = 0,
         max = 0
     )
-    public void togglePlace(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
+    public void togglePlace(Player player, LocalSession session) throws WorldEditException {
 
         if (session.togglePlacementPosition()) {
             player.print("Now placing at pos #1.");

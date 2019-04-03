@@ -28,6 +28,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.io.file.FilenameException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
@@ -62,7 +63,8 @@ public class CraftScriptContext extends CraftScriptEnvironment {
         EditSession editSession = controller.getEditSessionFactory()
                 .getEditSession(player.getWorld(),
                         session.getBlockChangeLimit(), session.getBlockBag(player), player);
-        editSession.enableQueue();
+        Request.request().setEditSession(editSession);
+        editSession.enableStandardMode();
         editSessions.add(editSession);
         return editSession;
     }

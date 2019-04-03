@@ -53,15 +53,17 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeData;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-
-
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
+import java.util.Set;
 
 /**
  * Implements biome-related commands such as "/biomelist".
@@ -102,11 +104,11 @@ public class BiomeCommands extends MethodCommands {
         }
 
         BiomeRegistry biomeRegistry = getBiomeRegistry();
-        List<BaseBiome> biomes = biomeRegistry.getBiomes();
+        List<BiomeType> biomes = biomeRegistry.getBiomes();
         int totalPages = biomes.size() / 19 + 1;
         Message msg = BBC.BIOME_LIST_HEADER.m(page, totalPages);
         String setBiome = Commands.getAlias(BiomeCommands.class, "/setbiome");
-        for (BaseBiome biome : biomes) {
+        for (BiomeType biome : biomes) {
             if (offset > 0) {
                 offset--;
             } else {
@@ -150,12 +152,12 @@ public class BiomeCommands extends MethodCommands {
                 return;
             }
 
-            BaseBiome biome = player.getWorld().getBiome(blockPosition.toBlockPoint().toBlockVector2());
-            biomes[biome.getId()]++;
+            BiomeType biome = player.getWorld().getBiome(blockPosition.toBlockPoint().toBlockVector2());
+            biomes[biome.getInternalId()]++;
             size = 1;
         } else if (args.hasFlag('p')) {
-            BaseBiome biome = player.getWorld().getBiome(player.getLocation().toBlockPoint().toBlockVector2());
-            biomes[biome.getId()]++;
+            BiomeType biome = player.getWorld().getBiome(player.getLocation().toBlockPoint().toBlockVector2());
+            biomes[biome.getInternalId()]++;
             size = 1;
         } else {
             World world = player.getWorld();
@@ -181,15 +183,15 @@ public class BiomeCommands extends MethodCommands {
 
         BBC.BIOME_LIST_HEADER.send(player, 1, 1);
 
-        List<Countable<BaseBiome>> distribution = new ArrayList<>();
+        List<Countable<BiomeType>> distribution = new ArrayList<>();
         for (int i = 0; i < biomes.length; i++) {
             int count = biomes[i];
             if (count != 0) {
-                distribution.add(new Countable<>(new BaseBiome(i), count));
+                distribution.add(new Countable<>(new BiomeType(i), count));
             }
         }
         Collections.sort(distribution);
-        for (Countable<BaseBiome> c : distribution) {
+        for (Countable<BiomeType> c : distribution) {
             BiomeData data = biomeRegistry.getData(c.getID());
             String str = String.format("%-7s (%.3f%%) %s #%d",
                     String.valueOf(c.getAmount()),
@@ -212,7 +214,7 @@ public class BiomeCommands extends MethodCommands {
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.biome.set")
-    public void setBiome(Player player, LocalSession session, EditSession editSession, BaseBiome target, @Switch('p') boolean atPosition) throws WorldEditException {
+    public void setBiome(Player player, LocalSession session, EditSession editSession, BiomeType target, @Switch('p') boolean atPosition) throws WorldEditException {
         World world = player.getWorld();
         Region region;
         Mask mask = editSession.getMask();

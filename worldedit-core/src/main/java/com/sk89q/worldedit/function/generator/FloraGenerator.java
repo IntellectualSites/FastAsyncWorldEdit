@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.function.generator;
 
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.pattern.BlockPattern;

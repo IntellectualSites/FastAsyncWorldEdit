@@ -58,7 +58,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ClipboardFormats {
 
@@ -74,7 +74,7 @@ public class ClipboardFormats {
             ClipboardFormat old = aliasMap.put(lowKey, format);
             if (old != null) {
                 aliasMap.put(lowKey, old);
-                WorldEdit.logger.warning(format.getClass().getName() + " cannot override existing alias '" + lowKey + "' used by " + old.getClass().getName());
+                WorldEdit.logger.warn(format.getClass().getName() + " cannot override existing alias '" + lowKey + "' used by " + old.getClass().getName());
             }
         }
         for (String ext : format.getFileExtensions()) {

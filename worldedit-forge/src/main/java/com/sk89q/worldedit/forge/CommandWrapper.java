@@ -19,60 +19,50 @@
 
 package com.sk89q.worldedit.forge;
 
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.sk89q.worldedit.util.command.CommandMapping;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.EntityPlayerMP;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
+import static net.minecraft.command.Commands.literal;
 
-public class CommandWrapper extends CommandBase {
-    private CommandMapping command;
-
-    protected CommandWrapper(CommandMapping command) {
-        this.command = command;
+public final class CommandWrapper {
+    private CommandWrapper() {
     }
 
-    @Override
-    public String getName() {
-        return command.getPrimaryAlias();
-    }
-
-    @Override
-    public List<String> getAliases() {
-        return Arrays.asList(command.getAllAliases());
-    }
-
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-    }
-
-    @Override
-    public String getUsage(ICommandSender icommandsender) {
-        return "/" + command.getPrimaryAlias() + " " + command.getDescription().getUsage();
-    }
-
-    @Override
-    public int getRequiredPermissionLevel() {
-        return 0;
-    }
-
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-        return true;
-    }
-
-    @Override
-    public int compareTo(@Nullable ICommand o) {
-        if (o == null) {
-            return 0;
-        } else {
-            return super.compareTo(o);
+    public static void register(CommandDispatcher<CommandSource> dispatcher, CommandMapping command) {
+        for (String alias : command.getAllAliases()) {
+            LiteralArgumentBuilder<CommandSource> base = literal(alias)
+                .executes(FAKE_COMMAND);
+            if (command.getDescription().getPermissions().size() > 0) {
+                base.requires(requirementsFor(command));
+            }
+            dispatcher.register(base);
         }
     }
+
+    public static final Command<CommandSource> FAKE_COMMAND = ctx -> {
+        EntityPlayerMP player = ctx.getSource().asPlayer();
+        if (player.world.isRemote()) {
+            return 0;
+        }
+        return 1;
+    };
+
+    private static Predicate<CommandSource> requirementsFor(CommandMapping mapping) {
+        return ctx -> {
+            ForgePermissionsProvider permsProvider = ForgeWorldEdit.inst.getPermissionsProvider();
+            return ctx.getEntity() instanceof EntityPlayerMP &&
+                mapping.getDescription().getPermissions().stream()
+                    .allMatch(perm -> permsProvider.hasPermission(
+                        (EntityPlayerMP) ctx.getEntity(), perm
+                    ));
+        };
+    }
+
 }

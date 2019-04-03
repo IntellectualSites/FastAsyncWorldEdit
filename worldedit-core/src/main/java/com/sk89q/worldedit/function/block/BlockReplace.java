@@ -26,9 +26,6 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BaseBlock;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Replaces blocks with a given pattern.

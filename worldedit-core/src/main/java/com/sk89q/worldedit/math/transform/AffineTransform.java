@@ -3,9 +3,9 @@ package com.sk89q.worldedit.math.transform;
 import java.io.IOException;
 import java.io.Serializable;
 
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 /**

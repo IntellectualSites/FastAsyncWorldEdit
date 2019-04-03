@@ -19,17 +19,15 @@
 
 package com.sk89q.worldedit.internal.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.Logging;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.command.parametric.AbstractInvokeListener;
 import com.sk89q.worldedit.util.command.parametric.InvokeHandler;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
@@ -39,6 +37,8 @@ import java.io.Closeable;
 import java.lang.reflect.Method;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Logs called commands to a logger.

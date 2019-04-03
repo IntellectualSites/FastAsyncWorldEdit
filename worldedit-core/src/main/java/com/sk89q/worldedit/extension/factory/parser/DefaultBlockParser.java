@@ -24,12 +24,6 @@ import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.*;
-
-import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEdit;

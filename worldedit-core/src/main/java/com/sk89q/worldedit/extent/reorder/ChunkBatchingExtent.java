@@ -72,6 +72,10 @@ public class ChunkBatchingExtent extends AbstractDelegateExtent {
         this.enabled = enabled;
     }
 
+    public boolean commitRequired() {
+        return enabled;
+    }
+
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (!enabled) {
@@ -84,7 +88,7 @@ public class ChunkBatchingExtent extends AbstractDelegateExtent {
 
     @Override
     protected Operation commitBefore() {
-        if (!enabled) {
+        if (!commitRequired()) {
             return null;
         }
         return new Operation() {

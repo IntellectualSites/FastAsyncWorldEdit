@@ -37,8 +37,6 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Step;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.command.tool.brush.*;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -633,7 +631,7 @@ public class BrushCommands extends BrushProcessor {
     )
     @CommandPermissions("worldedit.brush.smooth")
     public BrushSettings smoothBrush(Player player, LocalSession session, EditSession editSession,
-                                     @Optional("2") Expression radius, @Optional("4") int iterations, CommandContext context) throws WorldEditException {
+                                     @Optional("2") Expression radius, @Optional("4") int iterations, @Optional Mask mask, CommandContext context) throws WorldEditException {
 
         getWorldEdit().checkMaxBrushRadius(radius);
 
@@ -642,7 +640,7 @@ public class BrushCommands extends BrushProcessor {
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
 
         return set(session, context,
-                new SmoothBrush(iterations))
+                new SmoothBrush(iterations, mask))
                 .setSize(radius);
     }
 

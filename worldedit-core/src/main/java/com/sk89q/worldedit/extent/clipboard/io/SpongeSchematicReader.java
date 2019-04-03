@@ -86,7 +86,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         // If NBT Compat handlers are needed - add them here.
     }
 
-    private static final Logger log = Logger.getLogger(SpongeSchematicReader.class.getCanonicalName());
+    private static final Logger log = LoggerFactory.getLogger(SpongeSchematicReader.class);
     private final NBTInputStream inputStream;
 
     /**
@@ -108,12 +108,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     public Clipboard read(UUID uuid) throws IOException {
         return readVersion1(uuid);
     }
-//    private Clipboard readVersion1(Map<String, Tag> schematic) throws IOException {
-//        BlockVector3 origin;
-//        Region region;
-//
-//        Map<String, Tag> metadata = requireTag(schematic, "Metadata", CompoundTag.class).getValue();
-//    }
+    
     private int width, height, length;
     private int offsetX, offsetY, offsetZ;
     private char[] palette;

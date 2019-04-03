@@ -39,15 +39,12 @@ import com.sk89q.worldedit.world.storage.ChunkStore;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
 
 @Command(aliases = {}, desc = "[More Info](http://wiki.sk89q.com/wiki/WorldEdit/Snapshots)")
 public class SnapshotUtilCommands {
-
-    private static final Logger logger = Logger.getLogger("Minecraft.WorldEdit");
 
     private final WorldEdit we;
 
@@ -99,10 +96,10 @@ public class SnapshotUtilCommands {
                     File dir = config.snapshotRepo.getDirectory();
 
                     try {
-                        logger.info("FAWE found no snapshots: looked in: "
+                        WorldEdit.logger.info("FAWE found no snapshots: looked in: "
                                 + dir.getCanonicalPath());
                     } catch (IOException e) {
-                        logger.info("FAWE found no snapshots: looked in "
+                        WorldEdit.logger.info("FAWE found no snapshots: looked in "
                                 + "(NON-RESOLVABLE PATH - does it exist?): "
                                 + dir.getPath());
                     }

@@ -23,7 +23,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
@@ -50,7 +50,7 @@ public interface OutputExtent {
      * @return true if the block was successfully set (return value may not be accurate)
      * @throws WorldEditException thrown on an error
      */
-	<T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException;
+    <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException;
 
     /**
      * Set the biome.
@@ -59,7 +59,7 @@ public interface OutputExtent {
      * @param biome the biome to set to
      * @return true if the biome was successfully set (return value may not be accurate)
      */
-    boolean setBiome(BlockVector2 position, BaseBiome biome);
+    boolean setBiome(BlockVector2 position, BiomeType biome);
 
     /**
      * Return an {@link Operation} that should be called to tie up loose ends

@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -31,6 +31,7 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -118,7 +119,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     final BlockVector3 pos = BlockVector3.at(x, y - 2, z);
                     final BlockStateHolder state = world.getBlock(pos);
                     setPosition(Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5));
-//                    setPosition(Vector3.at(x + 0.5, y - 2 + 1, z + 0.5));
                 }
 
                 return;

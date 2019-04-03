@@ -40,8 +40,7 @@ public class FuzzyBlockState extends BlockState {
     private FuzzyBlockState(BlockType blockType, Map<Property<?>, Object> values) {
         this(blockType);
         for (Map.Entry<Property<?>, Object> entry : values.entrySet()) {
-//            setState(entry.getKey(), entry.getValue());
-        	with((Property<Object>)entry.getKey(), entry.getValue());
+            setState(entry.getKey(), entry.getValue());
         }
     }
 
@@ -58,7 +57,12 @@ public class FuzzyBlockState extends BlockState {
             Property<Object> objKey = (Property<Object>) entry.getKey();
             state = state.with(objKey, entry.getValue());
         }
-        return getBlockType().getDefaultState();
+        return state;
+    }
+
+    @Override
+    public BlockState toImmutableState() {
+        return getFullState();
     }
 
     /**

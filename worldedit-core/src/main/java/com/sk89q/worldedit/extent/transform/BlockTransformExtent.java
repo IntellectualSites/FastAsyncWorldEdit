@@ -41,13 +41,12 @@ import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -62,7 +61,7 @@ import javax.annotation.Nullable;
  */
 public class BlockTransformExtent extends ResettableExtent {
 
-    private Transform transform;
+    private final Transform transform;
 
     
     public BlockTransformExtent(Extent parent) {
@@ -121,7 +120,7 @@ public class BlockTransformExtent extends ResettableExtent {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transformBlock(super.getBlock(position), false).toImmutableState();
+        return transformBlock(super.getBlock(position), false);
     }
 
     @Override
@@ -142,6 +141,7 @@ public class BlockTransformExtent extends ResettableExtent {
     private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
 
 
+    private static final Set<String> directionNames = Sets.newHashSet("north", "south", "east", "west");
 
     /**
      * Transform the given block using the given transform.
@@ -155,6 +155,7 @@ public class BlockTransformExtent extends ResettableExtent {
     public static <B extends BlockStateHolder<B>> B transform(B block, Transform transform) {
         checkNotNull(block);
         checkNotNull(transform);
+
         B result = block;
         List<? extends Property<?>> properties = block.getBlockType().getProperties();
 
@@ -240,6 +241,7 @@ public class BlockTransformExtent extends ResettableExtent {
                 result = result.with(block.getBlockType().getProperty(directionName), directionalProperties.contains(directionName));
             }
         }
+
         return result;
     }
 

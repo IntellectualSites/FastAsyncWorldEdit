@@ -19,11 +19,23 @@
 
 package com.sk89q.worldedit.internal.expression;
 
+import static java.lang.Math.atan2;
+import static java.lang.Math.sin;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.internal.expression.lexer.LexerException;
 import com.sk89q.worldedit.internal.expression.parser.ParserException;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.internal.expression.runtime.ExpressionEnvironment;
-import org.junit.Test;
 
 import static java.lang.Math.atan2;
 import static java.lang.Math.sin;
@@ -31,6 +43,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class ExpressionTest {
+    @Before
+    public void setup() {
+        Platform mockPlat = Mockito.mock(Platform.class);
+        Mockito.when(mockPlat.getConfiguration()).thenReturn(new LocalConfiguration() {
+            @Override
+            public void load() {
+            }
+        });
+        WorldEdit.getInstance().getPlatformManager().register(mockPlat);
+    }
+
     @Test
     public void testEvaluate() throws ExpressionException {
         // check 
@@ -46,7 +69,7 @@ public class ExpressionTest {
         assertEquals(atan2(3, 4), simpleEval("atan2(3, 4)"), 0);
 
         // check variables
-        assertEquals(8, compile("foo+bar", "foo", "bar").evaluate(5, 3), 0);
+        assertEquals(8, compile("foo+bar", "foo", "bar").evaluate(5D, 3D), 0);
     }
 
     @Test
@@ -105,7 +128,7 @@ public class ExpressionTest {
     @Test
     public void testAssign() throws ExpressionException {
         Expression foo = compile("{a=x} b=y; c=z", "x", "y", "z", "a", "b", "c");
-        foo.evaluate(2, 3, 5);
+        foo.evaluate(2D, 3D, 5D);
         assertEquals(2, foo.getVariable("a", false).getValue(), 0);
         assertEquals(3, foo.getVariable("b", false).getValue(), 0);
         assertEquals(5, foo.getVariable("c", false).getValue(), 0);
@@ -118,13 +141,13 @@ public class ExpressionTest {
 
         // test 'dangling else'
         final Expression expression1 = compile("if (1) if (0) x=4; else y=5;", "x", "y");
-        expression1.evaluate(1, 2);
+        expression1.evaluate(1D, 2D);
         assertEquals(1, expression1.getVariable("x", false).getValue(), 0);
         assertEquals(5, expression1.getVariable("y", false).getValue(), 0);
 
         // test if the if construct is correctly recognized as a statement
         final Expression expression2 = compile("if (0) if (1) x=5; y=4;", "x", "y");
-        expression2.evaluate(1, 2);
+        expression2.evaluate(1D, 2D);
         assertEquals(4, expression2.getVariable("y", false).getValue(), 0);
     }
 
@@ -160,6 +183,16 @@ public class ExpressionTest {
         assertEquals(1, simpleEval("!query(3,4,5,3,2)"), 0);
         assertEquals(1, simpleEval("!queryAbs(3,4,5,10,40)"), 0);
         assertEquals(1, simpleEval("!queryRel(3,4,5,100,200)"), 0);
+    }
+
+    @Test
+    public void testTimeout() throws Exception {
+        try {
+            simpleEval("for(i=0;i<256;i++){for(j=0;j<256;j++){for(k=0;k<256;k++){for(l=0;l<256;l++){ln(pi)}}}}");
+            fail("Loop was not stopped.");
+        } catch (EvaluationException e) {
+            assertTrue(e.getMessage().contains("Calculations exceeded time limit"));
+        }
     }
 
     private double simpleEval(String expressionString) throws ExpressionException {

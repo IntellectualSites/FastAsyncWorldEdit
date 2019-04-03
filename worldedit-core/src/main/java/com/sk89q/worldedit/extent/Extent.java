@@ -22,25 +22,12 @@ package com.sk89q.worldedit.extent;
 import com.boydti.fawe.jnbt.anvil.generator.*;
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
-import com.sk89q.worldedit.*;
-
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.util.Countable;
-import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.registry.state.PropertyGroup;
-import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import javax.annotation.Nullable;
@@ -134,7 +121,7 @@ public interface Extent extends InputExtent, OutputExtent {
         return setBlock(BlockVector3.at(x, y, z), state);
     }
 
-    default boolean setBiome(int x, int y, int z, BaseBiome biome) {
+    default boolean setBiome(int x, int y, int z, BiomeType biome) {
         return setBiome(BlockVector2.at(x, z), biome);
     }
 

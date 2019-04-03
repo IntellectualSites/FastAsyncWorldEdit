@@ -17,15 +17,44 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.forge;
+package com.sk89q.worldedit.world.biome;
 
-import com.sk89q.worldedit.forge.gui.GuiHandler;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
+import com.sk89q.worldedit.registry.NamespacedRegistry;
 
-public class CommonProxy {
+/**
+ * All the types of biomes in the game.
+ */
+public class BiomeType {
 
-    public void registerHandlers() {
-        NetworkRegistry.INSTANCE.registerGuiHandler(ForgeWorldEdit.inst, new GuiHandler());
+    public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type");
+
+    private String id;
+
+    public BiomeType(String id) {
+        this.id = id;
     }
 
+    /**
+     * Gets the ID of this biome.
+     *
+     * @return The id
+     */
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String toString() {
+        return getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof BiomeType && this.id.equals(((BiomeType) obj).id);
+    }
 }

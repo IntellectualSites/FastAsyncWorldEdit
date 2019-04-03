@@ -117,10 +117,10 @@ public class EllipsoidRegion extends AbstractRegion {
         return diff.divide(2).floor();
     }
 
-    private BlockVector3 calculateChanges(BlockVector3... changes) {
-        BlockVector3 total = BlockVector3.ZERO;
+    private Vector3 calculateChanges(BlockVector3... changes) {
+        Vector3 total = Vector3.ZERO;
         for (BlockVector3 change : changes) {
-            total = total.add(change.abs());
+            total = total.add(change.abs().toVector3());
         }
 
         return total.divide(2).floor();
@@ -135,8 +135,8 @@ public class EllipsoidRegion extends AbstractRegion {
     @Override
     public void contract(BlockVector3... changes) throws RegionOperationException {
         center = center.subtract(calculateDiff(changes));
-        Vector3 newRadius = radius.subtract(calculateChanges(changes).toVector3());
-        setRadius(Vector3.at(1.5, 1.5, 1.5).getMaximum(newRadius));
+        Vector3 newRadius = radius.subtract(calculateChanges(changes));
+        radius = Vector3.at(1.5, 1.5, 1.5).getMaximum(newRadius);
     }
 
     @Override
@@ -214,31 +214,29 @@ public class EllipsoidRegion extends AbstractRegion {
     }
 
     @Override
-//    public boolean contains(Vector position) {
-//        int cx = position.getBlockX() - center.getBlockX();
-//        int cx2 = cx * cx;
-//        if (cx2 > radiusSqr.getBlockX()) {
-//            return false;
-//        }
-//        int cz = position.getBlockZ() - center.getBlockZ();
-//        int cz2 = cz * cz;
-//        if (cz2 > radiusSqr.getBlockZ()) {
-//            return false;
-//        }
-//        int cy = position.getBlockY() - center.getBlockY();
-//        int cy2 = cy * cy;
-//        if (radiusSqr.getBlockY() < 255 && cy2 > radiusSqr.getBlockY()) {
-//            return false;
-//        }
-//        if (sphere) {
-//            return cx2 + cy2 + cz2 <= radiusLengthSqr;
-//        }
-//        double cxd = (double) cx / radius.getBlockX();
-//        double cyd = (double) cy / radius.getBlockY();
-//        double czd = (double) cz / radius.getBlockZ();
-//        return cxd * cxd + cyd * cyd + czd * czd <= 1;
-    public boolean contains(BlockVector3 position) {
-        return position.subtract(center).divide(radius.toBlockPoint()).lengthSq() <= 1;
+   public boolean contains(BlockVector3 position) {
+       int cx = position.getBlockX() - center.getBlockX();
+       int cx2 = cx * cx;
+       if (cx2 > radiusSqr.getBlockX()) {
+           return false;
+       }
+       int cz = position.getBlockZ() - center.getBlockZ();
+       int cz2 = cz * cz;
+       if (cz2 > radiusSqr.getBlockZ()) {
+           return false;
+       }
+       int cy = position.getBlockY() - center.getBlockY();
+       int cy2 = cy * cy;
+       if (radiusSqr.getBlockY() < 255 && cy2 > radiusSqr.getBlockY()) {
+           return false;
+       }
+       if (sphere) {
+           return cx2 + cy2 + cz2 <= radiusLengthSqr;
+       }
+       double cxd = (double) cx / radius.getBlockX();
+       double cyd = (double) cy / radius.getBlockY();
+       double czd = (double) cz / radius.getBlockZ();
+       return cxd * cxd + cyd * cyd + czd * czd <= 1;
     }
 
     /**

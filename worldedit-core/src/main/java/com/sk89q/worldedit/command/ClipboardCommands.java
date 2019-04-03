@@ -579,7 +579,7 @@ public class ClipboardCommands extends MethodCommands {
             max = 1
     )
     @CommandPermissions("worldedit.clipboard.flip")
-    public void flip(Player player, LocalSession session, EditSession editSession,
+    public void flip(Player player, LocalSession session,
                      @Optional(Direction.AIM) @Direction BlockVector3 direction) throws WorldEditException {
         ClipboardHolder holder = session.getClipboard();
         AffineTransform transform = new AffineTransform();
@@ -597,7 +597,7 @@ public class ClipboardCommands extends MethodCommands {
             max = 0
     )
     @CommandPermissions("worldedit.clipboard.clear")
-    public void clearClipboard(Player player, LocalSession session, EditSession editSession) throws WorldEditException {
+    public void clearClipboard(Player player, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
         BBC.CLIPBOARD_CLEARED.send(player);
     }

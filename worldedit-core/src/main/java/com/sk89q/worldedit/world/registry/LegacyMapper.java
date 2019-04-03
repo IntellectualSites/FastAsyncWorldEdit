@@ -43,19 +43,20 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class LegacyMapper {
 
-    private static final Logger log = Logger.getLogger(LegacyMapper.class.getCanonicalName());
+    private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
     private static LegacyMapper INSTANCE;
 
     private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
@@ -71,7 +72,7 @@ public class LegacyMapper {
             loadFromResource();
         } catch (Throwable e) {
             e.printStackTrace();
-            log.log(Level.WARNING, "Failed to load the built-in legacy id registry", e);
+            log.warn("Failed to load the built-in legacy id registry", e);
         }
     }
 
@@ -110,7 +111,7 @@ public class LegacyMapper {
                 blockStateToLegacyId4Data.put(blockState.getInternalId(), (Integer) combinedId);
                 blockStateToLegacyId4Data.putIfAbsent(blockState.getInternalBlockTypeId(), combinedId);
             } catch (Exception e) {
-                log.fine("Unknown block: " + blockEntry.getValue());
+                log.warn("Unknown block: " + blockEntry.getValue());
             }
         }
         for (int id = 0; id < 256; id++) {
@@ -127,7 +128,7 @@ public class LegacyMapper {
             try {
                 itemMap.put(getCombinedId(itemEntry.getKey()), ItemTypes.get(itemEntry.getValue()));
             } catch (Exception e) {
-                log.fine("Unknown item: " + itemEntry.getValue());
+                log.warn("Unknown item: " + itemEntry.getValue());
             }
         }
     }
