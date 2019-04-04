@@ -9,6 +9,7 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 
 import java.util.*;
 
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.block.Biome;
@@ -55,16 +56,16 @@ public class BukkitChunk_All_ReadonlySnapshot extends FaweChunk {
     }
 
     @Override
-    public byte[] getBiomeArray() {
+    public BiomeType[] getBiomeArray() {
         if (!hasBiomes || next.biomes == null) return null;
         BukkitImplAdapter adapter = getParent().getAdapter();
-        byte[] biomes = Arrays.copyOf(next.biomes, next.biomes.length);
+        BiomeType[] biomes = Arrays.copyOf(next.biomes, next.biomes.length);
         int index = 0;
         for (int z = 0; z < 16; z++) {
             for (int x = 0; x < 16; x++, index++) {
-                if (biomes[index] != 0) {
+                if (biomes[index] != null) {
                     Biome biome = snapshot.getBiome(x, z);
-                    biomes[index] = (byte) adapter.getBiomeId(biome);
+                    biomes[index] = adapter.adapt(biome);
                 }
             }
         }
@@ -140,7 +141,7 @@ public class BukkitChunk_All_ReadonlySnapshot extends FaweChunk {
     }
 
     @Override
-    public void setBiome(int x, int z, byte biome) {
+    public void setBiome(int x, int z, BiomeType biome) {
         throw new UnsupportedOperationException("Read only");
     }
 

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -230,9 +231,9 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
     }
 
     @Override
-    public int getBiome(ChunkSnapshot chunkSnapshot, int x, int z) {
+    public BiomeType getBiome(ChunkSnapshot chunkSnapshot, int x, int z) {
         Biome biome = chunkSnapshot.getBiome(x & 15, z & 15);
-        return getAdapter().getBiomeId(biome);
+        return getAdapter().adapt(biome);
     }
 
     @Override
