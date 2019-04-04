@@ -8,6 +8,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -19,6 +21,7 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -353,5 +356,20 @@ public interface IBukkitAdapter {
      */
     default Player adapt(com.sk89q.worldedit.entity.Player player) {
         return ((BukkitPlayer) player).getPlayer();
+    }
+
+    default Biome adapt(BiomeType biomeType) {
+        if (!biomeType.getId().startsWith("minecraft:")) {
+            throw new IllegalArgumentException("Bukkit only supports vanilla biomes");
+        }
+        try {
+            return Biome.valueOf(biomeType.getId().substring(10).toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    default BiomeType adapt(Biome biome) {
+        return BiomeTypes.get(biome.name().toLowerCase());
     }
 }

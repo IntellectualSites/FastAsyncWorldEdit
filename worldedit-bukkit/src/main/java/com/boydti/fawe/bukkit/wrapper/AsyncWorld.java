@@ -858,13 +858,13 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public Biome getBiome(int x, int z) {
-        return adapter.getBiome(queue.getBiomeType(x, z));
+        return adapter.adapt(queue.getBiomeType(x, z));
     }
 
     @Override
     public void setBiome(int x, int z, Biome bio) {
-        int id = adapter.getBiomeId(bio);
-        queue.setBiome(x, z, new BiomeType(id));
+        BiomeType biome = adapter.adapt(bio);
+        queue.setBiome(x, z, biome);
     }
 
     @Override

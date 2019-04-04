@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.bekvon.bukkit.residence.commands.message;
-import com.bekvon.bukkit.residence.containers.cmd;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
@@ -36,28 +34,17 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
-import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.NoCapablePlatformException;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
-import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.FuzzyBlockState;
-import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemCategory;
-import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -74,9 +61,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
@@ -98,42 +87,42 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
     private BukkitConfiguration config;
 
     private static Map<String, Plugin> lookupNames;
-//    static {
-//        {   // Disable AWE as otherwise both fail to load
-//            PluginManager manager = Bukkit.getPluginManager();
-//            try {
-//                Field pluginsField = manager.getClass().getDeclaredField("plugins");
-//                Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
-//                pluginsField.setAccessible(true);
-//                lookupNamesField.setAccessible(true);
-//                List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
-//                lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
-//                pluginsField.set(manager, plugins = new ArrayList<Plugin>(plugins) {
-//                    @Override
-//                    public boolean add(Plugin plugin) {
-//                        if (plugin.getName().startsWith("AsyncWorldEdit")) {
-//                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
-//                        } else if (plugin.getName().startsWith("BetterShutdown")) {
-//                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
-//                        } else {
-//                            return super.add(plugin);
-//                        }
-//                        return false;
-//                    }
-//                });
-//                lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
-//                    @Override
-//                    public Plugin put(String key, Plugin plugin) {
-//                        if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
-//                            return null;
-//                        }
-//                        return super.put(key, plugin);
-//                    }
-//                });
-//            } catch (Throwable ignore) {}
-//        }
-//    }
-//
+    static {
+        {   // Disable AWE as otherwise both fail to load
+            PluginManager manager = Bukkit.getPluginManager();
+            try {
+                Field pluginsField = manager.getClass().getDeclaredField("plugins");
+                Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
+                pluginsField.setAccessible(true);
+                lookupNamesField.setAccessible(true);
+                List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
+                lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
+                pluginsField.set(manager, plugins = new ArrayList<Plugin>(plugins) {
+                    @Override
+                    public boolean add(Plugin plugin) {
+                        if (plugin.getName().startsWith("AsyncWorldEdit")) {
+                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
+                        } else if (plugin.getName().startsWith("BetterShutdown")) {
+                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
+                        } else {
+                            return super.add(plugin);
+                        }
+                        return false;
+                    }
+                });
+                lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
+                    @Override
+                    public Plugin put(String key, Plugin plugin) {
+                        if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
+                            return null;
+                        }
+                        return super.put(key, plugin);
+                    }
+                });
+            } catch (Throwable ignore) {}
+        }
+    }
+
     public WorldEditPlugin() {
         init();
     }

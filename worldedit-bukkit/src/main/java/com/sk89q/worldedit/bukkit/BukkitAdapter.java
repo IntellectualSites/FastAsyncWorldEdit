@@ -144,7 +144,7 @@ public enum BukkitAdapter {
     }
 
     public static Biome adapt(BiomeType biomeType) {
-        getAdapter().adapt(biomeType);
+        return getAdapter().adapt(biomeType);
     }
 
     /**

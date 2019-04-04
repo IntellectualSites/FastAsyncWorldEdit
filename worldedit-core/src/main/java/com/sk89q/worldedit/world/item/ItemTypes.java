@@ -873,7 +873,7 @@ public final class ItemTypes {
     }
 
     public static final @Nullable ItemType get(String id) {
-
+        return ItemType.REGISTRY.get(id);
     }
 
     public static final @Nullable ItemType get(BlockType type) {

@@ -31,7 +31,7 @@ public class OffsetFaweClipboard extends AbstractDelegateFaweClipboard {
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         return super.setBiome(ox + x, oz + z, biome);
     }
 

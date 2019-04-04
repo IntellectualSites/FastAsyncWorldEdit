@@ -37,7 +37,7 @@ public class ItemType {
     private int internalId;
     private BaseItem defaultState;
 
-    public ItemType(String id) {
+    protected ItemType(String id) {
         // If it has no namespace, assume minecraft.
         if (!id.contains(":")) {
             id = "minecraft:" + id;

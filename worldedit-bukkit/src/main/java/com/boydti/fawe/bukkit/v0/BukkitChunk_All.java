@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -170,17 +171,16 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
             }
 
             // Biomes
-            final byte[] biomes = getBiomeArray();
+            final BiomeType[] biomes = getBiomeArray();
             if (biomes != null) {
                 int index = 0;
                 for (int z = 0; z < 16; z++) {
                     int zz = bz + z;
                     for (int x = 0; x < 16; x++, index++) {
                         int xx = bx + x;
-                        int biome = biomes[index] & 0xFF;
-                        if (biome == 0) continue;
-                        if (biome == 255) biome = 0;
-                        Biome bukkitBiome = adapter.getBiome(biome);
+                        BiomeType biome = biomes[index];
+                        if (biome == null) continue;
+                        Biome bukkitBiome = adapter.adapt(biome);
                         if (bukkitBiome != null) {
                             world.setBiome(xx, zz, bukkitBiome);
                         }

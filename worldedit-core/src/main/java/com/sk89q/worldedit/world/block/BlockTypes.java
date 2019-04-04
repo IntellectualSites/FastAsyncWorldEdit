@@ -48,6 +48,7 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 import it.unimi.dsi.fastutil.ints.IntCollections;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
@@ -59,8 +60,8 @@ import java.util.stream.Stream;
  * Stores a list of common Block String IDs.
  */
 public final class BlockTypes {
-
-    @Nullable public static final BlockType __RESERVED__ = get("minecraft:__reserved__");
+    // Doesn't really matter what the hardcoded values are, as FAWE will update it on load
+    @Nullable public static final BlockType __RESERVED__ = null;
     @Nullable public static final BlockType ACACIA_BUTTON = get("minecraft:acacia_button");
     @Nullable public static final BlockType ACACIA_DOOR = get("minecraft:acacia_door");
     @Nullable public static final BlockType ACACIA_FENCE = get("minecraft:acacia_fence");
@@ -660,64 +661,15 @@ public final class BlockTypes {
     @Nullable public static final BlockType ZOMBIE_HEAD = get("minecraft:zombie_head");
     @Nullable public static final BlockType ZOMBIE_WALL_HEAD = get("minecraft:zombie_wall_head");
 
-
-    private static BlockType get(String id) {
-    	return register(new BlockType(id));
-    }
-
-    private static BlockType get(String id, Function<BlockState, BlockState> values) {
-    	return register(new BlockType(id, values));
-    }
-
-    public static BlockType get(BlockType type) {
-    	if(sortedRegistry == null) {
-    		sortedRegistry = new ArrayList<>();
-    		stateList = new ArrayList<>();
-    		$NAMESPACES = new LinkedHashSet<>();
-            BIT_OFFSET = MathMan.log2nlz(WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().registerBlocks().size());
-            BIT_MASK = ((1 << BIT_OFFSET) - 1);
-    	}
-    	if(!sortedRegistry.contains(type))sortedRegistry.add(type);
-    	return internalRegister(type, sortedRegistry.indexOf(type));
-    }
-
-    private static ArrayList<BlockType> sortedRegistry;
-    private static ArrayList<BlockState> stateList;
-    public static BlockType[] values;
-    public static BlockState[] states;
-    private static Set<String> $NAMESPACES;
-    @Deprecated public static int BIT_OFFSET; // Used internally
-    @Deprecated public static int BIT_MASK; // Used internally
-
-    private static BlockType internalRegister(BlockType blockType, final int internalId) {
-        init(blockType, blockType.getId(), internalId, stateList);
-        if(BlockType.REGISTRY.get(blockType.getId()) == null) BlockType.REGISTRY.register(blockType.getId(), blockType);
-        $NAMESPACES.add(blockType.getNamespace());
-        values = sortedRegistry.toArray(new BlockType[sortedRegistry.size()]);
-        states = stateList.toArray(new BlockState[stateList.size()]);
-        return blockType;
-    }
-
-    private static void init(BlockType type, String id, int internalId, ArrayList<BlockState> states) {
-        try {
-            type.setSettings(new Settings(type, id, internalId, states));
-            states.addAll(type.updateStates());
-            type.setStates(states);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-    
     /*
      -----------------------------------------------------
                     Settings
      -----------------------------------------------------
      */
-    public final static class Settings {
+    protected final static class Settings {
         protected final int internalId;
         protected final ItemType itemType;
-        protected BlockState defaultState;
+        protected final BlockState defaultState;
         protected final AbstractProperty<?>[] propertiesMapArr;
         protected final AbstractProperty<?>[] propertiesArr;
         protected final List<AbstractProperty<?>> propertiesList;
@@ -726,10 +678,14 @@ public final class BlockTypes {
         protected final BlockMaterial blockMaterial;
         protected final int permutations;
         protected int[] stateOrdinals;
-        protected ArrayList<BlockState> localStates;
 
         Settings(BlockType type, String id, int internalId, List<BlockState> states) {
             this.internalId = internalId;
+            String propertyString = null;
+            int propI = id.indexOf('[');
+            if (propI != -1) {
+                propertyString = id.substring(propI + 1, id.length() - 1);
+            }
 
             int maxInternalStateId = 0;
             Map<String, ? extends Property<?>> properties = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getProperties(type);
@@ -747,7 +703,7 @@ public final class BlockTypes {
                 int bitOffset = 0;
                 for (Map.Entry<String, ? extends Property<?>> entry : properties.entrySet()) {
                     PropertyKey key = PropertyKey.getOrCreate(entry.getKey());
-                    AbstractProperty<?> property = ((AbstractProperty<?>) entry.getValue()).withOffset(bitOffset);
+                    AbstractProperty<?> property = ((AbstractProperty) entry.getValue()).withOffset(bitOffset);
                     this.propertiesMapArr[key.ordinal()] = property;
                     this.propertiesArr[prop_arr_i++] = property;
                     propMap.put(entry.getKey(), property);
@@ -766,28 +722,40 @@ public final class BlockTypes {
                 this.propertiesSet = Collections.emptySet();
             }
             this.permutations = maxInternalStateId;
-            this.localStates = new ArrayList<>();
 
             this.blockMaterial = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(type);
             this.itemType = ItemTypes.get(type);
-            
+
             if (!propertiesList.isEmpty()) {
                 this.stateOrdinals = generateStateOrdinals(internalId, states.size(), maxInternalStateId, propertiesList);
                 for (int propId = 0; propId < this.stateOrdinals.length; propId++) {
                     int ordinal = this.stateOrdinals[propId];
                     if (ordinal != -1) {
                         int stateId = internalId + (propId << BlockTypes.BIT_OFFSET);
-                        this.localStates.add(new BlockStateImpl(type, stateId, ordinal));
+                        states.add(new BlockState(type, stateId, ordinal));
                     }
                 }
-                
-              this.defaultState = this.localStates.get(this.stateOrdinals[internalId >> BlockTypes.BIT_OFFSET] - states.size());     
+                int defaultPropId = parseProperties(propertyString, propertiesMap) >> BlockTypes.BIT_OFFSET;
+                this.defaultState = states.get(this.stateOrdinals[defaultPropId]);
             } else {
-                this.defaultState = new BlockStateImpl(id.contains("minecraft:__reserved__") ? new BlockType("minecraft:air") : type, internalId, states.size());
-                this.localStates.add(this.defaultState);
+                this.defaultState = new BlockState(type, internalId, states.size());
+                states.add(this.defaultState);
             }
         }
+
+        private int parseProperties(String properties, Map<String, AbstractProperty<?>> propertyMap) {
+            int id = internalId;
+            for (String keyPair : properties.split(",")) {
+                String[] split = keyPair.split("=");
+                String name = split[0];
+                String value = split[1];
+                AbstractProperty btp = propertyMap.get(name);
+                id = btp.modify(id, btp.getValueFor(value));
+            }
+            return id;
+        }
     }
+
     
     private static int[] generateStateOrdinals(int internalId, int ordinal, int maxStateId, List<AbstractProperty<?>> props) {
         if (props.isEmpty()) return null;
@@ -819,12 +787,105 @@ public final class BlockTypes {
         return result;
     }
 
+    /*
+     -----------------------------------------------------
+                    Static Initializer
+     -----------------------------------------------------
+     */
+
+    public static final int BIT_OFFSET; // Used internally
+    public static final int BIT_MASK; // Used internally
+
+    private static final Map<String, BlockType> $REGISTRY = new HashMap<>();
+
+    public static final BlockType[] values;
+    public static final BlockState[] states;
+
+    private static final Set<String> $NAMESPACES = new LinkedHashSet<String>();
+
+    static {
+        try {
+            ArrayList<BlockState> stateList = new ArrayList<>();
+
+            Collection<String> blocks = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().registerBlocks();
+            Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
+
+            int size = blockMap.size();
+            for (Field field : BlockID.class.getDeclaredFields()) size = Math.max(field.getInt(null) + 1, size);
+            BIT_OFFSET = MathMan.log2nlz(size);
+            BIT_MASK = ((1 << BIT_OFFSET) - 1);
+            values = new BlockType[size];
+
+            // Register the statically declared ones first
+            Field[] oldFields = BlockID.class.getDeclaredFields();
+            for (Field field : oldFields) {
+                if (field.getType() == int.class) {
+                    String id = field.getName().toLowerCase();
+                    String defaultState = blockMap.get(id);
+                    if (defaultState == null) {
+                        System.out.println("Ignoring invalid block " + id);
+                        continue;
+                    }
+                    int internalId = field.getInt(null);
+                    if (values[internalId] == null) {
+                        throw new IllegalStateException("Invalid duplicate id for " + field.getName());
+                    }
+                    BlockType type = register(defaultState, internalId, stateList);
+                    // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
+                    values[internalId] = type;
+                }
+            }
+
+            { // Register new blocks
+                int internalId = 1;
+                for (Map.Entry<String, String> entry : blockMap.entrySet()) {
+                    String id = entry.getKey();
+                    String defaultState = entry.getValue();
+                    // Skip already registered ids
+                    for (; values[internalId] != null; internalId++);
+                    BlockType type = register(defaultState, internalId, stateList);
+                    values[internalId] = type;
+                }
+            }
+
+            // Add to $Registry
+            for (BlockType type : values) {
+                $REGISTRY.put(type.getId().toLowerCase(), type);
+            }
+            states = stateList.toArray(new BlockState[stateList.size()]);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static BlockType register(final String id, int internalId, List<BlockState> states) {
+        // Get the enum name (remove namespace if minecraft:)
+        int propStart = id.indexOf('[');
+        String typeName = id.substring(0, propStart == -1 ? id.length() : propStart);
+        String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase();
+        BlockType existing = new BlockType(id, internalId, states);
+        // register states
+        if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
+        $REGISTRY.put(typeName, existing);
+        String nameSpace = typeName.substring(0, typeName.indexOf(':'));
+        $NAMESPACES.add(nameSpace);
+        return existing;
+    }
+
+
+    /*
+     -----------------------------------------------------
+                    Parsing
+     -----------------------------------------------------
+     */
+
     public static BlockType parse(final String type) throws InputParseException {
         final String inputLower = type.toLowerCase();
         String input = inputLower;
 
         if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
-        BlockType result = BlockType.REGISTRY.get(input);
+        BlockType result = $REGISTRY.get(input);
         if (result != null) return result;
 
         try {
@@ -844,13 +905,13 @@ public final class BlockTypes {
         return $NAMESPACES;
     }
 
-	public static final @Nullable BlockType get(final String id) {
-	  return BlockType.REGISTRY.get(id.toLowerCase());
-	}
+    public static final @Nullable BlockType get(final String id) {
+        return $REGISTRY.get(id);
+    }
 
-	public static final @Nullable BlockType get(final CharSequence id) {
-	  return BlockType.REGISTRY.get(id.toString().toLowerCase());
-	}
+    public static final @Nullable BlockType get(final CharSequence id) {
+        return $REGISTRY.get(id);
+    }
 
     @Deprecated
     public static final BlockType get(final int ordinal) {

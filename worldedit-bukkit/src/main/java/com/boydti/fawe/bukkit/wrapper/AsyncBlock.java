@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -232,13 +233,13 @@ public class AsyncBlock implements Block {
 
     @Override
     public Biome getBiome() {
-        return world.getAdapter().getBiome(queue.getBiomeType(x, z));
+        return world.getAdapter().adapt(queue.getBiomeType(x, z));
     }
 
     @Override
     public void setBiome(Biome bio) {
-        int id = world.getAdapter().getBiomeId(bio);
-        queue.setBiome(x, z, FaweCache.getBiome(id));
+        BiomeType biome = world.getAdapter().adapt(bio);
+        queue.setBiome(x, z, biome);
     }
 
     @Override

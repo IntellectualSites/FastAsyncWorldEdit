@@ -22,9 +22,7 @@ package com.sk89q.worldedit.world.block;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -39,29 +37,28 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
 public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
+    private final int internalId;
+    private final int ordinal;
+    private final BlockType blockType;
     private BlockMaterial material;
-    private BlockType blockType;
-    private int internalId, ordinal;
     private BaseBlock emptyBaseBlock;
-    
-    BlockState(BlockType blockType, int internalId, int ordinal) {
+
+    protected BlockState(BlockType blockType, int internalId, int ordinal) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
+        this.emptyBaseBlock = new BaseBlock(this);
     }
 
     /**
@@ -307,36 +304,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
     @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
-        if (this == o) {
-            // Added a reference equality check for speediness
-            return true;
-        }
-        if (!getBlockType().equals(o.getBlockType())) {
-            return false;
-        }
-
-        Set<Property<?>> differingProperties = new HashSet<>();
-        for (Object state : o.getStates().keySet()) {
-            if (getState((Property<?>) state) == null) {
-                differingProperties.add((Property<?>) state);
-            }
-        }
-        for (Property<?> property : getStates().keySet()) {
-            if (o.getState(property) == null) {
-                differingProperties.add(property);
-            }
-        }
-
-        for (Property<?> property : getStates().keySet()) {
-            if (differingProperties.contains(property)) {
-                continue;
-            }
-            if (!Objects.equals(getState(property), o.getState(property))) {
-                return false;
-            }
-        }
-
-        return true;
+        return o.getOrdinal() == this.getOrdinal();
     }
 
     @Override
@@ -366,20 +334,6 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 	public int getOrdinal() {
 		return this.ordinal;
 	}
-
-    /**
-     * Internal method used for creating the initial BlockState.
-     *
-     * Sets a value. DO NOT USE THIS.
-     *
-     * @param property The state
-     * @param value The value
-     * @return The blockstate, for chaining
-     */
-    BlockState setState(final Property<?> property, final Object value) {
-        this.values.put(property, value);
-        return this;
-    }
 
     @Override
     public String toString() {

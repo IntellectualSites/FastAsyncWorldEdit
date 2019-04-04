@@ -23,7 +23,9 @@ import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import com.sk89q.worldedit.world.registry.BlockCategoryRegistry;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.BundledRegistries;
+import com.sk89q.worldedit.world.registry.EntityRegistry;
 import com.sk89q.worldedit.world.registry.ItemCategoryRegistry;
+import com.sk89q.worldedit.world.registry.ItemRegistry;
 
 /**
  * World data for the Bukkit platform.

@@ -45,62 +45,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class BlockType implements FawePattern {
-	
-	public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
-	
-	private final @Nonnull String id;
-    private final BlockTypeEnum typeEnum;
-    private BlockTypes.Settings settings;
+	private final String id;
+    private final BlockTypes.Settings settings;
 
-//	private ArrayList<BlockState> states;
-//	public final Function<BlockState, BlockState> defaultValue;
-//
-//	private BlockMaterial material;
-
-	public BlockType(@Nonnull BlockTypeEnum typeEnum) {
-	    this.typeEnum = typeEnum;
-	}
-
-    public BlockTypeEnum getTypeEnum() {
-        return typeEnum;
+    protected BlockType(String id, int internalId, List<BlockState> states) {
+        this.settings = new BlockTypes.Settings(this, id, internalId, states);
+        int i = id.indexOf("[");
+        this.id = i == -1 ? id : id.substring(0, i);
     }
 
-    private void init(String id, int internalId, List<BlockState> states) {
-        try {
-            if (getId() == null) {
-                String name = (name().indexOf(':') == -1 ? "minecraft:" : "") + name().toLowerCase();
-                ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("id"), this, name);
-            }
-            Settings settings = new Settings(this, id, internalId, states);
-            ReflectionUtils.setFailsafeFieldValue(BlockTypes.class.getDeclaredField("settings"), this, settings);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-
-	public void setStates(ArrayList<BlockState> states) { //
-		this.states = states;
-	}
-	
-	public void setSettings(BlockTypes.Settings settings) { //
-		this.settings = settings;
-	}
-	
-	public BlockTypes.Settings getSettings(){ //
-		return settings;
-	}
-	
-	public ArrayList<BlockState> updateStates(){ //
-		if(settings != null) {
-			return settings.localStates = new ArrayList<>(settings.localStates.stream()
-          .map(state -> new BlockStateImpl(this, state.getInternalId(), state.getOrdinal())).collect(Collectors.toList()));
-		}else {
-			return null;
-		}
-	}
-	
     @Deprecated
     public int getMaxStateId() {
     	return settings.permutations;
@@ -225,14 +178,14 @@ public class BlockType implements FawePattern {
     public BlockState getDefaultState() {
         return this.settings.defaultState;
     }
-    
-    public FuzzyBlockState getFuzzyMatcher() { //
-        return new FuzzyBlockState(this);
-    }
 
-    public FuzzyBlockState getFuzzyMatcher() { //
-        return updateField(emptyFuzzy, () -> new FuzzyBlockState(this));
-    }
+//    public FuzzyBlockState getFuzzyMatcher() { //
+//        return new FuzzyBlockState(this);
+//    }
+//
+//    public FuzzyBlockState getFuzzyMatcher() { //
+//        return updateField(emptyFuzzy, () -> new FuzzyBlockState(this));
+//    }
 
     /**
      * Slow

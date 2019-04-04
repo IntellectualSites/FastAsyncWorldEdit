@@ -33,6 +33,7 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.*;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -187,18 +188,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
     // ------------------------------------------------------------------------
     // Code that is less likely to break
     // ------------------------------------------------------------------------
-
-    @Override
-    public BiomeType getBiomeId(Biome biome) {
-        BiomeBase mcBiome = CraftBlock.biomeToBiomeBase(biome);
-        return mcBiome != null ? IRegistry.BIOME.a(mcBiome) : 0;
-    }
-
-    @Override
-    public Biome getBiome(int id) {
-        BiomeBase mcBiome = IRegistry.BIOME.fromId(id);
-        return CraftBlock.biomeBaseToBiome(mcBiome); // Defaults to ocean if it's an invalid ID
-    }
 
     @SuppressWarnings("deprecation")
     @Override
