@@ -289,13 +289,9 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
      */
     public abstract CompoundTag getTile(int x, int y, int z);
 
-    public void setBiome(final int x, final int z, final BiomeType biome) {
-        setBiome(x, z, biome);
-    }
+    public abstract void setBiome(final int x, final int z, final BiomeType biome);
 
-    public abstract void setBiome(final int x, final int z, final byte biome);
-
-    public void setBiome(final byte biome) {
+    public void setBiome(final BiomeType biome) {
         for (int z = 0; z < 16; z++) {
             for (int x = 0; x < 16; x++) {
                 setBiome(x, z, biome);

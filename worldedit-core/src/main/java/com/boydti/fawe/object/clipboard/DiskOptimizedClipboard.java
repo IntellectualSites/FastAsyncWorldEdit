@@ -11,6 +11,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -127,15 +128,15 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         setBiome(getIndex(x, 0, z), biome);
         return true;
     }
 
     @Override
-    public void setBiome(int index, int biome) {
+    public void setBiome(int index, BiomeType biome) {
         if (initBiome()) {
-            mbb.put(HEADER_SIZE + (volume << 2) + index, (byte) biome);
+            mbb.put(HEADER_SIZE + (volume << 2) + index, (byte) biome.getInternalId());
         }
     }
 
@@ -145,7 +146,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             return null;
         }
         int biomeId = mbb.get(HEADER_SIZE + (volume << 2) + index) & 0xFF;
-        return FaweCache.CACHE_BIOME[biomeId];
+        return BiomeTypes.get(biomeId);
     }
 
     @Override

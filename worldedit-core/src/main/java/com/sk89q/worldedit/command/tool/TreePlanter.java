@@ -49,22 +49,24 @@ public class TreePlanter implements BlockTool {
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
 
         try (EditSession editSession = session.createEditSession(player)) {
-            boolean successful = false;
+            try {
+                boolean successful = false;
 
-            for (int i = 0; i < 10; i++) {
-                if (treeType.generate(editSession, clicked.add(0, 1, 0).toBlockPoint())) {
-                    successful = true;
-                    break;
+                for (int i = 0; i < 10; i++) {
+                    if (treeType.generate(editSession, clicked.add(0, 1, 0).toBlockPoint())) {
+                        successful = true;
+                        break;
+                    }
                 }
+
+                if (!successful) {
+                    player.printError("A tree can't go there.");
+                }
+            } catch (MaxChangedBlocksException e) {
+                player.printError("Max. blocks changed reached.");
+            } finally {
+                session.remember(editSession);
             }
-            
-            if (!successful) {
-                player.printError("A tree can't go there.");
-            }
-        } catch (MaxChangedBlocksException e) {
-            player.printError("Max. blocks changed reached.");
-        } finally {
-            session.remember(editSession);
         }
 
         return true;

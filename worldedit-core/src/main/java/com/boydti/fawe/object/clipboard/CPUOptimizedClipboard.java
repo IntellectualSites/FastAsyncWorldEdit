@@ -59,7 +59,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         setBiome(getIndex(x, 0, z), biome);
         return true;
     }
@@ -78,7 +78,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
         int index = 0;
         for (int z = 0; z < length; z++) {
             for (int x = 0; x < width; x++, index++) {
-                task.run(index, biomes[index] & 0xFF);
+                task.run(index, biomes[index].getInternalId());
             }
         }
     }

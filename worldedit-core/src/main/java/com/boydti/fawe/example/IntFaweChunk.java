@@ -5,6 +5,7 @@ import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.*;
@@ -16,7 +17,7 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
     public final short[] air;
     public final byte[] heightMap;
 
-    public byte[] biomes;
+    public BiomeType[] biomes;
     public HashMap<Short, CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
@@ -129,7 +130,7 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
     }
 
     @Override
-    public byte[] getBiomeArray() {
+    public BiomeType[] getBiomeArray() {
         return this.biomes;
     }
 
@@ -216,11 +217,10 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
     }
 
     @Override
-    public void setBiome(final int x, final int z, byte biome) {
+    public void setBiome(final int x, final int z, BiomeType biome) {
         if (this.biomes == null) {
-            this.biomes = new byte[256];
+            this.biomes = new BiomeType[256];
         }
-        if (biome == 0) biome = -1;
         biomes[((z & 15) << 4) + (x & 15)] = biome;
     }
 

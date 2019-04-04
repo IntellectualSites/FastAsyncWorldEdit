@@ -184,7 +184,7 @@ public class NullFaweQueue implements FaweQueue {
 
     @Override
     public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
-        return 0;
+        return null;
     }
 
     @Override

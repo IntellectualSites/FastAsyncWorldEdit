@@ -44,7 +44,7 @@ public class HeightMap {
      * @param region  the region
      */
     public HeightMap(EditSession session, Region region) {
-        this(session, region, false);
+        this(session, region, (Mask) null, false);
     }
 
     public HeightMap(EditSession session, Region region, Mask mask) {
@@ -83,7 +83,7 @@ public class HeightMap {
                 BlockVector2 pos = iter.next();
                 int x = pos.getBlockX();
                 int z = pos.getBlockZ();
-                layer = session.getNearestSurfaceLayer(x, z, (layer + 7) >> 3, 0, maxY, mask);
+                layer = session.getNearestSurfaceLayer(x, z, (layer + 7) >> 3, 0, maxY);
                 data[(z - bz) * width + (x - bx)] = layer;
             }
         } else {

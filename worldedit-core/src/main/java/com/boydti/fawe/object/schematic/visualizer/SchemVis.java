@@ -33,6 +33,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -580,7 +581,7 @@ public class SchemVis extends ImmutableVirtualWorld {
     @Override
     public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         // TODO later (currently not used)
-        return 0;
+        return BiomeTypes.FOREST;
     }
 
     @Override

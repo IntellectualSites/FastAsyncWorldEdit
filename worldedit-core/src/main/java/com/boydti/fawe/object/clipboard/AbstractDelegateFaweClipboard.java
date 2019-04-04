@@ -42,7 +42,7 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         return parent.setBiome(x, z, biome);
     }
 
@@ -62,7 +62,7 @@ public class AbstractDelegateFaweClipboard extends FaweClipboard {
     }
 
     @Override
-    public void setBiome(int index, int biome) {
+    public void setBiome(int index, BiomeType biome) {
         parent.setBiome(index, biome);
     }
 

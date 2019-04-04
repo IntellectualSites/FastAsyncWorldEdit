@@ -91,7 +91,7 @@ public abstract class LazyFaweChunk<T extends FaweChunk> extends FaweChunk {
     }
 
     @Override
-    public byte[] getBiomeArray() {
+    public BiomeType[] getBiomeArray() {
         return internalGetOrCacheChunk().getBiomeArray();
     }
 
@@ -176,12 +176,7 @@ public abstract class LazyFaweChunk<T extends FaweChunk> extends FaweChunk {
     }
 
     @Override
-    public void setBiome(int x, int z, byte biome) {
-        internalGetOrCacheChunk().setBiome(x, z, biome);
-    }
-
-    @Override
-    public void setBiome(byte biome) {
+    public void setBiome(BiomeType biome) {
         internalGetOrCacheChunk().setBiome(biome);
     }
 

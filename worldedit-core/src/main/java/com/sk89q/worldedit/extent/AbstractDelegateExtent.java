@@ -205,6 +205,11 @@ public class AbstractDelegateExtent implements LightingExtent {
     }
 
     @Override
+    public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
+        return extent.getHighestTerrainBlock(x, z, minY, maxY, filter);
+    }
+
+    @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
         return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
     }
@@ -217,6 +222,10 @@ public class AbstractDelegateExtent implements LightingExtent {
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
         return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
+    }
+
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
+        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
     }
 
     @Override

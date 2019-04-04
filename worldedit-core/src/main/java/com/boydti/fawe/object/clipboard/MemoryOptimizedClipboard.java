@@ -10,6 +10,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -92,17 +93,17 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         setBiome(getIndex(x, 0, z), biome);
         return true;
     }
 
     @Override
-    public void setBiome(int index, int biome) {
+    public void setBiome(int index, BiomeType biome) {
         if (biomes == null) {
             biomes = new byte[area];
         }
-        biomes[index] = (byte) biome;
+        biomes[index] = (byte) biome.getInternalId();
     }
 
     @Override
@@ -121,7 +122,7 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
         if (!hasBiomes()) {
             return null;
         }
-        return FaweCache.CACHE_BIOME[biomes[index] & 0xFF];
+        return BiomeTypes.get(biomes[index]);
     }
 
     @Override

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command.tool;
 
 import com.boydti.fawe.object.collection.BlockVectorSet;
+import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -27,10 +28,6 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
@@ -41,6 +38,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -71,11 +69,10 @@ public class FloatingTreeRemover implements BlockTool {
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config,
-            Player player, LocalSession session, Location clicked) {
+                              Player player, LocalSession session, Location clicked) {
 
         final World world = (World) clicked.getExtent();
-        BlockVector3 pos = clicked.toBlockPoint();
-        final BlockState state = world.getBlock(pos);
+        final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
 
         if (!isTreeBlock(state.getBlockType())) {
             player.printError("That's not a tree.");
@@ -84,10 +81,20 @@ public class FloatingTreeRemover implements BlockTool {
 
         try (EditSession editSession = session.createEditSession(player)) {
             try {
-                Pattern replace = BlockTypes.AIR;
-                RecursiveVisitor visitor = new RecursiveVisitor(new BlockMask(editSession, logs, leaves), replace, 64, editSession);
-                visitor.visit(pos);
-                Operations.completeBlindly(visitor);
+                final Set<BlockVector3> blockSet = bfs(world, clicked.toVector().toBlockPoint());
+                if (blockSet == null) {
+                    player.printError("That's not a floating tree.");
+                    return true;
+                }
+
+                for (BlockVector3 blockVector : blockSet) {
+                    final BlockState otherState = editSession.getBlock(blockVector);
+                    if (isTreeBlock(otherState.getBlockType())) {
+                        editSession.setBlock(blockVector, BlockTypes.AIR.getDefaultState());
+                    }
+                }
+            } catch (MaxChangedBlocksException e) {
+                player.printError("Max blocks change limit reached.");
             } finally {
                 session.remember(editSession);
             }
@@ -97,10 +104,60 @@ public class FloatingTreeRemover implements BlockTool {
     }
 
     private BlockVector3[] recurseDirections = {
+            Direction.NORTH.toBlockVector(),
             Direction.EAST.toBlockVector(),
             Direction.SOUTH.toBlockVector(),
             Direction.WEST.toBlockVector(),
             Direction.UP.toBlockVector(),
             Direction.DOWN.toBlockVector(),
     };
+
+    /**
+     * Helper method.
+     *
+     * @param world the world that contains the tree
+     * @param origin any point contained in the floating tree
+     * @return a set containing all blocks in the tree/shroom or null if this is not a floating tree/shroom.
+     */
+    private Set<BlockVector3> bfs(World world, BlockVector3 origin) throws MaxChangedBlocksException {
+        final LocalBlockVectorSet visited = new LocalBlockVectorSet();
+        final LocalBlockVectorSet queue = new LocalBlockVectorSet();
+
+        queue.add(origin);
+        visited.add(origin);
+
+        while (!queue.isEmpty()) {
+            Iterator<BlockVector3> iter = queue.iterator();
+            while (iter.hasNext()) {
+                final BlockVector3 current = iter.next();
+                iter.remove();
+                for (BlockVector3 recurseDirection : recurseDirections) {
+                    final BlockVector3 next = current.add(recurseDirection);
+                    if (origin.distanceSq(next) > rangeSq) {
+                        // Maximum range exceeded => stop walking
+                        continue;
+                    }
+
+                    if (visited.add(next)) {
+                        BlockState state = world.getBlock(next);
+                        if (state.getBlockType().getMaterial().isAir() || state.getBlockType() == BlockTypes.SNOW) {
+                            continue;
+                        }
+                        if (isTreeBlock(state.getBlockType())) {
+                            queue.add(next);
+                        } else {
+                            // we hit something solid - evaluate where we came from
+                            final BlockType currentType = world.getBlock(current).getBlockType();
+                            if (!BlockCategories.LEAVES.contains(currentType) && currentType != BlockTypes.VINE) {
+                                // log/shroom touching a wall/the ground => this is not a floating tree, bail out
+                                return null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return visited;
+    }
 }

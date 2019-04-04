@@ -105,7 +105,7 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
 
     @Override
     public BiomeType getBiome(final BlockVector2 position) {
-        return BiomeTypes.get(queue.getBiomeType(position.getBlockX(), position.getBlockZ()));
+        return queue.getBiomeType(position.getBlockX(), position.getBlockZ());
     }
 
     @Override

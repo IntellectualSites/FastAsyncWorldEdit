@@ -28,15 +28,6 @@ import java.util.Collections;
 public interface ItemRegistry {
 
     /**
-     * Gets the name for the given item.
-     *
-     * @param itemType the item
-     * @return The name, or null if it's unknown
-     */
-    @Nullable
-    String getName(ItemType itemType);
-
-    /**
      * Register all items
      */
     default Collection<String> registerItems() {

@@ -37,8 +37,8 @@ public class NullFaweChunk extends FaweChunk<Void> {
     }
 
     @Override
-    public byte[] getBiomeArray() {
-        return new byte[256];
+    public BiomeType[] getBiomeArray() {
+        return new BiomeType[256];
     }
 
     @Override
@@ -98,11 +98,6 @@ public class NullFaweChunk extends FaweChunk<Void> {
 
     @Override
     public void setBiome(int x, int z, BiomeType biome) {
-
-    }
-
-    @Override
-    public void setBiome(int x, int z, byte biome) {
 
     }
 

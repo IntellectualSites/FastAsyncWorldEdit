@@ -22,6 +22,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
@@ -118,7 +119,7 @@ public class SchematicStreamer extends NBTStreamer {
         ByteReader biomeReader = new ByteReader() {
             @Override
             public void run(int index, int value) {
-                fc.setBiome(index, value);
+                fc.setBiome(index, BiomeTypes.get(value));
             }
         };
         NBTStreamReader<Integer, Integer> initializer23 = new NBTStreamReader<Integer, Integer>() {

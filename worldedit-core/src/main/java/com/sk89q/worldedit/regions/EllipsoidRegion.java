@@ -129,7 +129,7 @@ public class EllipsoidRegion extends AbstractRegion {
     @Override
     public void expand(BlockVector3... changes) throws RegionOperationException {
         center = center.add(calculateDiff(changes));
-        setRadius(radius.add(calculateChanges(changes).toVector3()));
+        setRadius(radius.add(calculateChanges(changes)));
     }
 
     @Override

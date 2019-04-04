@@ -26,6 +26,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.CombinedTransform;
@@ -92,12 +93,12 @@ public class FlattenedClipboardTransform {
             corners[i] = transformAround.apply(corners[i]);
         }
 
-        MutableVector3 newMinimum = new MutableVector3(corners[0]);
-        MutableVector3 newMaximum = new MutableVector3(corners[0]);
+        Vector3 newMinimum = corners[0];
+        Vector3 newMaximum = corners[0];
         for (int i = 1; i < corners.length; i++) {
             Vector3 cbv = corners[i];
-            newMinimum = newMinimum.setComponents(newMinimum.getMinimum(cbv));
-            newMaximum = newMaximum.setComponents(newMaximum.getMaximum(cbv));
+            newMinimum = newMinimum.getMinimum(cbv);
+            newMaximum = newMaximum.getMaximum(cbv);
         }
 
         // After transformation, the points may not really sit on a block,

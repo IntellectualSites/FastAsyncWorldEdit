@@ -56,12 +56,12 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 
     @Override
-    public void setBiome(int index, int biome) {
+    public void setBiome(int index, BiomeType biome) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 
@@ -71,7 +71,7 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
         int index = 0;
         for (int z = 0; z <= dim.getBlockZ(); z++) {
             for (int x = 0; x <= dim.getBlockX(); x++, index++) {
-                task.run(index, getBiome(x, z));
+                task.run(index, getBiome(x, z).getInternalId());
             }
         }
     }

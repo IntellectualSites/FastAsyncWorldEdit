@@ -385,7 +385,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
         return getCombinedId4Data(lastSection, x, y, z);
     }
 
-    public abstract int getBiome(CHUNK chunk, int x, int z);
+    public abstract BiomeType getBiome(CHUNK chunk, int x, int z);
 
     public abstract CompoundTag getTileEntity(CHUNK chunk, int x, int y, int z);
 
@@ -765,12 +765,12 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
                 lastChunkSections = getSections(lastChunk);
             } else {
                 lastChunkSections = null;
-                return 0;
+                return null;
             }
         } else if (lastChunk == null) {
-            return 0;
+            return null;
         }
-        return getBiome(lastChunk, x, z) & 0xFF;
+        return getBiome(lastChunk, x, z);
     }
 
     @Override
