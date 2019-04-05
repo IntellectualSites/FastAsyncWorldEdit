@@ -53,7 +53,7 @@ public final class NamespacedRegistry<V extends RegistryItem> extends Registry<V
         values.add(value);
         super.register(key, value);
         if (key.startsWith(defaultNamespace)) {
-            super.register(key.substring(index), value);
+            super.register(key.substring(index + 1), value);
         }
         return value;
     }
