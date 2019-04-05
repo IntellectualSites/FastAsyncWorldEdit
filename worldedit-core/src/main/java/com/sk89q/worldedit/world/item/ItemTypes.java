@@ -19,21 +19,11 @@
 
 package com.sk89q.worldedit.world.item;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.blocks.BaseItem;
-import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
 
 public final class ItemTypes {
 
@@ -831,24 +821,6 @@ public final class ItemTypes {
     private ItemTypes() {
     }
 
-    private static ItemType register(final String id) {
-        return register(new ItemType(id));
-    }
-
-    public static ItemType register(final ItemType item) {
-    	if(sortedRegistry == null)
-    		sortedRegistry = new ArrayList<>();
-    	if(!sortedRegistry.contains(item))sortedRegistry.add(item);
-//        return ItemType.REGISTRY.register(item.getId(), item);
-    	return internalRegister(item);
-    }
-    
-    private static ArrayList<ItemType> sortedRegistry;
-    
-    public static ItemType[] values() {
-    	return sortedRegistry.toArray(new ItemType[sortedRegistry.size()]);
-    }
-
     @Nullable
     public static ItemType parse(String input) {
         input = input.toLowerCase();
@@ -866,30 +838,20 @@ public final class ItemTypes {
         return result;
     }
 
-    private static ItemType internalRegister(final ItemType type) {
-        type.setInternalId(sortedRegistry.indexOf(type));
-        type.setDefaultState(new BaseItemStack(type, 1));
-        return ItemType.REGISTRY.register(type.getId(), type);
-    }
-
     public static final @Nullable ItemType get(String id) {
         return ItemType.REGISTRY.get(id);
     }
 
-    public static final @Nullable ItemType get(BlockType type) {
-        ItemType item = get(type.getId());
-        if (item != null && item.getBlockType() == null) {
-            item.setBlockType(type);
-        }
-        return item;
-    }
-
     @Deprecated
     public static final ItemType get(final int ordinal) {
-        return values()[ordinal];
+        return ItemType.REGISTRY.getByInternalId(ordinal);
     }
 
     public static int size() {
-        return values().length;
+        return ItemType.REGISTRY.size();
+    }
+
+    public static Collection<ItemType> values() {
+        return ItemType.REGISTRY.values();
     }
 }

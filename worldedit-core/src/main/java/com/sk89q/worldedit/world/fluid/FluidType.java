@@ -19,13 +19,14 @@
 
 package com.sk89q.worldedit.world.fluid;
 
+import com.sk89q.worldedit.registry.RegistryItem;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 
 /**
  * Minecraft now has a 'fluid' system. This is a
  * stub class to represent what it may be in the future.
  */
-public class FluidType {
+public class FluidType implements RegistryItem {
 
     public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type");
 
@@ -42,6 +43,18 @@ public class FluidType {
      */
     public String getId() {
         return this.id;
+    }
+
+    private int internalId;
+
+    @Override
+    public void setInternalId(int internalId) {
+        this.internalId = internalId;
+    }
+
+    @Override
+    public int getInternalId() {
+        return internalId;
     }
 
     @Override

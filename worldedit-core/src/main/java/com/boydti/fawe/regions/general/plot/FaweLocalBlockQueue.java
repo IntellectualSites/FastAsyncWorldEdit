@@ -19,6 +19,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
+import java.util.Collection;
 import java.util.List;
 
 // TODO FIXME
@@ -95,7 +96,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
             if (reg == null) {
                 reg = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.USER_COMMANDS).getRegistries().getBiomeRegistry();
             }
-            List<BiomeType> biomes = BiomeTypes.values();
+            Collection<BiomeType> biomes = BiomeTypes.values();
             lastBiome = biome;
             this.biome = Biomes.findBiomeByName(biomes, biome, reg);
         }

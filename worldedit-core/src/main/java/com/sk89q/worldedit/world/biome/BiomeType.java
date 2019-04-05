@@ -19,22 +19,29 @@
 
 package com.sk89q.worldedit.world.biome;
 
+import com.sk89q.worldedit.registry.RegistryItem;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 
 /**
  * All the types of biomes in the game.
  */
-public class BiomeType {
+public class BiomeType implements RegistryItem {
 
     public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type");
-    private final int internalId;
     private final String id;
 
-    protected BiomeType(String id, int internalId) {
+    public BiomeType(String id) {
         this.id = id;
+    }
+
+    private int internalId;
+
+    @Override
+    public void setInternalId(int internalId) {
         this.internalId = internalId;
     }
 
+    @Override
     public int getInternalId() {
         return internalId;
     }

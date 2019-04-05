@@ -107,7 +107,7 @@ public class BiomeCommands extends MethodCommands {
         }
 
         BiomeRegistry biomeRegistry = getBiomeRegistry();
-        List<BiomeType> biomes = BiomeTypes.values();
+        Collection<BiomeType> biomes = BiomeTypes.values();
         int totalPages = biomes.size() / 19 + 1;
         Message msg = BBC.BIOME_LIST_HEADER.m(page, totalPages);
         String setBiome = Commands.getAlias(BiomeCommands.class, "/setbiome");
@@ -144,7 +144,7 @@ public class BiomeCommands extends MethodCommands {
     @CommandPermissions("worldedit.biome.info")
     public void biomeInfo(Player player, LocalSession session, final EditSession editSession, CommandContext args) throws WorldEditException {
         BiomeRegistry biomeRegistry = getBiomeRegistry();
-        List<BiomeType> values = BiomeTypes.values();
+        Collection<BiomeType> values = BiomeTypes.values();
         final int[] biomes = new int[values.size()];
         final String qualifier;
 

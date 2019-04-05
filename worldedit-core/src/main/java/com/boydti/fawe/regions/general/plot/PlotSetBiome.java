@@ -27,6 +27,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -56,7 +58,7 @@ public class PlotSetBiome extends Command {
         checkTrue(args.length == 1, Captions.COMMAND_SYNTAX, getUsage());
         final HashSet<RegionWrapper> regions = plot.getRegions();
         BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
-        List<BiomeType> knownBiomes = BiomeTypes.values();
+        Collection<BiomeType> knownBiomes = BiomeTypes.values();
         final BiomeType biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
         if (biome == null) {
             String biomes = StringMan.join(WorldUtil.IMP.getBiomeList(), Captions.BLOCK_LIST_SEPARATER.s());

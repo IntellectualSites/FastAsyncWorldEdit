@@ -34,17 +34,26 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.NoCapablePlatformException;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockCategory;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.FuzzyBlockState;
+import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemCategory;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -149,6 +158,7 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
 
     @Override
     public void onLoad() {
+        if (INSTANCE != null) return;
         rename();
         this.INSTANCE = this;
         FaweBukkit imp = new FaweBukkit(this);
@@ -162,11 +172,9 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
         server = new BukkitServerInterface(this, getServer());
         worldEdit.getPlatformManager().register(server);
         loadAdapter(); // Need an adapter to work with special blocks with NBT data
-        worldEdit.loadMappings();
 
         loadConfig(); // Load configuration
         fail(() -> PermissionsResolverManager.initialize(INSTANCE), "Failed to initialize permissions resolver");
-
     }
 
     /**
@@ -174,7 +182,11 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
      */
     @Override
     public void onEnable() {
+        if (INSTANCE != null) return;
+        onLoad();
         setupTags(); // these have to be done post-world since they rely on MC registries. the other ones just use Bukkit enums
+        setupRegistries();
+        WorldEdit.getInstance().loadMappings();
 
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
@@ -198,6 +210,48 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
                 if (!m.isLegacy() && m.isBlock()) {
                     legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
                 }
+            }
+        }
+    }
+
+    public void setupRegistries() {
+        // Biome
+        for (Biome biome : Biome.values()) {
+            BiomeType.REGISTRY.register("minecraft:" + biome.name().toLowerCase(), new BiomeType("minecraft:" + biome.name().toLowerCase()));
+        }
+        // Block & Item
+        for (Material material : Material.values()) {
+//            if (material.isBlock() && !material.isLegacy()) {
+//                BlockType.REGISTRY.register(material.getKey().toString(), new BlockType(material.getKey().toString(), blockState -> {
+//                    // TODO Use something way less hacky than this.
+//                    ParserContext context = new ParserContext();
+//                    context.setPreferringWildcard(true);
+//                    context.setTryLegacy(false);
+//                    context.setRestricted(false);
+//                    try {
+//                        FuzzyBlockState state = (FuzzyBlockState) WorldEdit.getInstance().getBlockFactory().parseFromInput(
+//                                BukkitAdapter.adapt(blockState.getBlockType()).createBlockData().getAsString(), context
+//                        ).toImmutableState();
+//                        BlockState defaultState = blockState.getBlockType().getAllStates().get(0);
+//                        for (Map.Entry<Property<?>, Object> propertyObjectEntry : state.getStates().entrySet()) {
+//                            defaultState = defaultState.with((Property) propertyObjectEntry.getKey(), propertyObjectEntry.getValue());
+//                        }
+//                        return defaultState;
+//                    } catch (InputParseException e) {
+//                        e.printStackTrace();
+//                        return blockState;
+//                    }
+//                }));
+//            }
+            if (material.isItem() && !material.isLegacy()) {
+                ItemType.REGISTRY.register(material.getKey().toString(), new ItemType(material.getKey().toString()));
+            }
+        }
+        // Entity
+        for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
+            String mcid = entityType.getName();
+            if (mcid != null) {
+                EntityType.REGISTRY.register("minecraft:" + mcid.toLowerCase(), new EntityType("minecraft:" + mcid.toLowerCase()));
             }
         }
     }
@@ -245,18 +299,18 @@ public class WorldEditPlugin extends JavaPlugin //implements TabCompleter
                 }
             }
         }
-        {
-            java.util.logging.Logger logger = getLogger();
-            if (logger != null) {
-                try {
-                    Field nameField = Logger.class.getDeclaredField("name");
-                    nameField.setAccessible(true);
-                    nameField.set(logger, "FastAsyncWorldEdit");
-                } catch (Throwable ignore) {
-                    ignore.printStackTrace();
-                }
-            }
-        }
+//        {
+//            java.util.logging.Logger logger = getLogger();
+//            if (logger != null) {
+//                try {
+//                    Field nameField = Logger.class.getDeclaredField("name");
+//                    nameField.setAccessible(true);
+//                    nameField.set(logger, "FastAsyncWorldEdit");
+//                } catch (Throwable ignore) {
+//                    ignore.printStackTrace();
+//                }
+//            }
+//        }
         {
             File pluginsFolder = MainUtil.getJarFile().getParentFile();
             for (File file : pluginsFolder.listFiles()) {

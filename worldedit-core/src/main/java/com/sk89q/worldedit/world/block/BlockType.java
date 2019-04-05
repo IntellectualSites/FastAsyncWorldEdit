@@ -29,6 +29,7 @@ import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
@@ -48,10 +49,13 @@ public class BlockType implements FawePattern {
 	private final String id;
     private final BlockTypes.Settings settings;
 
+    private boolean initItemType;
+    private ItemType itemType;
+
     protected BlockType(String id, int internalId, List<BlockState> states) {
-        this.settings = new BlockTypes.Settings(this, id, internalId, states);
         int i = id.indexOf("[");
         this.id = i == -1 ? id : id.substring(0, i);
+        this.settings = new BlockTypes.Settings(this, id, internalId, states);
     }
 
     @Deprecated
@@ -94,9 +98,9 @@ public class BlockType implements FawePattern {
     }
 
     @Deprecated
-    public BlockState withPropertyId(int internalPropertiesId) {
-        if (internalPropertiesId == 0) return getDefaultState();
-        return BlockState.getFromInternalId(getInternalId() + (internalPropertiesId << BlockTypes.BIT_OFFSET));
+    public BlockState withPropertyId(int propertyId) {
+        if (settings.stateOrdinals == null) return settings.defaultState;
+        return BlockTypes.states[settings.stateOrdinals[propertyId]];
     }
     
     @Deprecated
@@ -237,7 +241,11 @@ public class BlockType implements FawePattern {
      */
     @Nullable
     public ItemType getItemType() {
-        return settings.itemType;
+        if(!initItemType) {
+            initItemType = true;
+            itemType = ItemTypes.get(getId());
+        }
+        return itemType;
     }
 
     /**

@@ -21,6 +21,7 @@ package com.sk89q.worldedit.world.biome;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -107,28 +108,15 @@ public class BiomeTypes {
     private BiomeTypes() {
     }
 
-    private static List<BiomeType> biomes = new ArrayList<>();
-    private static List<BiomeType> biomesLocked = Collections.unmodifiableList(biomes);
-
-    private static BiomeType register(final String id) {
-        BiomeType biome = new BiomeType(id, biomes.size());
-        biomes.add(biome);
-        return register(biome);
-    }
-
-    public static BiomeType register(final BiomeType biome) {
-        return BiomeType.REGISTRY.register(biome.getId(), biome);
-    }
-
     public static @Nullable BiomeType get(final String id) {
         return BiomeType.REGISTRY.get(id);
     }
 
     public static BiomeType get(int internalId) {
-        return biomes.get(internalId);
+        return BiomeType.REGISTRY.getByInternalId(internalId);
     }
 
-    public static List<BiomeType> values() {
-        return biomesLocked;
+    public static Collection<BiomeType> values() {
+        return BiomeType.REGISTRY.values();
     }
 }

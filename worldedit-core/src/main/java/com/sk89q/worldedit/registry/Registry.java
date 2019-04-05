@@ -33,15 +33,19 @@ import javax.annotation.Nullable;
 
 public class Registry<V> implements Iterable<V> {
     private final Map<String, V> map = new HashMap<>();
+    private Collection<V> values = Collections.unmodifiableCollection(map.values());
     private final String name;
 
     public Registry(final String name) {
         this.name = name;
     }
 
-    public @Nullable V get(final String key) {
-        checkState(key.equals(key.toLowerCase()), "key must be lowercase");
+    public @Nullable V get(final CharSequence key) {
         return this.map.get(key);
+    }
+
+    public @Nullable V get(final String key) {
+        return get((CharSequence) key);
     }
 
     public V register(final String key, final V value) {
@@ -58,12 +62,11 @@ public class Registry<V> implements Iterable<V> {
     }
 
     public Collection<V> values() {
-        return Collections.unmodifiableCollection(this.map.values());
+        return values;
     }
 
     @Override
     public Iterator<V> iterator() {
         return this.map.values().iterator();
     }
-
 }

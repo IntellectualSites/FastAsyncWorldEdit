@@ -180,7 +180,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                             // Suggest property
                             String input = charSequence.toString();
                             BlockType finalType = type;
-                            throw new SuggestInputParseException("Invalid property " + type + " | " + input, input, () ->
+                            throw new SuggestInputParseException("Invalid property " + charSequence + ":" + input + " for type " + type, input, () ->
                                 finalType.getProperties().stream()
                                 .map(p -> p.getName())
                                 .filter(p -> p.startsWith(input))

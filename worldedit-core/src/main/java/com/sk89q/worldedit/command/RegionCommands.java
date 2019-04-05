@@ -74,6 +74,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -710,7 +711,7 @@ public class RegionCommands extends MethodCommands {
             BiomeType biome = null;
             if (context.argsLength() >= 1) {
                 BiomeRegistry biomeRegistry = worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
-                List<BiomeType> knownBiomes = BiomeTypes.values();
+                Collection<BiomeType> knownBiomes = BiomeTypes.values();
                 biome = Biomes.findBiomeByName(knownBiomes, context.getString(0), biomeRegistry);
             }
             Long seed = context.argsLength() != 2 || !MathMan.isInteger(context.getString(1)) ? null : Long.parseLong(context.getString(1));
