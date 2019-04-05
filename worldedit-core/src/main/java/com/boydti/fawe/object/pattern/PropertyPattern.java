@@ -111,11 +111,13 @@ public class PropertyPattern extends AbstractExtentPattern {
         } else {
             for (int i = 0; i < values.size(); i++) {
                 int statesIndex = current.modifyIndex(stateId, i) >> BlockTypes.BIT_OFFSET;
-                BlockState state = BlockState.getFromInternalId(statesIndex);
+                BlockState state = type.withPropertyId(statesIndex);
+
                 int existingOrdinal = transformed[state.getOrdinal()];
                 int existing = BlockTypes.states[existingOrdinal].getInternalId();
                         //states[statesIndex] << BlockTypes.BIT_OFFSET;
-                transformed[state.getOrdinal()] = property.modifyIndex(existing, index) >> BlockTypes.BIT_OFFSET;
+                BlockState newState = state.withPropertyId(property.modifyIndex(existing, index) >> BlockTypes.BIT_OFFSET);
+                transformed[state.getOrdinal()] = newState.getOrdinal();
             }
         }
     }
