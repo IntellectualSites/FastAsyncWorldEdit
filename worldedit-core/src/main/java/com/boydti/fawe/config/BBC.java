@@ -93,6 +93,7 @@ public enum BBC {
     COMMAND_HISTORY_OTHER_ERROR("Unable to find session for %s0.", "WorldEdit.History"),
     COMMAND_REDO_SUCCESS("Redo successful%s0.", "WorldEdit.History"),
     COMMAND_UNDO_ERROR("Nothing left to undo. (See also `/inspect` and `/frb`)", "WorldEdit.History"),
+    COMMAND_UNDO_DISABLED("Undo disabled, use: //fast", "WorldEdit.History"),
     COMMAND_UNDO_SUCCESS("Undo successful%s0.", "WorldEdit.History"),
 
     OPERATION("Operation queued (%s0)", "WorldEdit.Operation"),

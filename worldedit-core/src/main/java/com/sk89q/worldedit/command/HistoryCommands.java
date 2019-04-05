@@ -227,6 +227,10 @@ public class HistoryCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.history.undo")
     public void undo(Player player, LocalSession session, CommandContext context) throws WorldEditException {
+        if (session.hasFastMode()) {
+            BBC.COMMAND_UNDO_DISABLED.send(player);
+            return;
+        }
         int times = Math.max(1, context.getInteger(0, 1));
         FawePlayer.wrap(player).checkConfirmation(() -> {
             EditSession undone = null;
