@@ -77,6 +77,7 @@ public final class BrushCache {
         Map<String, Tag> map;
         if (nbt == null) {
             if (tool == null) {
+                item.setNbtData(null);
                 return tool;
             }
             nbt = new CompoundTag(map = new HashMap<>());
@@ -113,7 +114,6 @@ public final class BrushCache {
                     map.remove("display");
                 }
             }
-
         } else {
             return tool;
         }
