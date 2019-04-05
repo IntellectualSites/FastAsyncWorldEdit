@@ -92,7 +92,10 @@ public class HeightMap {
             int yTmp = 255;
             for (int z = 0; z < height; ++z) {
                 for (int x = 0; x < width; ++x, index++) {
-                    yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE, mask);
+                    if (mask != null)
+                        yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE, mask);
+                    else
+                        yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE);
                     switch (yTmp) {
                         case Integer.MIN_VALUE:
                             yTmp = minY;
