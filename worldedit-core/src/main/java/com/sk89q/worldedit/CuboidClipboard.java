@@ -341,7 +341,7 @@ public class CuboidClipboard {
     public BaseBlock getPoint(BlockVector3 position) throws ArrayIndexOutOfBoundsException {
         final BaseBlock block = getBlock(position);
         if (block == null) {
-            return new BaseBlock(BlockTypes.AIR);
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
 
         return block;

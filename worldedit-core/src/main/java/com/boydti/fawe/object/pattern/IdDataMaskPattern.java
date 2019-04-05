@@ -12,7 +12,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 public class IdDataMaskPattern extends AbstractExtentPattern {
     private final Pattern pattern;
     private final int bitMask;
-    private final BaseBlock mutable = new BaseBlock(BlockTypes.AIR);
 
     public IdDataMaskPattern(Extent extent, Pattern parent, int bitMask) {
         super(extent);

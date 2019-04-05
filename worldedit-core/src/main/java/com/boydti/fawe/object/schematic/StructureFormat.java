@@ -122,7 +122,7 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
                     if (state.getBlockType().getMaterial().hasContainer()) {
                         CompoundTag nbt = (CompoundTag) blockMap.get("nbt");
                         if (nbt != null) {
-                            BaseBlock block = new BaseBlock(state, nbt);
+                            BaseBlock block = state.toBaseBlock(nbt);
                             clipboard.setBlock(x, y, z, block);
                             continue;
                         }

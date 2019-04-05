@@ -379,8 +379,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                                 trio.set(x, y, z);
                                 CompoundTag nbt = nbtMap.get(trio);
                                 if (nbt != null) {
-                                    BaseBlock block = new BaseBlock(state, nbt);
-                                    task.run(x, y, z, block);
+                                    task.run(x, y, z, state.toBaseBlock(nbt));
                                     continue;
                                 }
                             }
@@ -411,8 +410,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                                 trio.set(x, y, z);
                                 CompoundTag nbt = nbtMap.get(trio);
                                 if (nbt != null) {
-                                    BaseBlock block = new BaseBlock(state, nbt);
-                                    task.run(x, y, z, block);
+                                    task.run(x, y, z, state.toBaseBlock(nbt));
                                     continue;
                                 }
                             }

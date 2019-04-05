@@ -271,7 +271,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
         }
 
-        if (nbt != null) return new BaseBlock(state, nbt);
+        if (nbt != null) return state.toBaseBlock(nbt);
 
         if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN) {
             // Allow special sign text syntax

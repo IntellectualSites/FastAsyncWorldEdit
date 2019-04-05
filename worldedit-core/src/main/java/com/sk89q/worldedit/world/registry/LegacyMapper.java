@@ -238,7 +238,7 @@ public class LegacyMapper {
     		}
     	}else if(plotBlock instanceof LegacyPlotBlock) {
     		try {
-    			return new BaseBlock(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData());
+    			return BaseBlock.getState(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData()).toBaseBlock();
     		}catch(Throwable failed) {
     			log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
     			failed.printStackTrace();

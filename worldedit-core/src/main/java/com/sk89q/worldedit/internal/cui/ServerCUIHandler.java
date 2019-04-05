@@ -153,6 +153,6 @@ public class ServerCUIHandler {
         structureTag.put("id", new StringTag(BlockTypes.STRUCTURE_BLOCK.getId()));
 
 //        return BlockTypes.STRUCTURE_BLOCK.getDefaultState().toBaseBlock(new CompoundTag(structureTag));
-        return new BaseBlock(BlockTypes.STRUCTURE_BLOCK.getDefaultState(), new CompoundTag(structureTag));
+        return BlockTypes.STRUCTURE_BLOCK.getDefaultState().toBaseBlock(new CompoundTag(structureTag));
     }
 }

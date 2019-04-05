@@ -203,8 +203,8 @@ public class WorldEditBinding {
     @BindingMatch(type = {BaseBlock.class, BlockState.class, BlockStateHolder.class},
             behavior = BindingBehavior.CONSUMES,
             consumedCount = 1)
-public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, WorldEditException {
-        return new BaseBlock(getBlockState(context));
+    public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, WorldEditException {
+        return getBlockState(context).toBaseBlock();
     }
 
     /**

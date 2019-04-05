@@ -205,7 +205,7 @@ public class PropertyPattern extends AbstractExtentPattern {
         if (newOrdinal != ordinal) {
             CompoundTag nbt = block.getNbtData();
             BlockState newState = BlockState.getFromOrdinal(newOrdinal);
-            return nbt != null ? new BaseBlock(newState, nbt) : newState.toBaseBlock();
+            return newState.toBaseBlock(nbt);
         }
         return orDefault;
     }

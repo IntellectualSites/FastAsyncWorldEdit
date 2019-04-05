@@ -245,7 +245,7 @@ public class AnvilChunk13 implements Chunk {
         BlockState state = sectionBlocks != null ? sectionBlocks[(yIndex << 8) | (z << 4) | x] : BlockTypes.AIR.getDefaultState();
         if (state.getMaterial().hasContainer()) {
             CompoundTag tileEntity = getBlockTileEntity(position);
-            if (tileEntity != null) return new BaseBlock(state, tileEntity);
+            return state.toBaseBlock(tileEntity);
         }
 
         return state.toBaseBlock();

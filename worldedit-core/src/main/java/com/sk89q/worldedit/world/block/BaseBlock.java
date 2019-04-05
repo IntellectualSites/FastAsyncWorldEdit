@@ -111,7 +111,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         this(getState(id, data));
     }
 
-    private static final BlockState getState(int id, int data) {
+    public static final BlockState getState(int id, int data) {
         BlockState blockState = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
         if (blockState == null) {
             blockState = BlockTypes.AIR.getDefaultState();
@@ -124,8 +124,8 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Deprecated
-    public static BaseBlock getFromInternalId(int id, CompoundTag nbtData) {
-        return new BaseBlock(id, nbtData);
+    public static BaseBlock getFromInternalId(int internalId, CompoundTag nbtData) {
+        return BlockState.getFromInternalId(internalId).toBaseBlock(nbtData);
     }
 
     /**
