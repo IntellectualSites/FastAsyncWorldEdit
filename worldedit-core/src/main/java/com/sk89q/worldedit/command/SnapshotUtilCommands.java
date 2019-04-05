@@ -37,9 +37,9 @@ import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.snapshot.SnapshotRestore;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
+
 import java.io.File;
 import java.io.IOException;
-
 
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
 
@@ -53,7 +53,7 @@ public class SnapshotUtilCommands {
     }
 
     @Command(
-            aliases = {"restore", "/restore"},
+            aliases = { "restore", "/restore" },
             usage = "[snapshot]",
             desc = "Restore the selection from a snapshot",
             min = 0,

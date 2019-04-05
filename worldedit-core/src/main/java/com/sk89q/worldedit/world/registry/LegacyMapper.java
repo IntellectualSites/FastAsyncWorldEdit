@@ -40,8 +40,6 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.util.gson.VectorAdapter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +48,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;

@@ -60,6 +60,8 @@ import com.sk89q.worldedit.util.command.fluent.CommandGraph;
 import com.sk89q.worldedit.util.command.fluent.DispatcherNode;
 import com.sk89q.worldedit.util.command.parametric.*;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
+import com.sk89q.worldedit.util.formatting.component.CommandUsageBox;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
@@ -74,7 +76,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -84,7 +85,7 @@ import static com.sk89q.worldedit.util.command.composition.LegacyCommandAdapter.
 
 /**
  * Handles the registration and invocation of commands.
- * <p>
+ *
  * <p>This class is primarily for internal usage.</p>
  */
 public final class CommandManager {
@@ -129,6 +130,7 @@ public final class CommandManager {
         commandLog.addHandler(dynamicHandler);
         dynamicHandler.setFormatter(new LogFormat());
 
+        // Set up the commands manager
         builder = new ParametricBuilder();
         builder.setAuthorizer(new ActorAuthorizer());
         builder.setDefaultCompleter(new UserCommandCompleter(platformManager));
@@ -430,7 +432,8 @@ public final class CommandManager {
         return handleCommandTask(task, locals, null, null, null, null);
     }
 
-    private Object handleCommandTask(ThrowableSupplier<Throwable> task, CommandLocals locals, @Nullable Actor actor, @Nullable LocalSession session, @Nullable Set<String> failedPermissions, @Nullable FawePlayer fp) {
+    private Object handleCommandTask(ThrowableSupplier<Throwable> task, CommandLocals locals, @Nullable
+        Actor actor, @Nullable LocalSession session, @Nullable Set<String> failedPermissions, @Nullable FawePlayer fp) {
         Request.reset();
         if (actor == null) actor = locals.get(Actor.class);
         if (session == null) session = locals.get(LocalSession.class);

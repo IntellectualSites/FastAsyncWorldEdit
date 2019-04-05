@@ -8,6 +8,8 @@ buildscript {
 
     configurations.all {
         resolutionStrategy {
+            force 'com.google.guava:guava:21.0'
+            force 'org.ow2.asm:asm:6.0_BETA'
             force 'commons-io:commons-io:2.4'
         }
     }

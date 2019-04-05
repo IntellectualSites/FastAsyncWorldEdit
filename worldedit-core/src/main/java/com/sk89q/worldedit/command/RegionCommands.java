@@ -299,8 +299,8 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/replace", "/re", "/rep", "/r"},
-            usage = "[from-mask] <to-pattern>",
+        aliases = { "/replace", "/re", "/rep" },
+        usage = "[from-block] <to-block>",
             desc = "Replace all blocks in the selection with another",
             flags = "f",
             min = 1,
@@ -528,7 +528,7 @@ public class RegionCommands extends MethodCommands {
             desc = "Move the contents of the selection",
             help =
                     "Moves the contents of the selection.\n" +
-                            "  -s flag shifts the selection to the target location.\n" +
+                            "The -s flag shifts the selection to the target location.\n" +
                             "  -b also copies biomes\n" +
                             "  -e ignores entities\n" +
                             "  -a ignores air\n" +
@@ -622,7 +622,7 @@ public class RegionCommands extends MethodCommands {
             if (moveSelection) {
                 try {
                     final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-                    BlockVector3 shiftVector = BlockVector3.at(direction.getX() * size.getX() * count, direction.getY() * size.getY() * count, direction.getZ() * size.getZ() * count);
+                    final BlockVector3 shiftVector = BlockVector3.at(direction.getX() * size.getX() * count, direction.getY() * size.getY() * count, direction.getZ() * size.getZ() * count);
                     region.shift(shiftVector);
 
                     session.getRegionSelector(player.getWorld()).learnChanges();

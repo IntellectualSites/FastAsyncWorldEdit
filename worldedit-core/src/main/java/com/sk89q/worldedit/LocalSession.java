@@ -96,7 +96,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LocalSession implements TextureHolder {
 
-    @Deprecated
     public transient static int MAX_HISTORY_SIZE = 15;
 
     // Non-session related fields

@@ -26,11 +26,13 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
 
@@ -41,7 +43,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class SchematicReader implements ClipboardReader {
 
-    private static final Logger log = Logger.getLogger(SchematicReader.class.getCanonicalName());
     private NBTInputStream inputStream;
     private InputStream rootStream;
 

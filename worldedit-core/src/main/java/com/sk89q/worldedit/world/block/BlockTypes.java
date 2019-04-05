@@ -904,8 +904,8 @@ public final class BlockTypes {
         try {
             BlockStateHolder block = LegacyMapper.getInstance().getBlockFromLegacy(input);
             if (block != null) return block.getBlockType();
-        } catch (NumberFormatException e) {
-        } catch (IndexOutOfBoundsException e) {}
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+        }
 
         throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(BlockTypes.values)
             .filter(b -> b.getId().contains(inputLower))

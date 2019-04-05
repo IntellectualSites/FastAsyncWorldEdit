@@ -19,11 +19,6 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -38,6 +33,11 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * A mode that cycles the data values of supported blocks.
  */
@@ -47,7 +47,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
     public boolean canUse(Actor player) {
         return player.hasPermission("worldedit.tool.data-cycler");
     }
-    
+
     private Map<UUID, Property<?>> selectedProperties = new HashMap<>();
 
     private boolean handleCycle(Platform server, LocalConfiguration config,
@@ -104,7 +104,8 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         		player.print("Now cycling " + currentProperty.getName());
         	}
         }
-            return true;
+
+        return true;
     }
 
     @Override

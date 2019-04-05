@@ -1,16 +1,16 @@
 package com.boydti.fawe.configuration.serialization;
 
+import com.boydti.fawe.configuration.Configuration;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
- * Utility class for storing and retrieving classes for {@link com.boydti.fawe.configuration.Configuration}.
+ * Utility class for storing and retrieving classes for {@link Configuration}.
  */
 public class ConfigurationSerialization {
 
@@ -27,7 +27,7 @@ public class ConfigurationSerialization {
      * Attempts to deserialize the given arguments into a new instance of the
      * given class.
      * <p>
-     * <p>The class must implement {@link com.boydti.fawe.configuration.serialization.ConfigurationSerializable}, including
+     * <p>The class must implement {@link ConfigurationSerializable}, including
      * the extra methods as specified in the javadoc of
      * ConfigurationSerializable.</p>
      * <p>
@@ -39,7 +39,7 @@ public class ConfigurationSerialization {
      * @return New instance of the specified class
      */
     public static ConfigurationSerializable deserializeObject(Map<String, ?> args, Class<? extends ConfigurationSerializable> clazz) {
-        return new com.boydti.fawe.configuration.serialization.ConfigurationSerialization(clazz).deserialize(args);
+        return new ConfigurationSerialization(clazz).deserialize(args);
     }
 
     /**
@@ -47,7 +47,7 @@ public class ConfigurationSerialization {
      * <p>
      * given class.
      * <p>
-     * The class must implement {@link com.boydti.fawe.configuration.serialization.ConfigurationSerializable}, including
+     * The class must implement {@link ConfigurationSerializable}, including
      * the extra methods as specified in the javadoc of
      * ConfigurationSerializable.</p>
      * <p>
@@ -80,17 +80,17 @@ public class ConfigurationSerialization {
             throw new IllegalArgumentException("Args doesn't contain type key ('" + SERIALIZED_TYPE_KEY + "')");
         }
 
-        return new com.boydti.fawe.configuration.serialization.ConfigurationSerialization(clazz).deserialize(args);
+        return new ConfigurationSerialization(clazz).deserialize(args);
     }
 
     /**
-     * Registers the given {@link com.boydti.fawe.configuration.serialization.ConfigurationSerializable} class by its
+     * Registers the given {@link ConfigurationSerializable} class by its
      * alias.
      *
      * @param clazz Class to register
      */
     public static void registerClass(Class<? extends ConfigurationSerializable> clazz) {
-        com.boydti.fawe.configuration.serialization.DelegateDeserialization delegate = clazz.getAnnotation(com.boydti.fawe.configuration.serialization.DelegateDeserialization.class);
+        DelegateDeserialization delegate = clazz.getAnnotation(DelegateDeserialization.class);
 
         if (delegate == null) {
             registerClass(clazz, getAlias(clazz));
@@ -99,19 +99,18 @@ public class ConfigurationSerialization {
     }
 
     /**
-     * Registers the given alias to the specified {@link
-     * com.boydti.fawe.configuration.serialization.ConfigurationSerializable} class.
+     * Registers the given alias to the specified {@link ConfigurationSerializable} class.
      *
      * @param clazz Class to register
      * @param alias Alias to register as
-     * @see com.boydti.fawe.configuration.serialization.SerializableAs
+     * @see SerializableAs
      */
     public static void registerClass(Class<? extends ConfigurationSerializable> clazz, String alias) {
         aliases.put(alias, clazz);
     }
 
     /**
-     * Unregisters the specified alias to a {@link com.boydti.fawe.configuration.serialization.ConfigurationSerializable}
+     * Unregisters the specified alias to a {@link ConfigurationSerializable}
      *
      * @param alias Alias to unregister
      */
@@ -120,8 +119,7 @@ public class ConfigurationSerialization {
     }
 
     /**
-     * Unregisters any aliases for the specified {@link
-     * com.boydti.fawe.configuration.serialization.ConfigurationSerializable} class.
+     * Unregisters any aliases for the specified {@link ConfigurationSerializable} class.
      *
      * @param clazz Class to unregister
      */
@@ -131,7 +129,7 @@ public class ConfigurationSerialization {
     }
 
     /**
-     * Attempts to get a registered {@link com.boydti.fawe.configuration.serialization.ConfigurationSerializable} class by
+     * Attempts to get a registered {@link ConfigurationSerializable} class by
      * its alias.
      *
      * @param alias Alias of the serializable
@@ -142,14 +140,14 @@ public class ConfigurationSerialization {
     }
 
     /**
-     * Gets the correct alias for the given {@link com.boydti.fawe.configuration.serialization.ConfigurationSerializable}
+     * Gets the correct alias for the given {@link ConfigurationSerializable}
      * class.
      *
      * @param clazz Class to get alias for
      * @return Alias to use for the class
      */
     public static String getAlias(Class<? extends ConfigurationSerializable> clazz) {
-        com.boydti.fawe.configuration.serialization.DelegateDeserialization delegate = clazz.getAnnotation(DelegateDeserialization.class);
+        DelegateDeserialization delegate = clazz.getAnnotation(DelegateDeserialization.class);
 
         if (delegate != null) {
             if ((delegate.value() == null) || (delegate.value() == clazz)) {
@@ -180,9 +178,7 @@ public class ConfigurationSerialization {
             }
 
             return method;
-        } catch (NoSuchMethodException ex) {
-            return null;
-        } catch (SecurityException ex) {
+        } catch (NoSuchMethodException | SecurityException ex) {
             return null;
         }
     }
@@ -190,9 +186,7 @@ public class ConfigurationSerialization {
     protected Constructor<? extends ConfigurationSerializable> getConstructor() {
         try {
             return this.clazz.getConstructor(Map.class);
-        } catch (NoSuchMethodException ex) {
-            return null;
-        } catch (SecurityException ex) {
+        } catch (NoSuchMethodException | SecurityException ex) {
             return null;
         }
     }
@@ -202,14 +196,13 @@ public class ConfigurationSerialization {
             ConfigurationSerializable result = (ConfigurationSerializable) method.invoke(null, args);
 
             if (result == null) {
-                Logger.getLogger(com.boydti.fawe.configuration.serialization.ConfigurationSerialization.class.getName()).log(Level.SEVERE,
+                LoggerFactory.getLogger(ConfigurationSerialization.class).error(
                         "Could not call method '" + method.toString() + "' of " + this.clazz + " for deserialization: method returned null");
             } else {
                 return result;
             }
         } catch (Throwable ex) {
-            Logger.getLogger(com.boydti.fawe.configuration.serialization.ConfigurationSerialization.class.getName())
-                    .log(Level.SEVERE, "Could not call method '" + method.toString() + "' of " + this.clazz
+            LoggerFactory.getLogger(ConfigurationSerialization.class).error("Could not call method '" + method.toString() + "' of " + this.clazz
                                     + " for deserialization",
                             ex instanceof InvocationTargetException ? ex.getCause() : ex);
         }
@@ -221,8 +214,7 @@ public class ConfigurationSerialization {
         try {
             return ctor.newInstance(args);
         } catch (Throwable ex) {
-            Logger.getLogger(com.boydti.fawe.configuration.serialization.ConfigurationSerialization.class.getName())
-                    .log(Level.SEVERE, "Could not call constructor '" + ctor.toString() + "' of " + this.clazz
+            LoggerFactory.getLogger(ConfigurationSerialization.class).error("Could not call constructor '" + ctor.toString() + "' of " + this.clazz
                                     + " for deserialization",
                             ex instanceof InvocationTargetException ? ex.getCause() : ex);
         }

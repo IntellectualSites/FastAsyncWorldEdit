@@ -33,6 +33,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.snapshot.InvalidSnapshotException;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -105,7 +106,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"use"},
+            aliases = { "use" },
             usage = "<snapshot>",
             desc = "Choose a snapshot to use",
             min = 1,
@@ -148,7 +149,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"sel"},
+            aliases = { "sel" },
             usage = "<index>",
             desc = "Choose the snapshot based on the list id",
             min = 1,
@@ -195,7 +196,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"before"},
+            aliases = { "before" },
             usage = "<date>",
             desc = "Choose the nearest snapshot before a date",
             min = 1,
@@ -234,7 +235,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"after"},
+            aliases = { "after" },
             usage = "<date>",
             desc = "Choose the nearest snapshot after a date",
             min = 1,
@@ -259,7 +260,8 @@ public class SnapshotCommands {
                 Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, player.getWorld().getName());
                 if (snapshot == null) {
                     dateFormat.setTimeZone(session.getTimeZone());
-                    player.printError("Couldn't find a snapshot after " + dateFormat.format(date.getTime()) + ".");
+                    player.printError("Couldn't find a snapshot after "
+                            + dateFormat.format(date.getTime()) + ".");
                 } else {
                     session.setSnapshot(snapshot);
                     BBC.SNAPSHOT_SET.send(player, snapshot.getName());
@@ -269,4 +271,5 @@ public class SnapshotCommands {
             }
         }
     }
+
 }

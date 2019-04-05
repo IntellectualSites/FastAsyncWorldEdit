@@ -25,6 +25,8 @@ import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.util.report.Unreported;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 import org.slf4j.Logger;
@@ -78,6 +80,8 @@ public class PropertiesConfiguration extends LocalConfiguration {
         profile = getBool("profile", profile);
         traceUnflushedSessions = getBool("trace-unflushed-sessions", traceUnflushedSessions);
         disallowedBlocks = getStringSet("disallowed-blocks", getDefaultDisallowedBlocks());
+        allowedDataCycleBlocks =
+                new HashSet<>(getStringSet("limits.allowed-data-cycle-blocks", null));
         defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
         maxChangeLimit = getInt("max-changed-blocks", maxChangeLimit);
         defaultMaxPolygonalPoints = getInt("default-max-polygon-points", defaultMaxPolygonalPoints);

@@ -50,20 +50,21 @@ import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
 
-    private final Logger logger = Logger.getLogger(getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Field nbtListTagListField;
     private final Method nbtCreateTagMethod;
@@ -337,7 +338,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             return Collections.emptyMap();
         }
         if (block == null) {
-            logger.warning("Failed to find properties for " + blockType.getId());
+            logger.warn("Failed to find properties for " + blockType.getId());
             return Collections.emptyMap();
         }
         Map<String, Property<?>> properties = Maps.newLinkedHashMap();
@@ -403,7 +404,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             try {
                 return toNativeList((NBTTagList) foreign);
             } catch (Throwable e) {
-                logger.log(Level.WARNING, "Failed to convert NBTTagList", e);
+                logger.warn("Failed to convert NBTTagList", e);
                 return new ListTag(ByteTag.class, new ArrayList<ByteTag>());
             }
         } else if (foreign instanceof NBTTagLong) {
