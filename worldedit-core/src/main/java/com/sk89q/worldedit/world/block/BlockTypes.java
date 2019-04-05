@@ -706,9 +706,9 @@ public final class BlockTypes {
                     this.propertiesMapArr[key.ordinal()] = property;
                     this.propertiesArr[prop_arr_i++] = property;
                     propMap.put(entry.getKey(), property);
-                    bitOffset += property.getNumBits();
 
                     maxInternalStateId += (property.getValues().size() << bitOffset);
+                    bitOffset += property.getNumBits();
                 }
                 this.propertiesList = Arrays.asList(this.propertiesArr);
                 this.propertiesMap = Collections.unmodifiableMap(propMap);
@@ -726,14 +726,17 @@ public final class BlockTypes {
 
             if (!propertiesList.isEmpty()) {
                 this.stateOrdinals = generateStateOrdinals(internalId, states.size(), maxInternalStateId, propertiesList);
+
                 for (int propId = 0; propId < this.stateOrdinals.length; propId++) {
                     int ordinal = this.stateOrdinals[propId];
                     if (ordinal != -1) {
                         int stateId = internalId + (propId << BlockTypes.BIT_OFFSET);
-                        states.add(new BlockState(type, stateId, ordinal));
+                        BlockState state = new BlockState(type, stateId, ordinal);
+                        states.add(state);
                     }
                 }
                 int defaultPropId = parseProperties(propertyString, propertiesMap) >> BlockTypes.BIT_OFFSET;
+
                 this.defaultState = states.get(this.stateOrdinals[defaultPropId]);
             } else {
                 this.defaultState = new BlockState(type, internalId, states.size());
@@ -754,10 +757,10 @@ public final class BlockTypes {
         }
     }
 
-    
+
     private static int[] generateStateOrdinals(int internalId, int ordinal, int maxStateId, List<AbstractProperty<?>> props) {
         if (props.isEmpty()) return null;
-        int[] result = new int[maxStateId + 1];
+        int[] result = new int[maxStateId];
         Arrays.fill(result, -1);
         int[] state = new int[props.size()];
         int[] sizes = new int[props.size()];
@@ -854,6 +857,7 @@ public final class BlockTypes {
                 $REGISTRY.put(type.getId().toLowerCase(), type);
             }
             states = stateList.toArray(new BlockState[stateList.size()]);
+
         } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);

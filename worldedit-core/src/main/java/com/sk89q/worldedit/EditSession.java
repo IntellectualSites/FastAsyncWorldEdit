@@ -1066,12 +1066,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return world.getBlock(position);
+        return extent.getBlock(position);
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return world.getFullBlock(position);
+        return extent.getFullBlock(position);
     }
 
     /**
@@ -2610,7 +2610,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 if ((BlockVector3.at(x, oy, z)).distanceSq(position) > radiusSq) {
                     continue;
                 }
-                for (int y = world.getMaxY(); y >= 1; --y) {
+                for (int y = maxY; y >= 1; --y) {
                     BlockVector3 pt = BlockVector3.at(x, y, z);
                     BlockType id = getBlock(pt).getBlockType();
 
@@ -2658,7 +2658,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 if ((BlockVector3.at(x, oy, z)).distanceSq(position) > radiusSq) {
                     continue;
                 }
-                for (int y = world.getMaxY(); y >= 1; --y) {
+                for (int y = maxY; y >= 1; --y) {
                     BlockVector3 pt = BlockVector3.at(x, y, z);
                     BlockType id = getBlock(pt).getBlockType();
                     if (id.getMaterial().isAir()) {
@@ -2681,7 +2681,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     // Too high?
-                    if (y == world.getMaxY()) {
+                    if (y == maxY) {
                         break;
                     }
 
@@ -3469,7 +3469,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             final int bx = cx << 4;
             final int bz = cz << 4;
             final BlockVector3 cmin = BlockVector3.at(bx, 0, bz);
-            final BlockVector3 cmax = cmin.add(15, getMaxY(), 15);
+            final BlockVector3 cmax = cmin.add(15, maxY, 15);
             final boolean containsBot1 = (fe == null || fe.contains(cmin.getBlockX(), cmin.getBlockY(), cmin.getBlockZ()));
             final boolean containsBot2 = region.contains(cmin);
             final boolean containsTop1 = (fe == null || fe.contains(cmax.getBlockX(), cmax.getBlockY(), cmax.getBlockZ()));
@@ -3488,7 +3488,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                         int xx = x + bx;
                         for (int z = 0; z < 16; z++) {
                             int zz = z + bz;
-                            for (int y = 0; y < getMaxY() + 1; y++) {
+                            for (int y = 0; y < maxY + 1; y++) {
                                 BaseBlock block = getFullBlock(mutable.setComponents(xx, y, zz));
                                 fcs.add(mbv, block, BlockTypes.AIR.getDefaultState().toBaseBlock());
                             }
@@ -3497,13 +3497,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 }
             } else {
                 if (!conNextX) {
-                    setExistingBlocks(BlockVector3.at(bx + 16, 0, bz), BlockVector3.at(bx + 31, getMaxY(), bz + 15));
+                    setExistingBlocks(BlockVector3.at(bx + 16, 0, bz), BlockVector3.at(bx + 31, maxY, bz + 15));
                 }
                 if (!conNextZ) {
-                    setExistingBlocks(BlockVector3.at(bx, 0, bz + 16), BlockVector3.at(bx + 15, getMaxY(), bz + 31));
+                    setExistingBlocks(BlockVector3.at(bx, 0, bz + 16), BlockVector3.at(bx + 15, maxY, bz + 31));
                 }
                 if (!chunks.contains(mutable2D.setComponents(cx + 1, cz + 1)) && !conNextX && !conNextZ) {
-                    setExistingBlocks(BlockVector3.at(bx + 16, 0, bz + 16), BlockVector3.at(bx + 31, getMaxY(), bz + 31));
+                    setExistingBlocks(BlockVector3.at(bx + 16, 0, bz + 16), BlockVector3.at(bx + 31, maxY, bz + 31));
                 }
                 for (int x = 0; x < 16; x++) {
                     int xx = x + bx;
@@ -3511,7 +3511,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     for (int z = 0; z < 16; z++) {
                         int zz = z + bz;
                         mutable.mutZ(zz);
-                        for (int y = 0; y < getMaxY() + 1; y++) {
+                        for (int y = 0; y < maxY + 1; y++) {
                             mutable.mutY(y);
                             boolean contains = (fe == null || fe.contains(xx, y, zz)) && region.contains(mutable);
                             if (contains) {

@@ -177,7 +177,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     @Override
     public BlockMaterial getMaterial(BlockState state) {
-        BlockType type = state.getBlockType();
         IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
         return new BlockMaterial_1_13(bs.getBlock(), bs);
     }

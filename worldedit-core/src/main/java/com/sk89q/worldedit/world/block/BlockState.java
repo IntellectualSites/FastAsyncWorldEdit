@@ -314,7 +314,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
 	@Override
 	public int getInternalId() {
-		return blockType.getInternalId();
+		return internalId;
 	}
 
 	@Override
