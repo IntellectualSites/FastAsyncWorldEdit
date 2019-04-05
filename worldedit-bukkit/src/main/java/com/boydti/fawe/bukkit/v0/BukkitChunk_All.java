@@ -107,12 +107,11 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
         final int bz = getZ() << 4;
         boolean update = adapter == null || adapter.isChunkInUse(chunk);
         if (layer == -1) {
-            if (adapter != null)
-            {
+            if (adapter != null) {
                 // Run change task
                 RunnableVal2<FaweChunk, FaweChunk> task = parent.getChangeTask();
                 BukkitChunk_All_ReadonlySnapshot previous;
-                if (task != null){
+                if (task != null) {
                     ChunkSnapshot snapshot = parent.ensureChunkLoaded(getX(), getZ());
                     previous = new BukkitChunk_All_ReadonlySnapshot(parent, this, snapshot, biomes != null);
                     for (BlockState tile : chunk.getTileEntities()) {
@@ -235,7 +234,6 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
 
                                 BlockType type = BlockTypes.getFromStateId(combined);
                                 if (type == BlockTypes.__RESERVED__) continue;
-                                String s = type.getResource().toUpperCase();
                                 if (type.getMaterial().isAir()) {
                                     if (!place) {
                                         mutableLoc.setX(xx);
@@ -251,7 +249,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                                         if (nbt != null) {
                                             synchronized (BukkitChunk_All.this) {
                                                 BaseBlock state =
-                                                    BaseBlock.getFromInternalId(combined, nbt);
+                                                        BaseBlock.getFromInternalId(combined, nbt);
                                                 adapter.setBlock(chunk, xx, yy, zz, state, update);
                                             }
                                             continue;
@@ -272,7 +270,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                         }
                     }
                 } else {
-                    for (;index < 4096; index++) {
+                    for (; index < 4096; index++) {
                         int j = place ? index : 4095 - index;
                         int combined = newArray[j];
                         BlockType type = BlockTypes.getFromStateId(combined);
@@ -281,72 +279,72 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                             if (!place) {
                                 int x = cacheX[j];
                                 int z = cacheZ[j];
-                                int y = cacheY[j];
-                                mutableLoc.setX(bx + x);
-                                mutableLoc.setY(y);
-                                mutableLoc.setZ(bz + z);
-                                setBlock(adapter, chunk, mutableLoc, combined, update);
-                            }
-                            continue;
-                        } else {
-                            boolean light = type.getMaterial().getLightValue() > 0;
-                            if (light) {
-                                if (place) {
-                                    continue;
-                                }
-                                light = light && getParent().getSettings().LIGHTING.MODE != 0;
-                                if (light) {
-                                    parent.enableLighting(disableResult);
-                                }
-                            } else if (!place) {
-                                continue;
-                            }
-                            int x = cacheX[j];
-                            int z = cacheZ[j];
-                            int y = cacheY[j];
-                            if (type.getMaterial().hasContainer() && adapter != null) {
-                                CompoundTag tile = getTile(x, y, z);
-                                if (tile != null) {
-                                    synchronized (BukkitChunk_All.this) {
-                                        BaseBlock state = BaseBlock.getFromInternalId(combined, tile);
-                                        adapter.setBlock(chunk, bx + x, y, bz + z, state, update);
-                                    }
-                                    break;
-                                }
-                            }
-                            if (type.getMaterial().isTicksRandomly()) {
-                                synchronized (BukkitChunk_All.this) {
+                                    int y = cacheY[j];
                                     mutableLoc.setX(bx + x);
                                     mutableLoc.setY(y);
                                     mutableLoc.setZ(bz + z);
                                     setBlock(adapter, chunk, mutableLoc, combined, update);
                                 }
+                                continue;
                             } else {
-                                mutableLoc.setX(bx + x);
-                                mutableLoc.setY(y);
-                                mutableLoc.setZ(bz + z);
-                                setBlock(adapter, chunk, mutableLoc, combined, update);
+                                boolean light = type.getMaterial().getLightValue() > 0;
+                                if (light) {
+                                    if (place) {
+                                        continue;
+                                    }
+                                    light = light && getParent().getSettings().LIGHTING.MODE != 0;
+                                    if (light) {
+                                        parent.enableLighting(disableResult);
+                                    }
+                                } else if (!place) {
+                                    continue;
+                                }
+                                int x = cacheX[j];
+                                int z = cacheZ[j];
+                                int y = cacheY[j];
+                                if (type.getMaterial().hasContainer() && adapter != null) {
+                                    CompoundTag tile = getTile(x, y, z);
+                                    if (tile != null) {
+                                        synchronized (BukkitChunk_All.this) {
+                                            BaseBlock state = BaseBlock.getFromInternalId(combined, tile);
+                                            adapter.setBlock(chunk, bx + x, y, bz + z, state, update);
+                                        }
+                                        continue;
+                                    }
+                                }
+                                if (type.getMaterial().isTicksRandomly()) {
+                                    synchronized (BukkitChunk_All.this) {
+                                        mutableLoc.setX(bx + x);
+                                        mutableLoc.setY(y);
+                                        mutableLoc.setZ(bz + z);
+                                        setBlock(adapter, chunk, mutableLoc, combined, update);
+                                    }
+                                } else {
+                                    mutableLoc.setX(bx + x);
+                                    mutableLoc.setY(y);
+                                    mutableLoc.setZ(bz + z);
+                                    setBlock(adapter, chunk, mutableLoc, combined, update);
+                                }
+                                if (light) {
+                                    parent.disableLighting(disableResult);
+                                }
                             }
-                            if (light) {
-                                parent.disableLighting(disableResult);
+                            if (System.currentTimeMillis() - start > recommended) {
+                                index++;
+                                break mainloop;
                             }
                         }
-                        if (System.currentTimeMillis() - start > recommended) {
-                            index++;
-                            break mainloop;
-                        }
+                        index = 0;
                     }
-                    index = 0;
+                } catch (final Throwable e) {
+                    MainUtil.handleError(e);
                 }
-            } catch (final Throwable e) {
-                MainUtil.handleError(e);
+            } while (System.currentTimeMillis() - start < recommended);
+            if (more || place) {
+                this.addToQueue();
             }
-        } while (System.currentTimeMillis() - start < recommended);
-        if (more || place) {
-            this.addToQueue();
-        }
-        parent.resetLighting(disableResult);
-        return this;
+            parent.resetLighting(disableResult);
+            return this;
     }
 
     public void setBlock(BukkitImplAdapter adapter, Chunk chunk, Location location, int combinedId, boolean update) {
