@@ -3321,7 +3321,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside) {
-        final BlockVectorSet queue = new BlockVectorSet();
+        final LocalBlockVectorSet queue = new LocalBlockVectorSet();
         while (!queue.isEmpty()) {
             Iterator<BlockVector3> iter = queue.iterator();
             while (iter.hasNext()) {

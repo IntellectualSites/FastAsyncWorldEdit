@@ -24,6 +24,8 @@ import com.boydti.fawe.config.Settings;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.object.collection.BlockVectorSet;
+import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
@@ -371,7 +373,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
     @Override
     public Set<BlockVector3> getChunkCubes() {
-        Set<BlockVector3> chunks = new HashSet<>();
+        Set<BlockVector3> chunks = new BlockVectorSet();
 
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
