@@ -629,11 +629,7 @@ public class BlockVector3 {
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + Integer.hashCode(x);
-        hash = 31 * hash + Integer.hashCode(y);
-        hash = 31 * hash + Integer.hashCode(z);
-        return hash;
+        return (x ^ (z << 12)) ^ (y << 24);
     }
 
     @Override

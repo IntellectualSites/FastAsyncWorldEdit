@@ -84,9 +84,9 @@ public class FloraGenerator implements RegionFunction {
      */
     public static Pattern getDesertPattern() {
         RandomPattern pattern = new RandomPattern();
-        pattern.add(new BlockPattern(BlockTypes.DEAD_BUSH.getDefaultState()), 30);
-        pattern.add(new BlockPattern(BlockTypes.CACTUS.getDefaultState()), 20);
-        pattern.add(new BlockPattern(BlockTypes.AIR.getDefaultState()), 300);
+        pattern.add((BlockTypes.DEAD_BUSH.getDefaultState()), 30);
+        pattern.add((BlockTypes.CACTUS.getDefaultState()), 20);
+        pattern.add((BlockTypes.AIR.getDefaultState()), 300);
         return pattern;
     }
 
@@ -97,9 +97,9 @@ public class FloraGenerator implements RegionFunction {
      */
     public static Pattern getTemperatePattern() {
         RandomPattern pattern = new RandomPattern();
-        pattern.add(new BlockPattern(BlockTypes.GRASS.getDefaultState()), 300);
-        pattern.add(new BlockPattern(BlockTypes.POPPY.getDefaultState()), 5);
-        pattern.add(new BlockPattern(BlockTypes.DANDELION.getDefaultState()), 5);
+        pattern.add((BlockTypes.GRASS.getDefaultState()), 300);
+        pattern.add((BlockTypes.POPPY.getDefaultState()), 5);
+        pattern.add((BlockTypes.DANDELION.getDefaultState()), 5);
         return pattern;
     }
 

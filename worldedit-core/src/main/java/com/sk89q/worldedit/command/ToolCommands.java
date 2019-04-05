@@ -104,7 +104,7 @@ public class ToolCommands {
 
     @Command(
             aliases = {"repl"},
-            usage = "<block>",
+            usage = "<pattern>",
             desc = "Block replacer tool",
             min = 1,
             max = 1

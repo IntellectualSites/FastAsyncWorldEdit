@@ -372,7 +372,7 @@ public class UtilityCommands extends MethodCommands {
 
     @Command(
             aliases = {"/removenear", "removenear"},
-            usage = "<block> [size]",
+            usage = "<mask> [size]",
             desc = "Remove blocks near you.",
             min = 1,
             max = 2

@@ -208,6 +208,6 @@ public class GardenPatchGenerator implements RegionFunction {
      * @return a melon pattern
      */
     public static Pattern getMelonPattern() {
-        return new BlockPattern(BlockTypes.MELON.getDefaultState());
+        return (BlockTypes.MELON.getDefaultState());
     }
 }

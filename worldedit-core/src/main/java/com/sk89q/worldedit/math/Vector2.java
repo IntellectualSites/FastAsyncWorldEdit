@@ -491,7 +491,7 @@ public class Vector2 {
 
     @Override
     public int hashCode() {
-        return ((int) getX() ^ ((int) getZ() << 16));
+        return (((int) x) << 16) ^ ((int) z);
     }
 
     @Override

@@ -669,7 +669,7 @@ public class SelectionCommands {
 
     @Command(
             aliases = {"/count"},
-            usage = "<block>",
+            usage = "<mask>",
             desc = "Counts the number of a certain type of block",
             flags = "d",
             min = 1,
