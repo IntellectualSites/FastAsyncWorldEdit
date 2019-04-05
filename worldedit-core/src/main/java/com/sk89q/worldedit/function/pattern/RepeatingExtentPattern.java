@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
@@ -31,6 +32,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 public class RepeatingExtentPattern extends AbstractExtentPattern {
 
     private final BlockVector3 size;
+    private final MutableBlockVector3 mutable;
     private BlockVector3 origin;
     private BlockVector3 offset;
 
@@ -45,6 +47,7 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
         setOrigin(origin);
         setOffset(offset);
         size = extent.getMaximumPoint().subtract(extent.getMinimumPoint()).add(1, 1, 1);
+        this.mutable = new MutableBlockVector3();
     }
 
     /**
@@ -86,11 +89,10 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
-        BlockVector3 base = position.add(offset);
-        int x = Math.abs(base.getBlockX()) % size.getBlockX();
-        int y = Math.abs(base.getBlockY()) % size.getBlockY();
-        int z = Math.abs(base.getBlockZ()) % size.getBlockZ();
-        return getExtent().getFullBlock(BlockVector3.at(x, y, z).add(origin));
+    public BaseBlock apply(BlockVector3 p) {
+        int x = (Math.abs((p.getX() + offset.getX())) % size.getBlockX()) + origin.getX();
+        int y = (Math.abs((p.getY() + offset.getY())) % size.getBlockY()) + origin.getY();
+        int z = (Math.abs((p.getZ() + offset.getZ())) % size.getBlockZ()) + origin.getZ();
+        return getExtent().getFullBlock(mutable.setComponents(x, y, z));
     }
 }
