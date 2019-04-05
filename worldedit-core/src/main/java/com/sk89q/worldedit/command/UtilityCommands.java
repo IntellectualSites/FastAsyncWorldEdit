@@ -337,7 +337,7 @@ public class UtilityCommands extends MethodCommands {
         worldEdit.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(
                 session.getPlacementPosition(player), radius, BlockTypes.WATER.toMask(editSession), BlockTypes.WATER.getDefaultState());
-        player.print(BBC.getPrefix() + affected + " block(s) have been changed.");
+        BBC.VISITOR_BLOCK.send(player, affected);
     }
 
     @Command(
@@ -352,7 +352,7 @@ public class UtilityCommands extends MethodCommands {
     public void removeAbove(Player player, LocalSession session, EditSession editSession, @Optional("1") double size, @Optional("256") double height) throws WorldEditException {
         worldEdit.checkMaxRadius(size);
         int affected = editSession.removeAbove(session.getPlacementPosition(player), (int) size, (int) height);
-        player.print(BBC.getPrefix() + affected + " block(s) have been removed.");
+        BBC.VISITOR_BLOCK.send(player, affected);
     }
 
     @Command(
@@ -367,7 +367,7 @@ public class UtilityCommands extends MethodCommands {
     public void removeBelow(Player player, LocalSession session, EditSession editSession, @Optional("1") double size, @Optional("256") double height) throws WorldEditException {
         worldEdit.checkMaxRadius(size);
         int affected = editSession.removeBelow(session.getPlacementPosition(player), (int) size, (int) height);
-        player.print(BBC.getPrefix() + affected + " block(s) have been removed.");
+        BBC.VISITOR_BLOCK.send(player, affected);
     }
 
     @Command(
@@ -383,7 +383,7 @@ public class UtilityCommands extends MethodCommands {
         worldEdit.checkMaxRadius(size);
         size = Math.max(1, size);
         int affected = editSession.removeNear(session.getPlacementPosition(player), mask, (int) size);
-        player.print(BBC.getPrefix() + affected + " block(s) have been removed.");
+        BBC.VISITOR_BLOCK.send(player, affected);
     }
 
     @Command(
@@ -461,7 +461,7 @@ public class UtilityCommands extends MethodCommands {
         final boolean onlyNormalDirt = !args.hasFlag('f');
 
         final int affected = editSession.green(session.getPlacementPosition(player), size);
-        player.print(BBC.getPrefix() + affected + " surfaces greened.");
+        BBC.VISITOR_BLOCK.send(player, affected);
     }
 
     @Command(
@@ -483,7 +483,7 @@ public class UtilityCommands extends MethodCommands {
         worldEdit.checkMaxRadius(size);
 
         int affected = editSession.removeNear(session.getPlacementPosition(player), BlockTypes.FIRE.toMask(editSession), size);
-        player.print(BBC.getPrefix() + affected + " block(s) have been removed.");
+        BBC.VISITOR_BLOCK.send(player, affected);
     }
 
     @Command(
