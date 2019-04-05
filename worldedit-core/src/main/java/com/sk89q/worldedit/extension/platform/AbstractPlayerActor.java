@@ -102,7 +102,6 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         Extent world = searchPos.getExtent();
         int x = searchPos.getBlockX();
         int y = Math.max(0, searchPos.getBlockY());
-        int origY = y;
         int z = searchPos.getBlockZ();
 
         byte free = 0;
@@ -115,12 +114,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             }
 
             if (free == 2) {
-                if (y - 1 != origY) {
-                    final BlockVector3 pos = BlockVector3.at(x, y - 2, z);
-                    final BlockStateHolder state = world.getBlock(pos);
-                    setPosition(new Location(world, Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5)));
-                }
-
+                final BlockVector3 pos = BlockVector3.at(x, y - 2, z);
+                final BlockStateHolder state = world.getBlock(pos);
+                setPosition(new Location(world, Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5)));
                 return;
             }
 
