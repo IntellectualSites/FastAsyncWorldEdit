@@ -2731,13 +2731,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 loop:
                 for (int y = maxY; y >= 1; --y) {
                     BlockType block = getBlockType(x, y, z);
-                    switch (block.getResource().toUpperCase()) {
-                        // TODO onlyNormalDirt
-                        case "DIRT":
+                    switch (block.getInternalId()) {
+                        case BlockID.DIRT:
                             this.setBlock(x, y, z, BlockTypes.GRASS_BLOCK.getDefaultState());
                             break loop;
-                        case "WATER":
-                        case "LAVA":
+                        case BlockID.WATER:
+                        case BlockID.LAVA:
                             break loop;
                         default:
                             if (block.getMaterial().isMovementBlocker()) {
@@ -2812,14 +2811,15 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     this.changes++;
                     for (int y = basePosition.getBlockY(); y >= (basePosition.getBlockY() - 10); --y) {
                         BlockType type = getBlockType(x, y, z);
-                        String s = type.getResource().toUpperCase();
-                        if (type == BlockTypes.GRASS || type == BlockTypes.DIRT) {
-                            treeType.generate(this, BlockVector3.at(x, y + 1, z));
-                            this.changes++;
-                        } else if (type == BlockTypes.SNOW) {
-                            setBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
-                        } else if (type.getMaterial().isAir()) {
-                            continue;
+                        switch (type.getInternalId()) {
+                            case BlockID.GRASS:
+                            case BlockID.DIRT:
+                                treeType.generate(this, BlockVector3.at(x, y + 1, z));
+                                this.changes++;
+                                break;
+                            case BlockID.SNOW:
+                                setBlock(BlockVector3.at(x, y, z), BlockTypes.AIR.getDefaultState());
+                                break;
                         }
                     }
                 }

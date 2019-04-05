@@ -17,6 +17,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -446,16 +447,20 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     private final void setLayerHeight(int index, int blockHeight, int layerHeight) {
         int floorState = floor.get()[index];
         BlockType type = BlockTypes.getFromStateId(floorState);
-        if (type == BlockTypes.SNOW || type == BlockTypes.SNOW_BLOCK) {
-            if (layerHeight != 0) {
-                this.heights.setByte(index, (byte) (blockHeight + 1));
-                this.floor.setInt(index, (BlockTypes.SNOW.getInternalId() + layerHeight));
-            } else {
+        switch (type.getInternalId()) {
+            case BlockID.SNOW:
+            case BlockID.SNOW_BLOCK:
+                if (layerHeight != 0) {
+                    this.heights.setByte(index, (byte) (blockHeight + 1));
+                    this.floor.setInt(index, (BlockTypes.SNOW.getInternalId() + layerHeight));
+                } else {
+                    this.heights.setByte(index, (byte) (blockHeight));
+                    this.floor.setInt(index, (BlockTypes.SNOW_BLOCK.getInternalId()));
+                }
+                break;
+            default:
                 this.heights.setByte(index, (byte) (blockHeight));
-                this.floor.setInt(index, (BlockTypes.SNOW_BLOCK.getInternalId()));
-            }
-        } else {
-            this.heights.setByte(index, (byte) (blockHeight));
+                break;
         }
     }
 
@@ -468,16 +473,20 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     private final void setLayerHeightRaw(int index, int blockHeight, int layerHeight) {
         int floorState = floor.get()[index];
         BlockType type = BlockTypes.getFromStateId(floorState);
-        if (type == BlockTypes.SNOW || type == BlockTypes.SNOW_BLOCK) {
-            if (layerHeight != 0) {
-                this.heights.getByteArray()[index] = (byte) (blockHeight + 1);
-                this.floor.getIntArray()[index] = (BlockTypes.SNOW.getInternalId() + layerHeight);
-            } else {
+        switch (type.getInternalId()) {
+            case BlockID.SNOW:
+            case BlockID.SNOW_BLOCK:
+                if (layerHeight != 0) {
+                    this.heights.getByteArray()[index] = (byte) (blockHeight + 1);
+                    this.floor.getIntArray()[index] = (BlockTypes.SNOW.getInternalId() + layerHeight);
+                } else {
+                    this.heights.getByteArray()[index] = (byte) (blockHeight);
+                    this.floor.getIntArray()[index] = (BlockTypes.SNOW_BLOCK.getInternalId());
+                }
+                break;
+            default:
                 this.heights.getByteArray()[index] = (byte) (blockHeight);
-                this.floor.getIntArray()[index] = (BlockTypes.SNOW_BLOCK.getInternalId());
-            }
-        } else {
-            this.heights.getByteArray()[index] = (byte) (blockHeight);
+                break;
         }
     }
 

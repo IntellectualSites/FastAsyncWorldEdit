@@ -1,6 +1,7 @@
 package com.thevoxelbox.voxelsniper.brush;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -70,12 +71,15 @@ public class OverlayBrush extends PerformBrush {
 
     @SuppressWarnings("deprecation") private boolean isIgnoredBlock(int materialId) {
         BlockType type = BlockTypes.get(materialId);
-        String s = type.getResource().toUpperCase();
-        if (type == BlockTypes.WATER || type == BlockTypes.LAVA || type == BlockTypes.CACTUS) {
-            return true;
+        switch (type.getInternalId()) {
+            case BlockID.WATER:
+            case BlockID.LAVA:
+            case BlockID.CACTUS:
+                return true;
+            default:
+                BlockMaterial mat = type.getMaterial();
+                return mat.isTranslucent();
         }
-        BlockMaterial mat = type.getMaterial();
-        return mat.isTranslucent();
     }
 
     @SuppressWarnings("deprecation") private boolean isOverrideableMaterial(int materialId) {

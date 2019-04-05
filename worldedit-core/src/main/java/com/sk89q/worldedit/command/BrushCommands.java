@@ -311,9 +311,11 @@ public class BrushCommands extends BrushProcessor {
         } else {
             if (fill instanceof BlockStateHolder) {
                 BlockType type = ((BlockStateHolder) fill).getBlockType();
-                if (type == BlockTypes.SAND || type == BlockTypes.GRAVEL) {
-                    BBC.BRUSH_TRY_OTHER.send(player);
-                    falling = true;
+                switch (type.getInternalId()) {
+                    case BlockID.SAND:
+                    case BlockID.GRAVEL:
+                        BBC.BRUSH_TRY_OTHER.send(player);
+                        falling = true;
                 }
             }
             if (falling) {

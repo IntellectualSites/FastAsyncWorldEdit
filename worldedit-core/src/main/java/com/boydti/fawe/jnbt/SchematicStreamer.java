@@ -197,24 +197,24 @@ public class SchematicStreamer extends NBTStreamer {
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                 BlockType type = block.getBlockType();
-                switch (type.getResource().toUpperCase()) {
-                    case "ACACIA_STAIRS":
-                    case "BIRCH_STAIRS":
-                    case "BRICK_STAIRS":
-                    case "COBBLESTONE_STAIRS":
-                    case "DARK_OAK_STAIRS":
-                    case "DARK_PRISMARINE_STAIRS":
-                    case "JUNGLE_STAIRS":
-                    case "NETHER_BRICK_STAIRS":
-                    case "OAK_STAIRS":
-                    case "PRISMARINE_BRICK_STAIRS":
-                    case "PRISMARINE_STAIRS":
-                    case "PURPUR_STAIRS":
-                    case "QUARTZ_STAIRS":
-                    case "RED_SANDSTONE_STAIRS":
-                    case "SANDSTONE_STAIRS":
-                    case "SPRUCE_STAIRS":
-                    case "STONE_BRICK_STAIRS":
+                switch (type.getInternalId()) {
+                    case BlockID.ACACIA_STAIRS:
+                    case BlockID.BIRCH_STAIRS:
+                    case BlockID.BRICK_STAIRS:
+                    case BlockID.COBBLESTONE_STAIRS:
+                    case BlockID.DARK_OAK_STAIRS:
+                    case BlockID.DARK_PRISMARINE_STAIRS:
+                    case BlockID.JUNGLE_STAIRS:
+                    case BlockID.NETHER_BRICK_STAIRS:
+                    case BlockID.OAK_STAIRS:
+                    case BlockID.PRISMARINE_BRICK_STAIRS:
+                    case BlockID.PRISMARINE_STAIRS:
+                    case BlockID.PURPUR_STAIRS:
+                    case BlockID.QUARTZ_STAIRS:
+                    case BlockID.RED_SANDSTONE_STAIRS:
+                    case BlockID.SANDSTONE_STAIRS:
+                    case BlockID.SPRUCE_STAIRS:
+                    case BlockID.STONE_BRICK_STAIRS:
                         Object half = block.getState(PropertyKey.HALF);
                         Direction facing = block.getState(PropertyKey.FACING);
 
@@ -301,38 +301,38 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     private int group(BlockType type) {
-        switch (type.getResource().toUpperCase()) {
-            case "ACACIA_FENCE":
-            case "BIRCH_FENCE":
-            case "DARK_OAK_FENCE":
-            case "JUNGLE_FENCE":
-            case "OAK_FENCE":
-            case "SPRUCE_FENCE":
+        switch (type.getInternalId()) {
+            case BlockID.ACACIA_FENCE:
+            case BlockID.BIRCH_FENCE:
+            case BlockID.DARK_OAK_FENCE:
+            case BlockID.JUNGLE_FENCE:
+            case BlockID.OAK_FENCE:
+            case BlockID.SPRUCE_FENCE:
                 return 0;
-            case "NETHER_BRICK_FENCE":
+            case BlockID.NETHER_BRICK_FENCE:
                 return 1;
-            case "COBBLESTONE_WALL":
-            case "MOSSY_COBBLESTONE_WALL":
+            case BlockID.COBBLESTONE_WALL:
+            case BlockID.MOSSY_COBBLESTONE_WALL:
                 return 2;
-            case "IRON_BARS":
-            case "BLACK_STAINED_GLASS_PANE":
-            case "BLUE_STAINED_GLASS_PANE":
-            case "BROWN_MUSHROOM_BLOCK":
-            case "BROWN_STAINED_GLASS_PANE":
-            case "CYAN_STAINED_GLASS_PANE":
-            case "GLASS_PANE":
-            case "GRAY_STAINED_GLASS_PANE":
-            case "GREEN_STAINED_GLASS_PANE":
-            case "LIGHT_BLUE_STAINED_GLASS_PANE":
-            case "LIGHT_GRAY_STAINED_GLASS_PANE":
-            case "LIME_STAINED_GLASS_PANE":
-            case "MAGENTA_STAINED_GLASS_PANE":
-            case "ORANGE_STAINED_GLASS_PANE":
-            case "PINK_STAINED_GLASS_PANE":
-            case "PURPLE_STAINED_GLASS_PANE":
-            case "RED_STAINED_GLASS_PANE":
-            case "WHITE_STAINED_GLASS_PANE":
-            case "YELLOW_STAINED_GLASS_PANE":
+            case BlockID.IRON_BARS:
+            case BlockID.BLACK_STAINED_GLASS_PANE:
+            case BlockID.BLUE_STAINED_GLASS_PANE:
+            case BlockID.BROWN_MUSHROOM_BLOCK:
+            case BlockID.BROWN_STAINED_GLASS_PANE:
+            case BlockID.CYAN_STAINED_GLASS_PANE:
+            case BlockID.GLASS_PANE:
+            case BlockID.GRAY_STAINED_GLASS_PANE:
+            case BlockID.GREEN_STAINED_GLASS_PANE:
+            case BlockID.LIGHT_BLUE_STAINED_GLASS_PANE:
+            case BlockID.LIGHT_GRAY_STAINED_GLASS_PANE:
+            case BlockID.LIME_STAINED_GLASS_PANE:
+            case BlockID.MAGENTA_STAINED_GLASS_PANE:
+            case BlockID.ORANGE_STAINED_GLASS_PANE:
+            case BlockID.PINK_STAINED_GLASS_PANE:
+            case BlockID.PURPLE_STAINED_GLASS_PANE:
+            case BlockID.RED_STAINED_GLASS_PANE:
+            case BlockID.WHITE_STAINED_GLASS_PANE:
+            case BlockID.YELLOW_STAINED_GLASS_PANE:
                 return 3;
             default:
                 return -1;

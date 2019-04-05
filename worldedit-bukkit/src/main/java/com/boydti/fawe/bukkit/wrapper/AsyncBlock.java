@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -219,11 +220,13 @@ public class AsyncBlock implements Block {
     public AsyncBlockState getState() {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combined);
-        String s = type.getResource().toUpperCase();
-        if (type == BlockTypes.SIGN || type == BlockTypes.WALL_SIGN) {
-            return new AsyncSign(this, combined);
+        switch (type.getInternalId()) {
+            case BlockID.SIGN:
+            case BlockID.WALL_SIGN:
+                return new AsyncSign(this, combined);
+            default:
+                return new AsyncBlockState(this, combined);
         }
-        return new AsyncBlockState(this, combined);
     }
 
     @Override
