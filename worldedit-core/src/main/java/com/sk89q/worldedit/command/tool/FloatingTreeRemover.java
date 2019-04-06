@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command.tool;
 
 import com.boydti.fawe.object.collection.BlockVectorSet;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -75,7 +76,7 @@ public class FloatingTreeRemover implements BlockTool {
         final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
 
         if (!isTreeBlock(state.getBlockType())) {
-            player.printError("That's not a tree.");
+            BBC.TOOL_DELTREE_ERROR.send(player);
             return true;
         }
 
@@ -83,7 +84,7 @@ public class FloatingTreeRemover implements BlockTool {
             try {
                 final Set<BlockVector3> blockSet = bfs(world, clicked.toVector().toBlockPoint());
                 if (blockSet == null) {
-                    player.printError("That's not a floating tree.");
+                    BBC.TOOL_DELTREE_FLOATING_ERROR.send(player);
                     return true;
                 }
 

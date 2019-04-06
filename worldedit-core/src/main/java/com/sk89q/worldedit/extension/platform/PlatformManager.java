@@ -511,7 +511,7 @@ public class PlatformManager {
             if (faweException != null) {
                 BBC.WORLDEDIT_CANCEL_REASON.send(player, faweException.getMessage());
             } else {
-                player.printError("Please report this error: [See console]");
+                player.printError(BBC.getPrefix() + "Please report this error: [See console]");
                 player.printRaw(e.getClass().getName() + ": " + e.getMessage());
                 MainUtil.handleError(e);
             }

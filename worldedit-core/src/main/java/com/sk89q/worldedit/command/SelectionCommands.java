@@ -181,7 +181,7 @@ public class SelectionCommands {
             session.getRegionSelector(player.getWorld())
                     .explainPrimarySelection(player, session, pos);
         } else {
-            player.printError("No block in sight!");
+            BBC.NO_BLOCK.send(player);
         }
     }
 
@@ -205,7 +205,7 @@ public class SelectionCommands {
             session.getRegionSelector(player.getWorld())
                     .explainSecondarySelection(player, session, pos);
         } else {
-            player.printError("No block in sight!");
+            BBC.NO_BLOCK.send(player);
         }
     }
 
@@ -713,7 +713,7 @@ public class SelectionCommands {
         size = session.getSelection(player.getWorld()).getArea();
 
         if (distributionData.size() <= 0) {
-            player.printError("No blocks counted.");
+            player.printError(BBC.getPrefix() + "No blocks counted.");
             return;
         }
         BBC.SELECTION_DISTR.send(player, size);

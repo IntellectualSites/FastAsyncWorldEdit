@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -84,7 +85,7 @@ public class ScriptingCommands {
         String ext = filename.substring(index + 1, filename.length());
 
         if (!ext.equalsIgnoreCase("js")) {
-            actor.printError("Only .js scripts are currently supported");
+            actor.printError(BBC.getPrefix() + "Only .js scripts are currently supported");
             return null;
         }
 
@@ -97,7 +98,7 @@ public class ScriptingCommands {
                 file = WorldEdit.class.getResourceAsStream("craftscripts/" + filename);
 
                 if (file == null) {
-                    actor.printError("Script does not exist: " + filename);
+                    actor.printError(BBC.getPrefix() + "Script does not exist: " + filename);
                     return null;
                 }
             } else {
@@ -110,7 +111,7 @@ public class ScriptingCommands {
             in.close();
             script = new String(data, 0, data.length, "utf-8");
         } catch (IOException e) {
-            actor.printError("Script read error: " + e.getMessage());
+            actor.printError(BBC.getPrefix() + "Script read error: " + e.getMessage());
             return null;
         }
 
@@ -145,14 +146,14 @@ public class ScriptingCommands {
             result = engine.evaluate(script, filename, vars);
         } catch (ScriptException e) {
             e.printStackTrace();
-            actor.printError("Failed to execute:");
+            actor.printError(BBC.getPrefix() + "Failed to execute:");
             actor.printRaw(e.getMessage());
         } catch (NumberFormatException e) {
             throw e;
         } catch (WorldEditException e) {
             throw e;
         } catch (Throwable e) {
-            actor.printError("Failed to execute (see console):");
+            actor.printError(BBC.getPrefix() + "Failed to execute (see console):");
             actor.printRaw(e.getClass().getCanonicalName());
         }
         if (result instanceof NativeJavaObject) {
@@ -169,7 +170,7 @@ public class ScriptingCommands {
         final String name = args.getString(0);
 
         if (!player.hasPermission("worldedit.scripting.execute." + name)) {
-            player.printError("You don't have permission to use that script.");
+            BBC.SCRIPTING_NO_PERM.send(player);
             return;
         }
 
@@ -197,12 +198,12 @@ public class ScriptingCommands {
         String lastScript = session.getLastScript();
 
         if (!player.hasPermission("worldedit.scripting.execute." + lastScript)) {
-            player.printError("You don't have permission to use that script.");
+            BBC.SCRIPTING_NO_PERM.send(player);
             return;
         }
 
         if (lastScript == null) {
-            player.printError("Use /cs with a script name first.");
+            BBC.SCRIPTING_CS.send(player);
             return;
         }
 
@@ -214,7 +215,7 @@ public class ScriptingCommands {
         try {
             this.worldEdit.runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
         } catch (final WorldEditException ex) {
-            player.printError("Error while executing CraftScript.");
+            BBC.SCRIPTING_ERROR.send(player);
         }
     }
 

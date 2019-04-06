@@ -210,7 +210,7 @@ public class ClipboardFormats {
                 }
                 f = player.openFileOpenDialog(extensions);
                 if (f == null || !f.exists()) {
-                    if (message) player.printError("Schematic " + input + " does not exist! (" + f + ")");
+                    if (message) player.printError(BBC.getPrefix() + "Schematic " + input + " does not exist! (" + f + ")");
                     return null;
                 }
             } else {
@@ -231,7 +231,7 @@ public class ClipboardFormats {
                 }
             }
             if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
-                if (message) player.printError("Schematic " + input + " does not exist! (" + ((f == null) ? false : f.exists()) + "|" + f + "|" + (f == null ? false : !MainUtil.isInSubDirectory(working, f)) + ")");
+                if (message) player.printError(BBC.getPrefix() + "Schematic " + input + " does not exist! (" + ((f == null) ? false : f.exists()) + "|" + f + "|" + (f == null ? false : !MainUtil.isInSubDirectory(working, f)) + ")");
                 return null;
             }
             if (format == null && f.isFile()) {

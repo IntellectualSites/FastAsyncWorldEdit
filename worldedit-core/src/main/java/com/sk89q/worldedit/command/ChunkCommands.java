@@ -115,7 +115,7 @@ public class ChunkCommands {
         FileOutputStream out = null;
 
         if (config.shellSaveType == null) {
-            player.printError("Shell script type must be configured: 'bat' or 'bash' expected.");
+            player.printError(BBC.getPrefix() + "Shell script type must be configured: 'bat' or 'bash' expected.");
         } else if (config.shellSaveType.equalsIgnoreCase("bat")) {
             try {
                 out = new FileOutputStream("worldedit-delchunks.bat");
