@@ -311,7 +311,7 @@ public enum BBC {
 
     SCRIPTING_NO_PERM("&cYou do not have permission to execute this craft script", "WorldEdit.Scripting"),
     SCRIPTING_CS("Use /cs with a script name first.", "WorldEdit.Scripting"),
-    SCRIPTING_ERROR("An error occured while executing a craft script", "WorldEditScripting"),
+    SCRIPTING_ERROR("An error occured while executing a craft script", "WorldEdit.Scripting"),
 
     TIP_SEL_LIST("Tip: See the different selection modes with &c//sel list", "Tips"),
     TIP_SELECT_CONNECTED("Tip: Select all connected blocks with //sel fuzzy", "Tips"),
