@@ -27,6 +27,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
+import com.sk89q.worldedit.extent.transform.BlockTransformExtent2;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -111,7 +112,7 @@ public class PasteBuilder {
     public Operation build() {
         Extent extent = clipboard;
         if (!transform.isIdentity()) {
-            extent = new BlockTransformExtent(extent, transform);
+            extent = new BlockTransformExtent2(extent, transform);
         }
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), targetExtent, to);
         copy.setTransform(transform);
