@@ -79,22 +79,22 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return transformBlock(super.getLazyBlock(getPos(x, y, z)), false).toImmutableState();
+        return transform(super.getLazyBlock(getPos(x, y, z)));
     }
 
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
-        return transformBlock(super.getLazyBlock(getPos(position)), false).toImmutableState();
+        return transform(super.getLazyBlock(getPos(position)));
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transformBlock(super.getBlock(getPos(position)), false).toImmutableState();
+        return transform(super.getBlock(getPos(position)));
     }
     
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-    	return transformBlock(super.getFullBlock(getPos(position)), false);
+    	return transform(super.getFullBlock(getPos(position)));
     }
 
     @Override
@@ -106,14 +106,16 @@ public class TransformExtent extends BlockTransformExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return super.setBlock(getPos(x, y, z), transformBlock((BlockState)block, false));
+    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+        System.out.println("Set block transform");
+        return super.setBlock(getPos(x, y, z), transformInverse(block));
     }
 
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return super.setBlock(getPos(location), transformBlock((BlockState)block, false));
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+        System.out.println("Set block transform2");
+        return super.setBlock(getPos(location), transformInverse(block));
     }
 
     @Override

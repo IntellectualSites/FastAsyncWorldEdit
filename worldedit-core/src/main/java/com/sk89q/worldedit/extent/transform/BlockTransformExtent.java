@@ -55,9 +55,9 @@ public class BlockTransformExtent extends ResettableExtent {
 
 
     private long combine(Direction... directions) {
-        int mask = 0;
+        long mask = 0;
         for (Direction dir : directions) {
-            mask = mask | (1 << dir.ordinal());
+            mask = mask | (1L << dir.ordinal());
         }
         return mask;
     }
@@ -65,7 +65,7 @@ public class BlockTransformExtent extends ResettableExtent {
     private long[] adapt(Direction... dirs) {
         long[] arr = new long[dirs.length];
         for (int i = 0; i < arr.length; i++) {
-            arr[i] = 1 << dirs[i].ordinal();
+            arr[i] = 1L << dirs[i].ordinal();
         }
         return arr;
     }
@@ -121,16 +121,16 @@ public class BlockTransformExtent extends ResettableExtent {
                                     result.add(combine(NORTH, EAST, SOUTH, WEST));
                                     continue;
                                 case "inner_left":
-                                    result.add(notIndex(combine(NORTHEAST, SOUTHWEST), property.getIndexFor("outer_right")));
+                                    result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
                                     continue;
                                 case "inner_right":
-                                    result.add(notIndex(combine(NORTHWEST, SOUTHEAST), property.getIndexFor("outer_left")));
+                                    result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
                                     continue;
                                 case "outer_left":
-                                    result.add(notIndex(combine(NORTHEAST, SOUTHWEST), property.getIndexFor("inner_right")));
+                                    result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
                                     continue;
                                 case "outer_right":
-                                    result.add(notIndex(combine(NORTHWEST, SOUTHEAST), property.getIndexFor("inner_left")));
+                                    result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
                                     continue;
                                 default:
                                     System.out.println("Unknown direction " + value);
@@ -184,21 +184,15 @@ public class BlockTransformExtent extends ResettableExtent {
         return null;
     }
 
-    private static Direction getFirst(long mask) {
-        for (Direction dir : Direction.values()) {
-            if (hasDirection(mask, dir)) {
-                return dir;
-            }
-        }
-        return null;
-    }
-
     private static boolean hasDirection(long mask, Direction dir) {
         return (mask & (1L << dir.ordinal())) != 0;
     }
 
-    private static long notIndex(long mask, int index) {
-        return mask | (1L << (index + values().length));
+    private static long notIndex(long mask, int... indexes) {
+        for (int index : indexes) {
+            mask = mask | (1L << (index + values().length));
+        }
+        return mask;
     }
 
     private static boolean hasIndex(long mask, int index) {
@@ -209,39 +203,49 @@ public class BlockTransformExtent extends ResettableExtent {
     private static Integer getNewStateIndex(Transform transform, long[] directions, int oldIndex) {
         long oldDirMask = directions[oldIndex];
         if (oldDirMask == 0) {
-            return oldIndex;
+            return null;
         }
+        Integer newIndex = null;
+
         for (Direction oldDirection : values()) {
-            if (!hasDirection(oldDirMask, oldDirection)) continue;
-            if (oldDirection == null) {
-                System.out.println(oldDirMask);
+            if (!hasDirection(oldDirMask, oldDirection)) {
+                continue;
             }
             Vector3 oldVector = oldDirection.toVector();
             Vector3 newVector = transform.apply(oldVector).subtract(transform.apply(Vector3.ZERO)).normalize();
-            int newIndex = oldIndex;
+            boolean flip = false;
+
+            if (transform instanceof AffineTransform) {
+                flip = ((AffineTransform) transform).isScaled(oldVector);
+            }
+
+            if (oldVector.equals(newVector)) {
+                continue;
+            }
+
             double closest = oldVector.normalize().dot(newVector);
-            boolean found = false;
             for (int i = 0; i < directions.length; i++) {
                 int j = (oldIndex + i) % directions.length;
                 long newDirMask = directions[j];
-                if (!hasIndex(oldDirMask, j)) continue;
+                if (!hasIndex(oldDirMask, j)) {
+                    continue;
+                }
                 for (Direction v : Direction.values()) {
                     // Check if it's one of the current directions
-                    if (!hasDirection(newDirMask, v)) continue;
+                    if (!hasDirection(newDirMask, v)) {
+                        continue;
+                    }
                     // Check if the old mask excludes it
                     double dot = v.toVector().normalize().dot(newVector);
-                    if (dot > closest) {
+                    if (dot > closest || (flip && dot >= closest)) { //
                         closest = dot;
                         newIndex = j;
-                        found = true;
                     }
                 }
             }
-            if (found) {
-                return newIndex;
-            }
+            if (newIndex != null) return newIndex;
         }
-        return null;
+        return newIndex != null ? newIndex : null;
     }
 
     private boolean isDirectional(Property property) {
@@ -348,11 +352,13 @@ public class BlockTransformExtent extends ResettableExtent {
             }
 
             for (AbstractProperty property : (Collection<AbstractProperty>) (Collection) type.getProperties()) {
-                long[] directions = getDirections(property);
-                if (directions != null) {
-                    Integer newIndex = getNewStateIndex(transform, directions, property.getIndex(state.getInternalId()));
-                    if (newIndex != null) {
-                        newMaskedId = property.modifyIndex(newMaskedId, newIndex);
+                if (isDirectional(property)) {
+                    long[] directions = getDirections(property);
+                    if (directions != null) {
+                        Integer newIndex = getNewStateIndex(transform, directions, property.getIndex(state.getInternalId()));
+                        if (newIndex != null) {
+                            newMaskedId = property.modifyIndex(newMaskedId, newIndex);
+                        }
                     }
                 }
             }
@@ -364,18 +370,18 @@ public class BlockTransformExtent extends ResettableExtent {
         }
     }
 
-    public final BaseBlock transformInverse(BlockStateHolder block) {
+    public final BaseBlock transform(BlockStateHolder block) {
         BlockState transformed = transform(block.toImmutableState());
         if (block.hasNbtData()) {
-            return transformFastWith(transformed, block.getNbtData(), transformInverse);
+            return transformFastWith(transformed, block.getNbtData(), transform);
         }
         return transformed.toBaseBlock();
     }
 
-    public final BlockStateHolder transform(BlockStateHolder block) {
-        BlockState transformed = transform(block.toImmutableState());
+    public final BlockStateHolder transformInverse(BlockStateHolder block) {
+        BlockState transformed = transformInverse(block.toImmutableState());
         if (block.hasNbtData()) {
-            return transformFastWith(transformed, block.getNbtData(), transform);
+            return transformFastWith(transformed, block.getNbtData(), transformInverse);
         }
         return transformed;
     }
@@ -407,32 +413,32 @@ public class BlockTransformExtent extends ResettableExtent {
         return transformed.toBaseBlock();
     }
 
-    public final BlockState transformInverse(BlockState block) {
-        return transform(block, BLOCK_TRANSFORM, transformInverse);
+    public final BlockState transform(BlockState block) {
+        return transform(block, BLOCK_TRANSFORM, transform);
     }
 
-    public final BlockState transform(BlockState block) {
-        return transform(block, BLOCK_TRANSFORM_INVERSE, transform);
+    public final BlockState transformInverse(BlockState block) {
+        return transform(block, BLOCK_TRANSFORM_INVERSE, transformInverse);
     }
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return transformInverse(super.getLazyBlock(x, y, z));
+        return transform(super.getLazyBlock(x, y, z));
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return transformInverse(super.getFullBlock(position));
+        return transform(super.getFullBlock(position));
     }
 
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
-        return transformInverse(super.getLazyBlock(position));
+        return transform(super.getLazyBlock(position));
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transformInverse(super.getBlock(position));
+        return transform(super.getBlock(position));
     }
 
     @Override
@@ -442,13 +448,13 @@ public class BlockTransformExtent extends ResettableExtent {
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(x, y, z, transform(block));
+        return super.setBlock(x, y, z, transformInverse(block));
     }
 
 
     @Override
     public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(location, transform(block));
+        return super.setBlock(location, transformInverse(block));
     }
 
 

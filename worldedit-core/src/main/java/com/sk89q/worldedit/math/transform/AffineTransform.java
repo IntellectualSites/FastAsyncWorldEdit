@@ -6,6 +6,7 @@ import java.io.Serializable;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 /**
@@ -17,7 +18,7 @@ import com.sk89q.worldedit.math.Vector3;
  */
 public class AffineTransform implements Transform, Serializable {
 
-    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
+    private AffineTransform inverse;
 
     /**
      * coefficients for x coordinate.
@@ -162,8 +163,9 @@ public class AffineTransform implements Transform, Serializable {
      */
     @Override
     public AffineTransform inverse() {
+        if (inverse != null) return inverse;
         double det = this.determinant();
-        return new AffineTransform(
+        return inverse = new AffineTransform(
                 (m11 * m22 - m21 * m12) / det,
                 (m02 * m21 - m22 * m01) / det,
                 (m01 * m12 - m11 * m02) / det,
@@ -290,16 +292,23 @@ public class AffineTransform implements Transform, Serializable {
         return scale(vec.getX(), vec.getY(), vec.getZ());
     }
 
+    public boolean isScaled(Vector3 vector) {
+        boolean flip = false;
+        if (vector.getX() != 0 && m00 < 0) flip = !flip;
+        if (vector.getY() != 0 && m11 < 0) flip = !flip;
+        if (vector.getZ() != 0 && m22 < 0) flip = !flip;
+        return flip;
+    }
+
     @Override
     public Vector3 apply(Vector3 vector) {
-        return Vector3.at(
-                vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03,
-                vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13,
-                vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23);
-//        mutable.mutX((vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03));
-//        mutable.mutY((vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13));
-//        mutable.mutZ((vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23));
-//        return mutable;
+        double x = (vector.getX() * m00 + vector.getY() * m01 + vector.getZ() * m02 + m03);
+        double y = (vector.getX() * m10 + vector.getY() * m11 + vector.getZ() * m12 + m13);
+        double z = (vector.getX() * m20 + vector.getY() * m21 + vector.getZ() * m22 + m23);
+        vector = vector.mutX(x);
+        vector = vector.mutY(y);
+        vector = vector.mutZ(z);
+        return vector;
     }
 
     public AffineTransform combine(AffineTransform other) {
@@ -324,7 +333,6 @@ public class AffineTransform implements Transform, Serializable {
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        mutable = new MutableBlockVector3();
     }
 
 
