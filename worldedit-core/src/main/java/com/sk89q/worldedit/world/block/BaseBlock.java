@@ -47,7 +47,7 @@ import java.util.Objects;
  * snapshot of blocks correctly, so, for example, the NBT data for a block
  * may be missing.</p>
  */
-public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
+public class BaseBlock implements BlockStateHolder<BaseBlock> {
     private final BlockState blockState;
 
     @Nullable

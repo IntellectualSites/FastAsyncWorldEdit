@@ -15,7 +15,6 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
-import com.sk89q.worldedit.extent.transform.BlockTransformExtent2;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -138,7 +137,7 @@ public class Schematic {
         Extent extent = clipboard;
         Mask sourceMask = editSession.getSourceMask();
         if (transform != null && !transform.isIdentity()) {
-            extent = new BlockTransformExtent2(clipboard, transform);
+            extent = new BlockTransformExtent(clipboard, transform);
         } else if (sourceMask == null) {
             paste(editSession, to, pasteAir);
             editSession.flushQueue();
@@ -171,7 +170,7 @@ public class Schematic {
         Region region = clipboard.getRegion();
         Extent source = clipboard;
         if (transform != null) {
-            source = new BlockTransformExtent2(clipboard, transform);
+            source = new BlockTransformExtent(clipboard, transform);
         }
         ForwardExtentCopy copy = new ForwardExtentCopy(source, clipboard.getRegion(), clipboard.getOrigin(), extent, to);
         if (transform != null) {

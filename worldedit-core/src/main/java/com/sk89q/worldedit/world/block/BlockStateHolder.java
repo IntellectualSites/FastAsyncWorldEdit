@@ -19,16 +19,18 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePattern {
+public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePattern, TileEntityBlock {
 
     /**
      * Get the block type
@@ -140,6 +142,51 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePat
      * @return The BaseBlock
      */
     BaseBlock toBaseBlock(CompoundTag compoundTag);
+
+    /**
+     * Return the name of the title entity ID.
+     *
+     * @return tile entity ID, non-null string
+     */
+    default String getNbtId() {
+        return "";
+    }
+
+    /**
+     * Returns whether the block contains NBT data. {@link #getNbtData()}
+     * must not return null if this method returns true.
+     *
+     * @return true if there is NBT data
+     */
+    default boolean hasNbtData() {
+        return false;
+    }
+
+    /**
+     * Get the object's NBT data (tile entity data). The returned tag, if
+     * modified in any way, should be sent to {@link #setNbtData(CompoundTag)}
+     * so that the instance knows of the changes. Making changes without
+     * calling {@link #setNbtData(CompoundTag)} could have unintended
+     * consequences.
+     *
+     * <p>{@link #hasNbtData()} must return true if and only if method does
+     * not return null.</p>
+     *
+     * @return compound tag, or null
+     */
+    @Nullable
+    default CompoundTag getNbtData() {
+        return null;
+    }
+
+    /**
+     * Set the object's NBT data (tile entity data).
+     *
+     * @param nbtData NBT data, or null if no data
+     */
+    default void setNbtData(@Nullable CompoundTag nbtData) {
+        throw new UnsupportedOperationException("State is immutable");
+    }
 
     default String getAsString() {
         if (getStates().isEmpty()) {

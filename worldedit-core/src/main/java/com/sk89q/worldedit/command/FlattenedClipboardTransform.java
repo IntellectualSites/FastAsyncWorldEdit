@@ -24,10 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
-import com.sk89q.worldedit.extent.transform.BlockTransformExtent2;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.CombinedTransform;
@@ -118,7 +116,7 @@ public class FlattenedClipboardTransform {
      */
     public Operation copyTo(Extent target) {
         Extent extent = original;
-        if (transform != null && !transform.isIdentity()) extent = new BlockTransformExtent2(original, transform);
+        if (transform != null && !transform.isIdentity()) extent = new BlockTransformExtent(original, transform);
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, original.getRegion(), original.getOrigin(), target, original.getOrigin());
         copy.setTransform(transform);
         return copy;

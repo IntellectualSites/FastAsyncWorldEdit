@@ -164,6 +164,7 @@ public class RegionVisitor implements Operation {
             } catch (FaweException e) {
                 throw new RuntimeException(e);
             } catch (Throwable ignore) {
+                ignore.printStackTrace();
             }
             try {
                 while (true) {
