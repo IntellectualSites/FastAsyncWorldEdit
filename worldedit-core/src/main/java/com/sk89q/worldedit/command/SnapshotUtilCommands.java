@@ -66,7 +66,7 @@ public class SnapshotUtilCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            player.printError("Snapshot/backup restore is not configured.");
+            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
             return;
         }
 
@@ -77,7 +77,7 @@ public class SnapshotUtilCommands {
             try {
                 snapshot = config.snapshotRepo.getSnapshot(args.getString(0));
             } catch (InvalidSnapshotException e) {
-                player.printError("That snapshot does not exist or is not available.");
+                BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
                 return;
             }
         } else {
@@ -90,7 +90,7 @@ public class SnapshotUtilCommands {
                 snapshot = config.snapshotRepo.getDefaultSnapshot(player.getWorld().getName());
 
                 if (snapshot == null) {
-                    player.printError("No snapshots were found. See console for details.");
+                    BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
 
                     // Okay, let's toss some debugging information!
                     File dir = config.snapshotRepo.getDirectory();
@@ -107,7 +107,7 @@ public class SnapshotUtilCommands {
                     return;
                 }
             } catch (MissingWorldException ex) {
-                player.printError("No snapshots were found for this world.");
+                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
                 return;
             }
         }
@@ -119,10 +119,10 @@ public class SnapshotUtilCommands {
             chunkStore = snapshot.getChunkStore();
             BBC.SNAPSHOT_LOADED.send(player, snapshot.getName());
         } catch (DataException e) {
-            player.printError("Failed to load snapshot: " + e.getMessage());
+            player.printError(BBC.getPrefix() + "Failed to load snapshot: " + e.getMessage());
             return;
         } catch (IOException e) {
-            player.printError("Failed to load snapshot: " + e.getMessage());
+            player.printError(BBC.getPrefix() + "Failed to load snapshot: " + e.getMessage());
             return;
         }
 
@@ -136,10 +136,10 @@ public class SnapshotUtilCommands {
             if (restore.hadTotalFailure()) {
                 String error = restore.getLastErrorMessage();
                 if (error != null) {
-                    player.printError("Errors prevented any blocks from being restored.");
-                    player.printError("Last error: " + error);
+                    BBC.SNAPSHOT_ERROR_RESTORE.send(player);
+                    player.printError(BBC.getPrefix() + "Last error: " + error);
                 } else {
-                    player.printError("No chunks could be loaded. (Bad archive?)");
+                    BBC.SNAPSHOT_ERROR_RESTORE_CHUNKS.send(player);
                 }
             } else {
                 player.print(BBC.getPrefix() + String.format("Restored; %d "

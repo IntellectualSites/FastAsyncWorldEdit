@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.BBC;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -55,7 +56,7 @@ public class ToolUtilCommands {
         String newState = args.getString(0, null);
         if (session.hasSuperPickAxe()) {
             if ("on".equals(newState)) {
-                player.printError("Super pick axe already enabled.");
+                player.printError(BBC.getPrefix() + "Super pick axe already enabled.");
                 return;
             }
 
@@ -63,7 +64,7 @@ public class ToolUtilCommands {
             player.print("Super pick axe disabled.");
         } else {
             if ("off".equals(newState)) {
-                player.printError("Super pick axe already disabled.");
+                player.printError(BBC.getPrefix() + "Super pick axe already disabled.");
                 return;
             }
             session.enableSuperPickAxe();

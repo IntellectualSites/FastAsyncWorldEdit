@@ -249,7 +249,7 @@ public class RegionCommands extends MethodCommands {
                      @Switch('h') boolean shell) throws WorldEditException {
 
         if (!(region instanceof CuboidRegion)) {
-            player.printError("//line only works with cuboid selections");
+            player.printError(BBC.getPrefix() + "//line only works with cuboid selections");
             return;
         }
 
@@ -770,7 +770,7 @@ public class RegionCommands extends MethodCommands {
     public void forest(Player player, EditSession editSession, @Selection Region region, @Optional("tree") TreeType type,
                        @Optional("5") @Range(min = 0, max = 100) double density) throws WorldEditException {
         int affected = editSession.makeForest(region, density / 100, type);
-        player.print(affected + " trees created.");
+        BBC.COMMAND_TREE.send(player, affected);
     }
 
     @Command(

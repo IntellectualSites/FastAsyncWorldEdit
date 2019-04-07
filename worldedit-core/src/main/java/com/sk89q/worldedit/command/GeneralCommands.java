@@ -68,7 +68,7 @@ public class GeneralCommands {
         int limit = args.argsLength() == 0 ? config.defaultChangeLimit : Math.max(-1, args.getInteger(0));
         if (!mayDisable && config.maxChangeLimit > -1) {
             if (limit > config.maxChangeLimit) {
-                player.printError("Your maximum allowable limit is " + config.maxChangeLimit + ".");
+                player.printError(BBC.getPrefix() + "Your maximum allowable limit is " + config.maxChangeLimit + ".");
                 return;
             }
         }
@@ -76,9 +76,9 @@ public class GeneralCommands {
         session.setBlockChangeLimit(limit);
 
         if (limit != config.defaultChangeLimit) {
-            player.print("Block change limit set to " + limit + ". (Use //limit to go back to the default.)");
+            player.print(BBC.getPrefix() + "Block change limit set to " + limit + ". (Use //limit to go back to the default.)");
         } else {
-            player.print("Block change limit set to " + limit + ".");
+            player.print(BBC.getPrefix() + "Block change limit set to " + limit + ".");
         }
     }
 
@@ -98,7 +98,7 @@ public class GeneralCommands {
         int limit = args.argsLength() == 0 ? config.calculationTimeout : Math.max(-1, args.getInteger(0));
         if (!mayDisable && config.maxCalculationTimeout > -1) {
             if (limit > config.maxCalculationTimeout) {
-                player.printError("Your maximum allowable timeout is " + config.maxCalculationTimeout + " ms.");
+                player.printError(BBC.getPrefix() + "Your maximum allowable timeout is " + config.maxCalculationTimeout + " ms.");
                 return;
             }
         }
@@ -106,9 +106,9 @@ public class GeneralCommands {
         session.setTimeout(limit);
 
         if (limit != config.calculationTimeout) {
-            player.print("Timeout time set to " + limit + " ms. (Use //timeout to go back to the default.)");
+            player.print(BBC.getPrefix() + "Timeout time set to " + limit + " ms. (Use //timeout to go back to the default.)");
         } else {
-            player.print("Timeout time set to " + limit + " ms.");
+            player.print(BBC.getPrefix() + "Timeout time set to " + limit + " ms.");
         }
     }
 
@@ -125,7 +125,7 @@ public class GeneralCommands {
         String newState = args.getString(0, null);
         if (session.hasFastMode()) {
             if ("on".equals(newState)) {
-                player.printError("Fast mode already enabled.");
+                player.printError(BBC.getPrefix() + "Fast mode already enabled.");
                 return;
             }
 
@@ -133,7 +133,7 @@ public class GeneralCommands {
             player.print("Fast mode disabled.");
         } else {
             if ("off".equals(newState)) {
-                player.printError("Fast mode already disabled.");
+                player.printError(BBC.getPrefix() + "Fast mode already disabled.");
                 return;
             }
 
@@ -158,7 +158,7 @@ public class GeneralCommands {
         String newState = args.getString(0, null);
         if (session.shouldUseServerCUI()) {
             if ("on".equals(newState)) {
-                player.printError("Server CUI already enabled.");
+                player.printError(BBC.getPrefix() + "Server CUI already enabled.");
                 return;
             }
 
@@ -167,7 +167,7 @@ public class GeneralCommands {
             player.print("Server CUI disabled.");
         } else {
             if ("off".equals(newState)) {
-                player.printError("Server CUI already disabled.");
+                player.printError(BBC.getPrefix() + "Server CUI already disabled.");
                 return;
             }
 

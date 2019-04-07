@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -60,10 +61,10 @@ public class TreePlanter implements BlockTool {
                 }
 
                 if (!successful) {
-                    player.printError("A tree can't go there.");
+                    BBC.TOOL_TREE_ERROR_BLOCK.send(player);
                 }
             } catch (MaxChangedBlocksException e) {
-                player.printError("Max. blocks changed reached.");
+                BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES.send(player);
             } finally {
                 session.remember(editSession);
             }
