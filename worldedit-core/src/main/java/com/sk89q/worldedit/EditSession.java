@@ -2196,18 +2196,24 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int fixLiquid(final BlockVector3 origin, final double radius, Mask liquidMask, Pattern pattern) {
+    public int fixLiquid(final BlockVector3 origin, final double radius, BlockType fluid) {
         checkNotNull(origin);
         checkArgument(radius >= 0, "radius >= 0 required");
 
+        // Our origins can only be liquids
+        Mask liquidMask = new BlockTypeMask(this, fluid);
+
+        // But we will also visit air blocks
+        MaskIntersection blockMask = new MaskUnion(liquidMask, Masks.negate(new ExistingBlockMask(this)));
+
         // There are boundaries that the routine needs to stay in
         MaskIntersection mask = new MaskIntersection(
-                new BoundedHeightMask(0, Math.min(origin.getBlockY(), getMaximumPoint().getBlockY())),
+                new BoundedHeightMask(0, Math.min(origin.getBlockY(), getWorld().getMaxY())),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
-                liquidMask);
+                blockMask);
 
-        BlockReplace replace = new BlockReplace(this, pattern);
-        NonRisingVisitor visitor = new NonRisingVisitor(mask, replace, (int) (radius * 2 + 1), this);
+        BlockReplace replace = new BlockReplace(this, new BlockPattern(fluid.getDefaultState()));
+        NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
@@ -2216,8 +2222,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             }
         }
 
-        Operations.completeBlindly(visitor);
-        return getBlockChangeCount();
+        Operations.completeLegacy(visitor);
+        return visitor.getAffected();
     }
 
     /**
