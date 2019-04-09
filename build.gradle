@@ -1,3 +1,5 @@
+import org.ajoberstar.grgit.Grgit
+
 buildscript {
     repositories {
         mavenLocal()
@@ -22,7 +24,7 @@ buildscript {
 
 plugins {
     id 'net.minecrell.licenser' version '0.4.1' apply false
-    id "org.ajoberstar.grgit" version "2.3.0"
+    id "org.ajoberstar.grgit" version "3.1.1"
 }
 
 apply plugin: 'java'
@@ -41,20 +43,15 @@ def revision = ""
 def buildNumber = ""
 def date = ""
 ext {
-    try {
-        git = org.ajoberstar.grgit.Grgit.open(file(".git"))
-        date = git.head().date.format("yy.MM.dd")
-        revision = "-${git.head().abbreviatedId}"
-        index = -1960;  // Offset to match CI
-        parents = git.head().parentIds;
-        for (; parents != null && !parents.isEmpty(); index++) {
-            commit = git.getResolve().toCommit(parents.get(0));
-            parents = commit.getParentIds()
-        }
-        buildNumber = "${index}"
-    } catch (Throwable ignore) {
-        revision = "-unknown"
+    git = Grgit.open(dir: '.git')
+    date = git.head().getDate().format("yy.MM.dd")
+    revision = "-${git.head().abbreviatedId}"
+    parents = git.head().parentIds;
+    index = -2111;  // Offset to match CI
+    for (; parents != null && !parents.isEmpty(); index++) {
+        parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
     }
+    buildNumber = "${index}"
 }
 
 if ( project.hasProperty("lzNoVersion") ) { // gradle build -PlzNoVersion
