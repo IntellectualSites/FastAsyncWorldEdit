@@ -1,7 +1,11 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.example.SimpleIntFaweChunk;
+import com.boydti.fawe.jnbt.anvil.HeightMapMCADrawer;
+import com.boydti.fawe.jnbt.anvil.MCAChunk;
+import com.boydti.fawe.jnbt.anvil.MCAWriter;
 import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.change.StreamChange;
@@ -77,7 +81,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         protected boolean randomVariation = true;
         protected int biomePriority = 0;
         protected int waterId = BlockTypes.WATER.getInternalId();
-        protected int bedrockId = 7;
+        protected int bedrockId = BlockID.BEDROCK;
         protected boolean modifiedMain = false;
 
         @Override
@@ -210,7 +214,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public HeightMapMCAGenerator(int width, int length, File regionFolder) {
         super(width, length, regionFolder);
-        int area = getArea();
 
         blocks = new DifferentialBlockBuffer(width, length);
         heights = new DifferentialArray(new byte[getArea()]);
@@ -296,7 +299,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int ecx = Math.min(lenCX - 1, pcx + 15);
             int ecz = Math.min(lenCZ - 1, pcz + 15);
 
-            MCAChunk chunk = new MCAChunk(this, 0, 0);
             for (int cz = scz; cz <= ecz; cz++) {
                 for (int cx = scx; cx <= ecx; cx++) {
                     final int finalCX = cx;
@@ -517,7 +519,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                         for (int x = 0; x < getWidth(); x++, index++) {
                             int height = img.getRGB(x, z) & 0xFF;
                             if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                                .nextInt(256) <= height) {
+                                    .nextInt(256) <= height) {
                                 int newHeight = table.average(x, z, index);
                                 setLayerHeightRaw(index, newHeight);
                             }
@@ -767,16 +769,15 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return getSnapshot(null, chunkX, chunkZ);
     }
 
-    private FaweChunk getSnapshot(final MCAChunk chunk, int chunkX, int chunkZ) {
-        return new LazyFaweChunk<MCAChunk>(this, chunkX, chunkZ) {
+    private FaweChunk getSnapshot(final WritableMCAChunk chunk, int chunkX, int chunkZ) {
+        return new LazyFaweChunk<WritableMCAChunk>(this, chunkX, chunkZ) {
             @Override
-            public MCAChunk getChunk() {
-                MCAChunk tmp = chunk;
+            public WritableMCAChunk getChunk() {
+                WritableMCAChunk tmp = chunk;
                 if (tmp == null) {
-                    tmp = new MCAChunk(HeightMapMCAGenerator.this, chunkX, chunkZ);
-                } else {
-                    tmp.setLoc(HeightMapMCAGenerator.this, chunkX, chunkZ);
+                    tmp = new WritableMCAChunk();
                 }
+                tmp.setLoc(HeightMapMCAGenerator.this, chunkX, chunkZ);
                 int cbx = chunkX << 4;
                 int cbz = chunkZ << 4;
                 int csx = Math.max(0, cbx);
@@ -790,7 +791,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
             @Override
             public void addToQueue() {
-                MCAChunk cached = getCachedChunk();
+                WritableMCAChunk cached = getCachedChunk();
                 if (cached != null) setChunk(cached);
             }
         };
@@ -1091,7 +1092,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                            .nextInt(256) <= height) {
+                                .nextInt(256) <= height) {
                             biomeArr[index] = biomeByte;
                         }
                     }
@@ -1143,7 +1144,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     if (imgMask != null) {
                         int height = imgMask.getRGB(x, z) & 0xFF;
                         if (height != 255 && (height <= 0 || !whiteOnly || ThreadLocalRandom
-                            .current().nextInt(256) > height)) continue;
+                                .current().nextInt(256) > height)) continue;
                     }
                     int color = img.getRGB(x, z);
                     if (textureUtil.getIsBlockCloserThanBiome(buffer, color, primtives.biomePriority)) {
@@ -1228,7 +1229,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = mask.getRGB(x, z) & 0xFF;
                     if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                        .nextInt(256) <= height) {
+                            .nextInt(256) <= height) {
                         int color = img.getRGB(x, z);
                         BlockType block = textureUtil.getNearestBlock(color);
                         if (block != null) {
@@ -1347,7 +1348,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (pattern instanceof BlockStateHolder) {
             setOverlay(img, ((BlockStateHolder) pattern).getInternalId(), white);
         } else if (pattern instanceof BlockType) {
-                setOverlay(img, ((BlockType) pattern).getInternalId(), white);
+            setOverlay(img, ((BlockType) pattern).getInternalId(), white);
         } else {
             if (img.getWidth() != getWidth() || img.getHeight() != getLength())
                 throw new IllegalArgumentException("Input image dimensions do not match the current height map!");
@@ -1363,7 +1364,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                            .nextInt(256) <= height) {
+                                .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
                             overlayArr[index] = pattern.apply(mutable).getInternalId();
@@ -1391,7 +1392,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                            .nextInt(256) <= height) {
+                                .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
                             mainArr[index] = pattern.apply(mutable).getInternalId();
@@ -1417,7 +1418,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                            .nextInt(256) <= height) {
+                                .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
                             floorArr[index] = pattern.apply(mutable).getInternalId();
@@ -1445,7 +1446,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     for (int x = 0; x < getWidth(); x++, index++) {
                         int height = img.getRGB(x, z) & 0xFF;
                         if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                            .nextInt(256) <= height) {
+                                .nextInt(256) <= height) {
                             mutable.mutX(x);
                             mutable.mutY(height);
                             int combined = pattern.apply(mutable).getInternalId();
@@ -1649,328 +1650,159 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public MCAChunk write(MCAChunk chunk, int csx, int cex, int csz, int cez) {
-        // TODO FIXME
-//        byte[] heights = this.heights.get();
-//        byte[] biomes = this.biomes.get();
-//        int[] main = this.main.get();
-//        int[] floor = this.floor.get();
-//        int[] overlay = this.overlay != null ? this.overlay.get() : null;
-//        try {
-//            int[] indexes = indexStore.get();
-//            for (int i = 0; i < chunk.ids.length; i++) {
-//                byte[] idsArray = chunk.ids[i];
-//                if (idsArray != null) {
-//                    Arrays.fill(idsArray, (byte) 0);
-//                    Arrays.fill(chunk.data[i], (byte) 0);
-//                }
-//            }
-//            int index;
-//            int maxY = 0;
-//            int minY = Integer.MAX_VALUE;
-//            int[] heightMap = chunk.getHeightMapArray();
-//            int globalIndex;
-//            for (int z = csz; z <= cez; z++) {
-//                globalIndex = z * getWidth() + csx;
-//                index = (z & 15) << 4;
-//                for (int x = csx; x <= cex; x++, index++, globalIndex++) {
-//                    indexes[index] = globalIndex;
-//                    int height = heights[globalIndex] & 0xFF;
-//                    heightMap[index] = height;
-//                    maxY = Math.max(maxY, height);
-//                    minY = Math.min(minY, height);
-//                }
-//            }
-//            boolean hasOverlay = this.overlay != null;
-//            if (hasOverlay) {
-//                maxY++;
-//            }
-//            int maxLayer = maxY >> 4;
-//            int fillLayers = Math.max(0, (minY - 1)) >> 4;
-//            for (int layer = 0; layer <= maxLayer; layer++) {
-//                if (chunk.ids[layer] == null) {
-//                    chunk.ids[layer] = new byte[4096];
-//                    chunk.data[layer] = new byte[2048];
-//                    chunk.skyLight[layer] = new byte[2048];
-//                    chunk.blockLight[layer] = new byte[2048];
-//                }
-//            }
-//            if (primtives.waterHeight != 0) {
-//                maxY = Math.max(maxY, primtives.waterHeight);
-//                int maxWaterLayer = ((primtives.waterHeight + 15) >> 4);
-//                for (int layer = 0; layer < maxWaterLayer; layer++) {
-//                    boolean fillAll = (layer << 4) + 15 <= primtives.waterHeight;
-//                    byte[] ids = chunk.ids[layer];
-//                    if (ids == null) {
-//                        chunk.ids[layer] = ids = new byte[4096];
-//                        chunk.data[layer] = new byte[2048];
-//                        chunk.skyLight[layer] = new byte[2048];
-//                        chunk.blockLight[layer] = new byte[2048];
-//                        Arrays.fill(chunk.skyLight[layer], (byte) 255);
-//                    }
-//                    if (fillAll) {
-//                        Arrays.fill(ids, primtives.waterId);
-//                    } else {
-//                        int maxIndex = (primtives.waterHeight & 15) << 8;
-//                        Arrays.fill(ids, 0, maxIndex, primtives.waterId);
-//                    }
-//                }
-//            }
-//
-//            if (primtives.modifiedMain) { // If the main block is modified, we can't short circuit this
-//                for (int layer = 0; layer < fillLayers; layer++) {
-//                    byte[] layerIds = chunk.ids[layer];
-//                    byte[] layerDatas = chunk.data[layer];
-//                    for (int z = csz; z <= cez; z++) {
-//                        index = (z & 15) << 4;
-//                        for (int x = csx; x <= cex; x++, index++) {
-//                            globalIndex = indexes[index];
-//                            char mainCombined = main[globalIndex];
-//                            byte id = (byte) FaweCache.getId(mainCombined);
-//                            int data = FaweCache.getData(mainCombined);
-//                            if (data != 0) {
-//                                for (int y = 0; y < 16; y++) {
-//                                    int mainIndex = index + (y << 8);
-//                                    chunk.setNibble(mainIndex, layerDatas, data);
-//                                }
-//                            }
-//                            for (int y = 0; y < 16; y++) {
-//                                layerIds[index + (y << 8)] = id;
-//                            }
-//                        }
-//                    }
-//                }
-//            } else {
-//                for (int layer = 0; layer < fillLayers; layer++) {
-//                    Arrays.fill(chunk.ids[layer], (byte) 1);
-//                }
-//            }
-//
-//            for (int layer = fillLayers; layer <= maxLayer; layer++) {
-//                Arrays.fill(chunk.skyLight[layer], (byte) 255);
-//                byte[] layerIds = chunk.ids[layer];
-//                byte[] layerDatas = chunk.data[layer];
-//                int startY = layer << 4;
-//                int endY = startY + 15;
-//                for (int z = csz; z <= cez; z++) {
-//                    index = (z & 15) << 4;
-//                    for (int x = csx; x <= cex; x++, index++) {
-//                        globalIndex = indexes[index];
-//                        int height = heightMap[index];
-//                        int diff;
-//                        if (height > endY) {
-//                            diff = 16;
-//                        } else if (height >= startY) {
-//                            diff = height - startY;
-//                            char floorCombined = floor[globalIndex];
-//                            int id = FaweCache.getId(floorCombined);
-//                            int floorIndex = index + ((height & 15) << 8);
-//                            layerIds[floorIndex] = (byte) id;
-//                            int data = FaweCache.getData(floorCombined);
-//                            if (data != 0) {
-//                                chunk.setNibble(floorIndex, layerDatas, data);
-//                            }
-//                            if (hasOverlay && height >= startY - 1 && height < endY) {
-//                                char overlayCombined = overlay[globalIndex];
-//                                id = FaweCache.getId(overlayCombined);
-//                                int overlayIndex = index + (((height + 1) & 15) << 8);
-//                                layerIds[overlayIndex] = (byte) id;
-//                                data = FaweCache.getData(overlayCombined);
-//                                if (data != 0) {
-//                                    chunk.setNibble(overlayIndex, layerDatas, data);
-//                                }
-//                            }
-//                        } else if (hasOverlay && height == startY - 1) {
-//                            char overlayCombined = overlay[globalIndex];
-//                            int id = FaweCache.getId(overlayCombined);
-//                            int overlayIndex = index + (((height + 1) & 15) << 8);
-//                            layerIds[overlayIndex] = (byte) id;
-//                            int data = FaweCache.getData(overlayCombined);
-//                            if (data != 0) {
-//                                chunk.setNibble(overlayIndex, layerDatas, data);
-//                            }
-//                            continue;
-//                        } else {
-//                            continue;
-//                        }
-//                        char mainCombined = main[globalIndex];
-//                        byte id = (byte) FaweCache.getId(mainCombined);
-//                        int data = FaweCache.getData(mainCombined);
-//                        if (data != 0) {
-//                            for (int y = 0; y < diff; y++) {
-//                                int mainIndex = index + (y << 8);
-//                                chunk.setNibble(mainIndex, layerDatas, data);
-//                            }
-//                        }
-//                        for (int y = 0; y < diff; y++) {
-//                            layerIds[index + (y << 8)] = id;
-//                        }
-//                    }
-//                }
-//            }
-//
-//            int maxYMod = 15 + (maxLayer << 4);
-//            for (int layer = (maxY >> 4) + 1; layer < 16; layer++) {
-//                chunk.ids[layer] = null;
-//                chunk.data[layer] = null;
-//            }
-//
-//            if (primtives.bedrockId != 0) { // Bedrock
-//                byte[] layerIds = chunk.ids[0];
-//                for (int z = csz; z <= cez; z++) {
-//                    index = (z & 15) << 4;
-//                    for (int x = csx; x <= cex; x++) {
-//                        layerIds[index++] = primtives.bedrockId;
-//                    }
-//                }
-//            }
-//
-//            char[][][] localBlocks = getChunkArray(chunk.getX(), chunk.getZ());
-//            if (localBlocks != null) {
-//                for (int layer = 0; layer < 16; layer++) {
-//                    int by = layer << 4;
-//                    int ty = by + 15;
-//                    index = 0;
-//                    for (int y = by; y <= ty; y++, index += 256) {
-//                        char[][] yBlocks = localBlocks[y];
-//                        if (yBlocks != null) {
-//                            if (chunk.ids[layer] == null) {
-//                                chunk.ids[layer] = new byte[4096];
-//                                chunk.data[layer] = new byte[2048];
-//                                chunk.skyLight[layer] = new byte[2048];
-//                                chunk.blockLight[layer] = new byte[2048];
-//                                Arrays.fill(chunk.skyLight[layer], (byte) 255);
-//                            }
-//                            byte[] idsLayer = chunk.ids[layer];
-//                            byte[] dataLayer = chunk.data[layer];
-//                            for (int z = 0; z < yBlocks.length; z++) {
-//                                char[] zBlocks = yBlocks[z];
-//                                if (zBlocks != null) {
-//                                    int zIndex = index + (z << 4);
-//                                    for (int x = 0; x < zBlocks.length; x++, zIndex++) {
-//                                        char combined = zBlocks[x];
-//                                        if (combined == 0) continue;
-//                                        int id = FaweCache.getId(combined);
-//                                        int data = FaweCache.getData(combined);
-//                                        if (data == 0) {
-//                                            chunk.setIdUnsafe(idsLayer, zIndex, (byte) id);
-//                                        } else {
-//                                            chunk.setBlockUnsafe(idsLayer, dataLayer, zIndex, (byte) id, FaweCache.getData(combined));
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//
-//            if (primtives.floorThickness != 0 || primtives.worldThickness != 0) {
-//                // Use biomes array as temporary buffer
-//                byte[] minArr = chunk.biomes;
-//                for (int z = csz; z <= cez; z++) {
-//                    index = (z & 15) << 4;
-//                    for (int x = csx; x <= cex; x++, index++) {
-//                        int gi = indexes[index];
-//                        int height = heightMap[index];
-//                        int min = height;
-//                        if (x > 0) min = Math.min(heights[gi - 1] & 0xFF, min);
-//                        if (x < getWidth() - 1) min = Math.min(heights[gi + 1] & 0xFF, min);
-//                        if (z > 0) min = Math.min(heights[gi - getWidth()] & 0xFF, min);
-//                        if (z < getLength() - 1) min = Math.min(heights[gi + getWidth()] & 0xFF, min);
-//                        minArr[index] = (byte) min;
-//                    }
-//                }
-//
-//                int minLayer = Math.max(0, (minY - primtives.floorThickness) >> 4);
-//
-//                if (primtives.floorThickness != 0) {
-//                    for (int layer = minLayer; layer <= maxLayer; layer++) {
-//                        byte[] layerIds = chunk.ids[layer];
-//                        byte[] layerDatas = chunk.data[layer];
-//                        int startY = layer << 4;
-//                        int endY = startY + 15;
-//                        for (int z = csz; z <= cez; z++) {
-//                            index = (z & 15) << 4;
-//                            for (int x = csx; x <= cex; x++, index++) {
-//                                globalIndex = indexes[index];
-//                                int height = heightMap[index];
-//
-//                                int min = (minArr[index] & 0xFF) - primtives.floorThickness;
-//                                int localMin = min - startY;
-//
-//                                int max = height + 1;
-//                                if (min < startY) min = startY;
-//                                if (max > endY) max = endY + 1;
-//
-//
-//                                if (min < max) {
-//                                    char floorCombined = floor[globalIndex];
-//                                    final byte id = (byte) FaweCache.getId(floorCombined);
-//                                    final int data = FaweCache.getData(floorCombined);
-//                                    for (int y = min; y < max; y++) {
-//                                        int floorIndex = index + ((y & 15) << 8);
-//                                        layerIds[floorIndex] = id;
-//                                        if (data != 0) {
-//                                            chunk.setNibble(floorIndex, layerDatas, data);
-//                                        }
-//                                    }
-//                                }
-//
-//                            }
-//                        }
-//                    }
-//                }
-//                if (primtives.worldThickness != 0) {
-//                    for (int layer = 0; layer < minLayer; layer++) {
-//                        chunk.ids[layer] = null;
-//                        chunk.data[layer] = null;
-//                    }
-//                    for (int layer = minLayer; layer <= maxLayer; layer++) {
-//                        byte[] layerIds = chunk.ids[layer];
-//                        byte[] layerDatas = chunk.data[layer];
-//                        int startY = layer << 4;
-//                        int endY = startY + 15;
-//                        for (int z = csz; z <= cez; z++) {
-//                            index = (z & 15) << 4;
-//                            for (int x = csx; x <= cex; x++, index++) {
-//                                globalIndex = indexes[index];
-//                                int height = heightMap[index];
-//
-//                                int min = (minArr[index] & 0xFF) - primtives.worldThickness;
-//                                int localMin = min - startY;
-//                                if (localMin > 0) {
-//                                    char floorCombined = floor[globalIndex];
-//                                    final byte id = (byte) FaweCache.getId(floorCombined);
-//                                    final int data = FaweCache.getData(floorCombined);
-//
-//                                    for (int y = 0; y < localMin; y++) {
-//                                        int floorIndex = index + ((y & 15) << 8);
-//                                        layerIds[floorIndex] = 0;
-//                                        if (data != 0) {
-//                                            chunk.setNibble(floorIndex, layerDatas, 0);
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                for (int layer = fillLayers; layer <= maxLayer; layer++) {
-//                    Arrays.fill(chunk.skyLight[layer], (byte) 255);
-//
-//                }
-//            }
-//
-//            for (int i = 0; i < 256; i++) {
-//                chunk.biomes[i] = biomes[indexes[i]];
-//            }
-//
-//
-//        } catch (Throwable e) {
-//            e.printStackTrace();
-//        }
+    public WritableMCAChunk write(WritableMCAChunk chunk, int csx, int cex, int csz, int cez) {
+        byte[] heights = this.heights.get();
+        byte[] biomes = this.biomes.get();
+        int[] main = this.main.get();
+        int[] floor = this.floor.get();
+        int[] overlay = this.overlay != null ? this.overlay.get() : null;
+        try {
+            int[] indexes = indexStore.get();
+
+            int index;
+            int maxY = 0;
+            int minY = Integer.MAX_VALUE;
+            int[] heightMap = chunk.biomes;
+            int globalIndex;
+            for (int z = csz; z <= cez; z++) {
+                globalIndex = z * getWidth() + csx;
+                index = (z & 15) << 4;
+                for (int x = csx; x <= cex; x++, index++, globalIndex++) {
+                    indexes[index] = globalIndex;
+                    int height = heights[globalIndex] & 0xFF;
+                    heightMap[index] = height;
+                    maxY = Math.max(maxY, height);
+                    minY = Math.min(minY, height);
+                }
+            }
+            boolean hasOverlay = this.overlay != null;
+            if (hasOverlay) {
+                maxY++;
+            }
+            int maxLayer = maxY >> 4;
+            for (int layer = 0; layer <= maxLayer; layer++) {
+                chunk.hasSections[layer] = true;
+            }
+            if (primtives.waterHeight != 0) {
+                maxY = Math.max(maxY, primtives.waterHeight);
+                int maxIndex = (primtives.waterHeight) << 8;
+                Arrays.fill(chunk.blocks, 0, maxIndex, primtives.waterId);
+            }
+
+            if (primtives.modifiedMain) { // If the main block is modified, we can't short circuit this
+                for (int z = csz; z <= cez; z++) {
+                    index = (z & 15) << 4;
+                    for (int x = csx; x <= cex; x++, index++) {
+                        globalIndex = indexes[index];
+                        int mainCombined = main[globalIndex];
+                        for (int y = 0; y < minY; y++) {
+                            chunk.blocks[index + (y << 8)] = mainCombined;
+                        }
+                    }
+                }
+            } else {
+                int maxIndex = minY << 8;
+                Arrays.fill(chunk.blocks, 0, maxIndex, BlockID.STONE);
+            }
+
+            final boolean hasFloorThickness = primtives.floorThickness != 0 || primtives.worldThickness != 0;
+            if (primtives.worldThickness != 0) {
+                int endLayer = ((minY - primtives.worldThickness + 1) >> 4);
+                for (int layer = 0; layer < endLayer; layer++) {
+                    chunk.hasSections[layer] = false;
+                }
+            }
+
+            for (int z = csz; z <= cez; z++) {
+                index = (z & 15) << 4;
+                for (int x = csx; x <= cex; x++, index++) {
+                    globalIndex = indexes[index];
+                    int height = heightMap[index];
+                    int maxMainY = height;
+                    int minMainY = minY;
+
+                    int mainCombined = main[globalIndex];
+
+                    int floorCombined = floor[globalIndex];
+                    if (hasFloorThickness) {
+                        if (x > 0) maxMainY = Math.min(heights[globalIndex - 1] & 0xFF, maxMainY);
+                        if (x < getWidth() - 1) maxMainY = Math.min(heights[globalIndex + 1] & 0xFF, maxMainY);
+                        if (z > 0) maxMainY = Math.min(heights[globalIndex - getWidth()] & 0xFF, maxMainY);
+                        if (z < getLength() - 1) maxMainY = Math.min(heights[globalIndex + getWidth()] & 0xFF, maxMainY);
+
+                        int min = maxMainY;
+
+                        if (primtives.floorThickness != 0) {
+                            maxMainY = Math.max(0, maxMainY - (primtives.floorThickness - 1));
+                            for (int y = maxMainY; y <= height; y++) {
+                                chunk.blocks[index + (y << 8)] = floorCombined;
+                            }
+                        }
+                        else {
+                            chunk.blocks[index + ((height) << 8)] = floorCombined;
+                        }
+
+                        if (primtives.worldThickness != 0) {
+                            minMainY = Math.max(minY, min - primtives.worldThickness + 1);
+                            for (int y = minY; y < minMainY; y++) {
+                                chunk.blocks[index + (y << 8)] = BlockID.AIR;
+                            }
+                        }
+
+                    } else {
+                        chunk.blocks[index + ((height) << 8)] = floorCombined;
+                    }
+
+                    for (int y = minMainY; y < maxMainY; y++) {
+                        chunk.blocks[index + (y << 8)] = mainCombined;
+                    }
+
+                    if (hasOverlay) {
+                        int overlayCombined = overlay[globalIndex];
+                        int overlayIndex = index + ((height + 1) << 8);
+                        chunk.blocks[overlayIndex] = overlayCombined;
+                    }
+
+                    if (primtives.bedrockId != 0) {
+                        chunk.blocks[index] = primtives.bedrockId;
+                    }
+                }
+            }
+
+            int[][][] localBlocks = getChunkArray(chunk.getX(), chunk.getZ());
+            if (localBlocks != null) {
+                index = 0;
+                for (int layer = 0; layer < 16; layer++) {
+                    int by = layer << 4;
+                    int ty = by + 15;
+                    for (int y = by; y <= ty; y++, index += 256) {
+                        int[][] yBlocks = localBlocks[y];
+                        if (yBlocks != null) {
+                            chunk.hasSections[layer] = true;
+                            for (int z = 0; z < yBlocks.length; z++) {
+                                int[] zBlocks = yBlocks[z];
+                                if (zBlocks != null) {
+                                    int zIndex = index + (z << 4);
+                                    for (int x = 0; x < zBlocks.length; x++, zIndex++) {
+                                        int combined = zBlocks[x];
+                                        if (combined == 0) continue;
+                                        chunk.blocks[zIndex] = combined;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < 256; i++) {
+                chunk.biomes[i] = biomes[indexes[i]];
+            }
+
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         return chunk;
     }
 
@@ -2092,7 +1924,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = img.getRGB(x, z) & 0xFF;
                     if (height == 255 || height > 0 && white && ThreadLocalRandom.current()
-                        .nextInt(256) <= height) {
+                            .nextInt(256) <= height) {
                         overlay.get()[index] = combined;
                     }
                 }
@@ -2111,7 +1943,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = img.getRGB(x, z) & 0xFF;
                     if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                        .nextInt(256) <= height) {
+                            .nextInt(256) <= height) {
                         main.get()[index] = combined;
                     }
                 }
@@ -2129,7 +1961,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = img.getRGB(x, z) & 0xFF;
                     if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                        .nextInt(256) <= height) {
+                            .nextInt(256) <= height) {
                         floor.get()[index] = combined;
                     }
                 }
@@ -2148,7 +1980,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 for (int x = 0; x < getWidth(); x++, index++) {
                     int height = img.getRGB(x, z) & 0xFF;
                     if (height == 255 || height > 0 && !white && ThreadLocalRandom.current()
-                        .nextInt(256) <= height) {
+                            .nextInt(256) <= height) {
                         main.get()[index] = combined;
                         floor.get()[index] = combined;
                     }
@@ -2286,27 +2118,27 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return false;
     }
 
-	@Override
-	public void dropItem(Vector3 position, BaseItemStack item) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void dropItem(Vector3 position, BaseItemStack item) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public boolean playEffect(Vector3 position, int type, int data) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    }
 
-	@Override
-	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean playEffect(Vector3 position, int type, int data) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	@Override
-	public BlockVector3 getSpawnPosition() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public BlockVector3 getSpawnPosition() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

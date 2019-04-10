@@ -294,11 +294,6 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
     }
 
     @Override
-    public IntFaweChunk getPrevious(IntFaweChunk fs, CHUNKSECTIONS sections, Map<?, ?> tiles, Collection<?>[] entities, Set<UUID> createdEntities, boolean all) throws Exception {
-        return fs;
-    }
-
-    @Override
     public boolean hasSky() {
         World world = getWorld();
         return world == null || world.getEnvironment() == World.Environment.NORMAL;

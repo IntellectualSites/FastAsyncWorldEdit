@@ -222,6 +222,4 @@ public abstract class NMSMappedFaweQueue<WORLD, CHUNK, CHUNKSECTION, SECTION> ex
     public abstract void setBlockLight(SECTION section, int x, int y, int z, int value);
 
     public abstract void refreshChunk(FaweChunk fs);
-
-    public abstract IntFaweChunk getPrevious(IntFaweChunk fs, CHUNKSECTION sections, Map<?, ?> tiles, Collection<?>[] entities, Set<UUID> createdEntities, boolean all) throws Exception;
 }

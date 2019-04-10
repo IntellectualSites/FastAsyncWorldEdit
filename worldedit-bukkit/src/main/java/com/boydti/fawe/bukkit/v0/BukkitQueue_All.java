@@ -349,8 +349,6 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
         return super.supports(capability);
     }
 
-    private int skip;
-
     @Override
     public void startSet(boolean parallel) {
         super.startSet(true);

@@ -974,7 +974,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 BBC.WORLDEDIT_SOME_FAILS_BLOCKBAG.send(player, str.toString());
             }
         }
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     /**
