@@ -795,7 +795,7 @@ public final class BlockTypes {
      */
 
     public static final int BIT_OFFSET; // Used internally
-    public static final int BIT_MASK; // Used internally
+    protected static final int BIT_MASK; // Used internally
 
     private static final Map<String, BlockType> $REGISTRY = new HashMap<>();
 

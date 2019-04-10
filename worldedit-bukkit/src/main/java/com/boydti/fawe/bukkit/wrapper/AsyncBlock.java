@@ -66,7 +66,8 @@ public class AsyncBlock implements Block {
     }
 
     public int getTypeId() {
-        return (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()) & BlockTypes.BIT_MASK);
+        int id = (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()));
+        return BlockTypes.getFromStateId(id).getInternalId();
     }
 
     @Override
