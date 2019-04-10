@@ -34,9 +34,34 @@ import com.boydti.fawe.util.chat.UsageMessage;
 import com.boydti.fawe.wrappers.FakePlayer;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.google.common.base.Joiner;
-import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.command.*;
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandLocals;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.BiomeCommands;
+import com.sk89q.worldedit.command.BrushCommands;
+import com.sk89q.worldedit.command.BrushOptionsCommands;
+import com.sk89q.worldedit.command.ChunkCommands;
+import com.sk89q.worldedit.command.ClipboardCommands;
+import com.sk89q.worldedit.command.GenerationCommands;
+import com.sk89q.worldedit.command.HistoryCommands;
+import com.sk89q.worldedit.command.NavigationCommands;
+import com.sk89q.worldedit.command.OptionsCommands;
+import com.sk89q.worldedit.command.RegionCommands;
+import com.sk89q.worldedit.command.SchematicCommands;
+import com.sk89q.worldedit.command.ScriptingCommands;
+import com.sk89q.worldedit.command.SelectionCommands;
+import com.sk89q.worldedit.command.SnapshotCommands;
+import com.sk89q.worldedit.command.SnapshotUtilCommands;
+import com.sk89q.worldedit.command.SuperPickaxeCommands;
+import com.sk89q.worldedit.command.ToolCommands;
+import com.sk89q.worldedit.command.UtilityCommands;
+import com.sk89q.worldedit.command.WorldEditCommands;
 import com.sk89q.worldedit.command.argument.ReplaceParser;
 import com.sk89q.worldedit.command.argument.TreeGeneratorParser;
 import com.sk89q.worldedit.command.composition.ApplyCommand;
@@ -50,18 +75,27 @@ import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Deform.Mode;
-import com.sk89q.worldedit.internal.command.*;
+import com.sk89q.worldedit.internal.command.ActorAuthorizer;
+import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
+import com.sk89q.worldedit.internal.command.UserCommandCompleter;
+import com.sk89q.worldedit.internal.command.WorldEditBinding;
+import com.sk89q.worldedit.internal.command.WorldEditExceptionConverter;
 import com.sk89q.worldedit.scripting.CommandScriptLoader;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.util.command.*;
+import com.sk89q.worldedit.util.command.CallableProcessor;
+import com.sk89q.worldedit.util.command.CommandCallable;
+import com.sk89q.worldedit.util.command.CommandMapping;
+import com.sk89q.worldedit.util.command.Dispatcher;
+import com.sk89q.worldedit.util.command.InvalidUsageException;
 import com.sk89q.worldedit.util.command.composition.ProvidedValue;
 import com.sk89q.worldedit.util.command.fluent.CommandGraph;
 import com.sk89q.worldedit.util.command.fluent.DispatcherNode;
-import com.sk89q.worldedit.util.command.parametric.*;
+import com.sk89q.worldedit.util.command.parametric.AParametricCallable;
+import com.sk89q.worldedit.util.command.parametric.ExceptionConverter;
+import com.sk89q.worldedit.util.command.parametric.LegacyCommandsHandler;
+import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
-import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
-import com.sk89q.worldedit.util.formatting.component.CommandUsageBox;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
@@ -144,12 +178,6 @@ public final class CommandManager {
 
         this.methodMap = new ConcurrentHashMap<>();
         this.commandMap = new ConcurrentHashMap<>();
-
-        try {
-            Class.forName("com.intellectualcrafters.plot.PS");
-            CFICommand cfi = new CFICommand(worldEdit, builder);
-            registerCommands(cfi);
-        } catch (ClassNotFoundException e) {}
     }
 
     /**
@@ -169,8 +197,8 @@ public final class CommandManager {
      * @param clazz   The class containing all the sub command methods
      * @param aliases The aliases to give the command
      */
-    public void registerCommands(Object clazz, String... aliases) {
-        if (platform != null) {
+    public synchronized void registerCommands(Object clazz, String... aliases) {
+        if (dispatcher != null) {
             if (aliases.length == 0) {
                 builder.registerMethodsAsCommands(dispatcher, clazz);
             } else {
@@ -191,8 +219,8 @@ public final class CommandManager {
      * @param clazz   The class containing all the sub command methods
      * @param aliases The aliases to give the command
      */
-    public void registerCommands(Object clazz, CallableProcessor processor, String... aliases) {
-        if (platform != null) {
+    public synchronized void registerCommands(Object clazz, CallableProcessor processor, String... aliases) {
+        if (dispatcher != null) {
             if (aliases.length == 0) {
                 builder.registerMethodsAsCommands(dispatcher, clazz, processor);
             } else {
@@ -206,8 +234,8 @@ public final class CommandManager {
         }
     }
 
-    public void registerCommand(String[] aliases, Command command, CommandCallable callable) {
-        if (platform != null) {
+    public synchronized void registerCommand(String[] aliases, Command command, CommandCallable callable) {
+        if (dispatcher != null) {
             if (aliases.length == 0) {
                 dispatcher.registerCommand(callable, command.aliases());
             } else {
@@ -228,7 +256,7 @@ public final class CommandManager {
     /**
      * Initialize the dispatcher
      */
-    public void setupDispatcher() {
+    public synchronized void setupDispatcher() {
         DispatcherNode graph = new CommandGraph().builder(builder).commands();
 
         for (Map.Entry<Object, String[]> entry : methodMap.entrySet()) {
@@ -305,37 +333,52 @@ public final class CommandManager {
 
     public void register(Platform platform) {
         log.info("Registering commands with " + platform.getClass().getCanonicalName());
-        this.platform = null;
-
-        try {
-            new CommandScriptLoader().load();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-
-        LocalConfiguration config = platform.getConfiguration();
-        boolean logging = config.logCommands;
-        String path = config.logFile;
-
-        // Register log
-        if (!logging || path.isEmpty()) {
-            dynamicHandler.setHandler(null);
-            commandLog.setLevel(Level.OFF);
-        } else {
-            File file = new File(config.getWorkingDirectory(), path);
-            commandLog.setLevel(Level.ALL);
-
-            log.info("Logging WorldEdit commands to " + file.getAbsolutePath());
-
-            try {
-                dynamicHandler.setHandler(new FileHandler(file.getAbsolutePath(), true));
-            } catch (IOException e) {
-                log.warn("Could not use command log file " + path + ": " + e.getMessage());
-            }
-        }
-
         this.platform = platform;
-        setupDispatcher();
+
+        // Delay command registration to allow time for other plugins to hook into FAWE
+        TaskManager.IMP.task(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (CommandManager.this) {
+                    try {
+                        Class.forName("com.github.intellectualsites.plotsquared.plot.PlotSquared");
+                        CFICommand cfi = new CFICommand(worldEdit, builder);
+                        registerCommands(cfi);
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        new CommandScriptLoader().load();
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    LocalConfiguration config = platform.getConfiguration();
+                    boolean logging = config.logCommands;
+                    String path = config.logFile;
+
+                    // Register log
+                    if (!logging || path.isEmpty()) {
+                        dynamicHandler.setHandler(null);
+                        commandLog.setLevel(Level.OFF);
+                    } else {
+                        File file = new File(config.getWorkingDirectory(), path);
+                        commandLog.setLevel(Level.ALL);
+
+                        log.info("Logging WorldEdit commands to " + file.getAbsolutePath());
+
+                        try {
+                            dynamicHandler.setHandler(new FileHandler(file.getAbsolutePath(), true));
+                        } catch (IOException e) {
+                            log.warn("Could not use command log file " + path + ": " + e.getMessage());
+                        }
+                    }
+
+                    setupDispatcher();
+                }
+            }
+        });
     }
 
     public void unregister() {
