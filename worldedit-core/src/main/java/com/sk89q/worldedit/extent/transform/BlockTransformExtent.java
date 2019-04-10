@@ -411,7 +411,8 @@ public class BlockTransformExtent extends ResettableExtent {
             return BlockState.getFromInternalId(newMaskedId | (internalId & (~mask)));
         }
 
-        int newMaskId = transformState(state, transform);
+        newMaskedId = transformState(state, transform);
+
         arr[maskedId >> BlockTypes.BIT_OFFSET] = newMaskedId & mask;
         return BlockState.getFromInternalId(newMaskedId);
     }

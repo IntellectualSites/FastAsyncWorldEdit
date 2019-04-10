@@ -22,6 +22,7 @@ package com.sk89q.worldedit.world.block;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -31,6 +32,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePattern, TileEntityBlock {
+
+    @Override
+    default BaseBlock apply(BlockVector3 position) {
+        return this.toBaseBlock();
+    }
 
     /**
      * Get the block type
