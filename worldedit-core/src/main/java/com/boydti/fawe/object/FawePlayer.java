@@ -74,7 +74,7 @@ public abstract class FawePlayer<T> extends Metadatable {
         }
         if (obj instanceof Player) {
             Player actor = LocationMaskedPlayerWrapper.unwrap((Player) obj);
-            if (obj.getClass().getSimpleName().equals("PlayerProxy")) {
+            if (obj.getClass().getName().endsWith("PlayerProxy")) {
                 try {
                     Field fieldBasePlayer = actor.getClass().getDeclaredField("basePlayer");
                     fieldBasePlayer.setAccessible(true);
