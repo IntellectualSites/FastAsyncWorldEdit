@@ -74,17 +74,10 @@ public abstract class FawePlayer<T> extends Metadatable {
         }
         if (obj instanceof Player) {
             Player actor = LocationMaskedPlayerWrapper.unwrap((Player) obj);
-            if (obj.getClass().getName().endsWith("PlayerProxy")) {
-                try {
-                    Field fieldBasePlayer = actor.getClass().getDeclaredField("basePlayer");
-                    fieldBasePlayer.setAccessible(true);
-                    Player player = (Player) fieldBasePlayer.get(actor);
-                    FawePlayer<Object> result = wrap(player);
-                    return (FawePlayer<V>) (result == null ? wrap(player.getName()) : result);
-                } catch (Throwable e) {
-                    MainUtil.handleError(e);
-                    return Fawe.imp().wrap(actor.getName());
-                }
+            if (obj instanceof PlayerProxy) {
+                Player player = ((PlayerProxy) obj).getBasePlayer();
+                FawePlayer<Object> result = wrap(player);
+                return (FawePlayer<V>) (result == null ? wrap(player.getName()) : result);
             } else if (obj instanceof PlayerWrapper) {
                 return wrap(((PlayerWrapper) obj).getParent());
             } else {

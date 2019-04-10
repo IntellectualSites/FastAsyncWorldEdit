@@ -189,5 +189,9 @@ public class PlayerProxy extends AbstractPlayerActor {
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
         basePlayer.sendFakeBlock(pos, block);
     }
+
+    public Player getBasePlayer() {
+        return basePlayer;
+    }
 }
 
