@@ -39,7 +39,7 @@ public class AsyncBlockState implements BlockState {
     }
 
     public int getTypeId() {
-        return combinedId & BlockTypes.BIT_MASK;
+        return BlockTypes.getFromStateId(combinedId).getInternalId();
     }
 
     public int getPropertyId() {
@@ -160,7 +160,7 @@ public class AsyncBlockState implements BlockState {
 
     @Override
     public void setRawData(byte data) {
-        this.combinedId = (combinedId & BlockTypes.BIT_MASK) + (data << BlockTypes.BIT_OFFSET);
+        this.combinedId = getTypeId() + (data << BlockTypes.BIT_OFFSET);
         this.blockData = BukkitAdapter.getBlockData(this.combinedId);
     }
 

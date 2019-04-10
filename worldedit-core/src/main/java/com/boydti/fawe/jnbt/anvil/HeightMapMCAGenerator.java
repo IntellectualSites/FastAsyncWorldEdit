@@ -20,6 +20,7 @@ import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -80,7 +81,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         protected int worldThickness = 0;
         protected boolean randomVariation = true;
         protected int biomePriority = 0;
-        protected int waterId = BlockTypes.WATER.getInternalId();
+        protected int waterId = BlockID.WATER;
         protected int bedrockId = BlockID.BEDROCK;
         protected boolean modifiedMain = false;
 
@@ -221,8 +222,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         floor = new DifferentialArray(new int[getArea()]);
         main = new DifferentialArray(new int[getArea()]);
 
-        int stone = BlockTypes.STONE.getInternalId();
-        int grass = BlockTypes.GRASS_BLOCK.getInternalId();
+        int stone = BlockID.STONE;
+        int grass = BlockTypes.GRASS_BLOCK.getDefaultState().with(PropertyKey.SNOWY, false).getInternalId();
         Arrays.fill(main.getIntArray(), stone);
         Arrays.fill(floor.getIntArray(), grass);
     }
@@ -1684,7 +1685,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 chunk.hasSections[layer] = true;
             }
             if (primtives.waterHeight != 0) {
-                maxY = Math.max(maxY, primtives.waterHeight);
                 int maxIndex = (primtives.waterHeight) << 8;
                 Arrays.fill(chunk.blocks, 0, maxIndex, primtives.waterId);
             }

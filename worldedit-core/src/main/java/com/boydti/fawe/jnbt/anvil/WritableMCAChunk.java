@@ -7,8 +7,10 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -73,11 +75,17 @@ public class WritableMCAChunk extends FaweChunk<Void> {
         modified = 0;
         deleted = false;
         hasBiomes = false;
+        // TODO optimize
+        for (int i = 0; i < 65536; i++) {
+            blocks[i] = BlockID.AIR;
+        }
         Arrays.fill(hasSections, false);
     }
 
     private transient final int[] blockToPalette = new int[BlockTypes.states.length];
-    private transient final boolean[] hasBlock = new boolean[BlockTypes.states.length];
+    {
+        Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+    }
     private transient final int[]  paletteToBlock = new int[Character.MAX_VALUE];
     private transient final long[] blockstates = new long[2048];
 
@@ -105,51 +113,52 @@ public class WritableMCAChunk extends FaweChunk<Void> {
             if (biomes != null) {
                 out.writeNamedTag("Biomes", biomes);
             }
-            out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
-            nbtOut.writeByte(NBTConstants.TYPE_COMPOUND);
             int len = 0;
             for (int layer = 0; layer < hasSections.length; layer++) {
                 if (hasSections[layer]) len++;
             }
-
+            out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
+            nbtOut.writeByte(NBTConstants.TYPE_COMPOUND);
             nbtOut.writeInt(len);
 
             for (int layer = 0; layer < hasSections.length; layer++) {
-                if (hasSections[layer]) {
-                    continue;
-                }
+                if (!hasSections[layer]) continue;
                 out.writeNamedTag("Y", (byte) layer);
 
-                out.writeNamedTagName("BlockLight", NBTConstants.TYPE_BYTE_ARRAY);
-                out.writeInt(2048);
-                out.write(blockLight, layer << 11, 1 << 11);
-
-                out.writeNamedTagName("SkyLight", NBTConstants.TYPE_BYTE_ARRAY);
-                out.writeInt(2048);
-                out.write(skyLight, layer << 11, 1 << 11);
-
-                int blockIndexStart = layer << 8;
-                int blockIndexEnd = blockIndexStart << 1;
+                int blockIndexStart = layer << 12;
+                int blockIndexEnd = blockIndexStart + 4096;
                 int num_palette = 0;
                 try {
+                    for (int i = blockIndexStart; i < blockIndexEnd; i++) {
+                        int stateId = blocks[i];
+                        int ordinal = BlockState.getFromInternalId(stateId).getOrdinal(); // TODO fixme Remove all use of BlockTypes.BIT_OFFSET so that this conversion isn't necessary
+                        int palette = blockToPalette[ordinal];
+                        if (palette == Integer.MAX_VALUE) {
+                            BlockState state = BlockTypes.states[ordinal];
+                            blockToPalette[ordinal] = palette = num_palette;
+                            paletteToBlock[num_palette] = ordinal;
+                            num_palette++;
+                        }
+                        blocks[i] = palette;
+                    }
+
+                    for (int i = 0; i < num_palette; i++) {
+                        blockToPalette[paletteToBlock[i]] = Integer.MAX_VALUE;
+                    }
+
                     out.writeNamedTagName("Palette", NBTConstants.TYPE_LIST);
                     out.writeByte(NBTConstants.TYPE_COMPOUND);
                     out.writeInt(num_palette);
 
-                    for (int i = blockIndexStart; i < blockIndexEnd; i++) {
-                        int stateId = blocks[i];
-                        if (!hasBlock[stateId]) {
-                            hasBlock[stateId] = true;
-                            blockToPalette[stateId] = num_palette;
-                            paletteToBlock[num_palette++] = stateId;
+                    for (int i = 0; i < num_palette; i++) {
+                        int ordinal = paletteToBlock[i];
+                        BlockState state = BlockTypes.states[ordinal];
+                        BlockType type = state.getBlockType();
+                        out.writeNamedTag("Name", type.getId());
 
-                            BlockState state = BlockTypes.states[stateId];
-                            BlockType type = state.getBlockType();
-                            out.writeNamedTag("Name", type.getId());
-
-                            // Properties
-                            if (type.getDefaultState() == state) continue;
-
+                        // Has no properties
+                        if (type.getDefaultState() != state) {
+                            // Write properties
                             out.writeNamedTagName("Properties", NBTConstants.TYPE_COMPOUND);
                             for (Property<?> property : type.getProperties()) {
                                 String key = property.getName();
@@ -161,30 +170,42 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                                 }
                                 out.writeNamedTag(key, valueStr);
                             }
-                            out.writeByte(NBTConstants.TYPE_END);
+                            out.writeEndTag();
                         }
+                        out.writeEndTag();
                     }
+
 
                     // BlockStates
                     int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
                     int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
                     if (num_palette == 1) {
                         Arrays.fill(blockstates, 0, blockBitArrayEnd, 0);
+                    } else {
+                        BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                        bitArray.fromRaw(blocks, blockIndexStart);
                     }
-                    BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
-                    bitArray.fromRaw(blocks, blockIndexStart);
 
                     out.writeNamedTagName("BlockStates", NBTConstants.TYPE_LONG_ARRAY);
                     out.writeInt(blockBitArrayEnd);
                     for (int i = 0; i < blockBitArrayEnd; i++) out.writeLong(blockstates[i]);
 
+
+                    out.writeNamedTagName("BlockLight", NBTConstants.TYPE_BYTE_ARRAY);
+                    out.writeInt(2048);
+                    out.write(blockLight, layer << 11, 1 << 11);
+
+                    out.writeNamedTagName("SkyLight", NBTConstants.TYPE_BYTE_ARRAY);
+                    out.writeInt(2048);
+                    out.write(skyLight, layer << 11, 1 << 11);
+
+
                     out.writeEndTag();
 
                     // cleanup
                 } catch (Throwable e) {
-                    for (int i = 0; i < num_palette; i++) {
-                        hasBlock[i] = false;
-                    }
+                    Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+                    System.out.println("======================== exception e");
                     throw e;
                 }
             }

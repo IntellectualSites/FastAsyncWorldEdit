@@ -648,11 +648,6 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
     }
 
     @Override
-    public IntFaweChunk getPrevious(IntFaweChunk fs, FaweChunk sections, Map<?, ?> tiles, Collection<?>[] entities, Set<UUID> createdEntities, boolean all) throws Exception {
-        throw new UnsupportedOperationException("Not supported");
-    }
-
-    @Override
     public FaweQueue getImpWorld() {
         return parent;
     }

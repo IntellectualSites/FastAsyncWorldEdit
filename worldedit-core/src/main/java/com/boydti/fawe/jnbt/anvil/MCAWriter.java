@@ -3,6 +3,7 @@ package com.boydti.fawe.jnbt.anvil;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.object.io.BufferedRandomAccessFile;
 import com.boydti.fawe.util.MainUtil;
+import com.sk89q.worldedit.world.block.BlockID;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,6 +83,7 @@ public abstract class MCAWriter {
             @Override
             protected WritableMCAChunk initialValue() {
                 WritableMCAChunk chunk = new WritableMCAChunk();
+                Arrays.fill(chunk.blocks, BlockID.AIR);
                 Arrays.fill(chunk.skyLight, (byte) 255);
                 return chunk;
             }
