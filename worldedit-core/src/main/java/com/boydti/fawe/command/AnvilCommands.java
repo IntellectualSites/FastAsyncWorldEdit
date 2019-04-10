@@ -308,18 +308,6 @@ public class AnvilCommands {
         if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
-
-    @Command(
-            aliases = {"debugfixair", },
-            desc = "debug - do not use"
-    )
-    @CommandPermissions("worldedit.anvil.debugfixair")
-    public void debugfixair(Player player, String folder) throws WorldEditException {
-        DebugFixAir filter = new DebugFixAir();
-        DebugFixAir result = runWithWorld(player, folder, filter, true, true);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
-    }
-
     @Command(
             aliases = {"debugfixroads", },
             desc = "debug - do not use"

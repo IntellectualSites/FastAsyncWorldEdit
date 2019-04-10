@@ -167,10 +167,10 @@ public class PlotTrimFilter extends DeleteUninhabitedFilter {
                             }
                             if (referenceIsVoid) {
                                 for (int i = 0; i < chunk.ids.length; i++) {
-                                    byte[] arr = chunk.ids[i];
+                                    int[] arr = chunk.ids[i];
                                     if (arr != null) {
-                                        for (byte b : arr) {
-                                            if (b != 0) return;
+                                        for (int b : arr) {
+                                            if (!BlockTypes.getFromStateId(b).getMaterial().isAir()) return;
                                         }
                                     }
                                 }

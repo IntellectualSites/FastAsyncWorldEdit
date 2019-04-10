@@ -29,10 +29,10 @@ public class CountIdFilter extends MCAFilterCounter {
     public MCAChunk applyChunk(MCAChunk chunk, MutableLong count) {
         // TODO FIXME
         for (int layer = 0; layer < chunk.ids.length; layer++) {
-            byte[] ids = chunk.ids[layer];
+            int[] ids = chunk.ids[layer];
             if (ids != null) {
-                for (byte i : ids) {
-                    if (allowedId[i & 0xFF]) {
+                for (int i : ids) {
+                    if (allowedId[BlockTypes.getFromStateId(i).getInternalId()]) {
                         count.increment();
                     }
                 }

@@ -5,21 +5,21 @@ import com.boydti.fawe.jnbt.anvil.MCAFile;
 import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.number.MutableLong;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class TrimAirFilter extends MCAFilterCounter {
     @Override
     public MCAChunk applyChunk(MCAChunk chunk, MutableLong cache) {
         for (int layer = 0; layer < chunk.ids.length; layer++) {
-            byte[] idLayer = chunk.ids[layer];
+            int[] idLayer = chunk.ids[layer];
             if (idLayer == null) continue;
             for (int i = 0; i < 4096; i++) {
-                if (idLayer[i] != 0) {
+                if (!BlockTypes.getFromStateId(idLayer[i]).getMaterial().isAir()) {
                     return null;
                 }
             }
             { // Possibly dead code depending on the generator
                 chunk.ids[layer] = null;
-                chunk.data[layer] = null;
                 chunk.setModified();
             }
         }

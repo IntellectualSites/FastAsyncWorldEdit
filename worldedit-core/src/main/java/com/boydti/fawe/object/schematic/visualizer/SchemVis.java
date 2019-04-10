@@ -283,12 +283,11 @@ public class SchemVis extends ImmutableVirtualWorld {
      */
     private void select(MCAChunk chunk) {
         for (int layer = 0; layer < 16; layer++) {
-            byte[] ids = chunk.ids[layer];
+            int[] ids = chunk.ids[layer];
             if (ids != null) {
                 for (int i = 0; i < ids.length; i++) {
                     // TODO FIXME update to 1.13
                     if (ids[i] != 0) ids[i] = (byte) BlockTypes.WHITE_STAINED_GLASS.getInternalId();
-                    Arrays.fill(chunk.data[layer], (byte) 0);
                 }
             }
         }

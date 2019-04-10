@@ -4,6 +4,9 @@ import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
 import com.boydti.fawe.object.number.MutableLong;
 import com.boydti.fawe.util.ArrayUtil;
+import com.sk89q.worldedit.world.block.BlockTypes;
+
+import java.util.Arrays;
 
 public class RemoveLayerFilter extends MCAFilterCounter {
     private final int startLayer;
@@ -23,7 +26,7 @@ public class RemoveLayerFilter extends MCAFilterCounter {
     @Override
     public MCAChunk applyChunk(MCAChunk chunk, MutableLong cache) {
         for (int layer = startLayer; layer <= endLayer; layer++) {
-            byte[] ids = chunk.ids[layer];
+            int[] ids = chunk.ids[layer];
             if (ids == null) {
                 return null;
             }
@@ -41,7 +44,7 @@ public class RemoveLayerFilter extends MCAFilterCounter {
             for (int y = startY; y <= endY; y++) {
                 int indexStart = y << 8;
                 int indexEnd = indexStart + 255;
-                ArrayUtil.fill(ids, indexStart, indexEnd + 1, (byte) 0);
+                Arrays.fill(ids, indexStart, indexEnd + 1, BlockTypes.AIR.getInternalId());
             }
             chunk.setModified();
         }
