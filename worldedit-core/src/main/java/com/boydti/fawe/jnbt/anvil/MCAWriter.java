@@ -84,7 +84,7 @@ public abstract class MCAWriter {
             protected WritableMCAChunk initialValue() {
                 WritableMCAChunk chunk = new WritableMCAChunk();
                 Arrays.fill(chunk.blocks, BlockID.AIR);
-                Arrays.fill(chunk.skyLight, (byte) 255);
+//                Arrays.fill(chunk.skyLight, (byte) 255);
                 return chunk;
             }
         };

@@ -91,12 +91,12 @@ public class WritableMCAChunk extends FaweChunk<Void> {
 
     public void write(NBTOutputStream nbtOut) throws IOException {
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
+        nbtOut.writeNamedTag("DataVersion", 1631);
         nbtOut.writeLazyCompoundTag("Level", out -> {
-            out.writeNamedTag("V", (byte) 1);
+//            out.writeNamedTag("V", (byte) 1);
+            out.writeNamedTag("Status", "decorated");
             out.writeNamedTag("xPos", getX());
             out.writeNamedTag("zPos", getZ());
-            out.writeNamedTag("LightPopulated", (byte) 0);
-            out.writeNamedTag("TerrainPopulated", (byte) 1);
             if (entities.isEmpty()) {
                 out.writeNamedEmptyList("Entities");
             } else {
@@ -180,7 +180,9 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                     int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
                     int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
                     if (num_palette == 1) {
-                        Arrays.fill(blockstates, 0, blockBitArrayEnd, 0);
+                        // Set a value, because minecraft needs it for some  reason
+                        blockstates[0] = 0;
+                        blockBitArrayEnd = 1;
                     } else {
                         BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
                         bitArray.fromRaw(blocks, blockIndexStart);
@@ -357,7 +359,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
     }
 
     public void removeLight() {
-        for (int i = 0; i < skyLight.length; i++) {
+        for (int i = 0; i < 16; i++) {
             removeLight(i);
         }
     }
