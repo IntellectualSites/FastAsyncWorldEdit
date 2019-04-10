@@ -212,15 +212,16 @@ public class BlockMask extends AbstractExtentMask {
 
     @Override
     public Mask inverse() {
-        for (int i = 0; i < bitSets.length; i++) {
-            if (bitSets[i] == null) bitSets[i] = ALL;
-            else if (bitSets[i] == ALL) bitSets[i] = null;
+        long[][] cloned = bitSets.clone();
+        for (int i = 0; i < cloned.length; i++) {
+            if (cloned[i] == null) cloned[i] = ALL;
+            else if (cloned[i] == ALL) cloned[i] = null;
             else {
-                for (int j = 0; j < bitSets[i].length; j++)
-                    bitSets[i][j] = ~bitSets[i][j];
+                for (int j = 0; j < cloned[i].length; j++)
+                    cloned[i][j] = ~cloned[i][j];
             }
         }
-        return this;
+        return new BlockMask(getExtent(), cloned);
     }
 
     public boolean test(BlockState block) {

@@ -62,7 +62,7 @@ public class MaskIntersection extends AbstractMask {
         if (masks.isEmpty()) {
             masksArray = new Mask[]{Masks.alwaysFalse()};
         } else {
-            masksArray = masks.toArray(new Mask[masks.size()]);
+            masksArray = masks.toArray(new Mask[0]);
         }
     }
 
@@ -172,7 +172,7 @@ public class MaskIntersection extends AbstractMask {
             return false;
         }
 
-        for (Mask mask : masks) {
+        for (Mask mask : masksArray) {
             if (!mask.test(vector)) {
                 return false;
             }
