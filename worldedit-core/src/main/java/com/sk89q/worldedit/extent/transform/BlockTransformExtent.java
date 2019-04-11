@@ -97,7 +97,7 @@ public class BlockTransformExtent extends ResettableExtent {
                 case AXIS:
                     switch (property.getValues().size()) {
                         case 3:
-                            return adapt(EAST, UP, SOUTH);
+                            return adapt(combine(EAST, WEST), combine(UP, DOWN), combine(SOUTH, NORTH));
                         case 2:
                             return adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
                         default:
