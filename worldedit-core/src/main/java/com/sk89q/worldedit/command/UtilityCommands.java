@@ -317,8 +317,7 @@ public class UtilityCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.fixlava")
     @Logging(PLACEMENT)
-    public void fixLava(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-        double radius = Math.max(0, args.getDouble(0));
+    public void fixLava(Player player, LocalSession session, EditSession editSession, @Range(min = 0) double radius) throws WorldEditException {
         worldEdit.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(
                 session.getPlacementPosition(player), radius, BlockTypes.LAVA);
@@ -334,8 +333,7 @@ public class UtilityCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.fixwater")
     @Logging(PLACEMENT)
-    public void fixWater(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
-        double radius = Math.max(0, args.getDouble(0));
+    public void fixWater(Player player, LocalSession session, EditSession editSession, @Range(min = 0) double radius) throws WorldEditException {
         worldEdit.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(
                 session.getPlacementPosition(player), radius, BlockTypes.WATER);
