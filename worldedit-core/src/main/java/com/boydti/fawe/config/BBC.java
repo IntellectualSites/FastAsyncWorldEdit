@@ -236,6 +236,10 @@ public enum BBC {
     TIMEZONE_SET("Timezone set for this session to: %s0", "WorldEdit.Timezone"),
     TIMEZONE_DISPLAY("The current time in that timezone is:  %s0", "WorldEdit.Timezone"),
 
+    BLOCK_CYCLER_CANNOT_CYCLE("That block's data cannot be cycled!", "WorldEdit.Cycler"),
+    BLOCK_CYCLER_LIMIT("Max blocks change limit reached.", "WorldEdit.Cycler"),
+    BLOCK_CYCLER_NO_PERM("&cYou are not permitted to cycle the data value of that block.", "WorldEdit.Cycler"),
+
     COMMAND_INVALID_SYNTAX("The command was not used properly (no more help available).", "WorldEdit.Command"),
 
     COMMAND_CLARIFYING_BRACKET("&7Added clarifying bracket for &c%s0", "WorldEdit.Help"),
@@ -254,6 +258,7 @@ public enum BBC {
 
     COMMAND_SYNTAX("&cUsage: &7%s0", "Error"),
     NO_PERM("&cYou are lacking the permission node: %s0", "Error"),
+    BLOCK_NOT_ALLOWED("You are not allowed to use", "Error"),
     SETTING_DISABLE("&cLacking setting: %s0", "Error"),
     BRUSH_NOT_FOUND("&cAvailable brushes: %s0", "Error"),
     BRUSH_INCOMPATIBLE("&cBrush not compatible with this version", "Error"),

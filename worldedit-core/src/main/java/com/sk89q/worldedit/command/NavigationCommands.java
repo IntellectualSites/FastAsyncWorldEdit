@@ -165,8 +165,8 @@ public class NavigationCommands {
     @Command(
             aliases = {"jumpto", "j"},
             usage = "[world,x,y,z]",
-            desc = "Teleport to a location" +
-                    "Flags:\n" +
+            desc = "Teleport to a location\n" +
+                    "Flags:" +
                     "  -f forces the specified position to be used",
             flags = "f",
             min = 0,
