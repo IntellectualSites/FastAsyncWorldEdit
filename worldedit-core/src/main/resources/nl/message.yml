@@ -1,23 +1,23 @@
-#Published by NotMyFault
 info:
   prefix: '&8(&4&lFAWE&8)&r&7'
   file_deleted: '%s0 Is verwijderd.'
   schematic_pasting: '&7Het schematic wordt geplaatst. dit kan niet veranderd worden.'
   lighting_propogate_selection: '&7Het licht heeft zich verspreid in %s0 chunks. (Note:
     om het licht te verwijderen, doe //removelight)'
-  updated_lighting_selection: '&7Lighting is geüpdatet in %s0 chunks. 
-  (het kan even duren voordat de packets worden verstuurd)'
+  updated_lighting_selection: '&7Lighting is geüpdatet in %s0 chunks. (het kan even
+    duren voordat de packets worden verstuurd)'
   set_region: '&7Toegestaande regio geselecteerd'
-  worldedit_command_limit: '&7U kunt weer verder gaan wanneer uw vorige actie voltooid is'
+  worldedit_command_limit: '&7U kunt weer verder gaan wanneer uw vorige actie voltooid
+    is'
   worldedit_delayed: '&7U kunt weer verder gaan wanneer wij uw FAWE action voltooien...'
   worldedit_run: '&7Sorry voor het ongemak.  huidige uitvoerende actie: %s'
   worldedit_complete: '&7Verandering voldaan.'
-  require_selection_in_mask: '&7%s Van je selectie is niet binnen je mask.
-  Je kan alleen veranderingen uitvoeren in de toegestaande regio.'
-  worldedit_volume: '&7Je kan niet een volume van %current% toepassen. 
-  Het maximum volume dat je kan toepassen is %max%.'
+  require_selection_in_mask: '&7%s Van je selectie is niet binnen je mask. Je kan
+    alleen veranderingen uitvoeren in de toegestaande regio.'
+  worldedit_volume: '&7Je kan niet een volume van %current% toepassen. Het maximum
+    volume dat je kan toepassen is %max%.'
   worldedit_iterations: '&7Je kan %current% niet zoveel keer herhalen. het maximale
-  wat toegestaan is, is %max%.'
+    wat toegestaan is, is %max%.'
   worldedit_unsafe: '&7Toegang tot deze command is geblokkeerd'
   worldedit_dangerous_worldedit: '&cNnveilige edits zijn verwerkt op %s0 by %s1'
   worldedit_toggle_tips_on: '&7Disabled FAWE tips.'
@@ -32,7 +32,7 @@ info:
     &8 - &7Wijs meer geheugen toe
     &8 - &7Disable `max-memory-percent`
   compressed: Geschiedenis gecomprimeerd. Saved ~ %s0b (%s1x kleiner)
-  action_complete: Action completed in %s0 seconds
+  action_complete: Uitvoering is over %s0 voltooid.
 error:
   worldedit_extend: '&cje edit is waarschijnlijk buiten het toegestaande gebied gekomen.'
   web_unauthorized: 'alleen links van de configureerde webhost zijn toegestaan: %s0'
@@ -55,16 +55,17 @@ error:
     &8 - &7Onnodige data collecteren
     &cNegeer dit als je de server wilt laten crashen.
     &7Note: Een laag opslagvermogen kan door WE veroorzaakt worden (dit hoeft niet)
-  worldedit_some_fails: '&c%s0 Blokken zijn niet geplaats omdat ze uit je
-  toegestaande gebied werden geplaatst.'
+  worldedit_some_fails: '&c%s0 Blokken zijn niet geplaats omdat ze uit je toegestaande
+    gebied werden geplaatst.'
   worldedit_some_fails_blockbag: '&coOntbrekende blokken: %s0'
+  block_not_allowed: Het is niet toegestaan om dit te gebruiken
 web:
   generating_link: Uploading %s, even geduld A.U.B...
   generating_link_failed: '&cDe donwload link kon niet worden gemaakt!'
   download_link: '%s'
 worldedit:
   general:
-    mask_disabled: Global mask uitgeschakeld 
+    mask_disabled: Global mask uitgeschakeld
     mask: Global mask is gezet
     texture_disabled: Texturing reset
     texture_set: Texturing tot %s1 gezet
@@ -103,16 +104,18 @@ worldedit:
     command_redo_success: Herdaan succesvol.
     command_undo_error: Er is niet om te ontdaan. (See also `/inspect` and `/frb`)
     command_undo_success: Herdaan succesvol.
+    command_undo_disabled: 'Undo disabled, use: //fast'
   operation:
     operation: Operaties die in de wacht staan (%s0)
   selection:
-    selection_wand: 'Links klikken: selecteer pos #1; Rechts klikken: selecteer pos #2'
+    selection_wand: 'Links klikken: selecteer pos #1; Rechts klikken: selecteer pos
+      #2'
     selection_wand_disable: Edit wand uitgeschakeld.
     selection_wand_enable: Edit wand ingeschakeld.
     selection_chunk: Chunk geselecteerd (%s0)
     selection_chunks: Chunks geselecteerd (%s0) - (%s1)
     selection_contract: Region contracted %s0 blokken.
-    selection_count:  '%s0 Blokken geteld.'
+    selection_count: '%s0 Blokken geteld.'
     selection_distr: '# Totaal aantal blokken: %s0'
     selection_expand: Regio vergroot met %s0 blokken.
     selection_expand_vert: Regio vergroot met %s0 blokken (van boven naar beneden)
@@ -123,8 +126,9 @@ worldedit:
   navigation:
     navigation_wand_error: '&cNergens om door heen te gaan'
   anvil:
-    world_is_loaded: de wereld zou niet in gebruik moeten zijn wanneer er een uitvoering wordt gedaan. onlaad de wereld,
-      of gebruik -f om het te overschrijden (save first)
+    world_is_loaded: de wereld zou niet in gebruik moeten zijn wanneer er een uitvoering
+      wordt gedaan. onlaad de wereld, of gebruik -f om het te overschrijden (save
+      first)
   brush:
     brush_reset: Reset je brush. (SHIFT + Click)
     brush_none: Je houdt hebt geen brush vast!
@@ -138,14 +142,16 @@ worldedit:
     brush_try_other: |-
       &cEr zijn betere brushes hier voor te gebruiken e.g.
       &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
-    brush_copy: Links klik de fundering van de constructie om te kopieëren, rechts klik om te plakken. Verhoog
-     de brush Settings als dat mogelijk is.
+    brush_copy: Links klik de fundering van de constructie om te kopieëren, rechts
+      klik om te plakken. Verhoog de brush Settings als dat mogelijk is.
     brush_height_invalid: Onvalide hoogte map file (%s0)
     brush_smooth: Gebruik de blend brush om caves en hangende dingen glad te krijgen.'
-    brush_spline: Klik Om een bevestigingspunt te zetten, klik hetzelfde punt om het af te ronden.
-    brush_line_primary: Punt %s0 toegevoegt, klik op een andere locatie om de lijn te creëeren.
-    brush_catenary_direction: Punt %s0 toegevoegt, klik naar de directie waar je
-      krommen wilt.
+    brush_spline: Klik Om een bevestigingspunt te zetten, klik hetzelfde punt om het
+      af te ronden.
+    brush_line_primary: Punt %s0 toegevoegt, klik op een andere locatie om de lijn
+      te creëeren.
+    brush_catenary_direction: Punt %s0 toegevoegt, klik naar de directie waar je krommen
+      wilt.
     brush_line_secondary: Kromme lijn gecreëerd
     brush_spline_primary_2: Positie toegevoegt, klik hetzelfde punt om mee te doen!
     brush_spline_secondary_error: Niet genoeg posities gezet!
@@ -160,7 +166,7 @@ worldedit:
     brush_transform: Brush transform gezet
     brush_material: Brush material gezet
   rollback:
-   rollback_element: aan %s0 het ontdaan maken.
+    rollback_element: Aan %s0 het ontdaan maken.
   tool:
     tool_inspect: Inspect tool gebonden aan %s0.
     tool_inspect_info: '&7%s0 veranderd %s1 to %s2 %s3 geleden'
@@ -180,13 +186,25 @@ worldedit:
     tool_lrbuild_info: links-klik gebonden aan %s0; rechts-klik gebonden aan %s1.
     superpickaxe_enabled: Super Pickaxe ingeschakeld.
     superpickaxe_disabled: Super Pickaxe uitgeschakeld.
-    superpickaxe_area_enabled: Mode veranderd. Links klik met een pickaxe. // om uit te schakelen.
+    superpickaxe_area_enabled: Mode veranderd. Links klik met een pickaxe. // om uit
+      te schakelen.
+    tool_tree_error_block: Daar kan je geen boom plaatsen.
+    tool_deltree_error: Dat is geen boom.
+    tool_deltree_floating_error: Dat is niet een vliegende boom.
   snapshot:
     snapshot_loaded: Snapshot '%s0' geladen; nu aan het herstellen...
     snapshot_set: 'Snapshot gezet tot: %s0'
     snapshot_newest: Je gebruikt de nieuwste snapshot.
     snapshot_list_header: 'Snapshots voor wereld (%s0):'
     snapshot_list_footer: Gebruik /snap use [snapshot] of /snap use latest.
+    snapshot_not_configured: Snapshot/backup restoratie is niet geconfigureerd.
+    snapshot_not_available: Er zijn geen snapshots gevonden, zie de console voor meer informatie.
+    snapshot_not_found_world: Er zijn geen snapshots gevonden van deze wereld.
+    snapshot_not_found: Er zijn geen snapshots gevonden.
+    snapshot_invalid_index: Geen geldende context, deze moest hoger of gelijk aan 1 zijn.
+    snapshot_error_date: Kon de data input niet vinden.
+    snapshot_error_restore: Storingen zorgden ervoor dat de blokken niet konden worden teruggeplaatst.
+    snapshot_error_restore_chunks: Er konden geen chunks geladen worden.
   biome:
     biome_list_header: 'Biomes (page %s0/%s1):'
     biome_changed: Biotopen zijn veranderd in %s0 columns.
@@ -195,8 +213,8 @@ worldedit:
     nothing_confirmed: Je hebt geen acties die bevestigt moeten worden.
     page_footer: Gebruik %s0 om naar de volgende pagina te gaan
   schematic:
-    schematic_prompt_clear: '&7we raden je aan &c%s0 &7 te gebruiken om je klipbord te verwijderen
-      first'
+    schematic_prompt_clear: '&7we raden je aan &c%s0 &7 te gebruiken om je klipbord
+      te verwijderen first'
     schematic_show: |-
       &7scematics &a%s0&7 aan het wergeven &a%s1&7:
       &8 - &aLinks klik &7a het gebouw om er een klipbord van de maken
@@ -245,13 +263,21 @@ worldedit:
     help_item_denied: '&c%s0&8 - &7%s1'
     help_header: 'Help: pagina %s0/%s1'
     help_footer: '&7Wiki: https://git.io/vSKE5'
+  cycler:
+    block_cycler_cannot_cycle:  De blok data kan niet worden veranderd.
+    block_cycler_limit: Maximale veranderingen in blokken bereikt.
+    block_cycler_no_perm: '&cHet is niet toegestaan om deze blok data te veranderen.'
+  scripting:
+    scripting_no_perm: '&cJe hebt onvoldoende rechten om deze craft scriptie uit te voeren. '
+    scripting_cs: Gebruik eerst /cs met een scriptie naam.
+    scripting_error: Er waren problemen onstaan bij het uitvoeren van de craft scriptie.
 progress:
   progress_message: '%s1/%s0 (%s2%) @%s3cps %s4s left'
   progress_finished: '[ Klaar! ]'
 cancel:
   worldedit_cancel_count: '&czoveel edits: %s0 ontdaan.'
-  worldedit_cancel_reason_confirm: '&7Het geselecteerde gebied is groot (&c%s0 &7-> &c%s1&7,
-    containing &c%s3&7 blocks). Gebruik &c//confirm &7om te bevestigen &c%s2'
+  worldedit_cancel_reason_confirm: '&7Het geselecteerde gebied is groot (&c%s0 &7->
+    &c%s1&7, containing &c%s3&7 blocks). Gebruik &c//confirm &7om te bevestigen &c%s2'
   worldedit_cancel_reason: '&cYour WorldEdit actie was opgeheven:&7 %s0&c.'
   worldedit_cancel_reason_manual: manuele opheffing
   worldedit_cancel_reason_low_memory: Lage memory
@@ -261,10 +287,10 @@ cancel:
   worldedit_cancel_reason_max_entities: Teveel entities
   worldedit_cancel_reason_max_iterations: Maximum herhaling
   worldedit_cancel_reason_outside_level: Buiten de bebouwde kom
-  worldedit_cancel_reason_outside_region: Buiten het toegestaande gebied (bypass with /wea,
-    or disable `region-restrictions` in config.yml)
-  worldedit_cancel_reason_no_region: geen toegestaand gebied (bypass with /wea, or disable
-    `region-restrictions` in config.yml)
+  worldedit_cancel_reason_outside_region: Buiten het toegestaande gebied (bypass with
+    /wea, or disable `region-restrictions` in config.yml)
+  worldedit_cancel_reason_no_region: geen toegestaand gebied (bypass with /wea, or
+    disable `region-restrictions` in config.yml)
   worldedit_failed_load_chunk: '&cChunks laden overgeslaan: &7%s0;%s1&c. probeer het
     chunk-wait op te krikken.'
 navigation:
@@ -288,8 +314,8 @@ selection:
   sel_sphere: 'Sphere selector: Links klik=center, rechts klik om de radius te zetten'
   sel_cylindrical: 'Cylindrical selector: links klik+center, right click to extend.'
   sel_max: '%s0 points maximum.'
-  sel_fuzzy: 'Fuzzy selector: links klik om alle bestaande blokken te plaatsen, rechts klik
-    om toe te voegen. om een lucht holte te selecteren, doe //pos1.'
+  sel_fuzzy: 'Fuzzy selector: links klik om alle bestaande blokken te plaatsen, rechts
+    klik om toe te voegen. om een lucht holte te selecteren, doe //pos1.'
   sel_convex_polyhedral: 'Convex polyhedral selector: Links klik=First vertex, rechts
     klik om meer toe te voegen.'
   sel_list: Voor een lijst met selecties doe:&c //sel list
@@ -303,8 +329,8 @@ tips:
   tip_fast: '&7Tip: Set fast and without undo using &c//fast'
   tip_cancel: '&7Tip: gebruik &c//cancel &7 om een edit stop te zetten'
   tip_mask: '&7Tip: Zet een globale bestemmings mask met &c/gmask'
-  tip_mask_angle: 'Tip: Vervang opwaartse hellingen van 3-20 blocks met&c //replace /[-20][-3]
-    bedrock'
+  tip_mask_angle: 'Tip: Vervang opwaartse hellingen van 3-20 blocks met&c //replace
+    /[-20][-3] bedrock'
   tip_set_linear: '&7Tip: Zet een blok lineaire met &c//set #l3d[wood,bedrock]'
   tip_surface_spread: '&7Tip: Verpsreid een oppervlakte met &c//set #surfacespread[5][0][5][#existing]'
   tip_set_hand: '&7Tip: Gebruik je huide hand met &c//set hand'
@@ -322,8 +348,7 @@ tips:
   tip_deform: 'Tip: Verander het van vorm met &c//deform'
   tip_transform: 'Tip: Zet een transform met &c//gtransform'
   tip_copypaste: 'Tip: Plaats bij klikken met &c//br copypaste'
-  tip_source_mask: 'Tip: Zet een source mask met
-  &c/gsmask <mask>&7'
+  tip_source_mask: 'Tip: Zet een source mask met &c/gsmask <mask>&7'
   tip_replace_marker: 'Tip: verander een blok in je volle klipbord met &c//replace
     wool #fullcopy'
   tip_paste: 'Tip: Plaats met &c//paste'
@@ -333,6 +358,8 @@ tips:
   tip_copy_pattern: 'Tip: Om een pattern te gebruiken, probeer &c#copy'
   tip_regen_0: 'Tip: Gebruik een biome met /regen [biome]'
   tip_regen_1: 'Tip: Gebruik een seed met /regen [biome] [seed]'
-  tip_biome_pattern: 'Tip: Dee &c#biome[forest]&7 pattern kan ik elke opdracht gebruikt worden'
-  tip_biome_mask: 'Tip: Er wordt een restrictie geplaatst op de biome met `$jungle` mask'
-  tip_discord: 'Heb je hulp nodig bij FAWE? https://discord.gg/ngZCzbU'
+  tip_biome_pattern: 'Tip: Dee &c#biome[forest]&7 pattern kan ik elke opdracht gebruikt
+    worden'
+  tip_biome_mask: 'Tip: Er wordt een restrictie geplaatst op de biome met `$jungle`
+    mask'
+  tip_discord: Heb je hulp nodig bij FAWE? https://discord.gg/ngZCzbU

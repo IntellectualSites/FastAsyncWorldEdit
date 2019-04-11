@@ -1,4 +1,4 @@
-#Updated by NotMyFault and enterih
+# Updated by NotMyFault, 11.04.2019
 info:
   prefix: '&8(&4&lFAWE&8)&r&7'
   schematic_pasting: '&7Die Schematic wird eingefügt. Dies kann nicht rückgängig gemacht
@@ -17,8 +17,7 @@ info:
     Du darfst nur innerhalb erlaubter Regionen Veränderungen durchführen.'
   worldedit_volume: '&7Du kannst keine %current% verändern. Die maximale Anzahl an
     Blöcken die du verändern darfst ist %max%.'
-  worldedit_iterations: '&7Du kannst %current% nicht wiederholen. Die maximale
-    Anzahl an erlaubten Wiederholungen ist %max%.'
+  worldedit_iterations: '&7Du kannst %current% nicht wiederholen. Die maximale Anzahl an erlaubten Wiederholungen ist %max%.'
   worldedit_unsafe: '&7Der Zugang zu diesem Befehl wurde verboten.'
   worldedit_dangerous_worldedit: '&cFAWE führt unsicher WorldEdit Aktionen aus! Position:
     %s0 Spielername: %s1'
@@ -63,6 +62,7 @@ error:
   web_unauthorized: 'Es sind nur Links vom konfigurierten Webhost erlaubt: %s0'
   brush_not_found: '&Verfügbare Brushes: %s0'
   brush_incompatible: '&cBrush ist nicht kompatibel mit dieser Version'
+  block_not_allowed: 'Du darfst diesen Block nicht benutzen:'
 web:
   generating_link: Lade %s hoch, bitte warten...
   generating_link_failed: '&cErstellung eines Download-Links fehlgeschlagen!'
@@ -116,6 +116,7 @@ worldedit:
     command_undo_error: Es gibt nichts zum Rückgängigmachen. (Siehe `/inspect` und
       `/frb`)
     command_history_other_error: WorldEdit Verlauf für %s0 konnte nicht gefunden werden.
+    command_undo_disabled: 'Undo ist deaktiviert, benutze //fast'
   operation:
     operation: Operation wird durchgeführt (%s0)
   selection:
@@ -192,8 +193,10 @@ worldedit:
     superpickaxe_disabled: Super-Spitzhacke deaktiviert.
     tool_range_error: 'Maximale Reichweite: %s0.'
     tool_radius_error: 'Maximal erlaubter Brush Radius: %s0.'
-    superpickaxe_area_enabled: Modus geändert. Linksklick mit einer Spitzhacke. Verwende //
-      zum deaktivieren.
+    superpickaxe_area_enabled: Modus geändert. Linksklick mit einer Spitzhacke. Verwende '//' zum deaktivieren.
+    tool_tree_error_block: Du kannst hier keinen Baum wachsen lassen
+    tool_deltree_error: Das ist kein Baum
+    tool_deltree_floating_error: Das ist kein schwebender Baum
   schematic:
     schematic_format: 'Verfügbare Zwischenablage Formate (Name: Suche Namen)'
     schematic_loaded: Schematic %s0 geladen. Platziere sie mit //paste
@@ -238,6 +241,14 @@ worldedit:
     snapshot_newest: Neuester Snapshot wird jetzt benutzt.
     snapshot_list_header: 'Snapshots für die Welt (%s0):'
     snapshot_list_footer: Nutze /snap use [snapshot] oder /snap use latest.
+    snapshot_not_configured: Snapshot/backups sind nicht konfiguriert.
+    snapshot_not_available: Keine Snapshots verfügbar, überprüfe die Konsole
+    snapshot_not_found_world: No snapshots were found for this world.
+    snapshot_not_found: Keine Snapshots gefunden
+    snapshot_invalid_index: Ungültiger Index, der WErt muss gleich oder größer 1 sein
+    snapshot_error_date: Datum konnte nicht gefunden werden
+    snapshot_error_restore: Ein Fehler verhinderte das wiederherstellen von Blöcken
+    snapshot_error_restore_chunks: Chunks konnten nicht geladen werden
   biome:
     biome_list_header: 'Biome (Seite %s0/%s1):'
     biome_changed: Biome wurden in %s0 Blöcken geändert.
@@ -263,6 +274,14 @@ worldedit:
     help_item_denied: '&c%s0&8 - &7%s1'
     help_header: 'Hilfe: Seite %s0/%s1'
     help_footer: '&7Wiki: https://git.io/vSKE5'
+  cycler:
+    block_cycler_cannot_cycle: Dieser Block kann mit cycler nicht verändert werden
+    block_cycler_limit: Du hast dein maximales Block-Change Limit erreicht.
+    block_cycler_no_perm: '&cDu hast keine Rechte diesen Block mit dem cycler zu bearbeiten'
+  scripting:
+    scripting_no_perm: '&cDu hast keine Rechte dieses CraftScript auszuführen'
+    scripting_cs: Nutze /cs mit einen Script Namen
+    scripting_error: Ein Fehler trat auf beim Asuführen eines Scripts.
 progress:
   progress_message: '[ Zwischenspeicher: %s0 | Erledigt: %s1 ]'
   progress_finished: '[ Fertiggestellt! ]'
@@ -282,8 +301,8 @@ cancel:
   worldedit_cancel_reason_confirm: '&7Deine Selektion ist zu groß (%s0 -> %s1). Benutze
     &c//confirm &7um &c%s2 auszuführen'
   worldedit_cancel_reason_outside_level: Außerhalb der Welt
-  worldedit_cancel_reason_outside_region: Außerhalb erlaubter Region (Umgehe es mit /wea,
-    oder deaktiviere `region-restrictions` in der config.yml)
+  worldedit_cancel_reason_outside_region: Außerhalb erlaubter Region (Umgehe es mit
+    /wea, oder deaktiviere `region-restrictions` in der config.yml)
 history: {}
 navigation:
   ascend_fail: Über dir konnte kein freier Platz gefunden werden.
@@ -327,7 +346,8 @@ tips:
   tip_surface_spread: '&7Tipp: Streue einen flachen Untergrund mit&c //set #surfacespread:5:0:5:#existing'
   tip_set_hand: '&7Tipp: Setze das Item in deiner Hand mit&c//set hand'
   tip_replace_id: '&7Tipp: Ersetze nur die Block-ID:&c //replace woodenstair #id:cobblestair'
-  tip_replace_light: 'Tipp: Entferne Licht-Quellen mit&c //replace #brightness:1:15 0'
+  tip_replace_light: 'Tipp: Entferne Licht-Quellen mit&c //replace #brightness:1:15
+    0'
   tip_tab_complete: 'Tipp: Der Replace-Befehl unterstützt Tab-Vervollständigung'
   tip_flip: '&7Tipp: Du kannst mit &c//flip &7spiegeln'
   tip_deform: 'Tipp: Forme um mit &c//deform'
