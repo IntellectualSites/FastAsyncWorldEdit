@@ -146,7 +146,6 @@ public class BiomeCommands extends MethodCommands {
         BiomeRegistry biomeRegistry = getBiomeRegistry();
         Collection<BiomeType> values = BiomeTypes.values();
         final int[] biomes = new int[values.size()];
-        final String qualifier;
 
         int size = 0;
         if (args.hasFlag('t')) {
@@ -201,7 +200,7 @@ public class BiomeCommands extends MethodCommands {
                     String.valueOf(c.getAmount()),
                     c.getAmount() / (double) size * 100,
                     data == null ? "Unknown" : data.getName(),
-                    c.getID().getId());
+                    c.getID().getInternalId());
             player.print(BBC.getPrefix() + str);
         }
     }
