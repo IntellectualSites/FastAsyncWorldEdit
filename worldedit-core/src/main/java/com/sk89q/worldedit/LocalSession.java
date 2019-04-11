@@ -1073,6 +1073,8 @@ public class LocalSession implements TextureHolder {
             BrushCache.setTool(item, (BrushTool) tool);
             if (tool != null) {
                 ((BrushTool) tool).setHolder(item);
+            } else {
+                this.tools[type.getInternalId()] = null;
             }
         } else {
             previous = this.tools[type.getInternalId()];
