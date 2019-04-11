@@ -228,20 +228,23 @@ public abstract class AParametricCallable implements CommandCallable {
             for (;maxConsumedI < parameters.length; maxConsumedI++) {
                 parameter = parameters[maxConsumedI];
                 if (parameter.getBinding().getBehavior(parameter) != BindingBehavior.PROVIDES) {
-                    // Parse the user input into a method argument
-                    ArgumentStack usedArguments = getScopedContext(parameter, scoped);
+                    if (mayConsumeArguments(maxConsumedI, scoped)) {
+                        // Parse the user input into a method argument
+                        ArgumentStack usedArguments = getScopedContext(parameter, scoped);
 
-                    usedArguments.mark();
-                    try {
-                        parameter.getBinding().bind(parameter, usedArguments, false);
-                        minConsumedI = maxConsumedI + 1;
-                    } catch (Throwable e) {
-                        while (e.getCause() != null && !(e instanceof ParameterException || e instanceof InvocationTargetException)) e = e.getCause();
-                        consumed = usedArguments.reset();
-                        // Not optional? Then we can't execute this command
-                        if (!parameter.isOptional()) {
-                            if (!(e instanceof MissingParameterException)) minConsumedI = maxConsumedI;
-                            throw e;
+                        usedArguments.mark();
+                        try {
+                            parameter.getBinding().bind(parameter, usedArguments, false);
+                            minConsumedI = maxConsumedI + 1;
+                        } catch (Throwable e) {
+                            while (e.getCause() != null && !(e instanceof ParameterException || e instanceof InvocationTargetException))
+                                e = e.getCause();
+                            consumed = usedArguments.reset();
+                            // Not optional? Then we can't execute this command
+                            if (!parameter.isOptional()) {
+                                if (!(e instanceof MissingParameterException)) minConsumedI = maxConsumedI;
+                                throw e;
+                            }
                         }
                     }
                 }

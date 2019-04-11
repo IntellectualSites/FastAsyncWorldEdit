@@ -286,6 +286,7 @@ public final class CommandManager {
                 .group("/anvil")
                 .describeAs("Anvil command")
                 .registerMethods(new AnvilCommands(worldEdit)).parent()
+                .registerMethods(new CFICommand(worldEdit, builder))
                 .registerMethods(new BiomeCommands(worldEdit))
                 .registerMethods(new ChunkCommands(worldEdit))
                 .registerMethods(new ClipboardCommands(worldEdit))
@@ -318,6 +319,7 @@ public final class CommandManager {
                 .group("superpickaxe", "pickaxe", "sp").describeAs("Super-pickaxe commands")
                 .registerMethods(new SuperPickaxeCommands(worldEdit))
                 .parent().graph().getDispatcher();
+
         if (platform != null) {
             platform.registerCommands(dispatcher);
         }
@@ -336,49 +338,34 @@ public final class CommandManager {
         this.platform = platform;
 
         // Delay command registration to allow time for other plugins to hook into FAWE
-        TaskManager.IMP.task(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (CommandManager.this) {
-                    try {
-                        Class.forName("com.github.intellectualsites.plotsquared.plot.PlotSquared");
-                        CFICommand cfi = new CFICommand(worldEdit, builder);
-                        registerCommands(cfi);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
+        try {
+            new CommandScriptLoader().load();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
-                    try {
-                        new CommandScriptLoader().load();
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
+        LocalConfiguration config = platform.getConfiguration();
+        boolean logging = config.logCommands;
+        String path = config.logFile;
 
-                    LocalConfiguration config = platform.getConfiguration();
-                    boolean logging = config.logCommands;
-                    String path = config.logFile;
+        // Register log
+        if (!logging || path.isEmpty()) {
+            dynamicHandler.setHandler(null);
+            commandLog.setLevel(Level.OFF);
+        } else {
+            File file = new File(config.getWorkingDirectory(), path);
+            commandLog.setLevel(Level.ALL);
 
-                    // Register log
-                    if (!logging || path.isEmpty()) {
-                        dynamicHandler.setHandler(null);
-                        commandLog.setLevel(Level.OFF);
-                    } else {
-                        File file = new File(config.getWorkingDirectory(), path);
-                        commandLog.setLevel(Level.ALL);
+            log.info("Logging WorldEdit commands to " + file.getAbsolutePath());
 
-                        log.info("Logging WorldEdit commands to " + file.getAbsolutePath());
-
-                        try {
-                            dynamicHandler.setHandler(new FileHandler(file.getAbsolutePath(), true));
-                        } catch (IOException e) {
-                            log.warn("Could not use command log file " + path + ": " + e.getMessage());
-                        }
-                    }
-
-                    setupDispatcher();
-                }
+            try {
+                dynamicHandler.setHandler(new FileHandler(file.getAbsolutePath(), true));
+            } catch (IOException e) {
+                log.warn("Could not use command log file " + path + ": " + e.getMessage());
             }
-        });
+        }
+
+        setupDispatcher();
     }
 
     public void unregister() {

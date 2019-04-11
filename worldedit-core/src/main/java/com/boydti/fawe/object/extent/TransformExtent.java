@@ -107,14 +107,12 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        System.out.println("Set block transform");
         return super.setBlock(getPos(x, y, z), transformInverse(block));
     }
 
 
     @Override
     public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
-        System.out.println("Set block transform2");
         return super.setBlock(getPos(location), transformInverse(block));
     }
 

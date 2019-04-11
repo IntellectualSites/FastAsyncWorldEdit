@@ -912,8 +912,9 @@ public final class BlockTypes {
         }
 
         throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(BlockTypes.values)
-            .filter(b -> b.getId().contains(inputLower))
+            .filter(b -> StringMan.blockStateMatches(inputLower, b.getId()))
             .map(e1 -> e1.getId())
+            .sorted(StringMan.blockStateComparator(inputLower))
             .collect(Collectors.toList())
         );
     }

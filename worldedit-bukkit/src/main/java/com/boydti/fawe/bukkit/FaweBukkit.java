@@ -3,10 +3,12 @@ package com.boydti.fawe.bukkit;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
 import com.boydti.fawe.bukkit.chat.BukkitChatManager;
+import com.boydti.fawe.bukkit.listener.AsyncTabCompleteListener;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.RenderListener;
+import com.boydti.fawe.bukkit.listener.SyncTabCompleteListener;
 import com.boydti.fawe.bukkit.regions.ASkyBlockHook;
 import com.boydti.fawe.bukkit.regions.FactionsFeature;
 import com.boydti.fawe.bukkit.regions.FactionsOneFeature;
@@ -40,6 +42,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.util.image.ImageViewer;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -127,13 +130,13 @@ public class FaweBukkit implements IFawe, Listener {
                 new ChunkListener_9();
             }
 
-            /*try {
+            try {
             Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
-                new AsyncTabCompleteListener(WorldEditPlugin.getInstance());
-            } catch (Throwable ignore)
-            {
+                Bukkit.getPluginManager().registerEvents(new AsyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
+            } catch (Throwable ignore) {
+                ignore.printStackTrace();
                 Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-            }*/
+            }
         });
     }
 

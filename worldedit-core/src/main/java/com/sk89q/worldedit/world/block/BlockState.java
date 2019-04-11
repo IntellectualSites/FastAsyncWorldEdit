@@ -21,6 +21,7 @@ package com.sk89q.worldedit.world.block;
 
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
+import com.boydti.fawe.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -38,6 +39,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -121,8 +123,9 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
             if (type == null) {
                 String input = key.toString();
                 throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(BlockTypes.values)
-                        .filter(b -> b.getId().contains(input))
+                        .filter(b -> StringMan.blockStateMatches(input, b.getId()))
                         .map(e1 -> e1.getId())
+                        .sorted(StringMan.blockStateComparator(input))
                         .collect(Collectors.toList())
                 );
             }
@@ -183,7 +186,8 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                             throw new SuggestInputParseException("Invalid property " + charSequence + ":" + input + " for type " + type, input, () ->
                                 finalType.getProperties().stream()
                                 .map(p -> p.getName())
-                                .filter(p -> p.startsWith(input))
+                                .filter(p -> StringMan.blockStateMatches(input, p))
+                                .sorted(StringMan.blockStateComparator(input))
                                 .collect(Collectors.toList()));
                         } else {
                             throw new SuggestInputParseException("No operator for " + state, "", () -> Arrays.asList("="));

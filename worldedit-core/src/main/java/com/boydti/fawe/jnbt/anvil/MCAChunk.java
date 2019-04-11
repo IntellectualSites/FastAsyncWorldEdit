@@ -12,6 +12,7 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 
 import java.io.DataOutput;
 import java.io.DataOutputStream;
@@ -20,17 +21,6 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 public class MCAChunk extends FaweChunk<Void> {
-
-//    ids: byte[16][4096]
-//    data: byte[16][2048]
-//    skylight: byte[16][2048]
-//    blocklight: byte[16][2048]
-//    entities: Map<Short, CompoundTag>
-//    tiles: List<CompoundTag>
-//    biomes: byte[256]
-//    compressedSize: int
-//    modified: boolean
-//    deleted: boolean
 
     public int[][] ids;
     public byte[][] skyLight;
@@ -88,6 +78,9 @@ public class MCAChunk extends FaweChunk<Void> {
     }
 
     public void write(NBTOutputStream nbtOut) throws IOException {
+
+
+
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeLazyCompoundTag("Level", out -> {
             out.writeNamedTag("V", (byte) 1);
@@ -224,7 +217,6 @@ public class MCAChunk extends FaweChunk<Void> {
                     int startIndexShift = startIndex >> 1;
                     int endIndexShift = endIndex >> 1;
                     int otherStartIndexShift = otherStartIndex >> 1;
-                    int otherEndIndexShift = otherEndIndex >> 1;
                     if ((startIndex & 1) != 0) {
                         startIndexShift++;
                         otherStartIndexShift++;
@@ -233,7 +225,6 @@ public class MCAChunk extends FaweChunk<Void> {
                     }
                     if ((endIndex & 1) != 1) {
                         endIndexShift--;
-                        otherEndIndexShift--;
                         setNibble(endIndex, thisSkyLight, getNibble(otherEndIndex, otherSkyLight));
                         setNibble(endIndex, thisBlockLight, getNibble(otherEndIndex, otherBlockLight));
                     }
@@ -365,7 +356,7 @@ public class MCAChunk extends FaweChunk<Void> {
         }
         if (!other.entities.isEmpty()) {
             for (Map.Entry<UUID, CompoundTag> entry : other.entities.entrySet()) {
-                // TODO
+                // TODO FIXME
             }
         }
     }
@@ -601,27 +592,27 @@ public class MCAChunk extends FaweChunk<Void> {
 
     @Override
     public int getBlockCombinedId(int x, int y, int z) {
-        // TODO FIXME
-        return 0;
-//        int layer = y >> 4;
-//        byte[] idLayer = ids[layer];
-//        if (idLayer == null) {
-//            return 0;
-//        }
-//        int j = FaweCache.CACHE_J[y][z & 15][x & 15];
-//        int id = idLayer[j] & 0xFF;
-//        if (FaweCache.hasData(id)) {
-//            byte[] dataLayer = data[layer];
-//            if (dataLayer != null) {
-//                return (id << 4) + getNibble(j, dataLayer);
-//            }
-//        }
-//        return id << 4;
+        int layer = y >> 4;
+        int[] idLayer = ids[layer];
+        if (idLayer == null) {
+            return 0;
+        }
+        int j = FaweCache.CACHE_J[y][z & 15][x & 15];
+        return idLayer[j];
     }
 
     @Override
     public BiomeType[] getBiomeArray() {
-        return null;
+        BiomeType[] arr = new BiomeType[256];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = BiomeTypes.get(biomes[i]);
+        }
+        return arr;
+    }
+
+    @Override
+    public BiomeType getBiomeType(int x, int z) {
+        return BiomeTypes.get(biomes[(x & 15) + ((z & 15) << 4)]);
     }
 
     @Override
@@ -730,20 +721,16 @@ public class MCAChunk extends FaweChunk<Void> {
 
     @Override
     public void setBlock(int x, int y, int z, int combinedId) {
-        // TODO FIXME
-//        setModified();
-//        int layer = y >> 4;
-//        byte[] idsLayer = ids[layer];
-//        if (idsLayer == null) {
-//            idsLayer = this.ids[layer] = new byte[4096];
-//            this.data[layer] = new byte[2048];
-//            this.skyLight[layer] = new byte[2048];
-//            this.blockLight[layer] = new byte[2048];
-//        }
-//        int j = FaweCache.CACHE_J[y][z & 15][x & 15];
-//        idsLayer[j] = (byte) id;
-//        byte[] dataLayer = this.data[layer];
-//        setNibble(j, dataLayer, data);
+        setModified();
+        int layer = y >> 4;
+        int[] idsLayer = ids[layer];
+        if (idsLayer == null) {
+            idsLayer = this.ids[layer] = new int[4096];
+            this.skyLight[layer] = new byte[2048];
+            this.blockLight[layer] = new byte[2048];
+        }
+        int j = FaweCache.CACHE_J[y][z & 15][x & 15];
+        idsLayer[j] = combinedId;
     }
 
     @Override

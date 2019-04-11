@@ -1,43 +1,40 @@
 package com.boydti.fawe.command;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.pattern.PatternExtent;
-import com.boydti.fawe.util.*;
+import com.boydti.fawe.util.CleanTextureUtil;
+import com.boydti.fawe.util.FilteredTextureUtil;
+import com.boydti.fawe.util.ImgurUtility;
+import com.boydti.fawe.util.MathMan;
+import com.boydti.fawe.util.SetQueue;
+import com.boydti.fawe.util.StringMan;
+import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.github.intellectualsites.plotsquared.plot.PlotSquared;
-import com.github.intellectualsites.plotsquared.plot.commands.Auto;
-import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.config.Settings;
-import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
-import com.github.intellectualsites.plotsquared.plot.object.PlotId;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
-import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
-import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
-import com.github.intellectualsites.plotsquared.plot.util.MathMan;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.MethodCommands;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
@@ -47,6 +44,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
@@ -56,6 +54,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
@@ -68,8 +68,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import javax.imageio.ImageIO;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import static com.boydti.fawe.util.image.ImageUtil.load;
 
 @Command(aliases = {"/cfi"}, desc = "Create a world from images: [More Info](https://git.io/v5iDy)")
@@ -87,8 +90,11 @@ public class CFICommands extends MethodCommands {
         this.dispathcer= dispatcher;
     }
 
-    private File getFolder(String worldName) {
-        return new File(PlotSquared.imp().getWorldContainer(), worldName + File.separator + "region");
+    public static File getFolder(String worldName) {
+        Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
+        List<? extends World> worlds = platform.getWorlds();
+        FaweQueue queue = SetQueue.IMP.getNewQueue(worlds.get(0), true, false);
+        return new File(queue.getSaveFolder().getParentFile().getParentFile(), worldName + File.separator + "region");
     }
 
     @Command(
@@ -174,23 +180,6 @@ public class CFICommands extends MethodCommands {
         fp.sendMessage(BBC.getPrefix() + "Cancelled!");
     }
 
-    @Deprecated
-    public static void autoClaimFromDatabase(PlotPlayer player, PlotArea area, PlotId start, com.github.intellectualsites.plotsquared.plot.object.RunnableVal<Plot> whenDone) {
-        final Plot plot = area.getNextFreePlot(player, start);
-        if (plot == null) {
-            whenDone.run(null);
-            return;
-        }
-        whenDone.value = plot;
-        plot.owner = player.getUUID();
-        DBFunc.createPlotSafe(plot, whenDone, new Runnable() {
-            @Override
-            public void run() {
-                autoClaimFromDatabase(player, area, plot.getId(), whenDone);
-            }
-        });
-    }
-
     @Command(
             aliases = {"done", "create"},
             usage = "",
@@ -199,59 +188,54 @@ public class CFICommands extends MethodCommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void done(FawePlayer fp) throws ParameterException, IOException {
         CFISettings settings = assertSettings(fp);
+        HeightMapMCAGenerator generator = settings.getGenerator();
 
-        PlotAreaManager manager = PlotSquared.get().getPlotAreaManager();
-        if (manager instanceof SinglePlotAreaManager) {
-            SinglePlotAreaManager sManager = (SinglePlotAreaManager) manager;
-            SinglePlotArea area = sManager.getArea();
-            PlotPlayer player = PlotPlayer.wrap(fp.parent);
-
-            fp.sendMessage(BBC.getPrefix() + "Claiming world");
-            Plot plot = TaskManager.IMP.sync(new RunnableVal<Plot>() {
-                @Override
-                public void run(Plot o) {
-                    int currentPlots = Settings.Limit.GLOBAL ? player.getPlotCount() : player.getPlotCount(area.worldname);
-                    int diff = player.getAllowedPlots() - currentPlots;
-                    if (diff < 1) {
-                        Captions.CANT_CLAIM_MORE_PLOTS_NUM.send(player, -diff);
-                        return;
+        Function<File, Boolean> function = new Function<File, Boolean>() {
+            @Override
+            public Boolean apply(File folder) {
+                if (folder != null) {
+                    try {
+                        generator.setFolder(folder);
+                        fp.sendMessage(BBC.getPrefix() + "Generating " + folder);
+                        generator.generate();
+                        generator.setPacketViewer(null);
+                        generator.setImageViewer(null);
+                        settings.remove();
+                        fp.sendMessage(BBC.getPrefix() + "Done!");
+                        return true;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
+                } else {
+                    fp.sendMessage("Unable to generate world... (see console)?");
+                }
+                return false;
+            }
+        };
 
-                    if (area.getMeta("lastPlot") == null) {
-                        area.setMeta("lastPlot", new PlotId(0, 0));
-                    }
-                    PlotId lastId = (PlotId) area.getMeta("lastPlot");
-                    while (true) {
-                        lastId = Auto.getNextPlotId(lastId, 1);
-                        if (area.canClaim(player, lastId, lastId)) {
-                            break;
+        try {
+            new PlotLoader().load(fp, settings, function);
+        } catch (Throwable ignore) {
+            ignore.printStackTrace();
+            function.apply(generator.getFolder().getParentFile());
+        }
+
+        File folder = generator.getFolder();
+        if (folder != null) {
+            World world = FaweAPI.getWorld(folder.getName());
+            if (world != null) {
+                if (fp.getWorld() != world) {
+                    TaskManager.IMP.sync(new RunnableVal<Object>() {
+                        @Override
+                        public void run(Object value) {
+                            Location spawn = new Location(world, world.getSpawnPosition().toVector3());
+                            fp.getPlayer().setPosition(spawn);
                         }
-                    }
-                    area.setMeta("lastPlot", lastId);
-                    this.value = area.getPlot(lastId);
-                    this.value.setOwner(player.getUUID());
+                    });
                 }
-            });
-            if (plot == null) return;
-
-            File folder = getFolder(plot.getWorldName());
-            HeightMapMCAGenerator generator = settings.getGenerator();
-            generator.setFolder(folder);
-
-            fp.sendMessage(BBC.getPrefix() + "Generating");
-            generator.generate();
-            generator.setPacketViewer(null);
-            generator.setImageViewer(null);
-            settings.remove();
-            fp.sendMessage(BBC.getPrefix() + "Done!");
-            TaskManager.IMP.sync(new RunnableVal<Object>() {
-                @Override
-                public void run(Object value) {
-                    plot.teleportPlayer(player);
-                }
-            });
-        } else {
-            fp.sendMessage(BBC.getPrefix() + "Must have the `worlds` component enabled in the PlotSquared config.yml");
+            } else {
+                fp.sendMessage("Unable to import world (" + folder.getName() + ") please do so manually");
+            }
         }
     }
 

@@ -18,6 +18,7 @@
 
 limits:
     max-blocks-changed:
+        # Ignored, use FAWE config limits
         default: -1
         maximum: -1
     max-polygonal-points:
@@ -29,6 +30,8 @@ limits:
     butcher-radius:
         default: -1
         maximum: -1
+    # Use either block ids, names, or regex
+    # Regex supports properties as well (see FAWE mask documentation)
     disallowed-blocks: []
 
 use-inventory:

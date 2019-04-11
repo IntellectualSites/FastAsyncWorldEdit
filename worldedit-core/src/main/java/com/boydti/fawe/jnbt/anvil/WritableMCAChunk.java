@@ -7,7 +7,6 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
@@ -207,7 +206,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                     // cleanup
                 } catch (Throwable e) {
                     Arrays.fill(blockToPalette, Integer.MAX_VALUE);
-                    System.out.println("======================== exception e");
+                    e.printStackTrace();
                     throw e;
                 }
             }

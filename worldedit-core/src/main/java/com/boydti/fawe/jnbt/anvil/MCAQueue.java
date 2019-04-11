@@ -88,7 +88,7 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
     @Override
     public BiomeType getBiome(FaweChunk faweChunk, int x, int z) {
         if (faweChunk instanceof MCAChunk) {
-            return ((MCAChunk) faweChunk).getBiomeArray()[((z & 0xF) << 4 | x & 0xF)];
+            return ((MCAChunk) faweChunk).getBiomeType(x, z);
         } else if (parent != null) {
             return parent.getBiomeType(x, z);
         } else {

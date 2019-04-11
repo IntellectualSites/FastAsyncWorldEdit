@@ -169,6 +169,10 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
 
     public abstract BiomeType[] getBiomeArray();
 
+    public BiomeType getBiomeType(int x, int z) {
+        return getBiomeArray()[(x & 15) + ((z & 15) << 4)];
+    }
+
     public void forEachQueuedBlock(FaweChunkVisitor onEach) {
         for (int y = 0; y < HEIGHT; y++) {
             for (int z = 0; z < 16; z++) {
