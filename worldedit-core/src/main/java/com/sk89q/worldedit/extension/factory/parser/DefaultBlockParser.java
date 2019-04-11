@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
 import com.boydti.fawe.command.SuggestInputParseException;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
 import com.boydti.fawe.util.MathMan;
@@ -228,7 +229,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 BaseItem item = slottable.getItem(slot);
 
                 if (!item.getType().hasBlockType()) {
-                    throw new InputParseException("You're not holding a block!");
+                    throw new InputParseException(BBC.getPrefix() + "You're not holding a block!");
                 }
                 state = item.getType().getBlockType().getDefaultState();
                 nbt = item.getNbtData();
@@ -236,7 +237,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 BlockType type = BlockTypes.parse(typeString.toLowerCase());
                 if (type != null) state = type.getDefaultState();
                 if (state == null) {
-                    throw new NoMatchException("Does not match a valid block type: '" + input + "'");
+                    throw new NoMatchException(BBC.getPrefix() + "Does not match a valid block type: '" + input + "'");
                 }
             }
 //            if (nbt == null) nbt = state.getNbtData();
@@ -281,7 +282,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 Platform capability = worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS);
                 if (!capability.isValidMobType(mobName)) {
                     final String finalMobName = mobName.toLowerCase();
-                    throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
+                    throw new SuggestInputParseException(BBC.getPrefix() + "Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
                     .map(m -> m.getName().toLowerCase())
                     .filter(s -> s.startsWith(finalMobName))
                     .collect(Collectors.toList()));
@@ -308,12 +309,12 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
-                throw new DisallowedUsageException("You are not allowed to use '" + holder + "'");
+                throw new DisallowedUsageException(BBC.getPrefix() + "You are not allowed to use '" + holder + "'");
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
                 if (!actor.hasPermission("worldedit.anyblock")) {
-                    throw new DisallowedUsageException("You are not allowed to nbt'");
+                    throw new DisallowedUsageException(BBC.getPrefix() + "You are not allowed to nbt'");
                 }
             }
         }
