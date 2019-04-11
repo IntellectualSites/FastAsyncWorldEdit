@@ -245,12 +245,12 @@ public class SessionManager {
      * @return the key object
      */
     protected UUID getKey(SessionKey key) {
-        String forcedKey = System.getProperty("worldedit.session.uuidOverride");
-        if (forcedKey != null) {
-            return UUID.fromString(forcedKey);
-        } else {
+//        String forcedKey = System.getProperty("worldedit.session.uuidOverride");
+//        if (forcedKey != null) {
+//            return UUID.fromString(forcedKey);
+//        } else {
             return key.getUniqueId();
-        }
+//        }
     }
 
     /**
