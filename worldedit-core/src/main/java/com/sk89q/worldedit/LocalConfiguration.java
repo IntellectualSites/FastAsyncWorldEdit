@@ -20,7 +20,11 @@
 package com.sk89q.worldedit;
 
 import com.google.common.collect.Lists;
+import com.sk89q.worldedit.extent.NullExtent;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.util.logging.LogFormat;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -40,6 +44,7 @@ public abstract class LocalConfiguration {
     public boolean profile = false;
     public boolean traceUnflushedSessions = false;
     public Set<String> disallowedBlocks = new HashSet<>();
+    protected BlockMask disallowedBlocksMask;
     public int defaultChangeLimit = -1;
     public int maxChangeLimit = -1;
     public int defaultMaxPolygonalPoints = -1;
@@ -148,6 +153,17 @@ public abstract class LocalConfiguration {
      * Load the configuration.
      */
     public abstract void load();
+
+    public boolean checkDisallowedBlocks(BlockStateHolder holder) {
+        if (disallowedBlocksMask == null) {
+            BlockMaskBuilder builder = new BlockMaskBuilder();
+            for (String blockRegex : disallowedBlocks) {
+                builder.addRegex(blockRegex);
+            }
+            disallowedBlocksMask = builder.build(new NullExtent());
+        }
+        return disallowedBlocksMask.test(holder.toImmutableState());
+    }
 
     /**
      * Get the working directory to work from.

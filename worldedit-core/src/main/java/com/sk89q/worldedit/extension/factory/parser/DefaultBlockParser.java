@@ -50,6 +50,7 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -257,21 +258,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         // Check if the item is allowed
         BlockType blockType = state.getBlockType();
 
-        if (context.isRestricted()) {
-            Actor actor = context.requireActor();
-            if (actor != null) {
-                if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
-                    throw new DisallowedUsageException("You are not allowed to use '" + input + "'");
-                }
-                if (nbt != null) {
-                    if (!actor.hasPermission("worldedit.anyblock")) {
-                        throw new DisallowedUsageException("You are not allowed to nbt'");
-                    }
-                }
-            }
-        }
-
-        if (nbt != null) return state.toBaseBlock(nbt);
+        if (nbt != null) return validate(context, state.toBaseBlock(nbt));
 
         if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN) {
             // Allow special sign text syntax
@@ -280,7 +267,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             text[1] = blockAndExtraData.length > 2 ? blockAndExtraData[2] : "";
             text[2] = blockAndExtraData.length > 3 ? blockAndExtraData[3] : "";
             text[3] = blockAndExtraData.length > 4 ? blockAndExtraData[4] : "";
-            return new SignBlock(state, text);
+            return validate(context, new SignBlock(state, text));
         } else if (blockType == BlockTypes.SPAWNER) {
             // Allow setting mob spawn type
             if (blockAndExtraData.length > 1) {
@@ -299,21 +286,37 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     .filter(s -> s.startsWith(finalMobName))
                     .collect(Collectors.toList()));
                 }
-                return new MobSpawnerBlock(state, mobName);
+                return validate(context, new MobSpawnerBlock(state, mobName));
             } else {
-                return new MobSpawnerBlock(state, MobType.PIG.getName());
+                return validate(context, new MobSpawnerBlock(state, MobType.PIG.getName()));
             }
         } else if (blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) {
             // allow setting type/player/rotation
             if (blockAndExtraData.length <= 1) {
-                return new SkullBlock(state);
+                return validate(context, new SkullBlock(state));
             }
 
             String type = blockAndExtraData[1];
 
-            return new SkullBlock(state, type.replace(" ", "_")); // valid MC usernames
+            return validate(context, new SkullBlock(state, type.replace(" ", "_"))); // valid MC usernames
         } else {
-            return state.toBaseBlock();
+            return validate(context, state.toBaseBlock());
         }
+    }
+
+    private <T extends BlockStateHolder> T validate(ParserContext context, T holder) {
+        if (context.isRestricted()) {
+            Actor actor = context.requireActor();
+            if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
+                throw new DisallowedUsageException("You are not allowed to use '" + holder + "'");
+            }
+            CompoundTag nbt = holder.getNbtData();
+            if (nbt != null) {
+                if (!actor.hasPermission("worldedit.anyblock")) {
+                    throw new DisallowedUsageException("You are not allowed to nbt'");
+                }
+            }
+        }
+        return holder;
     }
 }
