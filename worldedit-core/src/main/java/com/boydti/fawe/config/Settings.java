@@ -69,6 +69,13 @@ public class Settings extends Config {
     public PATHS PATHS;
     @Create
     public REGION_RESTRICTIONS_OPTIONS REGION_RESTRICTIONS_OPTIONS;
+    @Create
+    public ENABLED_COMPONENTS ENABLED_COMPONENTS;
+
+    @Comment("Enable or disable core components")
+    public static final class ENABLED_COMPONENTS {
+        public boolean COMMANDS = true;
+    }
 
     @Comment("Paths for various directories")
     public static final class PATHS {

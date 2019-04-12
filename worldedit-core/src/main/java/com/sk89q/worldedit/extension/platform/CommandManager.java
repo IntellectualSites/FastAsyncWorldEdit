@@ -25,6 +25,7 @@ import com.boydti.fawe.command.CFICommand;
 import com.boydti.fawe.command.MaskBinding;
 import com.boydti.fawe.command.PatternBinding;
 import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.ThrowableSupplier;
@@ -257,71 +258,73 @@ public final class CommandManager {
      * Initialize the dispatcher
      */
     public synchronized void setupDispatcher() {
-        DispatcherNode graph = new CommandGraph().builder(builder).commands();
+        if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
+            DispatcherNode graph = new CommandGraph().builder(builder).commands();
 
-        for (Map.Entry<Object, String[]> entry : methodMap.entrySet()) {
-            // add  command
-            String[] aliases = entry.getValue();
-            if (aliases.length == 0) {
-                graph = graph.registerMethods(entry.getKey());
-            } else {
-                graph = graph.group(aliases).registerMethods(entry.getKey()).parent();
+            for (Map.Entry<Object, String[]> entry : methodMap.entrySet()) {
+                // add  command
+                String[] aliases = entry.getValue();
+                if (aliases.length == 0) {
+                    graph = graph.registerMethods(entry.getKey());
+                } else {
+                    graph = graph.group(aliases).registerMethods(entry.getKey()).parent();
+                }
             }
-        }
 
-        for (Map.Entry<CommandCallable, String[][]> entry : commandMap.entrySet()) {
-            String[][] aliases = entry.getValue();
-            CommandCallable callable = entry.getKey();
-            if (aliases[0].length == 0) {
-                graph = graph.register(callable, aliases[1]);
-            } else {
-                graph = graph.group(aliases[0]).register(callable, aliases[1]).parent();
+            for (Map.Entry<CommandCallable, String[][]> entry : commandMap.entrySet()) {
+                String[][] aliases = entry.getValue();
+                CommandCallable callable = entry.getKey();
+                if (aliases[0].length == 0) {
+                    graph = graph.register(callable, aliases[1]);
+                } else {
+                    graph = graph.group(aliases[0]).register(callable, aliases[1]).parent();
+                }
             }
-        }
 
-        commandMap.clear();
-        methodMap.clear();
+            commandMap.clear();
+            methodMap.clear();
 
-        dispatcher = graph
-                .group("/anvil")
-                .describeAs("Anvil command")
-                .registerMethods(new AnvilCommands(worldEdit)).parent()
-                .registerMethods(new CFICommand(worldEdit, builder))
-                .registerMethods(new BiomeCommands(worldEdit))
-                .registerMethods(new ChunkCommands(worldEdit))
-                .registerMethods(new ClipboardCommands(worldEdit))
-                .registerMethods(new OptionsCommands(worldEdit))
-                .registerMethods(new GenerationCommands(worldEdit))
-                .registerMethods(new HistoryCommands(worldEdit))
-                .registerMethods(new NavigationCommands(worldEdit))
-                .registerMethods(new RegionCommands(worldEdit))
-                .registerMethods(new ScriptingCommands(worldEdit))
-                .registerMethods(new SelectionCommands(worldEdit))
-                .registerMethods(new SnapshotUtilCommands(worldEdit))
-                .registerMethods(new BrushOptionsCommands(worldEdit))
-                .registerMethods(new ToolCommands(worldEdit))
-                .registerMethods(new UtilityCommands(worldEdit))
-                .registerSubMethods(new WorldEditCommands(worldEdit))
-                .registerSubMethods(new SchematicCommands(worldEdit))
-                .registerSubMethods(new SnapshotCommands(worldEdit))
-                .groupAndDescribe(BrushCommands.class)
-                .registerMethods(new BrushCommands(worldEdit))
-                .registerMethods(new ToolCommands(worldEdit))
-                .registerMethods(new BrushOptionsCommands(worldEdit))
-                .register(adapt(new ShapedBrushCommand(new DeformCommand(), "worldedit.brush.deform")), "deform")
-                .register(adapt(new ShapedBrushCommand(new ApplyCommand(new ReplaceParser(), "Set all blocks within region"), "worldedit.brush.set")), "set")
-                .register(adapt(new ShapedBrushCommand(new PaintCommand(), "worldedit.brush.paint")), "paint")
-                .register(adapt(new ShapedBrushCommand(new ApplyCommand(), "worldedit.brush.apply")), "apply")
-                .register(adapt(new ShapedBrushCommand(new PaintCommand(new TreeGeneratorParser("treeType")), "worldedit.brush.forest")), "forest")
-                .register(adapt(new ShapedBrushCommand(ProvidedValue.create(new Deform("y-=1", Mode.RAW_COORD), "Raise one block"), "worldedit.brush.raise")), "raise")
-                .register(adapt(new ShapedBrushCommand(ProvidedValue.create(new Deform("y+=1", Mode.RAW_COORD), "Lower one block"), "worldedit.brush.lower")), "lower")
-                .parent()
-                .group("superpickaxe", "pickaxe", "sp").describeAs("Super-pickaxe commands")
-                .registerMethods(new SuperPickaxeCommands(worldEdit))
-                .parent().graph().getDispatcher();
+            dispatcher = graph
+                    .group("/anvil")
+                    .describeAs("Anvil command")
+                    .registerMethods(new AnvilCommands(worldEdit)).parent()
+                    .registerMethods(new CFICommand(worldEdit, builder))
+                    .registerMethods(new BiomeCommands(worldEdit))
+                    .registerMethods(new ChunkCommands(worldEdit))
+                    .registerMethods(new ClipboardCommands(worldEdit))
+                    .registerMethods(new OptionsCommands(worldEdit))
+                    .registerMethods(new GenerationCommands(worldEdit))
+                    .registerMethods(new HistoryCommands(worldEdit))
+                    .registerMethods(new NavigationCommands(worldEdit))
+                    .registerMethods(new RegionCommands(worldEdit))
+                    .registerMethods(new ScriptingCommands(worldEdit))
+                    .registerMethods(new SelectionCommands(worldEdit))
+                    .registerMethods(new SnapshotUtilCommands(worldEdit))
+                    .registerMethods(new BrushOptionsCommands(worldEdit))
+                    .registerMethods(new ToolCommands(worldEdit))
+                    .registerMethods(new UtilityCommands(worldEdit))
+                    .registerSubMethods(new WorldEditCommands(worldEdit))
+                    .registerSubMethods(new SchematicCommands(worldEdit))
+                    .registerSubMethods(new SnapshotCommands(worldEdit))
+                    .groupAndDescribe(BrushCommands.class)
+                    .registerMethods(new BrushCommands(worldEdit))
+                    .registerMethods(new ToolCommands(worldEdit))
+                    .registerMethods(new BrushOptionsCommands(worldEdit))
+                    .register(adapt(new ShapedBrushCommand(new DeformCommand(), "worldedit.brush.deform")), "deform")
+                    .register(adapt(new ShapedBrushCommand(new ApplyCommand(new ReplaceParser(), "Set all blocks within region"), "worldedit.brush.set")), "set")
+                    .register(adapt(new ShapedBrushCommand(new PaintCommand(), "worldedit.brush.paint")), "paint")
+                    .register(adapt(new ShapedBrushCommand(new ApplyCommand(), "worldedit.brush.apply")), "apply")
+                    .register(adapt(new ShapedBrushCommand(new PaintCommand(new TreeGeneratorParser("treeType")), "worldedit.brush.forest")), "forest")
+                    .register(adapt(new ShapedBrushCommand(ProvidedValue.create(new Deform("y-=1", Mode.RAW_COORD), "Raise one block"), "worldedit.brush.raise")), "raise")
+                    .register(adapt(new ShapedBrushCommand(ProvidedValue.create(new Deform("y+=1", Mode.RAW_COORD), "Lower one block"), "worldedit.brush.lower")), "lower")
+                    .parent()
+                    .group("superpickaxe", "pickaxe", "sp").describeAs("Super-pickaxe commands")
+                    .registerMethods(new SuperPickaxeCommands(worldEdit))
+                    .parent().graph().getDispatcher();
 
-        if (platform != null) {
-            platform.registerCommands(dispatcher);
+            if (platform != null) {
+                platform.registerCommands(dispatcher);
+            }
         }
     }
 
