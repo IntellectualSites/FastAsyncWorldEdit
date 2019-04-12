@@ -267,14 +267,14 @@ public class OptionsCommands {
             actor.print(BBC.getPrefix() + type.getId() + " (" + type.getName() + ")");
         } else {
             if (query.length() <= 2) {
-                actor.printError("Enter a longer search string (len > 2).");
+                actor.printError(BBC.getPrefix() + "Enter a longer search string (len > 2).");
                 return;
             }
 
             if (!blocksOnly && !itemsOnly) {
                 actor.print(BBC.getPrefix() + "Searching for: " + query);
             } else if (blocksOnly && itemsOnly) {
-                actor.printError("You cannot use both the 'b' and 'i' flags simultaneously.");
+                actor.printError(BBC.getPrefix() + "You cannot use both the 'b' and 'i' flags simultaneously.");
                 return;
             } else if (blocksOnly) {
                 actor.print(BBC.getPrefix() + "Searching for blocks: " + query);
@@ -308,7 +308,7 @@ public class OptionsCommands {
             }
 
             if (found == 0) {
-                actor.printError("No items found.");
+                actor.printError(BBC.getPrefix() + "No items found.");
             }
         }
     }

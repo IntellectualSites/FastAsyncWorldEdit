@@ -152,7 +152,7 @@ public abstract class HelpBuilder implements Runnable {
                                             displayFailure(BBC.HELP_SUGGEST.f(arg, StringMan.join(found, ", ")));
                                             return;
                                         } else {
-                                            String msg = String.format("The sub-command '%s' under '%s' could not be found.",
+                                            String msg = String.format(BBC.getPrefix() + "The sub-command '%s' under '%s' could not be found.",
                                                     command, Joiner.on(" ").join(visited));
                                             displayFailure(msg);
                                             return;

@@ -309,12 +309,12 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
-                throw new DisallowedUsageException(BBC.getPrefix() + "You are not allowed to use '" + holder + "'");
+                throw new DisallowedUsageException(BBC.BLOCK_NOT_ALLOWED + " '" + holder + "'");
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
                 if (!actor.hasPermission("worldedit.anyblock")) {
-                    throw new DisallowedUsageException(BBC.getPrefix() + "You are not allowed to nbt'");
+                    throw new DisallowedUsageException("You are not allowed to nbt'");
                 }
             }
         }

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.util.command.parametric;
 
 import com.boydti.fawe.command.SuggestInputParseException;
+import com.boydti.fawe.config.BBC;
 import com.google.common.primitives.Chars;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -270,9 +271,9 @@ public class ParametricCallable extends AParametricCallable {
             }
             return result;
         } catch (MissingParameterException e) {
-            throw new InvalidUsageException("Too few parameters!", this, true);
+            throw new InvalidUsageException(BBC.getPrefix() + "Too few parameters!", this, true);
         } catch (UnconsumedParameterException e) {
-            throw new InvalidUsageException("Too many parameters! Unused parameters: " + e.getUnconsumed(), this, true);
+            throw new InvalidUsageException(BBC.getPrefix() + "Too many parameters! Unused parameters: " + e.getUnconsumed(), this, true);
         } catch (ParameterException e) {
             assert parameter != null;
             String name = parameter.getName();
