@@ -27,12 +27,14 @@ import com.boydti.fawe.object.function.block.BiomeCopy;
 import com.boydti.fawe.object.function.block.CombinedBlockCopy;
 import com.boydti.fawe.object.function.block.SimpleBlockCopy;
 import com.boydti.fawe.util.MaskTraverser;
+import com.google.common.base.Predicate;
 import com.sk89q.worldedit.EditSession;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -52,6 +54,9 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.entity.EntityTypes;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -353,11 +358,15 @@ public class ForwardExtentCopy implements Operation {
         List<? extends Entity> entities;
         if (isCopyingEntities()) {
             // filter players since they can't be copied
-            entities = source.getEntities()
+            entities = source.getEntities(region)
                     .stream()
-                    .filter(entity -> entity.getState() != null &&
-                            !entity.getState().getType().getId().equals("minecraft:player") &&
-                            region.contains(entity.getLocation().toBlockPoint()))
+                    .filter(new Predicate<Entity>() {
+                        @Override
+                        public boolean apply(@Nullable Entity input) {
+                            BaseEntity state = input.getState();
+                            return state != null && state.getType() != EntityTypes.PLAYER;
+                        }
+                    })
                     .collect(Collectors.toList());
         } else {
             entities = new ArrayList<>();

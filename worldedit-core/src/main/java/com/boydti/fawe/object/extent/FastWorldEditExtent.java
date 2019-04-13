@@ -149,11 +149,13 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
 
     @Override
     public List<? extends Entity> getEntities() {
+        System.out.println("World cp * " + world + " | " + world.getClass());
         return world.getEntities();
     }
 
     @Override
     public List<? extends Entity> getEntities(final Region region) {
+        System.out.println("World cp rg " + world + " | " + world.getClass());
         return world.getEntities(region);
     }
 

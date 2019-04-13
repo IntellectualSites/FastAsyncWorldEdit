@@ -22,6 +22,7 @@ package com.sk89q.worldedit.entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Faceted;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.entity.EntityType;
 
 import javax.annotation.Nullable;
 
@@ -61,6 +62,11 @@ public interface Entity extends Faceted {
      * @return if the teleport worked
      */
     boolean setLocation(Location location);
+
+    default EntityType getType() {
+        BaseEntity state = getState();
+        return state != null ? state.getType() : null;
+    }
 
     /**
      * Get the extent that this entity is on.

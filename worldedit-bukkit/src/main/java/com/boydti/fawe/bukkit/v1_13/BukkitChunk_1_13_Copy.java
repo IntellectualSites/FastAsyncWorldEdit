@@ -22,6 +22,9 @@ public class BukkitChunk_1_13_Copy extends BukkitChunk_1_13 {
 
     @Override
     public int[][] getCombinedIdArrays() {
+        if (this.sectionPalettes == null) {
+            return this.ids;
+        }
         for (int i = 0; i < ids.length; i++) {
             getIdArray(i);
         }
@@ -30,36 +33,39 @@ public class BukkitChunk_1_13_Copy extends BukkitChunk_1_13 {
 
     @Override
     public int[] getIdArray(int layer) {
-        ChunkSection section = this.sectionPalettes[layer];
-        int[] idsArray = this.ids[layer];
-        if (section != null && idsArray == null) {
-            idsArray = new int[4096];
-            if (!section.a()) {
-                try {
-                    DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                    DataBits bits = (DataBits) BukkitQueue_1_13.fieldBits.get(blocks);
-                    DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitQueue_1_13.fieldPalette.get(blocks);
+        if (this.sectionPalettes != null) {
+            ChunkSection section = this.sectionPalettes[layer];
+            int[] idsArray = this.ids[layer];
+            if (section != null && idsArray == null) {
+                idsArray = new int[4096];
+                if (!section.a()) {
+                    try {
+                        DataPaletteBlock<IBlockData> blocks = section.getBlocks();
+                        DataBits bits = (DataBits) BukkitQueue_1_13.fieldBits.get(blocks);
+                        DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitQueue_1_13.fieldPalette.get(blocks);
 
-                    long[] raw = bits.a();
-                    int bitsPerEntry = bits.c();
+                        long[] raw = bits.a();
+                        int bitsPerEntry = bits.c();
 
-                    new BitArray4096(raw, bitsPerEntry).toRaw(idsArray);
-                    IBlockData defaultBlock = (IBlockData) BukkitQueue_1_13.fieldDefaultBlock.get(blocks);
-                    // TODO optimize away palette.a
-                    for (int i = 0; i < 4096; i++) {
-                        IBlockData ibd = palette.a(idsArray[i]);
-                        if (ibd == null) {
-                            ibd = defaultBlock;
+                        new BitArray4096(raw, bitsPerEntry).toRaw(idsArray);
+                        IBlockData defaultBlock = (IBlockData) BukkitQueue_1_13.fieldDefaultBlock.get(blocks);
+                        // TODO optimize away palette.a
+                        for (int i = 0; i < 4096; i++) {
+                            IBlockData ibd = palette.a(idsArray[i]);
+                            if (ibd == null) {
+                                ibd = defaultBlock;
+                            }
+                            int ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToInt(ibd);
+                            idsArray[i] = BlockTypes.states[ordinal].getInternalId();
                         }
-                        int ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToInt(ibd);
-                        idsArray[i] = BlockTypes.states[ordinal].getInternalId();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
                     }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
                 }
             }
+            return idsArray;
         }
-        return idsArray;
+        return null;
     }
 
     @Override

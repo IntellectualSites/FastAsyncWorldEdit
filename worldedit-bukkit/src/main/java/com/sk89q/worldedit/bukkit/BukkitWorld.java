@@ -18,6 +18,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -82,6 +83,7 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities(Region region) {
+        System.out.println(Fawe.isMainThread());
         World world = getWorld();
 
         List<Entity> ents = world.getEntities();
@@ -96,6 +98,7 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities() {
+        System.out.println(Fawe.isMainThread());
         List<com.sk89q.worldedit.entity.Entity> list = new ArrayList<>();
         for (Entity entity : getWorld().getEntities()) {
             list.add(BukkitAdapter.adapt(entity));

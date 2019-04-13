@@ -29,6 +29,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.*;
@@ -36,6 +37,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
@@ -57,6 +59,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -287,9 +290,16 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         String id = getEntityId(mcEntity);
 
         if (id != null) {
-            NBTTagCompound tag = new NBTTagCompound();
-            readEntityIntoTag(mcEntity, tag);
-            return new BaseEntity(com.sk89q.worldedit.world.entity.EntityTypes.get(id), (CompoundTag) toNative(tag));
+            EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
+            Supplier<CompoundTag> saveTag = new Supplier<CompoundTag>() {
+                @Override
+                public CompoundTag get() {
+                    NBTTagCompound tag = new NBTTagCompound();
+                    readEntityIntoTag(mcEntity, tag);
+                    return (CompoundTag) toNative(tag);
+                }
+            };
+            return new LazyBaseEntity(type, saveTag);
         } else {
             return null;
         }
