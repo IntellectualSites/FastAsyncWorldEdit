@@ -124,30 +124,30 @@ public class WorldEditCommands {
         actor.print(BBC.getPrefix() + "Reloaded WorldEdit " + we.getVersion() + " and FAWE (" + Fawe.get().getVersion() + ")");
     }
 
-    @Command(aliases = {"report"}, desc = "Writes a report on WorldEdit", flags = "p", max = 0)
-    @CommandPermissions({"worldedit.report"})
-    public void report(Actor actor, CommandContext args) throws WorldEditException {
-        ReportList report = new ReportList("Report");
-        report.add(new SystemInfoReport());
-        report.add(new ConfigReport());
-        String result = report.toString();
-
-        try {
-            File dest = new File(we.getWorkingDirectoryFile(we.getConfiguration().saveDir), "report.txt");
-            Files.write(result, dest, Charset.forName("UTF-8"));
-            actor.print("WorldEdit report written to " + dest.getAbsolutePath());
-        } catch (IOException e) {
-            actor.printError("Failed to write report: " + e.getMessage());
-        }
-
-        if (args.hasFlag('p')) {
-            actor.checkPermission("worldedit.report.pastebin");
-            ActorCallbackPaste.pastebin(
-                    we.getSupervisor(), actor, result, "WorldEdit report: %s.report",
-                    WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter()
-            );
-        }
-    }
+//    @Command(aliases = {"report"}, desc = "Writes a report on WorldEdit", flags = "p", max = 0)
+//    @CommandPermissions({"worldedit.report"})
+//    public void report(Actor actor, CommandContext args) throws WorldEditException {
+//        ReportList report = new ReportList("Report");
+//        report.add(new SystemInfoReport());
+//        report.add(new ConfigReport());
+//        String result = report.toString();
+//
+//        try {
+//            File dest = new File(we.getWorkingDirectoryFile(we.getConfiguration().saveDir), "report.txt");
+//            Files.write(result, dest, Charset.forName("UTF-8"));
+//            actor.print("WorldEdit report written to " + dest.getAbsolutePath());
+//        } catch (IOException e) {
+//            actor.printError("Failed to write report: " + e.getMessage());
+//        }
+//
+//        if (args.hasFlag('p')) {
+//            actor.checkPermission("worldedit.report.pastebin");
+//            ActorCallbackPaste.pastebin(
+//                    we.getSupervisor(), actor, result, "WorldEdit report: %s.report",
+//                    WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter()
+//            );
+//        }
+//    }
 
     @Command(
             aliases = {"update"},
@@ -247,28 +247,6 @@ public class WorldEditCommands {
             }
         }
     }
-
-//    @Command(aliases = {"report"}, desc = "Writes a report on WorldEdit", flags = "p", max = 0)
-//    @CommandPermissions({"worldedit.report"})
-//    public void report(Actor actor, CommandContext args) throws WorldEditException {
-//        ReportList report = new ReportList("Report");
-//        report.add(new SystemInfoReport());
-//        report.add(new ConfigReport());
-//        String result = report.toString();
-//
-//        try {
-//            File dest = new File(we.getWorkingDirectoryFile(we.getConfiguration().saveDir), "report.txt");
-//            Files.write(result, dest, Charset.forName("UTF-8"));
-//            actor.print("WorldEdit report written to " + dest.getAbsolutePath());
-//        } catch (IOException e) {
-//            actor.printError("Failed to write report: " + e.getMessage());
-//        }
-//
-//        if (args.hasFlag('p')) {
-//            actor.checkPermission("worldedit.report.pastebin");
-//            ActorCallbackPaste.pastebin(we.getSupervisor(), actor, result, "WorldEdit report: %s.report");
-//        }
-//    }
 
     @Command(
             aliases = {"cui"},
