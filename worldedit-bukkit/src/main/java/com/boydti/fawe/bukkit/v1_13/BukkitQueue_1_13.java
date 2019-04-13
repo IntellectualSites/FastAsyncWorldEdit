@@ -16,6 +16,7 @@ import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
+import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
@@ -65,6 +66,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Supplier;
 
 public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R2.Chunk, ChunkSection[], ChunkSection> {
 
@@ -105,6 +107,9 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     protected final static ChunkSection emptySection;
 
 //    protected static final Method methodResize;
+
+    protected final static Field fieldDirtyCount;
+    protected final static Field fieldDirtyBits;
 
     static {
         try {
@@ -181,6 +186,11 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
 
 //            methodResize = DataPaletteBlock.class.getDeclaredMethod("b", int.class);
 //            methodResize.setAccessible(true);
+
+            fieldDirtyCount = PlayerChunk.class.getDeclaredField("dirtyCount");
+            fieldDirtyBits = PlayerChunk.class.getDeclaredField("h");
+            fieldDirtyCount.setAccessible(true);
+            fieldDirtyBits.setAccessible(true);
 
             Fawe.debug("Using adapter: " + getAdapter());
             Fawe.debug("=========================================");
@@ -672,40 +682,60 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
         if (playerChunk == null) {
             return false;
         }
-        if (mask == 0) {
-            PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, 65535);
-            for (EntityPlayer player : playerChunk.players) {
-                player.playerConnection.sendPacket(packet);
-            }
-            return true;
-        }
-        // Send chunks
-        boolean empty = false;
-        ChunkSection[] sections = nmsChunk.getSections();
-        for (int i = 0; i < sections.length; i++) {
-            if (sections[i] == null) {
-                sections[i] = emptySection;
-                empty = true;
-            }
-        }
-        if (mask == 0 || mask == 65535 && hasEntities(nmsChunk)) {
-            PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, 65280);
-            for (EntityPlayer player : playerChunk.players) {
-                player.playerConnection.sendPacket(packet);
-            }
-            mask = 255;
-        }
-        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, mask);
-        for (EntityPlayer player : playerChunk.players) {
-            player.playerConnection.sendPacket(packet);
-        }
-        if (empty) {
-            for (int i = 0; i < sections.length; i++) {
-                if (sections[i] == emptySection) {
-                    sections[i] = null;
+        if (playerChunk.e()) {
+            TaskManager.IMP.sync(new Supplier<Object>() {
+                @Override
+                public Object get() {
+                    try {
+                        int dirtyBits = fieldDirtyBits.getInt(playerChunk);
+                        if (mask == 0) dirtyBits |= 65535;
+                        else dirtyBits |= mask;
+
+                        fieldDirtyBits.set(playerChunk, dirtyBits);
+                        fieldDirtyCount.set(playerChunk, 64);
+                        PlayerChunkMap playerManager = ((CraftWorld) getWorld()).getHandle().getPlayerChunkMap();
+                        playerManager.a(playerChunk);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
                 }
-            }
+            });
         }
+//        if (mask == 0) {
+//            PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, 65535);
+//            for (EntityPlayer player : playerChunk.players) {
+//                player.playerConnection.sendPacket(packet);
+//            }
+//            return true;
+//        }
+//        // Send chunks
+//        boolean empty = false;
+//        ChunkSection[] sections = nmsChunk.getSections();
+//        for (int i = 0; i < sections.length; i++) {
+//            if (sections[i] == null) {
+//                sections[i] = emptySection;
+//                empty = true;
+//            }
+//        }
+//        if (mask == 0 || mask == 65535 && hasEntities(nmsChunk)) {
+//            PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, 65280);
+//            for (EntityPlayer player : playerChunk.players) {
+//                player.playerConnection.sendPacket(packet);
+//            }
+//            mask = 255;
+//        }
+//        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, mask);
+//        for (EntityPlayer player : playerChunk.players) {
+//            player.playerConnection.sendPacket(packet);
+//        }
+//        if (empty) {
+//            for (int i = 0; i < sections.length; i++) {
+//                if (sections[i] == emptySection) {
+//                    sections[i] = null;
+//                }
+//            }
+//        }
         return true;
     }
 
