@@ -514,7 +514,8 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     public int getCombinedId4Data(ChunkSection lastSection, int x, int y, int z) {
         DataPaletteBlock<IBlockData> dataPalette = lastSection.getBlocks();
         IBlockData ibd = dataPalette.a(x & 15, y & 15, z & 15);
-        return ((Spigot_v1_13_R2) getAdapter()).adaptToInt(ibd);
+        int ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToInt(ibd);
+        return BlockTypes.states[ordinal].getInternalId();
     }
 
     @Override
