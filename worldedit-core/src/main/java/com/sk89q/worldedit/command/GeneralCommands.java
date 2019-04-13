@@ -253,7 +253,7 @@ public class GeneralCommands {
 
             int found = 0;
 
-            for (ItemType searchType : ItemTypes.values()) {
+            for (ItemType searchType : ItemType.REGISTRY) {
                 if (found >= 15) {
                     actor.print(BBC.getPrefix() + "Too many results!");
                     break;
@@ -269,7 +269,7 @@ public class GeneralCommands {
 
                 for (String alias : Sets.newHashSet(searchType.getId(), searchType.getName())) {
                     if (alias.contains(query)) {
-                        actor.print(searchType.getId() + " (" + searchType.getName() + ")");
+                        actor.print(BBC.getPrefix() + searchType.getId() + " (" + searchType.getName() + ")");
                         ++found;
                         break;
                     }
