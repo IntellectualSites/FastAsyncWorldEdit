@@ -20,18 +20,12 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
-import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.extension.input.DisallowedUsageException;
-import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.util.command.parametric.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -61,7 +55,7 @@ public class GeneralCommands {
     )
     @CommandPermissions("worldedit.limit")
     public void limit(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-        
+
         LocalConfiguration config = worldEdit.getConfiguration();
         boolean mayDisable = player.hasPermission("worldedit.limit.unrestricted");
 
@@ -113,36 +107,6 @@ public class GeneralCommands {
     }
 
     @Command(
-        aliases = { "/fast" },
-        usage = "[on|off]",
-        desc = "Toggle fast mode",
-        min = 0,
-        max = 1
-    )
-    @CommandPermissions("worldedit.fast")
-    public void fast(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-
-        String newState = args.getString(0, null);
-        if (session.hasFastMode()) {
-            if ("on".equals(newState)) {
-                player.printError(BBC.getPrefix() + "Fast mode already enabled.");
-                return;
-            }
-
-            session.setFastMode(false);
-            player.print("Fast mode disabled.");
-        } else {
-            if ("off".equals(newState)) {
-                player.printError(BBC.getPrefix() + "Fast mode already disabled.");
-                return;
-            }
-
-            session.setFastMode(true);
-            player.print("Fast mode enabled. Lighting in the affected chunks may be wrong and/or you may need to rejoin to see changes.");
-        }
-    }
-
-    @Command(
             aliases = { "/drawsel" },
             usage = "[on|off]",
             desc = "Toggle drawing the current selection",
@@ -174,111 +138,6 @@ public class GeneralCommands {
             session.setUseServerCUI(true);
             session.updateServerCUI(player);
             player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.");
-        }
-    }
-
-    @Command(
-        aliases = { "/gmask", "gmask" },
-        usage = "[mask]",
-        desc = "Set the global mask",
-        min = 0,
-        max = -1
-    )
-    @CommandPermissions("worldedit.global-mask")
-    public void gmask(Player player, LocalSession session, @Optional Mask mask) throws WorldEditException {
-        if (mask == null) {
-            session.setMask((Mask) null);
-            player.print("Global mask disabled.");
-        } else {
-            session.setMask(mask);
-            player.print("Global mask set.");
-        }
-    }
-
-    @Command(
-        aliases = { "/toggleplace", "toggleplace" },
-        usage = "",
-        desc = "Switch between your position and pos1 for placement",
-        min = 0,
-        max = 0
-    )
-    public void togglePlace(Player player, LocalSession session) throws WorldEditException {
-
-        if (session.togglePlacementPosition()) {
-            player.print("Now placing at pos #1.");
-        } else {
-            player.print("Now placing at the block you stand in.");
-        }
-    }
-
-    @Command(
-            aliases = { "/searchitem", "/l", "/search", "searchitem" },
-            usage = "<query>",
-            flags = "bi",
-            desc = "Search for an item",
-            help =
-                    "Searches for an item.\n" +
-                            "Flags:\n" +
-                            "  -b only search for blocks\n" +
-                            "  -i only search for items",
-            min = 1,
-            max = 1
-    )
-    public void searchItem(Actor actor, CommandContext args) throws WorldEditException {
-
-        String query = args.getString(0).trim().toLowerCase();
-        boolean blocksOnly = args.hasFlag('b');
-        boolean itemsOnly = args.hasFlag('i');
-
-        ItemType type = ItemTypes.get(query);
-
-        if (type != null) {
-            actor.print(type.getId() + " (" + type.getName() + ")");
-        } else {
-            if (query.length() <= 2) {
-                actor.printError(BBC.getPrefix() + "Enter a longer search string (len > 2).");
-                return;
-            }
-
-            if (!blocksOnly && !itemsOnly) {
-                actor.print(BBC.getPrefix() + "Searching for: " + query);
-            } else if (blocksOnly && itemsOnly) {
-                actor.printError(BBC.getPrefix() + "You cannot use both the 'b' and 'i' flags simultaneously.");
-                return;
-            } else if (blocksOnly) {
-                actor.print(BBC.getPrefix() + "Searching for blocks: " + query);
-            } else {
-                actor.print(BBC.getPrefix() + "Searching for items: " + query);
-            }
-
-            int found = 0;
-
-            for (ItemType searchType : ItemType.REGISTRY) {
-                if (found >= 15) {
-                    actor.print(BBC.getPrefix() + "Too many results!");
-                    break;
-                }
-
-                if (blocksOnly && !searchType.hasBlockType()) {
-                    continue;
-                }
-
-                if (itemsOnly && searchType.hasBlockType()) {
-                    continue;
-                }
-
-                for (String alias : Sets.newHashSet(searchType.getId(), searchType.getName())) {
-                    if (alias.contains(query)) {
-                        actor.print(BBC.getPrefix() + searchType.getId() + " (" + searchType.getName() + ")");
-                        ++found;
-                        break;
-                    }
-                }
-            }
-
-            if (found == 0) {
-                actor.printError(BBC.getPrefix() + "No items found.");
-            }
         }
     }
 
