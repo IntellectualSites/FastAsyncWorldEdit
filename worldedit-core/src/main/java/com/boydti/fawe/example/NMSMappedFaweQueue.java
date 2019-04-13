@@ -76,7 +76,8 @@ public abstract class NMSMappedFaweQueue<WORLD, CHUNK, CHUNKSECTION, SECTION> ex
         byte[] fix = new byte[(maxY + 1) >> 4];
         boolean sky = hasSky();
         if (sky) {
-            for (int i = cfc.ids.length - 1; i >= 0; i--) {
+            int layers = FaweChunk.HEIGHT >> 4;
+            for (int i = layers - 1; i >= 0; i--) {
                 int air = cfc.getAir(i);
                 int solid = cfc.getCount(i);
                 if (air == 4096) {
@@ -106,8 +107,6 @@ public abstract class NMSMappedFaweQueue<WORLD, CHUNK, CHUNKSECTION, SECTION> ex
             MainUtil.handleError(e);
         }
     }
-
-    public abstract void setHeightMap(FaweChunk chunk, byte[] heightMap);
 
     public abstract void setFullbright(CHUNKSECTION sections);
 
@@ -143,13 +142,12 @@ public abstract class NMSMappedFaweQueue<WORLD, CHUNK, CHUNKSECTION, SECTION> ex
         if ((y < 0) || (y > maxY)) {
             return BlockTypes.AIR.getInternalId();
         }
-        final int i = FaweCache.CACHE_I[y][z][x];
+        final int i = y >> 4;
         final char[] section = sections[i];
         if (section == null) {
             return 0;
         }
-        final int j = FaweCache.CACHE_J[y][z][x];
-        return section[j] >> 4;
+        return section[(((y & 0xF) << 8) | (z << 4) | x)] >> 4;
     }
 
     public void saveChunk(CHUNK chunk) {

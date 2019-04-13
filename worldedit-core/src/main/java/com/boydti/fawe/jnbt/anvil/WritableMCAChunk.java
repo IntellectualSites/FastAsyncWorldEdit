@@ -1,5 +1,6 @@
 package com.boydti.fawe.jnbt.anvil;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.MathMan;
@@ -81,14 +82,12 @@ public class WritableMCAChunk extends FaweChunk<Void> {
         Arrays.fill(hasSections, false);
     }
 
-    private transient final int[] blockToPalette = new int[BlockTypes.states.length];
-    {
-        Arrays.fill(blockToPalette, Integer.MAX_VALUE);
-    }
-    private transient final int[]  paletteToBlock = new int[Character.MAX_VALUE];
-    private transient final long[] blockstates = new long[2048];
-
     public void write(NBTOutputStream nbtOut) throws IOException {
+        int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
+        int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
+        long[] blockstates = FaweCache.BLOCK_STATES.get();
+        int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
+
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeNamedTag("DataVersion", 1631);
         nbtOut.writeLazyCompoundTag("Level", out -> {
@@ -128,7 +127,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                 int blockIndexEnd = blockIndexStart + 4096;
                 int num_palette = 0;
                 try {
-                    for (int i = blockIndexStart; i < blockIndexEnd; i++) {
+                    for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
                         int stateId = blocks[i];
                         int ordinal = BlockState.getFromInternalId(stateId).getOrdinal(); // TODO fixme Remove all use of BlockTypes.BIT_OFFSET so that this conversion isn't necessary
                         int palette = blockToPalette[ordinal];
@@ -138,7 +137,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                             paletteToBlock[num_palette] = ordinal;
                             num_palette++;
                         }
-                        blocks[i] = palette;
+                        blocksCopy[j] = palette;
                     }
 
                     for (int i = 0; i < num_palette; i++) {
@@ -184,7 +183,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                         blockBitArrayEnd = 1;
                     } else {
                         BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
-                        bitArray.fromRaw(blocks, blockIndexStart);
+                        bitArray.fromRaw(blocksCopy);
                     }
 
                     out.writeNamedTagName("BlockStates", NBTConstants.TYPE_LONG_ARRAY);

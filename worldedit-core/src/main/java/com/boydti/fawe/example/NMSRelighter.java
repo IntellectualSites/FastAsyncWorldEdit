@@ -409,8 +409,8 @@ public class NMSRelighter implements Relighter {
             }
         }
 
-        byte[] cacheX = FaweCache.CACHE_X[0];
-        byte[] cacheZ = FaweCache.CACHE_Z[0];
+//        byte[] cacheX = FaweCache.CACHE_X[0];
+//        byte[] cacheZ = FaweCache.CACHE_Z[0];
         for (int y = FaweChunk.HEIGHT - 1; y > 0; y--) {
             for (RelightSkyEntry chunk : chunks) { // Propogate skylight
                 int layer = y >> 4;
@@ -434,58 +434,58 @@ public class NMSRelighter implements Relighter {
                     queue.removeSectionLighting(section, y >> 4, true);
                 }
 
-                for (int j = 0; j <= maxY; j++) {
-                    int x = cacheX[j];
-                    int z = cacheZ[j];
-                    byte value = mask[j];
-                    byte pair = (byte) queue.getOpacityBrightnessPair(section, x, y, z);
-                    int opacity = MathMan.unpair16x(pair);
-                    int brightness = MathMan.unpair16y(pair);
-                    if (brightness > 1 && (brightness != 15 || opacity != 15)) {
-                        addLightUpdate(bx + x, y, bz + z);
-                    }
-                    switch (value) {
-                        case 0:
-                            if (opacity > 1) {
-                                queue.setSkyLight(section, x, y, z, 0);
+                for (int z = 0, j = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++, j++) {
+                        byte value = mask[j];
+                        byte pair = (byte) queue.getOpacityBrightnessPair(section, x, y, z);
+                        int opacity = MathMan.unpair16x(pair);
+                        int brightness = MathMan.unpair16y(pair);
+                        if (brightness > 1 && (brightness != 15 || opacity != 15)) {
+                            addLightUpdate(bx + x, y, bz + z);
+                        }
+                        switch (value) {
+                            case 0:
+                                if (opacity > 1) {
+                                    queue.setSkyLight(section, x, y, z, 0);
+                                    continue;
+                                }
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                            case 5:
+                            case 6:
+                            case 7:
+                            case 8:
+                            case 9:
+                            case 10:
+                            case 11:
+                            case 12:
+                            case 13:
+                            case 14:
+                                if (opacity >= value) {
+                                    mask[j] = 0;
+                                    queue.setSkyLight(section, x, y, z, 0);
+                                    continue;
+                                }
+                                if (opacity <= 1) {
+                                    mask[j] = --value;
+                                } else {
+                                    mask[j] = value = (byte) Math.max(0, value - opacity);
+                                }
+                                break;
+                            case 15:
+                                if (opacity > 1) {
+                                    value -= opacity;
+                                    mask[j] = value;
+                                }
+                                queue.setSkyLight(section, x, y, z, value);
                                 continue;
-                            }
-                            break;
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                        case 7:
-                        case 8:
-                        case 9:
-                        case 10:
-                        case 11:
-                        case 12:
-                        case 13:
-                        case 14:
-                            if (opacity >= value) {
-                                mask[j] = 0;
-                                queue.setSkyLight(section, x, y, z, 0);
-                                continue;
-                            }
-                            if (opacity <= 1) {
-                                mask[j] = --value;
-                            } else {
-                                mask[j] = value = (byte) Math.max(0, value - opacity);
-                            }
-                            break;
-                        case 15:
-                            if (opacity > 1) {
-                                value -= opacity;
-                                mask[j] = value;
-                            }
-                            queue.setSkyLight(section, x, y, z, value);
-                            continue;
+                        }
+                        chunk.smooth = true;
+                        queue.setSkyLight(section, x, y, z, value);
                     }
-                    chunk.smooth = true;
-                    queue.setSkyLight(section, x, y, z, value);
                 }
                 queue.saveChunk(chunkObj);
             }

@@ -207,11 +207,6 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
     }
 
     @Override
-    public void setHeightMap(FaweChunk chunk, byte[] heightMap) {
-        // Not supported
-    }
-
-    @Override
     public void setSkyLight(ChunkSnapshot chunk, int x, int y, int z, int value) {
         // Not supported
     }

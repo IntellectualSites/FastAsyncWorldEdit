@@ -653,21 +653,6 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
     }
 
     @Override
-    public void setHeightMap(FaweChunk chunk, byte[] heightMap) {
-        MCAChunk mca = (MCAChunk) chunk;
-        if (mca != null) {
-            int[] otherMap = mca.getHeightMapArray();
-            for (int i = 0; i < heightMap.length; i++) {
-                int newHeight = heightMap[i] & 0xFF;
-                int currentHeight = otherMap[i];
-                if (newHeight > currentHeight) {
-                    otherMap[i] = newHeight;
-                }
-            }
-        }
-    }
-
-    @Override
     public void setFullbright(FaweChunk sections) {
         if (sections.getClass() == MCAChunk.class) {
             ((MCAChunk) sections).setFullbright();

@@ -69,15 +69,14 @@ public final class BitArray4096 {
         }
     }
 
-    public final void fromRaw(int[] arr, int offset) {
+    public final void fromRaw(int[] arr) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;
-        final int maxEntryValue = this.maxEntryValue;
         final int maxSeqLocIndex = this.maxSeqLocIndex;
 
         int localStart = 0;
         int lastVal;
-        int arrI = offset;
+        int arrI = 0;
         long l = 0;
         long nextVal;
         for (int i = 0; i < longLen; i++) {
@@ -123,11 +122,11 @@ public final class BitArray4096 {
         return arr;
     }
 
-    public final char[] toRaw() {
-        return toRaw(new char[4096]);
+    public final int[] toRaw() {
+        return toRaw(new int[4096]);
     }
 
-    protected final char[] toRaw(char[] buffer) {
+    public final int[] toRaw(int[] buffer) {
         final long[] data = this.data;
         final int dataLength = longLen;
         final int bitsPerEntry = this.bitsPerEntry;

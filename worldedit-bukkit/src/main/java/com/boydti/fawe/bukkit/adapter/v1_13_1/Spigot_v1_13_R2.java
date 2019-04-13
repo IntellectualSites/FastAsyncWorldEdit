@@ -88,7 +88,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         nbtCreateTagMethod.setAccessible(true);
     }
 
-    private int[] idbToStateOrdinal;
+    public int[] idbToStateOrdinal;
 
     private boolean init() {
         if (idbToStateOrdinal != null) return false;
@@ -502,13 +502,21 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     @Override
     public BlockState adapt(BlockData blockData) {
+        CraftBlockData cbd = ((CraftBlockData) blockData);
+        IBlockData ibd = cbd.getState();
+        return adapt(ibd);
+    }
+
+    public BlockState adapt(IBlockData ibd) {
+        return BlockTypes.states[adaptToInt(ibd)];
+    }
+
+    public int adaptToInt(IBlockData ibd) {
         try {
-            CraftBlockData cbd = ((CraftBlockData) blockData);
-            IBlockData ibd = cbd.getState();
             int id = Block.REGISTRY_ID.getId(ibd);
-            return BlockTypes.states[idbToStateOrdinal[id]];
+            return idbToStateOrdinal[id];
         } catch (NullPointerException e) {
-            if (init()) return adapt(blockData);
+            if (init()) return adaptToInt(ibd);
             throw e;
         }
     }

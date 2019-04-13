@@ -6,6 +6,7 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.*;
@@ -15,7 +16,6 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
     public final int[][] ids;
     public final short[] count;
     public final short[] air;
-    public final byte[] heightMap;
 
     public BiomeType[] biomes;
     public HashMap<Short, CompoundTag> tiles;
@@ -24,12 +24,11 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
 
     public T chunk;
 
-    public IntFaweChunk(FaweQueue parent, int x, int z, int[][] ids, short[] count, short[] air, byte[] heightMap) {
+    public IntFaweChunk(FaweQueue parent, int x, int z, int[][] ids, short[] count, short[] air) {
         super(parent, x, z);
         this.ids = ids;
         this.count = count;
         this.air = air;
-        this.heightMap = heightMap;
     }
 
     /**
@@ -44,7 +43,6 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
         this.ids = new int[HEIGHT >> 4][];
         this.count = new short[HEIGHT >> 4];
         this.air = new short[HEIGHT >> 4];
-        this.heightMap = new byte[256];
     }
 
     @Override
@@ -136,12 +134,11 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
 
     @Override
     public int getBlockCombinedId(int x, int y, int z) {
-        short i = FaweCache.CACHE_I[y][z][x];
-        int[] array = getIdArray(i);
+        int[] array = getIdArray(y >> 4);
         if (array == null) {
             return 0;
         }
-        return array[FaweCache.CACHE_J[y][z][x]];
+        return array[(((y & 0xF) << 8) | (z << 4) | x)];
     }
 
     @Override
@@ -195,19 +192,20 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
 
     @Override
     public void setBlock(int x, int y, int z, int combinedId) {
-        final int i = FaweCache.CACHE_I[y][z][x];
-        final int j = FaweCache.CACHE_J[y][z][x];
+        final int i = y >> 4;
         int[] vs = this.ids[i];
         if (vs == null) {
             vs = this.ids[i] = new int[4096];
         }
-        vs[j] = combinedId;
+        vs[(((y & 15) << 8) | (z << 4) | x)] = combinedId;
         this.count[i]++;
-        if (BlockTypes.getFromStateId(combinedId).getMaterial().isAir()) {
-            this.air[i]++;
-            return;
+        switch (combinedId) {
+            case 0:
+            case BlockID.AIR:
+            case BlockID.CAVE_AIR:
+            case BlockID.VOID_AIR:
+                this.air[i]++;
         }
-        heightMap[z << 4 | x] = (byte) y;
         return;
     }
 

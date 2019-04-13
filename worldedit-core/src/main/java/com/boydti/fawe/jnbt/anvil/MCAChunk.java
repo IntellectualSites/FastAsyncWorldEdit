@@ -597,8 +597,7 @@ public class MCAChunk extends FaweChunk<Void> {
         if (idLayer == null) {
             return 0;
         }
-        int j = FaweCache.CACHE_J[y][z & 15][x & 15];
-        return idLayer[j];
+        return idLayer[(((y & 15) << 8) | ((z & 15) << 4) | (x & 15))];
     }
 
     @Override
@@ -627,8 +626,7 @@ public class MCAChunk extends FaweChunk<Void> {
         if (skyLayer == null) {
             return;
         }
-        int index = FaweCache.CACHE_J[y][z & 15][x & 15];
-        setNibble(index, skyLayer, value);
+        setNibble((((y & 15) << 8) | ((z & 15) << 4) | (x & 15)), skyLayer, value);
     }
 
     public void setBlockLight(int x, int y, int z, int value) {
@@ -638,8 +636,7 @@ public class MCAChunk extends FaweChunk<Void> {
         if (blockLayer == null) {
             return;
         }
-        int index = FaweCache.CACHE_J[y][z & 15][x & 15];
-        setNibble(index, blockLayer, value);
+        setNibble((((y & 15) << 8) | ((z & 15) << 4) | (x & 15)), blockLayer, value);
     }
 
     public int getSkyLight(int x, int y, int z) {
@@ -648,8 +645,7 @@ public class MCAChunk extends FaweChunk<Void> {
         if (skyLayer == null) {
             return 0;
         }
-        int index = FaweCache.CACHE_J[y][z & 15][x & 15];
-        return getNibble(index, skyLayer);
+        return getNibble((((y & 15) << 8) | ((z & 15) << 4) | (x & 15)), skyLayer);
     }
 
     public int getBlockLight(int x, int y, int z) {
@@ -658,8 +654,7 @@ public class MCAChunk extends FaweChunk<Void> {
         if (blockLayer == null) {
             return 0;
         }
-        int index = FaweCache.CACHE_J[y][z & 15][x & 15];
-        return getNibble(index, blockLayer);
+        return getNibble((((y & 15) << 8) | ((z & 15) << 4) | (x & 15)), blockLayer);
     }
 
     public void setFullbright() {
@@ -729,8 +724,7 @@ public class MCAChunk extends FaweChunk<Void> {
             this.skyLight[layer] = new byte[2048];
             this.blockLight[layer] = new byte[2048];
         }
-        int j = FaweCache.CACHE_J[y][z & 15][x & 15];
-        idsLayer[j] = combinedId;
+        idsLayer[(((y & 15) << 8) | ((z & 15) << 4) | (x & 15))] = combinedId;
     }
 
     @Override

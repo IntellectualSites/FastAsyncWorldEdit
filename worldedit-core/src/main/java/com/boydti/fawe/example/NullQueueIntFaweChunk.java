@@ -9,8 +9,8 @@ public class NullQueueIntFaweChunk extends IntFaweChunk {
         super(null, cx, cz);
     }
 
-    public NullQueueIntFaweChunk(int x, int z, int[][] ids, short[] count, short[] air, byte[] heightMap) {
-        super(null, x, z, ids, count, air, heightMap);
+    public NullQueueIntFaweChunk(int x, int z, int[][] ids, short[] count, short[] air) {
+        super(null, x, z, ids, count, air);
     }
 
     @Override
@@ -21,9 +21,9 @@ public class NullQueueIntFaweChunk extends IntFaweChunk {
     @Override
     public IntFaweChunk copy(boolean shallow) {
         if (shallow) {
-            return new NullQueueIntFaweChunk(getX(), getZ(), ids, count, air, heightMap);
+            return new NullQueueIntFaweChunk(getX(), getZ(), ids, count, air);
         } else {
-            return new NullQueueIntFaweChunk(getX(), getZ(), (int[][]) MainUtil.copyNd(ids), count.clone(), air.clone(), heightMap.clone());
+            return new NullQueueIntFaweChunk(getX(), getZ(), (int[][]) MainUtil.copyNd(ids), count.clone(), air.clone());
         }
     }
 

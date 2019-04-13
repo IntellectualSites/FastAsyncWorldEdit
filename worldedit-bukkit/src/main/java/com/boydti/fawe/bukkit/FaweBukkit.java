@@ -31,6 +31,7 @@ import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_All;
 import com.boydti.fawe.bukkit.v0.ChunkListener_8;
 import com.boydti.fawe.bukkit.v0.ChunkListener_9;
+import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
@@ -588,16 +589,6 @@ public class FaweBukkit implements IFawe, Listener {
                 try {
                     BukkitQueue_0.checkVersion(v.name());
                     this.version = tmp = v;
-                    if (tmp == Version.v1_13_R1) {
-                        try {
-                            Fawe.debug("Running 1.13 registry dumper!");
-                            // TODO FIXME
-//                            NMSRegistryDumper dumper = new NMSRegistryDumper(MainUtil.getFile(plugin.getDataFolder(), "extrablocks.json"));
-//                            dumper.run();
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                    }
                     break;
                 } catch (IllegalStateException e) {}
             }
@@ -606,20 +597,14 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     public enum Version {
-//        v1_7_R4,
-//        v1_8_R3,
-//        v1_9_R2,
-//        v1_10_R1,
-//        v1_11_R1,
-//        v1_12_R2,
-        v1_13_R1,
+        v1_13_R2,
         NONE,
     }
 
     private FaweQueue getQueue(World world) {
         switch (getVersion()) {
-            case v1_13_R1:
-//                return new BukkitQueue_1_13(world);
+            case v1_13_R2:
+                return new BukkitQueue_1_13(world);
             default:
             case NONE:
                 return new BukkitQueue_All(world);
@@ -628,8 +613,8 @@ public class FaweBukkit implements IFawe, Listener {
 
     private FaweQueue getQueue(String world) {
         switch (getVersion()) {
-            case v1_13_R1:
-//                return new BukkitQueue_1_13(world);
+            case v1_13_R2:
+                return new BukkitQueue_1_13(world);
             default:
             case NONE:
                 return new BukkitQueue_All(world);
