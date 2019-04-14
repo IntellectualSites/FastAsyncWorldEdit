@@ -137,8 +137,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
     }
 
     public ChunkSection copy(ChunkSection current) throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
-        int y = current.getYPosition();
-        ChunkSection newSection = new ChunkSection(y, current.getSkyLightArray() != null);
+        ChunkSection newSection = new ChunkSection(current.getYPosition(), current.getSkyLightArray() != null);
 
         // Copy light
         NibbleArray skyLight = current.getSkyLightArray();

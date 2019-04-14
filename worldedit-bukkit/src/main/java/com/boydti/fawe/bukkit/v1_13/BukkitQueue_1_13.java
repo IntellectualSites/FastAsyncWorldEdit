@@ -844,9 +844,9 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
 
     public static ChunkSection newChunkSection(int y2, boolean flag, int[] blocks) {
         if (blocks == null) {
-            return new ChunkSection(y2, flag);
+            return new ChunkSection(y2 << 4, flag);
         } else {
-            ChunkSection section = new ChunkSection(y2, flag);
+            ChunkSection section = new ChunkSection(y2 << 4, flag);
 
             int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
             int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
