@@ -120,6 +120,9 @@ public class FaweBukkit implements IFawe, Listener {
 
         // Registered delayed Event Listeners
         TaskManager.IMP.task(() -> {
+            // Fix for ProtocolSupport
+            Settings.IMP.PROTOCOL_SUPPORT_FIX = Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
+
             // This class
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 

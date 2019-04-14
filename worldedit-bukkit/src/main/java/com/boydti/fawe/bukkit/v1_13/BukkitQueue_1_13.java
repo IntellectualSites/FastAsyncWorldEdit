@@ -6,6 +6,7 @@ import com.boydti.fawe.bukkit.BukkitPlayer;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.BlockMaterial_1_13;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.FaweChunk;
@@ -867,11 +868,17 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
 
                 // BlockStates
                 int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
+                if (Settings.IMP.PROTOCOL_SUPPORT_FIX) {
+                    bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
+                } else {
+                    bitsPerEntry = 1; // For some reason minecraft needs 4096 bits to store 0 entries
+                }
+
+
                 int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
                 if (num_palette == 1) {
-                    // Set a value, because minecraft needs it for some  reason
-                    blockstates[0] = 0;
-                    blockBitArrayEnd = 1;
+                    // Set a value, because minecraft needs it for some reason even if the array is empty
+                    for (int i = 0; i < blockBitArrayEnd; i++) blockstates[i] = 0;
                 } else {
                     BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
                     bitArray.fromRaw(blocksCopy);
@@ -886,7 +893,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                 DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
                 DataPalette<IBlockData> palette;
 //                DataPaletteHash<IBlockData> hash = new DataPaletteHash<>(Block.REGISTRY_ID, num_palette, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
-                palette = new DataPaletteLinear<>(Block.REGISTRY_ID, num_palette, dataPaletteBlocks, GameProfileSerializer::d);
+                palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d);
                 // set palette
                 for (int i = 0; i < num_palette; i++) {
                     int ordinal = paletteToBlock[i];
@@ -903,6 +910,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                 } catch (IllegalAccessException | NoSuchFieldException e) {
                     throw new RuntimeException(e);
                 }
+
                 return section;
             } catch (Throwable e){
                 Arrays.fill(blockToPalette, Integer.MAX_VALUE);

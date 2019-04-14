@@ -238,7 +238,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                     if (current == null) {
                         continue;
                     }
-                    sectionPalettes[i] = copy(current);
+                    copy.sectionPalettes[i] = copy(current);
                 }
             } catch (Throwable e) {
                 MainUtil.handleError(e);

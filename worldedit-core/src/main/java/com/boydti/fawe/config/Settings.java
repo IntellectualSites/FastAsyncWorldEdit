@@ -9,6 +9,9 @@ public class Settings extends Config {
     @Ignore
     public static final Settings IMP = new Settings();
 
+    @Ignore
+    public boolean PROTOCOL_SUPPORT_FIX = false;
+
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
     public String ISSUES = "https://github.com/boy0001/FastAsyncWorldedit/issues";
