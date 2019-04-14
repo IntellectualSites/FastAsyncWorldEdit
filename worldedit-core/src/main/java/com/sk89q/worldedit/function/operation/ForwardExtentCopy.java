@@ -54,6 +54,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import javax.annotation.Nullable;
@@ -360,13 +361,7 @@ public class ForwardExtentCopy implements Operation {
             // filter players since they can't be copied
             entities = source.getEntities(region)
                     .stream()
-                    .filter(new Predicate<Entity>() {
-                        @Override
-                        public boolean apply(@Nullable Entity input) {
-                            BaseEntity state = input.getState();
-                            return state != null && state.getType() != EntityTypes.PLAYER;
-                        }
-                    })
+                    .filter(e -> e.getType() != EntityTypes.PLAYER)
                     .collect(Collectors.toList());
         } else {
             entities = new ArrayList<>();
