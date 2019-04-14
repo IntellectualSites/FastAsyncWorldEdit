@@ -15,5 +15,5 @@
 <!--- Make sure you've completed the following steps (put an "X" between of brackets): -->
 - [] I included a `/fawe debugpaste` link
 - [] I made sure there aren't duplicates of this report [(Use Search)](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues?utf8=%E2%9C%93&q=is%3Aissue)
-- [] I made sure I am using an up-to-date version of [FAWE for 1.13.x](https://ci.athion.net/job/FAWE-1.13/)
+- [] I made sure I am using an up-to-date version of [FAWE for 1.13.x](https://ci.athion.net/job/FastAsyncWorldEdit-1.13/)
 - [] I made sure the bug/error is not caused by any other plugin
