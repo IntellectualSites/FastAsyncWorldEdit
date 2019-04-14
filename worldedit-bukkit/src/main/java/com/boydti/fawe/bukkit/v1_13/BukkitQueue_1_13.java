@@ -87,6 +87,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     protected final static Field fieldLinearIndex;
     protected final static Field fieldDefaultBlock;
 
+    protected final static Field fieldFluidCount;
     protected final static Field fieldTickingBlockCount;
     protected final static Field fieldNonEmptyBlockCount;
     protected final static Field fieldSection;
@@ -120,17 +121,19 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             fieldLiquidCount = ChunkSection.class.getDeclaredField("e");
             fieldEmittedLight = ChunkSection.class.getDeclaredField("emittedLight");
             fieldSkyLight = ChunkSection.class.getDeclaredField("skyLight");
-
-
-            fieldTickingBlockCount = ChunkSection.class.getDeclaredField("tickingBlockCount");
-            fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldSection.setAccessible(true);
-            fieldTickingBlockCount.setAccessible(true);
-            fieldNonEmptyBlockCount.setAccessible(true);
-
             fieldLiquidCount.setAccessible(true);
             fieldEmittedLight.setAccessible(true);
             fieldSkyLight.setAccessible(true);
+
+            fieldFluidCount = ChunkSection.class.getDeclaredField("e");
+            fieldTickingBlockCount = ChunkSection.class.getDeclaredField("tickingBlockCount");
+            fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
+            fieldFluidCount.setAccessible(true);
+            fieldTickingBlockCount.setAccessible(true);
+            fieldNonEmptyBlockCount.setAccessible(true);
+
+
 
 //            fieldBiomes = ChunkProviderGenerate.class.getDeclaredField("D"); // *
 //            fieldBiomes.setAccessible(true);
@@ -689,13 +692,18 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                 public Object get() {
                     try {
                         int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                        if (mask == 0) dirtyBits |= 65535;
-                        else dirtyBits |= mask;
+                        if (dirtyBits == 0) {
+                            ((CraftWorld) getWorld()).getHandle().getPlayerChunkMap().a(playerChunk);
+                        }
+                        if (mask == 0) {
+                            dirtyBits = 65535;
+                        } else {
+                            dirtyBits |= mask;
+                        }
+                        System.out.println("Mask is " + dirtyBits);
 
                         fieldDirtyBits.set(playerChunk, dirtyBits);
                         fieldDirtyCount.set(playerChunk, 64);
-                        PlayerChunkMap playerManager = ((CraftWorld) getWorld()).getHandle().getPlayerChunkMap();
-                        playerManager.a(playerChunk);
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
@@ -821,6 +829,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     }
 
     public static void setCount(int tickingBlockCount, int nonEmptyBlockCount, ChunkSection section) throws NoSuchFieldException, IllegalAccessException {
+//        fieldFluidCount.set(section, 0); // TODO FIXME
         fieldTickingBlockCount.set(section, tickingBlockCount);
         fieldNonEmptyBlockCount.set(section, nonEmptyBlockCount);
     }
@@ -871,19 +880,16 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                 if (Settings.IMP.PROTOCOL_SUPPORT_FIX) {
                     bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
                 } else {
-                    bitsPerEntry = 1; // For some reason minecraft needs 4096 bits to store 0 entries
+                    bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
                 }
-
 
                 int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
                 if (num_palette == 1) {
-                    // Set a value, because minecraft needs it for some reason even if the array is empty
                     for (int i = 0; i < blockBitArrayEnd; i++) blockstates[i] = 0;
                 } else {
                     BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
                     bitArray.fromRaw(blocksCopy);
                 }
-
 
                 // set palette & data bits
                 DataPaletteBlock<IBlockData> dataPaletteBlocks = section.getBlocks();
@@ -892,7 +898,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                 long[] bits = Arrays.copyOfRange(blockstates, 0, blockBitArrayEnd);
                 DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
                 DataPalette<IBlockData> palette;
-//                DataPaletteHash<IBlockData> hash = new DataPaletteHash<>(Block.REGISTRY_ID, num_palette, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
+//                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
                 palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d);
                 // set palette
                 for (int i = 0; i < num_palette; i++) {

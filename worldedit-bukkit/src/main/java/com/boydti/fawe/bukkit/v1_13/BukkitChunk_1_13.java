@@ -439,10 +439,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                     }
                     if (this.sectionPalettes != null && this.sectionPalettes[j] != null) {
                         section = sections[j] = this.sectionPalettes[j];
-                        getParent().setCount(0, count - this.getAir(j), section);
+//                        getParent().setCount(0, count - this.getAir(j), section);
                         continue;
                     } else {
-                        sections[j] = getParent().newChunkSection(j << 4, flag, array);
+                        section = sections[j] = getParent().newChunkSection(j << 4, flag, array);
+//                        getParent().setCount(0, count - this.getAir(j), section);
                         continue;
                     }
                 } else if (count >= 4096) {
@@ -452,10 +453,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                     }
                     if (this.sectionPalettes != null && this.sectionPalettes[j] != null) {
                         section = sections[j] = this.sectionPalettes[j];
-                        getParent().setCount(0, count - this.getAir(j), section);
+//                        getParent().setCount(0, count - this.getAir(j), section);
                         continue;
                     } else {
-                        sections[j] = getParent().newChunkSection(j << 4, flag, array);
+                        section = sections[j] = getParent().newChunkSection(j << 4, flag, array);
+//                        getParent().setCount(0, count - this.getAir(j), section);
                         continue;
                     }
                 }
