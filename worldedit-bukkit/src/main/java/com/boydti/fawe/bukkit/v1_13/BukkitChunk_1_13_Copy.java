@@ -69,11 +69,6 @@ public class BukkitChunk_1_13_Copy extends BukkitChunk_1_13 {
     }
 
     @Override
-    public void setTile(int x, int y, int z, CompoundTag tile) {
-        throw new UnsupportedOperationException("Read only");
-    }
-
-    @Override
     public <B extends BlockStateHolder<B>> void setBlock(int x, int y, int z, B block) {
         throw new UnsupportedOperationException("Read only");
     }
