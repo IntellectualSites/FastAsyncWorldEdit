@@ -4,7 +4,11 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.queue.DelegateFaweQueue;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -25,8 +29,28 @@ public class ChangeSetFaweQueue extends DelegateFaweQueue {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, int combinedId) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 p, B block) throws WorldEditException {
+        return setBlock(p.getX(), p.getY(), p.getZ(), block.getInternalId(), block.getNbtData());
+    }
 
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        return setBlock(x, y, z, block.getInternalId(), block.getNbtData());
+    }
+
+    @Override
+    public boolean setBlock(int x, int y, int z, int combinedId, CompoundTag nbt) {
+        if (setBlock(x, y, z, combinedId)) {
+            if (nbt != null) {
+                set.addTileCreate(nbt);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setBlock(int x, int y, int z, int combinedId) {
         if (super.setBlock(x, y, z, combinedId)) {
             int combinedFrom = getParent().getCombinedId4Data(x, y, z);
             BlockType typeFrom = BlockTypes.getFromStateId(combinedFrom);
