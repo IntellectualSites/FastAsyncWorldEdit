@@ -30,7 +30,9 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
 import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
 import com.sk89q.worldedit.session.request.Request;
@@ -138,9 +140,15 @@ public class ScriptingCommands {
 
         engine.setTimeLimit(worldEdit.getConfiguration().scriptTimeout);
 
+        Player player = actor instanceof Player ? (Player) actor : null;
+        CraftScriptContext scriptContext = new CraftScriptContext(worldEdit, WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.USER_COMMANDS),
+                WorldEdit.getInstance().getConfiguration(), session, player, args);
+
         Map<String, Object> vars = new HashMap<>();
         vars.put("argv", args);
+        vars.put("context", scriptContext);
         vars.put("actor", actor);
+        vars.put("player", player);
 
         try {
             result = engine.evaluate(script, filename, vars);
@@ -155,6 +163,7 @@ public class ScriptingCommands {
         } catch (Throwable e) {
             actor.printError(BBC.getPrefix() + "Failed to execute (see console):");
             actor.printRaw(e.getClass().getCanonicalName());
+            e.printStackTrace();
         }
         if (result instanceof NativeJavaObject) {
             return (T) ((NativeJavaObject) result).unwrap();

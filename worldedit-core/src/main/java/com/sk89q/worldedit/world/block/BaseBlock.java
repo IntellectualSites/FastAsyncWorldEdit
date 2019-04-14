@@ -200,6 +200,10 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
     	return blockState.getBlockType();
     }
 
+    public BlockType getType() {
+        return getBlockType();
+    }
+
     @Override
     public int getOrdinal() {
         return blockState.getOrdinal();

@@ -21,6 +21,7 @@ package com.sk89q.worldedit.world.item;
 
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.RegistryItem;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
@@ -105,6 +106,9 @@ public class ItemType implements RegistryItem {
     }
     
     public BaseItem getDefaultState() {
+        if (defaultState == null) {
+            this.defaultState = new BaseItemStack(this);
+        }
     	return this.defaultState;
     }
     
