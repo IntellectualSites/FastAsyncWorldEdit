@@ -1,5 +1,6 @@
 package com.boydti.fawe.bukkit.wrapper;
 
+import com.avaje.ebean.validation.NotNull;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.object.FaweQueue;
@@ -20,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -181,6 +183,15 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         if (queue != null) {
             queue.flush();
         }
+    }
+
+    public int getHighestBlockYAt(int x, int z, com.destroystokyo.paper.HeightmapType heightmap) throws UnsupportedOperationException {
+        return TaskManager.IMP.sync(new Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                return parent.getHighestBlockYAt(x, z, heightmap);
+            }
+        });
     }
 
     @Override
