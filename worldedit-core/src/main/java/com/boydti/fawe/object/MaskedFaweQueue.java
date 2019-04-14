@@ -88,6 +88,14 @@ public class MaskedFaweQueue extends DelegateFaweQueue {
     }
 
     @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        if (region.contains(x, y, z)) {
+            return super.setBiome(x, y, z, biome);
+        }
+        return false;
+    }
+
+    @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         if (region.contains(position.getBlockX(), position.getBlockZ())) {
             return super.setBiome(position, biome);

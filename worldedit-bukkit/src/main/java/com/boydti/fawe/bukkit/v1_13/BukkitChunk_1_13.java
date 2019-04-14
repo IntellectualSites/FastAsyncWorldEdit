@@ -297,6 +297,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             net.minecraft.server.v1_13_R2.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
             nmsChunk.f(true); // Set Modified
             nmsChunk.mustSave = true;
+            nmsChunk.markDirty();
             net.minecraft.server.v1_13_R2.World nmsWorld = nmsChunk.world;
             ChunkSection[] sections = nmsChunk.getSections();
             List<Entity>[] entities = nmsChunk.getEntitySlices();

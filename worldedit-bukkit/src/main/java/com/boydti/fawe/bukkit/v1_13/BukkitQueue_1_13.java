@@ -700,7 +700,6 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                         } else {
                             dirtyBits |= mask;
                         }
-                        System.out.println("Mask is " + dirtyBits);
 
                         fieldDirtyBits.set(playerChunk, dirtyBits);
                         fieldDirtyCount.set(playerChunk, 64);
@@ -829,7 +828,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     }
 
     public static void setCount(int tickingBlockCount, int nonEmptyBlockCount, ChunkSection section) throws NoSuchFieldException, IllegalAccessException {
-//        fieldFluidCount.set(section, 0); // TODO FIXME
+        fieldFluidCount.set(section, 0); // TODO FIXME
         fieldTickingBlockCount.set(section, tickingBlockCount);
         fieldNonEmptyBlockCount.set(section, nonEmptyBlockCount);
     }
@@ -911,7 +910,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                 try {
                     fieldBits.set(dataPaletteBlocks, nmsBits);
                     fieldPalette.set(dataPaletteBlocks, palette);
-                    fieldSize.set(dataPaletteBlocks, num_palette);
+                    fieldSize.set(dataPaletteBlocks, bitsPerEntry);
                     setCount(0, 4096 - air, section);
                 } catch (IllegalAccessException | NoSuchFieldException e) {
                     throw new RuntimeException(e);
