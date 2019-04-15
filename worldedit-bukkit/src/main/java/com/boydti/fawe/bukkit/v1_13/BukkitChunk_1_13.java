@@ -1,9 +1,6 @@
 package com.boydti.fawe.bukkit.v1_13;
 
-import com.bekvon.bukkit.residence.commands.current;
-import com.bekvon.bukkit.residence.commands.set;
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.BlockMaterial_1_13;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
@@ -20,12 +17,10 @@ import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.minecraft.server.v1_13_R2.BiomeBase;
 import net.minecraft.server.v1_13_R2.Block;
@@ -35,7 +30,6 @@ import net.minecraft.server.v1_13_R2.ChunkSection;
 import net.minecraft.server.v1_13_R2.DataBits;
 import net.minecraft.server.v1_13_R2.DataPalette;
 import net.minecraft.server.v1_13_R2.DataPaletteBlock;
-import net.minecraft.server.v1_13_R2.DataPaletteGlobal;
 import net.minecraft.server.v1_13_R2.DataPaletteHash;
 import net.minecraft.server.v1_13_R2.DataPaletteLinear;
 import net.minecraft.server.v1_13_R2.Entity;
@@ -52,14 +46,11 @@ import net.minecraft.server.v1_13_R2.TileEntity;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,7 +60,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.*;
+import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistryb;
+import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistryc;
+import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistryd;
+import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistrye;
+import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistryf;
 
 public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
@@ -129,7 +124,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
     public boolean storeSection(ChunkSection section, int layer) throws IllegalAccessException {
         if (sectionPalettes == null) {
-            // TODO FIXME don't copy light
+            // TODO optimize don't copy light
             sectionPalettes = new ChunkSection[16];
         }
         sectionPalettes[layer] = section;

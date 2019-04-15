@@ -28,7 +28,6 @@ import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.server.v1_13_R2.BiomeBase;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockPosition;
-import net.minecraft.server.v1_13_R2.ChunkProviderGenerate;
 import net.minecraft.server.v1_13_R2.ChunkProviderServer;
 import net.minecraft.server.v1_13_R2.ChunkSection;
 import net.minecraft.server.v1_13_R2.DataBits;
@@ -44,7 +43,6 @@ import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.Packet;
 import net.minecraft.server.v1_13_R2.PacketDataSerializer;
-import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R2.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_13_R2.PlayerChunk;
 import net.minecraft.server.v1_13_R2.PlayerChunkMap;
@@ -62,7 +60,6 @@ import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -847,7 +844,6 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             return new ChunkSection(y2 << 4, flag);
         } else {
             ChunkSection section = new ChunkSection(y2 << 4, flag);
-
             int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
             int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
             long[] blockstates = FaweCache.BLOCK_STATES.get();
@@ -855,13 +851,14 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             try {
                 int num_palette = 0;
                 int air = 0;
-                for (int i = 0, j = 0; i < 4096; i++, j++) {
+                for (int i = 0; i < 4096; i++) {
                     int stateId = blocks[i];
                     switch (stateId) {
                         case 0:
                         case BlockID.AIR:
                         case BlockID.CAVE_AIR:
                         case BlockID.VOID_AIR:
+                            stateId = BlockID.AIR;
                             air++;
                     }
                     int ordinal = BlockState.getFromInternalId(stateId).getOrdinal(); // TODO fixme Remove all use of BlockTypes.BIT_OFFSET so that this conversion isn't necessary
@@ -871,7 +868,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;
                     }
-                    blocksCopy[j] = palette;
+                    blocksCopy[i] = palette;
                 }
 
                 // BlockStates
@@ -899,6 +896,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                 DataPalette<IBlockData> palette;
 //                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
                 palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d);
+
                 // set palette
                 for (int i = 0; i < num_palette; i++) {
                     int ordinal = paletteToBlock[i];
