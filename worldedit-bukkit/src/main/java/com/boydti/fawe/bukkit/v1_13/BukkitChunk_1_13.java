@@ -437,7 +437,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 //                        getParent().setCount(0, count - this.getAir(j), section);
                         continue;
                     } else {
-                        section = sections[j] = getParent().newChunkSection(j << 4, flag, array);
+                        section = sections[j] = getParent().newChunkSection(j, flag, array);
 //                        getParent().setCount(0, count - this.getAir(j), section);
                         continue;
                     }
@@ -451,7 +451,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 //                        getParent().setCount(0, count - this.getAir(j), section);
                         continue;
                     } else {
-                        section = sections[j] = getParent().newChunkSection(j << 4, flag, array);
+                        section = sections[j] = getParent().newChunkSection(j, flag, array);
 //                        getParent().setCount(0, count - this.getAir(j), section);
                         continue;
                     }
