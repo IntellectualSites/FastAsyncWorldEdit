@@ -47,7 +47,7 @@ import javax.annotation.Nullable;
 
 public class AbstractDelegateExtent implements LightingExtent {
     private transient final Extent extent;
-    private MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
+    protected MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
     /**
      * Create a new instance.

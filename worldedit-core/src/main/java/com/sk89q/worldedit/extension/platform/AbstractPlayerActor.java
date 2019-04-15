@@ -25,6 +25,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
@@ -106,15 +107,16 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         byte free = 0;
 
+        BlockVector3 mutablePos = MutableBlockVector3.at(0, 0, 0);
         while (y <= world.getMaximumPoint().getBlockY() + 2) {
-            if (!world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            if (!world.getBlock(mutablePos.setComponents(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 ++free;
             } else {
                 free = 0;
             }
 
             if (free == 2) {
-                final BlockVector3 pos = BlockVector3.at(x, y - 2, z);
+                final BlockVector3 pos = mutablePos.setComponents(x, y - 2, z);
                 final BlockStateHolder state = world.getBlock(pos);
                 setPosition(new Location(world, Vector3.at(x + 0.5, y - 2 + BlockTypeUtil.centralTopLimit(state), z + 0.5)));
                 return;

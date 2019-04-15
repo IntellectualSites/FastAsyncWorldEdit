@@ -61,7 +61,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        BaseBlock previous = queue.getFullBlock(BlockVector3.at(x, y, z)).toBaseBlock();
+        BaseBlock previous = queue.getFullBlock(mutable.setComponents(x, y, z)).toBaseBlock();
         if (previous.getInternalId() == block.getInternalId()) {
             if (!previous.hasNbtData() && (block instanceof BaseBlock && !((BaseBlock)block).hasNbtData())) {
                 return false;
