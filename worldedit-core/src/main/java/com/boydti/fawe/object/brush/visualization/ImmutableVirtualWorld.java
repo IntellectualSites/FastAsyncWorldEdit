@@ -57,11 +57,6 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public void addNotifyTask(int x, int z, Runnable runnable) {
-        if (runnable != null) runnable.run();
-    }
-
-    @Override
     public BiomeType getBiome(BlockVector2 position) {
         return BiomeTypes.FOREST;
     }

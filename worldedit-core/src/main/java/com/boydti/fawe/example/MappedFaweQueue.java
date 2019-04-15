@@ -145,12 +145,6 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     }
 
     @Override
-    public void addNotifyTask(int x, int z, Runnable runnable) {
-        FaweChunk chunk = map.getFaweChunk(x, z);
-        chunk.addNotifyTask(runnable);
-    }
-
-    @Override
     public boolean setBlock(int x, int y, int z, int id) {
         int cx = x >> 4;
         int cz = z >> 4;

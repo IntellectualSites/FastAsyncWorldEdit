@@ -394,8 +394,6 @@ public interface FaweQueue extends HasFaweQueue, Extent {
      */
     void clear();
 
-    void addNotifyTask(int x, int z, Runnable runnable);
-
     default boolean hasBlock(int x, int y, int z) throws FaweException.FaweChunkLoadException {
         return getCombinedId4Data(x, y, z) != 0;
     }

@@ -926,11 +926,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public void addNotifyTask(int x, int z, Runnable runnable) {
-        if (runnable != null) runnable.run();
-    }
-
-    @Override
     public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) index = Math.floorMod(index, getArea());

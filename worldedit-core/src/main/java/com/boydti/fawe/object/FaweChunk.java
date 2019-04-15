@@ -16,12 +16,10 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nullable;
 
 public abstract class FaweChunk<T> implements Callable<FaweChunk> {
+    public static int HEIGHT = 256;
 
     private FaweQueue parent;
     private int x, z;
-    public static int HEIGHT = 256;
-
-    private final ArrayDeque<Runnable> tasks = new ArrayDeque<>(0);
 
     /**
      * A FaweSections object represents a chunk and the blocks that you wish to change in it.
@@ -215,28 +213,6 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
                 }
             }
         }
-    }
-
-    /**
-     * Add a task to run when this chunk is dispatched
-     *
-     * @param run
-     */
-    public void addNotifyTask(Runnable run) {
-        if (run != null) {
-            tasks.add(run);
-        }
-    }
-
-    public boolean hasNotifyTasks() {
-        return tasks.size() > 0;
-    }
-
-    public void executeNotifyTasks() {
-        for (Runnable task : tasks) {
-            task.run();
-        }
-        tasks.clear();
     }
 
     /**

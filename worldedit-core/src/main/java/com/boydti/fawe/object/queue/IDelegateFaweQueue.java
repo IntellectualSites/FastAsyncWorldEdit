@@ -333,11 +333,6 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default void addNotifyTask(int x, int z, Runnable runnable) {
-        getQueue().addNotifyTask(x, z, runnable);
-    }
-
-    @Override
     default boolean hasBlock(int x, int y, int z) throws FaweException.FaweChunkLoadException {
         return getQueue().hasBlock(x, y, z);
     }

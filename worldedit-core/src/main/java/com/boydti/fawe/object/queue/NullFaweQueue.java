@@ -178,11 +178,6 @@ public class NullFaweQueue implements FaweQueue {
     }
 
     @Override
-    public void addNotifyTask(int x, int z, Runnable runnable) {
-        runnable.run();
-    }
-
-    @Override
     public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         return null;
     }

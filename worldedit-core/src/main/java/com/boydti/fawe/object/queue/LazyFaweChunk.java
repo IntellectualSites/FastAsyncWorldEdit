@@ -116,21 +116,6 @@ public abstract class LazyFaweChunk<T extends FaweChunk> extends FaweChunk {
     }
 
     @Override
-    public void addNotifyTask(Runnable run) {
-        internalGetOrCacheChunk().addNotifyTask(run);
-    }
-
-    @Override
-    public boolean hasNotifyTasks() {
-        return internalGetOrCacheChunk().hasNotifyTasks();
-    }
-
-    @Override
-    public void executeNotifyTasks() {
-        internalGetOrCacheChunk().executeNotifyTasks();
-    }
-
-    @Override
     public void setTile(int x, int y, int z, CompoundTag tile) {
         internalGetOrCacheChunk().setTile(x, y, z, tile);
     }
