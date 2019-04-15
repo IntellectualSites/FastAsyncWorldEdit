@@ -221,7 +221,7 @@ public class SchematicCommands extends MethodCommands {
                 }
                 UUID uuid = UUID.fromString(filename.substring(4));
                 URL base = new URL(Settings.IMP.WEB.URL);
-                URL url = new URL(base, "uploads/" + uuid + ".schematic");
+                URL url = new URL(base, "uploads/" + uuid + "." + format.getPrimaryFileExtension());
                 ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 in = Channels.newInputStream(rbc);
                 uri = url.toURI();
