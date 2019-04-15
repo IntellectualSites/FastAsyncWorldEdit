@@ -178,7 +178,7 @@ public class ClipboardFormats {
                 return null;
             }
             URL base = new URL(Settings.IMP.WEB.URL);
-            input = new URL(base, "uploads/" + input.substring(4) + ".schematic").toString();
+            input = new URL(base, "uploads/" + input.substring(4) + "." + format.getPrimaryFileExtension()).toString();
         }
         if (input.startsWith("http")) {
             if (!player.hasPermission("worldedit.schematic.load.asset")) {

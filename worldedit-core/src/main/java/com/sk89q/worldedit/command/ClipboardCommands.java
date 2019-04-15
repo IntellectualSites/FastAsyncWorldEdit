@@ -295,7 +295,7 @@ public class ClipboardCommands extends MethodCommands {
     @Command(aliases = {"download"}, desc = "Downloads your clipboard through the configured web interface")
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.download"})
-    public void download(final Player player, final LocalSession session, @Optional("schematic") final String formatName) throws CommandException, WorldEditException {
+    public void download(final Player player, final LocalSession session, @Optional("schem") final String formatName) throws CommandException, WorldEditException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
             BBC.CLIPBOARD_INVALID_FORMAT.send(player, formatName);
@@ -356,29 +356,23 @@ public class ClipboardCommands extends MethodCommands {
             } else {
                 target = clipboard;
             }
-            switch (format.getName()) {
-                case "PNG":
-                    try {
-                        FastByteArrayOutputStream baos = new FastByteArrayOutputStream(Short.MAX_VALUE);
-                        ClipboardWriter writer = format.getWriter(baos);
-                        writer.write(target);
-                        baos.flush();
-                        url = ImgurUtility.uploadImage(baos.toByteArray());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        url = null;
-                    }
-                    break;
-                case "SCHEMATIC":
-                    if (Settings.IMP.WEB.URL.isEmpty()) {
-                        BBC.SETTING_DISABLE.send(player, "web.url");
-                        return;
-                    }
-                    url = FaweAPI.upload(target, format);
-                    break;
-                default:
+            if (format == BuiltInClipboardFormat.PNG) {
+                try {
+                    FastByteArrayOutputStream baos = new FastByteArrayOutputStream(Short.MAX_VALUE);
+                    ClipboardWriter writer = format.getWriter(baos);
+                    writer.write(target);
+                    baos.flush();
+                    url = ImgurUtility.uploadImage(baos.toByteArray());
+                } catch (IOException e) {
+                    e.printStackTrace();
                     url = null;
-                    break;
+                }
+            } else {
+                if (Settings.IMP.WEB.URL.isEmpty()) {
+                    BBC.SETTING_DISABLE.send(player, "web.url");
+                    return;
+                }
+                url = FaweAPI.upload(target, format);
             }
 	        if (url == null) {
 	            BBC.GENERATING_LINK_FAILED.send(player);
