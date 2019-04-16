@@ -1,24 +1,33 @@
 package com.boydti.fawe;
 
 public class FaweVersion {
-    public final int year, month, day, hash, build, major, minor, patch;
+    public final int year, month, day, hash, build;
 
-    public FaweVersion(String version) {
-        String[] split = version.substring(version.indexOf('=') + 1).split("-");
-        if (split[0].equals("unknown")) {
-            this.year = month = day = hash = build = major = minor = patch = 0;
-            return;
+    public FaweVersion(int year, int month, int day, int hash, int build) {
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.hash = hash;
+        this.build = build;
+    }
+
+    public FaweVersion(String version, String commit, String date) {
+        String[] split = version.substring(version.indexOf('=') + 1).split("\\.");
+        this.build = Integer.parseInt(split[1]);
+        this.hash = Integer.parseInt(commit.substring(commit.indexOf('=') + 1), 16);
+        String[] split1 = date.substring(date.indexOf('=') + 1).split("\\.");
+        this.year = Integer.parseInt(split1[0]);
+        this.month = Integer.parseInt(split1[1]);
+        this.day = Integer.parseInt(split1[2]);
+    }
+
+    public static FaweVersion tryParse(String version, String commit, String date) {
+        try {
+            return new FaweVersion(version, commit, date);
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+            return new FaweVersion(0, 0, 0, 0, 0);
         }
-        String[] date = split[0].split("\\.");
-        this.year = Integer.parseInt(date[0]);
-        this.month = Integer.parseInt(date[1]);
-        this.day = Integer.parseInt(date[2]);
-        this.hash = Integer.parseInt(split[1], 16);
-        this.build = Integer.parseInt(split[2]);
-        String[] semver = split[3].split("\\.");
-        this.major = Integer.parseInt(semver[0]);
-        this.minor = Integer.parseInt(semver[1]);
-        this.patch = Integer.parseInt(semver[2]);
     }
 
     @Override
@@ -27,6 +36,6 @@ public class FaweVersion {
     }
 
     public boolean isNewer(FaweVersion other) {
-        return other.build < this.build && (this.major > other.major || (this.major == other.major && this.minor > other.minor) || (this.major == other.major && this.minor == other.minor && this.patch > other.patch));
+        return other.build < this.build;
     }
 }

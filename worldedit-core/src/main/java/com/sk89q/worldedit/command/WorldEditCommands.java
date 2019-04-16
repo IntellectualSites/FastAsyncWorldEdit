@@ -89,7 +89,7 @@ public class WorldEditCommands {
         PlatformManager pm = we.getPlatformManager();
         actor.printDebug("Platforms:");
         for (Platform platform : pm.getPlatforms()) {
-            actor.printDebug(String.format(" - %s (%s)", platform.getPlatformName(), platform.getPlatformVersion()));
+            actor.printDebug(String.format(" - %s", platform.getPlatformName()));
         }
         actor.printDebug("Capabilities:");
         for (Capability capability : Capability.values()) {

@@ -59,7 +59,7 @@ if ( project.hasProperty("lzNoVersion") ) { // gradle build -PlzNoVersion
 } else {
     version = String.format("%s.%s", rootVersion, buildNumber)
 }
-description = """FastAsyncWorldEdit"""
+description = rootProject.name
 
 subprojects {
     apply plugin: 'java'
@@ -67,8 +67,6 @@ subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
     // Enable this requires putting license header files in many, many FAWE files
     //apply plugin: 'net.minecrell.licenser'
-
-    ext.internalVersion = version
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
