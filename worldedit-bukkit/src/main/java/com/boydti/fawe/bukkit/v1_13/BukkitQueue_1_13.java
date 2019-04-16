@@ -684,6 +684,12 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             return false;
         }
         if (playerChunk.e()) {
+            ChunkSection[] sections = nmsChunk.getSections();
+            for (int layer = 0; layer < 16; layer++) {
+                if (sections[layer] == null && (mask & (1 << layer)) != 0) {
+                    sections[layer] = new ChunkSection(layer << 4, nmsWorld.worldProvider.g());
+                }
+            }
             TaskManager.IMP.sync(new Supplier<Object>() {
                 @Override
                 public Object get() {

@@ -15,6 +15,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
@@ -281,7 +282,6 @@ public abstract class FaweChangeSet implements ChangeSet {
                                             index++;
                                         }
                                     }
-                                    // TODO
                                 }
                                 // Block changes
                                 for (int layer = 0; layer < layers; layer++) {
@@ -305,7 +305,7 @@ public abstract class FaweChangeSet implements ChangeSet {
                                                     case 1:
                                                         combinedIdCurrent = 0;
                                                     default:
-                                                        int combinedIdPrevious = previousLayer != null ? previousLayer[index] : 0;
+                                                        int combinedIdPrevious = previousLayer != null ? previousLayer[index] : BlockID.AIR;
                                                         if (combinedIdCurrent != combinedIdPrevious) {
                                                             add(xx, yy, zz, combinedIdPrevious, combinedIdCurrent);
                                                         }
