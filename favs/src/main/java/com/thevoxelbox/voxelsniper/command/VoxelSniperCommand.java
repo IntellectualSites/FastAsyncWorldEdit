@@ -85,19 +85,19 @@ public class VoxelSniperCommand extends VoxelCommand
                 player.sendMessage(PerformerE.performer_list_long);
                 return true;
             }
-            else if (args[0].equalsIgnoreCase("enable"))
+            else if (args[0].equalsIgnoreCase("enable") && player.hasPermission("voxelsniper.command.vs.enable"))
             {
                 sniper.setEnabled(true);
                 player.sendMessage("VoxelSniper is " + (sniper.isEnabled() ? "enabled" : "disabled"));
                 return true;
             }
-            else if (args[0].equalsIgnoreCase("disable"))
+            else if (args[0].equalsIgnoreCase("disable") && player.hasPermission("voxelsniper.command.vs.enable"))
             {
                 sniper.setEnabled(false);
                 player.sendMessage("VoxelSniper is " + (sniper.isEnabled() ? "enabled" : "disabled"));
                 return true;
             }
-            else if (args[0].equalsIgnoreCase("toggle"))
+            else if (args[0].equalsIgnoreCase("toggle") && player.hasPermission("voxelsniper.command.vs.enable"))
             {
                 sniper.setEnabled(!sniper.isEnabled());
                 player.sendMessage("VoxelSniper is " + (sniper.isEnabled() ? "enabled" : "disabled"));
