@@ -23,10 +23,10 @@ public class SimpleIntFaweChunk extends IntFaweChunk {
     public IntFaweChunk copy(boolean shallow) {
         SimpleIntFaweChunk copy;
         if (shallow) {
-            copy = new SimpleIntFaweChunk(getParent(), getX(), getZ(), ids, count, air);
+            copy = new SimpleIntFaweChunk(getParent(), getX(), getZ(), setBlocks, count, air);
             copy.biomes = biomes;
         } else {
-            copy = new SimpleIntFaweChunk(getParent(), getX(), getZ(), (int[][]) MainUtil.copyNd(ids), count.clone(), air.clone());
+            copy = new SimpleIntFaweChunk(getParent(), getX(), getZ(), (int[][]) MainUtil.copyNd(setBlocks), count.clone(), air.clone());
             copy.biomes = biomes != null ? biomes.clone() : null;
         }
         return copy;

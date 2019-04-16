@@ -879,7 +879,11 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
 
                 // BlockStates
                 int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-                bitsPerEntry = Math.max(bitsPerEntry, 4);
+                if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+                    bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
+                } else {
+                    bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
+                }
 
                 int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
                 if (num_palette == 1) {

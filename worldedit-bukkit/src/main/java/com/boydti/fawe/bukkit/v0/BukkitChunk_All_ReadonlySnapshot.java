@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.v0;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -10,7 +9,6 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import java.util.*;
 
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
@@ -75,7 +73,7 @@ public class BukkitChunk_All_ReadonlySnapshot extends FaweChunk {
     @Nullable
     @Override
     public int[] getIdArray(int layer) {
-        int[] nextLayer = next.ids[layer];
+        int[] nextLayer = next.setBlocks[layer];
         if (nextLayer == null) return null;
         int[] ids = Arrays.copyOf(nextLayer, nextLayer.length);
         int index = 0;

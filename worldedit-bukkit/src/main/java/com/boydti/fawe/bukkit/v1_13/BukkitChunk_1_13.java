@@ -6,6 +6,7 @@ import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.IntFaweChunk;
+import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MainUtil;
@@ -60,6 +61,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.boydti.fawe.bukkit.v0.BukkitQueue_0.getAdapter;
 import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistryb;
 import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistryc;
 import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistryd;
@@ -69,6 +71,7 @@ import static com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13.fieldRegistryf;
 public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
     public ChunkSection[] sectionPalettes;
+
     private static final IBlockData AIR = ((BlockMaterial_1_13) BlockTypes.AIR.getMaterial()).getState();
 
     /**
@@ -95,6 +98,52 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                 this.biomes[i] = BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(biomes[i]));
             }
         }
+    }
+
+    @Override
+    public int[][] getCombinedIdArrays() {
+        if (this.sectionPalettes != null) {
+            for (int i = 0; i < setBlocks.length; i++) {
+                getIdArray(i);
+            }
+        }
+        return this.setBlocks;
+    }
+
+    @Override
+    public int[] getIdArray(int layer) {
+        if (this.setBlocks[layer] == null && this.sectionPalettes != null) {
+            ChunkSection section = this.sectionPalettes[layer];
+            int[] idsArray = this.setBlocks[layer];
+            if (section != null && idsArray == null) {
+                this.setBlocks[layer] = idsArray = new int[4096];
+                if (!section.a()) {
+                    try {
+                        DataPaletteBlock<IBlockData> blocks = section.getBlocks();
+                        DataBits bits = (DataBits) BukkitQueue_1_13.fieldBits.get(blocks);
+                        DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitQueue_1_13.fieldPalette.get(blocks);
+
+                        long[] raw = bits.a();
+                        int bitsPerEntry = bits.c();
+
+                        new BitArray4096(raw, bitsPerEntry).toRaw(idsArray);
+                        IBlockData defaultBlock = (IBlockData) BukkitQueue_1_13.fieldDefaultBlock.get(blocks);
+                        // TODO optimize away palette.a
+                        for (int i = 0; i < 4096; i++) {
+                            IBlockData ibd = palette.a(idsArray[i]);
+                            if (ibd == null) {
+                                ibd = defaultBlock;
+                            }
+                            int ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToInt(ibd);
+                            idsArray[i] = BlockTypes.states[ordinal].getInternalId();
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return this.setBlocks[layer];
     }
 
     public boolean storeTile(TileEntity tile, BlockPosition pos) {
@@ -216,11 +265,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
     public IntFaweChunk<Chunk, BukkitQueue_1_13> copy(boolean shallow) {
         BukkitChunk_1_13 copy;
         if (shallow) {
-            copy = new BukkitChunk_1_13(getParent(), getX(), getZ(), ids, count, air);
+            copy = new BukkitChunk_1_13(getParent(), getX(), getZ(), setBlocks, count, air);
             copy.biomes = biomes;
             copy.chunk = chunk;
         } else {
-            copy = new BukkitChunk_1_13(getParent(), getX(), getZ(), (int[][]) MainUtil.copyNd(ids), count.clone(), air.clone());
+            copy = new BukkitChunk_1_13(getParent(), getX(), getZ(), (int[][]) MainUtil.copyNd(setBlocks), count.clone(), air.clone());
             copy.biomes = biomes != null ? biomes.clone() : null;
             copy.chunk = chunk;
         }
@@ -281,7 +330,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
     public FaweChunk call() {
         Spigot_v1_13_R2 adapter = (Spigot_v1_13_R2) BukkitQueue_0.getAdapter();
         try {
-            BukkitChunk_1_13_Copy copy = getParent().getChangeTask() != null ? new BukkitChunk_1_13_Copy(getParent(), getX(), getZ()) : null;
+            BukkitChunk_1_13 copy = getParent().getChangeTask() != null ? new BukkitChunk_1_13(getParent(), getX(), getZ()) : null;
             final Chunk chunk = this.getChunk();
             final World world = chunk.getWorld();
             Settings settings = getParent().getSettings();
@@ -439,7 +488,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                         section = sections[j] = getParent().newChunkSection(j, flag, array);
                         continue;
                     }
-                } else if (count >= 4096) {
+                } else if (count >= 4096 && false) {
                     if (countAir >= 4096) {
                         sections[j] = null;
                         continue;
@@ -450,6 +499,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                     } else {
                         section = sections[j] = getParent().newChunkSection(j, flag, array);
                         continue;
+                    }
+                }
+                if (count >= 4096) {
+                    for (int i = 0; i < 4096; i++) {
+                        if (array[i] == 0) System.out.println("Invalid ");
                     }
                 }
                 int by = j << 4;

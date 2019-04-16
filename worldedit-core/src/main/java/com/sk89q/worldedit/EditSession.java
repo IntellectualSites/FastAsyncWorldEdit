@@ -2484,6 +2484,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int makeSphere(final BlockVector3 pos, final Pattern block, double radiusX, double radiusY, double radiusZ, final boolean filled) {
+        System.out.println("Make sphere");
         radiusX += 0.5;
         radiusY += 0.5;
         radiusZ += 0.5;
@@ -2500,35 +2501,37 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final int ceilRadiusY = (int) Math.ceil(radiusY);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
 
-        double nextXn = 0;
-        double dx, dy, dz, dxy, dxyz;
+        double nextXn = invRadiusX;
+        double dx, dy, dz, dxz, dxyz;
         forX:
         for (int x = 0; x <= ceilRadiusX; ++x) {
             final double xn = nextXn;
             dx = xn * xn;
             nextXn = (x + 1) * invRadiusX;
-            double nextYn = 0;
-            forY:
-            for (int y = 0; y <= ceilRadiusY; ++y) {
-                final double yn = nextYn;
-                dy = yn * yn;
-                dxy = dx + dy;
-                nextYn = (y + 1) * invRadiusY;
-                double nextZn = 0;
-                forZ:
-                for (int z = 0; z <= ceilRadiusZ; ++z) {
-                    final double zn = nextZn;
-                    dz = zn * zn;
-                    dxyz = dxy + dz;
-                    nextZn = (z + 1) * invRadiusZ;
+            double nextZn = invRadiusZ;
+            forZ:
+            for (int z = 0; z <= ceilRadiusZ; ++z) {
+                final double zn = nextZn;
+                dz = zn * zn;
+                dxz = dx + dz;
+                nextZn = (z + 1) * invRadiusZ;
+                double nextYn = invRadiusY;
+
+                forY:
+                for (int y = 0; y <= ceilRadiusY; ++y) {
+                    final double yn = nextYn;
+                    dy = yn * yn;
+                    dxyz = dxz + dy;
+                    nextYn = (y + 1) * invRadiusY;
+
                     if (dxyz > 1) {
-                        if (z == 0) {
-                            if (y == 0) {
+                        if (y == 0) {
+                            if (z == 0) {
                                 break forX;
                             }
-                            break forY;
+                            break forZ;
                         }
-                        break forZ;
+                        break forY;
                     }
 
                     if (!filled) {
@@ -2538,13 +2541,19 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     this.setBlock(px + x, py + y, pz + z, block);
-                    this.setBlock(px - x, py + y, pz + z, block);
-                    this.setBlock(px + x, py - y, pz + z, block);
-                    this.setBlock(px + x, py + y, pz - z, block);
-                    this.setBlock(px - x, py - y, pz + z, block);
-                    this.setBlock(px + x, py - y, pz - z, block);
-                    this.setBlock(px - x, py + y, pz - z, block);
-                    this.setBlock(px - x, py - y, pz - z, block);
+                    if (x != 0) this.setBlock(px - x, py + y, pz + z, block);
+                    if (z != 0) {
+                        this.setBlock(px + x, py + y, pz - z, block);
+                        if (x != 0) this.setBlock(px - x, py + y, pz - z, block);
+                    }
+                    if (y != 0) {
+                        this.setBlock(px + x, py - y, pz + z, block);
+                        if (x != 0) this.setBlock(px - x, py - y, pz + z, block);
+                        if (z != 0) {
+                            this.setBlock(px + x, py - y, pz - z, block);
+                            if (x != 0) this.setBlock(px - x, py - y, pz - z, block);
+                        }
+                    }
                 }
             }
         }

@@ -65,10 +65,10 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
     public IntFaweChunk copy(boolean shallow) {
         BukkitChunk_All copy;
         if (shallow) {
-            copy = new BukkitChunk_All(getParent(), getX(), getZ(), ids, count, air);
+            copy = new BukkitChunk_All(getParent(), getX(), getZ(), setBlocks, count, air);
             copy.biomes = biomes;
         } else {
-            copy = new BukkitChunk_All(getParent(), getX(), getZ(), (int[][]) MainUtil.copyNd(ids), count.clone(), air.clone());
+            copy = new BukkitChunk_All(getParent(), getX(), getZ(), (int[][]) MainUtil.copyNd(setBlocks), count.clone(), air.clone());
             copy.biomes = biomes != null ? biomes.clone() : null;
         }
         copy.chunk = chunk;

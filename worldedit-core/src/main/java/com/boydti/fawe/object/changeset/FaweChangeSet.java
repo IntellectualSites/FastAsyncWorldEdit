@@ -302,10 +302,16 @@ public abstract class FaweChangeSet implements ChangeSet {
                                                 switch (combinedIdCurrent) {
                                                     case 0:
                                                         continue;
-                                                    case 1:
-                                                        combinedIdCurrent = 0;
                                                     default:
-                                                        int combinedIdPrevious = previousLayer != null ? previousLayer[index] : BlockID.AIR;
+                                                        int combinedIdPrevious;
+                                                        if (previousLayer != null) {
+                                                            combinedIdPrevious = previousLayer[index];
+                                                            if (combinedIdPrevious == 0) {
+                                                                combinedIdPrevious = BlockID.AIR;
+                                                            }
+                                                        }  else {
+                                                            combinedIdPrevious = BlockID.AIR;
+                                                        }
                                                         if (combinedIdCurrent != combinedIdPrevious) {
                                                             add(xx, yy, zz, combinedIdPrevious, combinedIdCurrent);
                                                         }

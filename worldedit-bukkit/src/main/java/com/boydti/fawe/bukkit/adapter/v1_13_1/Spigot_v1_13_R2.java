@@ -20,6 +20,7 @@
 package com.boydti.fawe.bukkit.adapter.v1_13_1;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.object.collection.ObjObjMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.Tag;

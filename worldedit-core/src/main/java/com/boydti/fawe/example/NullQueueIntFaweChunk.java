@@ -21,9 +21,9 @@ public class NullQueueIntFaweChunk extends IntFaweChunk {
     @Override
     public IntFaweChunk copy(boolean shallow) {
         if (shallow) {
-            return new NullQueueIntFaweChunk(getX(), getZ(), ids, count, air);
+            return new NullQueueIntFaweChunk(getX(), getZ(), setBlocks, count, air);
         } else {
-            return new NullQueueIntFaweChunk(getX(), getZ(), (int[][]) MainUtil.copyNd(ids), count.clone(), air.clone());
+            return new NullQueueIntFaweChunk(getX(), getZ(), (int[][]) MainUtil.copyNd(setBlocks), count.clone(), air.clone());
         }
     }
 
