@@ -11,7 +11,7 @@ public class VoxelUndoCommand extends VoxelCommand
     {
         super("VoxelUndo", plugin);
         setIdentifier("u");
-        setPermission("voxelsniper.command.uu");
+        setPermission("voxelsniper.sniper");
     }
 
     @Override

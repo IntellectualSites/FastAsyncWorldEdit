@@ -12,7 +12,7 @@ public class VoxelUndoUserCommand extends VoxelCommand
     {
         super("VoxelUndoUser", plugin);
         setIdentifier("uu");
-        setPermission("voxelsniper.sniper");
+        setPermission("voxelsniper.command.uu");
     }
 
     @Override
