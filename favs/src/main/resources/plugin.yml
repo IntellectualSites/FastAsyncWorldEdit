@@ -34,7 +34,7 @@ commands:
            Example: /<command> -- Undoes your most recent snipe.
   uu:
     description: UndoUser undoes another sniper user's snipes.
-    permission: voxelsniper.sniper
+    permission: voxelsniper.command.uu
     usage: |
            /<command> [playername]
            Example: /<command> bads -- Undoes BadSniper's last snipe.  BadSniper must be online for name detection to function. Truncation allowed.
