@@ -213,12 +213,14 @@ public abstract class ChunkListener implements Listener {
                 return;
             }
         }
-        switch (event.getChangedType()) {
-            case AIR:
-            case CAVE_AIR:
-            case VOID_AIR:
-                return;
-        }
+//        switch (event.getChangedType()) {
+//            case AIR:
+//            case CAVE_AIR:
+//            case VOID_AIR:
+//                break;
+//            case REDSTONE_WIRE::
+//                return;
+//        }
         Exception e = new Exception();
         int depth = getDepth(e);
         if (depth >= 256) {
