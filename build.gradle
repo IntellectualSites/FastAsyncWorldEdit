@@ -87,6 +87,7 @@ subprojects {
         maven {url "http://repo.dmulloy2.net/content/groups/public/"}
         maven {url "https://repo.destroystokyo.com/repository/maven-public//"}
         maven {url "http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/"}
+        maven { url "https://libraries.minecraft.net" }
         mavenLocal()
         maven {url "http://empcraft.com/maven2"}
         maven {url "https://hub.spigotmc.org/nexus/content/groups/public/"}
