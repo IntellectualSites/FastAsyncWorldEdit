@@ -302,7 +302,7 @@ public class FaweBukkit implements IFawe, Listener {
         try {
             this.vault = new VaultUtil();
         } catch (final Throwable e) {
-            this.debug("&dVault is used for persistent `/wea` toggles.");
+            this.debug(BBC.getPrefix() + "&dVault is used for persistent `/wea` toggles.");
         }
     }
 
@@ -310,7 +310,7 @@ public class FaweBukkit implements IFawe, Listener {
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
         List<String> pl = new ArrayList<>();
-        msg.append("server.version: " + Bukkit.getVersion() + " / " + Bukkit.getBukkitVersion() + "\n");
+        msg.append("server.version: " + Bukkit.getVersion() + "\n");
         msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
             msg.append(" - " + p.getName() + ": " + p.getDescription().getVersion() + "\n");

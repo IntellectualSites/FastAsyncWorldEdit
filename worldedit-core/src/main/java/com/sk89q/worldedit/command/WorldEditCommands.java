@@ -23,9 +23,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweVersion;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.*;
-import com.google.common.io.Files;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -35,21 +33,12 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
 import com.sk89q.worldedit.extension.platform.*;
-
-import java.io.IOException;
-import java.net.URL;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
-import com.sk89q.worldedit.util.paste.ActorCallbackPaste;
-import com.sk89q.worldedit.util.report.ConfigReport;
-import com.sk89q.worldedit.util.report.ReportList;
-import com.sk89q.worldedit.util.report.SystemInfoReport;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -89,7 +78,7 @@ public class WorldEditCommands {
         PlatformManager pm = we.getPlatformManager();
         actor.printDebug("Platforms:");
         for (Platform platform : pm.getPlatforms()) {
-            actor.printDebug(String.format(" - %s", platform.getPlatformName()));
+            actor.printDebug(String.format(" - %s (%s)", platform.getPlatformName(), platform.getVersion()));
         }
         actor.printDebug("Capabilities:");
         for (Capability capability : Capability.values()) {
