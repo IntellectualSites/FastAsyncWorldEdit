@@ -8,7 +8,6 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
-import org.bukkit.block.Block;
 
 public class PatternPerformer extends vPerformer {
     private String info;
@@ -32,7 +31,7 @@ public class PatternPerformer extends vPerformer {
 
     @Override
     public void perform(AsyncBlock block) {
-    	BlockVector3 bv = BlockVector3.at(block.getX(), block.getY(), block.getZ());
+        BlockVector3 bv = BlockVector3.at(block.getX(), block.getY(), block.getZ());
         try {
             pattern.apply(extent, bv, bv);
         } catch (WorldEditException e) {

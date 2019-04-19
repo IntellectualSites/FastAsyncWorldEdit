@@ -9,20 +9,16 @@ import java.util.UUID;
 /**
  *
  */
-public class SniperManager
-{
+public class SniperManager {
     private Map<UUID, Sniper> sniperInstances = Maps.newHashMap();
     private VoxelSniper plugin;
 
-    public SniperManager(VoxelSniper plugin)
-    {
+    public SniperManager(VoxelSniper plugin) {
         this.plugin = plugin;
     }
 
-    public Sniper getSniperForPlayer(Player player)
-    {
-        if (sniperInstances.get(player.getUniqueId()) == null)
-        {
+    public Sniper getSniperForPlayer(Player player) {
+        if (sniperInstances.get(player.getUniqueId()) == null) {
             sniperInstances.put(player.getUniqueId(), new Sniper(plugin, player));
         }
         return sniperInstances.get(player.getUniqueId());

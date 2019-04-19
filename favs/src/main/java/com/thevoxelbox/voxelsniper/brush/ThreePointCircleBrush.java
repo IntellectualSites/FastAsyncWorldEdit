@@ -12,8 +12,7 @@ import org.bukkit.util.Vector;
  *
  * @author Giltwist
  */
-public class ThreePointCircleBrush extends PerformBrush
-{
+public class ThreePointCircleBrush extends PerformBrush {
     private Vector coordsOne;
     private Vector coordsTwo;
     private Vector coordsThree;
@@ -22,31 +21,22 @@ public class ThreePointCircleBrush extends PerformBrush
     /**
      * Default Constructor.
      */
-    public ThreePointCircleBrush()
-    {
+    public ThreePointCircleBrush() {
         this.setName("3-Point Circle");
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
-        if (this.coordsOne == null)
-        {
+    protected final void arrow(final SnipeData v) {
+        if (this.coordsOne == null) {
             this.coordsOne = this.getTargetBlock().getLocation().toVector();
             v.sendMessage(ChatColor.GRAY + "First Corner set.");
-        }
-        else if (this.coordsTwo == null)
-        {
+        } else if (this.coordsTwo == null) {
             this.coordsTwo = this.getTargetBlock().getLocation().toVector();
             v.sendMessage(ChatColor.GRAY + "Second Corner set.");
-        }
-        else if (this.coordsThree == null)
-        {
+        } else if (this.coordsThree == null) {
             this.coordsThree = this.getTargetBlock().getLocation().toVector();
             v.sendMessage(ChatColor.GRAY + "Third Corner set.");
-        }
-        else
-        {
+        } else {
             this.coordsOne = this.getTargetBlock().getLocation().toVector();
             this.coordsTwo = null;
             this.coordsThree = null;
@@ -55,10 +45,8 @@ public class ThreePointCircleBrush extends PerformBrush
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
-        if (this.coordsOne == null || this.coordsTwo == null || this.coordsThree == null)
-        {
+    protected final void powder(final SnipeData v) {
+        if (this.coordsOne == null || this.coordsTwo == null || this.coordsThree == null) {
             return;
         }
 
@@ -71,8 +59,7 @@ public class ThreePointCircleBrush extends PerformBrush
         vectorThree.subtract(vectorTwo);
 
         // Redundant data check
-        if (vectorOne.length() == 0 || vectorTwo.length() == 0 || vectorThree.length() == 0 || vectorOne.angle(vectorTwo) == 0 || vectorOne.angle(vectorThree) == 0 || vectorThree.angle(vectorTwo) == 0)
-        {
+        if (vectorOne.length() == 0 || vectorTwo.length() == 0 || vectorThree.length() == 0 || vectorOne.angle(vectorTwo) == 0 || vectorOne.angle(vectorThree) == 0 || vectorThree.angle(vectorTwo) == 0) {
 
             v.sendMessage(ChatColor.RED + "ERROR: Invalid points, try again.");
             this.coordsOne = null;
@@ -117,12 +104,9 @@ public class ThreePointCircleBrush extends PerformBrush
         final double radius = circumcenter.distance(new Vector(this.coordsOne.getX(), this.coordsOne.getY(), this.coordsOne.getZ()));
         final int brushSize = NumberConversions.ceil(radius) + 1;
 
-        for (int x = -brushSize; x <= brushSize; x++)
-        {
-            for (int y = -brushSize; y <= brushSize; y++)
-            {
-                for (int z = -brushSize; z <= brushSize; z++)
-                {
+        for (int x = -brushSize; x <= brushSize; x++) {
+            for (int y = -brushSize; y <= brushSize; y++) {
+                for (int z = -brushSize; z <= brushSize; z++) {
                     // Calculate distance from center
                     final double tempDistance = Math.pow(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2), .5);
 
@@ -133,8 +117,7 @@ public class ThreePointCircleBrush extends PerformBrush
                     final double centerConstant = normalVector.getX() * (circumcenter.getX() + x + .5) + normalVector.getY() * (circumcenter.getY() + y + .5) + normalVector.getZ() * (circumcenter.getZ() + z + .5);
 
                     // Check if point is within sphere and on plane (some tolerance given)
-                    if (tempDistance <= radius && (Math.abs(cornerConstant - planeConstant) < this.tolerance.getValue() || Math.abs(centerConstant - planeConstant) < this.tolerance.getValue()))
-                    {
+                    if (tempDistance <= radius && (Math.abs(cornerConstant - planeConstant) < this.tolerance.getValue() || Math.abs(centerConstant - planeConstant) < this.tolerance.getValue())) {
                         this.current.perform(this.clampY(brushCenter.getBlockX() + x, brushCenter.getBlockY() + y, brushCenter.getBlockZ() + z));
                     }
 
@@ -153,11 +136,9 @@ public class ThreePointCircleBrush extends PerformBrush
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
-        switch (this.tolerance)
-        {
+        switch (this.tolerance) {
             case ACCURATE:
                 vm.custom(ChatColor.GOLD + "Mode: Accurate");
                 break;
@@ -175,16 +156,12 @@ public class ThreePointCircleBrush extends PerformBrush
     }
 
     @Override
-    public final void parameters(final String[] par, final SnipeData v)
-    {
-        if (par[1].equalsIgnoreCase("info"))
-        {
+    public final void parameters(final String[] par, final SnipeData v) {
+        if (par[1].equalsIgnoreCase("info")) {
             v.sendMessage(ChatColor.YELLOW + "3-Point Circle Brush instructions: Select three corners with the arrow brush, then generate the Circle with the powder brush.");
             String toleranceOptions = "";
-            for (final Tolerance tolerance : Tolerance.values())
-            {
-                if (!toleranceOptions.isEmpty())
-                {
+            for (final Tolerance tolerance : Tolerance.values()) {
+                if (!toleranceOptions.isEmpty()) {
                     toleranceOptions += "|";
                 }
                 toleranceOptions += tolerance.name().toLowerCase();
@@ -193,20 +170,21 @@ public class ThreePointCircleBrush extends PerformBrush
             return;
         }
 
-        for (int i = 1; i < par.length; i++)
-        {
+        for (int i = 1; i < par.length; i++) {
             final String parameter = par[i].toUpperCase();
-            try
-            {
+            try {
                 this.tolerance = Tolerance.valueOf(parameter);
                 v.sendMessage(ChatColor.AQUA + "Brush set to " + this.tolerance.name().toLowerCase() + " tolerance.");
                 return;
-            }
-            catch (final IllegalArgumentException exception)
-            {
+            } catch (final IllegalArgumentException exception) {
                 v.getVoxelMessage().brushMessage("No such tolerance.");
             }
         }
+    }
+
+    @Override
+    public String getPermissionNode() {
+        return "voxelsniper.brush.threepointcircle";
     }
 
     /**
@@ -214,25 +192,16 @@ public class ThreePointCircleBrush extends PerformBrush
      *
      * @author MikeMatrix
      */
-    private enum Tolerance
-    {
+    private enum Tolerance {
         DEFAULT(1000), ACCURATE(10), SMOOTH(2000);
         private int value;
 
-        Tolerance(final int value)
-        {
+        Tolerance(final int value) {
             this.value = value;
         }
 
-        public int getValue()
-        {
+        public int getValue() {
             return this.value;
         }
-    }
-
-    @Override
-    public String getPermissionNode()
-    {
-        return "voxelsniper.brush.threepointcircle";
     }
 }

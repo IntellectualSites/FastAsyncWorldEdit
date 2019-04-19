@@ -137,7 +137,7 @@ public class RegionCommands extends MethodCommands {
         FawePlayer fp = FawePlayer.wrap(player);
         final FaweLocation loc = fp.getLocation();
         FaweQueue queue = fp.getFaweQueue(false);
-        fp.sendMessage("Light: " + queue.getEmmittedLight(loc.x, loc.y, loc.z) + " | " + queue.getSkyLight(loc.x, loc.y, loc.z));
+        fp.sendMessage(BBC.getPrefix() + "Light: " + queue.getEmmittedLight(loc.x, loc.y, loc.z) + " | " + queue.getSkyLight(loc.x, loc.y, loc.z));
     }
 
     @Command(

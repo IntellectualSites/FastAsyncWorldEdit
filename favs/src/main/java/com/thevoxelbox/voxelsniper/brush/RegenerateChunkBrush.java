@@ -10,27 +10,21 @@ import org.bukkit.Chunk;
  *
  * @author Mick
  */
-public class RegenerateChunkBrush extends Brush
-{
+public class RegenerateChunkBrush extends Brush {
     /**
      *
      */
-    public RegenerateChunkBrush()
-    {
+    public RegenerateChunkBrush() {
         this.setName("Chunk Generator 40k");
     }
 
-    private void generateChunk(final SnipeData v)
-    {
+    private void generateChunk(final SnipeData v) {
         final Chunk chunk = this.getTargetBlock().getChunk();
         final Undo undo = new Undo();
 
-        for (int z = CHUNK_SIZE; z >= 0; z--)
-        {
-            for (int x = CHUNK_SIZE; x >= 0; x--)
-            {
-                for (int y = this.getWorld().getMaxHeight(); y >= 0; y--)
-                {
+        for (int z = CHUNK_SIZE; z >= 0; z--) {
+            for (int x = CHUNK_SIZE; x >= 0; x--) {
+                for (int y = this.getWorld().getMaxHeight(); y >= 0; y--) {
                     undo.put(chunk.getBlock(x, y, z));
                 }
             }
@@ -43,28 +37,24 @@ public class RegenerateChunkBrush extends Brush
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.generateChunk(v);
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.generateChunk(v);
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.brushMessage("Tread lightly.");
         vm.brushMessage("This brush will melt your spleen and sell your kidneys.");
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.regeneratechunk";
     }
 }

@@ -9,39 +9,33 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
  *
  * @author Voxel
  */
-public class SnipeBrush extends PerformBrush
-{
+public class SnipeBrush extends PerformBrush {
     /**
      *
      */
-    public SnipeBrush()
-    {
+    public SnipeBrush() {
         this.setName("Snipe");
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.current.perform(this.getTargetBlock());
         v.owner().storeUndo(this.current.getUndo());
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.current.perform(this.getLastBlock());
         v.owner().storeUndo(this.current.getUndo());
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.snipe";
     }
 }

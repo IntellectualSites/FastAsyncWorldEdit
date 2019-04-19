@@ -3,6 +3,8 @@ package com.boydti.fawe.installer;
 import com.boydti.fawe.FaweVersion;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
+import com.sk89q.worldedit.WorldEdit;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -149,11 +151,11 @@ public class InstallerFrame extends JFrame {
                 java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
                 String versionString = scanner.next().trim();
                 scanner.close();
-                FaweVersion version = new FaweVersion(versionString);
+                FaweVersion version = null;
                 String date = new Date(100 + version.year, version.month, version.day).toGMTString();
                 String build = "https://ci.athion.net/job/FastAsyncWorldEdit/" + version.build;
                 String commit = "https://github.com/boy0001/FastAsyncWorldedit/commit/" + Integer.toHexString(version.hash);
-                String footerMessage = "FAWE v" + version.major + "." + version.minor + "." + version.patch + " by Empire92 (c) 2017 (GPL v3.0)";
+                String footerMessage = "FAWE v" + version.year + "." + version.month + "." + version.day + " by Empire92 (c) 2017 (GPL v3.0)";
                 URL licenseUrl = new URL("https://github.com/boy0001/FastAsyncWorldedit/blob/master/LICENSE");
                 URLButton licenseButton = new URLButton(licenseUrl, footerMessage);
                 bottomBar.add(licenseButton);

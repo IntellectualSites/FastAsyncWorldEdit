@@ -11,15 +11,13 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import com.thevoxelbox.voxelsniper.util.BlockWrapper;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 /**
  * Abstract implementation of the {@link IBrush} interface.
  */
-public abstract class Brush implements IBrush
-{
+public abstract class Brush implements IBrush {
     protected static final int CHUNK_SIZE = 16;
     /**
      * Targeted Block.
@@ -40,27 +38,20 @@ public abstract class Brush implements IBrush
      * @param z
      * @return {@link Block}
      */
-    public final AsyncBlock clampY(final int x, final int y, final int z)
-    {
+    public final AsyncBlock clampY(final int x, final int y, final int z) {
         int clampedY = y;
-        if (clampedY < 0)
-        {
+        if (clampedY < 0) {
             clampedY = 0;
-        }
-        else if (clampedY > this.getWorld().getMaxHeight())
-        {
+        } else if (clampedY > this.getWorld().getMaxHeight()) {
             clampedY = this.getWorld().getMaxHeight();
         }
 
         return this.getWorld().getBlockAt(x, clampedY, z);
     }
 
-    private boolean preparePerform(final SnipeData v, final AsyncBlock clickedBlock, final BlockFace clickedFace)
-    {
-        if (this.getTarget(v, clickedBlock, clickedFace))
-        {
-            if (this instanceof PerformBrush)
-            {
+    private boolean preparePerform(final SnipeData v, final AsyncBlock clickedBlock, final BlockFace clickedFace) {
+        if (this.getTarget(v, clickedBlock, clickedFace)) {
+            if (this instanceof PerformBrush) {
                 ((PerformBrush) this).initP(v);
             }
             return true;
@@ -70,12 +61,10 @@ public abstract class Brush implements IBrush
     }
 
     @Override
-    public boolean perform(SnipeAction action, SnipeData data, AsyncBlock targetBlock, AsyncBlock lastBlock)
-    {
+    public boolean perform(SnipeAction action, SnipeData data, AsyncBlock targetBlock, AsyncBlock lastBlock) {
         this.setTargetBlock(targetBlock);
         this.setLastBlock(lastBlock);
-        switch (action)
-        {
+        switch (action) {
             case ARROW:
                 this.arrow(data);
                 return true;
@@ -92,8 +81,7 @@ public abstract class Brush implements IBrush
      *
      * @param v Sniper caller
      */
-    protected void arrow(final SnipeData v)
-    {
+    protected void arrow(final SnipeData v) {
     }
 
     /**
@@ -101,16 +89,14 @@ public abstract class Brush implements IBrush
      *
      * @param v Sniper caller
      */
-    protected void powder(final SnipeData v)
-    {
+    protected void powder(final SnipeData v) {
     }
 
     @Override
     public abstract void info(Message vm);
 
     @Override
-    public void parameters(final String[] par, final SnipeData v)
-    {
+    public void parameters(final String[] par, final SnipeData v) {
         v.sendMessage(ChatColor.RED + "This brush does not accept additional parameters.");
     }
 
@@ -122,52 +108,38 @@ public abstract class Brush implements IBrush
      * @param clickedFace
      * @return boolean
      */
-    protected final boolean getTarget(final SnipeData v, final AsyncBlock clickedBlock, final BlockFace clickedFace)
-    {
-        if (clickedBlock != null)
-        {
+    protected final boolean getTarget(final SnipeData v, final AsyncBlock clickedBlock, final BlockFace clickedFace) {
+        if (clickedBlock != null) {
             this.setTargetBlock(clickedBlock);
             this.setLastBlock(clickedBlock.getRelative(clickedFace));
-            if (this.getLastBlock() == null)
-            {
+            if (this.getLastBlock() == null) {
                 v.sendMessage(ChatColor.RED + "Snipe target block must be visible.");
                 return false;
             }
-            if (v.owner().getSnipeData(v.owner().getCurrentToolId()).isLightningEnabled())
-            {
+            if (v.owner().getSnipeData(v.owner().getCurrentToolId()).isLightningEnabled()) {
                 this.getWorld().strikeLightning(this.getTargetBlock().getLocation());
             }
             return true;
-        }
-        else
-        {
+        } else {
             RangeBlockHelper rangeBlockHelper;
-            if (v.owner().getSnipeData(v.owner().getCurrentToolId()).isRanged())
-            {
+            if (v.owner().getSnipeData(v.owner().getCurrentToolId()).isRanged()) {
                 rangeBlockHelper = new RangeBlockHelper(v.owner().getPlayer(), v.owner().getWorld(), (double) v.owner().getSnipeData(v.owner().getCurrentToolId()).getRange());
                 this.setTargetBlock(rangeBlockHelper.getRangeBlock());
-            }
-            else
-            {
+            } else {
                 rangeBlockHelper = new RangeBlockHelper(v.owner().getPlayer(), v.owner().getWorld());
                 this.setTargetBlock(rangeBlockHelper.getTargetBlock());
             }
-            if (this.getTargetBlock() != null)
-            {
+            if (this.getTargetBlock() != null) {
                 this.setLastBlock(rangeBlockHelper.getLastBlock());
-                if (this.getLastBlock() == null)
-                {
+                if (this.getLastBlock() == null) {
                     v.sendMessage(ChatColor.RED + "Snipe target block must be visible.");
                     return false;
                 }
-                if (v.owner().getSnipeData(v.owner().getCurrentToolId()).isLightningEnabled())
-                {
+                if (v.owner().getSnipeData(v.owner().getCurrentToolId()).isLightningEnabled()) {
                     this.getWorld().strikeLightning(this.getTargetBlock().getLocation());
                 }
                 return true;
-            }
-            else
-            {
+            } else {
                 v.sendMessage(ChatColor.RED + "Snipe target block must be visible.");
                 return false;
             }
@@ -175,44 +147,38 @@ public abstract class Brush implements IBrush
     }
 
     @Override
-    public final String getName()
-    {
+    public final String getName() {
         return this.name;
     }
 
     @Override
-    public final void setName(final String name)
-    {
+    public final void setName(final String name) {
         this.name = name;
     }
 
     @Override
-    public String getBrushCategory()
-    {
+    public String getBrushCategory() {
         return "General";
     }
 
     /**
      * @return the targetBlock
      */
-    protected final AsyncBlock getTargetBlock()
-    {
+    protected final AsyncBlock getTargetBlock() {
         return this.targetBlock;
     }
 
     /**
      * @param targetBlock the targetBlock to set
      */
-    protected final void setTargetBlock(final AsyncBlock targetBlock)
-    {
+    protected final void setTargetBlock(final AsyncBlock targetBlock) {
         this.targetBlock = targetBlock;
     }
 
     /**
      * @return the world
      */
-    protected final AsyncWorld getWorld()
-    {
+    protected final AsyncWorld getWorld() {
         return targetBlock.getWorld();
     }
 
@@ -225,18 +191,15 @@ public abstract class Brush implements IBrush
      * @return Type ID of Block at given coordinates in the world of the targeted Block.
      */
     @SuppressWarnings("deprecation")
-    protected int getBlockIdAt(int x, int y, int z)
-    {
+    protected int getBlockIdAt(int x, int y, int z) {
         return getWorld().getBlockAt(x, y, z).getTypeId();
     }
 
-    protected Block getBlockAt(int x, int y, int z)
-    {
+    protected Block getBlockAt(int x, int y, int z) {
         return getWorld().getBlockAt(x, y, z);
     }
 
-    protected Material getBlockType(int x, int y, int z)
-    {
+    protected Material getBlockType(int x, int y, int z) {
         return getWorld().getBlockAt(x, y, z).getType();
     }
 
@@ -249,24 +212,21 @@ public abstract class Brush implements IBrush
      * @return Block Data Value of Block at given coordinates in the world of the targeted Block.
      */
     @SuppressWarnings("deprecation")
-	protected int getBlockDataAt(int x, int y, int z)
-    {
+    protected int getBlockDataAt(int x, int y, int z) {
         return this.getWorld().getBlockAt(x, y, z).getPropertyId();
     }
 
     /**
      * @return Block before target Block.
      */
-    protected final AsyncBlock getLastBlock()
-    {
+    protected final AsyncBlock getLastBlock() {
         return this.lastBlock;
     }
 
     /**
      * @param lastBlock Last Block before target Block.
      */
-    protected final void setLastBlock(AsyncBlock lastBlock)
-    {
+    protected final void setLastBlock(AsyncBlock lastBlock) {
         this.lastBlock = lastBlock;
     }
 
@@ -276,8 +236,7 @@ public abstract class Brush implements IBrush
      * @param blockWrapper Block data wrapper
      */
     @Deprecated
-    protected final void setBlock(BlockWrapper blockWrapper)
-    {
+    protected final void setBlock(BlockWrapper blockWrapper) {
         this.getWorld().getBlockAt(blockWrapper.getX(), blockWrapper.getY(), blockWrapper.getZ()).setTypeId(blockWrapper.getId());
     }
 
@@ -290,8 +249,7 @@ public abstract class Brush implements IBrush
      * @param id The id the block will be set to
      */
     @SuppressWarnings("deprecation")
-	protected final void setBlockIdAt(int z, int x, int y, int id)
-    {
+    protected final void setBlockIdAt(int z, int x, int y, int id) {
         this.getWorld().getBlockAt(x, y, z).setTypeId(id);
     }
 
@@ -305,8 +263,7 @@ public abstract class Brush implements IBrush
      * @param data The data value the block will be set to
      */
     @SuppressWarnings("deprecation")
-    protected final void setBlockIdAndDataAt(int x, int y, int z, int id, int data)
-    {
+    protected final void setBlockIdAndDataAt(int x, int y, int z, int id, int data) {
         this.getWorld().getBlockAt(x, y, z).setTypeIdAndPropertyId(id, data, true);
     }
 
@@ -320,8 +277,7 @@ public abstract class Brush implements IBrush
      * @param data The data value the block will be set to
      */
     @SuppressWarnings("deprecation")
-    protected final void setBlockLegacy(int x, int y, int z, int id, int data)
-    {
+    protected final void setBlockLegacy(int x, int y, int z, int id, int data) {
         this.getWorld().getBlockAt(x, y, z).setCombinedId(LegacyMapper.getInstance().getBlockFromLegacy(id, data).getInternalId());
     }
 }

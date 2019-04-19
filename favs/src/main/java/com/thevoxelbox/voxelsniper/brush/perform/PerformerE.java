@@ -4,43 +4,42 @@
  */
 package com.thevoxelbox.voxelsniper.brush.perform;
 
+import org.bukkit.ChatColor;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
-
 /**
  * @author Voxel
  */
 
 /* The m/i/c system of naming performers: <placement-option>[replacement-option][extras]
- * 
+ *
  * placement-option is mandatory and can be material(m) [for /v], ink(i) [for /vi] or combo(c) [for both]
  * replacement-option is optional and can be m [for /vr], i [for /vir] or c [for both]
  * extras is optional and can be update(u) [for graphical glitch], physics(p) [for no-phys] or up [for both]
- * 
+ *
  * new extra: n = no undo
- * 
+ *
  * The main benefit of this system is that it provides the least possible number of characters in the paramaters
  * while guaranteeing that all sensible combinations will be made.  Additionally, the names will be VERY consistent
- * 
+ *
  * EX Old System: /b b isrcup (use /v, /vi, /vr and /vir, update graphics and no physics)
  * EX New System: /b b ccup   (two characters shorter, good because snipers have been complaing about keystrokes)
- * 
+ *
  */
 
-/* This enum is getting REALLY Long, would it be possible to algorithmically generate the full performer 
+/* This enum is getting REALLY Long, would it be possible to algorithmically generate the full performer
  * from the pieces? So if the performer name is of the for m*, you'll setTypeId whereas if it is of the
  * form c* you'd setTypeIdAndPropertyId?  Similarly, if the performer is of the form *p, any setTypeId's or setTypeIdAndPropertyId's
  * will be set to false instead of true? The middle bits might be tougher, being of the form _m* perhaps?
  * Regex to the rescue, am I right? - Giltwist
  */
 
-public enum PerformerE
-{
+public enum PerformerE {
 
     MATERIAL(pMaterial.class, "m", "material"),
     MATERIAL_NOPHYS(pMaterialNoPhys.class, "mp", "mat-nophys"),
@@ -91,67 +90,16 @@ public enum PerformerE
     //COMBO_COMBO_UPDATE(       pComboComboUpdate.class,        "ccu",          "combo-combo-update"),      //              place combo, replace combo, graphical update
     //COMBO_COMBO_NOPHYS_UPDATE(pComboComboNoPhysUpdate.class,  "ccup",         "combo-combo-update-nophys"),//             place combo, replace combo, graphical update, no physics
 
-    private static Map<String, vPerformer> performers;
-    private static Map<String, String> long_names;
-    private Class<? extends vPerformer> pclass;
-    private String short_name;
-    private String long_name;
     public static String performer_list_short = "";
     public static String performer_list_long = "";
+    private static Map<String, vPerformer> performers;
+    private static Map<String, String> long_names;
 
-    PerformerE(Class<? extends vPerformer> c, String s, String l)
-    {
-        pclass = c;
-        short_name = s;
-        long_name = l;
-    }
-
-    private vPerformer getPerformer()
-    {
-        vPerformer p;
-        try
-        {
-            try
-            {
-                p = pclass.getConstructor().newInstance();
-                return p;
-            }
-            catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException ex)
-            {
-                Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        catch (NoSuchMethodException | SecurityException ex)
-        {
-            Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-
-    public static vPerformer getPerformer(String s)
-    {
-        if (performers.containsKey(s))
-        {
-            return performers.get(s);
-        }
-        else
-        {
-            return performers.get(long_names.get(s));
-        }
-    }
-
-    public static boolean has(String s)
-    {
-        return performers.containsKey(s);
-    }
-
-    static
-    {
+    static {
         performers = new TreeMap<>();
         long_names = new TreeMap<>();
 
-        for (PerformerE pe : values())
-        {
+        for (PerformerE pe : values()) {
             performers.put(pe.short_name, pe.getPerformer());
             long_names.put(pe.long_name, pe.short_name);
             performer_list_short = performer_list_short + ChatColor.GREEN + pe.short_name + ChatColor.RED + ", ";
@@ -159,5 +107,42 @@ public enum PerformerE
         }
         performer_list_short = performer_list_short.substring(0, performer_list_short.length() - 2);
         performer_list_long = performer_list_long.substring(0, performer_list_long.length() - 2);
+    }
+
+    private Class<? extends vPerformer> pclass;
+    private String short_name;
+    private String long_name;
+
+    PerformerE(Class<? extends vPerformer> c, String s, String l) {
+        pclass = c;
+        short_name = s;
+        long_name = l;
+    }
+
+    public static vPerformer getPerformer(String s) {
+        if (performers.containsKey(s)) {
+            return performers.get(s);
+        } else {
+            return performers.get(long_names.get(s));
+        }
+    }
+
+    public static boolean has(String s) {
+        return performers.containsKey(s);
+    }
+
+    private vPerformer getPerformer() {
+        vPerformer p;
+        try {
+            try {
+                p = pclass.getConstructor().newInstance();
+                return p;
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | IllegalArgumentException ex) {
+                Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (NoSuchMethodException | SecurityException ex) {
+            Logger.getLogger(PerformerE.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }

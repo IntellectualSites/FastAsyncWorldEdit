@@ -10,36 +10,30 @@ import com.thevoxelbox.voxelsniper.Message;
 /**
  * @author Voxel
  */
-public class pInkNoUndo extends vPerformer
-{
+public class pInkNoUndo extends vPerformer {
 
     private int d;
 
-    public pInkNoUndo()
-    {
+    public pInkNoUndo() {
         name = "Ink, No-Undo"; // made name more descriptive - Giltwist
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v)
-    {
+    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
         w = v.getWorld();
         d = v.getPropertyId();
     }
 
     @Override
-    public void info(Message vm)
-    {
+    public void info(Message vm) {
         vm.performerName(name);
         vm.data();
     }
 
     @SuppressWarnings("deprecation")
-	@Override
-    public void perform(AsyncBlock b)
-    {
-        if (b.getPropertyId() != d)
-        {
+    @Override
+    public void perform(AsyncBlock b) {
+        if (b.getPropertyId() != d) {
             b.setPropertyId(d);
         }
     }
