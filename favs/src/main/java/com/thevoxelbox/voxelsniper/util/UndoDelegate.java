@@ -1,4 +1,3 @@
-
 package com.thevoxelbox.voxelsniper.util;
 
 import com.thevoxelbox.voxelsniper.Undo;
@@ -10,26 +9,23 @@ import org.bukkit.block.data.BlockData;
 /**
  *
  */
-public class UndoDelegate implements BlockChangeDelegate
-{
+public class UndoDelegate implements BlockChangeDelegate {
     private final World targetWorld;
     private Undo currentUndo;
-        
-    public Undo getUndo()
-    {
+
+    public UndoDelegate(World targetWorld) {
+        this.targetWorld = targetWorld;
+        this.currentUndo = new Undo();
+    }
+
+    public Undo getUndo() {
         final Undo pastUndo = currentUndo;
         currentUndo = new Undo();
         return pastUndo;
     }
 
-    public UndoDelegate(World targetWorld)
-    {
-        this.targetWorld = targetWorld;
-        this.currentUndo = new Undo();
-    }
     @SuppressWarnings("deprecation")
-	public boolean setBlock(Block b)
-    {
+    public boolean setBlock(Block b) {
         this.currentUndo.put(this.targetWorld.getBlockAt(b.getLocation()));
         this.targetWorld.getBlockAt(b.getLocation()).setBlockData(b.getBlockData());
         return true;
@@ -48,14 +44,12 @@ public class UndoDelegate implements BlockChangeDelegate
     }
 
     @Override
-    public int getHeight()
-    {
+    public int getHeight() {
         return this.targetWorld.getMaxHeight();
     }
 
     @Override
-    public boolean isEmpty(int x, int y, int z)
-    {
+    public boolean isEmpty(int x, int y, int z) {
         return this.targetWorld.getBlockAt(x, y, z).isEmpty();
     }
 }
