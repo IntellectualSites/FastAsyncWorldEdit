@@ -1,34 +1,19 @@
 package com.thevoxelbox.voxelsniper;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.BukkitCommand;
 import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.util.Jars;
-import com.boydti.fawe.util.MainUtil;
-import com.google.common.base.Preconditions;
 import com.thevoxelbox.voxelsniper.brush.*;
-import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
-import com.thevoxelbox.voxelsniper.command.VoxelVoxelCommand;
-import com.thevoxelbox.voxelsniper.event.SniperBrushChangedEvent;
-import com.thevoxelbox.voxelsniper.event.SniperMaterialChangedEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
 /**
  * Bukkit extension point.
  */
-public class VoxelSniper extends JavaPlugin
-{
+public class VoxelSniper extends JavaPlugin {
     private static VoxelSniper instance;
     private SniperManager sniperManager = new SniperManager(this);
     private final VoxelSniperListener voxelSniperListener = new VoxelSniperListener(this);
@@ -39,8 +24,7 @@ public class VoxelSniper extends JavaPlugin
      *
      * @return Brush Manager for current instance.
      */
-    public Brushes getBrushManager()
-    {
+    public Brushes getBrushManager() {
         return brushManager;
     }
 
@@ -49,8 +33,7 @@ public class VoxelSniper extends JavaPlugin
     /**
      * @return {@link VoxelSniper}
      */
-    public static VoxelSniper getInstance()
-    {
+    public static VoxelSniper getInstance() {
         return VoxelSniper.instance;
     }
 
@@ -59,8 +42,7 @@ public class VoxelSniper extends JavaPlugin
      *
      * @return {@link VoxelSniperConfiguration} object for accessing global VoxelSniper options.
      */
-    public VoxelSniperConfiguration getVoxelSniperConfiguration()
-    {
+    public VoxelSniperConfiguration getVoxelSniperConfiguration() {
         return voxelSniperConfiguration;
     }
 
@@ -69,20 +51,16 @@ public class VoxelSniper extends JavaPlugin
      *
      * @return SniperManager
      */
-    public SniperManager getSniperManager()
-    {
+    public SniperManager getSniperManager() {
         return sniperManager;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
-    {
-        if (sender instanceof Player)
-        {
+    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
+        if (sender instanceof Player) {
             String[] arguments = args;
 
-            if (arguments == null)
-            {
+            if (arguments == null) {
                 arguments = new String[0];
             }
 
@@ -94,8 +72,7 @@ public class VoxelSniper extends JavaPlugin
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         VoxelSniper.instance = this;
 
         registerBrushes();
@@ -134,14 +111,14 @@ public class VoxelSniper extends JavaPlugin
 
                 }
             });
-        } catch (Throwable ignore) {}
+        } catch (Throwable ignore) {
+        }
     }
 
     /**
      * Registers all brushes.
      */
-    public void registerBrushes()
-    {
+    public void registerBrushes() {
         brushManager.registerSniperBrush(BallBrush.class, "b", "ball");
         brushManager.registerSniperBrush(BiomeBrush.class, "bio", "biome");
         brushManager.registerSniperBrush(BlendBallBrush.class, "bb", "blendball");

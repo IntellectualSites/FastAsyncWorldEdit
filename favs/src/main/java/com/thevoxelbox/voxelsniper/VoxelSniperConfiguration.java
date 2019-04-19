@@ -8,8 +8,7 @@ import java.util.List;
 /**
  * Configuration storage defining global configurations for VoxelSniper.
  */
-public class VoxelSniperConfiguration
-{
+public class VoxelSniperConfiguration {
     public static final String CONFIG_IDENTIFIER_LITESNIPER_MAX_BRUSH_SIZE = "litesniper-max-brush-size";
     public static final String CONFIG_IDENTIFIER_UNDO_CACHE_SIZE = "undo-cache-size";
     public static final String CONFIG_IDENTIFIER_LITESNIPER_RESTRICTED_ITEMS = "litesniper-restricted-items";
@@ -22,8 +21,7 @@ public class VoxelSniperConfiguration
     /**
      * @param configuration Configuration that is going to be used.
      */
-    public VoxelSniperConfiguration(FileConfiguration configuration)
-    {
+    public VoxelSniperConfiguration(FileConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -32,8 +30,7 @@ public class VoxelSniperConfiguration
      *
      * @return the maximum amount of snipes stored in the undo cache of snipers
      */
-    public int getUndoCacheSize()
-    {
+    public int getUndoCacheSize() {
         return configuration.getInt(CONFIG_IDENTIFIER_UNDO_CACHE_SIZE, DEFAULT_UNDO_CACHE_SIZE);
     }
 
@@ -42,8 +39,7 @@ public class VoxelSniperConfiguration
      *
      * @param size size of undo cache
      */
-    public void setUndoCacheSize(int size)
-    {
+    public void setUndoCacheSize(int size) {
         configuration.set(CONFIG_IDENTIFIER_UNDO_CACHE_SIZE, size);
     }
 
@@ -52,8 +48,7 @@ public class VoxelSniperConfiguration
      *
      * @return maximum size
      */
-    public int getLiteSniperMaxBrushSize()
-    {
+    public int getLiteSniperMaxBrushSize() {
         return configuration.getInt(CONFIG_IDENTIFIER_LITESNIPER_MAX_BRUSH_SIZE, DEFAULT_LITESNIPER_MAX_BRUSH_SIZE);
     }
 
@@ -62,8 +57,7 @@ public class VoxelSniperConfiguration
      *
      * @param size maximum size
      */
-    public void setLiteSniperMaxBrushSize(int size)
-    {
+    public void setLiteSniperMaxBrushSize(int size) {
         configuration.set(CONFIG_IDENTIFIER_LITESNIPER_MAX_BRUSH_SIZE, size);
     }
 
@@ -72,8 +66,7 @@ public class VoxelSniperConfiguration
      *
      * @return List of restricted Litesniper Items
      */
-    public List<Integer> getLiteSniperRestrictedItems()
-    {
+    public List<Integer> getLiteSniperRestrictedItems() {
         return configuration.getIntegerList(CONFIG_IDENTIFIER_LITESNIPER_RESTRICTED_ITEMS);
     }
 
@@ -82,8 +75,7 @@ public class VoxelSniperConfiguration
      *
      * @param restrictedItems List of restricted Litesniper Items
      */
-    public void setLitesniperRestrictedItems(List<Integer> restrictedItems)
-    {
+    public void setLitesniperRestrictedItems(List<Integer> restrictedItems) {
         Preconditions.checkNotNull(restrictedItems, "Restricted items must be a list.");
         configuration.set(CONFIG_IDENTIFIER_LITESNIPER_RESTRICTED_ITEMS, restrictedItems);
     }
@@ -93,8 +85,7 @@ public class VoxelSniperConfiguration
      *
      * @return true if message on login is enabled, false otherwise.
      */
-    public boolean isMessageOnLoginEnabled()
-    {
+    public boolean isMessageOnLoginEnabled() {
         return configuration.getBoolean(CONFIG_IDENTIFIER_MESSAGE_ON_LOGIN_ENABLED, DEFAULT_MESSAGE_ON_LOGIN_ENABLED);
     }
 
@@ -103,8 +94,7 @@ public class VoxelSniperConfiguration
      *
      * @param enabled Message on Login enabled
      */
-    public void setMessageOnLoginEnabled(boolean enabled)
-    {
+    public void setMessageOnLoginEnabled(boolean enabled) {
         configuration.set(CONFIG_IDENTIFIER_MESSAGE_ON_LOGIN_ENABLED, enabled);
     }
 }

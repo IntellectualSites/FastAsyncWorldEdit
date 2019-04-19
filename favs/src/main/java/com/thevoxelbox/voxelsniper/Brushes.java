@@ -13,21 +13,18 @@ import java.util.Set;
 /**
  * Brush registration manager.
  */
-public class Brushes
-{
+public class Brushes {
     private Multimap<Class<? extends IBrush>, String> brushes = HashMultimap.create();
 
     /**
      * Register a brush for VoxelSniper to be able to use.
      *
-     * @param clazz        Brush implementing IBrush interface.
-     * @param handles      Handles under which the brush can be accessed ingame.
+     * @param clazz   Brush implementing IBrush interface.
+     * @param handles Handles under which the brush can be accessed ingame.
      */
-    public void registerSniperBrush(Class<? extends IBrush> clazz, String... handles)
-    {
+    public void registerSniperBrush(Class<? extends IBrush> clazz, String... handles) {
         Preconditions.checkNotNull(clazz, "Cannot register null as a class.");
-        for (String handle : handles)
-        {
+        for (String handle : handles) {
             brushes.put(clazz, handle.toLowerCase());
         }
     }
@@ -38,18 +35,14 @@ public class Brushes
      * @param handle Case insensitive brush handle
      * @return Brush class
      */
-    public Class<? extends IBrush> getBrushForHandle(String handle)
-    {
+    public Class<? extends IBrush> getBrushForHandle(String handle) {
         Preconditions.checkNotNull(handle, "Brushhandle can not be null.");
-        if (!brushes.containsValue(handle.toLowerCase()))
-        {
+        if (!brushes.containsValue(handle.toLowerCase())) {
             return null;
         }
 
-        for (Map.Entry<Class<? extends IBrush>, String> entry : brushes.entries())
-        {
-            if (entry.getValue().equalsIgnoreCase(handle))
-            {
+        for (Map.Entry<Class<? extends IBrush>, String> entry : brushes.entries()) {
+            if (entry.getValue().equalsIgnoreCase(handle)) {
                 return entry.getKey();
             }
         }
@@ -59,34 +52,29 @@ public class Brushes
     /**
      * @return Amount of IBrush classes registered with the system under Sniper visibility.
      */
-    public int registeredSniperBrushes()
-    {
+    public int registeredSniperBrushes() {
         return brushes.keySet().size();
     }
 
     /**
      * @return Amount of handles registered with the system under Sniper visibility.
      */
-    public int registeredSniperBrushHandles()
-    {
+    public int registeredSniperBrushHandles() {
         return brushes.size();
     }
 
     /**
-     *
      * @param clazz Brush class
      * @return All Sniper registered handles for the brush.
      */
-    public Set<String> getSniperBrushHandles(Class<? extends IBrush> clazz)
-    {
+    public Set<String> getSniperBrushHandles(Class<? extends IBrush> clazz) {
         return new HashSet<>(brushes.get(clazz));
     }
 
     /**
      * @return Immutable Multimap copy of all the registered brushes
      */
-    public Multimap<Class<?extends IBrush>, String> getRegisteredBrushesMultimap()
-    {
+    public Multimap<Class<? extends IBrush>, String> getRegisteredBrushesMultimap() {
         return ImmutableMultimap.copyOf(brushes);
     }
 }

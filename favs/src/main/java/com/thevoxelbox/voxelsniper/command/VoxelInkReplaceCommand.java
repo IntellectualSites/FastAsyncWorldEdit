@@ -7,45 +7,32 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Sniper;
 import com.thevoxelbox.voxelsniper.VoxelSniper;
 import com.thevoxelbox.voxelsniper.api.command.VoxelCommand;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public class VoxelInkReplaceCommand extends VoxelCommand
-{
-    public VoxelInkReplaceCommand(final VoxelSniper plugin)
-    {
+public class VoxelInkReplaceCommand extends VoxelCommand {
+    public VoxelInkReplaceCommand(final VoxelSniper plugin) {
         super("VoxelInkReplace", plugin);
         setIdentifier("vir");
         setPermission("voxelsniper.sniper");
     }
 
     @Override
-    public boolean onCommand(Player player, String[] args)
-    {
+    public boolean onCommand(Player player, String[] args) {
         Sniper sniper = plugin.getSniperManager().getSniperForPlayer(player);
 
         int dataValue;
 
-        if (args.length == 0)
-        {
+        if (args.length == 0) {
             AsyncBlock targetBlock = new RangeBlockHelper(player, sniper.getWorld()).getTargetBlock();
-            if (targetBlock != null)
-            {
+            if (targetBlock != null) {
                 dataValue = targetBlock.getPropertyId();
-            }
-            else
-            {
+            } else {
                 return true;
             }
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 dataValue = Integer.parseInt(args[0]);
-            }
-            catch (NumberFormatException exception)
-            {
+            } catch (NumberFormatException exception) {
                 BlockState state = BlockState.get(args[0]);
                 if (state == null) {
                     player.sendMessage("Couldn't parse input.");
