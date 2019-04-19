@@ -10,47 +10,40 @@ import com.thevoxelbox.voxelsniper.Message;
 /**
  * @author Voxel
  */
-public class pInkInk extends vPerformer
-{
+public class pInkInk extends vPerformer {
 
     private int d;
     private int dr;
 
-    public pInkInk()
-    {
+    public pInkInk() {
         name = "Ink-Ink";
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v)
-    {
+    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
         w = v.getWorld();
         d = v.getPropertyId();
         dr = v.getReplaceData();
     }
 
     @Override
-    public void info(Message vm)
-    {
+    public void info(Message vm) {
         vm.performerName(name);
         vm.data();
         vm.replaceData();
     }
 
     @SuppressWarnings("deprecation")
-	@Override
-    public void perform(AsyncBlock b)
-    {
-        if (b.getPropertyId() == dr)
-        {
+    @Override
+    public void perform(AsyncBlock b) {
+        if (b.getPropertyId() == dr) {
             h.put(b);
             b.setPropertyId(d);
         }
     }
 
     @Override
-    public boolean isUsingReplaceMaterial()
-    {
+    public boolean isUsingReplaceMaterial() {
         return true;
     }
 }

@@ -12,26 +12,22 @@ import org.bukkit.block.BlockFace;
  *
  * @author Gavjenks
  */
-public class VoltMeterBrush extends Brush
-{
+public class VoltMeterBrush extends Brush {
     /**
      *
      */
-    public VoltMeterBrush()
-    {
+    public VoltMeterBrush() {
         this.setName("VoltMeter");
     }
 
     @SuppressWarnings("deprecation")
-	private void data(final SnipeData v)
-    {
+    private void data(final SnipeData v) {
         final AsyncBlock block = this.clampY(this.getTargetBlock().getX(), this.getTargetBlock().getY(), this.getTargetBlock().getZ());
         final int data = block.getPropertyId();
         v.sendMessage(ChatColor.AQUA + "Blocks until repeater needed: " + data);
     }
 
-    private void volt(final SnipeData v)
-    {
+    private void volt(final SnipeData v) {
         final Block block = this.clampY(this.getTargetBlock().getX(), this.getTargetBlock().getY(), this.getTargetBlock().getZ());
         final boolean indirect = block.isBlockIndirectlyPowered();
         final boolean direct = block.isBlockPowered();
@@ -45,27 +41,23 @@ public class VoltMeterBrush extends Brush
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.volt(v);
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.data(v);
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.brushMessage("Right click with arrow to see if blocks/faces are powered. Powder measures wire current.");
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.voltmeter";
     }
 }

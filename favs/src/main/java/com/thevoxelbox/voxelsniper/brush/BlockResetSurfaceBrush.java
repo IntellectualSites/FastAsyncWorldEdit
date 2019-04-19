@@ -1,17 +1,12 @@
 package com.thevoxelbox.voxelsniper.brush;
 
-import java.util.ArrayList;
-
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
-
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
 
 /**
  * This brush only looks for solid blocks, and then changes those plus any air blocks touching them. If it works, this brush should be faster than the original
@@ -28,90 +23,76 @@ import org.bukkit.block.Block;
  *
  * @author GavJenks
  */
-public class BlockResetSurfaceBrush extends Brush
-{
+public class BlockResetSurfaceBrush extends Brush {
     /**
      *
      */
-    public BlockResetSurfaceBrush()
-    {
+    public BlockResetSurfaceBrush() {
         this.setName("Block Reset Brush Surface Only");
     }
 
     @SuppressWarnings("deprecation")
-	private void applyBrush(final SnipeData v)
-    {
+    private void applyBrush(final SnipeData v) {
         final AsyncWorld world = this.getWorld();
 
-        for (int z = -v.getBrushSize(); z <= v.getBrushSize(); z++)
-        {
-            for (int x = -v.getBrushSize(); x <= v.getBrushSize(); x++)
-            {
-                for (int y = -v.getBrushSize(); y <= v.getBrushSize(); y++)
-                {
+        for (int z = -v.getBrushSize(); z <= v.getBrushSize(); z++) {
+            for (int x = -v.getBrushSize(); x <= v.getBrushSize(); x++) {
+                for (int y = -v.getBrushSize(); y <= v.getBrushSize(); y++) {
 
                     AsyncBlock block = world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z);
 
 
                     Material type = block.getType();
                     BlockMaterial mat = BukkitAdapter.adapt(type).getMaterial();
-                    if (!mat.isSolid() || !mat.isFullCube() || mat.hasContainer())
-                    {
+                    if (!mat.isSolid() || !mat.isFullCube() || mat.hasContainer()) {
                         continue;
                     }
 
                     boolean airFound = false;
 
-                    if (world.getBlockAt(this.getTargetBlock().getX() + x + 1, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z).isEmpty())
-                    {
+                    if (world.getBlockAt(this.getTargetBlock().getX() + x + 1, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z).isEmpty()) {
                         block = world.getBlockAt(this.getTargetBlock().getX() + x + 1, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z);
                         final int oldData = block.getPropertyId();
                         resetBlock(block, oldData);
                         airFound = true;
                     }
 
-                    if (world.getBlockAt(this.getTargetBlock().getX() + x - 1, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z).isEmpty())
-                    {
+                    if (world.getBlockAt(this.getTargetBlock().getX() + x - 1, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z).isEmpty()) {
                         block = world.getBlockAt(this.getTargetBlock().getX() + x - 1, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z);
                         final int oldData = block.getPropertyId();
                         resetBlock(block, oldData);
                         airFound = true;
                     }
 
-                    if (world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y + 1, this.getTargetBlock().getZ() + z).isEmpty())
-                    {
+                    if (world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y + 1, this.getTargetBlock().getZ() + z).isEmpty()) {
                         block = world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y + 1, this.getTargetBlock().getZ() + z);
                         final int oldData = block.getPropertyId();
                         resetBlock(block, oldData);
                         airFound = true;
                     }
 
-                    if (world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y - 1, this.getTargetBlock().getZ() + z).isEmpty())
-                    {
+                    if (world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y - 1, this.getTargetBlock().getZ() + z).isEmpty()) {
                         block = world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y - 1, this.getTargetBlock().getZ() + z);
                         final int oldData = block.getPropertyId();
                         resetBlock(block, oldData);
                         airFound = true;
                     }
 
-                    if (world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z + 1).isEmpty())
-                    {
+                    if (world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z + 1).isEmpty()) {
                         block = world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z + 1);
                         final int oldData = block.getPropertyId();
                         resetBlock(block, oldData);
                         airFound = true;
                     }
 
-                    if (world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z - 1).isEmpty())
-                    {
+                    if (world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z - 1).isEmpty()) {
                         block = world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z - 1);
                         final int oldData = block.getPropertyId();
                         resetBlock(block, oldData);
                         airFound = true;
                     }
 
-                    if (airFound)
-                    {
+                    if (airFound) {
                         block = world.getBlockAt(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + y, this.getTargetBlock().getZ() + z);
                         final int oldData = block.getPropertyId();
                         resetBlock(block, oldData);
@@ -122,33 +103,28 @@ public class BlockResetSurfaceBrush extends Brush
     }
 
     @SuppressWarnings("deprecation")
-	private void resetBlock(AsyncBlock block, final int oldData)
-    {
-        block.setTypeIdAndPropertyId(block.getTypeId(),  ((block.getPropertyId() + 1) & 0xf), true);
+    private void resetBlock(AsyncBlock block, final int oldData) {
+        block.setTypeIdAndPropertyId(block.getTypeId(), ((block.getPropertyId() + 1) & 0xf), true);
         block.setTypeIdAndPropertyId(block.getTypeId(), oldData, true);
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         applyBrush(v);
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         applyBrush(v);
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.blockresetsurface";
     }
 }

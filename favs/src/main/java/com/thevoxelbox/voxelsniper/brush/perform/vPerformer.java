@@ -8,13 +8,11 @@ import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 
 /**
  * @author Voxel
  */
-public abstract class vPerformer
-{
+public abstract class vPerformer {
 
     public String name = "Performer";
     protected Undo h;
@@ -24,22 +22,19 @@ public abstract class vPerformer
 
     public abstract void init(com.thevoxelbox.voxelsniper.SnipeData v);
 
-    public void setUndo()
-    {
+    public void setUndo() {
         h = new Undo();
     }
 
     public abstract void perform(AsyncBlock b);
 
-    public Undo getUndo()
-    {
+    public Undo getUndo() {
         Undo temp = h;
         h = null;
         return temp;
     }
 
-    public boolean isUsingReplaceMaterial()
-    {
+    public boolean isUsingReplaceMaterial() {
         return false;
     }
 }

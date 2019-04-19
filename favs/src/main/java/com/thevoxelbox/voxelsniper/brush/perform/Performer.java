@@ -9,8 +9,7 @@ import com.thevoxelbox.voxelsniper.Message;
 /**
  * @author Voxel
  */
-public interface Performer
-{
+public interface Performer {
 
     void parse(String[] args, com.thevoxelbox.voxelsniper.SnipeData v);
 
