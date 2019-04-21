@@ -437,7 +437,7 @@ public class ClipboardCommands extends MethodCommands {
     @Command(
             aliases = {"/paste"},
             usage = "",
-            flags = "sao",
+            flags = "saobe",
             desc = "Paste the clipboard's contents",
             help =
                     "Pastes the clipboard's contents.\n" +
