@@ -1,5 +1,6 @@
 package com.thevoxelbox.voxelsniper.command;
 
+import com.boydti.fawe.config.BBC;
 import com.thevoxelbox.voxelsniper.Sniper;
 import com.thevoxelbox.voxelsniper.VoxelSniper;
 import com.thevoxelbox.voxelsniper.api.command.VoxelCommand;
@@ -21,12 +22,12 @@ public class VoxelUndoCommand extends VoxelCommand {
                 int amount = Integer.parseInt(args[0]);
                 sniper.undo(amount);
             } catch (NumberFormatException exception) {
-                player.sendMessage("Error while parsing amount of undo. Number format exception.");
+                player.sendMessage(BBC.getPrefix() + "Number expected; string given.");
             }
         } else {
             sniper.undo();
         }
-        plugin.getLogger().info("Player \"" + player.getName() + "\" used /u");
+//        plugin.getLogger().info("Player \"" + player.getName() + "\" used /u");
         return true;
     }
 }

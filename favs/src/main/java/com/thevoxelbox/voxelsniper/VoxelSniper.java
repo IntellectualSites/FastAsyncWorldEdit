@@ -15,9 +15,17 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class VoxelSniper extends JavaPlugin {
     private static VoxelSniper instance;
-    private SniperManager sniperManager = new SniperManager(this);
     private final VoxelSniperListener voxelSniperListener = new VoxelSniperListener(this);
+    private SniperManager sniperManager = new SniperManager(this);
     private VoxelSniperConfiguration voxelSniperConfiguration;
+    private Brushes brushManager = new Brushes();
+
+    /**
+     * @return {@link VoxelSniper}
+     */
+    public static VoxelSniper getInstance() {
+        return VoxelSniper.instance;
+    }
 
     /**
      * Returns {@link com.thevoxelbox.voxelsniper.Brushes} for current instance.
@@ -26,15 +34,6 @@ public class VoxelSniper extends JavaPlugin {
      */
     public Brushes getBrushManager() {
         return brushManager;
-    }
-
-    private Brushes brushManager = new Brushes();
-
-    /**
-     * @return {@link VoxelSniper}
-     */
-    public static VoxelSniper getInstance() {
-        return VoxelSniper.instance;
     }
 
     /**
@@ -67,7 +66,7 @@ public class VoxelSniper extends JavaPlugin {
             return voxelSniperListener.onCommand((Player) sender, arguments, command.getName());
         }
 
-        getLogger().info("Only Players can execute commands.");
+        getLogger().info("Only players can execute VoxelSniper commands.");
         return true;
     }
 

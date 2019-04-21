@@ -64,7 +64,6 @@ public final class DocumentationPrinter {
         classes.add(BiomeCommands.class);
         classes.add(ChunkCommands.class);
         classes.add(ClipboardCommands.class);
-        classes.add(GeneralCommands.class);
         classes.add(GenerationCommands.class);
         classes.add(HistoryCommands.class);
         classes.add(NavigationCommands.class);
