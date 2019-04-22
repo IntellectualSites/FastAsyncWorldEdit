@@ -10,6 +10,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Player;
@@ -236,6 +237,71 @@ public class OptionsCommands {
             BBC.PLACE_ENABLED.send(player);
         } else {
             BBC.PLACE_DISABLED.send(player);
+        }
+    }
+
+    @Command(
+            aliases = { "/timeout" },
+            usage = "[time]",
+            desc = "Modify evaluation timeout time.",
+            min = 0,
+            max = 1
+    )
+    @CommandPermissions("worldedit.timeout")
+    public void timeout(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+
+        LocalConfiguration config = worldEdit.getConfiguration();
+        boolean mayDisable = player.hasPermission("worldedit.timeout.unrestricted");
+
+        int limit = args.argsLength() == 0 ? config.calculationTimeout : Math.max(-1, args.getInteger(0));
+        if (!mayDisable && config.maxCalculationTimeout > -1) {
+            if (limit > config.maxCalculationTimeout) {
+                player.printError(BBC.getPrefix() + "Your maximum allowable timeout is " + config.maxCalculationTimeout + " ms.");
+                return;
+            }
+        }
+
+        session.setTimeout(limit);
+
+        if (limit != config.calculationTimeout) {
+            player.print(BBC.getPrefix() + "Timeout time set to " + limit + " ms. (Use //timeout to go back to the default.)");
+        } else {
+            player.print(BBC.getPrefix() + "Timeout time set to " + limit + " ms.");
+        }
+    }
+
+    @Command(
+            aliases = { "/drawsel" },
+            usage = "[on|off]",
+            desc = "Toggle drawing the current selection",
+            min = 0,
+            max = 1
+    )
+    @CommandPermissions("worldedit.drawsel")
+    public void drawSelection(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+
+        if (!WorldEdit.getInstance().getConfiguration().serverSideCUI) {
+            throw new DisallowedUsageException(BBC.getPrefix() + "This functionality is disabled in the configuration!");
+        }
+        String newState = args.getString(0, null);
+        if (session.shouldUseServerCUI()) {
+            if ("on".equals(newState)) {
+                player.printError(BBC.getPrefix() + "Server CUI already enabled.");
+                return;
+            }
+
+            session.setUseServerCUI(false);
+            session.updateServerCUI(player);
+            player.print(BBC.getPrefix() + "Server CUI disabled.");
+        } else {
+            if ("off".equals(newState)) {
+                player.printError(BBC.getPrefix() + "Server CUI already disabled.");
+                return;
+            }
+
+            session.setUseServerCUI(true);
+            session.updateServerCUI(player);
+            player.print(BBC.getPrefix() + "Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.");
         }
     }
 
