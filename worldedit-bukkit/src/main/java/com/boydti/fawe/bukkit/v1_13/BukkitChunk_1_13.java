@@ -501,11 +501,6 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                         continue;
                     }
                 }
-                if (count >= 4096) {
-                    for (int i = 0; i < 4096; i++) {
-                        if (array[i] == 0) System.out.println("Invalid ");
-                    }
-                }
                 int by = j << 4;
                 DataPaletteBlock<IBlockData> nibble = section.getBlocks();
                 int nonEmptyBlockCount = 0;
