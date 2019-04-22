@@ -47,11 +47,15 @@ ext {
     date = git.head().getDate().format("yy.MM.dd")
     revision = "-${git.head().abbreviatedId}"
     parents = git.head().parentIds;
-    index = -2109;  // Offset to match CI
-    for (; parents != null && !parents.isEmpty(); index++) {
-        parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
+    if (project.hasProperty('buildnumber')) {
+        buildNumber = "$buildnumber"
+    } else {
+        index = -2109;  // Offset to match CI
+        for (; parents != null && !parents.isEmpty(); index++) {
+            parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
+        }
+        buildNumber = "${index}"
     }
-    buildNumber = "${index}"
 }
 
 if ( project.hasProperty("lzNoVersion") ) { // gradle build -PlzNoVersion
