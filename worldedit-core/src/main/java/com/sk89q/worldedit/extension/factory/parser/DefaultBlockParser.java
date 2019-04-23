@@ -173,11 +173,20 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (split.length == 1) {
                     state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]));
                 } else if (MathMan.isInteger(split[0])) {
-                    state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+                    int id = Integer.parseInt(split[0]);
+                    int data = Integer.parseInt(split[1]);
+                    if (data < 0 || data >= 16) {
+                        throw new InputParseException("Invalid data " + data);
+                    }
+                    state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
                 } else {
                     BlockType type = BlockTypes.get(split[0].toLowerCase());
                     if (type != null) {
-                        state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, Integer.parseInt(split[1]));
+                        int data = Integer.parseInt(split[1]);
+                        if (data < 0 || data >= 16) {
+                            throw new InputParseException("Invalid data " + data);
+                        }
+                        state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, data);
                     }
                 }
             } catch (NumberFormatException ignore) {}
