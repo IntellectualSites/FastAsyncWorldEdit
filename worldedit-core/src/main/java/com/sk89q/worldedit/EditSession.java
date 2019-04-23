@@ -530,7 +530,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         this.extent = nullExtent;
         bypassAll = nullExtent;
         dequeue();
-        queue.clear();
+        if (!queue.isEmpty()) {
+            if (Fawe.isMainThread()) {
+                queue.clear();
+            } else {
+                SetQueue.IMP.addTask(() -> queue.clear());
+            }
+        }
         return true;
     }
 
