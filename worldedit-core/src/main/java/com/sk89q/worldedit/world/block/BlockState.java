@@ -145,8 +145,10 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
             String name = property.getName();
 
             charSequence.setSubstring(propStrStart + name.length() + 2, state.length() - 1);
-
-            return type.withPropertyId(property.getIndexFor(charSequence));
+            int index = charSequence.length() <= 0 ? -1 : property.getIndexFor(charSequence);
+            if (index != -1) {
+                return type.withPropertyId(index);
+            }
         }
         int stateId;
         if (defaultState != null) {
@@ -167,13 +169,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
                     if (property != null) {
                         int index = property.getIndexFor(charSequence);
                         if (index == -1) {
-                            String input = charSequence.toString();
-                            List<Object> values = property.getValues();
-                            throw new SuggestInputParseException("No value: " + input + " for " + type, input, () ->
-                                values.stream()
-                                .map(v -> v.toString())
-                                .filter(v -> v.startsWith(input))
-                                .collect(Collectors.toList()));
+                            throw SuggestInputParseException.of(charSequence.toString(), property.getValues());
                         }
                         stateId = property.modifyIndex(stateId, index);
                     } else {
