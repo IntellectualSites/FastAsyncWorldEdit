@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.bekvon.bukkit.residence.commands.message;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
@@ -328,6 +329,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                     e.printStackTrace();
                 }
                 getLogger().info("Please restart the server if you have any plugins which depend on FAWE.");
+            } else if (dummy == null) {
+                MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "update" + File.separator + "DummyFawe.jar");
             }
         }
     }
