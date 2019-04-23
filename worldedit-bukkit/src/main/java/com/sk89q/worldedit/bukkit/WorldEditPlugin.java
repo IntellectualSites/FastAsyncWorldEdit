@@ -318,17 +318,17 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         {
             File pluginsFolder = MainUtil.getJarFile().getParentFile();
             for (File file : pluginsFolder.listFiles()) {
-                if (file.length() == 1073) return;
+                if (file.length() == 1988) return;
             }
             File dummy = MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
-            if (dummy != null && dummy.exists()) {
+            if (dummy != null && dummy.exists() && Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") == null) {
                 try {
                     Bukkit.getPluginManager().loadPlugin(dummy);
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
+                getLogger().info("Please restart the server if you have any plugins which depend on FAWE.");
             }
-            getLogger().info("Please restart the server if you have any plugins which depend on FAWE.");
         }
     }
 
