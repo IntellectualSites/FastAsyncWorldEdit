@@ -94,14 +94,14 @@ public class ItemType implements RegistryItem {
      */
     @Nullable
     public BlockType getBlockType() {
-        return this.blockType;
-    }
-    
-    public void setBlockType(BlockType blockType) {
         if (!initBlockType) {
             initBlockType = true;
             this.blockType = BlockTypes.get(this.id);
         }
+        return this.blockType;
+    }
+    
+    public void setBlockType(BlockType blockType) {
     	this.blockType = blockType;
     }
     
