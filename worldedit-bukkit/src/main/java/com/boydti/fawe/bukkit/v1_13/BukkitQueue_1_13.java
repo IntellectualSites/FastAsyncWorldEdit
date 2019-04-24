@@ -954,7 +954,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
         net.minecraft.server.v1_13_R2.Chunk c = ((CraftChunk) chunk).getHandle();
         c.mustSave = false;
         if (chunk.isLoaded()) {
-            chunk.unload(false, false);
+            chunk.unload(false);
         }
         return true;
     }

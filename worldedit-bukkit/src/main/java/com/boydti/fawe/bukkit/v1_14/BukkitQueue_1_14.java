@@ -28,6 +28,7 @@ import io.netty.buffer.ByteBufAllocator;
 import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
+import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_14_R1.ChunkProviderServer;
 import net.minecraft.server.v1_14_R1.ChunkSection;
 import net.minecraft.server.v1_14_R1.ChunkStatus;
@@ -66,6 +67,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R1.Chunk, ChunkSection[], ChunkSection> {
@@ -535,27 +537,17 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
 
     @Override
     public int getOpacity(ChunkSection section, int x, int y, int z) {
-        DataPaletteBlock<IBlockData> dataPalette = section.getBlocks();
-        IBlockData ibd = dataPalette.a(x & 15, y & 15, z & 15);
-        pos.a(x, y, z);
-        return ibd.b(nmsWorld, pos);
+        return 0;
     }
 
     @Override
     public int getBrightness(ChunkSection section, int x, int y, int z) {
-        DataPaletteBlock<IBlockData> dataPalette = section.getBlocks();
-        IBlockData ibd = dataPalette.a(x & 15, y & 15, z & 15);
-        return ibd.e();
+        return 0;
     }
 
     @Override
     public int getOpacityBrightnessPair(ChunkSection section, int x, int y, int z) {
-        DataPaletteBlock<IBlockData> dataPalette = section.getBlocks();
-        IBlockData ibd = dataPalette.a(x & 15, y & 15, z & 15);
-        pos.a(x, y, z);
-        int opacity = ibd.b(nmsWorld, pos);
-        int brightness = ibd.e();
-        return MathMan.pair16(brightness, opacity);
+        return 0;
     }
 
     @Override
@@ -603,16 +595,25 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
     public void sendBlockUpdate(FaweChunk chunk, FawePlayer... players) {
         try {
             PlayerChunkMap playerManager = ((CraftWorld) getWorld()).getHandle().getChunkProvider().playerChunkMap;
-            boolean watching = false;
+            boolean[] watching = new boolean[1];
             boolean[] watchingArr = new boolean[players.length];
-            for (int i = 0; i < players.length; i++) {
-                EntityPlayer player = ((CraftPlayer) ((BukkitPlayer) players[i]).parent).getHandle();
-                if (playerManager.visibleChunks.get(player, chunk.getX(), chunk.getZ())) {
-                    watchingArr[i] = true;
-                    watching = true;
-                }
+            ChunkCoordIntPair pair = new ChunkCoordIntPair(chunk.getX(), chunk.getZ());
+            PlayerChunk plrChunk = playerManager.visibleChunks.get(pair.pair());
+            if (plrChunk != null) {
+                plrChunk.players.a(pair, false).forEach(new Consumer<EntityPlayer>() {
+                    @Override
+                    public void accept(EntityPlayer entityPlayer) {
+                        for (int i = 0; i < players.length; i++) {
+                            EntityPlayer player = ((CraftPlayer) ((BukkitPlayer) players[i]).parent).getHandle();
+                            if (player == entityPlayer) {
+                                watchingArr[i] = true;
+                                watching[0] = true;
+                            }
+                        }
+                    }
+                });
             }
-            if (!watching) return;
+            if (!watching[0]) return;
             final LongAdder size = new LongAdder();
             if (chunk instanceof VisualChunk) {
                 size.add(((VisualChunk) chunk).size());
@@ -656,22 +657,10 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
         sendChunk(fc.getX(), fc.getZ(), fc.getBitMask());
     }
 
-    public void sendPacket(int cx, int cz, Packet packet) {
-        PlayerChunk chunk = getPlayerChunk(nmsWorld, cx, cz);
-        if (chunk != null) {
-            for (EntityPlayer player : chunk.players) {
-                player.playerConnection.sendPacket(packet);
-            }
-        }
-    }
-
     private PlayerChunk getPlayerChunk(WorldServer w, int cx, int cz) {
         PlayerChunkMap chunkMap = w.getChunkProvider().playerChunkMap;
-        PlayerChunk playerChunk = chunkMap.getChunk(cx, cz);
+        PlayerChunk playerChunk = chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
         if (playerChunk == null) {
-            return null;
-        }
-        if (playerChunk.players.isEmpty()) {
             return null;
         }
         return playerChunk;
@@ -681,36 +670,34 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
         if (playerChunk == null) {
             return false;
         }
-        if (playerChunk.e()) {
-            ChunkSection[] sections = nmsChunk.getSections();
-            for (int layer = 0; layer < 16; layer++) {
-                if (sections[layer] == null && (mask & (1 << layer)) != 0) {
-                    sections[layer] = new ChunkSection(layer << 4, nmsWorld.worldProvider.g());
-                }
+        ChunkSection[] sections = nmsChunk.getSections();
+        for (int layer = 0; layer < 16; layer++) {
+            if (sections[layer] == null && (mask & (1 << layer)) != 0) {
+                sections[layer] = new ChunkSection(layer << 4);
             }
-            TaskManager.IMP.sync(new Supplier<Object>() {
-                @Override
-                public Object get() {
-                    try {
-                        int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                        if (dirtyBits == 0) {
-                            ((CraftWorld) getWorld()).getHandle().getPlayerChunkMap().a(playerChunk);
-                        }
-                        if (mask == 0) {
-                            dirtyBits = 65535;
-                        } else {
-                            dirtyBits |= mask;
-                        }
-
-                        fieldDirtyBits.set(playerChunk, dirtyBits);
-                        fieldDirtyCount.set(playerChunk, 64);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-            });
         }
+        TaskManager.IMP.sync(new Supplier<Object>() {
+            @Override
+            public Object get() {
+                try {
+                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
+                    if (dirtyBits == 0) {
+                        ((CraftWorld) getWorld()).getHandle().getChunkProvider().playerChunkMap.a(playerChunk);
+                    }
+                    if (mask == 0) {
+                        dirtyBits = 65535;
+                    } else {
+                        dirtyBits |= mask;
+                    }
+
+                    fieldDirtyBits.set(playerChunk, dirtyBits);
+                    fieldDirtyCount.set(playerChunk, 64);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
 //        if (mask == 0) {
 //            PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, 65535);
 //            for (EntityPlayer player : playerChunk.players) {
@@ -763,6 +750,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
 
     @Override
     public boolean removeSectionLighting(ChunkSection section, int layer, boolean sky) {
+        return false;
     }
 
     @Override
@@ -771,11 +759,12 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
 
     @Override
     public int getSkyLight(ChunkSection section, int x, int y, int z) {
-
+        return 15;
     }
 
     @Override
     public int getEmmittedLight(ChunkSection section, int x, int y, int z) {
+        return 15;
     }
 
     @Override

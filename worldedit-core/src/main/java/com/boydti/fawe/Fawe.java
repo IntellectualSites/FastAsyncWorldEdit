@@ -9,7 +9,6 @@ import com.boydti.fawe.regions.general.plot.PlotSquaredFeature;
 import com.boydti.fawe.util.*;
 import com.boydti.fawe.util.chat.ChatManager;
 import com.boydti.fawe.util.chat.PlainChatManager;
-import com.boydti.fawe.util.cui.CUI;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -197,25 +196,6 @@ public class Fawe {
     }
 
     public void onDisable() {
-    }
-
-    public CUI getCUI(Actor actor) {
-        FawePlayer<Object> fp = FawePlayer.wrap(actor);
-        CUI cui = fp.getMeta("CUI");
-        if (cui == null) {
-            cui = Fawe.imp().getCUI(fp);
-            if (cui != null) {
-                synchronized (fp) {
-                    CUI tmp = fp.getMeta("CUI");
-                    if (tmp == null) {
-                        fp.setMeta("CUI", cui);
-                    } else {
-                        cui = tmp;
-                    }
-                }
-            }
-        }
-        return cui;
     }
 
     public ChatManager getChatManager() {

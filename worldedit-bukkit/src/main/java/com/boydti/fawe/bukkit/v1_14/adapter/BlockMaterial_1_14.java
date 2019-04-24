@@ -91,7 +91,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
 
     @Override
     public int getLightValue() {
-        return defaultState.e();
+        return defaultState.h();
     }
 
     @Override

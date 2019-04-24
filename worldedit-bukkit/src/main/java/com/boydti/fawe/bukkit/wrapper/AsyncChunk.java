@@ -130,18 +130,18 @@ public class AsyncChunk implements Chunk {
         });
     }
 
-    @Override
-    public BlockState[] getTileEntities(boolean b) {
-        if (!isLoaded()) {
-            return new BlockState[0];
-        }
-        return TaskManager.IMP.sync(new RunnableVal<BlockState[]>() {
-            @Override
-            public void run(BlockState[] value) {
-                this.value = world.getChunkAt(x, z).getTileEntities(b);
-            }
-        });
-    }
+//    @Override
+//    public BlockState[] getTileEntities(boolean b) {
+//        if (!isLoaded()) {
+//            return new BlockState[0];
+//        }
+//        return TaskManager.IMP.sync(new RunnableVal<BlockState[]>() {
+//            @Override
+//            public void run(BlockState[] value) {
+//                this.value = world.getChunkAt(x, z).getTileEntities(b);
+//            }
+//        });
+//    }
 
     @Override
     public boolean isLoaded() {
@@ -164,13 +164,8 @@ public class AsyncChunk implements Chunk {
     }
 
     @Override
-    public boolean unload(boolean save, boolean safe) {
-        return world.unloadChunk(x, z, save, safe);
-    }
-
-    @Override
     public boolean unload(boolean save) {
-        return unload(true, false);
+        return world.unloadChunk(x, z, save);
     }
 
     @Override

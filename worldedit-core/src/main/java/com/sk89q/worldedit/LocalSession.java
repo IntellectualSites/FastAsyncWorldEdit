@@ -33,7 +33,6 @@ import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.collection.SparseBitSet;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.*;
-import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
@@ -1209,9 +1208,8 @@ public class LocalSession implements TextureHolder {
 
         if (hasCUISupport) {
             actor.dispatchCUIEvent(event);
-        } else if (actor.isPlayer()) {
-            CUI cui = Fawe.get().getCUI(actor);
-            if (cui != null) cui.dispatchCUIEvent(event);
+        } else if (useServerCUI) {
+            updateServerCUI(actor);
         }
     }
 

@@ -66,6 +66,7 @@ import net.minecraft.server.v1_14_R1.BlockStateEnum;
 import net.minecraft.server.v1_14_R1.BlockStateInteger;
 import net.minecraft.server.v1_14_R1.BlockStateList;
 import net.minecraft.server.v1_14_R1.Chunk;
+import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_14_R1.ChunkSection;
 import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityTypes;
@@ -274,8 +275,8 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
     @Override
     public boolean isChunkInUse(org.bukkit.Chunk chunk) {
         CraftChunk craftChunk = (CraftChunk) chunk;
-        PlayerChunkMap chunkMap = ((WorldServer) craftChunk.getHandle().getWorld()).getPlayerChunkMap();
-        return chunkMap.isChunkInUse(chunk.getX(), chunk.getZ());
+        PlayerChunkMap chunkMap = ((WorldServer) craftChunk.getHandle().getWorld()).getChunkProvider().playerChunkMap;
+        return chunkMap.visibleChunks.containsKey(ChunkCoordIntPair.pair(chunk.getX(), chunk.getZ()));
     }
 
     @Override

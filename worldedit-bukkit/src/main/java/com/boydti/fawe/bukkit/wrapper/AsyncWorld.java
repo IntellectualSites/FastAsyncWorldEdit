@@ -68,28 +68,6 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         parent.spawnParticle(particle, v, v1, v2, i, v3, v4, v5, v6, t);
     }
 
-    @Override
-    public Entity getEntity(UUID uuid) {
-        return TaskManager.IMP.sync(() -> parent.getEntity(uuid));
-    }
-
-
-    @Override
-    public boolean createExplosion(Entity source, Location loc, float power, boolean setFire, boolean breakBlocks) {
-        return TaskManager.IMP.sync(() -> parent.createExplosion(source, loc, power, setFire, breakBlocks));
-    }
-
-
-    @Override
-    public <T> void spawnParticle(Particle particle, List<Player> receivers, Player source, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, T data) {
-        parent.spawnParticle(particle, receivers, source, x, y, z, count, offsetX, offsetY, offsetZ, extra, data);
-    }
-
-    @Override
-    public <T> void spawnParticle(Particle particle, List<Player> list, Player player, double v, double v1, double v2, int i, double v3, double v4, double v5, double v6, T t, boolean b) {
-        parent.spawnParticle(particle, list, player, v, v1, v2, i, v3, v4, v5, v6, t, b);
-    }
-
     /**
      * @deprecated use {@link #wrap(World)} instead
      * @param parent Parent world
@@ -185,15 +163,6 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         }
     }
 
-    public int getHighestBlockYAt(int x, int z, com.destroystokyo.paper.HeightmapType heightmap) throws UnsupportedOperationException {
-        return TaskManager.IMP.sync(new Supplier<Integer>() {
-            @Override
-            public Integer get() {
-                return parent.getHighestBlockYAt(x, z, heightmap);
-            }
-        });
-    }
-
     @Override
     public WorldBorder getWorldBorder() {
         return TaskManager.IMP.sync(new RunnableVal<WorldBorder>() {
@@ -202,6 +171,11 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
                 this.value = parent.getWorldBorder();
             }
         });
+    }
+
+    @Override
+    public boolean unloadChunkRequest(int x, int z) {
+        return unloadChunk(x, z);
     }
 
     @Override
@@ -321,21 +295,6 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     }
 
     @Override
-    public void getChunkAtAsync(int x, int z, ChunkLoadCallback cb) {
-        parent.getChunkAtAsync(x, z, cb);
-    }
-
-    @Override
-    public void getChunkAtAsync(Location location, ChunkLoadCallback cb) {
-        parent.getChunkAtAsync(location, cb);
-    }
-
-    @Override
-    public void getChunkAtAsync(Block block, ChunkLoadCallback cb) {
-        parent.getChunkAtAsync(block, cb);
-    }
-
-    @Override
     public boolean isChunkLoaded(Chunk chunk) {
         return chunk.isLoaded();
     }
@@ -426,31 +385,15 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public boolean unloadChunk(int x, int z, boolean save) {
-        return unloadChunk(x, z, save, false);
-    }
-
-    @Deprecated
-    @Override
-    public boolean unloadChunk(final int x, final int z, final boolean save, final boolean safe) {
         if (isChunkLoaded(x, z)) {
             return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
                 @Override
                 public void run(Boolean value) {
-                    this.value = parent.unloadChunk(x, z, save, safe);
+                    this.value = parent.unloadChunk(x, z, save);
                 }
             });
         }
         return true;
-    }
-
-    @Override
-    public boolean unloadChunkRequest(int x, int z) {
-        return unloadChunk(x, z);
-    }
-
-    @Override
-    public boolean unloadChunkRequest(int x, int z, boolean safe) {
-        return unloadChunk(x, z, safe);
     }
 
     @Override
@@ -1132,61 +1075,6 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         return adapter;
     }
 
-    @Override
-    public int getEntityCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getEntityCount();
-            }
-        });
-    }
-
-    @Override
-    public int getTileEntityCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getTileEntityCount();
-            }
-        });
-    }
-
-    @Override
-    public int getTickableTileEntityCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getTickableTileEntityCount();
-            }
-        });
-    }
-
-    @Override
-    public int getChunkCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getChunkCount();
-            }
-        });
-    }
-
-    @Override
-    public int getPlayerCount() {
-        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
-            @Override
-            public void run(Integer value) {
-                this.value = parent.getPlayerCount();
-            }
-        });
-    }
-
-	@Override
-	public CompletableFuture<Chunk> getChunkAtAsync(int arg0, int arg1, boolean arg2) {
-		return parent.getChunkAtAsync(arg0, arg1, arg2);
-	}
-
 	@Override
 	public Collection<Entity> getNearbyEntities(BoundingBox arg0) {
 		return parent.getNearbyEntities(arg0);
@@ -1206,11 +1094,6 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 	@Override
 	public boolean isChunkForceLoaded(int arg0, int arg1) {
 		return parent.isChunkForceLoaded(arg0, arg1);
-	}
-
-	@Override
-	public boolean isDayTime() {
-		return parent.isDayTime();
 	}
 
 	@Override
@@ -1283,4 +1166,129 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 	public Collection<Chunk> getForceLoadedChunks() {
 		return parent.getForceLoadedChunks();
 	}
+
+//    @Override
+//    public int getHighestBlockYAt(int x, int z, com.destroystokyo.paper.HeightmapType heightmap) throws UnsupportedOperationException {
+//        return TaskManager.IMP.sync(new Supplier<Integer>() {
+//            @Override
+//            public Integer get() {
+//                return parent.getHighestBlockYAt(x, z, heightmap);
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public int getEntityCount() {
+//        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
+//            @Override
+//            public void run(Integer value) {
+//                this.value = parent.getEntityCount();
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public int getTileEntityCount() {
+//        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
+//            @Override
+//            public void run(Integer value) {
+//                this.value = parent.getTileEntityCount();
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public int getTickableTileEntityCount() {
+//        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
+//            @Override
+//            public void run(Integer value) {
+//                this.value = parent.getTickableTileEntityCount();
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public int getChunkCount() {
+//        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
+//            @Override
+//            public void run(Integer value) {
+//                this.value = parent.getChunkCount();
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public int getPlayerCount() {
+//        return TaskManager.IMP.sync(new RunnableVal<Integer>() {
+//            @Override
+//            public void run(Integer value) {
+//                this.value = parent.getPlayerCount();
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public CompletableFuture<Chunk> getChunkAtAsync(int arg0, int arg1, boolean arg2) {
+//        return parent.getChunkAtAsync(arg0, arg1, arg2);
+//    }
+//
+//    @Override
+//    public boolean isDayTime() {
+//        return parent.isDayTime();
+//    }
+//
+//    @Override
+//    public boolean unloadChunk(final int x, final int z, final boolean save, final boolean safe) {
+//        if (isChunkLoaded(x, z)) {
+//            return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
+//                @Override
+//                public void run(Boolean value) {
+//                    this.value = parent.unloadChunk(x, z, save, safe);
+//                }
+//            });
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean unloadChunkRequest(int x, int z, boolean safe) {
+//        return unloadChunk(x, z, safe);
+//    }
+//
+//    @Override
+//    public void getChunkAtAsync(int x, int z, ChunkLoadCallback cb) {
+//        parent.getChunkAtAsync(x, z, cb);
+//    }
+//
+//    @Override
+//    public void getChunkAtAsync(Location location, ChunkLoadCallback cb) {
+//        parent.getChunkAtAsync(location, cb);
+//    }
+//
+//    @Override
+//    public void getChunkAtAsync(Block block, ChunkLoadCallback cb) {
+//        parent.getChunkAtAsync(block, cb);
+//    }
+//
+//    @Override
+//    public Entity getEntity(UUID uuid) {
+//        return TaskManager.IMP.sync(() -> parent.getEntity(uuid));
+//    }
+//
+//
+//    @Override
+//    public boolean createExplosion(Entity source, Location loc, float power, boolean setFire, boolean breakBlocks) {
+//        return TaskManager.IMP.sync(() -> parent.createExplosion(source, loc, power, setFire, breakBlocks));
+//    }
+//
+//
+//    @Override
+//    public <T> void spawnParticle(Particle particle, List<Player> receivers, Player source, double x, double y, double z, int count, double offsetX, double offsetY, double offsetZ, double extra, T data) {
+//        parent.spawnParticle(particle, receivers, source, x, y, z, count, offsetX, offsetY, offsetZ, extra, data);
+//    }
+//
+//    @Override
+//    public <T> void spawnParticle(Particle particle, List<Player> list, Player player, double v, double v1, double v2, int i, double v3, double v4, double v5, double v6, T t, boolean b) {
+//        parent.spawnParticle(particle, list, player, v, v1, v2, i, v3, v4, v5, v6, t, b);
+//    }
 }

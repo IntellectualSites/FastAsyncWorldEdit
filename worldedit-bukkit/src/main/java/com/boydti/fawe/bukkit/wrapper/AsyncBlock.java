@@ -231,11 +231,6 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public AsyncBlockState getState(boolean useSnapshot) {
-        return getState();
-    }
-
-    @Override
     public Biome getBiome() {
         return world.getAdapter().adapt(queue.getBiomeType(x, z));
     }
@@ -278,7 +273,14 @@ public class AsyncBlock implements Block {
 
     @Override
     public boolean isEmpty() {
-        return getType().isEmpty();
+        switch (getType()) {
+            case AIR:
+            case CAVE_AIR:
+            case VOID_AIR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

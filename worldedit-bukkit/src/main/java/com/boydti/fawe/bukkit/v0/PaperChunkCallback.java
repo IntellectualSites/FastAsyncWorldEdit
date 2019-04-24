@@ -5,7 +5,8 @@ import org.bukkit.World;
 
 public abstract class PaperChunkCallback {
     public PaperChunkCallback(World world, int x, int z) {
-        world.getChunkAtAsync(x, z, PaperChunkCallback.this::onLoad);
+//        world.getChunkAtAsync(x, z, PaperChunkCallback.this::onLoad);
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     public abstract void onLoad(Chunk chunk);
