@@ -6,6 +6,7 @@ import com.boydti.fawe.bukkit.BukkitPlayer;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.BlockMaterial_1_13;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.jnbt.anvil.BitArray4096;
@@ -193,8 +194,8 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits.setAccessible(true);
 
-            Fawe.debug("Using adapter: " + getAdapter());
-            Fawe.debug("=========================================");
+            System.out.println(BBC.getPrefix() + "Using adapter: " + getAdapter());
+            System.out.println(BBC.getPrefix() + "=========================================");
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
