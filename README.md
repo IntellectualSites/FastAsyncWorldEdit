@@ -15,11 +15,11 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 
 ## Downloads
 ### 1.13+
-* [Download](https://incendo.org/download/)
-* [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-1.13/)
+* [Download](https://empcraft.com/fawe/download/)
+* [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-Breaking/)
 
 ### < 1.12.2
-* [Download](https://incendo.org/download/)
+* [Download](https://empcraft.com/fawe/download/?bukkit)
 * [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit/)
 * [Repository](https://github.com/boy0001/FastAsyncWorldedit)
 
