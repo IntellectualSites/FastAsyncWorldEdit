@@ -1,14 +1,40 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
 public class FaweCache {
+    public static final IterableThreadLocal<char[]> BLOCK_TO_PALETTE_CHAR = new IterableThreadLocal<char[]>() {
+        @Override
+        public char[] init() {
+            char[] result = new char[BlockTypes.states.length];
+            Arrays.fill(result, Character.MAX_VALUE);
+            return result;
+        }
+    };
+
+    public static final IterableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new IterableThreadLocal<char[]>() {
+        @Override
+        public char[] init() {
+            return new char[Character.MAX_VALUE];
+        }
+    };
+
+    public static final IterableThreadLocal<char[]> SECTION_BLOCKS_CHAR = new IterableThreadLocal<char[]>() {
+        @Override
+        public char[] init() {
+            return new char[4096];
+        }
+    };
+
     public static final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<int[]>() {
         @Override
         public int[] init() {
@@ -178,5 +204,57 @@ public class FaweCache {
         }
         if (clazz == null) clazz = EndTag.class;
         return new ListTag(clazz, list);
+    }
+
+    private static final class Palette {
+
+    }
+
+    public void toPalette(int layer, char[] blocks) {
+        int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
+        int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
+        long[] blockstates = FaweCache.BLOCK_STATES.get();
+        int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
+
+        int blockIndexStart = layer << 12;
+        int blockIndexEnd = blockIndexStart + 4096;
+        int num_palette = 0;
+        try {
+            for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
+                int ordinal = blocks[i];
+                int palette = blockToPalette[ordinal];
+                if (palette == Integer.MAX_VALUE) {
+                    BlockState state = BlockTypes.states[ordinal];
+                    blockToPalette[ordinal] = palette = num_palette;
+                    paletteToBlock[num_palette] = ordinal;
+                    num_palette++;
+                }
+                blocksCopy[j] = palette;
+            }
+
+            for (int i = 0; i < num_palette; i++) {
+                blockToPalette[paletteToBlock[i]] = Integer.MAX_VALUE;
+            }
+
+            // BlockStates
+            int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
+            int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
+            if (num_palette == 1) {
+                // Set a value, because minecraft needs it for some  reason
+                blockstates[0] = 0;
+                blockBitArrayEnd = 1;
+            } else {
+                BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                bitArray.fromRaw(blocksCopy);
+            }
+
+            // num_palette
+            // paletteToBlock
+            // blockstates (range: blockBitArrayEnd)
+        } catch (Throwable e) {
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

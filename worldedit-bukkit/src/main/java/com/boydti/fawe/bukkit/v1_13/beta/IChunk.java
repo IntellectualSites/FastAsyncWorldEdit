@@ -7,9 +7,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public interface IChunk {
     /* set */
-    void setBiome(int x, int z, BiomeType biome);
+    boolean setBiome(int x, int y, int z, BiomeType biome);
 
-    void setBlock(int x, int y, int z, BlockStateHolder holder);
+    boolean setBlock(int x, int y, int z, BlockStateHolder holder);
 
     /* get */
     BiomeType getBiome(int x, int z);
@@ -17,4 +17,18 @@ public interface IChunk {
     BlockState getBlock(int x, int y, int z);
 
     BaseBlock getFullBlock(int x, int y, int z);
+
+    void init(SingleThreadQueueExtent extent, int X, int Z);
+
+    int getX();
+
+    int getZ();
+
+    void apply();
+
+    default IChunk getRoot() {
+        return this;
+    }
+
+    void filter(Filter filter);
 }
