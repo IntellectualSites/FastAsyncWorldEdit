@@ -71,7 +71,7 @@ public class WorldEditCommands {
             Date date = new GregorianCalendar(2000 + version.year, version.month - 1, version.day).getTime();
             actor.printDebug(" - DATE: " + date.toLocaleString());
             actor.printDebug(" - COMMIT: " + Integer.toHexString(version.hash));
-            actor.printDebug(" - BUILD: #" + version.build);
+            actor.printDebug(" - BUILD: " + version.build);
             actor.printDebug(" - PLATFORM: " + Settings.IMP.PLATFORM);
             actor.printDebug("------------------------------------");
         }
