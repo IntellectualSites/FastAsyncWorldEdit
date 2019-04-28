@@ -81,15 +81,15 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
      * @param x
      * @param z
      */
-    public BukkitChunk_1_13(FaweQueue parent, int x, int z) {
+    public BukkitChunk_1_13(final FaweQueue parent, final int x, final int z) {
         super(parent, x, z);
     }
 
-    public BukkitChunk_1_13(FaweQueue parent, int x, int z, int[][] ids, short[] count, short[] air) {
+    public BukkitChunk_1_13(final FaweQueue parent, final int x, final int z, final int[][] ids, final short[] count, final short[] air) {
         super(parent, x, z, ids, count, air);
     }
 
-    public void storeBiomes(BiomeBase[] biomes) {
+    public void storeBiomes(final BiomeBase[] biomes) {
         if (biomes != null) {
             if (this.biomes == null) {
                 this.biomes = new BiomeType[256];
@@ -111,33 +111,33 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
     }
 
     @Override
-    public int[] getIdArray(int layer) {
+    public int[] getIdArray(final int layer) {
         if (this.setBlocks[layer] == null && this.sectionPalettes != null) {
-            ChunkSection section = this.sectionPalettes[layer];
+            final ChunkSection section = this.sectionPalettes[layer];
             int[] idsArray = this.setBlocks[layer];
             if (section != null && idsArray == null) {
                 this.setBlocks[layer] = idsArray = new int[4096];
                 if (!section.a()) {
                     try {
-                        DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                        DataBits bits = (DataBits) BukkitQueue_1_13.fieldBits.get(blocks);
-                        DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitQueue_1_13.fieldPalette.get(blocks);
+                        final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
+                        final DataBits bits = (DataBits) BukkitQueue_1_13.fieldBits.get(blocks);
+                        final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitQueue_1_13.fieldPalette.get(blocks);
 
-                        long[] raw = bits.a();
-                        int bitsPerEntry = bits.c();
+                        final long[] raw = bits.a();
+                        final int bitsPerEntry = bits.c();
 
                         new BitArray4096(raw, bitsPerEntry).toRaw(idsArray);
-                        IBlockData defaultBlock = (IBlockData) BukkitQueue_1_13.fieldDefaultBlock.get(blocks);
+                        final IBlockData defaultBlock = (IBlockData) BukkitQueue_1_13.fieldDefaultBlock.get(blocks);
                         // TODO optimize away palette.a
                         for (int i = 0; i < 4096; i++) {
                             IBlockData ibd = palette.a(idsArray[i]);
                             if (ibd == null) {
                                 ibd = defaultBlock;
                             }
-                            int ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToInt(ibd);
+                            final int ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToInt(ibd);
                             idsArray[i] = BlockTypes.states[ordinal].getInternalId();
                         }
-                    } catch (IllegalAccessException e) {
+                    } catch (final IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
@@ -146,23 +146,23 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
         return this.setBlocks[layer];
     }
 
-    public boolean storeTile(TileEntity tile, BlockPosition pos) {
-        CompoundTag nativeTag = getParent().getTag(tile);
+    public boolean storeTile(final TileEntity tile, final BlockPosition pos) {
+        final CompoundTag nativeTag = getParent().getTag(tile);
         setTile(pos.getX() & 15, pos.getY(), pos.getZ() & 15, nativeTag);
         return true;
     }
 
-    public boolean storeEntity(Entity ent) throws InvocationTargetException, IllegalAccessException {
+    public boolean storeEntity(final Entity ent) throws InvocationTargetException, IllegalAccessException {
         if (ent instanceof EntityPlayer || BukkitQueue_0.getAdapter() == null) {
             return false;
         }
-        EntityTypes<?> type = ent.P();
-        MinecraftKey id = EntityTypes.getName(type);
+        final EntityTypes<?> type = ent.P();
+        final MinecraftKey id = EntityTypes.getName(type);
         if (id != null) {
-            NBTTagCompound tag = new NBTTagCompound();
+            final NBTTagCompound tag = new NBTTagCompound();
             ent.save(tag); // readEntityIntoTag
-            CompoundTag nativeTag = (CompoundTag) BukkitQueue_0.toNative(tag);
-            Map<String, Tag> map = ReflectionUtils.getMap(nativeTag.getValue());
+            final CompoundTag nativeTag = (CompoundTag) BukkitQueue_0.toNative(tag);
+            final Map<String, Tag> map = ReflectionUtils.getMap(nativeTag.getValue());
             map.put("Id", new StringTag(id.toString()));
             setEntity(nativeTag);
             return true;
@@ -171,7 +171,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
         }
     }
 
-    public boolean storeSection(ChunkSection section, int layer) throws IllegalAccessException {
+    public boolean storeSection(final ChunkSection section, final int layer) throws IllegalAccessException {
         if (sectionPalettes == null) {
             // TODO optimize don't copy light
             sectionPalettes = new ChunkSection[16];
@@ -180,56 +180,56 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
         return true;
     }
 
-    public ChunkSection copy(ChunkSection current) throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
-        ChunkSection newSection = new ChunkSection(current.getYPosition(), current.getSkyLightArray() != null);
+    public ChunkSection copy(final ChunkSection current) throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
+        final ChunkSection newSection = new ChunkSection(current.getYPosition(), current.getSkyLightArray() != null);
 
         // Copy light
-        NibbleArray skyLight = current.getSkyLightArray();
-        NibbleArray blockLight = current.getEmittedLightArray();
+        final NibbleArray skyLight = current.getSkyLightArray();
+        final NibbleArray blockLight = current.getEmittedLightArray();
 
-        NibbleArray newBlockLight = newSection.getEmittedLightArray();
-        NibbleArray newSkyLight = newSection.getSkyLightArray();
+        final NibbleArray newBlockLight = newSection.getEmittedLightArray();
+        final NibbleArray newSkyLight = newSection.getSkyLightArray();
 
-        byte[] newBlockBytes = newBlockLight.asBytes();
-        byte[] blockLightBytes = blockLight.asBytes();
+        final byte[] newBlockBytes = newBlockLight.asBytes();
+        final byte[] blockLightBytes = blockLight.asBytes();
         for (int i = 0; i < 2048; i++) newBlockBytes[i] = blockLightBytes[i];
         if (skyLight != null) {
-            byte[] newSkyBytes = newSkyLight.asBytes();
-            byte[] skyLightBytes = skyLight.asBytes();
+            final byte[] newSkyBytes = newSkyLight.asBytes();
+            final byte[] skyLightBytes = skyLight.asBytes();
             for (int i = 0; i < 2048; i++) newSkyBytes[i] = skyLightBytes[i];
         }
 
         // Copy counters
-        Object nonEmptyBlockCount = BukkitQueue_1_13.fieldNonEmptyBlockCount.get(current);
+        final Object nonEmptyBlockCount = BukkitQueue_1_13.fieldNonEmptyBlockCount.get(current);
         BukkitQueue_1_13.fieldNonEmptyBlockCount.set(newSection, nonEmptyBlockCount);
 
-        Object tickingBlockCount = BukkitQueue_1_13.fieldTickingBlockCount.get(current);
+        final Object tickingBlockCount = BukkitQueue_1_13.fieldTickingBlockCount.get(current);
         BukkitQueue_1_13.fieldTickingBlockCount.set(newSection, tickingBlockCount);
 
-        Object liquidCount = BukkitQueue_1_13.fieldLiquidCount.get(current);
+        final Object liquidCount = BukkitQueue_1_13.fieldLiquidCount.get(current);
         BukkitQueue_1_13.fieldLiquidCount.set(newSection, liquidCount);
 
         // Copy blocks
-        DataPaletteBlock<IBlockData> blocks = current.getBlocks();
-        DataPaletteBlock<IBlockData> blocksCopy = copy(blocks);
+        final DataPaletteBlock<IBlockData> blocks = current.getBlocks();
+        final DataPaletteBlock<IBlockData> blocksCopy = copy(blocks);
         BukkitQueue_1_13.fieldSection.set(newSection, blocksCopy);
 
         return newSection;
     }
 
-    public DataPaletteBlock<IBlockData> copy(DataPaletteBlock current) throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
+    public DataPaletteBlock<IBlockData> copy(final DataPaletteBlock current) throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
         // Clone palette
-        DataPalette currentPalette = (DataPalette) BukkitQueue_1_13.fieldPalette.get(current);
-        DataPaletteBlock<IBlockData> paletteBlock = newDataPaletteBlock();
-        int size = BukkitQueue_1_13.fieldSize.getInt(current);
+        final DataPalette currentPalette = (DataPalette) BukkitQueue_1_13.fieldPalette.get(current);
+        final DataPaletteBlock<IBlockData> paletteBlock = newDataPaletteBlock();
+        final int size = BukkitQueue_1_13.fieldSize.getInt(current);
 
         DataPalette<IBlockData> newPalette = currentPalette;
         if (currentPalette instanceof DataPaletteHash) {
             // TODO optimize resize
             newPalette = new DataPaletteHash<>(Block.REGISTRY_ID, size, paletteBlock, GameProfileSerializer::d, GameProfileSerializer::a);
-            RegistryID<IBlockData> currReg = (RegistryID<IBlockData>) BukkitQueue_1_13.fieldHashBlocks.get(currentPalette);
-            RegistryID<IBlockData> newReg = (RegistryID<IBlockData>) BukkitQueue_1_13.fieldHashBlocks.get(newPalette);
-            int arrLen = 1 << size;
+            final RegistryID<IBlockData> currReg = (RegistryID<IBlockData>) BukkitQueue_1_13.fieldHashBlocks.get(currentPalette);
+            final RegistryID<IBlockData> newReg = (RegistryID<IBlockData>) BukkitQueue_1_13.fieldHashBlocks.get(newPalette);
+            final int arrLen = 1 << size;
             System.arraycopy(fieldRegistryb.get(currReg), 0, fieldRegistryb.get(newReg), 0, arrLen);
             System.arraycopy(fieldRegistryc.get(currReg), 0, fieldRegistryc.get(newReg), 0, arrLen);
             System.arraycopy(fieldRegistryd.get(currReg), 0, fieldRegistryd.get(newReg), 0, arrLen);
@@ -238,8 +238,8 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
         } else if (currentPalette instanceof DataPaletteLinear) {
             // TODO optimize resize
             newPalette = new DataPaletteLinear<>(Block.REGISTRY_ID, size, paletteBlock, GameProfileSerializer::d);
-            Object[] currArray = ((Object[]) BukkitQueue_1_13.fieldLinearBlocks.get(currentPalette));
-            Object[] newArray = ((Object[]) BukkitQueue_1_13.fieldLinearBlocks.get(newPalette));
+            final Object[] currArray = ((Object[]) BukkitQueue_1_13.fieldLinearBlocks.get(currentPalette));
+            final Object[] newArray = ((Object[]) BukkitQueue_1_13.fieldLinearBlocks.get(newPalette));
             BukkitQueue_1_13.fieldLinearIndex.set(newPalette, BukkitQueue_1_13.fieldLinearIndex.get(currentPalette));
             for (int i = 0; i < newArray.length; i++) newArray[i] = currArray[i];
         }
@@ -248,12 +248,12 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
         // Clone size
         BukkitQueue_1_13.fieldSize.set(paletteBlock, size);
         // Clone palette
-        DataBits currentBits = (DataBits) BukkitQueue_1_13.fieldBits.get(current);
-        DataBits newBits = new DataBits(currentBits.c(), currentBits.b(), currentBits.a().clone());
+        final DataBits currentBits = (DataBits) BukkitQueue_1_13.fieldBits.get(current);
+        final DataBits newBits = new DataBits(currentBits.c(), currentBits.b(), currentBits.a().clone());
         BukkitQueue_1_13.fieldBits.set(paletteBlock, newBits);
 
         // TODO copy only if different
-        Object defaultBlock = BukkitQueue_1_13.fieldDefaultBlock.get(current);
+        final Object defaultBlock = BukkitQueue_1_13.fieldDefaultBlock.get(current);
         if (defaultBlock != AIR) {
             ReflectionUtils.setFailsafeFieldValue(BukkitQueue_1_13.fieldDefaultBlock, paletteBlock, BukkitQueue_1_13.fieldDefaultBlock.get(current));
         }
@@ -262,8 +262,8 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
     }
 
     @Override
-    public IntFaweChunk<Chunk, BukkitQueue_1_13> copy(boolean shallow) {
-        BukkitChunk_1_13 copy;
+    public IntFaweChunk<Chunk, BukkitQueue_1_13> copy(final boolean shallow) {
+        final BukkitChunk_1_13 copy;
         if (shallow) {
             copy = new BukkitChunk_1_13(getParent(), getX(), getZ(), setBlocks, count, air);
             copy.biomes = biomes;
@@ -277,13 +277,13 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             copy.sectionPalettes = new ChunkSection[16];
             try {
                 for (int i = 0; i < sectionPalettes.length; i++) {
-                    ChunkSection current = sectionPalettes[i];
+                    final ChunkSection current = sectionPalettes[i];
                     if (current == null) {
                         continue;
                     }
                     copy.sectionPalettes[i] = copy(current);
                 }
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 MainUtil.handleError(e);
             }
         }
@@ -303,13 +303,13 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
         if (sectionPalettes != null) {
             return;
         }
-        int[][] arrays = getCombinedIdArrays();
+        final int[][] arrays = getCombinedIdArrays();
         for (int layer = 0; layer < 16; layer++) {
             if (getCount(layer) > 0) {
                 if (sectionPalettes == null) {
                     sectionPalettes = new ChunkSection[16];
                 }
-                int[] array = arrays[layer];
+                final int[] array = arrays[layer];
                 sectionPalettes[layer] = BukkitQueue_1_13.newChunkSection(layer, getParent().hasSky(), array);
             }
         }
@@ -320,7 +320,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
         getChunk().load(true);
     }
 
-    private void removeEntity(Entity entity) {
+    private void removeEntity(final Entity entity) {
         entity.b(false);
         entity.die();
         entity.valid = false;
@@ -328,32 +328,32 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
     @Override
     public FaweChunk call() {
-        Spigot_v1_13_R2 adapter = (Spigot_v1_13_R2) BukkitQueue_0.getAdapter();
+        final Spigot_v1_13_R2 adapter = (Spigot_v1_13_R2) BukkitQueue_0.getAdapter();
         try {
-            BukkitChunk_1_13 copy = getParent().getChangeTask() != null ? new BukkitChunk_1_13(getParent(), getX(), getZ()) : null;
+            final BukkitChunk_1_13 copy = getParent().getChangeTask() != null ? new BukkitChunk_1_13(getParent(), getX(), getZ()) : null;
             final Chunk chunk = this.getChunk();
             final World world = chunk.getWorld();
-            Settings settings = getParent().getSettings();
-            int bx = this.getX() << 4;
-            int bz = this.getZ() << 4;
+            final Settings settings = getParent().getSettings();
+            final int bx = this.getX() << 4;
+            final int bz = this.getZ() << 4;
             final boolean flag = world.getEnvironment() == World.Environment.NORMAL;
-            net.minecraft.server.v1_13_R2.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
+            final net.minecraft.server.v1_13_R2.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
             nmsChunk.f(true); // Set Modified
             nmsChunk.mustSave = true;
             nmsChunk.markDirty();
-            net.minecraft.server.v1_13_R2.World nmsWorld = nmsChunk.world;
-            ChunkSection[] sections = nmsChunk.getSections();
-            List<Entity>[] entities = nmsChunk.getEntitySlices();
-            Map<BlockPosition, TileEntity> tiles = nmsChunk.getTileEntities();
+            final net.minecraft.server.v1_13_R2.World nmsWorld = nmsChunk.world;
+            final ChunkSection[] sections = nmsChunk.getSections();
+            final List<Entity>[] entities = nmsChunk.getEntitySlices();
+            final Map<BlockPosition, TileEntity> tiles = nmsChunk.getTileEntities();
             // Remove entities
-            HashSet<UUID> entsToRemove = this.getEntityRemoves();
+            final HashSet<UUID> entsToRemove = this.getEntityRemoves();
             if (!entsToRemove.isEmpty()) {
                 for (int i = 0; i < entities.length; i++) {
-                    Collection<Entity> ents = entities[i];
+                    final Collection<Entity> ents = entities[i];
                     if (!ents.isEmpty()) {
-                        Iterator<Entity> iter = ents.iterator();
+                        final Iterator<Entity> iter = ents.iterator();
                         while (iter.hasNext()) {
-                            Entity entity = iter.next();
+                            final Entity entity = iter.next();
                             if (entsToRemove.contains(entity.getUniqueID())) {
                                 if (copy != null) {
                                     copy.storeEntity(entity);
@@ -368,16 +368,16 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                 }
             }
             for (int i = 0; i < entities.length; i++) {
-                int count = this.getCount(i);
+                final int count = this.getCount(i);
                 if (count == 0 || settings.EXPERIMENTAL.KEEP_ENTITIES_IN_BLOCKS) {
                     continue;
                 } else if (count >= 4096) {
-                    Collection<Entity> ents = entities[i];
+                    final Collection<Entity> ents = entities[i];
                     if (!ents.isEmpty()) {
                         synchronized (BukkitQueue_0.class) {
-                            Iterator<Entity> iter = ents.iterator();
+                            final Iterator<Entity> iter = ents.iterator();
                             while (iter.hasNext()) {
-                                Entity entity = iter.next();
+                                final Entity entity = iter.next();
                                 if (entity instanceof EntityPlayer) {
                                     continue;
                                 }
@@ -390,24 +390,24 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                         }
                     }
                 } else {
-                    Collection<Entity> ents = entities[i];
+                    final Collection<Entity> ents = entities[i];
                     if (!ents.isEmpty()) {
-                        int layerYStart = i << 4;
-                        int layerYEnd = layerYStart + 15;
-                        int[] array = this.getIdArray(i);
+                        final int layerYStart = i << 4;
+                        final int layerYEnd = layerYStart + 15;
+                        final int[] array = this.getIdArray(i);
                         if (array == null) continue;
-                        Iterator<Entity> iter = ents.iterator();
+                        final Iterator<Entity> iter = ents.iterator();
                         while (iter.hasNext()) {
-                            Entity entity = iter.next();
+                            final Entity entity = iter.next();
                             if (entity instanceof EntityPlayer) {
                                 continue;
                             }
-                            int y = MathMan.roundInt(entity.locY);
+                            final int y = MathMan.roundInt(entity.locY);
                             if (y > layerYEnd || y < layerYStart) continue;
-                            int x = (MathMan.roundInt(entity.locX) & 15);
-                            int z = (MathMan.roundInt(entity.locZ) & 15);
+                            final int x = (MathMan.roundInt(entity.locX) & 15);
+                            final int z = (MathMan.roundInt(entity.locZ) & 15);
 
-                            int index = (((y & 0xF) << 8) | (z << 4) | x);
+                            final int index = (((y & 0xF) << 8) | (z << 4) | x);
                             if (array[index] != 0) {
                                 if (copy != null) {
                                     copy.storeEntity(entity);
@@ -422,32 +422,32 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                 }
             }
             // Set entities
-            Set<CompoundTag> entitiesToSpawn = this.getEntities();
+            final Set<CompoundTag> entitiesToSpawn = this.getEntities();
             if (!entitiesToSpawn.isEmpty()) {
                 synchronized (BukkitQueue_0.class) {
-                    for (CompoundTag nativeTag : entitiesToSpawn) {
-                        Map<String, Tag> entityTagMap = ReflectionUtils.getMap(nativeTag.getValue());
-                        StringTag idTag = (StringTag) entityTagMap.get("Id");
-                        ListTag posTag = (ListTag) entityTagMap.get("Pos");
-                        ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
+                    for (final CompoundTag nativeTag : entitiesToSpawn) {
+                        final Map<String, Tag> entityTagMap = ReflectionUtils.getMap(nativeTag.getValue());
+                        final StringTag idTag = (StringTag) entityTagMap.get("Id");
+                        final ListTag posTag = (ListTag) entityTagMap.get("Pos");
+                        final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
                         if (idTag == null || posTag == null || rotTag == null) {
                             Fawe.debug("Unknown entity tag: " + nativeTag);
                             continue;
                         }
-                        double x = posTag.getDouble(0);
-                        double y = posTag.getDouble(1);
-                        double z = posTag.getDouble(2);
-                        float yaw = rotTag.getFloat(0);
-                        float pitch = rotTag.getFloat(1);
-                        String id = idTag.getValue();
-                        Entity entity = EntityTypes.a(nmsWorld, new MinecraftKey(id));
+                        final double x = posTag.getDouble(0);
+                        final double y = posTag.getDouble(1);
+                        final double z = posTag.getDouble(2);
+                        final float yaw = rotTag.getFloat(0);
+                        final float pitch = rotTag.getFloat(1);
+                        final String id = idTag.getValue();
+                        final Entity entity = EntityTypes.a(nmsWorld, new MinecraftKey(id));
                         if (entity != null) {
-                            UUID uuid = entity.getUniqueID();
+                            final UUID uuid = entity.getUniqueID();
                             entityTagMap.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
                             entityTagMap.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
                             if (nativeTag != null) {
-                                NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
-                                for (String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
+                                for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
                                     tag.remove(name);
                                 }
                                 entity.f(tag);
@@ -462,11 +462,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             }
             // Set blocks
             for (int j = 0; j < sections.length; j++) {
-                int count = this.getCount(j);
+                final int count = this.getCount(j);
                 if (count == 0) {
                     continue;
                 }
-                int countAir = this.getAir(j);
+                final int countAir = this.getAir(j);
                 final int[] array = this.getIdArray(j);
                 if (array == null) {
                     continue;
@@ -501,15 +501,15 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                         continue;
                     }
                 }
-                int by = j << 4;
-                DataPaletteBlock<IBlockData> nibble = section.getBlocks();
+                final int by = j << 4;
+                final DataPaletteBlock<IBlockData> nibble = section.getBlocks();
                 int nonEmptyBlockCount = 0;
                 IBlockData existing;
 
                 for (int y = 0, i = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
                         for (int x= 0; x < 16; x++, i++) {
-                            int combinedId = array[i];
+                            final int combinedId = array[i];
                             switch (combinedId) {
                                 case 0:
                                     continue;
@@ -534,8 +534,8 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                                     } else {
                                         nonEmptyBlockCount++;
                                     }
-                                    BlockState state = BlockState.getFromInternalId(combinedId);
-                                    IBlockData ibd = ((BlockMaterial_1_13) state.getMaterial()).getState();
+                                    final BlockState state = BlockState.getFromInternalId(combinedId);
+                                    final IBlockData ibd = ((BlockMaterial_1_13) state.getMaterial()).getState();
                                     nibble.setBlock(x, y, z, ibd);
                             }
                         }
@@ -547,19 +547,19 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             // Trim tiles
             HashMap<BlockPosition, TileEntity> toRemove = null;
             if (!tiles.isEmpty()) {
-                Iterator<Map.Entry<BlockPosition, TileEntity>> iterator = tiles.entrySet().iterator();
+                final Iterator<Map.Entry<BlockPosition, TileEntity>> iterator = tiles.entrySet().iterator();
                 while (iterator.hasNext()) {
-                    Map.Entry<BlockPosition, TileEntity> tile = iterator.next();
-                    BlockPosition pos = tile.getKey();
-                    int lx = pos.getX() & 15;
-                    int ly = pos.getY();
-                    int lz = pos.getZ() & 15;
-                    int layer = ly >> 4;
-                    int[] array = this.getIdArray(layer);
+                    final Map.Entry<BlockPosition, TileEntity> tile = iterator.next();
+                    final BlockPosition pos = tile.getKey();
+                    final int lx = pos.getX() & 15;
+                    final int ly = pos.getY();
+                    final int lz = pos.getZ() & 15;
+                    final int layer = ly >> 4;
+                    final int[] array = this.getIdArray(layer);
                     if (array == null) {
                         continue;
                     }
-                    int index = (((ly & 0xF) << 8) | (lz << 4) | lx);
+                    final int index = (((ly & 0xF) << 8) | (lz << 4) | lx);
                     if (array[index] != 0) {
                         if (toRemove == null) {
                             toRemove = new HashMap<>();
@@ -572,9 +572,9 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                 }
                 if (toRemove != null) {
                     synchronized (BukkitQueue_0.class) {
-                        for (Map.Entry<BlockPosition, TileEntity> entry : toRemove.entrySet()) {
-                            BlockPosition bp = entry.getKey();
-                            TileEntity tile = entry.getValue();
+                        for (final Map.Entry<BlockPosition, TileEntity> entry : toRemove.entrySet()) {
+                            final BlockPosition bp = entry.getKey();
+                            final TileEntity tile = entry.getValue();
                             nmsWorld.n(bp);
                             tiles.remove(bp);
                             tile.z();
@@ -586,32 +586,32 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
             // Set biomes
             if (this.biomes != null) {
-                BiomeBase[] currentBiomes = nmsChunk.getBiomeIndex();
+                final BiomeBase[] currentBiomes = nmsChunk.getBiomeIndex();
                 if (copy != null) {
                     copy.storeBiomes(currentBiomes);
                 }
                 for (int i = 0 ; i < this.biomes.length; i++) {
-                    BiomeType biome = this.biomes[i];
+                    final BiomeType biome = this.biomes[i];
                     if (biome != null) {
-                        Biome craftBiome = adapter.adapt(biome);
+                        final Biome craftBiome = adapter.adapt(biome);
                         currentBiomes[i] = CraftBlock.biomeToBiomeBase(craftBiome);
                     }
                 }
             }
             // Set tiles
-            Map<Short, CompoundTag> tilesToSpawn = this.getTiles();
+            final Map<Short, CompoundTag> tilesToSpawn = this.getTiles();
             if (!tilesToSpawn.isEmpty()) {
-                for (Map.Entry<Short, CompoundTag> entry : tilesToSpawn.entrySet()) {
-                    CompoundTag nativeTag = entry.getValue();
-                    short blockHash = entry.getKey();
-                    int x = (blockHash >> 12 & 0xF) + bx;
-                    int y = (blockHash & 0xFF);
-                    int z = (blockHash >> 8 & 0xF) + bz;
-                    BlockPosition pos = new BlockPosition(x, y, z); // Set pos
+                for (final Map.Entry<Short, CompoundTag> entry : tilesToSpawn.entrySet()) {
+                    final CompoundTag nativeTag = entry.getValue();
+                    final short blockHash = entry.getKey();
+                    final int x = (blockHash >> 12 & 0xF) + bx;
+                    final int y = (blockHash & 0xFF);
+                    final int z = (blockHash >> 8 & 0xF) + bz;
+                    final BlockPosition pos = new BlockPosition(x, y, z); // Set pos
                     synchronized (BukkitQueue_0.class) {
-                        TileEntity tileEntity = nmsWorld.getTileEntity(pos);
+                        final TileEntity tileEntity = nmsWorld.getTileEntity(pos);
                         if (tileEntity != null) {
-                            NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
+                            final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
                             tag.set("x", new NBTTagInt(x));
                             tag.set("y", new NBTTagInt(y));
                             tag.set("z", new NBTTagInt(z));
@@ -624,7 +624,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             if (copy != null) {
                 getParent().getChangeTask().run(copy, this);
             }
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             MainUtil.handleError(e);
         }
         return this;

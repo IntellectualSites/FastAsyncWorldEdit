@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.v1_13.beta;
+package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -10,4 +10,6 @@ public interface IGetBlocks extends IBlocks {
     BiomeType getBiome(int x, int z);
 
     BlockState getBlock(int x, int y, int z);
+
+    void trim();
 }

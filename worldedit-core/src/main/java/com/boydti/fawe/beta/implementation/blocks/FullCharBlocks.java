@@ -1,4 +1,6 @@
-package com.boydti.fawe.bukkit.v1_13.beta;
+package com.boydti.fawe.beta.implementation.blocks;
+
+import com.boydti.fawe.beta.IBlocks;
 
 public class FullCharBlocks implements IBlocks {
     public final boolean[] hasSections = new boolean[16];

@@ -1,8 +1,8 @@
-package com.boydti.fawe.bukkit.v1_13.beta;
+package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.world.block.BaseBlock;
 
-public class Filter {
+public interface Filter {
     /**
      * Check whether a chunk should be read
      *
@@ -10,7 +10,7 @@ public class Filter {
      * @param cz
      * @return
      */
-    public boolean appliesChunk(int cx, int cz) {
+    default boolean appliesChunk(final int cx, final int cz) {
         return true;
     }
 
@@ -22,7 +22,7 @@ public class Filter {
      * @param chunk
      * @return
      */
-    public IChunk applyChunk(IChunk chunk) {
+    default IChunk applyChunk(final IChunk chunk) {
         return chunk;
     }
 
@@ -36,7 +36,7 @@ public class Filter {
      * @param z
      * @param block
      */
-    public void applyBlock(int x, int y, int z, BaseBlock block) {
+    default void applyBlock(final int x, final int y, final int z, final BaseBlock block) {
     }
 
     /**
@@ -45,6 +45,6 @@ public class Filter {
      * @param chunk
      * @return
      */
-    public void finishChunk(IChunk chunk) {
+    default void finishChunk(final IChunk chunk) {
     }
 }

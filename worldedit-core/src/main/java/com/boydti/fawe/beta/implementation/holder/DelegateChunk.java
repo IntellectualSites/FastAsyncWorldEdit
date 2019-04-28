@@ -1,11 +1,12 @@
-package com.boydti.fawe.bukkit.v1_13.beta.holder;
+package com.boydti.fawe.beta.implementation.holder;
 
-import com.boydti.fawe.bukkit.v1_13.beta.IChunk;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IDelegateChunk;
 
 public class DelegateChunk<T extends IChunk> implements IDelegateChunk {
     private T parent;
 
-    public DelegateChunk(T parent) {
+    public DelegateChunk(final T parent) {
         this.parent = parent;
     }
 
@@ -13,7 +14,7 @@ public class DelegateChunk<T extends IChunk> implements IDelegateChunk {
         return parent;
     }
 
-    public final void setParent(T parent) {
+    public final void setParent(final T parent) {
         this.parent = parent;
     }
 }

@@ -1,5 +1,6 @@
-package com.boydti.fawe.bukkit.v1_13.beta;
+package com.boydti.fawe.beta.implementation.blocks;
 
+import com.boydti.fawe.beta.ISetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 
 import java.util.HashMap;

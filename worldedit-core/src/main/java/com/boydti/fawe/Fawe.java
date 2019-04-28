@@ -31,22 +31,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * [ WorldEdit action]
- * |
+ *  |
  * \|/
  * [ EditSession ] - The change is processed (area restrictions, change limit, block type)
- * |
+ *  |
  * \|/
  * [Block change] - A block change from some location
- * |
+ *  |
  * \|/
  * [ Set Queue ] - The SetQueue manages the implementation specific queue
- * |
+ *  |
  * \|/
  * [ Fawe Queue] - A queue of chunks - check if the queue has the chunk for a change
- * |
+ *  |
  * \|/
  * [ Fawe Chunk Implementation ] - Otherwise create a new FaweChunk object which is a wrapper around the Chunk object
- * |
+ *  |
  * \|/
  * [ Execution ] - When done, the queue then sets the blocks for the chunk, performs lighting updates and sends the chunk packet to the clients
  * <p>

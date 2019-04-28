@@ -1,15 +1,15 @@
-package com.boydti.fawe.bukkit.v1_13.beta;
+package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-public interface IChunk {
+public interface IChunk<T, V extends IQueueExtent> {
     /* set */
     boolean setBiome(int x, int y, int z, BiomeType biome);
 
-    boolean setBlock(int x, int y, int z, BlockStateHolder holder);
+    boolean setBlock(int x, int y, int z, BlockStateHolder block);
 
     /* get */
     BiomeType getBiome(int x, int z);
@@ -18,13 +18,13 @@ public interface IChunk {
 
     BaseBlock getFullBlock(int x, int y, int z);
 
-    void init(SingleThreadQueueExtent extent, int X, int Z);
+    void init(V extent, int X, int Z);
+
+    T apply();
 
     int getX();
 
     int getZ();
-
-    void apply();
 
     default IChunk getRoot() {
         return this;
