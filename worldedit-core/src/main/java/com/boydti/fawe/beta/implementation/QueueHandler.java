@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 
@@ -12,8 +13,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Class which handles all the queues {@link IQueueExtent}
+ */
 public abstract class QueueHandler implements Trimable {
     private Map<World, WeakReference<WorldChunkCache>> chunkCache = new HashMap<>();
+
     private IterableThreadLocal<IQueueExtent> pool = new IterableThreadLocal<IQueueExtent>() {
         @Override
         public IQueueExtent init() {
@@ -21,7 +26,14 @@ public abstract class QueueHandler implements Trimable {
         }
     };
 
-    public WorldChunkCache getOrCreate(final World world) {
+    /**
+     * Get or create the WorldChunkCache for a world
+     * @param world
+     * @return
+     */
+    public WorldChunkCache getOrCreate(World world) {
+        world = WorldWrapper.unwrap(world);
+
         synchronized (chunkCache) {
             final WeakReference<WorldChunkCache> ref = chunkCache.get(world);
             if (ref != null) {
@@ -38,6 +50,7 @@ public abstract class QueueHandler implements Trimable {
 
     public abstract IQueueExtent create();
 
+    @Override
     public boolean trim(final boolean aggressive) {
         boolean result = true;
         synchronized (chunkCache) {

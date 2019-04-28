@@ -21,7 +21,7 @@ public class BukkitFullChunk extends ChunkHolder {
     }
 
     @Override
-    public void filter(Filter filter) {
+    public void set(Filter filter) {
 
     }
 

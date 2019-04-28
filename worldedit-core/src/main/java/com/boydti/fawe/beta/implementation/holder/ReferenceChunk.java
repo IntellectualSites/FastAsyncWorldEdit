@@ -6,6 +6,11 @@ import com.boydti.fawe.beta.IQueueExtent;
 
 import java.lang.ref.Reference;
 
+/**
+ * An IChunk may be wrapped by a ReferenceChunk if there is low memory<br>
+ * A reference chunk stores a reference (for garbage collection purposes)<br>
+ *  - If it is garbage collected, the {@link FinalizedChunk} logic is run
+ */
 public abstract class ReferenceChunk implements IDelegateChunk {
     private final Reference<FinalizedChunk> ref;
 

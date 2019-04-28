@@ -15,6 +15,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.function.Supplier;
 
+/**
+ * Abstract IChunk class that implements basic get/set blocks
+ */
 public abstract class ChunkHolder<T, V extends SingleThreadQueueExtent> implements IChunk<T, V>, Supplier<IGetBlocks> {
     private IGetBlocks get;
     private ISetBlocks set;
@@ -28,6 +31,11 @@ public abstract class ChunkHolder<T, V extends SingleThreadQueueExtent> implemen
 
     public ChunkHolder(IBlockDelegate delegate) {
         this.delegate = delegate;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return set == null || set.isEmpty();
     }
 
     public final IGetBlocks cachedGet() {

@@ -8,11 +8,27 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.io.Flushable;
 import java.util.concurrent.Future;
 
+/**
+ * TODO: implement Extent (need to refactor Extent first)
+ * Interface for a queue based extent which uses chunks
+ */
 public interface IQueueExtent extends Flushable, Trimable {
     void init(WorldChunkCache world);
 
+    /**
+     * Get the IChunk at a position (and cache it if it's not already)
+     * @param X
+     * @param Z
+     * @return IChunk
+     */
     IChunk getCachedChunk(int X, int Z);
 
+    /**
+     * Submit the chunk so that it's changes are applied to the world
+     * @param chunk
+     * @param <T> result type
+     * @return result
+     */
     <T> Future<T> submit(IChunk<T, ?> chunk);
 
     default boolean setBlock(final int x, final int y, final int z, final BlockStateHolder state) {
@@ -36,14 +52,16 @@ public interface IQueueExtent extends Flushable, Trimable {
     }
 
     /**
-     * Return the IChunk
+     * Create a new root IChunk object<br>
+     *  - Full chunks will be reused, so a more optimized chunk can be returned in that case<br>
+     *  - Don't wrap the chunk, that should be done in {@link #wrap(IChunk)}
      * @param full
      * @return
      */
     IChunk create(boolean full);
 
     /**
-     * Wrap the chunk object (i.e. for region restrictions etc.)
+     * Wrap the chunk object (i.e. for region restrictions / limits etc.)
      * @param root
      * @return wrapped chunk
      */
@@ -51,6 +69,10 @@ public interface IQueueExtent extends Flushable, Trimable {
         return root;
     }
 
+    /**
+     * Flush all changes to the world
+     *  - Best to call this async so it doesn't hang the server
+     */
     @Override
     void flush();
 }

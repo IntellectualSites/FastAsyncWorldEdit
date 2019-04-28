@@ -38,7 +38,7 @@ public class BukkitChunkHolder extends ChunkHolder<Boolean, BukkitQueue> {
     }
 
     @Override
-    public void filter(final Filter filter) {
+    public void set(final Filter filter) {
         // for each block
         // filter.applyBlock(block)
         throw new UnsupportedOperationException("Not implemented");

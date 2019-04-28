@@ -2,7 +2,10 @@ package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.world.block.BaseBlock;
 
-public interface Filter {
+/**
+ * A filter is an interface used for setting blocks
+ */
+public interface Filter  {
     /**
      * Check whether a chunk should be read
      *
@@ -46,5 +49,14 @@ public interface Filter {
      * @return
      */
     default void finishChunk(final IChunk chunk) {
+    }
+
+    /**
+     * Fork this for use by another thread
+     *  - Typically filters are simple and don't need to create another copy to be thread safe here
+     * @return this
+     */
+    default Filter fork() {
+        return this;
     }
 }

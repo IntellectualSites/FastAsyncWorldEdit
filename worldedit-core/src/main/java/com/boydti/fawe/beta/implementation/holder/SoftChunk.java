@@ -6,9 +6,12 @@ import com.boydti.fawe.beta.IQueueExtent;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 
+/**
+ * Soft reference implementation of {@link ReferenceChunk}
+ */
 public class SoftChunk extends ReferenceChunk {
 
-    public SoftChunk(final IChunk parent, IQueueExtent queueExtent) {
+    public SoftChunk(final IChunk parent, final IQueueExtent queueExtent) {
         super(parent, queueExtent);
     }
 

@@ -4,6 +4,9 @@ import com.boydti.fawe.beta.implementation.WorldChunkCache;
 
 import java.util.concurrent.Future;
 
+/**
+ * Delegate for IQueueExtent
+ */
 public interface IDelegateQueueExtent extends IQueueExtent {
     IQueueExtent getParent();
 

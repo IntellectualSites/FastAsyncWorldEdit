@@ -10,6 +10,10 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.lang.ref.WeakReference;
 import java.util.function.Supplier;
 
+/**
+ * IGetBlocks may be cached by the WorldChunkCache so that it can be used between multiple IQueueExtents
+ *  - avoids conversion between palette and raw data on every block get
+ */
 public class WorldChunkCache implements Trimable {
     protected final Long2ObjectLinkedOpenHashMap<WeakReference<IGetBlocks>> getCache;
     private final World world;
@@ -27,6 +31,12 @@ public class WorldChunkCache implements Trimable {
         return getCache.size();
     }
 
+    /**
+     * Get or create the IGetBlocks
+     * @param index chunk index {@link com.boydti.fawe.util.MathMan#pairInt(int, int)}
+     * @param provider used to create if it isn't already cached
+     * @return cached IGetBlocks
+     */
     public synchronized IGetBlocks get(final long index, final Supplier<IGetBlocks> provider) {
         final WeakReference<IGetBlocks> ref = getCache.get(index);
         if (ref != null) {
@@ -52,7 +62,7 @@ public class WorldChunkCache implements Trimable {
                     result = false;
                     if (!aggressive) return result;
                     synchronized (igb) {
-                        igb.trim();
+                        igb.trim(aggressive);
                     }
                 }
             }
