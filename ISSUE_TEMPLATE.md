@@ -4,15 +4,16 @@
 <!--- Remove this template if making a suggestion or asking a question. -->
 <!--- Incomplete reports might be marked as invalid. -->
 **[REQUIRED] FastAsyncWorldEdit Version Number:** 
-<!--- Enter /fawe version in game or in your console and copy the output here -->
+<!--- Enter /fawe version in game or in your console and copy the full output here -->
 
 **[REQUIRED] Spigot/Paper Version Number:** 
-<!--- Enter /version ingame or in your console and paste the output here -->
+<!--- Enter /version ingame or in your console and paste the full output here -->
 
 **Links to config.yml and config-legacy.yml file:** 
 <!--- Copy and paste the information to the service of your choosing (pastebin, hasteb.in e.g) and provide the link here. -->
 
 **[REQUIRED] Description of the problem:**
+<!--- Check your console for errors while testing -->
 <!--- Include relevant information like errors or a picture of the problem -->
 
 **Plugins being used on the server:**
