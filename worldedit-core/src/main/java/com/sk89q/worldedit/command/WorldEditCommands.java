@@ -102,7 +102,7 @@ public class WorldEditCommands {
         we.getEventBus().post(new ConfigurationLoadEvent(we.getPlatformManager().queryCapability(Capability.CONFIGURATION).getConfiguration()));
         Fawe.get().setupConfigs();
         CommandManager.getInstance().register(we.getPlatformManager().queryCapability(Capability.USER_COMMANDS));
-        actor.print(BBC.getPrefix() + "Reloaded WorldEdit " + we.getVersion() + " and FAWE (" + Fawe.get().getVersion() + ")");
+        actor.print(BBC.getPrefix() + "Reloaded WorldEdit " + we.getVersion() + " and " + Fawe.get().getVersion() + "");
     }
 
     @Command(
