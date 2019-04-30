@@ -138,7 +138,12 @@ public class FaweBukkit implements IFawe, Listener {
             Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
                 Bukkit.getPluginManager().registerEvents(new AsyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
             } catch (Throwable ignore) {
-                ignore.printStackTrace();
+                debug("====== USE PAPER ======");
+                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
+                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
+                debug(" - This is only a recommendation");
+                debug(" - Allows the use of Async Tab Completetion as provided by Paper");
+                debug("==============================");
                 Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
             }
         });
