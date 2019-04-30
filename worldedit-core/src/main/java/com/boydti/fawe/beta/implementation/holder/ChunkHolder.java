@@ -1,5 +1,9 @@
 package com.boydti.fawe.beta.implementation.holder;
 
+import com.boydti.fawe.beta.CharFilterBlock;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.FilterBlock;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.IChunk;
@@ -18,11 +22,11 @@ import java.util.function.Supplier;
 /**
  * Abstract IChunk class that implements basic get/set blocks
  */
-public abstract class ChunkHolder<T, V extends SingleThreadQueueExtent> implements IChunk<T, V>, Supplier<IGetBlocks> {
+public abstract class ChunkHolder<T> implements IChunk, Supplier<IGetBlocks> {
     private IGetBlocks get;
     private ISetBlocks set;
     private IBlockDelegate delegate;
-    private SingleThreadQueueExtent extent;
+    private IQueueExtent extent;
     private int X,Z;
 
     public ChunkHolder() {
@@ -31,6 +35,37 @@ public abstract class ChunkHolder<T, V extends SingleThreadQueueExtent> implemen
 
     public ChunkHolder(IBlockDelegate delegate) {
         this.delegate = delegate;
+    }
+
+    @Override
+    public void filter(Filter filter, FilterBlock block) {
+        block.init(X, Z, get);
+        IGetBlocks get = cachedGet();
+        get.filter(filter, block);
+    }
+
+    @Override
+    public boolean trim(boolean aggressive) {
+        if (set != null) {
+            boolean result = set.trim(aggressive);
+            if (result) {
+                delegate = NULL;
+                get = null;
+                set = null;
+                return true;
+            }
+        }
+        if (aggressive) {
+            get = null;
+            if (delegate == BOTH) {
+                delegate = SET;
+            } else if (delegate == GET) {
+                delegate = NULL;
+            }
+        } else {
+            get.trim(false);
+        }
+        return false;
     }
 
     @Override
@@ -53,25 +88,29 @@ public abstract class ChunkHolder<T, V extends SingleThreadQueueExtent> implemen
     }
 
     private IGetBlocks newGet() {
-        WorldChunkCache cache = extent.getCache();
-        cache.get(MathMan.pairInt(X, Z), this);
-        return new CharGetBlocks();
+        if (extent instanceof SingleThreadQueueExtent) {
+            WorldChunkCache cache = ((SingleThreadQueueExtent) extent).getCache();
+            return cache.get(MathMan.pairInt(X, Z), this);
+        }
+        return get();
     }
 
-    public void init(final SingleThreadQueueExtent extent, final int X, final int Z) {
+    @Override
+    public void init(IQueueExtent extent, final int X, final int Z) {
         this.extent = extent;
         this.X = X;
         this.Z = Z;
-        set = null;
-        if (delegate == BOTH) {
-            delegate = GET;
-        } else if (delegate == SET) {
+        if (set != null) {
+            set.reset();
+            delegate = SET;
+        } else {
             delegate = NULL;
         }
+        get = null;
     }
 
-    public V getExtent() {
-        return (V) extent;
+    public IQueueExtent getExtent() {
+        return extent;
     }
 
     @Override

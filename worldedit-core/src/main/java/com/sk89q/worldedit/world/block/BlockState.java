@@ -52,6 +52,7 @@ import java.util.stream.Stream;
 public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     private final int internalId;
     private final int ordinal;
+    private final char ordinalChar;
     private final BlockType blockType;
     private BlockMaterial material;
     private BaseBlock emptyBaseBlock;
@@ -60,6 +61,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
+        this.ordinalChar = (char) ordinal;
         this.emptyBaseBlock = new BaseBlock(this);
     }
 
@@ -285,7 +287,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
 
     @Override
-    public BaseBlock toBaseBlock() {
+    public final BaseBlock toBaseBlock() {
         return this.emptyBaseBlock;
     }
 
@@ -330,10 +332,15 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         return material;
 	}
 
-	@Override
-	public int getOrdinal() {
-		return this.ordinal;
-	}
+    @Override
+    public int getOrdinal() {
+        return this.ordinal;
+    }
+
+    @Override
+    public final char getOrdinalChar() {
+        return this.ordinalChar;
+    }
 
     @Override
     public String toString() {

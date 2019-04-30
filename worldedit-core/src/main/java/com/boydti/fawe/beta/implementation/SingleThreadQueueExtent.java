@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta.implementation;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.holder.ReferenceChunk;
@@ -12,8 +13,10 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.Future;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -37,10 +40,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         }
     }
 
-    /**
-     * Get the {@link WorldChunkCache}
-     * @return
-     */
+    @Override
     public WorldChunkCache getCache() {
         return cache;
     }
@@ -52,12 +52,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         checkThread();
         cache = null;
         if (!chunks.isEmpty()) {
-            for (IChunk chunk : chunks.values()) {
-                chunk = chunk.getRoot();
-                if (chunk != null) {
-                    CHUNK_POOL.add(chunk);
-                }
-            }
+            CHUNK_POOL.addAll(chunks.values());
             chunks.clear();
         }
         lastChunk = null;
@@ -88,27 +83,19 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
 
     @Override
-    public <T> ForkJoinTask<T> submit(final IChunk<T, ?> chunk) {
+    public Future<?> submit(final IChunk chunk) {
         if (chunk.isEmpty()) {
             CHUNK_POOL.add(chunk);
             return null;
         }
-        // TODO use SetQueue to run in parallel
-        final ForkJoinPool pool = TaskManager.IMP.getPublicForkJoinPool();
-        return pool.submit(new Callable<T>() {
-            @Override
-            public T call() {
-                IChunk<T, ?> tmp = chunk;
-
-                T result = tmp.apply();
-
-                tmp = tmp.getRoot();
-                if (tmp != null) {
-                    CHUNK_POOL.add(tmp);
-                }
-                return result;
+        if (Fawe.isMainThread()) {
+            if (!chunk.applyAsync()) {
+                chunk.applySync();
             }
-        });
+            return null;
+        }
+        QueueHandler handler = Fawe.get().getQueueHandler();
+        return handler.submit(chunk);
     }
 
     @Override
@@ -141,7 +128,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
 
     @Override
     public final IChunk getCachedChunk(final int X, final int Z) {
-        final long pair = MathMan.pairInt(X, Z);
+        final long pair = (((long) X) << 32) | (Z & 0xffffffffL);
         if (pair == lastPair) {
             return lastChunk;
         }
@@ -178,14 +165,21 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     public synchronized void flush() {
         checkThread();
         if (!chunks.isEmpty()) {
-            final ForkJoinTask[] tasks = new ForkJoinTask[chunks.size()];
+            final Future[] tasks = new ForkJoinTask[chunks.size()];
             int i = 0;
             for (final IChunk chunk : chunks.values()) {
                 tasks[i++] = submit(chunk);
             }
             chunks.clear();
-            for (final ForkJoinTask task : tasks) {
-                if (task != null) task.join();
+            for (final Future task : tasks) {
+                if (task != null) {
+                    try {
+                        task.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }
         reset();

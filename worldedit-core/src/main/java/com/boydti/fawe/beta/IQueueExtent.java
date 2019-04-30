@@ -16,6 +16,12 @@ public interface IQueueExtent extends Flushable, Trimable {
     void init(WorldChunkCache world);
 
     /**
+     * Get the {@link WorldChunkCache}
+     * @return
+     */
+    WorldChunkCache getCache();
+
+    /**
      * Get the IChunk at a position (and cache it if it's not already)
      * @param X
      * @param Z
@@ -26,10 +32,9 @@ public interface IQueueExtent extends Flushable, Trimable {
     /**
      * Submit the chunk so that it's changes are applied to the world
      * @param chunk
-     * @param <T> result type
      * @return result
      */
-    <T> Future<T> submit(IChunk<T, ?> chunk);
+    Future<?> submit(IChunk chunk);
 
     default boolean setBlock(final int x, final int y, final int z, final BlockStateHolder state) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
@@ -75,4 +80,6 @@ public interface IQueueExtent extends Flushable, Trimable {
      */
     @Override
     void flush();
+
+    FilterBlock initFilterBlock();
 }

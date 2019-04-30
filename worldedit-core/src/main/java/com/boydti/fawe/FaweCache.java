@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class FaweCache implements Trimable {
+    public static final char[] EMPTY_CHAR_4096 = new char[4096];
 
     /*
     Palette buffers / cache
@@ -40,7 +41,16 @@ public class FaweCache implements Trimable {
     public static final IterableThreadLocal<int[]> PALETTE_TO_BLOCK = new IterableThreadLocal<int[]>() {
         @Override
         public int[] init() {
-            return new int[Character.MAX_VALUE];
+            return new int[Character.MAX_VALUE + 1];
+        }
+    };
+
+    public static final IterableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new IterableThreadLocal<char[]>() {
+        @Override
+        public char[] init() {
+            char[] result = new char[Character.MAX_VALUE + 1];
+            Arrays.fill(result, Character.MAX_VALUE);
+            return result;
         }
     };
 
@@ -58,17 +68,10 @@ public class FaweCache implements Trimable {
         }
     };
 
-    public static Map<String, Object> asMap(Object... pairs) {
-        HashMap<String, Object> map = new HashMap<>(pairs.length >> 1);
-        for (int i = 0; i < pairs.length; i += 2) {
-            String key = (String) pairs[i];
-            Object value = pairs[i + 1];
-            map.put(key, value);
-        }
-        return map;
-    }
-
-    private static final class Palette {
+    /**
+     * Holds data for a palette used in a chunk section
+     */
+    public static final class Palette {
         public int paletteToBlockLength;
         /**
          * Reusable buffer array, MUST check paletteToBlockLength for actual length
@@ -91,31 +94,31 @@ public class FaweCache implements Trimable {
 
     /**
      * Convert raw char array to palette
-     * @param layer
+     * @param layerOffset
      * @param blocks
      * @return palette
      */
-    public static Palette toPalette(int layer, char[] blocks) {
-        return toPalette(layer, null, blocks);
+    public static Palette toPalette(int layerOffset, char[] blocks) {
+        return toPalette(layerOffset, null, blocks);
     }
 
     /**
      * Convert raw int array to palette
-     * @param layer
+     * @param layerOffset
      * @param blocks
      * @return palette
      */
-    public static Palette toPalette(int layer, int[] blocks) {
-        return toPalette(layer, blocks, null);
+    public static Palette toPalette(int layerOffset, int[] blocks) {
+        return toPalette(layerOffset, blocks, null);
     }
 
-    private static Palette toPalette(int layer, int[] blocksInts, char[] blocksChars) {
+    private static Palette toPalette(int layerOffset, int[] blocksInts, char[] blocksChars) {
         int[] blockToPalette = BLOCK_TO_PALETTE.get();
         int[] paletteToBlock = PALETTE_TO_BLOCK.get();
         long[] blockstates = BLOCK_STATES.get();
         int[] blocksCopy = SECTION_BLOCKS.get();
 
-        int blockIndexStart = layer << 12;
+        int blockIndexStart = layerOffset << 12;
         int blockIndexEnd = blockIndexStart + 4096;
         int num_palette = 0;
         try {
@@ -124,7 +127,7 @@ public class FaweCache implements Trimable {
                     int ordinal = blocksChars[i];
                     int palette = blockToPalette[ordinal];
                     if (palette == Integer.MAX_VALUE) {
-                        BlockState state = BlockTypes.states[ordinal];
+//                        BlockState state = BlockTypes.states[ordinal];
                         blockToPalette[ordinal] = palette = num_palette;
                         paletteToBlock[num_palette] = ordinal;
                         num_palette++;
@@ -182,6 +185,16 @@ public class FaweCache implements Trimable {
     /*
     Conversion methods between JNBT tags and raw values
      */
+
+    public static Map<String, Object> asMap(Object... pairs) {
+        HashMap<String, Object> map = new HashMap<>(pairs.length >> 1);
+        for (int i = 0; i < pairs.length; i += 2) {
+            String key = (String) pairs[i];
+            Object value = pairs[i + 1];
+            map.put(key, value);
+        }
+        return map;
+    }
 
     public static ShortTag asTag(short value) {
         return new ShortTag(value);

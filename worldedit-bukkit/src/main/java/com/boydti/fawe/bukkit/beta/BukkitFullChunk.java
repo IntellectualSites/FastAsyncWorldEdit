@@ -16,8 +16,13 @@ public class BukkitFullChunk extends ChunkHolder {
     }
 
     @Override
-    public Object apply() {
-        return null;
+    public boolean applyAsync() {
+        return false;
+    }
+
+    @Override
+    public boolean applySync() {
+        return false;
     }
 
     @Override

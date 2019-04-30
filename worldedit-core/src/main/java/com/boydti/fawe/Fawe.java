@@ -1,5 +1,6 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.config.Settings;
@@ -81,6 +82,8 @@ public class Fawe {
     private TextureUtil textures;
     private DefaultTransformParser transformParser;
     private ChatManager chatManager = new PlainChatManager();
+
+    private QueueHandler queueHandler;
 
     /**
      * Get the implementation specific class
@@ -197,6 +200,17 @@ public class Fawe {
     }
 
     public void onDisable() {
+    }
+
+    public QueueHandler getQueueHandler() {
+        if (queueHandler == null) {
+            synchronized (this) {
+                if (queueHandler == null) {
+                    queueHandler = IMP.getQueueHandler();
+                }
+            }
+        }
+        return queueHandler;
     }
 
     public CUI getCUI(Actor actor) {

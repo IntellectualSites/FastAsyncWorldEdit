@@ -19,24 +19,22 @@
 
 package com.sk89q.worldedit.world.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.world.registry.LegacyMapper;
-import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
-
 import java.util.Map;
 import java.util.Objects;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a "snapshot" of a block with NBT Data.
@@ -84,7 +82,6 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
      */
 
     public BaseBlock(BlockState blockState) {
-//        this(blockState, blockState.getNbtData());
     	this.blockState = blockState;
     }
 
@@ -210,7 +207,12 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
     }
 
     @Override
-    public BaseBlock toBaseBlock() {
+    public final char getOrdinalChar() {
+        return blockState.getOrdinalChar();
+    }
+
+    @Override
+    public final BaseBlock toBaseBlock() {
         return this;
     }
 

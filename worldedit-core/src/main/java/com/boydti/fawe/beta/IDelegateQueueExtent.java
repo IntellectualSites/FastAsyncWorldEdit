@@ -21,7 +21,7 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default <T> Future<T> submit(IChunk<T, ?> chunk) {
+    default Future<?> submit(IChunk chunk) {
         return getParent().submit(chunk);
     }
 

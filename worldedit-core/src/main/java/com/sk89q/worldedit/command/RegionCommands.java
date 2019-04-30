@@ -19,7 +19,12 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.implementation.WorldChunkCache;
+import com.boydti.fawe.beta.test.CountFilter;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.object.FaweLimit;
@@ -61,20 +66,25 @@ import com.sk89q.worldedit.math.convolution.HeightMap;
 import com.sk89q.worldedit.math.convolution.HeightMapFilter;
 import com.sk89q.worldedit.math.noise.RandomNoise;
 import com.sk89q.worldedit.regions.*;
+import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -259,6 +269,19 @@ public class RegionCommands extends MethodCommands {
         int blocksChanged = editSession.drawLine(pattern, pos1, pos2, thickness, !shell);
 
         BBC.VISITOR_BLOCK.send(player, blocksChanged);
+    }
+
+    @Command(
+            aliases = {"debugtest"},
+            usage = "",
+            desc = "debugtest",
+            help = "debugtest"
+    )
+    public void debugtest(Player player, @Selection Region region) throws WorldEditException {
+        QueueHandler queueHandler = Fawe.get().getQueueHandler();
+        World world = player.getWorld();
+        CountFilter filter = new CountFilter();
+        queueHandler.apply(world, region, filter);
     }
 
     @Command(

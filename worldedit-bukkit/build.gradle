@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     compile project(':worldedit-core')
-    compile 'org.bukkit:craftbukkit-1.14:pre5'
+//    compile 'org.bukkit:craftbukkit-1.14:pre5'
     compile 'net.milkbowl.vault:VaultAPI:1.7'
     compile 'com.sk89q:dummypermscompat:1.10'
     compile 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'

@@ -22,7 +22,8 @@ public class FinalizedChunk extends DelegateChunk {
     @Override
     protected void finalize() throws Throwable {
         if (getParent() != null) {
-            apply();
+            // TODO apply safely
+//            apply();
             setParent(null);
         }
         super.finalize();

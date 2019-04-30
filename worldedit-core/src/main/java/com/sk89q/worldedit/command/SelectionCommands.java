@@ -710,7 +710,7 @@ public class SelectionCommands {
             distributionData = (List) editSession.getBlockDistributionWithData(region);
         else
             distributionData = (List) editSession.getBlockDistribution(region);
-        size = session.getSelection(player.getWorld()).getArea();
+        size = region.getArea();
 
         if (distributionData.size() <= 0) {
             player.printError(BBC.getPrefix() + "No blocks counted.");

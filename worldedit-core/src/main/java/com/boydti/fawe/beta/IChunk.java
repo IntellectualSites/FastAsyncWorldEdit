@@ -8,17 +8,15 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 /**
  * Represents a chunk in the queue {@link IQueueExtent}
  * Used for getting and setting blocks / biomes / entities
- * @param <T> The result type (typically returns true when the chunk is applied)
- * @param <V> The IQueue class
  */
-public interface IChunk<T, V extends IQueueExtent> extends Trimable {
+public interface IChunk extends Trimable {
     /**
      * Initialize at the location
      * @param extent
      * @param X
      * @param Z
      */
-    void init(V extent, int X, int Z);
+    void init(IQueueExtent extent, int X, int Z);
 
     int getX();
 
@@ -38,10 +36,16 @@ public interface IChunk<T, V extends IQueueExtent> extends Trimable {
     boolean isEmpty();
 
     /**
-     * Apply the queued changes to the world
-     * @return
+     * Apply the queued async changes to the world
+     * @return false if applySync needs to run
      */
-    T apply();
+    boolean applyAsync();
+
+    /**
+     * Apply the queued sync changes to the world
+     * @return true
+     */
+    boolean applySync();
 
     /* set - queues a change */
     boolean setBiome(int x, int y, int z, BiomeType biome);
@@ -60,4 +64,6 @@ public interface IChunk<T, V extends IQueueExtent> extends Trimable {
     BlockState getBlock(int x, int y, int z);
 
     BaseBlock getFullBlock(int x, int y, int z);
+
+    void filter(Filter filter, FilterBlock mutable);
 }

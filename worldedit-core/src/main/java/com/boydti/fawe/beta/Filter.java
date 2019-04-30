@@ -34,12 +34,9 @@ public interface Filter  {
      * - e.g. block.setId(...)<br>
      * - Note: Performance is critical here<br>
      *
-     * @param x
-     * @param y
-     * @param z
      * @param block
      */
-    default void applyBlock(final int x, final int y, final int z, final BaseBlock block) {
+    default void applyBlock(final FilterBlock block) {
     }
 
     /**
@@ -58,5 +55,9 @@ public interface Filter  {
      */
     default Filter fork() {
         return this;
+    }
+
+    default void join(Filter parent) {
+
     }
 }

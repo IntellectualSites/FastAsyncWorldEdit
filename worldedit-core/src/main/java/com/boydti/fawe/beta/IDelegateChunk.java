@@ -7,11 +7,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 /**
  * Delegate for IChunk
- * @param <T> The result type (typically returns true when the chunk is applied)
- * @param <V> The IQueue class
  * @param <U> parent class
  */
-public interface IDelegateChunk<T, V extends IQueueExtent, U extends IChunk<T, V>> extends IChunk<T, V> {
+public interface IDelegateChunk<U extends IChunk> extends IChunk {
     U getParent();
 
     default IChunk getRoot() {
@@ -48,7 +46,7 @@ public interface IDelegateChunk<T, V extends IQueueExtent, U extends IChunk<T, V
     }
 
     @Override
-    default void init(final V extent, final int X, final int Z) {
+    default void init(final IQueueExtent extent, final int X, final int Z) {
         getParent().init(extent, X, Z);
     }
 
@@ -68,13 +66,19 @@ public interface IDelegateChunk<T, V extends IQueueExtent, U extends IChunk<T, V
         return getParent().trim(aggressive);
     }
 
-    /**
-     * Apply this chunk to the world
-     * @return result T (typically a boolean)
-     */
     @Override
-    default T apply() {
-        return getParent().apply();
+    default boolean applySync() {
+        return getParent().applySync();
+    }
+
+    @Override
+    default boolean applyAsync() {
+        return getParent().applyAsync();
+    }
+
+    @Override
+    default void filter(Filter filter, FilterBlock mutable) {
+        getParent().filter(filter, mutable);
     }
 
     @Override

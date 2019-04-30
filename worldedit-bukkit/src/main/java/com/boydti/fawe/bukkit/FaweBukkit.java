@@ -2,6 +2,9 @@ package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
+import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.bukkit.beta.BukkitQueue;
+import com.boydti.fawe.bukkit.beta.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.chat.BukkitChatManager;
 import com.boydti.fawe.bukkit.listener.AsyncTabCompleteListener;
 import com.boydti.fawe.bukkit.listener.BrushListener;
@@ -142,6 +145,11 @@ public class FaweBukkit implements IFawe, Listener {
                 Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
             }
         });
+    }
+
+    @Override
+    public QueueHandler getQueueHandler() {
+        return new BukkitQueueHandler();
     }
 
     @Override
