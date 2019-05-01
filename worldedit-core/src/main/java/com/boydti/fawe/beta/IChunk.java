@@ -5,11 +5,16 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
+
 /**
  * Represents a chunk in the queue {@link IQueueExtent}
  * Used for getting and setting blocks / biomes / entities
  */
-public interface IChunk extends Trimable {
+public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
     /**
      * Initialize at the location
      * @param extent
@@ -21,6 +26,8 @@ public interface IChunk extends Trimable {
     int getX();
 
     int getZ();
+
+
 
     /**
      * If the chunk is a delegate, returns it's paren'ts root
@@ -36,16 +43,33 @@ public interface IChunk extends Trimable {
     boolean isEmpty();
 
     /**
-     * Apply the queued async changes to the world
-     * @return false if applySync needs to run
+     * Spend time optimizing for apply<br>
+     * default behavior: do nothing
      */
-    boolean applyAsync();
+    default void optimize() {
+
+    }
 
     /**
-     * Apply the queued sync changes to the world
-     * @return true
+     * Apply the queued changes to the world<br>
+     * The future returned may return another future<br>
+     * To ensure completion keep calling {@link Future#get()} on each result
+     * @return Futures
      */
-    boolean applySync();
+    T call();
+
+    /**
+     * Call and join
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    default void join() throws ExecutionException, InterruptedException {
+        T future = call();
+        while (future != null) {
+            future = future.get();
+        }
+        return;
+    }
 
     /* set - queues a change */
     boolean setBiome(int x, int y, int z, BiomeType biome);

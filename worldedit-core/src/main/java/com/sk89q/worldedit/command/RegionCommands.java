@@ -281,7 +281,10 @@ public class RegionCommands extends MethodCommands {
         QueueHandler queueHandler = Fawe.get().getQueueHandler();
         World world = player.getWorld();
         CountFilter filter = new CountFilter();
+        long start = System.currentTimeMillis();
         queueHandler.apply(world, region, filter);
+        long diff = System.currentTimeMillis() - start;
+        System.out.println(diff);
     }
 
     @Command(

@@ -5,6 +5,9 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 /**
  * Delegate for IChunk
  * @param <U> parent class
@@ -67,13 +70,13 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default boolean applySync() {
-        return getParent().applySync();
+    default Future call() {
+        return getParent().call();
     }
 
     @Override
-    default boolean applyAsync() {
-        return getParent().applyAsync();
+    default void join() throws ExecutionException, InterruptedException {
+        getParent().join();
     }
 
     @Override

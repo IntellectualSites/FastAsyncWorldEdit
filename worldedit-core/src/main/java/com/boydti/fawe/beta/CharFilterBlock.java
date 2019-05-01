@@ -13,12 +13,12 @@ public class CharFilterBlock implements FilterBlock {
     private char[] section;
 
     @Override
-    public void init(IQueueExtent queue) {
+    public final void init(IQueueExtent queue) {
         this.queue = queue;
     }
 
     @Override
-    public void init(int X, int Z, IGetBlocks chunk) {
+    public final void init(int X, int Z, IGetBlocks chunk) {
         this.chunk = (CharGetBlocks) chunk;
         this.X = X;
         this.Z = Z;
@@ -26,68 +26,85 @@ public class CharFilterBlock implements FilterBlock {
         this.zz = Z << 4;
     }
 
-    public void init(char[] section, int layer) {
-        this.section = section;
-        this.layer = layer;
-        this.yy = layer << 4;
+    // local
+    private int layer, index, x, y, z, xx, yy, zz, X, Z;
+
+    public final void filter(CharGetBlocks blocks, Filter filter) {
+        for (int layer = 0; layer < 16; layer++) {
+            if (!blocks.hasSection(layer)) continue;
+            char[] arr = blocks.sections[layer].get(blocks, layer);
+
+            this.section = arr;
+            this.layer = layer;
+            this.yy = layer << 4;
+
+            for (y = 0, index = 0; y < 16; y++) {
+                for (z = 0; z < 16; z++) {
+                    for (x = 0; x < 16; x++, index++) {
+                        filter.applyBlock(this);
+                    }
+                }
+            }
+        }
     }
 
-    // local
-    public int layer, index, x, y, z, xx, yy, zz, X, Z;
-
     @Override
-    public int getX() {
+    public final int getX() {
         return xx + x;
     }
 
     @Override
-    public int getY() {
+    public final int getY() {
         return yy + y;
     }
 
     @Override
-    public int getZ() {
+    public final int getZ() {
         return zz + z;
     }
 
     @Override
-    public  int getLocalX() {
+    public final int getLocalX() {
         return x;
     }
 
     @Override
-    public  int getLocalY() {
+    public final int getLocalY() {
         return y;
     }
 
     @Override
-    public  int getLocalZ() {
+    public final int getLocalZ() {
         return z;
     }
 
     @Override
-    public  int getChunkX() {
+    public final int getChunkX() {
         return X;
     }
 
     @Override
-    public  int getChunkZ() {
+    public final int getChunkZ() {
         return Z;
     }
 
-    @Override
-    public int getOrdinal() {
+    public final char getOrdinalChar() {
         return section[index];
     }
 
     @Override
-    public BlockState getState() {
+    public final int getOrdinal() {
+        return section[index];
+    }
+
+    @Override
+    public final BlockState getState() {
         int ordinal = section[index];
         return BlockTypes.states[ordinal];
     }
 
     @Override
-    public BaseBlock getBaseBlock() {
+    public final BaseBlock getBaseBlock() {
         BlockState state = getState();
         BlockMaterial material = state.getMaterial();
         if (material.hasContainer()) {
@@ -98,11 +115,11 @@ public class CharFilterBlock implements FilterBlock {
     }
 
     @Override
-    public CompoundTag getTag() {
+    public final CompoundTag getTag() {
         return null;
     }
 
-    public BlockState getOrdinalBelow() {
+    public final BlockState getOrdinalBelow() {
         if (y > 0) {
             return states[section[index - 256]];
         }
@@ -114,7 +131,7 @@ public class CharFilterBlock implements FilterBlock {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-    public BlockState getStateAbove() {
+    public final BlockState getStateAbove() {
         if (y < 16) {
             return states[section[index + 256]];
         }
@@ -126,7 +143,7 @@ public class CharFilterBlock implements FilterBlock {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-    public BlockState getStateRelativeY(int y) {
+    public final BlockState getStateRelativeY(int y) {
         int newY = this.y + y;
         int layerAdd = newY >> 4;
         switch (layerAdd) {
@@ -180,7 +197,7 @@ public class CharFilterBlock implements FilterBlock {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-    public BlockState getStateRelative(final int x, final int y, final int z) {
+    public final BlockState getStateRelative(final int x, final int y, final int z) {
         int newX = this.x + x;
         if (newX >> 4 == 0) {
             int newZ = this.z + z;
@@ -189,7 +206,7 @@ public class CharFilterBlock implements FilterBlock {
                 int layerAdd = newY >> 4;
                 switch (layerAdd) {
                     case 0:
-                        return states[section[this.index + ((y << 8) | (z << 4) | x)]];
+                        return states[section[this.index + ((y << 8) + (z << 4) + x)]];
                     case 1:
                     case 2:
                     case 3:
@@ -207,7 +224,7 @@ public class CharFilterBlock implements FilterBlock {
                     case 15: {
                         int newLayer = layer + layerAdd;
                         if (newLayer < 16) {
-                            int index = this.index + (((y & 15) << 8) | (z << 4) | x);
+                            int index = ((newY & 15) << 8) + (newZ << 4) + newX;
                             return states[chunk.sections[newLayer].get(chunk, newLayer, index)];
                         }
                         break;
@@ -229,7 +246,7 @@ public class CharFilterBlock implements FilterBlock {
                     case -15: {
                         int newLayer = layer + layerAdd;
                         if (newLayer >= 0) {
-                            int index = this.index + (((y & 15) << 8) | (z << 4) | x);
+                            int index = ((newY & 15) << 8) + (newZ << 4) + newX;
                             return states[chunk.sections[newLayer].get(chunk, newLayer, index)];
                         }
                         break;

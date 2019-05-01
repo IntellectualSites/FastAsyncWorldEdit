@@ -70,7 +70,6 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
 
     public final static Field fieldBits;
     public final static Field fieldPalette;
-
     protected final static Field fieldSize;
 
     protected final static Field fieldHashBlocks;
@@ -88,6 +87,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     protected final static Field fieldFluidCount;
     protected final static Field fieldTickingBlockCount;
     protected final static Field fieldNonEmptyBlockCount;
+
     protected final static Field fieldSection;
     protected final static Field fieldLiquidCount;
     protected final static Field fieldEmittedLight;
@@ -847,85 +847,84 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     }
 
     public static ChunkSection newChunkSection(final int y2, final boolean flag, final int[] blocks) {
+        ChunkSection section = new ChunkSection(y2 << 4, flag);
         if (blocks == null) {
-            return new ChunkSection(y2 << 4, flag);
-        } else {
-            final ChunkSection section = new ChunkSection(y2 << 4, flag);
-            final int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
-            final int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
-            final long[] blockstates = FaweCache.BLOCK_STATES.get();
-            final int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
-            try {
-                int num_palette = 0;
-                int air = 0;
-                for (int i = 0; i < 4096; i++) {
-                    int stateId = blocks[i];
-                    switch (stateId) {
-                        case 0:
-                        case BlockID.AIR:
-                        case BlockID.CAVE_AIR:
-                        case BlockID.VOID_AIR:
-                            stateId = BlockID.AIR;
-                            air++;
-                    }
-                    final int ordinal = BlockState.getFromInternalId(stateId).getOrdinal(); // TODO fixme Remove all use of BlockTypes.BIT_OFFSET so that this conversion isn't necessary
-                    int palette = blockToPalette[ordinal];
-                    if (palette == Integer.MAX_VALUE) {
-                        blockToPalette[ordinal] = palette = num_palette;
-                        paletteToBlock[num_palette] = ordinal;
-                        num_palette++;
-                    }
-                    blocksCopy[i] = palette;
+            return section;
+        }
+        final int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
+        final long[] blockstates = FaweCache.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
+        try {
+            int num_palette = 0;
+            int air = 0;
+            for (int i = 0; i < 4096; i++) {
+                int stateId = blocks[i];
+                switch (stateId) {
+                    case 0:
+                    case BlockID.AIR:
+                    case BlockID.CAVE_AIR:
+                    case BlockID.VOID_AIR:
+                        stateId = BlockID.AIR;
+                        air++;
                 }
-
-                // BlockStates
-                int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-                if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
-                    bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
-                } else {
-                    bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
+                final int ordinal = BlockState.getFromInternalId(stateId).getOrdinal(); // TODO fixme Remove all use of BlockTypes.BIT_OFFSET so that this conversion isn't necessary
+                int palette = blockToPalette[ordinal];
+                if (palette == Integer.MAX_VALUE) {
+                    blockToPalette[ordinal] = palette = num_palette;
+                    paletteToBlock[num_palette] = ordinal;
+                    num_palette++;
                 }
-
-                final int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
-                if (num_palette == 1) {
-                    for (int i = 0; i < blockBitArrayEnd; i++) blockstates[i] = 0;
-                } else {
-                    final BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
-                    bitArray.fromRaw(blocksCopy);
-                }
-
-                // set palette & data bits
-                final DataPaletteBlock<IBlockData> dataPaletteBlocks = section.getBlocks();
-                // private DataPalette<T> h;
-                // protected DataBits a;
-                final long[] bits = Arrays.copyOfRange(blockstates, 0, blockBitArrayEnd);
-                final DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
-                final DataPalette<IBlockData> palette;
-//                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
-                palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d);
-
-                // set palette
-                for (int i = 0; i < num_palette; i++) {
-                    final int ordinal = paletteToBlock[i];
-                    blockToPalette[ordinal] = Integer.MAX_VALUE;
-                    final BlockState state = BlockTypes.states[ordinal];
-                    final IBlockData ibd = ((BlockMaterial_1_13) state.getMaterial()).getState();
-                    palette.a(ibd);
-                }
-                try {
-                    fieldBits.set(dataPaletteBlocks, nmsBits);
-                    fieldPalette.set(dataPaletteBlocks, palette);
-                    fieldSize.set(dataPaletteBlocks, bitsPerEntry);
-                    setCount(0, 4096 - air, section);
-                } catch (final IllegalAccessException | NoSuchFieldException e) {
-                    throw new RuntimeException(e);
-                }
-
-                return section;
-            } catch (final Throwable e){
-                Arrays.fill(blockToPalette, Integer.MAX_VALUE);
-                throw e;
+                blocksCopy[i] = palette;
             }
+
+            // BlockStates
+            int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
+            if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+                bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
+            } else {
+                bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
+            }
+
+            final int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
+            if (num_palette == 1) {
+                for (int i = 0; i < blockBitArrayEnd; i++) blockstates[i] = 0;
+            } else {
+                final BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                bitArray.fromRaw(blocksCopy);
+            }
+
+            // set palette & data bits
+            final DataPaletteBlock<IBlockData> dataPaletteBlocks = section.getBlocks();
+            // private DataPalette<T> h;
+            // protected DataBits a;
+            final long[] bits = Arrays.copyOfRange(blockstates, 0, blockBitArrayEnd);
+            final DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
+            final DataPalette<IBlockData> palette;
+//                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
+            palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d);
+
+            // set palette
+            for (int i = 0; i < num_palette; i++) {
+                final int ordinal = paletteToBlock[i];
+                blockToPalette[ordinal] = Integer.MAX_VALUE;
+                final BlockState state = BlockTypes.states[ordinal];
+                final IBlockData ibd = ((BlockMaterial_1_13) state.getMaterial()).getState();
+                palette.a(ibd);
+            }
+            try {
+                fieldBits.set(dataPaletteBlocks, nmsBits);
+                fieldPalette.set(dataPaletteBlocks, palette);
+                fieldSize.set(dataPaletteBlocks, bitsPerEntry);
+                setCount(0, 4096 - air, section);
+            } catch (final IllegalAccessException | NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
+
+            return section;
+        } catch (final Throwable e){
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+            throw e;
         }
     }
 

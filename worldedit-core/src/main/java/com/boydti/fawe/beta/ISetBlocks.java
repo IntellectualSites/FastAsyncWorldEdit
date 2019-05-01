@@ -12,4 +12,8 @@ public interface ISetBlocks extends IBlocks {
     boolean setBlock(int x, int y, int z, BlockStateHolder holder);
 
     boolean isEmpty();
+
+    default void optimize() {
+
+    }
 }

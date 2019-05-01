@@ -34,7 +34,7 @@ public interface IQueueExtent extends Flushable, Trimable {
      * @param chunk
      * @return result
      */
-    Future<?> submit(IChunk chunk);
+    <T extends Future<T>> T submit(IChunk<T> chunk);
 
     default boolean setBlock(final int x, final int y, final int z, final BlockStateHolder state) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);

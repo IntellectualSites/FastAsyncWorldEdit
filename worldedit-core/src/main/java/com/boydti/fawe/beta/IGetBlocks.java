@@ -21,4 +21,8 @@ public interface IGetBlocks extends IBlocks, Trimable {
     boolean trim(boolean aggressive);
 
     void filter(Filter filter, FilterBlock block);
+
+    default void optimize() {
+
+    }
 }

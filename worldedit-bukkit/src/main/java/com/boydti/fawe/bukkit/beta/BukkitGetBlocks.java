@@ -24,10 +24,10 @@ import net.minecraft.server.v1_13_R2.World;
 import static com.boydti.fawe.bukkit.v0.BukkitQueue_0.getAdapter;
 
 public class BukkitGetBlocks extends CharGetBlocks {
-    private ChunkSection[] sections;
-    private Chunk nmsChunk;
-    private World nmsWorld;
-    private int X, Z;
+    public ChunkSection[] sections;
+    public Chunk nmsChunk;
+    public World nmsWorld;
+    public int X, Z;
 
     public BukkitGetBlocks(World nmsWorld, int X, int Z) {/*d*/
         this.nmsWorld = nmsWorld;
@@ -48,12 +48,12 @@ public class BukkitGetBlocks extends CharGetBlocks {
     }
 
     @Override
-    protected char[] load(int layer) {
+    public char[] load(int layer) {
         return load(layer, null);
     }
 
     @Override
-    protected char[] load(int layer, char[] data) {
+    public char[] load(int layer, char[] data) {
         ChunkSection section = getSections()[layer];
         // Section is null, return empty array
         if (section == null) {
@@ -136,7 +136,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
         return data;
     }
 
-    private ChunkSection[] getSections() {
+    public ChunkSection[] getSections() {
         ChunkSection[] tmp = sections;
         if (tmp == null) {
             Chunk chunk = getChunk();
@@ -145,16 +145,10 @@ public class BukkitGetBlocks extends CharGetBlocks {
         return tmp;
     }
 
-    private Chunk getChunk() {
+    public Chunk getChunk() {
         Chunk tmp = nmsChunk;
         if (tmp == null) {
-            ChunkProviderServer provider = (ChunkProviderServer) nmsWorld.getChunkProvider();
-            nmsChunk = tmp = provider.chunks.get(ChunkCoordIntPair.a(X, Z));
-            if (tmp == null) {
-                System.out.println("SYNC");
-                // TOOD load with paper
-                nmsChunk = tmp = TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(X, Z));
-            }
+            nmsChunk = tmp = BukkitQueue.ensureLoaded(nmsWorld, X, Z);
         }
         return tmp;
     }

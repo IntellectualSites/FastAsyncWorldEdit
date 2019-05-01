@@ -5,17 +5,12 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.holder.ReferenceChunk;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
-import com.boydti.fawe.util.SetQueue;
-import com.boydti.fawe.util.TaskManager;
+import com.google.common.util.concurrent.Futures;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class SingleThreadQueueExtent implements IQueueExtent {
     private WorldChunkCache cache;
     private Thread currentThread;
+    private ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
 
     /**
      * Safety check to ensure that the thread being used matches the one being initialized on
@@ -66,7 +62,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
      */
     @Override
     public synchronized void init(final WorldChunkCache cache) {
-        if (cache != null) {
+        if (this.cache != null) {
             reset();
         }
         currentThread = Thread.currentThread();
@@ -83,19 +79,17 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
 
     @Override
-    public Future<?> submit(final IChunk chunk) {
+    public <T extends Future<T>> T submit(final IChunk<T> chunk) {
         if (chunk.isEmpty()) {
             CHUNK_POOL.add(chunk);
-            return null;
+            return (T) (Future) Futures.immediateFuture(null);
         }
+
         if (Fawe.isMainThread()) {
-            if (!chunk.applyAsync()) {
-                chunk.applySync();
-            }
-            return null;
+            return chunk.call();
         }
-        QueueHandler handler = Fawe.get().getQueueHandler();
-        return handler.submit(chunk);
+
+        return Fawe.get().getQueueHandler().submit(chunk);
     }
 
     @Override
@@ -106,6 +100,13 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
             lastChunk = null;
             lastPair = Long.MAX_VALUE;
             return chunks.isEmpty();
+        }
+        if (!submissions.isEmpty()) {
+            if (aggressive) {
+                pollSubmissions(0, aggressive);
+            } else {
+                pollSubmissions(Settings.IMP.QUEUE.PARALLEL_THREADS, aggressive);
+            }
         }
         synchronized (this) {
             return currentThread == null;
@@ -121,7 +122,10 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
      */
     private IChunk poolOrCreate(final int X, final int Z) {
         IChunk next = CHUNK_POOL.poll();
-        if (next == null) next = create(false);
+        if (next == null) {
+            System.out.println("Create");
+            next = create(false);
+        }
         next.init(this, X, Z);
         return next;
     }
@@ -145,10 +149,19 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
 
         checkThread();
         final int size = chunks.size();
-        if (size > Settings.IMP.QUEUE.TARGET_SIZE || MemUtil.isMemoryLimited()) {
-            if (size > Settings.IMP.QUEUE.PARALLEL_THREADS * 2 + 16) {
-                chunk = chunks.removeFirst();
-                submit(chunk);
+        boolean lowMem = MemUtil.isMemoryLimited();
+        if (lowMem || size > Settings.IMP.QUEUE.TARGET_SIZE) {
+            chunk = chunks.removeFirst();
+            Future future = submit(chunk);
+            if (future != null && !future.isDone()) {
+                int targetSize;
+                if (lowMem) {
+                    targetSize = Settings.IMP.QUEUE.PARALLEL_THREADS;
+                } else {
+                    targetSize = Settings.IMP.QUEUE.TARGET_SIZE;
+                }
+                pollSubmissions(targetSize, true);
+                submissions.add(future);
             }
         }
         chunk = poolOrCreate(X, Z);
@@ -161,27 +174,59 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         return chunk;
     }
 
+    private void pollSubmissions(int targetSize, boolean aggressive) {
+        int overflow = submissions.size() - targetSize;
+        if (aggressive) {
+            for (int i = 0; i < overflow; i++) {
+                Future first = submissions.poll();
+                try {
+                    while ((first = (Future) first.get()) != null) ;
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            for (int i = 0; i < overflow; i++) {
+                Future next = submissions.peek();
+                while (next != null) {
+                    if (next.isDone()) {
+                        try {
+                            next = (Future) next.get();
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        return;
+                    }
+                }
+                submissions.poll();
+            }
+        }
+    }
+
     @Override
     public synchronized void flush() {
         checkThread();
         if (!chunks.isEmpty()) {
-            final Future[] tasks = new ForkJoinTask[chunks.size()];
-            int i = 0;
-            for (final IChunk chunk : chunks.values()) {
-                tasks[i++] = submit(chunk);
-            }
-            chunks.clear();
-            for (final Future task : tasks) {
-                if (task != null) {
-                    try {
-                        task.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException(e);
+            if (MemUtil.isMemoryLimited()) {
+                for (IChunk chunk : chunks.values()) {
+                    Future future = submit(chunk);
+                    if (future != null && !future.isDone()) {
+                        pollSubmissions(Settings.IMP.QUEUE.PARALLEL_THREADS, true);
+                        submissions.add(future);
+                    }
+                }
+            } else {
+                for (final IChunk chunk : chunks.values()) {
+                    Future future = submit(chunk);
+                    if (future != null && !future.isDone()) {
+                        submissions.add(future);
                     }
                 }
             }
+            chunks.clear();
         }
+        pollSubmissions(0, true);
         reset();
     }
 }

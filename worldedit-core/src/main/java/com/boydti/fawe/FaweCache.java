@@ -1,6 +1,7 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MathMan;
@@ -11,6 +12,12 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class FaweCache implements Trimable {
     public static final char[] EMPTY_CHAR_4096 = new char[4096];
@@ -325,5 +332,17 @@ public class FaweCache implements Trimable {
         }
         if (clazz == null) clazz = EndTag.class;
         return new ListTag(clazz, list);
+    }
+
+    /*
+    Thread stuff
+     */
+    public static ThreadPoolExecutor newBlockingExecutor() {
+        int nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
+        ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads);
+        return new ThreadPoolExecutor(nThreads, nThreads,
+                0L, TimeUnit.MILLISECONDS, queue
+                , Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.CallerRunsPolicy());
     }
 }
