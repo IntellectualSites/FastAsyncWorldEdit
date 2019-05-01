@@ -25,7 +25,7 @@ public final class IncendoPaste implements Paster{
     /**
      * Upload service URL
      */
-    public static final String UPLOAD_PATH = "https://incendo.org/paste/upload";
+    public static final String UPLOAD_PATH = "https://athion.net/ISPaster/paste/upload";
     /**
      * Valid paste applications
      */
@@ -242,6 +242,7 @@ public final class IncendoPaste implements Paster{
         }
 
         incendoPaster.addFile(new PasteFile("config.yml", readFile(new File(Fawe.imp().getDirectory(), "config.yml"))));
+        incendoPaster.addFile(new PasteFile("config-legacy.yml", readFile(new File(Fawe.imp().getDirectory(), "config-legacy.yml"))));
         incendoPaster.addFile(new PasteFile("message.yml", readFile(new File(Fawe.imp().getDirectory(), "message.yml"))));
         incendoPaster.addFile(new PasteFile("commands.yml", readFile(new File(Fawe.imp().getDirectory(), "commands.yml"))));
 
@@ -255,7 +256,7 @@ public final class IncendoPaste implements Paster{
 
         if (jsonObject.has("created")) {
             final String pasteId = jsonObject.get("paste_id").getAsString();
-            return String.format("https://incendo.org/paste/view/%s", pasteId);
+            return String.format("https://athion.net/ISPaster/paste/view/%s", pasteId);
         } else {
             throw new IOException(String.format("Failed to upload files: %s",
                 jsonObject.get("response").getAsString()));
