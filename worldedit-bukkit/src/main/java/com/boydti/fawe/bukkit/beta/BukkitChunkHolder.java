@@ -1,10 +1,15 @@
 package com.boydti.fawe.bukkit.beta;
 
 import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IGetBlocks;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
+import com.google.common.util.concurrent.Futures;
+import net.minecraft.server.v1_13_R2.Chunk;
+import net.minecraft.server.v1_13_R2.ChunkSection;
+import org.bukkit.World;
 
 import java.util.concurrent.Future;
 
@@ -25,6 +30,20 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
         BukkitQueue extent = (BukkitQueue) getExtent();
         BukkitGetBlocks get = (BukkitGetBlocks) getOrCreateGet();
         CharSetBlocks set = (CharSetBlocks) getOrCreateSet();
+        int X = getX();
+        int Z = getZ();
+
+        Chunk currentNmsChunk = extent.ensureLoaded(X, Z);
+        ChunkSection[] sections = currentNmsChunk.getSections();
+        World world = extent.getBukkitWorld();
+        boolean hasSky = world.getEnvironment() == World.Environment.NORMAL;
+
+        for (int layer = 0; layer < 16; layer++) {
+            if (!set.hasSection(layer)) continue;
+            char[] arr = set.blocks[layer];
+            ChunkSection newSection = extent.newChunkSection(layer, hasSky, arr);
+            sections[layer] = newSection;
+        }
 
 
 
@@ -48,8 +67,10 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
 
          */
 
-        throw new UnsupportedOperationException("Not implemented");
+//        throw new UnsupportedOperationException("Not implemented");
 //        return true;
+        return null;
+//        return (T) (Future) Futures.immediateFuture(null);
     }
 
     @Override

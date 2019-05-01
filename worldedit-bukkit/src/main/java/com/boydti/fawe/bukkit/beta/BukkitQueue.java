@@ -160,8 +160,8 @@ public class BukkitQueue extends SimpleCharQueueExtent {
     NMS conversion
      */
 
-    public static ChunkSection newChunkSection(final int y2, final boolean flag, final char[] blocks) {
-        ChunkSection section = new ChunkSection(y2 << 4, flag);
+    public static ChunkSection newChunkSection(final int layer, final boolean flag, final char[] blocks) {
+        ChunkSection section = new ChunkSection(layer << 4, flag);
         if (blocks == null) {
             return section;
         }

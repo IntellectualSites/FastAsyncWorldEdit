@@ -288,6 +288,26 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
+            aliases = {"db2"},
+            usage = "",
+            desc = "db2",
+            help = "db2"
+    )
+    public void db2(Player player, @Selection Region region) throws WorldEditException {
+        QueueHandler queueHandler = Fawe.get().getQueueHandler();
+        World world = player.getWorld();
+        IQueueExtent queue = queueHandler.getQueue(world);
+        BlockState block = BlockTypes.STONE.getDefaultState();
+        long start = System.currentTimeMillis();
+        for (BlockVector3 p : region) {
+            queue.setBlock(p.getX(), p.getY(), p.getZ(), block);
+        }
+        queue.flush();
+        long diff = System.currentTimeMillis() - start;
+        System.out.println(diff);
+    }
+
+    @Command(
             aliases = {"/curve", "/spline"},
             usage = "<pattern> [thickness]",
             desc = "Draws a spline through selected points",
