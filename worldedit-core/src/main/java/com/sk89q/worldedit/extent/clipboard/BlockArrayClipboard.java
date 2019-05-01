@@ -29,6 +29,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,7 +41,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.Closeable;
@@ -138,7 +138,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
 
     @Override
     public Region getRegion() {
-        return region.clone();
+        return region;
     }
 
     public void setRegion(Region region) {
@@ -209,20 +209,9 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-//<<<<<<< HEAD
     public BlockState getLazyBlock(BlockVector3 position) {
         return getBlock(position);
     }
-//=======
-//    public BaseBlock getFullBlock(BlockVector3 position) {
-//        if (region.contains(position)) {
-//            BlockVector3 v = position.subtract(region.getMinimumPoint());
-//            BlockStateHolder block = blocks[v.getBlockX()][v.getBlockY()][v.getBlockZ()];
-//            if (block != null) {
-//                return block.toBaseBlock();
-//            }
-//        }
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
@@ -262,17 +251,17 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         int x = position.getBlockX() - mx;
         int z = position.getBlockZ() - mz;
         return IMP.getBiome(x, z);
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         int x = position.getBlockX() - mx;
         int z = position.getBlockZ() - mz;
-        IMP.setBiome(x, z, biome.getId());
+        IMP.setBiome(x, z, biome);
         return true;
     }
 

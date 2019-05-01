@@ -5,6 +5,7 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -176,8 +177,11 @@ public class CavesGen extends GenBase {
                                 BlockStateHolder material = chunk.getLazyBlock(bx + local_x, local_y, bz + local_z);
                                 BlockStateHolder materialAbove = chunk.getLazyBlock(bx + local_x, local_y + 1, bz + local_z);
                                 BlockType blockType = material.getBlockType();
-                                if (blockType == BlockTypes.MYCELIUM || blockType == BlockTypes.GRASS) {
-                                    grassFound = true;
+                                switch (blockType.getInternalId()) {
+                                    case BlockID.MYCELIUM:
+                                    case BlockID.GRASS:
+                                        grassFound = true;
+
                                 }
                                 if (this.isSuitableBlock(material, materialAbove)) {
                                     if (local_y - 1 < 10) {
@@ -206,13 +210,13 @@ public class CavesGen extends GenBase {
     }
 
     protected boolean isSuitableBlock(BlockStateHolder material, BlockStateHolder materialAbove) {
-        switch (material.getBlockType().getResource().toUpperCase()) {
-            case "AIR":
-            case "CAVE_AIR":
-            case "VOID_AIR":
-            case "WATER":
-            case "LAVA":
-            case "BEDROCK":
+        switch (material.getBlockType().getInternalId()) {
+            case BlockID.AIR:
+            case BlockID.CAVE_AIR:
+            case BlockID.VOID_AIR:
+            case BlockID.WATER:
+            case BlockID.LAVA:
+            case BlockID.BEDROCK:
                 return false;
             default:
                 return true;

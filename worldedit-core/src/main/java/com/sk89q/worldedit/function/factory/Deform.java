@@ -23,6 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
 
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
@@ -147,6 +149,7 @@ public class Deform implements Contextual<Operation> {
                 unit = Vector3.ONE;
         }
 
+        LocalSession session = context.getSession();
         return new DeformOperation(context.getDestination(), region, zero, unit, expression);
     }
 

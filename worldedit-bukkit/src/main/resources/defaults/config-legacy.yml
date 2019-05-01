@@ -17,8 +17,8 @@
 #
 
 limits:
-    allow-extra-data-values: false
     max-blocks-changed:
+        # Ignored, use FAWE config limits
         default: -1
         maximum: -1
     max-polygonal-points:
@@ -30,6 +30,8 @@ limits:
     butcher-radius:
         default: -1
         maximum: -1
+    # Use either block ids, names, or regex
+    # Regex supports properties as well (see FAWE mask documentation)
     disallowed-blocks: []
 
 use-inventory:
@@ -77,9 +79,16 @@ history:
     size: 15
     expiration: 10
 
+calculation:
+    timeout: 100
+
+debugging:
+    trace-unflushed-sessions: false
+
 wand-item: minecraft:wooden_axe
 shell-save-type:
 no-double-slash: false
 no-op-permissions: false
 debug: false
 show-help-on-first-use: true
+server-side-cui: true

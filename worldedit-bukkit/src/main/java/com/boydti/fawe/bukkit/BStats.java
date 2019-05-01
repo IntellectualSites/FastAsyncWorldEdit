@@ -1,6 +1,7 @@
-package org.bstats.bukkit;
+package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;

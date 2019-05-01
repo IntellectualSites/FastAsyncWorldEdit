@@ -21,15 +21,15 @@ package com.sk89q.worldedit.world.block;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.collect.ImmutableList;
+import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.google.common.collect.ImmutableMap;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
@@ -37,57 +37,27 @@ import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
-import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class BlockType implements FawePattern {
-	
-	public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
-	
-	private final @Nonnull String id;
-	private ArrayList<BlockState> states;
-	public final Function<BlockState, BlockState> defaultValue;
-	private BlockTypes.Settings settings;
-	private BlockMaterial material;
+	private final String id;
+    private final BlockTypes.Settings settings;
 
-	public BlockType(@Nonnull String id) {
-		this(id, null);
-	}
-	
-	public BlockType(@Nonnull String id, Function<BlockState, BlockState> defaultValue) {
-		this.id = id;
-		this.defaultValue = defaultValue;
-	}
-	
-	public void setStates(ArrayList<BlockState> states) {
-		this.states = states;
-	}
-	
-	public void setSettings(BlockTypes.Settings settings) {
-		this.settings = settings;
-	}
-	
-	public BlockTypes.Settings getSettings(){
-		return settings;
-	}
-	
-	public ArrayList<BlockState> updateStates(){
-		if(settings != null) {
-			return settings.localStates = new ArrayList<>(settings.localStates.stream()
-          .map(state -> new BlockStateImpl(this, state.getInternalId(), state.getOrdinal())).collect(Collectors.toList()));
-		}else {
-			return null;
-		}
-	}
-	
+    private boolean initItemType;
+    private ItemType itemType;
+
+    protected BlockType(String id, int internalId, List<BlockState> states) {
+        int i = id.indexOf("[");
+        this.id = i == -1 ? id : id.substring(0, i);
+        this.settings = new BlockTypes.Settings(this, id, internalId, states);
+    }
+
     @Deprecated
     public int getMaxStateId() {
     	return settings.permutations;
@@ -130,11 +100,11 @@ public class BlockType implements FawePattern {
     @Deprecated
     public BlockState withPropertyId(int propertyId) {
         if (settings.stateOrdinals == null) return settings.defaultState;
-        return states.get(settings.stateOrdinals[propertyId]);
+        return BlockTypes.states[settings.stateOrdinals[propertyId]];
     }
     
     @Deprecated
-    public BlockState withStateId(int internalStateId) {
+    public BlockState withStateId(int internalStateId) { //
         return this.withPropertyId(internalStateId >> BlockTypes.BIT_OFFSET);
     }
 
@@ -143,7 +113,7 @@ public class BlockType implements FawePattern {
      * @param properties
      * @return
      */
-    public BlockState withProperties(String properties) {
+    public BlockState withProperties(String properties) { //
         int id = getInternalId();
         for (String keyPair : properties.split(",")) {
             String[] split = keyPair.split("=");
@@ -188,7 +158,6 @@ public class BlockType implements FawePattern {
      */
     @Deprecated
     public <V> Property<V> getProperty(String name) {
-    	checkArgument(this.settings.propertiesMap.get(name) != null, "%s has no property named %s", this, name);
         return (Property<V>) this.settings.propertiesMap.get(name);
     }
 
@@ -211,16 +180,16 @@ public class BlockType implements FawePattern {
      * @return The default state
      */
     public BlockState getDefaultState() {
-    	BlockState defaultState = this.settings.defaultState;
-        if (defaultValue != null) {
-            defaultState = defaultValue.apply(defaultState);
-        }
-        return defaultState;
+        return this.settings.defaultState;
     }
-    
-    public FuzzyBlockState getFuzzyMatcher() {
-        return new FuzzyBlockState(this);
-    }
+
+//    public FuzzyBlockState getFuzzyMatcher() { //
+//        return new FuzzyBlockState(this);
+//    }
+//
+//    public FuzzyBlockState getFuzzyMatcher() { //
+//        return updateField(emptyFuzzy, () -> new FuzzyBlockState(this));
+//    }
 
     /**
      * Slow
@@ -229,7 +198,7 @@ public class BlockType implements FawePattern {
     @Deprecated
     public List<BlockState> getAllStates() {
         if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
-        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> states.get(i)).collect(Collectors.toList());
+        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypes.states[i]).collect(Collectors.toList());
     }
 
     /**
@@ -237,7 +206,7 @@ public class BlockType implements FawePattern {
      *
      * @return The state, if it exists
      */
-    public BlockState getState(Map<Property<?>, Object> key) {
+    public BlockState getState(Map<Property<?>, Object> key) { //
         int id = getInternalId();
         for (Map.Entry<Property<?>, Object> iter : key.entrySet()) {
             Property<?> prop = iter.getKey();
@@ -272,7 +241,11 @@ public class BlockType implements FawePattern {
      */
     @Nullable
     public ItemType getItemType() {
-        return ItemTypes.get(this);
+        if(!initItemType) {
+            initItemType = true;
+            itemType = ItemTypes.get(getId());
+        }
+        return itemType;
     }
 
     /**
@@ -281,9 +254,7 @@ public class BlockType implements FawePattern {
      * @return The material
      */
     public BlockMaterial getMaterial() {
-    	return this.material == null ? 
-    			WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this) 
-    			: this.material;
+    	return this.settings.blockMaterial;
     }
 
     /**
@@ -311,12 +282,12 @@ public class BlockType implements FawePattern {
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return settings.internalId;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof BlockType && this.id.equals(((BlockType) obj).id);
+        return obj == this;
     }
     
     @Override
@@ -341,7 +312,7 @@ public class BlockType implements FawePattern {
 
 
     @Deprecated
-    public int getLegacyId() {
+    public int getLegacyId() { //
         Integer id = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
         if (id != null) {
             return id >> 4;

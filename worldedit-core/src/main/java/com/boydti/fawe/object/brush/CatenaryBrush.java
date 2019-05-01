@@ -43,7 +43,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
             return;
         }
         if (this.vertex == null) {
-            vertex = getVertex(pos1, pos2, slack);
+            vertex = getVertex(pos1.toVector3(), pos2.toVector3(), slack);
             if (this.direction) {
                 BBC.BRUSH_CATENARY_DIRECTION.send(editSession.getPlayer(), 2);
                 return;
@@ -79,8 +79,8 @@ public class CatenaryBrush implements Brush, ResettableTool {
         return true;
     }
 
-    public static BlockVector3 getVertex(BlockVector3 pos1, BlockVector3 pos2, double lenPercent) {
-        if (lenPercent <= 1) return MathUtils.midpoint(pos1, pos2);
+    public static BlockVector3 getVertex(Vector3 pos1, Vector3 pos2, double lenPercent) {
+        if (lenPercent <= 1) return pos1.add(pos2).divide(2).toBlockPoint();
         double curveLen = pos1.distance(pos2) * lenPercent;
         double dy = pos2.getY() - pos1.getY();
         double dx = pos2.getX() - pos1.getX();
@@ -93,6 +93,6 @@ public class CatenaryBrush implements Brush, ResettableTool {
         double z = (dh/2)/a;
         double oY = (dy - curveLen * (Math.cosh(z) / Math.sinh(z))) / 2;
         double vertY = a * 1 + oY;
-        return pos1.add(pos2.subtract(pos1).multiply(MathMan.roundInt(vertX / dh)).add(0, MathMan.roundInt(vertY), 0)).round();
+        return pos1.add(pos2.subtract(pos1).multiply(vertX / dh).add(0, vertY, 0)).round().toBlockPoint();
     }
 }

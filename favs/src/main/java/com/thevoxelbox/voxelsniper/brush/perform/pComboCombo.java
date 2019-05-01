@@ -10,22 +10,19 @@ import com.thevoxelbox.voxelsniper.Message;
 /**
  * @author Voxel
  */
-public class pComboCombo extends vPerformer
-{
+public class pComboCombo extends vPerformer {
 
     private int d;
     private int dr;
     private int i;
     private int ir;
 
-    public pComboCombo()
-    {
+    public pComboCombo() {
         name = "Combo-Combo";
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v)
-    {
+    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
         w = v.getWorld();
         d = v.getPropertyId();
         dr = v.getReplaceData();
@@ -34,8 +31,7 @@ public class pComboCombo extends vPerformer
     }
 
     @Override
-    public void info(Message vm)
-    {
+    public void info(Message vm) {
         vm.performerName(name);
         vm.voxel();
         vm.replace();
@@ -44,19 +40,16 @@ public class pComboCombo extends vPerformer
     }
 
     @SuppressWarnings("deprecation")
-	@Override
-    public void perform(AsyncBlock b)
-    {
-        if (b.getTypeId() == ir && b.getPropertyId() == dr)
-        {
+    @Override
+    public void perform(AsyncBlock b) {
+        if (b.getTypeId() == ir && b.getPropertyId() == dr) {
             h.put(b);
             b.setTypeIdAndPropertyId(i, d, true);
         }
     }
 
     @Override
-    public boolean isUsingReplaceMaterial()
-    {
+    public boolean isUsingReplaceMaterial() {
         return true;
     }
 }

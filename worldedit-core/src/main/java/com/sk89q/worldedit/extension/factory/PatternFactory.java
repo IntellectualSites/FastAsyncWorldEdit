@@ -24,7 +24,9 @@ import com.sk89q.worldedit.extension.factory.parser.pattern.BlockCategoryPattern
 import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.RandomPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.RandomStatePatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.SingleBlockPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.TypeOrStateApplyingPatternParser;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 
@@ -44,10 +46,6 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
      */
     public PatternFactory(WorldEdit worldEdit) {
         super(worldEdit);
-
-//        register(new ClipboardPatternParser(worldEdit));
-//        register(new SingleBlockPatternParser(worldEdit));
-//        register(new RandomPatternParser(worldEdit));
         register(new BlockCategoryPatternParser(worldEdit));
         register(new DefaultPatternParser(worldEdit));
     }

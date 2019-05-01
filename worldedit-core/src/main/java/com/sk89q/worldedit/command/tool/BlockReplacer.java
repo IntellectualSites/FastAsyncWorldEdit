@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -35,7 +36,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
 /**
- * A mode that replaces one block.
  */
 public class BlockReplacer implements DoubleActionBlockTool {
 
@@ -54,15 +54,18 @@ public class BlockReplacer implements DoubleActionBlockTool {
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
         BlockBag bag = session.getBlockBag(player);
 
-        EditSession editSession = session.createEditSession(player);
-
-        try {
-            editSession.setBlock(clicked.toBlockPoint(), pattern);
+        try (EditSession editSession = session.createEditSession(player)) {
+            try {
+                BlockVector3 position = clicked.toVector().toBlockPoint();
+                editSession.setBlock(position, pattern.apply(position));
+            } catch (MaxChangedBlocksException ignored) {
+            } finally {
+                session.remember(editSession);
+            }
         } finally {
             if (bag != null) {
                 bag.flushChanges();
             }
-            session.remember(editSession);
         }
 
         return true;
@@ -77,7 +80,7 @@ public class BlockReplacer implements DoubleActionBlockTool {
 
         if (type != null) {
             this.pattern = targetBlock;
-            player.print("Replacer tool switched to: " + type.getName());
+            player.print(BBC.getPrefix() + "Replacer tool switched to: " + type.getName());
         }
 
         return true;

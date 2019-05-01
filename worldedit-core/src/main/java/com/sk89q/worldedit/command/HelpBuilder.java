@@ -152,7 +152,7 @@ public abstract class HelpBuilder implements Runnable {
                                             displayFailure(BBC.HELP_SUGGEST.f(arg, StringMan.join(found, ", ")));
                                             return;
                                         } else {
-                                            String msg = String.format("The sub-command '%s' under '%s' could not be found.",
+                                            String msg = String.format(BBC.getPrefix() + "The sub-command '%s' under '%s' could not be found.",
                                                     command, Joiner.on(" ").join(visited));
                                             displayFailure(msg);
                                             return;
@@ -161,7 +161,7 @@ public abstract class HelpBuilder implements Runnable {
                                     visited.add(args.getString(i));
                                     isRootLevel = false;
                                 } else {
-                                    String msg = String.format("'%s' has no sub-commands. (Maybe '%s' is for a parameter?)",
+                                    String msg = String.format(BBC.getPrefix() + "'%s' has no sub-commands. (Maybe '%s' is for a parameter?)",
                                             Joiner.on(" ").join(visited), command);
                                     displayFailure(msg);
                                     return;
@@ -200,7 +200,7 @@ public abstract class HelpBuilder implements Runnable {
 
                     // Box
                     if (offset >= aliases.size()) {
-                        displayFailure(String.format("There is no page %d (total number of pages is %d).", page + 1, pageTotal));
+                        displayFailure(String.format(BBC.getPrefix() + "There is no page %d (total number of pages is %d).", page + 1, pageTotal));
                     } else {
                         int end = Math.min(offset + perPage, aliases.size());
                         List<CommandMapping> subAliases = aliases.subList(offset, end);

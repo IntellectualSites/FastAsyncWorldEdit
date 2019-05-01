@@ -28,13 +28,11 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.sk89q.worldedit.command.tool.*;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BlockTool;
+import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.DoubleActionBlockTool;
 import com.sk89q.worldedit.command.tool.DoubleActionTraceTool;
 import com.sk89q.worldedit.command.tool.Tool;
@@ -54,8 +52,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -138,9 +139,9 @@ public class PlatformManager {
 
             // Check whether this platform was chosen to be the preferred one
             // for any capability and be sure to remove it
-            Iterator<Entry<Capability, Platform>> it = preferences.entrySet().iterator();
+            Iterator<Map.Entry<Capability, Platform>> it = preferences.entrySet().iterator();
             while (it.hasNext()) {
-                Entry<Capability, Platform> entry = it.next();
+                Map.Entry<Capability, Platform> entry = it.next();
                 if (entry.getValue().equals(platform)) {
                     entry.getKey().unload(this, entry.getValue());
                     it.remove();
@@ -325,10 +326,7 @@ public class PlatformManager {
                 }
 
                 if (event.getType() == Interaction.HIT) {
-                    if (player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
-                        if (!session.isToolControlEnabled()) {
-                            return;
-                        }
+                    if (session.isToolControlEnabled() && player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
                         if (!actor.hasPermission("worldedit.selection.pos")) {
                             return;
                         }
@@ -349,7 +347,7 @@ public class PlatformManager {
                         event.setCancelled(true);
                         return;
                     }
-                    if (player.isHoldingPickAxe() && session.hasSuperPickAxe()) {
+                    if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
                         final BlockTool superPickaxe = session.getSuperPickaxe();
                         if (superPickaxe != null && superPickaxe.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
@@ -359,21 +357,23 @@ public class PlatformManager {
                             return;
                         }
                     }
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
-                    if (tool instanceof DoubleActionBlockTool) {
+                    final Tool tool = session.getTool(player);
+                    if (tool != null && tool instanceof DoubleActionBlockTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
                             final Player maskedPlayerWrapper = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
-                            fp.runAction(() -> reset(((DoubleActionBlockTool) tool)).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), maskedPlayerWrapper, session, location), false, true);
+                            fp.runAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    reset(((DoubleActionBlockTool) tool)).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), maskedPlayerWrapper, session, location);
+                                }
+                            }, false, true);
                             event.setCancelled(true);
                             return;
                         }
                     }
                 } else if (event.getType() == Interaction.OPEN) {
-                    if (player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
-                        if (!session.isToolControlEnabled()) {
-                            return;
-                        }
+                    if (session.isToolControlEnabled() && player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
                         if (!actor.hasPermission("worldedit.selection.pos")) {
                             return;
                         }
@@ -395,8 +395,9 @@ public class PlatformManager {
                         event.setCancelled(true);
                         return;
                     }
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
-                    if (tool instanceof BlockTool) {
+
+                    final Tool tool = session.getTool(player);
+                    if (tool != null && tool instanceof BlockTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
                             if (fp.checkAction()) {
@@ -417,6 +418,8 @@ public class PlatformManager {
             }
         } catch (Throwable e) {
             handleThrowable(e, actor);
+        } finally {
+            Request.reset();
         }
     }
 
@@ -448,11 +451,7 @@ public class PlatformManager {
         try {
             switch (event.getInputType()) {
                 case PRIMARY: {
-                    if (player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
-                        if (getConfiguration().navigationWandMaxDistance <= 0) {
-                            return;
-                        }
-
+                    if (getConfiguration().navigationWandMaxDistance > 0 && player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
                         if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
                             return;
                         }
@@ -468,7 +467,7 @@ public class PlatformManager {
                         return;
                     }
 
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                    Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
@@ -481,11 +480,7 @@ public class PlatformManager {
                 }
 
                 case SECONDARY: {
-                    if (player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
-                        if (getConfiguration().navigationWandMaxDistance <= 0) {
-                            return;
-                        }
-
+                    if (getConfiguration().navigationWandMaxDistance > 0 && player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
                         if (!player.hasPermission("worldedit.navigation.thru.tool")) {
                             return;
                         }
@@ -498,7 +493,7 @@ public class PlatformManager {
                         return;
                     }
 
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                    Tool tool = session.getTool(player);
                     if (tool instanceof TraceTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
@@ -516,10 +511,12 @@ public class PlatformManager {
             if (faweException != null) {
                 BBC.WORLDEDIT_CANCEL_REASON.send(player, faweException.getMessage());
             } else {
-                player.printError("Please report this error: [See console]");
+                player.printError(BBC.getPrefix() + "Please report this error: [See console]");
                 player.printRaw(e.getClass().getName() + ": " + e.getMessage());
                 MainUtil.handleError(e);
             }
+        } finally {
+            Request.reset();
         }
     }
 

@@ -29,10 +29,10 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Makes a layer of grass on top, three layers of dirt below, and smooth stone

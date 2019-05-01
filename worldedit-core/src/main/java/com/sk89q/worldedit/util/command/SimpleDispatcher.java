@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.util.command;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.base.Joiner;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -141,7 +142,7 @@ public class SimpleDispatcher implements Dispatcher {
 
         }
 
-        throw new InvalidUsageException("Please choose a sub-command.", this, true);
+        throw new InvalidUsageException(BBC.getPrefix() + "Please choose a sub-command.", this, true);
     }
 
     @Override

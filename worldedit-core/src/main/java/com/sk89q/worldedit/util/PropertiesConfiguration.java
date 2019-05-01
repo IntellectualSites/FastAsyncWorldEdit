@@ -78,9 +78,9 @@ public class PropertiesConfiguration extends LocalConfiguration {
         loadExtra();
 
         profile = getBool("profile", profile);
-
-        disallowedBlocks =
-            new HashSet<>(getStringSet("limits.disallowed-blocks", getDefaultDisallowedBlocks()));
+        traceUnflushedSessions = getBool("trace-unflushed-sessions", traceUnflushedSessions);
+        disallowedBlocks = getStringSet("disallowed-blocks", getDefaultDisallowedBlocks());
+        disallowedBlocksMask = null;
         allowedDataCycleBlocks =
                 new HashSet<>(getStringSet("limits.allowed-data-cycle-blocks", null));
         defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
@@ -116,11 +116,14 @@ public class PropertiesConfiguration extends LocalConfiguration {
         navigationWandMaxDistance = getInt("nav-wand-distance", navigationWandMaxDistance);
         navigationUseGlass = getBool("nav-use-glass", navigationUseGlass);
         scriptTimeout = getInt("scripting-timeout", scriptTimeout);
+        calculationTimeout = getInt("calculation-timeout", calculationTimeout);
+        maxCalculationTimeout = getInt("max-calculation-timeout", maxCalculationTimeout);
         saveDir = getString("schematic-save-dir", saveDir);
         scriptsDir = getString("craftscript-dir", scriptsDir);
         butcherDefaultRadius = getInt("butcher-default-radius", butcherDefaultRadius);
         butcherMaxRadius = getInt("butcher-max-radius", butcherMaxRadius);
         allowSymlinks = getBool("allow-symbolic-links", allowSymlinks);
+        serverSideCUI = getBool("server-side-cui", serverSideCUI);
 
         LocalSession.MAX_HISTORY_SIZE = Math.max(15, getInt("history-size", 15));
 

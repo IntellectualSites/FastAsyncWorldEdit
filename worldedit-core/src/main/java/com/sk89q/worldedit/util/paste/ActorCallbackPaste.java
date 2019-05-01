@@ -47,7 +47,7 @@ public class ActorCallbackPaste {
      * @param content The content
      * @param successMessage The message, formatted with {@link String#format(String, Object...)} on success
      */
-public static void pastebin(Supervisor supervisor, final Actor sender, String content, final String successMessage, final ExceptionConverter exceptionConverter) {
+    public static void pastebin(Supervisor supervisor, final Actor sender, String content, final String successMessage, final ExceptionConverter exceptionConverter) {
         ListenableFuture<URL> future = new IncendoPaste("fastasyncworldedit").paste(content);
 
         AsyncCommandHelper.wrap(future, supervisor, sender, exceptionConverter)

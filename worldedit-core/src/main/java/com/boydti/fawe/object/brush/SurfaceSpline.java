@@ -25,7 +25,7 @@ public class SurfaceSpline implements Brush {
         this.quality = quality;
     }
 
-    private ArrayList<Vector3> path = new ArrayList<>();
+    private ArrayList<BlockVector3> path = new ArrayList<>();
 
     @Override
     public void build(EditSession editSession, BlockVector3 pos, Pattern pattern, double radius) throws MaxChangedBlocksException {
@@ -35,7 +35,7 @@ public class SurfaceSpline implements Brush {
             int max = editSession.getNearestSurfaceTerrainBlock(pos.getBlockX(), pos.getBlockZ(), pos.getBlockY(), 0, editSession.getMaxY());
             if (max == -1) return;
 //            pos.mutY(max);
-            path.add(Vector3.at(pos.getBlockX(), max, pos.getBlockZ()));
+            path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
             editSession.getPlayer().sendMessage(BBC.getPrefix() + BBC.BRUSH_SPLINE_PRIMARY_2.s());
             if (!vis) return;
         }
@@ -43,8 +43,8 @@ public class SurfaceSpline implements Brush {
         final List<Node> nodes = new ArrayList<>(path.size());
         final KochanekBartelsInterpolation interpol = new KochanekBartelsInterpolation();
 
-        for (final Vector3 nodevector : path) {
-            final Node n = new Node(nodevector);
+        for (final BlockVector3 nodevector : path) {
+            final Node n = new Node(nodevector.toVector3());
             n.setTension(tension);
             n.setBias(bias);
             n.setContinuity(continuity);

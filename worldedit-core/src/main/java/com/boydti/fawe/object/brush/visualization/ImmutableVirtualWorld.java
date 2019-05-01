@@ -9,6 +9,7 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -18,7 +19,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
@@ -41,7 +42,7 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public boolean regenerateChunk(int x, int z, @Nullable BaseBiome biome, @Nullable Long seed) {
+    public boolean regenerateChunk(int x, int z, @Nullable BiomeType biome, @Nullable Long seed) {
         return unsupported();
     }
 
@@ -56,13 +57,8 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public void addNotifyTask(int x, int z, Runnable runnable) {
-        if (runnable != null) runnable.run();
-    }
-
-    @Override
-    public BaseBiome getBiome(BlockVector2 position) {
-        return FaweCache.getBiome(0);
+    public BiomeType getBiome(BlockVector2 position) {
+        return BiomeTypes.FOREST;
     }
 
     @Override
@@ -232,7 +228,7 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     }
 
     @Override
-    public boolean setBiome(int x, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         return unsupported();
     }
 

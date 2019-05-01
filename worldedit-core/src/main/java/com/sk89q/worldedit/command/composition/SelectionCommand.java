@@ -92,13 +92,14 @@ public class SelectionCommand extends SimpleCommand<Operation> {
                 Region selection = session.getSelection(player.getWorld());
 
                 EditSession editSession = session.createEditSession(player);
-                editSession.enableQueue();
+                editSession.enableStandardMode();
                 locals.put(EditSession.class, editSession);
                 session.tellVersion(player);
 
                 EditContext editContext = new EditContext();
                 editContext.setDestination(locals.get(EditSession.class));
                 editContext.setRegion(selection);
+                editContext.setSession(session);
 
                 Operation operation = operationFactory.createFromContext(editContext);
                 // Shortcut

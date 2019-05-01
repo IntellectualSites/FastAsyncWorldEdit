@@ -3,7 +3,7 @@ package com.boydti.fawe.example;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FaweQueue;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashMap;
@@ -37,8 +37,8 @@ public class NullFaweChunk extends FaweChunk<Void> {
     }
 
     @Override
-    public byte[] getBiomeArray() {
-        return new byte[256];
+    public BiomeType[] getBiomeArray() {
+        return new BiomeType[256];
     }
 
     @Override
@@ -97,12 +97,7 @@ public class NullFaweChunk extends FaweChunk<Void> {
     }
 
     @Override
-    public void setBiome(int x, int z, BaseBiome biome) {
-
-    }
-
-    @Override
-    public void setBiome(int x, int z, byte biome) {
+    public void setBiome(int x, int z, BiomeType biome) {
 
     }
 

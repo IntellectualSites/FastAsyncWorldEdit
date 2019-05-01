@@ -55,18 +55,16 @@ import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.*;
 
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
 
 /**
  * Commands for the generation of shapes and other objects.
@@ -287,7 +285,7 @@ public class GenerationCommands extends MethodCommands {
     @CommandPermissions("worldedit.generation.forest")
     @Logging(POSITION)
     @SuppressWarnings("deprecation")
-    public void forestGen(Player player, LocalSession session, EditSession editSession, @Optional("10") int size, @Optional("tree") TreeType type, @Optional("5") double density) throws WorldEditException, ParameterException {
+    public void forestGen(Player player, LocalSession session, EditSession editSession, @Optional("10") int size, @Optional("tree") TreeType type, @Optional("5") @Range(min = 0, max = 100) double density) throws WorldEditException, ParameterException {
         density = density / 100;
         int affected = editSession.makeForest(session.getPlacementPosition(player), size, density, type);
         player.print(BBC.getPrefix() + affected + " trees created.");
@@ -430,16 +428,17 @@ public class GenerationCommands extends MethodCommands {
             min = 2,
             max = -1
     )
-    @CommandPermissions({"worldedit.generation.shape", "worldedit.biome.set"})
+    @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
     public void generateBiome(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                               @Selection Region region,
-                              BaseBiome target,
+                              BiomeType target,
                               @Text String expression,
                               @Switch('h') boolean hollow,
                               @Switch('r') boolean useRawCoords,
                               @Switch('o') boolean offset,
-                              @Switch('c') boolean offsetCenter, CommandContext context) throws WorldEditException {
+                              @Switch('c') boolean offsetCenter,
+                              CommandContext context) throws WorldEditException {
         final Vector3 zero;
         Vector3 unit;
 

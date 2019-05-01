@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.sk89q.worldedit.*;
+import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -182,7 +182,7 @@ public abstract class AbstractRegion implements Region {
 
     @Override
     public Set<BlockVector3> getChunkCubes() {
-        final Set<BlockVector3> chunks = new HashSet<>();
+        final Set<BlockVector3> chunks = new BlockVectorSet();
 
         final BlockVector3 min = getMinimumPoint();
         final BlockVector3 max = getMaximumPoint();

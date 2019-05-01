@@ -48,7 +48,14 @@ public class BooleanProperty extends AbstractProperty<Boolean> {
 
     @Override
     public int getIndexFor(CharSequence string) throws IllegalArgumentException {
-        return string.charAt(0) == 't' ? defaultIndex : 1 - defaultIndex;
+        switch (string.charAt(0)) {
+            case 't':
+                return defaultIndex;
+            case 'f':
+                return 1 - defaultIndex;
+            default:
+                return -1;
+        }
     }
 
     @Nullable

@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.world.snapshot;
 
+import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.DataException;
@@ -36,13 +36,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A snapshot restore operation.
  */
 public class SnapshotRestore {
 
-    private final Map<BlockVector2, ArrayList<BlockVector3>> neededChunks = new LinkedHashMap<>();
+    private final Map<BlockVector2, Set<BlockVector3>> neededChunks = new LinkedHashMap<>();
     private final ChunkStore chunkStore;
     private final EditSession editSession;
     private ArrayList<BlockVector2> missingChunks;
@@ -109,7 +110,7 @@ public class SnapshotRestore {
 
         // Unidentified chunk
         if (!neededChunks.containsKey(chunkPos)) {
-            neededChunks.put(chunkPos, new ArrayList<>());
+            neededChunks.put(chunkPos, new LocalBlockVectorSet());
         }
 
         neededChunks.get(chunkPos).add(pos);
@@ -135,7 +136,7 @@ public class SnapshotRestore {
         errorChunks = new ArrayList<>();
 
         // Now let's start restoring!
-        for (Map.Entry<BlockVector2, ArrayList<BlockVector3>> entry : neededChunks.entrySet()) {
+        for (Map.Entry<BlockVector2, Set<BlockVector3>> entry : neededChunks.entrySet()) {
             BlockVector2 chunkPos = entry.getKey();
             Chunk chunk;
 

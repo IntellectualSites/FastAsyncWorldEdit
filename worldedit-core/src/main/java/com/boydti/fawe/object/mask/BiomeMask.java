@@ -5,13 +5,13 @@ import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 public class BiomeMask extends AbstractExtentMask implements ResettableMask {
-    private final BaseBiome biome;
+    private final BiomeType biome;
     private transient MutableBlockVector2 mutable = new MutableBlockVector2();
 
-    public BiomeMask(Extent extent, BaseBiome biome) {
+    public BiomeMask(Extent extent, BiomeType biome) {
         super(extent);
         this.biome = biome;
     }

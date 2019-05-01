@@ -272,7 +272,7 @@ public class SnipeData {
      * @param voxelId the voxelId to set
      */
     public final void setVoxelId(final int voxelId) {
-        if (WorldEdit.getInstance().getConfiguration().disallowedBlocks.contains(BlockTypes.getFromStateId(voxelId).getId())) {
+        if (WorldEdit.getInstance().getConfiguration().checkDisallowedBlocks(BlockTypes.getFromStateId(voxelId).getDefaultState())) {
             if (owner != null) {
                 Player plr = owner.getPlayer();
                 if (plr != null) {

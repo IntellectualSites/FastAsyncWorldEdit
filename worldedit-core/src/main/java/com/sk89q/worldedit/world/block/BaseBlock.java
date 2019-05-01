@@ -47,7 +47,7 @@ import java.util.Objects;
  * snapshot of blocks correctly, so, for example, the NBT data for a block
  * may be missing.</p>
  */
-public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
+public class BaseBlock implements BlockStateHolder<BaseBlock> {
     private final BlockState blockState;
 
     @Nullable
@@ -111,7 +111,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         this(getState(id, data));
     }
 
-    private static final BlockState getState(int id, int data) {
+    public static final BlockState getState(int id, int data) {
         BlockState blockState = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
         if (blockState == null) {
             blockState = BlockTypes.AIR.getDefaultState();
@@ -124,8 +124,8 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Deprecated
-    public static BaseBlock getFromInternalId(int id, CompoundTag nbtData) {
-        return new BaseBlock(id, nbtData);
+    public static BaseBlock getFromInternalId(int internalId, CompoundTag nbtData) {
+        return BlockState.getFromInternalId(internalId).toBaseBlock(nbtData);
     }
 
     /**
@@ -200,6 +200,10 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     	return blockState.getBlockType();
     }
 
+    public BlockType getType() {
+        return getBlockType();
+    }
+
     @Override
     public int getOrdinal() {
         return blockState.getOrdinal();
@@ -223,11 +227,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public int hashCode() {
-        int ret = toImmutableState().hashCode() << 3;
-        if (hasNbtData()) {
-            ret += getNbtData().hashCode();
-        }
-        return ret;
+        return getOrdinal();
     }
 
     @Override

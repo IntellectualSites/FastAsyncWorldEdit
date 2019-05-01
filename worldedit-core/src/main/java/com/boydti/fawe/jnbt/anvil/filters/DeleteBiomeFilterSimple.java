@@ -3,13 +3,13 @@ package com.boydti.fawe.jnbt.anvil.filters;
 import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
 import com.boydti.fawe.object.number.MutableLong;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 public class DeleteBiomeFilterSimple extends MCAFilterCounter {
     private final int id;
 
-    public DeleteBiomeFilterSimple(BaseBiome biome) {
-        this.id = biome.getId();
+    public DeleteBiomeFilterSimple(BiomeType biome) {
+        this.id = biome.getInternalId();
     }
 
     @Override

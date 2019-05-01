@@ -39,7 +39,7 @@ import java.util.Map;
  * found at <a href="http://www.minecraft.net/docs/NBT.txt">
  * http://www.minecraft.net/docs/NBT.txt</a>.</p>
  */
-public final class NBTOutputStream implements Closeable {
+public final class NBTOutputStream extends OutputStream implements Closeable, DataOutput {
 
     /**
      * The output stream.
@@ -426,11 +426,82 @@ public final class NBTOutputStream implements Closeable {
         if (os instanceof Closeable) ((Closeable) os).close();
     }
 
+    @Override
+    public void write(int b) throws IOException {
+        os.write(b);
+    }
+
+    @Override
+    public void write(byte[] b) throws IOException {
+        os.write(b);
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        os.write(b, off, len);
+    }
+
+    @Override
+    public void writeBoolean(boolean v) throws IOException {
+        os.writeBoolean(v);
+    }
+
+    @Override
+    public void writeByte(int v) throws IOException {
+        os.writeByte(v);
+    }
+
+    @Override
+    public void writeShort(int v) throws IOException {
+        os.writeShort(v);
+    }
+
+    @Override
+    public void writeChar(int v) throws IOException {
+        os.writeChar(v);
+    }
+
+    @Override
+    public void writeInt(int v) throws IOException {
+        os.writeInt(v);
+    }
+
+    @Override
+    public void writeLong(long v) throws IOException {
+        os.writeLong(v);
+    }
+
+    @Override
+    public void writeFloat(float v) throws IOException {
+        os.writeFloat(v);
+    }
+
+    @Override
+    public void writeDouble(double v) throws IOException {
+        os.writeDouble(v);
+    }
+
+    @Override
+    public void writeBytes(String s) throws IOException {
+        os.writeBytes(s);
+    }
+
+    @Override
+    public void writeChars(String s) throws IOException {
+        os.writeChars(s);
+    }
+
+    @Override
+    public void writeUTF(String s) throws IOException {
+        os.writeUTF(s);
+    }
+
     /**
      * Flush output.
      *
      * @throws IOException
      */
+    @Override
     public void flush() throws IOException {
         if (os instanceof Flushable) ((Flushable) os).flush();
     }

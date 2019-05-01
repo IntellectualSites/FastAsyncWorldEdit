@@ -1,3 +1,4 @@
+# Updated by NShoot
 info:
   prefix: '&8(&4&lFAWE&8)&r&7'
   file_deleted: '%s0 a été supprimé.'
@@ -61,6 +62,7 @@ error:
   worldedit_some_fails: '&c%s0 blocs ne peuvent pas être posés car ils sont en dehors
     de votre région autorisée.'
   worldedit_some_fails_blockbag: '&cBlocs manquants : %s0'
+  block_not_allowed: Vous n’avez pas la permission d’utiliser
 web:
   generating_link: Téléversement de %s, veuillez patienter...
   generating_link_failed: '&cImpossible de générer le lien.'
@@ -107,6 +109,7 @@ worldedit:
     command_redo_success: Opération refaite.
     command_undo_error: Rien à défaire. (Tapez `/inspect` et `/frb`)
     command_undo_success: Annulation réussie.
+    command_undo_disabled: 'Undo désactivé, utilisez: //fast'
   operation:
     operation: Opération en attente (%s0)
   selection:
@@ -190,12 +193,23 @@ worldedit:
     superpickaxe_disabled: Super pioche désactivée.
     superpickaxe_area_enabled: Mode modifié. Clique gauche avec la pioche. // pour
       désactiver.
+    tool_tree_error_block: Un arbre ne peux pas pousser ici
+    tool_deltree_error: Ce n’est pas un arbre
+    tool_deltree_floating_error: Ce n’est pas un arbre flottant
   snapshot:
     snapshot_loaded: Instantané '%s0' chargé; restauration en cours...
     snapshot_set: 'Instantané mis sur : %s0'
     snapshot_newest: Utilisation du dernier instantané désormais.
     snapshot_list_header: 'Instantanés du monde (%s0):'
     snapshot_list_footer: Utilisez /snap use [instantané] our /snap use latest.
+    snapshot_not_configured: La restauration de snapshot/backup n’a pas été configurée.
+    snapshot_not_available: Aucune snapshot n’est disponible. Regardez la console pour plus de détails.
+    snapshot_not_found_world: Aucune snapshot n’ont été trouvée pour ce monde.
+    snapshot_not_found: Aucune snapshot n’a été trouvée.
+    snapshot_invalid_index: Index invalide, il doit être égal ou supérieur à 1.
+    snapshot_error_date: La date entrée n’a pas pû être détectée.
+    snapshot_error_restore: Les erreurs ont empêché la restauration des blocs.
+    snapshot_error_restore_chunks: Aucun chunks n’a pû être chargé. (Mauvaise archive?)
   biome:
     biome_list_header: 'Biomes (page %s0/%s1):'
     biome_changed: Les biomes ont été modifiés dans %s0 colonnes.
@@ -255,6 +269,14 @@ worldedit:
     help_item_denied: '&c%s0&8 - &7%s1'
     help_header: 'Aide : page %s0/%s1'
     help_footer: '&7Wiki anglais : https://git.io/vSKE5'
+  cycler:
+    block_cycler_cannot_cycle: Le data de ce bloc ne peut pas être cyclé!
+    block_cycler_limit: Limite du nombre maximal de blocs changeable atteinte.
+    block_cycler_no_perm: '&cVous n’êtes pas autorisé à cycler la valeur du data de ce bloc.'
+  scripting:
+    scripting_no_perm: '&cVous n’avez pas la permission d’exécuter ce script de fabrication'
+    scripting_cs: Utilisez /cs avec un nom de script avant.
+    scripting_error: Une erreur s’est produite lors de l’exécution d’un script de fabrication.
 progress:
   progress_message: '%s1/%s0 (%s2%) @%s3bps %s4s restants'
   progress_finished: '[ Terminé ! ]'

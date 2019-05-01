@@ -7,26 +7,21 @@ package com.thevoxelbox.voxelsniper.brush.perform;
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.thevoxelbox.voxelsniper.Message;
 
-import org.bukkit.block.Block;
-
 /**
  * @author Voxel
  */
-public class pMatComboNophys extends vPerformer
-{
+public class pMatComboNophys extends vPerformer {
 
     private int dr;
     private int i;
     private int ir;
 
-    public pMatComboNophys()
-    {
+    public pMatComboNophys() {
         name = "Mat-Combo, No Physics";
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v)
-    {
+    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
         w = v.getWorld();
         dr = v.getReplaceData();
         i = v.getVoxelId();
@@ -34,8 +29,7 @@ public class pMatComboNophys extends vPerformer
     }
 
     @Override
-    public void info(Message vm)
-    {
+    public void info(Message vm) {
         vm.performerName(name);
         vm.voxel();
         vm.replace();
@@ -43,19 +37,16 @@ public class pMatComboNophys extends vPerformer
     }
 
     @SuppressWarnings("deprecation")
-	@Override
-    public void perform(AsyncBlock b)
-    {
-        if (b.getTypeId() == ir && b.getPropertyId() == dr)
-        {
+    @Override
+    public void perform(AsyncBlock b) {
+        if (b.getTypeId() == ir && b.getPropertyId() == dr) {
             h.put(b);
             b.setTypeId(i);
         }
     }
 
     @Override
-    public boolean isUsingReplaceMaterial()
-    {
+    public boolean isUsingReplaceMaterial() {
         return true;
     }
 }

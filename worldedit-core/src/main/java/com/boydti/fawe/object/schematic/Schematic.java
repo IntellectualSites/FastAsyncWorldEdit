@@ -206,6 +206,7 @@ public class Schematic {
             final int relx = to.getBlockX() + bot.getBlockX() - origin.getBlockX();
             final int rely = to.getBlockY() + bot.getBlockY() - origin.getBlockY();
             final int relz = to.getBlockZ() + bot.getBlockZ() - origin.getBlockZ();
+
             BlockArrayClipboard bac = (BlockArrayClipboard) clipboard;
             if (copyBiomes) {
                 bac.IMP.forEach(new FaweClipboard.BlockReader() {

@@ -16,7 +16,7 @@ import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.EOFException;
@@ -325,7 +325,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void addBiomeChange(int x, int z, BaseBiome from, BaseBiome to) {
+    public void addBiomeChange(int x, int z, BiomeType from, BiomeType to) {
         blockSize++;
         try {
             OutputStream os = getBiomeOS();
@@ -337,8 +337,8 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
             os.write((byte) (z >> 16));
             os.write((byte) (z >> 8));
             os.write((byte) (z));
-            os.write(from.getId());
-            os.write(to.getId());
+            ((FaweOutputStream) os).writeVarInt(from.getInternalId());
+            ((FaweOutputStream) os).writeVarInt(to.getInternalId());
         } catch (Throwable e) {
             MainUtil.handleError(e);
         }
@@ -462,8 +462,8 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                     if (int1 != -1) {
                         int x = ((int1 << 24) + (is.read() << 16) + (is.read() << 8) + (is.read() << 0));
                         int z = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + (is.read() << 0));
-                        int from = is.read();
-                        int to = is.read();
+                        int from = ((FaweInputStream) is).readVarInt();
+                        int to = ((FaweInputStream) is).readVarInt();
                         change.setBiome(x, z, from, to);
                         return change;
                     }

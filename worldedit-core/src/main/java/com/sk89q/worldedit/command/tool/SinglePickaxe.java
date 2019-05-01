@@ -50,24 +50,12 @@ public class SinglePickaxe implements BlockTool {
                 && !player.canDestroyBedrock()) {
             return true;
         }
-        final EditSession editSession = session.createEditSession(player);
-        try {
+
+        try (EditSession editSession = session.createEditSession(player)) {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeDrop);
             editSession.setBlock(blockPoint, BlockTypes.AIR.getDefaultState());
-        } catch (MaxChangedBlocksException e) {
-            player.printError("Max blocks change limit reached.");
-        }
-
-        try {
-            if (editSession.setBlock(clicked.getBlockX(), clicked.getBlockY(), clicked.getBlockZ(), EditSession.nullBlock)) {
-                // TODO FIXME play effect
-//                world.playEffect(clicked, 2001, blockType);
-            }
-        } finally {
-            editSession.flushQueue();
             session.remember(editSession);
         }
-
         return true;
     }
 

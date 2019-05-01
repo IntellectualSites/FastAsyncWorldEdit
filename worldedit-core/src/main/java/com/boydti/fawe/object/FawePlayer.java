@@ -74,17 +74,10 @@ public abstract class FawePlayer<T> extends Metadatable {
         }
         if (obj instanceof Player) {
             Player actor = LocationMaskedPlayerWrapper.unwrap((Player) obj);
-            if (obj.getClass().getSimpleName().equals("PlayerProxy")) {
-                try {
-                    Field fieldBasePlayer = actor.getClass().getDeclaredField("basePlayer");
-                    fieldBasePlayer.setAccessible(true);
-                    Player player = (Player) fieldBasePlayer.get(actor);
-                    FawePlayer<Object> result = wrap(player);
-                    return (FawePlayer<V>) (result == null ? wrap(player.getName()) : result);
-                } catch (Throwable e) {
-                    MainUtil.handleError(e);
-                    return Fawe.imp().wrap(actor.getName());
-                }
+            if (obj instanceof PlayerProxy) {
+                Player player = ((PlayerProxy) obj).getBasePlayer();
+                FawePlayer<Object> result = wrap(player);
+                return (FawePlayer<V>) (result == null ? wrap(player.getName()) : result);
             } else if (obj instanceof PlayerWrapper) {
                 return wrap(((PlayerWrapper) obj).getParent());
             } else {
@@ -123,10 +116,6 @@ public abstract class FawePlayer<T> extends Metadatable {
         Fawe.get().register(this);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
-        }
-        Updater updater = Fawe.get().getUpdater();
-        if (updater != null && updater.hasPending(this)) {
-            TaskManager.IMP.async(() -> updater.confirmUpdate(this));
         }
     }
 
@@ -630,7 +619,6 @@ public abstract class FawePlayer<T> extends Metadatable {
         cancel(true);
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
             session = getSession();
-            WorldEdit.getInstance().getSessionManager().remove(toWorldEditPlayer());
             session.setClipboard(null);
             session.clearHistory();
             session.unregisterTools(getPlayer());

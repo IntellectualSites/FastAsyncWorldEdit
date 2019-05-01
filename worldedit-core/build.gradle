@@ -44,8 +44,10 @@ processResources {
     from('src/main/resources') {
         include 'fawe.properties'
         expand(
-                internalVersion: "${project.parent.version}",
+                version: "${project.parent.version}",
                 name: project.parent.name,
+                commit: "${git.head().abbreviatedId}",
+                date: "${git.head().getDate().format("yy.MM.dd")}",
         )
     }
 }

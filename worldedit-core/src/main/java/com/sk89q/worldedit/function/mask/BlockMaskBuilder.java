@@ -229,7 +229,10 @@ public class BlockMaskBuilder {
         throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
             Set<PropertyKey> keys = new HashSet<>();
             finalTypes.forEach(t -> t.getProperties().stream().forEach(p -> keys.add(p.getKey())));
-            return keys.stream().map(p -> p.getId()).filter(p -> p.startsWith(property)).collect(Collectors.toList());
+            return keys.stream().map(p -> p.getId())
+                    .filter(p -> StringMan.blockStateMatches(property, p))
+                    .sorted(StringMan.blockStateComparator(property))
+                    .collect(Collectors.toList());
         });
     }
 
@@ -387,7 +390,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder addBlocks(Collection<BlockStateHolder> blocks) {
+    public <T extends BlockStateHolder> BlockMaskBuilder addBlocks(Collection<T> blocks) {
         for (BlockStateHolder block : blocks) add(block);
         return this;
     }
@@ -397,7 +400,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder addBlocks(BlockStateHolder... blocks) {
+    public <T extends BlockStateHolder> BlockMaskBuilder addBlocks(T... blocks) {
         for (BlockStateHolder block : blocks) add(block);
         return this;
     }

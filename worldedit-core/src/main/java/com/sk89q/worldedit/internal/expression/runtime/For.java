@@ -29,10 +29,9 @@ public class For extends Node {
                 throw new EvaluationException(this.getPosition(), "Loop exceeded 256 iterations.");
             }
 
-            if(Thread.currentThread().isInterrupted()){
+            if(Thread.interrupted()){
                 throw new EvaluationException(this.getPosition(), "Thread has been interrupted.");
             }
-
             ++iterations;
 
             try {

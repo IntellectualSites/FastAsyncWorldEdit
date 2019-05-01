@@ -3,7 +3,6 @@ package com.thevoxelbox.voxelsniper.brush;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
-
 import org.bukkit.ChatColor;
 import org.bukkit.util.Vector;
 
@@ -12,8 +11,7 @@ import org.bukkit.util.Vector;
  *
  * @author Gavjenks
  */
-public class RulerBrush extends Brush
-{
+public class RulerBrush extends Brush {
     private boolean first = true;
     private Vector coords = new Vector(0, 0, 0);
 
@@ -24,24 +22,19 @@ public class RulerBrush extends Brush
     /**
      *
      */
-    public RulerBrush()
-    {
+    public RulerBrush() {
         this.setName("Ruler");
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         final int voxelMaterialId = v.getVoxelId();
         this.coords = this.getTargetBlock().getLocation().toVector();
 
-        if (this.xOff == 0 && this.yOff == 0 && this.zOff == 0)
-        {
+        if (this.xOff == 0 && this.yOff == 0 && this.zOff == 0) {
             v.sendMessage(ChatColor.DARK_PURPLE + "First point selected.");
             this.first = !this.first;
-        }
-        else
-        {
+        } else {
             final Undo undo = new Undo();
 
             undo.put(this.clampY(this.getTargetBlock().getX() + this.xOff, this.getTargetBlock().getY() + this.yOff, this.getTargetBlock().getZ() + this.zOff));
@@ -51,10 +44,8 @@ public class RulerBrush extends Brush
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
-        if (this.coords == null || this.coords.lengthSquared() == 0)
-        {
+    protected final void powder(final SnipeData v) {
+        if (this.coords == null || this.coords.lengthSquared() == 0) {
             v.sendMessage(ChatColor.RED + "Warning: You did not select a first coordinate with the arrow. Comparing to point 0,0,0 instead.");
             return;
         }
@@ -71,59 +62,44 @@ public class RulerBrush extends Brush
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.voxel();
     }
 
     @Override
-    public final void parameters(final String[] par, final SnipeData v)
-    {
-        for (int i = 1; i < par.length; i++)
-        {
+    public final void parameters(final String[] par, final SnipeData v) {
+        for (int i = 1; i < par.length; i++) {
             final String parameter = par[i];
 
-            if (parameter.equalsIgnoreCase("info"))
-            {
+            if (parameter.equalsIgnoreCase("info")) {
                 v.sendMessage(ChatColor.GOLD + "Ruler Brush instructions: Right click first point with the arrow. Right click with powder for distances from that block (can repeat without getting a new first block.) For placing blocks, use arrow and input the desired coordinates with parameters.");
                 v.sendMessage(ChatColor.LIGHT_PURPLE + "/b r x[x value] y[y value] z[z value] -- Will place blocks one at a time of the type you have set with /v at the location you click + this many units away.  If you don't include a value, it will be zero.  Don't include ANY values, and the brush will just measure distance.");
                 v.sendMessage(ChatColor.BLUE + "/b r ruler -- will reset the tool to just measure distances, not layout blocks.");
 
                 return;
-            }
-            else if (parameter.startsWith("x"))
-            {
+            } else if (parameter.startsWith("x")) {
                 this.xOff = Integer.parseInt(parameter.replace("x", ""));
                 v.sendMessage(ChatColor.AQUA + "X offset set to " + this.xOff);
-            }
-            else if (parameter.startsWith("y"))
-            {
+            } else if (parameter.startsWith("y")) {
                 this.yOff = Integer.parseInt(parameter.replace("y", ""));
                 v.sendMessage(ChatColor.AQUA + "Y offset set to " + this.yOff);
-            }
-            else if (parameter.startsWith("z"))
-            {
+            } else if (parameter.startsWith("z")) {
                 this.zOff = Integer.parseInt(parameter.replace("z", ""));
                 v.sendMessage(ChatColor.AQUA + "Z offset set to " + this.zOff);
-            }
-            else if (parameter.startsWith("ruler"))
-            {
+            } else if (parameter.startsWith("ruler")) {
                 this.zOff = 0;
                 this.yOff = 0;
                 this.xOff = 0;
                 v.sendMessage(ChatColor.BLUE + "Ruler mode.");
-            }
-            else
-            {
+            } else {
                 v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
             }
         }
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.ruler";
     }
 }

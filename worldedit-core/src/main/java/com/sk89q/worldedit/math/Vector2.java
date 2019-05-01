@@ -485,18 +485,18 @@ public class Vector2 {
         }
 
         Vector2 other = (Vector2) obj;
-        return other.getX() == this.getX() && other.getZ() == this.getZ();
+        return other.x == this.x && other.z == this.z;
 
     }
 
     @Override
     public int hashCode() {
-        return ((int) getX() ^ ((int) getZ() << 16));
+        return (((int) x) << 16) ^ ((int) z);
     }
 
     @Override
     public String toString() {
-        return "(" + getX() + ", " + getZ() + ")";
+        return "(" + x + ", " + z + ")";
     }
 
 }

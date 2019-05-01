@@ -11,6 +11,8 @@ import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.DataOutput;
 import java.io.File;
@@ -18,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -455,7 +458,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         public int maxZ;
 
         public DiskStorageSummary(int x, int z) {
-            blocks = new int[256];
+            blocks = new int[BlockTypes.states.length];
             this.x = x;
             this.z = z;
             minX = x;
@@ -465,7 +468,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         }
 
         public void add(int x, int z, int id) {
-            blocks[id]++;
+            blocks[BlockState.getFromInternalId(id).getOrdinal()]++;
             if (x < minX) {
                 minX = x;
             } else if (x > maxX) {
@@ -478,22 +481,23 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             }
         }
 
-        public Map<Integer, Integer> getBlocks() {
-            Int2ObjectOpenHashMap<Integer> map = new Int2ObjectOpenHashMap<>();
+        public Map<BlockState, Integer> getBlocks() {
+            HashMap<BlockState, Integer> map = new HashMap<>();
             for (int i = 0; i < blocks.length; i++) {
                 if (blocks[i] != 0) {
-                    map.put(i, (Integer) blocks[i]);
+                    BlockState state = BlockTypes.states[i];
+                    map.put(state, (Integer) blocks[i]);
                 }
             }
             return map;
         }
 
-        public Map<Integer, Double> getPercents() {
-            Map<Integer, Integer> map = getBlocks();
+        public Map<BlockState, Double> getPercents() {
+            Map<BlockState, Integer> map = getBlocks();
             int count = getSize();
-            Int2ObjectOpenHashMap<Double> newMap = new Int2ObjectOpenHashMap<>();
-            for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
-                int id = entry.getKey();
+            Map<BlockState, Double> newMap = new HashMap<>();
+            for (Map.Entry<BlockState, Integer> entry : map.entrySet()) {
+                BlockState id = entry.getKey();
                 int changes = entry.getValue();
                 double percent = ((changes * 1000l) / count) / 10d;
                 newMap.put(id, (Double) percent);

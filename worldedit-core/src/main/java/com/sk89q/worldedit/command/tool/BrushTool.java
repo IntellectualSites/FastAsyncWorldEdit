@@ -472,14 +472,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 MaskIntersection newMask = new MaskIntersection(existingMask);
                 newMask.add(mask);
                 editSession.setMask(newMask);
-//=======
-//            try {
-//                brush.build(editSession, target.toBlockPoint(), material, size);
-//            } catch (MaxChangedBlocksException e) {
-//                player.printError("Max blocks change limit reached.");
-//            } finally {
-//                session.remember(editSession);
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
             }
         }
         Mask sourceMask = current.getSourceMask();

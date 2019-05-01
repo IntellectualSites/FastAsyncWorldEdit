@@ -9,9 +9,12 @@ public class Settings extends Config {
     @Ignore
     public static final Settings IMP = new Settings();
 
+    @Ignore
+    public boolean PROTOCOL_SUPPORT_FIX = false;
+
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
-    public String ISSUES = "https://github.com/boy0001/FastAsyncWorldedit/issues";
+    public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues";
     @Final
     public String WIKI = "https://github.com/boy0001/FastAsyncWorldedit/wiki/";
     @Final
@@ -24,14 +27,8 @@ public class Settings extends Config {
     public String PLATFORM; // These values are set from FAWE before loading
 
     @Comment({"Options: cn, de, es, fr, it, nl, ru, tr",
-            "Create a PR to contribute a translation: https://github.com/boy0001/FastAsyncWorldedit/new/master/core/src/main/resources",})
+            "Create a PR to contribute a translation: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/tree/master/worldedit-core/src/main/resources",})
     public String LANGUAGE = "";
-    @Comment({"Enable or disable automatic updates",
-            " - true = update automatically in the background",
-            " - confirm = prompt an admin to confirm each update",
-            " - false = do not update the plugin"
-    })
-    public String UPDATE = "false";
     @Comment("Send anonymous usage statistics")
     public boolean METRICS = true;
     @Comment({
@@ -69,6 +66,13 @@ public class Settings extends Config {
     public PATHS PATHS;
     @Create
     public REGION_RESTRICTIONS_OPTIONS REGION_RESTRICTIONS_OPTIONS;
+    @Create
+    public ENABLED_COMPONENTS ENABLED_COMPONENTS;
+
+    @Comment("Enable or disable core components")
+    public static final class ENABLED_COMPONENTS {
+        public boolean COMMANDS = true;
+    }
 
     @Comment("Paths for various directories")
     public static final class PATHS {

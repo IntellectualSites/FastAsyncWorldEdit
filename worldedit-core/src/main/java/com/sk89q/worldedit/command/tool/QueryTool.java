@@ -48,7 +48,7 @@ public class QueryTool implements BlockTool {
         BlockVector3 blockPoint = clicked.toBlockPoint();
         BaseBlock block = editSession.getFullBlock(blockPoint);
 
-        player.print("\u00A79@" + clicked + ": " + "\u00A7e"
+        player.print("\u00A79@" + blockPoint + ": " + "\u00A7e"
                 + block.getBlockType().getName() + "\u00A77" + " ("
                 + block.toString() + ") "
                 + "\u00A7f"

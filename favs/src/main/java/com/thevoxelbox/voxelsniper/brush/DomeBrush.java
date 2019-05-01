@@ -1,16 +1,15 @@
 package com.thevoxelbox.voxelsniper.brush;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
-
 import org.bukkit.block.Block;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * http://www.voxelwiki.com/minecraft/Voxelsniper#Dome_Brush
@@ -18,19 +17,16 @@ import org.bukkit.util.Vector;
  * @author Gavjenks
  * @author MikeMatrix
  */
-public class DomeBrush extends Brush
-{
+public class DomeBrush extends Brush {
     /**
      *
      */
-    public DomeBrush()
-    {
+    public DomeBrush() {
         this.setName("Dome");
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.size();
         vm.voxel();
@@ -42,11 +38,9 @@ public class DomeBrush extends Brush
      * @param targetBlock
      */
     @SuppressWarnings("deprecation")
-	private void generateDome(final SnipeData v, final Block targetBlock)
-    {
+    private void generateDome(final SnipeData v, final Block targetBlock) {
 
-        if (v.getVoxelHeight() == 0)
-        {
+        if (v.getVoxelHeight() == 0) {
             v.sendMessage("VoxelHeight must not be 0.");
             return;
         }
@@ -63,11 +57,9 @@ public class DomeBrush extends Brush
 
         final double stepSize = 1 / stepScale;
 
-        for (double u = 0; u <= Math.PI / 2; u += stepSize)
-        {
+        for (double u = 0; u <= Math.PI / 2; u += stepSize) {
             final double y = absoluteHeight * Math.sin(u);
-            for (double stepV = -Math.PI; stepV <= -(Math.PI / 2); stepV += stepSize)
-            {
+            for (double stepV = -Math.PI; stepV <= -(Math.PI / 2); stepV += stepSize) {
                 final double x = v.getBrushSize() * Math.cos(u) * Math.cos(stepV);
                 final double z = v.getBrushSize() * Math.cos(u) * Math.sin(stepV);
 
@@ -86,11 +78,9 @@ public class DomeBrush extends Brush
             }
         }
 
-        for (final Vector vector : changeablePositions)
-        {
+        for (final Vector vector : changeablePositions) {
             final AsyncBlock currentTargetBlock = (AsyncBlock) vector.toLocation(this.getTargetBlock().getWorld()).getBlock();
-            if (currentTargetBlock.getTypeId() != v.getVoxelId() || currentTargetBlock.getPropertyId() != v.getPropertyId())
-            {
+            if (currentTargetBlock.getTypeId() != v.getVoxelId() || currentTargetBlock.getPropertyId() != v.getPropertyId()) {
                 undo.put(currentTargetBlock);
                 currentTargetBlock.setTypeIdAndPropertyId(v.getVoxelId(), v.getPropertyId(), true);
             }
@@ -100,20 +90,17 @@ public class DomeBrush extends Brush
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.generateDome(v, this.getTargetBlock());
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.generateDome(v, this.getLastBlock());
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.dome";
     }
 }

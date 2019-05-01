@@ -5,6 +5,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -17,6 +18,8 @@ import java.util.Iterator;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.annotation.Nullable;
 
 /**
  * Allows applications of Kernels onto the region's height map.
@@ -41,14 +44,14 @@ public class HeightMap {
      * @param region  the region
      */
     public HeightMap(EditSession session, Region region) {
-        this(session, region, false);
+        this(session, region, (Mask) null, false);
     }
 
-    public HeightMap(EditSession session, Region region, boolean naturalOnly) {
-        this(session, region, naturalOnly, false);
+    public HeightMap(EditSession session, Region region, Mask mask) {
+        this(session, region, mask, false);
     }
 
-    public HeightMap(EditSession session, Region region, boolean naturalOnly, boolean layers) {
+    public HeightMap(EditSession session, Region region, Mask mask, boolean layers) {
         checkNotNull(session);
         checkNotNull(region);
 
@@ -86,29 +89,24 @@ public class HeightMap {
         } else {
             // Store current heightmap data
             int index = 0;
-            if (naturalOnly) {
-                for (int z = 0; z < height; ++z) {
-                    for (int x = 0; x < width; ++x, index++) {
-                        data[index] = session.getHighestTerrainBlock(x + minX, z + minZ, minY, maxY);
-                    }
-                }
-            } else {
-                int yTmp = 255;
-                for (int z = 0; z < height; ++z) {
-                    for (int x = 0; x < width; ++x, index++) {
+            int yTmp = 255;
+            for (int z = 0; z < height; ++z) {
+                for (int x = 0; x < width; ++x, index++) {
+                    if (mask != null)
+                        yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE, mask);
+                    else
                         yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE);
-                        switch (yTmp) {
-                            case Integer.MIN_VALUE:
-                                yTmp = minY;
-                                invalid[index] = true;
-                                break;
-                            case Integer.MAX_VALUE:
-                                yTmp = maxY;
-                                invalid[index] = true;
-                                break;
-                        }
-                        data[index] = yTmp;
+                    switch (yTmp) {
+                        case Integer.MIN_VALUE:
+                            yTmp = minY;
+                            invalid[index] = true;
+                            break;
+                        case Integer.MAX_VALUE:
+                            yTmp = maxY;
+                            invalid[index] = true;
+                            break;
                     }
+                    data[index] = yTmp;
                 }
             }
         }
@@ -180,7 +178,6 @@ public class HeightMap {
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight > curHeight) {
                     // Set the top block of the column to be the same type (this might go wrong with rounding)
-//<<<<<<< HEAD
                     BlockStateHolder existing = session.getBlock(xr, curBlock, zr);
 
                     // Skip water/lava
@@ -200,34 +197,13 @@ public class HeightMap {
                         } else {
                             existing = PropertyGroup.LEVEL.set(existing, 15);
                             session.setBlock(xr, newBlock, zr, existing);
-
-//=======
-//                    BlockState existing = session.getBlock(BlockVector3.at(xr, curHeight, zr));
-//
-//                    // Skip water/lava
-//                    if (existing.getBlockType() != BlockTypes.WATER && existing.getBlockType() != BlockTypes.LAVA) {
-//                        session.setBlock(BlockVector3.at(xr, newHeight, zr), existing);
-//                        ++blocksChanged;
-//
-//                        // Grow -- start from 1 below top replacing airblocks
-//                        for (int y = newHeight - 1 - originY; y >= 0; --y) {
-//                            int copyFrom = (int) (y * scale);
-//                            session.setBlock(BlockVector3.at(xr, originY + y, zr), session.getBlock(BlockVector3.at(xr, originY + copyFrom, zr)));
-//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                             ++blocksChanged;
                         }
                     }
                 } else if (curHeight > newHeight) {
-//<<<<<<< HEAD
                     // Fill rest with air
                     for (int y = newBlock + 1; y <= ((curHeight + 15) >> 4); ++y) {
                         session.setBlock(xr, y, zr, fillerAir);
-//=======
-//                    // Shrink -- start from bottom
-//                    for (int y = 0; y < newHeight - originY; ++y) {
-//                        int copyFrom = (int) (y * scale);
-//                        session.setBlock(BlockVector3.at(xr, originY + y, zr), session.getBlock(BlockVector3.at(xr, originY + copyFrom, zr)));
-//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                         ++blocksChanged;
                     }
                     // Set the top block of the column to be the same type

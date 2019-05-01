@@ -63,6 +63,7 @@ task copyFiles {
 shadowJar {
     dependencies {
         include(dependency(':worldedit-core'))
+        include(dependency('org.bstats:bstats-sponge:1.4'))
     }
     archiveName = "${parent.name}-${project.name.replaceAll("worldedit-", "")}-${parent.version}.jar"
     destinationDir = file '../target'

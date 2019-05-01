@@ -32,7 +32,8 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -282,12 +283,11 @@ public class SchemVis extends ImmutableVirtualWorld {
      */
     private void select(MCAChunk chunk) {
         for (int layer = 0; layer < 16; layer++) {
-            byte[] ids = chunk.ids[layer];
+            int[] ids = chunk.ids[layer];
             if (ids != null) {
                 for (int i = 0; i < ids.length; i++) {
                     // TODO FIXME update to 1.13
                     if (ids[i] != 0) ids[i] = (byte) BlockTypes.WHITE_STAINED_GLASS.getInternalId();
-                    Arrays.fill(chunk.data[layer], (byte) 0);
                 }
             }
         }
@@ -578,9 +578,9 @@ public class SchemVis extends ImmutableVirtualWorld {
     public void sendChunk(int x, int z, int bitMask) { /* do nothing - never used*/ }
 
     @Override
-    public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
+    public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         // TODO later (currently not used)
-        return 0;
+        return BiomeTypes.FOREST;
     }
 
     @Override
@@ -630,7 +630,7 @@ public class SchemVis extends ImmutableVirtualWorld {
 	}
 
 	@Override
-	public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+	public boolean setBiome(BlockVector2 position, BiomeType biome) {
 		// TODO Auto-generated method stub
 		return false;
 	}

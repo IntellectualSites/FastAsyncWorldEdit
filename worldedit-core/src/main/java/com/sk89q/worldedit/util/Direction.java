@@ -55,7 +55,13 @@ public enum Direction {
     EAST_NORTHEAST(Vector3.at(Math.cos(Math.PI / 8), 0, -Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 7, 8),
     EAST_SOUTHEAST(Vector3.at(Math.cos(Math.PI / 8), 0, Math.sin(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 6, 9),
     SOUTH_SOUTHEAST(Vector3.at(Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 6, 9),
-    SOUTH_SOUTHWEST(Vector3.at(-Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 8, 7);
+    SOUTH_SOUTHWEST(Vector3.at(-Math.sin(Math.PI / 8), 0, Math.cos(Math.PI / 8)), Flag.SECONDARY_ORDINAL, 8, 7),
+
+    ASCENDING_NORTH(Vector3.at(0, 1, -1), Flag.ASCENDING_CARDINAL, 3 + 18, 1 + 18),
+    ASCENDING_EAST(Vector3.at(1, 1, 0), Flag.ASCENDING_CARDINAL, 0 + 18, 2 + 18),
+    ASCENDING_SOUTH(Vector3.at(0, 1, 1), Flag.ASCENDING_CARDINAL, 1 + 18, 3 + 18),
+    ASCENDING_WEST(Vector3.at(-1, 1, 0), Flag.ASCENDING_CARDINAL, 2 + 18, 0 + 18),
+    ;
 
     private final Vector3 direction;
     private final BlockVector3 blockVector;
@@ -317,8 +323,9 @@ public enum Direction {
         public static int ORDINAL = 0x2;
         public static int SECONDARY_ORDINAL = 0x4;
         public static int UPRIGHT = 0x8;
+        public static int ASCENDING_CARDINAL = 0xF;
 
-        public static int ALL = CARDINAL | ORDINAL | SECONDARY_ORDINAL | UPRIGHT;
+        public static int ALL = CARDINAL | ORDINAL | SECONDARY_ORDINAL | UPRIGHT | ASCENDING_CARDINAL;
 
         private Flag() {
         }

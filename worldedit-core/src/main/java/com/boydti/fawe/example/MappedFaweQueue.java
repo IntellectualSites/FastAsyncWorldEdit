@@ -17,7 +17,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.ArrayDeque;
@@ -119,7 +119,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
 
     public abstract WORLD getImpWorld();
 
-    public abstract boolean regenerateChunk(WORLD world, int x, int z, BaseBiome biome, Long seed);
+    public abstract boolean regenerateChunk(WORLD world, int x, int z, BiomeType biome, Long seed);
 
     @Override
     public abstract FaweChunk getFaweChunk(int x, int z);
@@ -140,14 +140,8 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     }
 
     @Override
-    public boolean regenerateChunk(int x, int z, BaseBiome biome, Long seed) {
+    public boolean regenerateChunk(int x, int z, BiomeType biome, Long seed) {
         return regenerateChunk(getWorld(), x, z, biome, seed);
-    }
-
-    @Override
-    public void addNotifyTask(int x, int z, Runnable runnable) {
-        FaweChunk chunk = map.getFaweChunk(x, z);
-        chunk.addNotifyTask(runnable);
     }
 
     @Override
@@ -193,7 +187,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     }
 
     @Override
-    public boolean setBiome(int x, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         int cx = x >> 4;
         int cz = z >> 4;
         FaweChunk chunk = map.getFaweChunk(cx, cz);
@@ -385,7 +379,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
         return getCombinedId4Data(lastSection, x, y, z);
     }
 
-    public abstract int getBiome(CHUNK chunk, int x, int z);
+    public abstract BiomeType getBiome(CHUNK chunk, int x, int z);
 
     public abstract CompoundTag getTileEntity(CHUNK chunk, int x, int y, int z);
 
@@ -753,7 +747,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
     }
 
     @Override
-    public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
+    public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         int cx = x >> 4;
         int cz = z >> 4;
         lastSectionY = -1;
@@ -765,12 +759,12 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
                 lastChunkSections = getSections(lastChunk);
             } else {
                 lastChunkSections = null;
-                return 0;
+                return null;
             }
         } else if (lastChunk == null) {
-            return 0;
+            return null;
         }
-        return getBiome(lastChunk, x, z) & 0xFF;
+        return getBiome(lastChunk, x, z);
     }
 
     @Override

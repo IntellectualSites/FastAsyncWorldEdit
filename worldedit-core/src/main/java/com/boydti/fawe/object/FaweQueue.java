@@ -21,7 +21,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -107,7 +107,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default BaseBiome getBiome(BlockVector2 position) {
+    default BiomeType getBiome(BlockVector2 position) {
         return null;
     }
 
@@ -127,7 +127,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    default boolean setBiome(BlockVector2 position, BiomeType biome) {
         return setBiome(position.getBlockX(), position.getBlockZ(), biome);
     }
 
@@ -214,7 +214,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
 
     void removeEntity(int x, int y, int z, UUID uuid);
 
-    boolean setBiome(final int x, final int z, final BaseBiome biome);
+    boolean setBiome(final int x, final int z, final BiomeType biome);
 
     FaweChunk getFaweChunk(int x, int z);
 
@@ -333,7 +333,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         return regenerateChunk(x, z, null, null);
     }
 
-    boolean regenerateChunk(int x, int z, @Nullable BaseBiome biome, @Nullable Long seed);
+    boolean regenerateChunk(int x, int z, @Nullable BiomeType biome, @Nullable Long seed);
 
     default void startSet(boolean parallel) {
     }
@@ -394,13 +394,11 @@ public interface FaweQueue extends HasFaweQueue, Extent {
      */
     void clear();
 
-    void addNotifyTask(int x, int z, Runnable runnable);
-
     default boolean hasBlock(int x, int y, int z) throws FaweException.FaweChunkLoadException {
         return getCombinedId4Data(x, y, z) != 0;
     }
 
-    int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException;
+    BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException;
 
     int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException;
 

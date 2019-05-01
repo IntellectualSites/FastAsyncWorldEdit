@@ -19,15 +19,25 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.base.Function;
+import com.sk89q.worldedit.NotABlockException;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.SimpleBukkitAdapter;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -37,6 +47,7 @@ import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.item.ItemType;
 
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -122,6 +133,26 @@ public enum BukkitAdapter {
         return getAdapter().adapt(gameMode);
     }
 
+    /**
+     * Create a WorldEdit BiomeType from a Bukkit one.
+     *
+     * @param biome Bukkit Biome
+     * @return WorldEdit BiomeType
+     */
+    public static BiomeType adapt(Biome biome) {
+        return getAdapter().adapt(biome);
+    }
+
+    public static Biome adapt(BiomeType biomeType) {
+        return getAdapter().adapt(biomeType);
+    }
+
+    /**
+     * Create a WorldEdit EntityType from a Bukkit one.
+     *
+     * @param entityType Bukkit EntityType
+     * @return WorldEdit EntityType
+     */
     public static EntityType adapt(org.bukkit.entity.EntityType entityType) {
         return getAdapter().adapt(entityType);
     }
@@ -146,6 +177,12 @@ public enum BukkitAdapter {
         return getAdapter().adapt(material);
     }
 
+    /**
+     * Create a Bukkit BlockData from a WorldEdit BlockStateHolder
+     *
+     * @param block The WorldEdit BlockStateHolder
+     * @return The Bukkit BlockData
+     */
 	public static <B extends BlockStateHolder<B>> BlockData adapt(B block) {
 		return getAdapter().adapt(block);
     }

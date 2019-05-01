@@ -14,7 +14,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -33,7 +33,7 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     private int area;
     private int volume;
 
-    private byte[] biomes = null;
+    private BiomeType[] biomes = null;
     private int[] states;
 
     private final HashMap<IntegerTrio, CompoundTag> nbtMapLoc;
@@ -59,17 +59,17 @@ public class CPUOptimizedClipboard extends FaweClipboard {
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         setBiome(getIndex(x, 0, z), biome);
         return true;
     }
 
     @Override
-    public void setBiome(int index, int biome) {
+    public void setBiome(int index, BiomeType biome) {
         if (biomes == null) {
-            biomes = new byte[area];
+            biomes = new BiomeType[area];
         }
-        biomes[index] = (byte) biome;
+        biomes[index] = biome;
     }
 
     @Override
@@ -78,21 +78,21 @@ public class CPUOptimizedClipboard extends FaweClipboard {
         int index = 0;
         for (int z = 0; z < length; z++) {
             for (int x = 0; x < width; x++, index++) {
-                task.run(index, biomes[index] & 0xFF);
+                task.run(index, biomes[index].getInternalId());
             }
         }
     }
 
     @Override
-    public BaseBiome getBiome(int index) {
+    public BiomeType getBiome(int index) {
         if (!hasBiomes()) {
-            return EditSession.nullBiome;
+            return null;
         }
-        return FaweCache.CACHE_BIOME[biomes[index] & 0xFF];
+        return biomes[index];
     }
 
     @Override
-    public BaseBiome getBiome(int x, int z) {
+    public BiomeType getBiome(int x, int z) {
         return getBiome(getIndex(x, 0, z));
     }
 

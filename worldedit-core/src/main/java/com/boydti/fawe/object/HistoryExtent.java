@@ -17,7 +17,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -61,7 +61,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        BaseBlock previous = queue.getFullBlock(BlockVector3.at(x, y, z)).toBaseBlock();
+        BaseBlock previous = queue.getFullBlock(mutable.setComponents(x, y, z)).toBaseBlock();
         if (previous.getInternalId() == block.getInternalId()) {
             if (!previous.hasNbtData() && (block instanceof BaseBlock && !((BaseBlock)block).hasNbtData())) {
                 return false;
@@ -105,8 +105,8 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome newBiome) {
-        BaseBiome oldBiome = this.getBiome(position);
+    public boolean setBiome(BlockVector2 position, BiomeType newBiome) {
+        BiomeType oldBiome = this.getBiome(position);
         if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(position.getBlockX(), position.getBlockZ(), oldBiome, newBiome);
             return getExtent().setBiome(position, newBiome);
@@ -116,8 +116,8 @@ public class HistoryExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(int x, int y, int z, BaseBiome newBiome) {
-        BaseBiome oldBiome = this.getBiome(BlockVector2.at(x, z));
+    public boolean setBiome(int x, int y, int z, BiomeType newBiome) {
+        BiomeType oldBiome = this.getBiome(BlockVector2.at(x, z));
         if (oldBiome.getId() != newBiome.getId()) {
             this.changeSet.addBiomeChange(x, z, oldBiome, newBiome);
             return getExtent().setBiome(x, y, z, newBiome);

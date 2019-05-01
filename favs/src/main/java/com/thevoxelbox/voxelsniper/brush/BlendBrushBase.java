@@ -1,20 +1,14 @@
 package com.thevoxelbox.voxelsniper.brush;
 
-import com.bekvon.bukkit.residence.commands.material;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
-
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 
 /**
  * @author Monofraps
  */
 @SuppressWarnings("deprecation")
-public abstract class BlendBrushBase extends Brush
-{
+public abstract class BlendBrushBase extends Brush {
     protected boolean excludeAir = true;
     protected boolean excludeWater = true;
 
@@ -24,22 +18,19 @@ public abstract class BlendBrushBase extends Brush
     protected abstract void blend(final SnipeData v);
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.excludeAir = false;
         this.blend(v);
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.excludeAir = true;
         this.blend(v);
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.size();
         vm.voxel();
@@ -47,12 +38,9 @@ public abstract class BlendBrushBase extends Brush
     }
 
     @Override
-    public void parameters(final String[] par, final SnipeData v)
-    {
-        for (int i = 1; i < par.length; ++i)
-        {
-            if (par[i].equalsIgnoreCase("water"))
-            {
+    public void parameters(final String[] par, final SnipeData v) {
+        for (int i = 1; i < par.length; ++i) {
+            if (par[i].equalsIgnoreCase("water")) {
                 this.excludeWater = !this.excludeWater;
                 v.sendMessage(ChatColor.AQUA + "Water Mode: " + (this.excludeWater ? "exclude" : "include"));
             }
@@ -62,32 +50,28 @@ public abstract class BlendBrushBase extends Brush
     /**
      * @return
      */
-    protected final boolean isExcludeAir()
-    {
+    protected final boolean isExcludeAir() {
         return excludeAir;
     }
 
     /**
      * @param excludeAir
      */
-    protected final void setExcludeAir(boolean excludeAir)
-    {
+    protected final void setExcludeAir(boolean excludeAir) {
         this.excludeAir = excludeAir;
     }
 
     /**
      * @return
      */
-    protected final boolean isExcludeWater()
-    {
+    protected final boolean isExcludeWater() {
         return excludeWater;
     }
 
     /**
      * @param excludeWater
      */
-    protected final void setExcludeWater(boolean excludeWater)
-    {
+    protected final void setExcludeWater(boolean excludeWater) {
         this.excludeWater = excludeWater;
     }
 }

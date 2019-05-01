@@ -25,7 +25,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.history.change.BiomeChange;
@@ -37,12 +36,11 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-
-import javax.annotation.Nullable;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,15 +67,15 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        BlockStateHolder previous = getBlock(location);
+        BaseBlock previous = getFullBlock(location);
         changeSet.add(new BlockChange(location, previous, block));
         return super.setBlock(location, block);
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
-        BaseBiome previous = getBiome(position);
-        changeSet.add(new BiomeChange(position, previous, new BaseBiome(biome)));
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+        BiomeType previous = getBiome(position);
+        changeSet.add(new BiomeChange(position, previous, biome));
         return super.setBiome(position, biome);
     }
 

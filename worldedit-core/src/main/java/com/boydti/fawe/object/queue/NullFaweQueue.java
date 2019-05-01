@@ -9,7 +9,7 @@ import com.boydti.fawe.util.SetQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -53,7 +53,7 @@ public class NullFaweQueue implements FaweQueue {
     }
 
     @Override
-    public boolean setBiome(int x, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         return false;
     }
 
@@ -148,7 +148,7 @@ public class NullFaweQueue implements FaweQueue {
     }
 
     @Override
-    public boolean regenerateChunk(int x, int z, @Nullable BaseBiome biome, @Nullable Long seed) {
+    public boolean regenerateChunk(int x, int z, @Nullable BiomeType biome, @Nullable Long seed) {
         return false;
     }
 
@@ -178,13 +178,8 @@ public class NullFaweQueue implements FaweQueue {
     }
 
     @Override
-    public void addNotifyTask(int x, int z, Runnable runnable) {
-        runnable.run();
-    }
-
-    @Override
-    public int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
-        return 0;
+    public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
+        return null;
     }
 
     @Override

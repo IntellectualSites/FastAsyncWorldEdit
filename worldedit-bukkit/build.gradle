@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     compile project(':worldedit-core')
+
     compile 'net.milkbowl.vault:VaultAPI:1.7'
     compile 'com.sk89q:dummypermscompat:1.10'
     compile 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
@@ -33,13 +34,12 @@ dependencies {
 }
 
 processResources {
-    from (sourceSets.main.resources.srcDirs) {
-        expand 'internalVersion': project.internalVersion
+    from('src/main/resources') {
+        expand(
+                name: project.parent.name,
+                version: project.parent.version
+        )
         include 'plugin.yml'
-    }
-
-    from (sourceSets.main.resources.srcDirs) {
-        exclude 'plugin.yml'
     }
 }
 

@@ -107,7 +107,7 @@ public class ChunkCommands {
     )
     @CommandPermissions("worldedit.delchunks")
     @Logging(REGION)
-    public void deleteChunks(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void deleteChunks(Player player, LocalSession session) throws WorldEditException {
         player.print(BBC.getPrefix() + "Note that this command does not yet support the mcregion format.");
         LocalConfiguration config = worldEdit.getConfiguration();
 
@@ -115,7 +115,7 @@ public class ChunkCommands {
         FileOutputStream out = null;
 
         if (config.shellSaveType == null) {
-            player.printError("Shell script type must be configured: 'bat' or 'bash' expected.");
+            player.printError(BBC.getPrefix() + "Shell script type must be configured: 'bat' or 'bash' expected.");
         } else if (config.shellSaveType.equalsIgnoreCase("bat")) {
             try {
                 out = new FileOutputStream("worldedit-delchunks.bat");

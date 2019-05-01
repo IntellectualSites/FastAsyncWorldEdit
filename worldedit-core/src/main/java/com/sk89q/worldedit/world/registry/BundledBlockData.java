@@ -72,7 +72,6 @@ public class BundledBlockData {
      */
     private void loadFromResource() throws IOException {
         GsonBuilder gsonBuilder = new GsonBuilder();
-//<<<<<<< HEAD
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
         gsonBuilder.registerTypeAdapter(int.class, new JsonDeserializer<Integer>() {
             @Override
@@ -86,9 +85,6 @@ public class BundledBlockData {
                 return primitive.getAsInt();
             }
         });
-//=======
-//        gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner
         Gson gson = gsonBuilder.create();
         URL url = BundledBlockData.class.getResource("blocks.json");
         if (url == null) {

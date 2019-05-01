@@ -3,8 +3,23 @@ package com.boydti.fawe.bukkit;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
 import com.boydti.fawe.bukkit.chat.BukkitChatManager;
-import com.boydti.fawe.bukkit.listener.*;
-import com.boydti.fawe.bukkit.regions.*;
+import com.boydti.fawe.bukkit.listener.AsyncTabCompleteListener;
+import com.boydti.fawe.bukkit.listener.BrushListener;
+import com.boydti.fawe.bukkit.listener.BukkitImageListener;
+import com.boydti.fawe.bukkit.listener.CFIPacketListener;
+import com.boydti.fawe.bukkit.listener.RenderListener;
+import com.boydti.fawe.bukkit.listener.SyncTabCompleteListener;
+import com.boydti.fawe.bukkit.regions.ASkyBlockHook;
+import com.boydti.fawe.bukkit.regions.FactionsFeature;
+import com.boydti.fawe.bukkit.regions.FactionsOneFeature;
+import com.boydti.fawe.bukkit.regions.FactionsUUIDFeature;
+import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
+import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
+import com.boydti.fawe.bukkit.regions.PreciousStonesFeature;
+import com.boydti.fawe.bukkit.regions.ResidenceFeature;
+import com.boydti.fawe.bukkit.regions.TownyFeature;
+import com.boydti.fawe.bukkit.regions.Worldguard;
+import com.boydti.fawe.bukkit.regions.WorldguardFlag;
 import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
@@ -16,6 +31,7 @@ import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_All;
 import com.boydti.fawe.bukkit.v0.ChunkListener_8;
 import com.boydti.fawe.bukkit.v0.ChunkListener_9;
+import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
@@ -27,8 +43,8 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.util.image.ImageViewer;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
-import org.bstats.bukkit.BStats;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
@@ -40,7 +56,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,7 +63,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -86,7 +100,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
             if (Bukkit.getVersion().contains("git-Spigot")) {
                 debug("====== USE PAPER ======");
-                debug("DOWNLOAD: https://ci.destroystokyo.com/job/Paper-1.13/");
+                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
                 debug("GUIDE: https://www.spigotmc.org/threads/21726/");
                 debug(" - This is only a recommendation");
                 debug("==============================");
@@ -106,6 +120,9 @@ public class FaweBukkit implements IFawe, Listener {
 
         // Registered delayed Event Listeners
         TaskManager.IMP.task(() -> {
+            // Fix for ProtocolSupport
+            Settings.IMP.PROTOCOL_SUPPORT_FIX = Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
+
             // This class
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 
@@ -117,13 +134,18 @@ public class FaweBukkit implements IFawe, Listener {
                 new ChunkListener_9();
             }
 
-            /*try {
+            try {
             Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
-                new AsyncTabCompleteListener(WorldEditPlugin.getInstance());
-            } catch (Throwable ignore)
-            {
+                Bukkit.getPluginManager().registerEvents(new AsyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
+            } catch (Throwable ignore) {
+                debug("====== USE PAPER ======");
+                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
+                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
+                debug(" - This is only a recommendation");
+                debug(" - Allows the use of Async Tab Completetion as provided by Paper");
+                debug("==============================");
                 Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-            }*/
+            }
         });
     }
 
@@ -258,7 +280,7 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override public void startMetrics() {
-        BStats bStats = new BStats(plugin);
+        new BStats(plugin);
     }
 
     public ItemUtil getItemUtil() {
@@ -285,7 +307,7 @@ public class FaweBukkit implements IFawe, Listener {
         try {
             this.vault = new VaultUtil();
         } catch (final Throwable e) {
-            this.debug("&dVault is used for persistent `/wea` toggles.");
+            this.debug(BBC.getPrefix() + "&dVault is used for persistent `/wea` toggles.");
         }
     }
 
@@ -293,7 +315,7 @@ public class FaweBukkit implements IFawe, Listener {
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
         List<String> pl = new ArrayList<>();
-        msg.append("server.version: " + Bukkit.getVersion() + " / " + Bukkit.getBukkitVersion() + "\n");
+        msg.append("server.version: " + Bukkit.getVersion() + "\n");
         msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
             msg.append(" - " + p.getName() + ": " + p.getDescription().getVersion() + "\n");
@@ -575,16 +597,6 @@ public class FaweBukkit implements IFawe, Listener {
                 try {
                     BukkitQueue_0.checkVersion(v.name());
                     this.version = tmp = v;
-                    if (tmp == Version.v1_13_R1) {
-                        try {
-                            Fawe.debug("Running 1.13 registry dumper!");
-                            // TODO FIXME
-//                            NMSRegistryDumper dumper = new NMSRegistryDumper(MainUtil.getFile(plugin.getDataFolder(), "extrablocks.json"));
-//                            dumper.run();
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                    }
                     break;
                 } catch (IllegalStateException e) {}
             }
@@ -593,20 +605,14 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     public enum Version {
-//        v1_7_R4,
-//        v1_8_R3,
-//        v1_9_R2,
-//        v1_10_R1,
-//        v1_11_R1,
-//        v1_12_R2,
-        v1_13_R1,
+        v1_13_R2,
         NONE,
     }
 
     private FaweQueue getQueue(World world) {
         switch (getVersion()) {
-            case v1_13_R1:
-//                return new BukkitQueue_1_13(world);
+            case v1_13_R2:
+                return new BukkitQueue_1_13(world);
             default:
             case NONE:
                 return new BukkitQueue_All(world);
@@ -615,8 +621,8 @@ public class FaweBukkit implements IFawe, Listener {
 
     private FaweQueue getQueue(String world) {
         switch (getVersion()) {
-            case v1_13_R1:
-//                return new BukkitQueue_1_13(world);
+            case v1_13_R2:
+                return new BukkitQueue_1_13(world);
             default:
             case NONE:
                 return new BukkitQueue_All(world);

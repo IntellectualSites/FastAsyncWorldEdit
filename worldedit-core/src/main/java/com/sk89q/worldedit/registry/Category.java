@@ -22,7 +22,7 @@ package com.sk89q.worldedit.registry;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class Category<T> {
+public abstract class Category<T> implements RegistryItem {
     private final Set<T> set = new HashSet<>();
     protected final String id;
     private boolean empty = true;
@@ -41,6 +41,18 @@ public abstract class Category<T> {
             this.empty = false;
         }
         return this.set;
+    }
+
+    private int internalId;
+
+    @Override
+    public void setInternalId(int internalId) {
+        this.internalId = internalId;
+    }
+
+    @Override
+    public int getInternalId() {
+        return internalId;
     }
 
     protected abstract Set<T> load();

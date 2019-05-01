@@ -86,7 +86,7 @@ public class DispatcherNode {
      * @see ParametricBuilder#registerMethodsAsCommands(com.sk89q.worldedit.util.command.Dispatcher, Object)
      */
     public DispatcherNode registerMethods(Object object) {
-        return registerMethods(object, null);
+        return registerMethods(object, object instanceof CallableProcessor ? (CallableProcessor) object : null);
     }
 
     /**

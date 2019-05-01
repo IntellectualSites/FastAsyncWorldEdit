@@ -20,6 +20,7 @@
 package com.boydti.fawe.bukkit.adapter.v1_13_1;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.object.collection.ObjObjMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.Tag;
@@ -29,12 +30,15 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.*;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
@@ -56,6 +60,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -87,7 +92,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         nbtCreateTagMethod.setAccessible(true);
     }
 
-    private int[] idbToStateOrdinal;
+    public int[] idbToStateOrdinal;
 
     private boolean init() {
         if (idbToStateOrdinal != null) return false;
@@ -176,7 +181,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     @Override
     public BlockMaterial getMaterial(BlockState state) {
-        BlockType type = state.getBlockType();
         IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
         return new BlockMaterial_1_13(bs.getBlock(), bs);
     }
@@ -188,18 +192,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
     // ------------------------------------------------------------------------
     // Code that is less likely to break
     // ------------------------------------------------------------------------
-
-    @Override
-    public int getBiomeId(Biome biome) {
-        BiomeBase mcBiome = CraftBlock.biomeToBiomeBase(biome);
-        return mcBiome != null ? IRegistry.BIOME.a(mcBiome) : 0;
-    }
-
-    @Override
-    public Biome getBiome(int id) {
-        BiomeBase mcBiome = IRegistry.BIOME.fromId(id);
-        return CraftBlock.biomeBaseToBiome(mcBiome); // Defaults to ocean if it's an invalid ID
-    }
 
     @SuppressWarnings("deprecation")
     @Override
@@ -299,9 +291,16 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         String id = getEntityId(mcEntity);
 
         if (id != null) {
-            NBTTagCompound tag = new NBTTagCompound();
-            readEntityIntoTag(mcEntity, tag);
-            return new BaseEntity(com.sk89q.worldedit.world.entity.EntityTypes.get(id), (CompoundTag) toNative(tag));
+            EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
+            Supplier<CompoundTag> saveTag = new Supplier<CompoundTag>() {
+                @Override
+                public CompoundTag get() {
+                    NBTTagCompound tag = new NBTTagCompound();
+                    readEntityIntoTag(mcEntity, tag);
+                    return (CompoundTag) toNative(tag);
+                }
+            };
+            return new LazyBaseEntity(type, saveTag);
         } else {
             return null;
         }
@@ -514,13 +513,21 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     @Override
     public BlockState adapt(BlockData blockData) {
+        CraftBlockData cbd = ((CraftBlockData) blockData);
+        IBlockData ibd = cbd.getState();
+        return adapt(ibd);
+    }
+
+    public BlockState adapt(IBlockData ibd) {
+        return BlockTypes.states[adaptToInt(ibd)];
+    }
+
+    public int adaptToInt(IBlockData ibd) {
         try {
-            CraftBlockData cbd = ((CraftBlockData) blockData);
-            IBlockData ibd = cbd.getState();
             int id = Block.REGISTRY_ID.getId(ibd);
-            return BlockTypes.states[idbToStateOrdinal[id]];
+            return idbToStateOrdinal[id];
         } catch (NullPointerException e) {
-            if (init()) return adapt(blockData);
+            if (init()) return adaptToInt(ibd);
             throw e;
         }
     }

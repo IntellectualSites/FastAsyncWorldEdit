@@ -11,6 +11,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -19,7 +20,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -127,25 +128,25 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         setBiome(getIndex(x, 0, z), biome);
         return true;
     }
 
     @Override
-    public void setBiome(int index, int biome) {
+    public void setBiome(int index, BiomeType biome) {
         if (initBiome()) {
-            mbb.put(HEADER_SIZE + (volume << 2) + index, (byte) biome);
+            mbb.put(HEADER_SIZE + (volume << 2) + index, (byte) biome.getInternalId());
         }
     }
 
     @Override
-    public BaseBiome getBiome(int index) {
+    public BiomeType getBiome(int index) {
         if (!hasBiomes()) {
-            return EditSession.nullBiome;
+            return null;
         }
         int biomeId = mbb.get(HEADER_SIZE + (volume << 2) + index) & 0xFF;
-        return FaweCache.CACHE_BIOME[biomeId];
+        return BiomeTypes.get(biomeId);
     }
 
     @Override
@@ -162,7 +163,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public BaseBiome getBiome(int x, int z) {
+    public BiomeType getBiome(int x, int z) {
         return getBiome(getIndex(x, 0, z));
     }
 
@@ -378,8 +379,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                                 trio.set(x, y, z);
                                 CompoundTag nbt = nbtMap.get(trio);
                                 if (nbt != null) {
-                                    BaseBlock block = new BaseBlock(state, nbt);
-                                    task.run(x, y, z, block);
+                                    task.run(x, y, z, state.toBaseBlock(nbt));
                                     continue;
                                 }
                             }
@@ -410,8 +410,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                                 trio.set(x, y, z);
                                 CompoundTag nbt = nbtMap.get(trio);
                                 if (nbt != null) {
-                                    BaseBlock block = new BaseBlock(state, nbt);
-                                    task.run(x, y, z, block);
+                                    task.run(x, y, z, state.toBaseBlock(nbt));
                                     continue;
                                 }
                             }

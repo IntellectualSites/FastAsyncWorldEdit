@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -29,7 +30,9 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
 import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
 import com.sk89q.worldedit.session.request.Request;
@@ -84,7 +87,7 @@ public class ScriptingCommands {
         String ext = filename.substring(index + 1, filename.length());
 
         if (!ext.equalsIgnoreCase("js")) {
-            actor.printError("Only .js scripts are currently supported");
+            actor.printError(BBC.getPrefix() + "Only .js scripts are currently supported");
             return null;
         }
 
@@ -97,7 +100,7 @@ public class ScriptingCommands {
                 file = WorldEdit.class.getResourceAsStream("craftscripts/" + filename);
 
                 if (file == null) {
-                    actor.printError("Script does not exist: " + filename);
+                    actor.printError(BBC.getPrefix() + "Script does not exist: " + filename);
                     return null;
                 }
             } else {
@@ -110,7 +113,7 @@ public class ScriptingCommands {
             in.close();
             script = new String(data, 0, data.length, "utf-8");
         } catch (IOException e) {
-            actor.printError("Script read error: " + e.getMessage());
+            actor.printError(BBC.getPrefix() + "Script read error: " + e.getMessage());
             return null;
         }
 
@@ -137,23 +140,30 @@ public class ScriptingCommands {
 
         engine.setTimeLimit(worldEdit.getConfiguration().scriptTimeout);
 
+        Player player = actor instanceof Player ? (Player) actor : null;
+        CraftScriptContext scriptContext = new CraftScriptContext(worldEdit, WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.USER_COMMANDS),
+                WorldEdit.getInstance().getConfiguration(), session, player, args);
+
         Map<String, Object> vars = new HashMap<>();
         vars.put("argv", args);
+        vars.put("context", scriptContext);
         vars.put("actor", actor);
+        vars.put("player", player);
 
         try {
             result = engine.evaluate(script, filename, vars);
         } catch (ScriptException e) {
             e.printStackTrace();
-            actor.printError("Failed to execute:");
+            actor.printError(BBC.getPrefix() + "Failed to execute:");
             actor.printRaw(e.getMessage());
         } catch (NumberFormatException e) {
             throw e;
         } catch (WorldEditException e) {
             throw e;
         } catch (Throwable e) {
-            actor.printError("Failed to execute (see console):");
+            actor.printError(BBC.getPrefix() + "Failed to execute (see console):");
             actor.printRaw(e.getClass().getCanonicalName());
+            e.printStackTrace();
         }
         if (result instanceof NativeJavaObject) {
             return (T) ((NativeJavaObject) result).unwrap();
@@ -169,7 +179,7 @@ public class ScriptingCommands {
         final String name = args.getString(0);
 
         if (!player.hasPermission("worldedit.scripting.execute." + name)) {
-            player.printError("You don't have permission to use that script.");
+            BBC.SCRIPTING_NO_PERM.send(player);
             return;
         }
 
@@ -192,16 +202,17 @@ public class ScriptingCommands {
     @Command(aliases = {".s"}, usage = "[args...]", desc = "Execute last CraftScript", min = 0, max = -1)
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void executeLast(final Player player, final LocalSession session, final CommandContext args) throws WorldEditException {
-        final String lastScript = session.getLastScript();
+    public void executeLast(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+        
+        String lastScript = session.getLastScript();
 
         if (!player.hasPermission("worldedit.scripting.execute." + lastScript)) {
-            player.printError("You don't have permission to use that script.");
+            BBC.SCRIPTING_NO_PERM.send(player);
             return;
         }
 
         if (lastScript == null) {
-            player.printError("Use /cs with a script name first.");
+            BBC.SCRIPTING_CS.send(player);
             return;
         }
 
@@ -213,7 +224,7 @@ public class ScriptingCommands {
         try {
             this.worldEdit.runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
         } catch (final WorldEditException ex) {
-            player.printError("Error while executing CraftScript.");
+            BBC.SCRIPTING_ERROR.send(player);
         }
     }
 

@@ -22,26 +22,27 @@ package com.sk89q.worldedit.extent;
 import com.boydti.fawe.jnbt.anvil.generator.*;
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
-import com.sk89q.worldedit.*;
-
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.util.Countable;
-import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.registry.state.PropertyGroup;
-import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.registry.state.PropertyGroup;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -134,7 +135,7 @@ public interface Extent extends InputExtent, OutputExtent {
         return setBlock(BlockVector3.at(x, y, z), state);
     }
 
-    default boolean setBiome(int x, int y, int z, BaseBiome biome) {
+    default boolean setBiome(int x, int y, int z, BiomeType biome) {
         return setBiome(BlockVector2.at(x, z), biome);
     }
 
@@ -144,6 +145,17 @@ public interface Extent extends InputExtent, OutputExtent {
         for (int y = maxY; y >= minY; --y) {
             BlockState block = getLazyBlock(x, y, z);
             if (block.getBlockType().getMaterial().isMovementBlocker()) {
+                return y;
+            }
+        }
+        return minY;
+    }
+
+    default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY, Mask filter) {
+        maxY = Math.min(maxY, Math.max(0, maxY));
+        minY = Math.max(0, minY);
+        for (int y = maxY; y >= minY; --y) {
+            if (filter.test(MutableBlockVector3.get(x, y, z))) {
                 return y;
             }
         }
@@ -179,10 +191,6 @@ public interface Extent extends InputExtent, OutputExtent {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getLazyBlock(x, layer, z);
                     if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
-
-//                        int blockHeight = (newHeight) >> 3;
-//                        int layerHeight = (newHeight) & 0x7;
-
                         int data = (state ? PropertyGroup.LEVEL.get(block) : data1);
                         return ((layer + offset) << 4) + 0;
                     }
@@ -211,6 +219,34 @@ public interface Extent extends InputExtent, OutputExtent {
 
     default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
         return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, true);
+    }
+
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
+        y = Math.max(minY, Math.min(maxY, y));
+        int clearanceAbove = maxY - y;
+        int clearanceBelow = y - minY;
+        int clearance = Math.min(clearanceAbove, clearanceBelow);
+        boolean state = !mask.test(MutableBlockVector3.get(x, y, z));
+        int offset = state ? 0 : 1;
+        for (int d = 0; d <= clearance; d++) {
+            int y1 = y + d;
+            if (mask.test(MutableBlockVector3.get(x, y1, z)) != state) return y1 - offset;
+            int y2 = y - d;
+            if (mask.test(MutableBlockVector3.get(x, y2, z)) != state) return y2 + offset;
+        }
+        if (clearanceAbove != clearanceBelow) {
+            if (clearanceAbove < clearanceBelow) {
+                for (int layer = y - clearance - 1; layer >= minY; layer--) {
+                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) return layer + offset;
+                }
+            } else {
+                for (int layer = y + clearance + 1; layer <= maxY; layer++) {
+                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) return layer - offset;
+                }
+            }
+        }
+        int result = state ? failedMin : failedMax;
+        return result;
     }
 
     default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
@@ -333,11 +369,11 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param region a region
      * @return the results
      */
-    default List<Countable<BlockStateHolder>> getBlockDistributionWithData(final Region region) {
+    default List<Countable<BlockState>> getBlockDistributionWithData(final Region region) {
         int[][] counter = new int[BlockTypes.size()][];
 
         for (final BlockVector3 pt : region) {
-            BlockStateHolder blk = this.getBlock(pt);
+            BlockState blk = this.getBlock(pt);
             BlockType type = blk.getBlockType();
             int[] stateCounter = counter[type.getInternalId()];
             if (stateCounter == null) {
@@ -345,7 +381,7 @@ public interface Extent extends InputExtent, OutputExtent {
             }
             stateCounter[blk.getInternalPropertiesId()]++;
         }
-        List<Countable<BlockStateHolder>> distribution = new ArrayList<>();
+        List<Countable<BlockState>> distribution = new ArrayList<>();
         for (int typeId = 0; typeId < counter.length; typeId++) {
             BlockType type = BlockTypes.get(typeId);
             int[] stateCount = counter[typeId];
@@ -353,7 +389,7 @@ public interface Extent extends InputExtent, OutputExtent {
                 for (int propId = 0; propId < stateCount.length; propId++) {
                     int count = stateCount[propId];
                     if (count != 0) {
-                        BlockStateHolder state = type.withPropertyId(propId);
+                        BlockState state = type.withPropertyId(propId);
                         distribution.add(new Countable<>(state, count));
                     }
 

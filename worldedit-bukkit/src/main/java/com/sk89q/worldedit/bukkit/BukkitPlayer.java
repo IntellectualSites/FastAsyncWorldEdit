@@ -28,6 +28,7 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -60,6 +61,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     private Player player;
     private WorldEditPlugin plugin;
+
+    public BukkitPlayer(Player player) {
+        this(WorldEditPlugin.getInstance(), player);
+    }
 
     public BukkitPlayer(WorldEditPlugin plugin, Player player) {
         this.plugin = plugin;
@@ -158,6 +163,16 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void setPosition(Vector3 pos, float pitch, float yaw) {
+        if (pos instanceof com.sk89q.worldedit.util.Location) {
+            com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
+            Extent extent = loc.getExtent();
+            if (extent instanceof World) {
+                org.bukkit.World world = Bukkit.getWorld(((World) extent).getName());
+               // System.out.println("Teleport to world " + world);
+                player.teleport(new Location(world, pos.getX(), pos.getY(),
+                        pos.getZ(), yaw, pitch));
+            }
+        }
         player.teleport(new Location(player.getWorld(), pos.getX(), pos.getY(),
                 pos.getZ(), yaw, pitch));
     }

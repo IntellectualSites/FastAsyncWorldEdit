@@ -32,7 +32,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -291,7 +291,7 @@ public class AnvilCommands {
             desc = "Delete chunks matching a specific biome"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
-    public void deleteBiome(Player player, String folder, BaseBiome biome, @Switch('u') boolean unsafe) {
+    public void deleteBiome(Player player, String folder, BiomeType biome, @Switch('u') boolean unsafe) {
         DeleteBiomeFilterSimple filter = new DeleteBiomeFilterSimple(biome);
         DeleteBiomeFilterSimple result = runWithWorld(player, folder, filter, true, unsafe);
         if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
@@ -305,18 +305,6 @@ public class AnvilCommands {
     public void trimAllAir(Player player, String folder, @Switch('u') boolean unsafe) throws WorldEditException {
         TrimAirFilter filter = new TrimAirFilter();
         TrimAirFilter result = runWithWorld(player, folder, filter, true, unsafe);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
-    }
-
-
-    @Command(
-            aliases = {"debugfixair", },
-            desc = "debug - do not use"
-    )
-    @CommandPermissions("worldedit.anvil.debugfixair")
-    public void debugfixair(Player player, String folder) throws WorldEditException {
-        DebugFixAir filter = new DebugFixAir();
-        DebugFixAir result = runWithWorld(player, folder, filter, true, true);
         if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 

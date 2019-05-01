@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.BBC;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -62,12 +63,12 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         if (!config.allowedDataCycleBlocks.isEmpty()
                 && !player.hasPermission("worldedit.override.data-cycler")
                 && !config.allowedDataCycleBlocks.contains(block.getBlockType().getId())) {
-            player.printError("You are not permitted to cycle the data value of that block.");
+            BBC.BLOCK_CYCLER_NO_PERM.send(player);
             return true;
         }
 
         if (block.getStates().keySet().isEmpty()) {
-        	player.printError("That block's data cannot be cycled!");
+        	BBC.BLOCK_CYCLER_CANNOT_CYCLE.send(player);
         } else {
         	Property<?> currentProperty = selectedProperties.get(player.getUniqueId());
         	
@@ -88,9 +89,9 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         			EditSession editSession = session.createEditSession(player);
         			try {
         				editSession.setBlock(blockPoint, newBlock);
-        				player.print("Value of " + currentProperty.getName() + " is now " + currentProperty.getValues().get(index).toString());
+        				player.print(BBC.getPrefix() + "Value of " + currentProperty.getName() + " is now " + currentProperty.getValues().get(index).toString());
         			} catch (MaxChangedBlocksException e) {
-        				player.printError("Max blocks change limit reached.");
+        				BBC.BLOCK_CYCLER_LIMIT.send(player);
         			} finally {
         				session.remember(editSession);
         			}
@@ -101,7 +102,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         		index = (index + 1) % properties.size();
         		currentProperty = properties.get(index);
         		selectedProperties.put(player.getUniqueId(), currentProperty);
-        		player.print("Now cycling " + currentProperty.getName());
+        		player.print(BBC.getPrefix() + "Now cycling " + currentProperty.getName());
         	}
         }
 

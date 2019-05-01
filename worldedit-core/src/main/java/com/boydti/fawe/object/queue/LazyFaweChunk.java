@@ -6,7 +6,7 @@ import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.sk89q.jnbt.CompoundTag;
 
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Map;
@@ -91,7 +91,7 @@ public abstract class LazyFaweChunk<T extends FaweChunk> extends FaweChunk {
     }
 
     @Override
-    public byte[] getBiomeArray() {
+    public BiomeType[] getBiomeArray() {
         return internalGetOrCacheChunk().getBiomeArray();
     }
 
@@ -113,21 +113,6 @@ public abstract class LazyFaweChunk<T extends FaweChunk> extends FaweChunk {
     @Override
     public void fillCuboid(int x1, int x2, int y1, int y2, int z1, int z2, int combinedId) {
         internalGetOrCacheChunk().fillCuboid(x1, x2, y1, y2, z1, z2, combinedId);
-    }
-
-    @Override
-    public void addNotifyTask(Runnable run) {
-        internalGetOrCacheChunk().addNotifyTask(run);
-    }
-
-    @Override
-    public boolean hasNotifyTasks() {
-        return internalGetOrCacheChunk().hasNotifyTasks();
-    }
-
-    @Override
-    public void executeNotifyTasks() {
-        internalGetOrCacheChunk().executeNotifyTasks();
     }
 
     @Override
@@ -171,17 +156,12 @@ public abstract class LazyFaweChunk<T extends FaweChunk> extends FaweChunk {
     }
 
     @Override
-    public void setBiome(int x, int z, BaseBiome biome) {
+    public void setBiome(int x, int z, BiomeType biome) {
         internalGetOrCacheChunk().setBiome(x, z, biome);
     }
 
     @Override
-    public void setBiome(int x, int z, byte biome) {
-        internalGetOrCacheChunk().setBiome(x, z, biome);
-    }
-
-    @Override
-    public void setBiome(byte biome) {
+    public void setBiome(BiomeType biome) {
         internalGetOrCacheChunk().setBiome(biome);
     }
 

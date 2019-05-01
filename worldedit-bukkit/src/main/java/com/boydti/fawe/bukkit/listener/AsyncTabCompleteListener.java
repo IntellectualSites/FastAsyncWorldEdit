@@ -14,14 +14,13 @@ import java.util.List;
 public class AsyncTabCompleteListener extends ATabCompleteListener {
     public AsyncTabCompleteListener(WorldEditPlugin worldEdit) {
         super(worldEdit);
-        Bukkit.getPluginManager().registerEvents(this, worldEdit);
     }
 
     @EventHandler
     public void onTabComplete(AsyncTabCompleteEvent event) {
         if (event.isCommand()) {
             List<String> result = this.onTab(event.getBuffer(), event.getSender());
-            if (result != null) {
+            if (result != null && !result.isEmpty()) {
                 event.setCompletions(result);
                 event.setHandled(true);
             }

@@ -176,7 +176,7 @@ public interface ClipboardFormat {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

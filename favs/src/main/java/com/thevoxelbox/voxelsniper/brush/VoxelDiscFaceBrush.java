@@ -11,22 +11,17 @@ import org.bukkit.block.BlockFace;
  *
  * @author Voxel
  */
-public class VoxelDiscFaceBrush extends PerformBrush
-{
+public class VoxelDiscFaceBrush extends PerformBrush {
     /**
      *
      */
-    public VoxelDiscFaceBrush()
-    {
+    public VoxelDiscFaceBrush() {
         this.setName("Voxel Disc Face");
     }
 
-    private void disc(final SnipeData v, Block targetBlock)
-    {
-        for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--)
-        {
-            for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--)
-            {
+    private void disc(final SnipeData v, Block targetBlock) {
+        for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--) {
+            for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--) {
                 this.current.perform(this.clampY(targetBlock.getX() + x, targetBlock.getY(), targetBlock.getZ() + y));
             }
         }
@@ -34,12 +29,9 @@ public class VoxelDiscFaceBrush extends PerformBrush
         v.owner().storeUndo(this.current.getUndo());
     }
 
-    private void discNS(final SnipeData v, Block targetBlock)
-    {
-        for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--)
-        {
-            for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--)
-            {
+    private void discNS(final SnipeData v, Block targetBlock) {
+        for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--) {
+            for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--) {
                 this.current.perform(this.clampY(targetBlock.getX() + x, targetBlock.getY() + y, targetBlock.getZ()));
             }
         }
@@ -47,12 +39,9 @@ public class VoxelDiscFaceBrush extends PerformBrush
         v.owner().storeUndo(this.current.getUndo());
     }
 
-    private void discEW(final SnipeData v, Block targetBlock)
-    {
-        for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--)
-        {
-            for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--)
-            {
+    private void discEW(final SnipeData v, Block targetBlock) {
+        for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--) {
+            for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--) {
                 this.current.perform(this.clampY(targetBlock.getX(), targetBlock.getY() + x, targetBlock.getZ() + y));
             }
         }
@@ -60,14 +49,11 @@ public class VoxelDiscFaceBrush extends PerformBrush
         v.owner().storeUndo(this.current.getUndo());
     }
 
-    private void pre(final SnipeData v, final BlockFace bf, Block targetBlock)
-    {
-        if (bf == null)
-        {
+    private void pre(final SnipeData v, final BlockFace bf, Block targetBlock) {
+        if (bf == null) {
             return;
         }
-        switch (bf)
-        {
+        switch (bf) {
             case NORTH:
             case SOUTH:
                 this.discNS(v, targetBlock);
@@ -89,27 +75,23 @@ public class VoxelDiscFaceBrush extends PerformBrush
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.pre(v, this.getTargetBlock().getFace(this.getLastBlock()), this.getTargetBlock());
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.pre(v, this.getTargetBlock().getFace(this.getLastBlock()), this.getLastBlock());
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.size();
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.voxeldiscface";
     }
 }

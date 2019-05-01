@@ -21,12 +21,16 @@ package com.sk89q.worldedit.world.block;
 
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
+import com.boydti.fawe.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
@@ -34,45 +38,31 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
-public class BlockState implements BlockStateHolder<BlockState> {
+public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
+    private final int internalId;
+    private final int ordinal;
     private final BlockType blockType;
+    private BlockMaterial material;
     private BaseBlock emptyBaseBlock;
-    
-    BlockState(BlockType blockType) {
+
+    protected BlockState(BlockType blockType, int internalId, int ordinal) {
         this.blockType = blockType;
+        this.internalId = internalId;
+        this.ordinal = ordinal;
         this.emptyBaseBlock = new BaseBlock(this);
     }
-    
-    BlockState(BlockType blockType, BaseBlock baseBlock){
-    	this.blockType = blockType;
-    	this.emptyBaseBlock = baseBlock;
-    }
-    
-    /**
-     * Creates a fuzzy BlockState. This can be used for partial matching.
-     *
-     * @param blockType The block type
-     * @param values The block state values
-     */
-    private BlockState(BlockType blockType, Map<Property<?>, Object> values) {
-        this.blockType = blockType;
-//        this.values = values;
-//        this.fuzzy = true;
-    }
-    
+
     /**
      * Returns a temporary BlockState for a given internal id
      * @param combinedId
@@ -133,8 +123,9 @@ public class BlockState implements BlockStateHolder<BlockState> {
             if (type == null) {
                 String input = key.toString();
                 throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(BlockTypes.values)
-                        .filter(b -> b.getId().contains(input))
+                        .filter(b -> StringMan.blockStateMatches(input, b.getId()))
                         .map(e1 -> e1.getId())
+                        .sorted(StringMan.blockStateComparator(input))
                         .collect(Collectors.toList())
                 );
             }
@@ -154,8 +145,10 @@ public class BlockState implements BlockStateHolder<BlockState> {
             String name = property.getName();
 
             charSequence.setSubstring(propStrStart + name.length() + 2, state.length() - 1);
-
-            return type.withPropertyId(property.getIndexFor(charSequence));
+            int index = charSequence.length() <= 0 ? -1 : property.getIndexFor(charSequence);
+            if (index != -1) {
+                return type.withPropertyId(index);
+            }
         }
         int stateId;
         if (defaultState != null) {
@@ -176,13 +169,7 @@ public class BlockState implements BlockStateHolder<BlockState> {
                     if (property != null) {
                         int index = property.getIndexFor(charSequence);
                         if (index == -1) {
-                            String input = charSequence.toString();
-                            List<Object> values = property.getValues();
-                            throw new SuggestInputParseException("No value: " + input + " for " + type, input, () ->
-                                values.stream()
-                                .map(v -> v.toString())
-                                .filter(v -> v.startsWith(input))
-                                .collect(Collectors.toList()));
+                            throw SuggestInputParseException.of(charSequence.toString(), property.getValues());
                         }
                         stateId = property.modifyIndex(stateId, index);
                     } else {
@@ -192,10 +179,11 @@ public class BlockState implements BlockStateHolder<BlockState> {
                             // Suggest property
                             String input = charSequence.toString();
                             BlockType finalType = type;
-                            throw new SuggestInputParseException("Invalid property " + type + " | " + input, input, () ->
+                            throw new SuggestInputParseException("Invalid property " + charSequence + ":" + input + " for type " + type, input, () ->
                                 finalType.getProperties().stream()
                                 .map(p -> p.getName())
-                                .filter(p -> p.startsWith(input))
+                                .filter(p -> StringMan.blockStateMatches(input, p))
+                                .sorted(StringMan.blockStateComparator(input))
                                 .collect(Collectors.toList()));
                         } else {
                             throw new SuggestInputParseException("No operator for " + state, "", () -> Arrays.asList("="));
@@ -315,42 +303,8 @@ public class BlockState implements BlockStateHolder<BlockState> {
     }
 
     @Override
-    public int hashCode() {
-        return getOrdinal();
-    }
-
-    @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
-        if (this == o) {
-            // Added a reference equality check for
-            return true;
-        }
-        if (!getBlockType().equals(o.getBlockType())) {
-            return false;
-        }
-
-        Set<Property<?>> differingProperties = new HashSet<>();
-        for (Object state : o.getStates().keySet()) {
-            if (getState((Property<?>) state) == null) {
-                differingProperties.add((Property<?>) state);
-            }
-        }
-        for (Property<?> property : getStates().keySet()) {
-            if (o.getState(property) == null) {
-                differingProperties.add(property);
-            }
-        }
-
-        for (Property<?> property : getStates().keySet()) {
-            if (differingProperties.contains(property)) {
-                continue;
-            }
-            if (!Objects.equals(getState(property), o.getState(property))) {
-                return false;
-            }
-        }
-
-        return true;
+        return o.getOrdinal() == this.getOrdinal();
     }
 
     @Override
@@ -358,26 +312,34 @@ public class BlockState implements BlockStateHolder<BlockState> {
         return this;
     }
 
+	@Override
+	public int getInternalId() {
+		return internalId;
+	}
+
+	@Override
+	public BlockMaterial getMaterial() {
+        if (this.material == null) {
+            if (blockType == BlockTypes.__RESERVED__) {
+                return this.material = blockType.getMaterial();
+            }
+            if (this.material == null) {
+                this.material = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
+            }
+        }
+        return material;
+	}
+
+	@Override
+	public int getOrdinal() {
+		return this.ordinal;
+	}
+
     @Override
     public String toString() {
         return getAsString();
     }
 
-	@Override
-	public int getInternalId() {
-		return blockType.getInternalId();
-	}
-
-	@Override
-	public BlockMaterial getMaterial() {
-		return blockType.getMaterial();
-	}
-
-	@Override
-	public int getOrdinal() {
-		//?
-		return 0;
-	}
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof BlockState)) {
@@ -385,5 +347,10 @@ public class BlockState implements BlockStateHolder<BlockState> {
         }
 
         return equalsFuzzy((BlockState) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return getOrdinal();
     }
 }

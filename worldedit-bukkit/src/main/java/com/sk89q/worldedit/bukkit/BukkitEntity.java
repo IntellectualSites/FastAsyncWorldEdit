@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -29,6 +30,8 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NullWorld;
+import com.sk89q.worldedit.world.entity.EntityTypes;
+import org.bukkit.entity.EntityType;
 
 import java.lang.ref.WeakReference;
 
@@ -40,6 +43,7 @@ import javax.annotation.Nullable;
 public class BukkitEntity implements Entity {
 
     private final WeakReference<org.bukkit.entity.Entity> entityRef;
+    private final EntityType type;
 
     /**
      * Create a new instance.
@@ -48,6 +52,7 @@ public class BukkitEntity implements Entity {
      */
     public BukkitEntity(org.bukkit.entity.Entity entity) {
         checkNotNull(entity);
+        this.type = entity.getType();
         this.entityRef = new WeakReference<>(entity);
     }
 
@@ -79,6 +84,11 @@ public class BukkitEntity implements Entity {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public com.sk89q.worldedit.world.entity.EntityType getType() {
+        return EntityTypes.get(type.getName().toUpperCase());
     }
 
     @Override

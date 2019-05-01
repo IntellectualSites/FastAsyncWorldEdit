@@ -174,7 +174,6 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
         BBC.SELECTOR_CENTER.send(player, pos, 0);
-
         session.describeCUI(player);
     }
 
@@ -182,7 +181,7 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
         Vector3 center = region.getCenter();
 
-        if (!center.equals(BlockVector3.ZERO)) {
+        if (!center.equals(Vector3.ZERO)) {
             BBC.SELECTOR_RADIUS.send(player, NUMBER_FORMAT.format(region.getRadius().getX()) + "/" + NUMBER_FORMAT.format(region.getRadius().getZ()), region.getArea());
         } else {
             BBC.SELECTION_WAND.send(player);

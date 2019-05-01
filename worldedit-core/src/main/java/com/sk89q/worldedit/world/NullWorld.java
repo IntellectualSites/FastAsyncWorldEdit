@@ -33,11 +33,14 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
+import com.sk89q.worldedit.world.weather.WeatherTypes;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -80,12 +83,12 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
-        return null;
+    public BiomeType getBiome(BlockVector2 position) {
+        return BiomeTypes.THE_VOID;
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return false;
     }
 
@@ -109,7 +112,7 @@ public class NullWorld extends AbstractWorld {
 
     @Override
     public WeatherType getWeather() {
-        return null;
+        return WeatherTypes.CLEAR;
     }
 
     @Override
@@ -136,7 +139,6 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-//<<<<<<< HEAD
     public BlockState getLazyBlock(BlockVector3 position) {
         return getBlock(position);
     }
@@ -145,10 +147,6 @@ public class NullWorld extends AbstractWorld {
     public BaseBlock getFullBlock(BlockVector3 position) {
         return getBlock(position).toBaseBlock();
     }
-//=======
-//    public BaseBlock getFullBlock(BlockVector3 position) {
-//        return getBlock(position).toBaseBlock();
-//>>>>>>> 399e0ad5... Refactor vector system to be cleaner    }
 
     @Override
     public List<Entity> getEntities(Region region) {

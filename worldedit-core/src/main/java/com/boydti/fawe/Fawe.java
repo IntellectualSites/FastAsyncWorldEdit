@@ -18,10 +18,7 @@ import com.sk89q.worldedit.session.request.Request;
 import javax.annotation.Nullable;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.NotificationEmitter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
@@ -81,7 +78,6 @@ public class Fawe {
     private final FaweTimer timer;
     private FaweVersion version;
     private VisualQueue visualQueue;
-    private Updater updater;
     private TextureUtil textures;
     private DefaultTransformParser transformParser;
     private ChatManager chatManager = new PlainChatManager();
@@ -198,24 +194,9 @@ public class Fawe {
         }, 0);
 
         TaskManager.IMP.repeat(timer, 1);
-
-        if (!Settings.IMP.UPDATE.equalsIgnoreCase("false")) {
-            // Delayed updating
-            updater = new Updater();
-            TaskManager.IMP.async(this::update);
-            TaskManager.IMP.repeatAsync(this::update, 36000);
-        }
     }
 
     public void onDisable() {
-    }
-
-    private boolean update() {
-        if (updater != null) {
-            updater.getUpdate(IMP.getPlatform(), getVersion());
-            return true;
-        }
-        return false;
     }
 
     public CUI getCUI(Actor actor) {
@@ -253,16 +234,6 @@ public class Fawe {
 
     public DefaultTransformParser getTransformParser() {
         return transformParser;
-    }
-
-    /**
-     * The FAWE updater class
-     * - Use to get basic update information (changelog/version etc)
-     *
-     * @return
-     */
-    public Updater getUpdater() {
-        return updater;
     }
 
     public TextureUtil getCachedTextureUtil(boolean randomize, int min, int max) {
@@ -342,15 +313,17 @@ public class Fawe {
         // Setting up config.yml
         File file = new File(this.IMP.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
-        try {
-            InputStream stream = getClass().getResourceAsStream("/fawe.properties");
-            java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
-            String versionString = scanner.next().trim();
-            scanner.close();
-            this.version = new FaweVersion(versionString);
+        try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
+             BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
+          //  java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
+            String versionString = br.readLine();
+            String commitString = br.readLine();
+            String dateString = br.readLine();
+           // scanner.close();
+            this.version = FaweVersion.tryParse(versionString, commitString, dateString);
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
-            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit/" + version.build;
-            Settings.IMP.COMMIT = "https://github.com/boy0001/FastAsyncWorldedit/commit/" + Integer.toHexString(version.hash);
+            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-Breaking/" + version.build;
+            Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignore) {}
         try {
             Settings.IMP.reload(file);

@@ -5,7 +5,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.ArrayDeque;
@@ -16,12 +16,10 @@ import java.util.concurrent.Callable;
 import javax.annotation.Nullable;
 
 public abstract class FaweChunk<T> implements Callable<FaweChunk> {
+    public static int HEIGHT = 256;
 
     private FaweQueue parent;
     private int x, z;
-    public static int HEIGHT = 256;
-
-    private final ArrayDeque<Runnable> tasks = new ArrayDeque<>(0);
 
     /**
      * A FaweSections object represents a chunk and the blocks that you wish to change in it.
@@ -167,7 +165,11 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
         return null;
     }
 
-    public abstract byte[] getBiomeArray();
+    public abstract BiomeType[] getBiomeArray();
+
+    public BiomeType getBiomeType(int x, int z) {
+        return getBiomeArray()[(x & 15) + ((z & 15) << 4)];
+    }
 
     public void forEachQueuedBlock(FaweChunkVisitor onEach) {
         for (int y = 0; y < HEIGHT; y++) {
@@ -211,28 +213,6 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
                 }
             }
         }
-    }
-
-    /**
-     * Add a task to run when this chunk is dispatched
-     *
-     * @param run
-     */
-    public void addNotifyTask(Runnable run) {
-        if (run != null) {
-            tasks.add(run);
-        }
-    }
-
-    public boolean hasNotifyTasks() {
-        return tasks.size() > 0;
-    }
-
-    public void executeNotifyTasks() {
-        for (Runnable task : tasks) {
-            task.run();
-        }
-        tasks.clear();
     }
 
     /**
@@ -289,13 +269,9 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
      */
     public abstract CompoundTag getTile(int x, int y, int z);
 
-    public void setBiome(final int x, final int z, final BaseBiome biome) {
-        setBiome(x, z, (byte) biome.getId());
-    }
+    public abstract void setBiome(final int x, final int z, final BiomeType biome);
 
-    public abstract void setBiome(final int x, final int z, final byte biome);
-
-    public void setBiome(final byte biome) {
+    public void setBiome(final BiomeType biome) {
         for (int z = 0; z < 16; z++) {
             for (int x = 0; x < 16; x++) {
                 setBiome(x, z, biome);

@@ -10,8 +10,8 @@ public class SimpleIntFaweChunk extends IntFaweChunk {
         super(parent, x, z);
     }
 
-    public SimpleIntFaweChunk(FaweQueue parent, int x, int z, int[][] ids, short[] count, short[] air, byte[] heightMap) {
-        super(parent, x, z, ids, count, air, heightMap);
+    public SimpleIntFaweChunk(FaweQueue parent, int x, int z, int[][] ids, short[] count, short[] air) {
+        super(parent, x, z, ids, count, air);
     }
 
     @Override
@@ -23,10 +23,10 @@ public class SimpleIntFaweChunk extends IntFaweChunk {
     public IntFaweChunk copy(boolean shallow) {
         SimpleIntFaweChunk copy;
         if (shallow) {
-            copy = new SimpleIntFaweChunk(getParent(), getX(), getZ(), ids, count, air, heightMap);
+            copy = new SimpleIntFaweChunk(getParent(), getX(), getZ(), setBlocks, count, air);
             copy.biomes = biomes;
         } else {
-            copy = new SimpleIntFaweChunk(getParent(), getX(), getZ(), (int[][]) MainUtil.copyNd(ids), count.clone(), air.clone(), heightMap.clone());
+            copy = new SimpleIntFaweChunk(getParent(), getX(), getZ(), (int[][]) MainUtil.copyNd(setBlocks), count.clone(), air.clone());
             copy.biomes = biomes != null ? biomes.clone() : null;
         }
         return copy;

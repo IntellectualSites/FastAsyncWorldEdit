@@ -9,7 +9,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class TransformExtent extends BlockTransformExtent {
@@ -79,26 +79,26 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        return transformBlock(super.getLazyBlock(getPos(x, y, z)), false).toImmutableState();
+        return transform(super.getLazyBlock(getPos(x, y, z)));
     }
 
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
-        return transformBlock(super.getLazyBlock(getPos(position)), false).toImmutableState();
+        return transform(super.getLazyBlock(getPos(position)));
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transformBlock(super.getBlock(getPos(position)), false).toImmutableState();
+        return transform(super.getBlock(getPos(position)));
     }
     
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-    	return transformBlock(super.getFullBlock(getPos(position)), false);
+    	return transform(super.getFullBlock(getPos(position)));
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);
@@ -106,18 +106,18 @@ public class TransformExtent extends BlockTransformExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return super.setBlock(getPos(x, y, z), transformBlock((BlockState)block, false));
+    public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
+        return super.setBlock(getPos(x, y, z), transformInverse(block));
     }
 
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return super.setBlock(getPos(location), transformBlock((BlockState)block, false));
+    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
+        return super.setBlock(getPos(location), transformInverse(block));
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(0);

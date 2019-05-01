@@ -16,7 +16,7 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
     }
 
     @Override
-    public BaseBiome getBiome(int x, int z) {
+    public BiomeType getBiome(int x, int z) {
         return extent.getBiome(MutableBlockVector2.setComponents(mx + x, mz + z));
     }
 

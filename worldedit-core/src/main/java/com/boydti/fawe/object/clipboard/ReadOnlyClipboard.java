@@ -10,7 +10,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -51,17 +51,17 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
     }
 
     @Override
-    public BaseBiome getBiome(int index) {
+    public BiomeType getBiome(int index) {
         throw new UnsupportedOperationException("World based clipboards do not provide index access");
     }
 
     @Override
-    public boolean setBiome(int x, int z, int biome) {
+    public boolean setBiome(int x, int z, BiomeType biome) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 
     @Override
-    public void setBiome(int index, int biome) {
+    public void setBiome(int index, BiomeType biome) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
 
@@ -71,7 +71,7 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
         int index = 0;
         for (int z = 0; z <= dim.getBlockZ(); z++) {
             for (int x = 0; x <= dim.getBlockX(); x++, index++) {
-                task.run(index, getBiome(x, z).getId());
+                task.run(index, getBiome(x, z).getInternalId());
             }
         }
     }
@@ -80,7 +80,7 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
     public abstract BaseBlock getBlock(int x, int y, int z);
 
     @Override
-    public abstract BaseBiome getBiome(int x, int z);
+    public abstract BiomeType getBiome(int x, int z);
 
     @Override
     public abstract List<? extends Entity> getEntities();

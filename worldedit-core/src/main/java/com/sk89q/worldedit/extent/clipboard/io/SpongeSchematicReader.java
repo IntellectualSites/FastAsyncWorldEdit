@@ -45,6 +45,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -109,12 +110,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     public Clipboard read(UUID uuid) throws IOException {
         return readVersion1(uuid);
     }
-//    private Clipboard readVersion1(Map<String, Tag> schematic) throws IOException {
-//        BlockVector3 origin;
-//        Region region;
-//
-//        Map<String, Tag> metadata = requireTag(schematic, "Metadata", CompoundTag.class).getValue();
-//    }
+    
     private int width, height, length;
     private int offsetX, offsetY, offsetZ;
     private char[] palette;
@@ -244,7 +240,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
                 int volume = width * length;
                 for (int index = 0; index < volume; index++) {
-                    fc.setBiome(index, fis.read());
+                    fc.setBiome(index, BiomeTypes.get(fis.read()));
                 }
             }
         }

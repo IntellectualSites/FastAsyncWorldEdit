@@ -72,7 +72,6 @@ public enum BBC {
 
     COMMAND_COPY("%s0 blocks were copied.", "WorldEdit.Copy"),
 
-
     COMMAND_CUT_SLOW("%s0 blocks were cut.", "WorldEdit.Cut"),
     COMMAND_CUT_LAZY("%s0 blocks will be removed on paste", "WorldEdit.Cut"),
 
@@ -93,6 +92,7 @@ public enum BBC {
     COMMAND_HISTORY_OTHER_ERROR("Unable to find session for %s0.", "WorldEdit.History"),
     COMMAND_REDO_SUCCESS("Redo successful%s0.", "WorldEdit.History"),
     COMMAND_UNDO_ERROR("Nothing left to undo. (See also `/inspect` and `/frb`)", "WorldEdit.History"),
+    COMMAND_UNDO_DISABLED("Undo disabled, use: //fast", "WorldEdit.History"),
     COMMAND_UNDO_SUCCESS("Undo successful%s0.", "WorldEdit.History"),
 
     OPERATION("Operation queued (%s0)", "WorldEdit.Operation"),
@@ -155,6 +155,7 @@ public enum BBC {
     TOOL_NONE("Tool unbound from your current item.", "WorldEdit.Tool"),
     TOOL_INFO("Info tool bound to %s0.", "WorldEdit.Tool"),
     TOOL_TREE("Tree tool bound to %s0.", "WorldEdit.Tool"),
+    TOOL_TREE_ERROR_BLOCK("A tree can't go here", "WorldEdit.Tool"),
     TOOL_TREE_ERROR("Tree type %s0 is unknown.", "WorldEdit.Tool"),
     TOOL_REPL("Block replacer tool bound to %s0.", "WorldEdit.Tool"),
     TOOL_CYCLER("Block data cycler tool bound to %s0.", "WorldEdit.Tool"),
@@ -162,6 +163,8 @@ public enum BBC {
     TOOL_RANGE_ERROR("Maximum range: %s0.", "WorldEdit.Tool"),
     TOOL_RADIUS_ERROR("Maximum allowed brush radius: %s0.", "WorldEdit.Tool"),
     TOOL_DELTREE("Floating tree remover tool bound to %s0.", "WorldEdit.Tool"),
+    TOOL_DELTREE_ERROR("That's not a tree", "WorldEdit.Tool"),
+    TOOL_DELTREE_FLOATING_ERROR("That's not a floating tree", "WorldEdit.Tool"),
     TOOL_FARWAND("Far wand tool bound to %s0.", "WorldEdit.Tool"),
     TOOL_LRBUILD_BOUND("Long-range building tool bound to %s0.", "WorldEdit.Tool"),
     TOOL_LRBUILD_INFO("Left-click set to %s0; right-click set to %s1.", "WorldEdit.Tool"),
@@ -174,6 +177,14 @@ public enum BBC {
     SNAPSHOT_NEWEST("Now using newest snapshot.", "WorldEdit.Snapshot"),
     SNAPSHOT_LIST_HEADER("Snapshots for world (%s0):", "WorldEdit.Snapshot"),
     SNAPSHOT_LIST_FOOTER("Use /snap use [snapshot] or /snap use latest.", "WorldEdit.Snapshot"),
+    SNAPSHOT_NOT_CONFIGURED("Snapshot/backup restore is not configured.", "WorldEdit.Snapshot"),
+    SNAPSHOT_NOT_AVAILABLE("No snapshots are available. See console for details.", "WorldEdit.Snapshot"),
+    SNAPSHOT_NOT_FOUND_WORLD("No snapshots were found for this world.", "WorldEdit.Snapshot"),
+    SNAPSHOT_NOT_FOUND("No snapshots were found.", "WorldEdit.Snapshot"),
+    SNAPSHOT_INVALID_INDEX("Invalid index, must be equal or higher then 1.", "WorldEdit.Snapshot"),
+    SNAPSHOT_ERROR_DATE("Could not detect the date inputted.", "WorldEdit.Snapshot"),
+    SNAPSHOT_ERROR_RESTORE("Errors prevented any blocks from being restored.", "WorldEdit.Snapshot"),
+    SNAPSHOT_ERROR_RESTORE_CHUNKS("No chunks could be loaded. (Bad archive?)", "WorldEdit.Snapshot"),
 
     BIOME_LIST_HEADER("Biomes (page %s0/%s1):", "WorldEdit.Biome"),
     BIOME_CHANGED("Biomes were changed in %s0 columns.", "WorldEdit.Biome"),
@@ -225,6 +236,10 @@ public enum BBC {
     TIMEZONE_SET("Timezone set for this session to: %s0", "WorldEdit.Timezone"),
     TIMEZONE_DISPLAY("The current time in that timezone is:  %s0", "WorldEdit.Timezone"),
 
+    BLOCK_CYCLER_CANNOT_CYCLE("That block's data cannot be cycled!", "WorldEdit.Cycler"),
+    BLOCK_CYCLER_LIMIT("Max blocks change limit reached.", "WorldEdit.Cycler"),
+    BLOCK_CYCLER_NO_PERM("&cYou are not permitted to cycle the data value of that block.", "WorldEdit.Cycler"),
+
     COMMAND_INVALID_SYNTAX("The command was not used properly (no more help available).", "WorldEdit.Command"),
 
     COMMAND_CLARIFYING_BRACKET("&7Added clarifying bracket for &c%s0", "WorldEdit.Help"),
@@ -243,6 +258,7 @@ public enum BBC {
 
     COMMAND_SYNTAX("&cUsage: &7%s0", "Error"),
     NO_PERM("&cYou are lacking the permission node: %s0", "Error"),
+    BLOCK_NOT_ALLOWED("You are not allowed to use", "Error"),
     SETTING_DISABLE("&cLacking setting: %s0", "Error"),
     BRUSH_NOT_FOUND("&cAvailable brushes: %s0", "Error"),
     BRUSH_INCOMPATIBLE("&cBrush not compatible with this version", "Error"),
@@ -297,6 +313,10 @@ public enum BBC {
     SEL_CONVEX_POLYHEDRAL("Convex polyhedral selector: Left click=First vertex, right click to add more.", "Selection"),
     SEL_LIST("For a list of selection types use:&c //sel list", "Selection"),
     SEL_MODES("Select one of the modes below:", "Selection"),
+
+    SCRIPTING_NO_PERM("&cYou do not have permission to execute this craft script", "WorldEdit.Scripting"),
+    SCRIPTING_CS("Use /cs with a script name first.", "WorldEdit.Scripting"),
+    SCRIPTING_ERROR("An error occured while executing a craft script", "WorldEdit.Scripting"),
 
     TIP_SEL_LIST("Tip: See the different selection modes with &c//sel list", "Tips"),
     TIP_SELECT_CONNECTED("Tip: Select all connected blocks with //sel fuzzy", "Tips"),

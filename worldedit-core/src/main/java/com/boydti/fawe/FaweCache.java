@@ -1,79 +1,43 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.sk89q.jnbt.*;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
 public class FaweCache {
-    /**
-     * [ y | z | x ] => index
-     */
-    public final static short[][][] CACHE_I = new short[256][16][16];
-    /**
-     * [ y | z | x ] => index
-     */
-    public final static short[][][] CACHE_J = new short[256][16][16];
-
-    /**
-     * [ i | j ] => x
-     */
-    public final static byte[][] CACHE_X = new byte[16][];
-    /**
-     * [ i | j ] => y
-     */
-    public final static short[][] CACHE_Y = new short[16][4096];
-    /**
-     * [ i | j ] => z
-     */
-    public final static byte[][] CACHE_Z = new byte[16][];
-
-    /**
-     * Immutable biome cache
-     */
-    public final static BaseBiome[] CACHE_BIOME = new BaseBiome[256];
-
-    public static final BaseBiome getBiome(int id) {
-        return CACHE_BIOME[id];
-    }
-
-    static {
-        for (int i = 0; i < 256; i++) {
-            CACHE_BIOME[i] = new BaseBiome(i) {
-                @Override
-                public void setId(int id) {
-                    throw new IllegalStateException("Cannot set id");
-                }
-            };
+    public static final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<int[]>() {
+        @Override
+        public int[] init() {
+            int[] result = new int[BlockTypes.states.length];
+            Arrays.fill(result, Integer.MAX_VALUE);
+            return result;
         }
-        CACHE_X[0] = new byte[4096];
-        CACHE_Z[0] = new byte[4096];
-        for (int y = 0; y < 16; y++) {
-            CACHE_X[y] = CACHE_X[0];
-            CACHE_Z[y] = CACHE_Z[0];
+    };
+
+    public static final IterableThreadLocal<int[]> PALETTE_TO_BLOCK = new IterableThreadLocal<int[]>() {
+        @Override
+        public int[] init() {
+            return new int[Character.MAX_VALUE];
         }
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                for (int y = 0; y < 16; y++) {
-                    final short j = (short) (((y & 0xF) << 8) | (z << 4) | x);
-                    CACHE_X[0][j] = (byte) x;
-                    CACHE_Z[0][j] = (byte) z;
-                }
-            }
+    };
+
+    public static final IterableThreadLocal<long[]> BLOCK_STATES = new IterableThreadLocal<long[]>() {
+        @Override
+        public long[] init() {
+            return new long[2048];
         }
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                for (int y = 0; y < 256; y++) {
-                    final short i = (short) (y >> 4);
-                    final short j = (short) (((y & 0xF) << 8) | (z << 4) | x);
-                    CACHE_I[y][z][x] = i;
-                    CACHE_J[y][z][x] = j;
-                    CACHE_Y[i][j] = (short) y;
-                }
-            }
+    };
+
+    public static final IterableThreadLocal<int[]> SECTION_BLOCKS = new IterableThreadLocal<int[]>() {
+        @Override
+        public int[] init() {
+            return new int[4096];
         }
-    }
+    };
 
     public static Map<String, Object> asMap(Object... pairs) {
         HashMap<String, Object> map = new HashMap<>(pairs.length >> 1);

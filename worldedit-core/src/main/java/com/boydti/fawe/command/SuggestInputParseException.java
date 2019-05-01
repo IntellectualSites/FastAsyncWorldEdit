@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -50,6 +51,14 @@ public class SuggestInputParseException extends InputParseException {
             if (t instanceof SuggestInputParseException) return (SuggestInputParseException) t;
         }
         return null;
+    }
+
+    public static SuggestInputParseException of(String input, List<Object> values) {
+        throw new SuggestInputParseException("No value: " + input, input, () ->
+                values.stream()
+                        .map(v -> v.toString())
+                        .filter(v -> v.startsWith(input))
+                        .collect(Collectors.toList()));
     }
 
     @Override

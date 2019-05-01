@@ -83,7 +83,7 @@ public class ProgressIterator<V> implements Iterator<V>, ProgressObservable {
      * @return an instance
      */
     public static <V> ProgressIterator<V> create(Iterator<V> iterator, int count) {
-        return new ProgressIterator<>(iterator, count);
+        return new ProgressIterator<V>(iterator, count);
     }
 
     /**

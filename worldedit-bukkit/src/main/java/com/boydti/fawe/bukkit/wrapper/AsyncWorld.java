@@ -1,5 +1,6 @@
 package com.boydti.fawe.bukkit.wrapper;
 
+import com.avaje.ebean.validation.NotNull;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.object.FaweQueue;
@@ -12,7 +13,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -182,6 +183,15 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         if (queue != null) {
             queue.flush();
         }
+    }
+
+    public int getHighestBlockYAt(int x, int z, com.destroystokyo.paper.HeightmapType heightmap) throws UnsupportedOperationException {
+        return TaskManager.IMP.sync(new Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                return parent.getHighestBlockYAt(x, z, heightmap);
+            }
+        });
     }
 
     @Override
@@ -859,13 +869,13 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public Biome getBiome(int x, int z) {
-        return adapter.getBiome(queue.getBiomeId(x, z));
+        return adapter.adapt(queue.getBiomeType(x, z));
     }
 
     @Override
     public void setBiome(int x, int z, Biome bio) {
-        int id = adapter.getBiomeId(bio);
-        queue.setBiome(x, z, new BaseBiome(id));
+        BiomeType biome = adapter.adapt(bio);
+        queue.setBiome(x, z, biome);
     }
 
     @Override

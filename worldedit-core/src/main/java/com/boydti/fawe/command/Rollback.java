@@ -79,16 +79,12 @@ public class Rollback extends FaweCommand {
                             long seconds = (System.currentTimeMillis() - edit.getBDFile().lastModified()) / 1000;
                             total += edit.getBDFile().length();
                             int size = summary.getSize();
-                            Map<Integer, Double> percents = summary.getPercents();
+                            Map<BlockState, Double> percents = summary.getPercents();
                             StringBuilder percentString = new StringBuilder();
                             String prefix = "";
-                            for (Map.Entry<Integer, Double> entry : percents.entrySet()) {
-                                int id = entry.getKey();
-                                BlockStateHolder state = null;
-                                try {
-                                    state = BlockState.getFromInternalId(id);
-                                } catch (Throwable ignore) {};
-                                String itemName = state == null ? "#" + id : state.getAsString();
+                            for (Map.Entry<BlockState, Double> entry : percents.entrySet()) {
+                                BlockState state = entry.getKey();
+                                String itemName = "#" + state;
                                 percentString.append(prefix).append(entry.getValue()).append("% ").append(itemName);
                                 prefix = ", ";
                             }

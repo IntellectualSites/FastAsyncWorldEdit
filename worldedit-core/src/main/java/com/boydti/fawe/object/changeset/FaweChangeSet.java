@@ -15,6 +15,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
@@ -25,7 +26,7 @@ import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Iterator;
@@ -141,7 +142,7 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public abstract void addEntityCreate(CompoundTag tag);
 
-    public abstract void addBiomeChange(int x, int z, BaseBiome from, BaseBiome to);
+    public abstract void addBiomeChange(int x, int z, BiomeType from, BiomeType to);
 
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return getIterator(redo);
@@ -266,23 +267,21 @@ public abstract class FaweChangeSet implements ChangeSet {
                             int bx = cx << 4;
                             int bz = cz << 4;
                             synchronized (FaweChangeSet.this) {
-                                // Biome changes
-                                if (previous.getBiomeArray() != null) {
-                                    byte[] previousBiomes = previous.getBiomeArray();
-                                    byte[] nextBiomes = next.getBiomeArray();
+                                BiomeType[] previousBiomes = previous.getBiomeArray();
+                                if (previousBiomes != null) {
+                                    BiomeType[] nextBiomes = next.getBiomeArray();
                                     int index = 0;
                                     for (int z = 0; z < 16; z++) {
                                         int zz = bz + z;
                                         for (int x = 0; x < 16; x++) {
-                                            byte idFrom = previousBiomes[index];
-                                            byte idTo = nextBiomes[index];
-                                            if (idFrom != idTo && idTo != 0) {
-                                                addBiomeChange(bx + x, zz, FaweCache.getBiome(idFrom & 0xFF), FaweCache.getBiome(idTo & 0xFF));
+                                            BiomeType idFrom = previousBiomes[index];
+                                            BiomeType idTo = nextBiomes[index];
+                                            if (idFrom != idTo && idTo != null) {
+                                                addBiomeChange(bx + x, zz, idFrom, idTo);
                                             }
                                             index++;
                                         }
                                     }
-                                    // TODO
                                 }
                                 // Block changes
                                 for (int layer = 0; layer < layers; layer++) {
@@ -303,10 +302,16 @@ public abstract class FaweChangeSet implements ChangeSet {
                                                 switch (combinedIdCurrent) {
                                                     case 0:
                                                         continue;
-                                                    case 1:
-                                                        combinedIdCurrent = 0;
                                                     default:
-                                                        int combinedIdPrevious = previousLayer != null ? previousLayer[index] : 0;
+                                                        int combinedIdPrevious;
+                                                        if (previousLayer != null) {
+                                                            combinedIdPrevious = previousLayer[index];
+                                                            if (combinedIdPrevious == 0) {
+                                                                combinedIdPrevious = BlockID.AIR;
+                                                            }
+                                                        }  else {
+                                                            combinedIdPrevious = BlockID.AIR;
+                                                        }
                                                         if (combinedIdCurrent != combinedIdPrevious) {
                                                             add(xx, yy, zz, combinedIdPrevious, combinedIdCurrent);
                                                         }

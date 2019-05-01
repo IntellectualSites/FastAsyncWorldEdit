@@ -24,6 +24,8 @@ import com.boydti.fawe.config.Settings;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.object.collection.BlockVectorSet;
+import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
@@ -36,9 +38,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An axis-aligned cuboid. It can be defined using two corners of the cuboid.
@@ -346,16 +345,10 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 };
             }
 
-//<<<<<<< HEAD
             @Override
             public int size() {
                 return size;
             }
-//=======
-//        for (int x = min.getBlockX() >> ChunkStore.CHUNK_SHIFTS; x <= max.getBlockX() >> ChunkStore.CHUNK_SHIFTS; ++x) {
-//            for (int z = min.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; z <= max.getBlockZ() >> ChunkStore.CHUNK_SHIFTS; ++z) {
-//                chunks.add(BlockVector2.at(x, z));
-//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
 
 
             @Override
@@ -377,7 +370,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
     @Override
     public Set<BlockVector3> getChunkCubes() {
-        Set<BlockVector3> chunks = new HashSet<>();
+        Set<BlockVector3> chunks = new BlockVectorSet();
 
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
@@ -394,27 +387,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
 
-//    private int ly = Integer.MIN_VALUE;
-//    private int lz = Integer.MIN_VALUE;
-//    private boolean lr, lry, lrz;
-
     @Override
     public boolean contains(int x, int y, int z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ && y >= this.minY && y <= this.maxY;
-//        if (z != lz) {
-//            lz = z;
-//            lrz = z >= this.minZ && z <= this.maxZ;
-//            if (y != ly) {
-//                ly = y;
-//                lry = y >= this.minY && y <= this.maxY;
-//            }
-//            lr = lrz && lry;
-//        } else if (y != ly) {
-//            ly = y;
-//            lry = y >= this.minY && y <= this.maxY;
-//            lr = lrz && lry;
-//        }
-//        return lr && (x >= this.minX && x <= this.maxX);
     }
 
     @Override
@@ -467,7 +442,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public BlockVector3 next() {
-//<<<<<<< HEAD
                 mutable.mutX(x);
                 mutable.mutY(y);
                 mutable.mutZ(z);
@@ -503,16 +477,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         } else {
                             x = cbx;
                             z = cbz;
-//=======
-//                if (!hasNext()) throw new NoSuchElementException();
-//                BlockVector3 answer = BlockVector3.at(nextX, nextY, nextZ);
-//                if (++nextX > max.getBlockX()) {
-//                    nextX = min.getBlockX();
-//                    if (++nextY > max.getBlockY()) {
-//                        nextY = min.getBlockY();
-//                        if (++nextZ > max.getBlockZ()) {
-//                            nextX = Integer.MIN_VALUE;
-//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                         }
                     } else {
                         x = cbx;
@@ -540,16 +504,10 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             }
 
             @Override
-//<<<<<<< HEAD
             public BlockVector3 next() {
                 mutable.mutX(nextX);
                 mutable.mutY(nextY);
                 mutable.mutZ(nextZ);
-//=======
-//            public BlockVector2 next() {
-//                if (!hasNext()) throw new NoSuchElementException();
-//                BlockVector2 answer = BlockVector2.at(nextX, nextZ);
-//>>>>>>> 2c8b2fe0... Move vectors to static creators, for caching
                 if (++nextX > max.getBlockX()) {
                     nextX = min.getBlockX();
                     if (++nextZ > max.getBlockZ()) {

@@ -6,14 +6,12 @@ import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import com.thevoxelbox.voxelsniper.util.BlockWrapper;
-
 import org.bukkit.ChatColor;
 
 /**
  *
  */
-public class Rot3DBrush extends Brush
-{
+public class Rot3DBrush extends Brush {
     private final int mode = 0;
     private int bSize;
     private int brushSize;
@@ -25,14 +23,12 @@ public class Rot3DBrush extends Brush
     /**
      *
      */
-    public Rot3DBrush()
-    {
+    public Rot3DBrush() {
         this.setName("3D Rotation");
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.brushMessage("Rotates Yaw (XZ), then Pitch(XY), then Roll(ZY), in order.");
     }
@@ -42,45 +38,33 @@ public class Rot3DBrush extends Brush
     // matrix and compare Block.getId with 'id' if different undo.add( new BlockWrapper ( Block, oldId ) )
 
     @Override
-    public final void parameters(final String[] par, final SnipeData v)
-    {
-        for (int i = 1; i < par.length; i++)
-        {
+    public final void parameters(final String[] par, final SnipeData v) {
+        for (int i = 1; i < par.length; i++) {
             final String parameter = par[i];
             // which way is clockwise is less obvious for roll and pitch... should probably fix that / make it clear
-            if (parameter.equalsIgnoreCase("info"))
-            {
+            if (parameter.equalsIgnoreCase("info")) {
                 v.sendMessage(ChatColor.GOLD + "Rotate brush Parameters:");
                 v.sendMessage(ChatColor.AQUA + "p[0-359] -- set degrees of pitch rotation (rotation about the Z axis).");
                 v.sendMessage(ChatColor.BLUE + "r[0-359] -- set degrees of roll rotation (rotation about the X axis).");
                 v.sendMessage(ChatColor.LIGHT_PURPLE + "y[0-359] -- set degrees of yaw rotation (Rotation about the Y axis).");
 
                 return;
-            }
-            else if (parameter.startsWith("p"))
-            {
+            } else if (parameter.startsWith("p")) {
                 this.sePitch = Math.toRadians(Double.parseDouble(parameter.replace("p", "")));
                 v.sendMessage(ChatColor.AQUA + "Around Z-axis degrees set to " + this.sePitch);
-                if (this.sePitch < 0 || this.sePitch > 359)
-                {
+                if (this.sePitch < 0 || this.sePitch > 359) {
                     v.sendMessage(ChatColor.RED + "Invalid brush parameters! Angles must be from 1-359");
                 }
-            }
-            else if (parameter.startsWith("r"))
-            {
+            } else if (parameter.startsWith("r")) {
                 this.seRoll = Math.toRadians(Double.parseDouble(parameter.replace("r", "")));
                 v.sendMessage(ChatColor.AQUA + "Around X-axis degrees set to " + this.seRoll);
-                if (this.seRoll < 0 || this.seRoll > 359)
-                {
+                if (this.seRoll < 0 || this.seRoll > 359) {
                     v.sendMessage(ChatColor.RED + "Invalid brush parameters! Angles must be from 1-359");
                 }
-            }
-            else if (parameter.startsWith("y"))
-            {
+            } else if (parameter.startsWith("y")) {
                 this.seYaw = Math.toRadians(Double.parseDouble(parameter.replace("y", "")));
                 v.sendMessage(ChatColor.AQUA + "Around Y-axis degrees set to " + this.seYaw);
-                if (this.seYaw < 0 || this.seYaw > 359)
-                {
+                if (this.seYaw < 0 || this.seYaw > 359) {
                     v.sendMessage(ChatColor.RED + "Invalid brush parameters! Angles must be from 1-359");
                 }
             }
@@ -88,8 +72,7 @@ public class Rot3DBrush extends Brush
     }
 
     @SuppressWarnings("deprecation")
-	private void getMatrix()
-    { // only need to do once. But y needs to change + sphere
+    private void getMatrix() { // only need to do once. But y needs to change + sphere
         final double brushSizeSquared = Math.pow(this.bSize + 0.5, 2);
         this.brushSize = (this.bSize * 2) + 1;
 
@@ -99,20 +82,16 @@ public class Rot3DBrush extends Brush
         //int sy = this.getTargetBlock().getY() - this.bSize; Not used
         int sz = this.getTargetBlock().getZ() - this.bSize;
 
-        for (int x = 0; x < this.snap.length; x++)
-        {
+        for (int x = 0; x < this.snap.length; x++) {
             final double xSquared = Math.pow(x - this.bSize, 2);
             sz = this.getTargetBlock().getZ() - this.bSize;
 
-            for (int z = 0; z < this.snap.length; z++)
-            {
+            for (int z = 0; z < this.snap.length; z++) {
                 final double zSquared = Math.pow(z - this.bSize, 2);
                 sz = this.getTargetBlock().getY() - this.bSize;
 
-                for (int y = 0; y < this.snap.length; y++)
-                {
-                    if (xSquared + zSquared + Math.pow(y - this.bSize, 2) <= brushSizeSquared)
-                    {
+                for (int y = 0; y < this.snap.length; y++) {
+                    if (xSquared + zSquared + Math.pow(y - this.bSize, 2) <= brushSizeSquared) {
                         final AsyncBlock block = this.clampY(sx, sz, sz);
                         this.snap[x][y][z] = new BlockWrapper(block);
                         block.setTypeId(BlockTypes.AIR.getInternalId());
@@ -127,8 +106,7 @@ public class Rot3DBrush extends Brush
 
     }
 
-    private void rotate(final SnipeData v)
-    {
+    private void rotate(final SnipeData v) {
         // basically 1) make it a sphere we are rotating in, not a cylinder
         // 2) do three rotations in a row, one in each dimension, unless some dimensions are set to zero or udnefined or whatever, then skip those.
         // --> Why not utilize Sniper'world new oportunities and have arrow rotate all 3, powder rotate x, goldsisc y, otherdisc z. Or something like that. Or
@@ -147,23 +125,19 @@ public class Rot3DBrush extends Brush
         final boolean[][][] doNotFill = new boolean[this.snap.length][this.snap.length][this.snap.length];
         final Undo undo = new Undo();
 
-        for (int x = 0; x < this.snap.length; x++)
-        {
+        for (int x = 0; x < this.snap.length; x++) {
             final int xx = x - this.bSize;
             final double xSquared = Math.pow(xx, 2);
 
-            for (int z = 0; z < this.snap.length; z++)
-            {
+            for (int z = 0; z < this.snap.length; z++) {
                 final int zz = z - this.bSize;
                 final double zSquared = Math.pow(zz, 2);
                 final double newxzX = (xx * cosYaw) - (zz * sinYaw);
                 final double newxzZ = (xx * sinYaw) + (zz * cosYaw);
 
-                for (int y = 0; y < this.snap.length; y++)
-                {
+                for (int y = 0; y < this.snap.length; y++) {
                     final int yy = y - this.bSize;
-                    if (xSquared + zSquared + Math.pow(yy, 2) <= brushSizeSquared)
-                    {
+                    if (xSquared + zSquared + Math.pow(yy, 2) <= brushSizeSquared) {
                         undo.put(this.clampY(this.getTargetBlock().getX() + xx, this.getTargetBlock().getY() + yy, this.getTargetBlock().getZ() + zz)); // just store
                         // whole sphere in undo, too complicated otherwise, since this brush both adds and remos things unpredictably.
 
@@ -177,8 +151,7 @@ public class Rot3DBrush extends Brush
                         // after all three, though.
 
                         final BlockWrapper block = this.snap[x][y][z];
-                        if (BlockTypes.get(block.getId()).getMaterial().isAir())
-                        {
+                        if (BlockTypes.get(block.getId()).getMaterial().isAir()) {
                             continue;
                         }
                         this.setBlockIdAndDataAt(this.getTargetBlock().getX() + (int) newxyX, this.getTargetBlock().getY() + (int) newyzY, this.getTargetBlock().getZ() + (int) newyzZ, block.getId(), block.getPropertyId());
@@ -187,22 +160,17 @@ public class Rot3DBrush extends Brush
             }
         }
 
-        for (int x = 0; x < this.snap.length; x++)
-        {
+        for (int x = 0; x < this.snap.length; x++) {
             final double xSquared = Math.pow(x - this.bSize, 2);
             final int fx = x + this.getTargetBlock().getX() - this.bSize;
 
-            for (int z = 0; z < this.snap.length; z++)
-            {
+            for (int z = 0; z < this.snap.length; z++) {
                 final double zSquared = Math.pow(z - this.bSize, 2);
                 final int fz = z + this.getTargetBlock().getZ() - this.bSize;
 
-                for (int y = 0; y < this.snap.length; y++)
-                {
-                    if (xSquared + zSquared + Math.pow(y - this.bSize, 2) <= brushSizeSquared)
-                    {
-                        if (!doNotFill[x][y][z])
-                        {
+                for (int y = 0; y < this.snap.length; y++) {
+                    if (xSquared + zSquared + Math.pow(y - this.bSize, 2) <= brushSizeSquared) {
+                        if (!doNotFill[x][y][z]) {
                             // smart fill stuff
                             final int fy = y + this.getTargetBlock().getY() - this.bSize;
                             final int a = this.getBlockIdAt(fx + 1, fy, fz);
@@ -216,20 +184,15 @@ public class Rot3DBrush extends Brush
                             int winner;
                             int winnerData;
 
-                            if (a == b || a == c || a == d)
-                            { // I figure that since we are already narrowing it down to ONLY the holes left behind, it
+                            if (a == b || a == c || a == d) { // I figure that since we are already narrowing it down to ONLY the holes left behind, it
                                 // should
                                 // be fine to do all 5 checks needed to be legit about it.
                                 winner = a;
                                 winnerData = aData;
-                            }
-                            else if (b == d || c == d)
-                            {
+                            } else if (b == d || c == d) {
                                 winner = d;
                                 winnerData = dData;
-                            }
-                            else
-                            {
+                            } else {
                                 winner = b; // blockPositionY making this default, it will also automatically cover situations where B = C;
                                 winnerData = bData;
                             }
@@ -244,8 +207,7 @@ public class Rot3DBrush extends Brush
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.bSize = v.getBrushSize();
 
         if (this.mode == 0) {
@@ -257,8 +219,7 @@ public class Rot3DBrush extends Brush
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.bSize = v.getBrushSize();
 
         if (this.mode == 0) {
@@ -270,8 +231,7 @@ public class Rot3DBrush extends Brush
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.rot3d";
     }
 }

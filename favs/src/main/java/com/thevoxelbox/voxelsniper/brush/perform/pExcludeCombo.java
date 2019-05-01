@@ -11,21 +11,18 @@ import com.thevoxelbox.voxelsniper.util.VoxelList;
 /**
  * @author Voxel
  */
-public class pExcludeCombo extends vPerformer
-{
+public class pExcludeCombo extends vPerformer {
 
     private VoxelList excludeList;
     private int id;
     private int data;
 
-    public pExcludeCombo()
-    {
+    public pExcludeCombo() {
         name = "Exclude Combo";
     }
 
     @Override
-    public void info(Message vm)
-    {
+    public void info(Message vm) {
         vm.performerName(name);
         vm.voxelList();
         vm.voxel();
@@ -33,8 +30,7 @@ public class pExcludeCombo extends vPerformer
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v)
-    {
+    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
         w = v.getWorld();
         id = v.getVoxelId();
         data = v.getPropertyId();
@@ -42,11 +38,9 @@ public class pExcludeCombo extends vPerformer
     }
 
     @SuppressWarnings("deprecation")
-	@Override
-    public void perform(AsyncBlock b)
-    {
-        if (!excludeList.contains(b.getBlockData()))
-        {
+    @Override
+    public void perform(AsyncBlock b) {
+        if (!excludeList.contains(b.getBlockData())) {
             h.put(b);
             b.setTypeIdAndPropertyId(id, data, true);
         }

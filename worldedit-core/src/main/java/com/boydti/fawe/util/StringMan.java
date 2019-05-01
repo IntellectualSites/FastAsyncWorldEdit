@@ -1,5 +1,7 @@
 package com.boydti.fawe.util;
 
+import com.sk89q.util.StringUtil;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +14,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
+import java.util.function.Predicate;
 
 public class StringMan {
     public static String replaceFromMap(final String string, final Map<String, String> replacements) {
@@ -321,6 +324,57 @@ public class StringMan {
             }
         }
         return true;
+    }
+
+    public static Comparator<String> blockStateComparator(String input) {
+        return new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return blockStateStringDistance(input, o1) - blockStateStringDistance(input, o2);
+            }
+        };
+    }
+
+    public static boolean blockStateMatches(String input, String item) {
+        return blockStateStringDistance(input, item) != Integer.MAX_VALUE;
+    }
+
+    public static int blockStateStringDistance(String input, String item) {
+        int distance = 0;
+        boolean sequentail = false;
+        int j = 0;
+        for (int i = 0; i < input.length(); i++) {
+            char ai = input.charAt(i);
+            outer:
+            while (true) {
+                if (j >= item.length()) return Integer.MAX_VALUE;
+
+                char bj = item.charAt(j++);
+                if (sequentail) {
+                    switch (bj) {
+                        case ':':
+                        case '_':
+                            sequentail = false;
+                            if (bj == ai) break outer;
+                            continue;
+                    }
+                    continue;
+                }
+                if (bj != ai) {
+                    distance++;
+                    switch (bj) {
+                        case ':':
+                        case '_':
+                            continue;
+                        default:
+                            sequentail = true;
+                            continue;
+                    }
+                }
+                break;
+            }
+        }
+        return distance;
     }
 
     public static int getLevenshteinDistance(String s, String t) {

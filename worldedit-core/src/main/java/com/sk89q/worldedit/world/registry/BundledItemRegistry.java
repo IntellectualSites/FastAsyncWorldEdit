@@ -19,9 +19,7 @@
 
 package com.sk89q.worldedit.world.registry;
 
-import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -35,20 +33,22 @@ public class BundledItemRegistry implements ItemRegistry {
 
     @Nullable
     @Override
-    public BaseItem createFromId(String id) {
-        ItemType itemType = ItemTypes.get(id);
-        return itemType == null ? null : new BaseItem(itemType);
+    public String getName(ItemType itemType) {
+        String id = itemType.getId();
+        BundledItemData.ItemEntry itemEntry = BundledItemData.getInstance().findById(id);
+        if (itemEntry != null) {
+            String localized = itemEntry.localizedName;
+            if (localized.equals("Air")) {
+                int c = id.indexOf(':');
+                return c < 0 ? id : id.substring(c + 1);
+            }
+            return localized;
+        }
+        return null;
     }
 
     @Override
     public Collection<String> registerItems() {
         return Collections.emptyList();
-    }
-
-    @Nullable
-    @Override
-    public String getName(ItemType itemType) {
-        BundledItemData.ItemEntry itemEntry = BundledItemData.getInstance().findById(itemType.getId());
-        return itemEntry != null ? itemEntry.localizedName : null;
     }
 }

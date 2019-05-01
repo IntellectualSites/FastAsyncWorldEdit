@@ -153,7 +153,7 @@ public class FakePlayer extends AbstractPlayerActor {
 
     @Override
     public BaseBlock getBlockInHand(HandSide ignore) {
-        return new BaseBlock(BlockTypes.AIR.getDefaultState());
+        return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
 
     @Override

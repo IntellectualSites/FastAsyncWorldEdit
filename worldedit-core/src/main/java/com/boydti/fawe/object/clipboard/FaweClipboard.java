@@ -12,7 +12,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -33,15 +33,15 @@ public abstract class FaweClipboard {
 
     public abstract boolean hasBiomes();
 
-    public abstract boolean setBiome(int x, int z, int biome);
+    public abstract boolean setBiome(int x, int z, BiomeType biome);
 
-    public abstract BaseBiome getBiome(int x, int z);
+    public abstract BiomeType getBiome(int x, int z);
 
-    public abstract BaseBiome getBiome(int index);
+    public abstract BiomeType getBiome(int index);
 
     public abstract BaseBlock getBlock(int index);
 
-    public abstract void setBiome(int index, int biome);
+    public abstract void setBiome(int index, BiomeType biome);
 
     public abstract boolean setTile(int x, int y, int z, CompoundTag tag);
 

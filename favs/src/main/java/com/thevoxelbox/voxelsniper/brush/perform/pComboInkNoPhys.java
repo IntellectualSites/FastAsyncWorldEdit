@@ -10,21 +10,18 @@ import com.thevoxelbox.voxelsniper.Message;
 /**
  * @author Voxel
  */
-public class pComboInkNoPhys extends vPerformer
-{
+public class pComboInkNoPhys extends vPerformer {
 
     private int d;
     private int dr;
     private int i;
 
-    public pComboInkNoPhys()
-    {
+    public pComboInkNoPhys() {
         name = "Combo-Ink, No Physics";
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v)
-    {
+    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
         w = v.getWorld();
         d = v.getPropertyId();
         dr = v.getReplaceData();
@@ -32,8 +29,7 @@ public class pComboInkNoPhys extends vPerformer
     }
 
     @Override
-    public void info(Message vm)
-    {
+    public void info(Message vm) {
         vm.performerName(name);
         vm.voxel();
         vm.data();
@@ -41,19 +37,16 @@ public class pComboInkNoPhys extends vPerformer
     }
 
     @SuppressWarnings("deprecation")
-	@Override
-    public void perform(AsyncBlock b)
-    {
-        if (b.getPropertyId() == dr)
-        {
+    @Override
+    public void perform(AsyncBlock b) {
+        if (b.getPropertyId() == dr) {
             h.put(b);
             b.setTypeIdAndPropertyId(i, d, false);
         }
     }
 
     @Override
-    public boolean isUsingReplaceMaterial()
-    {
+    public boolean isUsingReplaceMaterial() {
         return true;
     }
 }

@@ -17,29 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.forge.gui;
+package com.sk89q.worldedit.internal.expression.runtime;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.IGuiHandler;
-
-public class GuiHandler implements IGuiHandler {
-
-    public static final int REFERENCE_ID = 0;
-
-    @Override
-    public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-        return null;
+/**
+ * Thrown when an evaluation exceeds the timeout time.
+ */
+public class ExpressionTimeoutException extends EvaluationException {
+    public ExpressionTimeoutException(String message) {
+        super(-1, message);
     }
-
-    @Override
-    public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
-        switch (id) {
-            case REFERENCE_ID:
-                return new GuiReferenceCard();
-        }
-
-        return null;
-    }
-
 }

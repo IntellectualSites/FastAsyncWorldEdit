@@ -17,24 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.forge;
+package com.sk89q.worldedit.function.pattern;
 
-import com.sk89q.worldedit.forge.net.LeftClickAirEventMessage;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+import com.sk89q.worldedit.extent.Extent;
 
-import java.nio.charset.Charset;
+public interface ExtentPattern extends Pattern {
 
-public class InternalPacketHandler {
-    public static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
-    public static SimpleNetworkWrapper CHANNEL;
-
-    public static void init() {
-         CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(ForgeWorldEdit.MOD_ID);
-         CHANNEL.registerMessage(LeftClickAirEventMessage.Handler.class, LeftClickAirEventMessage.class, 0, Side.SERVER);
-    }
-
-    private InternalPacketHandler() {
-    }
+    /**
+     * Get the extent associated with this pattern.
+     *
+     * @return the extent for this pattern
+     */
+    public Extent getExtent();
 }

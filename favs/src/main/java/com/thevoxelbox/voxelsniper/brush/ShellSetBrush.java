@@ -14,31 +14,24 @@ import java.util.ArrayList;
  *
  * @author Piotr
  */
-public class ShellSetBrush extends Brush
-{
+public class ShellSetBrush extends Brush {
     private static final int MAX_SIZE = 5000000;
     private Block block = null;
 
     /**
      *
      */
-    public ShellSetBrush()
-    {
+    public ShellSetBrush() {
         this.setName("Shell Set");
     }
 
     @SuppressWarnings("deprecation")
-	private boolean set(final Block bl, final SnipeData v)
-    {
-        if (this.block == null)
-        {
+    private boolean set(final Block bl, final SnipeData v) {
+        if (this.block == null) {
             this.block = bl;
             return true;
-        }
-        else
-        {
-            if (!this.block.getWorld().getName().equals(bl.getWorld().getName()))
-            {
+        } else {
+            if (!this.block.getWorld().getName().equals(bl.getWorld().getName())) {
                 v.sendMessage(ChatColor.RED + "You selected points in different worlds!");
                 this.block = null;
                 return true;
@@ -51,50 +44,29 @@ public class ShellSetBrush extends Brush
             final int highY = (this.block.getY() >= bl.getY()) ? this.block.getY() : bl.getY();
             final int highZ = (this.block.getZ() >= bl.getZ()) ? this.block.getZ() : bl.getZ();
 
-            if (Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY) > MAX_SIZE)
-            {
+            if (Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY) > MAX_SIZE) {
                 v.sendMessage(ChatColor.RED + "Selection size above hardcoded limit, please use a smaller selection.");
-            }
-            else
-            {
+            } else {
                 final ArrayList<AsyncBlock> blocks = new ArrayList<>(
-                    ((Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY)) / 2));
-                for (int y = lowY; y <= highY; y++)
-                {
-                    for (int x = lowX; x <= highX; x++)
-                    {
-                        for (int z = lowZ; z <= highZ; z++)
-                        {
-                            if (this.getWorld().getBlockAt(x, y, z).getTypeId() == v.getReplaceId())
-                            {
+                        ((Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY)) / 2));
+                for (int y = lowY; y <= highY; y++) {
+                    for (int x = lowX; x <= highX; x++) {
+                        for (int z = lowZ; z <= highZ; z++) {
+                            if (this.getWorld().getBlockAt(x, y, z).getTypeId() == v.getReplaceId()) {
                                 continue;
-                            }
-                            else if (this.getWorld().getBlockAt(x + 1, y, z).getTypeId() == v.getReplaceId())
-                            {
+                            } else if (this.getWorld().getBlockAt(x + 1, y, z).getTypeId() == v.getReplaceId()) {
                                 continue;
-                            }
-                            else if (this.getWorld().getBlockAt(x - 1, y, z).getTypeId() == v.getReplaceId())
-                            {
+                            } else if (this.getWorld().getBlockAt(x - 1, y, z).getTypeId() == v.getReplaceId()) {
                                 continue;
-                            }
-                            else if (this.getWorld().getBlockAt(x, y, z + 1).getTypeId() == v.getReplaceId())
-                            {
+                            } else if (this.getWorld().getBlockAt(x, y, z + 1).getTypeId() == v.getReplaceId()) {
                                 continue;
-                            }
-                            else if (this.getWorld().getBlockAt(x, y, z - 1).getTypeId() == v.getReplaceId())
-                            {
+                            } else if (this.getWorld().getBlockAt(x, y, z - 1).getTypeId() == v.getReplaceId()) {
                                 continue;
-                            }
-                            else if (this.getWorld().getBlockAt(x, y + 1, z).getTypeId() == v.getReplaceId())
-                            {
+                            } else if (this.getWorld().getBlockAt(x, y + 1, z).getTypeId() == v.getReplaceId()) {
                                 continue;
-                            }
-                            else if (this.getWorld().getBlockAt(x, y - 1, z).getTypeId() == v.getReplaceId())
-                            {
+                            } else if (this.getWorld().getBlockAt(x, y - 1, z).getTypeId() == v.getReplaceId()) {
                                 continue;
-                            }
-                            else
-                            {
+                            } else {
                                 blocks.add(this.getWorld().getBlockAt(x, y, z));
                             }
                         }
@@ -102,10 +74,8 @@ public class ShellSetBrush extends Brush
                 }
 
                 final Undo undo = new Undo();
-                for (final AsyncBlock currentBlock : blocks)
-                {
-                    if (currentBlock.getTypeId() != v.getVoxelId())
-                    {
+                for (final AsyncBlock currentBlock : blocks) {
+                    if (currentBlock.getTypeId() != v.getVoxelId()) {
                         undo.put(currentBlock);
                         currentBlock.setTypeId(v.getVoxelId());
                     }
@@ -120,26 +90,21 @@ public class ShellSetBrush extends Brush
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
-        if (this.set(this.getTargetBlock(), v))
-        {
+    protected final void arrow(final SnipeData v) {
+        if (this.set(this.getTargetBlock(), v)) {
             v.owner().getPlayer().sendMessage(ChatColor.GRAY + "Point one");
         }
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
-        if (this.set(this.getLastBlock(), v))
-        {
+    protected final void powder(final SnipeData v) {
+        if (this.set(this.getLastBlock(), v)) {
             v.owner().getPlayer().sendMessage(ChatColor.GRAY + "Point one");
         }
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.size();
         vm.voxel();
@@ -147,8 +112,7 @@ public class ShellSetBrush extends Brush
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.shellset";
     }
 }

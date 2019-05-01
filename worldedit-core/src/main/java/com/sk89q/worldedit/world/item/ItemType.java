@@ -21,20 +21,22 @@ package com.sk89q.worldedit.world.item;
 
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.registry.RegistryItem;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
 
-public class ItemType {
+public class ItemType implements RegistryItem {
 
     public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type");
 
     private String id;
     private BlockType blockType;
-    private int internalId;
+    private boolean initBlockType;
     private BaseItem defaultState;
 
     public ItemType(String id) {
@@ -43,19 +45,22 @@ public class ItemType {
             id = "minecraft:" + id;
         }
         this.id = id;
-        this.blockType = BlockTypes.get(this.id);
     }
 
     public String getId() {
         return this.id;
     }
-    
-    public int getInternalId() {
-    	return this.internalId;
-    }
-    
+
+    private int internalId;
+
+    @Override
     public void setInternalId(int internalId) {
-    	this.internalId = internalId;
+        this.internalId = internalId;
+    }
+
+    @Override
+    public int getInternalId() {
+        return internalId;
     }
 
     /**
@@ -89,6 +94,10 @@ public class ItemType {
      */
     @Nullable
     public BlockType getBlockType() {
+        if (!initBlockType) {
+            initBlockType = true;
+            this.blockType = BlockTypes.get(this.id);
+        }
         return this.blockType;
     }
     
@@ -97,6 +106,9 @@ public class ItemType {
     }
     
     public BaseItem getDefaultState() {
+        if (defaultState == null) {
+            this.defaultState = new BaseItemStack(this);
+        }
     	return this.defaultState;
     }
     

@@ -26,7 +26,6 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.LongArrayTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
-
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.DataException;
@@ -246,7 +245,7 @@ public class AnvilChunk13 implements Chunk {
         BlockState state = sectionBlocks != null ? sectionBlocks[(yIndex << 8) | (z << 4) | x] : BlockTypes.AIR.getDefaultState();
         if (state.getMaterial().hasContainer()) {
             CompoundTag tileEntity = getBlockTileEntity(position);
-            if (tileEntity != null) return new BaseBlock(state, tileEntity);
+            return state.toBaseBlock(tileEntity);
         }
 
         return state.toBaseBlock();

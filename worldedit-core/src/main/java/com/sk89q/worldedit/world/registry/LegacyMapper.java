@@ -70,6 +70,7 @@ public class LegacyMapper {
         try {
             loadFromResource();
         } catch (Throwable e) {
+            e.printStackTrace();
             log.warn("Failed to load the built-in legacy id registry", e);
         }
     }
@@ -237,14 +238,14 @@ public class LegacyMapper {
     		}
     	}else if(plotBlock instanceof LegacyPlotBlock) {
     		try {
-    			return new BaseBlock(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData());
+    			return BaseBlock.getState(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData()).toBaseBlock();
     		}catch(Throwable failed) {
     			log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
     			failed.printStackTrace();
     			return null;
     		}
     	}else {
-			  log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
+			log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
 			return null;
     	}
     }

@@ -36,6 +36,8 @@ import com.google.common.io.Files;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +60,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ClipboardFormats {
 
@@ -176,7 +178,7 @@ public class ClipboardFormats {
                 return null;
             }
             URL base = new URL(Settings.IMP.WEB.URL);
-            input = new URL(base, "uploads/" + input.substring(4) + ".schematic").toString();
+            input = new URL(base, "uploads/" + input.substring(4) + "." + format.getPrimaryFileExtension()).toString();
         }
         if (input.startsWith("http")) {
             if (!player.hasPermission("worldedit.schematic.load.asset")) {
@@ -208,7 +210,7 @@ public class ClipboardFormats {
                 }
                 f = player.openFileOpenDialog(extensions);
                 if (f == null || !f.exists()) {
-                    if (message) player.printError("Schematic " + input + " does not exist! (" + f + ")");
+                    if (message) player.printError(BBC.getPrefix() + "Schematic " + input + " does not exist! (" + f + ")");
                     return null;
                 }
             } else {
@@ -229,7 +231,7 @@ public class ClipboardFormats {
                 }
             }
             if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
-                if (message) player.printError("Schematic " + input + " does not exist! (" + ((f == null) ? false : f.exists()) + "|" + f + "|" + (f == null ? false : !MainUtil.isInSubDirectory(working, f)) + ")");
+                if (message) player.printError(BBC.getPrefix() + "Schematic " + input + " does not exist! (" + ((f == null) ? false : f.exists()) + "|" + f + "|" + (f == null ? false : !MainUtil.isInSubDirectory(working, f)) + ")");
                 return null;
             }
             if (format == null && f.isFile()) {

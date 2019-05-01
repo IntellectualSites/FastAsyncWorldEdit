@@ -9,24 +9,18 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
  *
  * @author Piotr
  */
-public class VoxelBrush extends PerformBrush
-{
+public class VoxelBrush extends PerformBrush {
     /**
      *
      */
-    public VoxelBrush()
-    {
+    public VoxelBrush() {
         this.setName("Voxel");
     }
 
-    private void voxel(final SnipeData v)
-    {
-        for (int z = v.getBrushSize(); z >= -v.getBrushSize(); z--)
-        {
-            for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--)
-            {
-                for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--)
-                {
+    private void voxel(final SnipeData v) {
+        for (int z = v.getBrushSize(); z >= -v.getBrushSize(); z--) {
+            for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--) {
+                for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--) {
                     this.current.perform(this.clampY(this.getTargetBlock().getX() + x, this.getTargetBlock().getY() + z, this.getTargetBlock().getZ() + y));
                 }
             }
@@ -35,27 +29,23 @@ public class VoxelBrush extends PerformBrush
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.voxel(v);
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.voxel(v);
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.size();
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.voxel";
     }
 }

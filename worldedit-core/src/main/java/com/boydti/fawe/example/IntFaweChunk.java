@@ -1,34 +1,32 @@
 package com.boydti.fawe.example;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockID;
 
 import java.util.*;
 
 public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> {
 
-    public final int[][] ids;
+    public final int[][] setBlocks;
     public final short[] count;
     public final short[] air;
-    public final byte[] heightMap;
 
-    public byte[] biomes;
+    public BiomeType[] biomes;
     public HashMap<Short, CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
 
     public T chunk;
 
-    public IntFaweChunk(FaweQueue parent, int x, int z, int[][] ids, short[] count, short[] air, byte[] heightMap) {
+    public IntFaweChunk(FaweQueue parent, int x, int z, int[][] setBlocks, short[] count, short[] air) {
         super(parent, x, z);
-        this.ids = ids;
+        this.setBlocks = setBlocks;
         this.count = count;
         this.air = air;
-        this.heightMap = heightMap;
     }
 
     /**
@@ -40,10 +38,9 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
      */
     public IntFaweChunk(FaweQueue parent, int x, int z) {
         super(parent, x, z);
-        this.ids = new int[HEIGHT >> 4][];
+        this.setBlocks = new int[HEIGHT >> 4][];
         this.count = new short[HEIGHT >> 4];
         this.air = new short[HEIGHT >> 4];
-        this.heightMap = new byte[256];
     }
 
     @Override
@@ -104,8 +101,8 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
     @Override
     public int getBitMask() {
         int bitMask = 0;
-        for (int section = 0; section < ids.length; section++) {
-            if (ids[section] != null) {
+        for (int section = 0; section < setBlocks.length; section++) {
+            if (setBlocks[section] != null) {
                 bitMask += 1 << section;
             }
         }
@@ -120,27 +117,26 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
      */
     @Override
     public int[] getIdArray(final int i) {
-        return this.ids[i];
+        return this.setBlocks[i];
     }
 
     @Override
     public int[][] getCombinedIdArrays() {
-        return this.ids;
+        return this.setBlocks;
     }
 
     @Override
-    public byte[] getBiomeArray() {
+    public BiomeType[] getBiomeArray() {
         return this.biomes;
     }
 
     @Override
     public int getBlockCombinedId(int x, int y, int z) {
-        short i = FaweCache.CACHE_I[y][z][x];
-        int[] array = getIdArray(i);
+        int[] array = getIdArray(y >> 4);
         if (array == null) {
             return 0;
         }
-        return array[FaweCache.CACHE_J[y][z][x]];
+        return array[(((y & 0xF) << 8) | (z << 4) | x)];
     }
 
     @Override
@@ -194,19 +190,39 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
 
     @Override
     public void setBlock(int x, int y, int z, int combinedId) {
-        final int i = FaweCache.CACHE_I[y][z][x];
-        final int j = FaweCache.CACHE_J[y][z][x];
-        int[] vs = this.ids[i];
+        final int i = y >> 4;
+        int[] vs = this.setBlocks[i];
         if (vs == null) {
-            vs = this.ids[i] = new int[4096];
+            vs = this.setBlocks[i] = new int[4096];
         }
-        vs[j] = combinedId;
-        this.count[i]++;
-        if (BlockTypes.getFromStateId(combinedId).getMaterial().isAir()) {
-            this.air[i]++;
-            return;
+        int index = (((y & 15) << 8) | (z << 4) | x);
+        int existing = vs[index];
+        vs[index] = combinedId;
+        switch (existing) {
+            case 0:
+                this.count[i]++;
+                switch (combinedId) {
+                    case 0:
+                    case BlockID.AIR:
+                    case BlockID.CAVE_AIR:
+                    case BlockID.VOID_AIR:
+                        this.air[i]++;
+                }
+                break;
+            case BlockID.AIR:
+            case BlockID.CAVE_AIR:
+            case BlockID.VOID_AIR:
+                switch (combinedId) {
+                    case 0:
+                    case BlockID.AIR:
+                    case BlockID.CAVE_AIR:
+                    case BlockID.VOID_AIR:
+                        break;
+                    default:
+                        this.air[i]--;
+
+                }
         }
-        heightMap[z << 4 | x] = (byte) y;
         return;
     }
 
@@ -216,11 +232,10 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
     }
 
     @Override
-    public void setBiome(final int x, final int z, byte biome) {
+    public void setBiome(final int x, final int z, BiomeType biome) {
         if (this.biomes == null) {
-            this.biomes = new byte[256];
+            this.biomes = new BiomeType[256];
         }
-        if (biome == 0) biome = -1;
         biomes[((z & 15) << 4) + (x & 15)] = biome;
     }
 

@@ -54,6 +54,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         }
 
         profile = config.getBoolean("debug", profile);
+        traceUnflushedSessions = config.getBoolean("debugging.trace-unflushed-sessions", traceUnflushedSessions);
         wandItem = convertLegacyItem(config.getString("wand-item", wandItem));
 
         defaultChangeLimit = Math.max(-1, config.getInt(
@@ -78,8 +79,8 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
         disallowedBlocks = new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks())));
-        allowedDataCycleBlocks =
-                new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
+        disallowedBlocksMask = null;
+        allowedDataCycleBlocks = new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
 
         registerHelp = config.getBoolean("register-help", true);
         logCommands = config.getBoolean("logging.log-commands", logCommands);
@@ -106,6 +107,9 @@ public class YAMLConfiguration extends LocalConfiguration {
         scriptTimeout = config.getInt("scripting.timeout", scriptTimeout);
         scriptsDir = config.getString("scripting.dir", scriptsDir);
 
+        calculationTimeout = config.getInt("calculation.timeout", calculationTimeout);
+        maxCalculationTimeout = config.getInt("calculation.max-timeout", maxCalculationTimeout);
+
         saveDir = config.getString("saving.dir", saveDir);
 
         allowSymlinks = config.getBoolean("files.allow-symbolic-links", false);
@@ -113,6 +117,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         SessionManager.EXPIRATION_GRACE = config.getInt("history.expiration", 10) * 60 * 1000;
 
         showHelpInfo = config.getBoolean("show-help-on-first-use", true);
+        serverSideCUI = config.getBoolean("server-side-cui", true);
 
         String snapshotsDir = config.getString("snapshots.directory", "");
         if (!snapshotsDir.isEmpty()) {

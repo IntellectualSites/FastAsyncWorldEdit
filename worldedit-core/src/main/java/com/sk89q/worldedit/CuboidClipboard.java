@@ -149,11 +149,6 @@ public class CuboidClipboard {
         return clipboard;
     }
 
-    private BaseBlock adapt(BlockState state) {
-//        if (state instanceof BaseBlock) return (BaseBlock) state;
-        return new BaseBlock(state);
-    }
-
     /* ------------------------------------------------------------------------------------------------------------- */
 
     public BaseBlock getBlock(BlockVector3 position) {
@@ -346,7 +341,7 @@ public class CuboidClipboard {
     public BaseBlock getPoint(BlockVector3 position) throws ArrayIndexOutOfBoundsException {
         final BaseBlock block = getBlock(position);
         if (block == null) {
-            return new BaseBlock(BlockTypes.AIR);
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
 
         return block;
@@ -462,8 +457,8 @@ public class CuboidClipboard {
      */
     public List<Countable<Integer>> getBlockDistribution() {
         List<Countable<Integer>> distribution = new ArrayList<>();
-        List<Countable<BlockStateHolder>> distr = clipboard.getBlockDistributionWithData(clipboard.getRegion());
-        for (Countable<BlockStateHolder> item : distr) {
+        List<Countable<BlockState>> distr = clipboard.getBlockDistributionWithData(clipboard.getRegion());
+        for (Countable<BlockState> item : distr) {
             BlockStateHolder state = item.getID();
             int[] legacyId = LegacyMapper.getInstance().getLegacyFromBlock(state.toImmutableState());
             if (legacyId[0] != 0) distribution.add(new Countable<>(legacyId[0], item.getAmount()));
@@ -478,8 +473,8 @@ public class CuboidClipboard {
      */
     public List<Countable<BaseBlock>> getBlockDistributionWithData() {
         List<Countable<BaseBlock>> distribution = new ArrayList<>();
-        List<Countable<BlockStateHolder>> distr = clipboard.getBlockDistributionWithData(clipboard.getRegion());
-        for (Countable<BlockStateHolder> item : distr) {
+        List<Countable<BlockState>> distr = clipboard.getBlockDistributionWithData(clipboard.getRegion());
+        for (Countable<BlockState> item : distr) {
             distribution.add(new Countable<>(item.getID().toBaseBlock(), item.getAmount()));
         }
         return distribution;

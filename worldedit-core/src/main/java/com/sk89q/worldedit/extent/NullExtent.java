@@ -20,16 +20,6 @@
 package com.sk89q.worldedit.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.LazyBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -37,8 +27,9 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -52,8 +43,6 @@ import java.util.List;
  * pass on any changes.
  */
 public class NullExtent implements Extent {
-
-    private final BlockVector3 nullPoint = BlockVector3.at(0, 0, 0);
 
     public static final NullExtent INSTANCE = new NullExtent();
 
@@ -93,29 +82,22 @@ public class NullExtent implements Extent {
     }
 
     @Override
-
     public BaseBlock getFullBlock(BlockVector3 position) {
         return getBlock(position).toBaseBlock();
     }
 
-    @Nullable
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
-        return null;
+    public BiomeType getBiome(BlockVector2 position) {
+        return BiomeTypes.THE_VOID;
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         return false;
     }
-    
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return false;
-    }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return false;
     }
 

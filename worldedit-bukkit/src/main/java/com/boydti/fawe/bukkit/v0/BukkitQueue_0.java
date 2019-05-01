@@ -21,7 +21,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -287,15 +287,10 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
     }
 
     @Override
-    public boolean regenerateChunk(World world, int x, int z, BaseBiome biome, Long seed) {
+    public boolean regenerateChunk(World world, int x, int z, BiomeType biome, Long seed) {
         if (!keepLoaded.isEmpty()) keepLoaded.remove(MathMan.pairInt(x, z));
         boolean result = world.regenerateChunk(x, z);
         return result;
-    }
-
-    @Override
-    public IntFaweChunk getPrevious(IntFaweChunk fs, CHUNKSECTIONS sections, Map<?, ?> tiles, Collection<?>[] entities, Set<UUID> createdEntities, boolean all) throws Exception {
-        return fs;
     }
 
     @Override

@@ -17,16 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.forge;
+package com.sk89q.worldedit.forge.proxy;
 
-import net.minecraftforge.common.MinecraftForge;
+public interface CommonProxy {
 
-public class ClientProxy extends CommonProxy {
-
-    @Override
-    public void registerHandlers() {
-        super.registerHandlers();
-        MinecraftForge.EVENT_BUS.register(new KeyHandler());
-    }
-
+    void registerHandlers();
 }

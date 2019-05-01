@@ -5,6 +5,7 @@ import com.boydti.fawe.object.collection.SparseBitSet;
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -87,8 +88,8 @@ public class VisualChunk extends FaweChunk<FaweChunk> {
     }
 
     @Override
-    public byte[] getBiomeArray() {
-        return new byte[256];
+    public BiomeType[] getBiomeArray() {
+        return new BiomeType[256];
     }
 
     @Override
@@ -154,7 +155,7 @@ public class VisualChunk extends FaweChunk<FaweChunk> {
     }
 
     @Override
-    public void setBiome(int x, int z, byte biome) {
+    public void setBiome(int x, int z, BiomeType biome) {
         // Unsupported
     }
 

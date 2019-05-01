@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.registry;
 
-import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.world.item.ItemType;
 
 import javax.annotation.Nullable;
@@ -27,15 +26,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 public interface ItemRegistry {
-
-    /**
-     * Create a new item using its ID.
-     *
-     * @param id the id
-     * @return the item, which may be null if no item exists
-     */
-    @Nullable
-    BaseItem createFromId(String id);
 
     /**
      * Register all items

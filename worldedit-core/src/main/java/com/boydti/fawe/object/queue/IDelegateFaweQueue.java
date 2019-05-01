@@ -28,7 +28,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.io.File;
 import java.util.Collection;
@@ -76,7 +76,7 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default BaseBiome getBiome(BlockVector2 position) {
+    default BiomeType getBiome(BlockVector2 position) {
         return getQueue().getBiome(position);
     }
 
@@ -86,7 +86,7 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    default boolean setBiome(BlockVector2 position, BiomeType biome) {
         return getQueue().setBiome(position, biome);
     }
 
@@ -146,7 +146,7 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default boolean setBiome(int x, int z, BaseBiome biome) {
+    default boolean setBiome(int x, int z, BiomeType biome) {
         return getQueue().setBiome(x, z, biome);
     }
 
@@ -277,7 +277,7 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default boolean regenerateChunk(int x, int z, @Nullable BaseBiome biome, @Nullable Long seed) {
+    default boolean regenerateChunk(int x, int z, @Nullable BiomeType biome, @Nullable Long seed) {
         return getQueue().regenerateChunk(x, z, biome, seed);
     }
 
@@ -333,18 +333,13 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default void addNotifyTask(int x, int z, Runnable runnable) {
-        getQueue().addNotifyTask(x, z, runnable);
-    }
-
-    @Override
     default boolean hasBlock(int x, int y, int z) throws FaweException.FaweChunkLoadException {
         return getQueue().hasBlock(x, y, z);
     }
 
     @Override
-    default int getBiomeId(int x, int z) throws FaweException.FaweChunkLoadException {
-        return getQueue().getBiomeId(x, z);
+    default BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
+        return getQueue().getBiomeType(x, z);
     }
 
     @Override

@@ -1,61 +1,44 @@
 package com.thevoxelbox.voxelsniper.command;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
-import com.boydti.fawe.object.FawePlayer;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extension.factory.MaskFactory;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.RangeBlockHelper;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Sniper;
 import com.thevoxelbox.voxelsniper.VoxelSniper;
 import com.thevoxelbox.voxelsniper.api.command.VoxelCommand;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public class VoxelListCommand extends VoxelCommand
-{
-    public VoxelListCommand(final VoxelSniper plugin)
-    {
+public class VoxelListCommand extends VoxelCommand {
+    public VoxelListCommand(final VoxelSniper plugin) {
         super("VoxelList", plugin);
         setIdentifier("vl");
         setPermission("voxelsniper.sniper");
     }
 
     @Override
-    public boolean onCommand(Player player, String[] args)
-    {
+    public boolean onCommand(Player player, String[] args) {
         Sniper sniper = plugin.getSniperManager().getSniperForPlayer(player);
 
         SnipeData snipeData = sniper.getSnipeData(sniper.getCurrentToolId());
-        if (args.length == 0)
-        {
+        if (args.length == 0) {
             final RangeBlockHelper rangeBlockHelper = new RangeBlockHelper(player, sniper.getWorld());
             final AsyncBlock targetBlock = rangeBlockHelper.getTargetBlock();
             snipeData.getVoxelList().add(BukkitAdapter.adapt(targetBlock.getBlockData()));
             snipeData.getVoxelMessage().voxelList();
             return true;
-        }
-        else
-        {
-            if (args[0].equalsIgnoreCase("clear"))
-            {
+        } else {
+            if (args[0].equalsIgnoreCase("clear")) {
                 snipeData.getVoxelList().clear();
                 snipeData.getVoxelMessage().voxelList();
                 return true;
             }
         }
 
-        for (String string : args)
-        {
+        for (String string : args) {
             boolean remove = false;
             if (string.charAt(0) == '-') {
                 string = string.substring(1);

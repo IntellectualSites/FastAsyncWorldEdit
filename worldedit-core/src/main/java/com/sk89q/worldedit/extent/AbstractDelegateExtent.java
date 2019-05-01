@@ -22,11 +22,9 @@ package com.sk89q.worldedit.extent;
 import com.boydti.fawe.jnbt.anvil.generator.GenBase;
 import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.object.extent.LightingExtent;
-import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.worldedit.world.block.BaseBlock;
+
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -38,20 +36,18 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import java.util.List;
 import javax.annotation.Nullable;
 
-/**
- * A base class for {@link Extent}s that merely passes extents onto another.
- */
 public class AbstractDelegateExtent implements LightingExtent {
-
     private transient final Extent extent;
-//    private MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
+    protected MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
     /**
      * Create a new instance.
@@ -78,11 +74,6 @@ public class AbstractDelegateExtent implements LightingExtent {
     @Override
     public BlockType getBlockType(BlockVector3 position) {
         return extent.getBlockType(position);
-    }
-
-    @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return extent.getFullBlock(position);
     }
 
 
@@ -126,10 +117,7 @@ public class AbstractDelegateExtent implements LightingExtent {
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-//        mutable.mutX(x);
-//        mutable.mutY(y);
-//        mutable.mutZ(z);
-        return extent.getLazyBlock(BlockVector3.at(x, y, z));
+        return extent.getLazyBlock(mutable.setComponents(x, y, z));
     }
 
     @Override
@@ -139,19 +127,21 @@ public class AbstractDelegateExtent implements LightingExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-//        mutable.mutX(x);
-//        mutable.mutY(y);
-//        mutable.mutZ(z);
-        return setBlock(BlockVector3.at(x, y, z), block);
+        return setBlock(mutable.setComponents(x, y, z), block);
+    }
+
+    public BlockState getBlock(BlockVector3 position) {
+        return extent.getBlock(position);
+    }
+
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return extent.getFullBlock(position);
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
         return extent.setBlock(location, block);
-    }
-    
-    public BlockState getBlock(BlockVector3 position) {
-        return extent.getBlock(position);
     }
 
     @Override
@@ -171,17 +161,17 @@ public class AbstractDelegateExtent implements LightingExtent {
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         return extent.getBiome(position);
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return extent.setBiome(position, biome);
     }
 
     @Override
-    public boolean setBiome(int x, int y, int z, BaseBiome biome) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return extent.setBiome(x, y, z, biome);
     }
 
@@ -215,6 +205,11 @@ public class AbstractDelegateExtent implements LightingExtent {
     }
 
     @Override
+    public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
+        return extent.getHighestTerrainBlock(x, z, minY, maxY, filter);
+    }
+
+    @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
         return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
     }
@@ -227,6 +222,10 @@ public class AbstractDelegateExtent implements LightingExtent {
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
         return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
+    }
+
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
+        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
     }
 
     @Override

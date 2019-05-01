@@ -34,21 +34,12 @@ public final class Request {
 
     private static final ThreadLocal<Request> threadLocal = ThreadLocal.withInitial(Request::new);
 
-    private
-    @Nullable
-    World world;
-    private
-    @Nullable
-    Actor actor;
-    private
-    @Nullable
-    LocalSession session;
-    private
-    @Nullable
-    EditSession editSession;
-    private
-    @Nullable
-    Extent extent;
+    private @Nullable World world;
+    private @Nullable Actor actor;
+    private @Nullable LocalSession session;
+    private @Nullable EditSession editSession;
+    private @Nullable Extent extent;
+    private boolean valid;
 
     private Request() {
     }
@@ -148,8 +139,20 @@ public final class Request {
      * Reset the current request and clear all fields.
      */
     public static void reset() {
+        request().invalidate();
         threadLocal.remove();
     }
 
+    /**
+     * Check if the current request object is still valid. Invalid requests may contain outdated values.
+     *
+     * @return true if the request is valid
+     */
+    public boolean isValid() {
+        return valid;
+    }
 
+    private void invalidate() {
+        valid = false;
+    }
 }

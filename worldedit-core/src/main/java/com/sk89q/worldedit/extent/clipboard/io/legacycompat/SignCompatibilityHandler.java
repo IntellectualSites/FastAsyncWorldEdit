@@ -26,6 +26,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -36,7 +37,13 @@ public class SignCompatibilityHandler implements NBTCompatibilityHandler {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean isAffectedBlock(B block) {
-        return block.getBlockType() == BlockTypes.SIGN || block.getBlockType() == BlockTypes.WALL_SIGN;
+        switch (block.getBlockType().getInternalId()) {
+            case BlockID.SIGN:
+            case BlockID.WALL_SIGN:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

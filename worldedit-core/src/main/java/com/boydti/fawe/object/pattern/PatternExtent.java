@@ -13,7 +13,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BaseBiome;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
@@ -102,8 +102,8 @@ public class PatternExtent extends AbstractPattern implements Extent {
     }
 
     @Override
-    public BaseBiome getBiome(BlockVector2 position) {
-        return new BaseBiome(0);
+    public BiomeType getBiome(BlockVector2 position) {
+        return null;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class PatternExtent extends AbstractPattern implements Extent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BaseBiome biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return false;
     }
 

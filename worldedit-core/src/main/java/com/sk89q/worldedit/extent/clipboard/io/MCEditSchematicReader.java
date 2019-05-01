@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -54,7 +52,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads schematic files that are compatible with MCEdit and other editors.
@@ -255,9 +254,8 @@ public class MCEditSchematicReader extends NBTSchematicReader {
         // Entities
         // ====================================================================
 
-        try {
-            List<Tag> entityTags = requireTag(schematic, "Entities", ListTag.class).getValue();
-
+        List<Tag> entityTags = getTag(schematic, "Entities", ListTag.class).getValue();
+        if (entityTags != null) {
             for (Tag tag : entityTags) {
                 if (tag instanceof CompoundTag) {
                     CompoundTag compound = (CompoundTag) tag;
@@ -275,7 +273,6 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                     }
                 }
             }
-        } catch (IOException ignored) { // No entities? No problem
         }
 
         return clipboard;

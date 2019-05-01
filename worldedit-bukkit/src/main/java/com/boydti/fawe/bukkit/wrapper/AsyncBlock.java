@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -64,7 +66,8 @@ public class AsyncBlock implements Block {
     }
 
     public int getTypeId() {
-        return (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()) & BlockTypes.BIT_MASK);
+        int id = (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()));
+        return BlockTypes.getFromStateId(id).getInternalId();
     }
 
     @Override
@@ -218,11 +221,13 @@ public class AsyncBlock implements Block {
     public AsyncBlockState getState() {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combined);
-        String s = type.getResource().toUpperCase();
-        if (type == BlockTypes.SIGN || type == BlockTypes.WALL_SIGN) {
-            return new AsyncSign(this, combined);
+        switch (type.getInternalId()) {
+            case BlockID.SIGN:
+            case BlockID.WALL_SIGN:
+                return new AsyncSign(this, combined);
+            default:
+                return new AsyncBlockState(this, combined);
         }
-        return new AsyncBlockState(this, combined);
     }
 
     @Override
@@ -232,13 +237,13 @@ public class AsyncBlock implements Block {
 
     @Override
     public Biome getBiome() {
-        return world.getAdapter().getBiome(queue.getBiomeId(x, z));
+        return world.getAdapter().adapt(queue.getBiomeType(x, z));
     }
 
     @Override
     public void setBiome(Biome bio) {
-        int id = world.getAdapter().getBiomeId(bio);
-        queue.setBiome(x, z, FaweCache.getBiome(id));
+        BiomeType biome = world.getAdapter().adapt(bio);
+        queue.setBiome(x, z, biome);
     }
 
     @Override

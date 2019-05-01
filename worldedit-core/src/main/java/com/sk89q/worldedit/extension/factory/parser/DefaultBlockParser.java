@@ -20,20 +20,17 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
 import com.boydti.fawe.command.SuggestInputParseException;
+import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.*;
-
-import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.MobSpawnerBlock;
 import com.sk89q.worldedit.blocks.SignBlock;
 import com.sk89q.worldedit.blocks.SkullBlock;
@@ -45,24 +42,21 @@ import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -179,11 +173,20 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (split.length == 1) {
                     state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]));
                 } else if (MathMan.isInteger(split[0])) {
-                    state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+                    int id = Integer.parseInt(split[0]);
+                    int data = Integer.parseInt(split[1]);
+                    if (data < 0 || data >= 16) {
+                        throw new InputParseException("Invalid data " + data);
+                    }
+                    state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
                 } else {
                     BlockType type = BlockTypes.get(split[0].toLowerCase());
                     if (type != null) {
-                        state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, Integer.parseInt(split[1]));
+                        int data = Integer.parseInt(split[1]);
+                        if (data < 0 || data >= 16) {
+                            throw new InputParseException("Invalid data " + data);
+                        }
+                        state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, data);
                     }
                 }
             } catch (NumberFormatException ignore) {}
@@ -235,7 +238,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 BaseItem item = slottable.getItem(slot);
 
                 if (!item.getType().hasBlockType()) {
-                    throw new InputParseException("You're not holding a block!");
+                    throw new InputParseException(BBC.getPrefix() + "You're not holding a block!");
                 }
                 state = item.getType().getBlockType().getDefaultState();
                 nbt = item.getNbtData();
@@ -243,7 +246,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 BlockType type = BlockTypes.parse(typeString.toLowerCase());
                 if (type != null) state = type.getDefaultState();
                 if (state == null) {
-                    throw new NoMatchException("Does not match a valid block type: '" + input + "'");
+                    throw new NoMatchException(BBC.getPrefix() + "Does not match a valid block type: '" + input + "'");
                 }
             }
 //            if (nbt == null) nbt = state.getNbtData();
@@ -265,21 +268,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         // Check if the item is allowed
         BlockType blockType = state.getBlockType();
 
-        if (context.isRestricted()) {
-            Actor actor = context.requireActor();
-            if (actor != null) {
-                if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
-                    throw new DisallowedUsageException("You are not allowed to use '" + input + "'");
-                }
-                if (nbt != null) {
-                    if (!actor.hasPermission("worldedit.anyblock")) {
-                        throw new DisallowedUsageException("You are not allowed to nbt'");
-                    }
-                }
-            }
-        }
-
-        if (nbt != null) return new BaseBlock(state, nbt);
+        if (nbt != null) return validate(context, state.toBaseBlock(nbt));
 
         if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN) {
             // Allow special sign text syntax
@@ -288,7 +277,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             text[1] = blockAndExtraData.length > 2 ? blockAndExtraData[2] : "";
             text[2] = blockAndExtraData.length > 3 ? blockAndExtraData[3] : "";
             text[3] = blockAndExtraData.length > 4 ? blockAndExtraData[4] : "";
-            return new SignBlock(state, text);
+            return validate(context, new SignBlock(state, text));
         } else if (blockType == BlockTypes.SPAWNER) {
             // Allow setting mob spawn type
             if (blockAndExtraData.length > 1) {
@@ -302,26 +291,42 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 Platform capability = worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS);
                 if (!capability.isValidMobType(mobName)) {
                     final String finalMobName = mobName.toLowerCase();
-                    throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
+                    throw new SuggestInputParseException(BBC.getPrefix() + "Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
                     .map(m -> m.getName().toLowerCase())
                     .filter(s -> s.startsWith(finalMobName))
                     .collect(Collectors.toList()));
                 }
-                return new MobSpawnerBlock(state, mobName);
+                return validate(context, new MobSpawnerBlock(state, mobName));
             } else {
-                return new MobSpawnerBlock(state, MobType.PIG.getName());
+                return validate(context, new MobSpawnerBlock(state, MobType.PIG.getName()));
             }
         } else if (blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) {
             // allow setting type/player/rotation
             if (blockAndExtraData.length <= 1) {
-                return new SkullBlock(state);
+                return validate(context, new SkullBlock(state));
             }
 
             String type = blockAndExtraData[1];
 
-            return new SkullBlock(state, type.replace(" ", "_")); // valid MC usernames
+            return validate(context, new SkullBlock(state, type.replace(" ", "_"))); // valid MC usernames
         } else {
-            return state.toBaseBlock();
+            return validate(context, state.toBaseBlock());
         }
+    }
+
+    private <T extends BlockStateHolder> T validate(ParserContext context, T holder) {
+        if (context.isRestricted()) {
+            Actor actor = context.requireActor();
+            if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
+                throw new DisallowedUsageException(BBC.BLOCK_NOT_ALLOWED + " '" + holder + "'");
+            }
+            CompoundTag nbt = holder.getNbtData();
+            if (nbt != null) {
+                if (!actor.hasPermission("worldedit.anyblock")) {
+                    throw new DisallowedUsageException("You are not allowed to nbt'");
+                }
+            }
+        }
+        return holder;
     }
 }

@@ -5,7 +5,6 @@ import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 /**
@@ -13,31 +12,25 @@ import org.bukkit.block.BlockFace;
  *
  * @author Voxel
  */
-public class DiscFaceBrush extends PerformBrush
-{
+public class DiscFaceBrush extends PerformBrush {
     private double trueCircle = 0;
 
     /**
      *
      */
-    public DiscFaceBrush()
-    {
+    public DiscFaceBrush() {
         this.setName("Disc Face");
     }
 
-    private void discUD(final SnipeData v, AsyncBlock targetBlock)
-    {
+    private void discUD(final SnipeData v, AsyncBlock targetBlock) {
         final int brushSize = v.getBrushSize();
         final double brushSizeSquared = Math.pow(brushSize + this.trueCircle, 2);
 
-        for (int x = brushSize; x >= 0; x--)
-        {
+        for (int x = brushSize; x >= 0; x--) {
             final double xSquared = Math.pow(x, 2);
 
-            for (int z = brushSize; z >= 0; z--)
-            {
-                if ((xSquared + Math.pow(z, 2)) <= brushSizeSquared)
-                {
+            for (int z = brushSize; z >= 0; z--) {
+                if ((xSquared + Math.pow(z, 2)) <= brushSizeSquared) {
                     current.perform(targetBlock.getRelative(x, 0, z));
                     current.perform(targetBlock.getRelative(x, 0, -z));
                     current.perform(targetBlock.getRelative(-x, 0, z));
@@ -49,18 +42,14 @@ public class DiscFaceBrush extends PerformBrush
         v.owner().storeUndo(this.current.getUndo());
     }
 
-    private void discNS(final SnipeData v, AsyncBlock targetBlock)
-    {
+    private void discNS(final SnipeData v, AsyncBlock targetBlock) {
         final int brushSize = v.getBrushSize();
         final double brushSizeSquared = Math.pow(brushSize + this.trueCircle, 2);
 
-        for (int x = brushSize; x >= 0; x--)
-        {
+        for (int x = brushSize; x >= 0; x--) {
             final double xSquared = Math.pow(x, 2);
-            for (int y = brushSize; y >= 0; y--)
-            {
-                if ((xSquared + Math.pow(y, 2)) <= brushSizeSquared)
-                {
+            for (int y = brushSize; y >= 0; y--) {
+                if ((xSquared + Math.pow(y, 2)) <= brushSizeSquared) {
                     current.perform(targetBlock.getRelative(x, y, 0));
                     current.perform(targetBlock.getRelative(x, -y, 0));
                     current.perform(targetBlock.getRelative(-x, y, 0));
@@ -72,18 +61,14 @@ public class DiscFaceBrush extends PerformBrush
         v.owner().storeUndo(this.current.getUndo());
     }
 
-    private void discEW(final SnipeData v, AsyncBlock targetBlock)
-    {
+    private void discEW(final SnipeData v, AsyncBlock targetBlock) {
         final int brushSize = v.getBrushSize();
         final double brushSizeSquared = Math.pow(brushSize + this.trueCircle, 2);
 
-        for (int x = brushSize; x >= 0; x--)
-        {
+        for (int x = brushSize; x >= 0; x--) {
             final double xSquared = Math.pow(x, 2);
-            for (int y = brushSize; y >= 0; y--)
-            {
-                if ((xSquared + Math.pow(y, 2)) <= brushSizeSquared)
-                {
+            for (int y = brushSize; y >= 0; y--) {
+                if ((xSquared + Math.pow(y, 2)) <= brushSizeSquared) {
                     current.perform(targetBlock.getRelative(0, x, y));
                     current.perform(targetBlock.getRelative(0, x, -y));
                     current.perform(targetBlock.getRelative(0, -x, y));
@@ -95,15 +80,12 @@ public class DiscFaceBrush extends PerformBrush
         v.owner().storeUndo(this.current.getUndo());
     }
 
-    private void pre(final SnipeData v, AsyncBlock targetBlock)
-    {
+    private void pre(final SnipeData v, AsyncBlock targetBlock) {
         BlockFace blockFace = getTargetBlock().getFace(this.getLastBlock());
-        if (blockFace == null)
-        {
+        if (blockFace == null) {
             return;
         }
-        switch (blockFace)
-        {
+        switch (blockFace) {
             case NORTH:
             case SOUTH:
                 this.discNS(v, targetBlock);
@@ -125,57 +107,45 @@ public class DiscFaceBrush extends PerformBrush
     }
 
     @Override
-    protected final void arrow(final SnipeData v)
-    {
+    protected final void arrow(final SnipeData v) {
         this.pre(v, this.getTargetBlock());
     }
 
     @Override
-    protected final void powder(final SnipeData v)
-    {
+    protected final void powder(final SnipeData v) {
         this.pre(v, this.getLastBlock());
     }
 
     @Override
-    public final void info(final Message vm)
-    {
+    public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.size();
     }
 
     @Override
-    public final void parameters(final String[] par, final SnipeData v)
-    {
-        for (int i = 1; i < par.length; i++)
-        {
+    public final void parameters(final String[] par, final SnipeData v) {
+        for (int i = 1; i < par.length; i++) {
             final String parameter = par[i];
 
-            if (parameter.equalsIgnoreCase("info"))
-            {
+            if (parameter.equalsIgnoreCase("info")) {
                 v.sendMessage(ChatColor.GOLD + "Disc Face brush Parameters:");
                 v.sendMessage(ChatColor.AQUA + "/b df true -- will use a true circle algorithm instead of the skinnier version with classic sniper nubs. /b b false will switch back. (false is default)");
                 return;
             }
-            if (parameter.startsWith("true"))
-            {
+            if (parameter.startsWith("true")) {
                 this.trueCircle = 0.5;
                 v.sendMessage(ChatColor.AQUA + "True circle mode ON.");
-            }
-            else if (parameter.startsWith("false"))
-            {
+            } else if (parameter.startsWith("false")) {
                 this.trueCircle = 0;
                 v.sendMessage(ChatColor.AQUA + "True circle mode OFF.");
-            }
-            else
-            {
+            } else {
                 v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
             }
         }
     }
 
     @Override
-    public String getPermissionNode()
-    {
+    public String getPermissionNode() {
         return "voxelsniper.brush.discface";
     }
 }
