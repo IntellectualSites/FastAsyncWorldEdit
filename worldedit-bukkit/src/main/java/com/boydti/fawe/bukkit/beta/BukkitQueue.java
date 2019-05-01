@@ -125,12 +125,20 @@ public class BukkitQueue extends SimpleCharQueueExtent {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldLock = DataPaletteBlock.class.getDeclaredField("j");
-            fieldLock.setAccessible(true);
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            int modifiers = modifiersField.getInt(fieldLock);
-            modifiers &= ~Modifier.FINAL;
-            modifiersField.setInt(fieldLock, modifiers);
+            {
+                Field tmp = null;
+                try {
+                    tmp = DataPaletteBlock.class.getDeclaredField("j");
+                } catch (NoSuchFieldException paper) {
+                    tmp = DataPaletteBlock.class.getDeclaredField("writeLock");
+                }
+                fieldLock = tmp;
+                fieldLock.setAccessible(true);
+                Field modifiersField = Field.class.getDeclaredField("modifiers");
+                int modifiers = modifiersField.getInt(fieldLock);
+                int newModifiers = modifiers & (~Modifier.FINAL);
+                if (newModifiers != modifiers) modifiersField.setInt(fieldLock, newModifiers);
+            }
 
             Unsafe unsafe = UnsafeUtils.getUNSAFE();
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
