@@ -54,6 +54,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
         int Z = getZ();
 
         Chunk nmsChunk = extent.ensureLoaded(X, Z);
+        int bitMask = 0;
         try {
             synchronized (nmsChunk) {
                 ChunkSection[] sections = nmsChunk.getSections();
@@ -62,6 +63,9 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
 
                 for (int layer = 0; layer < 16; layer++) {
                     if (!set.hasSection(layer)) continue;
+
+                    bitMask |= 1 << layer;
+
                     char[] setArr = set.blocks[layer];
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
@@ -84,10 +88,10 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                         synchronized (get) {
                             ChunkSection getSection;
                             if (get.nmsChunk != nmsChunk) {
+                                if (get.nmsChunk != null) System.out.println("chunk doesn't match");
                                 get.nmsChunk = nmsChunk;
                                 get.sections = null;
                                 get.reset();
-                                System.out.println("chunk doesn't match");
                             } else {
                                 getSection = get.getSections()[layer];
                                 if (getSection != existingSection) {
@@ -118,6 +122,15 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                 }
             }
         } finally {
+            if (bitMask != 0) {
+                // Set Modified
+                nmsChunk.f(true);
+                nmsChunk.mustSave = true;
+                nmsChunk.markDirty();
+                // send to player
+                extent.sendChunk(X, Z, bitMask);
+            }
+
             extent.returnToPool(this);
         }
         /*

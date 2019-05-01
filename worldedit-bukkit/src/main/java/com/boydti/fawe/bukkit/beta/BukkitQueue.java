@@ -29,6 +29,8 @@ import net.minecraft.server.v1_13_R2.DataPaletteBlock;
 import net.minecraft.server.v1_13_R2.DataPaletteLinear;
 import net.minecraft.server.v1_13_R2.GameProfileSerializer;
 import net.minecraft.server.v1_13_R2.IBlockData;
+import net.minecraft.server.v1_13_R2.PlayerChunk;
+import net.minecraft.server.v1_13_R2.PlayerChunkMap;
 import net.minecraft.server.v1_13_R2.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
@@ -42,6 +44,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 import sun.misc.Unsafe;
 
@@ -106,6 +109,9 @@ public class BukkitQueue extends SimpleCharQueueExtent {
     public final static Field fieldTickingBlockCount;
     public final static Field fieldNonEmptyBlockCount;
 
+    private final static Field fieldDirtyCount;
+    private final static Field fieldDirtyBits;
+
     private static final int CHUNKSECTION_BASE;
     private static final int CHUNKSECTION_SHIFT;
 
@@ -126,6 +132,11 @@ public class BukkitQueue extends SimpleCharQueueExtent {
             fieldTickingBlockCount.setAccessible(true);
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
+
+            fieldDirtyCount = PlayerChunk.class.getDeclaredField("dirtyCount");
+            fieldDirtyCount.setAccessible(true);
+            fieldDirtyBits = PlayerChunk.class.getDeclaredField("h");
+            fieldDirtyBits.setAccessible(true);
 
             {
                 Field tmp = null;
@@ -215,6 +226,50 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         }
         // TODO optimize
         return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(X, Z));
+    }
+
+    private PlayerChunk getPlayerChunk(final int cx, final int cz) {
+        final PlayerChunkMap chunkMap = nmsWorld.getPlayerChunkMap();
+        final PlayerChunk playerChunk = chunkMap.getChunk(cx, cz);
+        if (playerChunk == null) {
+            return null;
+        }
+        if (playerChunk.players.isEmpty()) {
+            return null;
+        }
+        return playerChunk;
+    }
+
+    public boolean sendChunk(final int X, final int Z, final int mask) {
+        PlayerChunk playerChunk = getPlayerChunk(X, Z);
+        if (playerChunk == null) {
+            return false;
+        }
+        if (playerChunk.e()) {
+            TaskManager.IMP.sync(new Supplier<Object>() {
+                @Override
+                public Object get() {
+                    try {
+                        int dirtyBits = fieldDirtyBits.getInt(playerChunk);
+                        if (dirtyBits == 0) {
+                            nmsWorld.getPlayerChunkMap().a(playerChunk);
+                        }
+                        if (mask == 0) {
+                            dirtyBits = 65535;
+                        } else {
+                            dirtyBits |= mask;
+                        }
+
+                        fieldDirtyBits.set(playerChunk, dirtyBits);
+                        fieldDirtyCount.set(playerChunk, 64);
+                    } catch (final IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            });
+        }
+        return true;
     }
 
     /*
