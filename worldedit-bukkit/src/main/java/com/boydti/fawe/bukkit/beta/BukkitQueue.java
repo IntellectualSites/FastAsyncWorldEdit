@@ -17,6 +17,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
@@ -34,9 +35,13 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.ReentrantLock;
+
+import sun.misc.Unsafe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -99,6 +104,11 @@ public class BukkitQueue extends SimpleCharQueueExtent {
     public final static Field fieldTickingBlockCount;
     public final static Field fieldNonEmptyBlockCount;
 
+    private static final int CHUNKSECTION_BASE;
+    private static final int CHUNKSECTION_SHIFT;
+
+    private static final Field fieldLock;
+
     static {
         try {
             fieldSize = DataPaletteBlock.class.getDeclaredField("i");
@@ -114,11 +124,51 @@ public class BukkitQueue extends SimpleCharQueueExtent {
             fieldTickingBlockCount.setAccessible(true);
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
+
+            fieldLock = DataPaletteBlock.class.getDeclaredField("j");
+            fieldLock.setAccessible(true);
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            int modifiers = modifiersField.getInt(fieldLock);
+            modifiers &= ~Modifier.FINAL;
+            modifiersField.setInt(fieldLock, modifiers);
+
+            Unsafe unsafe = UnsafeUtils.getUNSAFE();
+            CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
+            int scale = unsafe.arrayIndexScale(ChunkSection[].class);
+            if ((scale & (scale - 1)) != 0)
+                throw new Error("data type scale not a power of two");
+            CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
             rethrow.printStackTrace();
             throw new RuntimeException(rethrow);
+        }
+    }
+
+    public static boolean setSectionAtomic(ChunkSection[] sections, ChunkSection expected, ChunkSection value, int layer) {
+        long offset = ((long) layer << CHUNKSECTION_SHIFT) + CHUNKSECTION_BASE;
+        if (layer >= 0 && layer < sections.length) {
+            return UnsafeUtils.getUNSAFE().compareAndSwapObject(sections, offset, expected, value);
+        }
+        return false;
+    }
+
+    public static DelegateLock applyLock(ChunkSection section) {
+        try {
+            synchronized (section) {
+                DataPaletteBlock<IBlockData> blocks = section.getBlocks();
+                ReentrantLock currentLock = (ReentrantLock) fieldLock.get(blocks);
+                if (currentLock instanceof DelegateLock) {
+                    return (DelegateLock) currentLock;
+                }
+                DelegateLock newLock = new DelegateLock(currentLock);
+                fieldLock.set(blocks, newLock);
+                return newLock;
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

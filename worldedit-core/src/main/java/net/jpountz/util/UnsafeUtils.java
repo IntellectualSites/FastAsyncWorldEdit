@@ -144,4 +144,8 @@ public enum UnsafeUtils {
     public static void writeShort(short[] dest, int destOff, int value) {
         UNSAFE.putShort(dest, SHORT_ARRAY_OFFSET + SHORT_ARRAY_SCALE * destOff, (short) value);
     }
+
+    public static Unsafe getUNSAFE() {
+        return UNSAFE;
+    }
 }

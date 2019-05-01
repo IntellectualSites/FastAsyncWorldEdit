@@ -7,11 +7,14 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
 import com.google.common.util.concurrent.Futures;
+import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.ChunkSection;
 import org.bukkit.World;
 
+import java.util.Arrays;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
     @Override
@@ -33,20 +36,73 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
         int X = getX();
         int Z = getZ();
 
-        Chunk currentNmsChunk = extent.ensureLoaded(X, Z);
-        ChunkSection[] sections = currentNmsChunk.getSections();
-        World world = extent.getBukkitWorld();
-        boolean hasSky = world.getEnvironment() == World.Environment.NORMAL;
+        Chunk nmsChunk = extent.ensureLoaded(X, Z);
+        try {
+            synchronized (nmsChunk) {
+                ChunkSection[] sections = nmsChunk.getSections();
+                World world = extent.getBukkitWorld();
+                boolean hasSky = world.getEnvironment() == World.Environment.NORMAL;
 
-        for (int layer = 0; layer < 16; layer++) {
-            if (!set.hasSection(layer)) continue;
-            char[] arr = set.blocks[layer];
-            ChunkSection newSection = extent.newChunkSection(layer, hasSky, arr);
-            sections[layer] = newSection;
+                for (int layer = 0; layer < 16; layer++) {
+                    if (!set.hasSection(layer)) continue;
+                    char[] setArr = set.blocks[layer];
+                    ChunkSection newSection;
+                    ChunkSection existingSection = sections[layer];
+                    if (existingSection == null) {
+                        newSection = extent.newChunkSection(layer, hasSky, setArr);
+                        if (BukkitQueue.setSectionAtomic(sections, null, newSection, layer)) {
+                            continue;
+                        } else {
+                            existingSection = sections[layer];
+                            if (existingSection == null) {
+                                System.out.println("Skipping invalid null section. chunk:" + X + "," + Z + " layer: " + layer);
+                                continue;
+                            }
+                        }
+                    }
+                    DelegateLock lock = BukkitQueue.applyLock(existingSection);
+                    synchronized (lock) {
+                        if (lock.isLocked()) {
+                            lock.lock();
+                            lock.unlock();
+                        }
+                        synchronized (get) {
+                            ChunkSection getSection;
+                            if (get.nmsChunk != nmsChunk) {
+                                get.nmsChunk = nmsChunk;
+                                get.sections = null;
+                                get.reset();
+                                System.out.println("chunk doesn't match");
+                            } else {
+                                getSection = get.getSections()[layer];
+                                if (getSection != existingSection) {
+                                    get.sections[layer] = existingSection;
+                                    get.reset();
+                                    System.out.println("Section doesn't match");
+                                } else if (lock.isModified()) {
+                                    System.out.println("lock is outdated");
+                                    get.reset(layer);
+                                }
+                            }
+                            char[] getArr = get.load(layer);
+                            for (int i = 0; i < 4096; i++) {
+                                char value = setArr[i];
+                                if (value != 0) {
+                                    getArr[i] = value;
+                                }
+                            }
+                            newSection = extent.newChunkSection(layer, hasSky, getArr);
+                            if (!BukkitQueue.setSectionAtomic(sections, existingSection, newSection, layer)) {
+                                System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        } finally {
+            extent.returnToPool(this);
         }
-
-
-
         /*
 
  - getBlocks

@@ -30,6 +30,10 @@ public class CharBlocks implements IBlocks {
         for (int i = 0; i < 16; i++) sections[i] = NULL;
     }
 
+    public void reset(int layer) {
+        sections[layer] = NULL;
+    }
+
     protected char[] load(int layer) {
         return new char[4096];
     }

@@ -13,6 +13,14 @@ public class DelegateLock extends ReentrantLock {
         this.parent = parent;
     }
 
+    public boolean isModified() {
+        return modified;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
+    }
+
     @Override
     public void lock() {
         modified = true;
@@ -35,10 +43,14 @@ public class DelegateLock extends ReentrantLock {
     }
 
     @Override
-    public synchronized void unlock() {
+    public void unlock() {
         modified = true;
         parent.unlock();
         this.notifyAll();
+    }
+
+    public ReentrantLock getParent() {
+        return parent;
     }
 
     @Override

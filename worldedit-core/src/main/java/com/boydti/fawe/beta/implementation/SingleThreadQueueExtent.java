@@ -78,6 +78,10 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     // Pool discarded chunks for reuse (can safely be cleared by another thread)
     private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
 
+    public void returnToPool(IChunk chunk) {
+        CHUNK_POOL.add(chunk);
+    }
+
     @Override
     public <T extends Future<T>> T submit(final IChunk<T> chunk) {
         if (chunk.isEmpty()) {
@@ -123,7 +127,6 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     private IChunk poolOrCreate(final int X, final int Z) {
         IChunk next = CHUNK_POOL.poll();
         if (next == null) {
-            System.out.println("Create");
             next = create(false);
         }
         next.init(this, X, Z);
