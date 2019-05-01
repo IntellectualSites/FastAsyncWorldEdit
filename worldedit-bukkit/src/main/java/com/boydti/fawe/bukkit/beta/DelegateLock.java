@@ -1,16 +1,27 @@
 package com.boydti.fawe.bukkit.beta;
 
+import org.apache.commons.lang.mutable.MutableInt;
+
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DelegateLock extends ReentrantLock {
-    private final ReentrantLock parent;
+    private final Lock parent;
     private volatile boolean modified;
+    private final AtomicInteger count;
 
-    public DelegateLock(ReentrantLock parent) {
+    public DelegateLock(Lock parent) {
         this.parent = parent;
+        if (!(parent instanceof ReentrantLock)) {
+            count = new AtomicInteger();
+        } else {
+            count = null;
+        }
     }
 
     public boolean isModified() {
@@ -22,9 +33,12 @@ public class DelegateLock extends ReentrantLock {
     }
 
     @Override
-    public void lock() {
+    public synchronized void lock() {
         modified = true;
         parent.lock();
+        if (count != null) {
+            count.incrementAndGet();
+        }
     }
 
     @Override
@@ -46,10 +60,14 @@ public class DelegateLock extends ReentrantLock {
     public void unlock() {
         modified = true;
         parent.unlock();
-        this.notifyAll();
+        if (count != null) {
+            if (count.getAndDecrement() <= 0) {
+                count.incrementAndGet();
+            }
+        }
     }
 
-    public ReentrantLock getParent() {
+    public Lock getParent() {
         return parent;
     }
 
@@ -60,27 +78,42 @@ public class DelegateLock extends ReentrantLock {
 
     @Override
     public synchronized int getHoldCount() {
-        return parent.getHoldCount();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public synchronized boolean isHeldByCurrentThread() {
-        return parent.isHeldByCurrentThread();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public synchronized boolean isLocked() {
-        return parent.isLocked();
+        if (parent instanceof ReentrantLock) {
+            return ((ReentrantLock) parent).isLocked();
+        }
+        return count.get() > 0;
+    }
+
+    public void untilFree() {
+        if (parent instanceof ReentrantLock) {
+            ReentrantLock rl = (ReentrantLock) parent;
+            if (rl.isLocked()) {
+                rl.lock();
+                rl.unlock();
+            }
+            return;
+        }
+        while (count.get() > 0);
     }
 
     @Override
     public synchronized boolean hasWaiters(Condition condition) {
-        return parent.hasWaiters(condition);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public synchronized int getWaitQueueLength(Condition condition) {
-        return parent.getWaitQueueLength(condition);
+        throw new UnsupportedOperationException();
     }
 
     @Override

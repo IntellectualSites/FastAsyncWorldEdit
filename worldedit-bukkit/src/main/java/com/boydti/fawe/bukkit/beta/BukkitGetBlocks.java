@@ -64,10 +64,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
         }
         DelegateLock lock = BukkitQueue.applyLock(section);
         synchronized (lock) {
-            if (lock.isLocked()) {
-                lock.lock();
-                lock.unlock();
-            }
+            lock.untilFree();
             lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {

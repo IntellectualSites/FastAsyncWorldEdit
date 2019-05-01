@@ -28,6 +28,23 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
         return new BukkitGetBlocks(extent.getNmsWorld(), getX(), getZ());
     }
 
+    private void updateGet(BukkitGetBlocks get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
+        synchronized (get) {
+            if (get.nmsChunk != nmsChunk) {
+                get.nmsChunk = nmsChunk;
+                get.sections = sections.clone();
+                get.reset();
+            }
+            if (get.sections == null) {
+                get.sections = sections;
+            }
+            if (get.sections[layer] != section) {
+                get.sections[layer] = section;
+            }
+            get.blocks[layer] = arr;
+        }
+    }
+
     @Override
     public T call() {
         BukkitQueue extent = (BukkitQueue) getExtent();
@@ -51,6 +68,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                     if (existingSection == null) {
                         newSection = extent.newChunkSection(layer, hasSky, setArr);
                         if (BukkitQueue.setSectionAtomic(sections, null, newSection, layer)) {
+                            updateGet(get, nmsChunk, sections, newSection, setArr, layer);
                             continue;
                         } else {
                             existingSection = sections[layer];
@@ -62,10 +80,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                     }
                     DelegateLock lock = BukkitQueue.applyLock(existingSection);
                     synchronized (lock) {
-                        if (lock.isLocked()) {
-                            lock.lock();
-                            lock.unlock();
-                        }
+                        lock.untilFree();
                         synchronized (get) {
                             ChunkSection getSection;
                             if (get.nmsChunk != nmsChunk) {
@@ -95,6 +110,8 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                             if (!BukkitQueue.setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
+                            } else {
+                                updateGet(get, nmsChunk, sections, newSection, setArr, layer);
                             }
                         }
                     }

@@ -39,7 +39,9 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import sun.misc.Unsafe;
 
@@ -135,6 +137,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
                 fieldLock = tmp;
                 fieldLock.setAccessible(true);
                 Field modifiersField = Field.class.getDeclaredField("modifiers");
+                modifiersField.setAccessible(true);
                 int modifiers = modifiersField.getInt(fieldLock);
                 int newModifiers = modifiers & (~Modifier.FINAL);
                 if (newModifiers != modifiers) modifiersField.setInt(fieldLock, newModifiers);
@@ -154,7 +157,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         }
     }
 
-    public static boolean setSectionAtomic(ChunkSection[] sections, ChunkSection expected, ChunkSection value, int layer) {
+    protected static boolean setSectionAtomic(ChunkSection[] sections, ChunkSection expected, ChunkSection value, int layer) {
         long offset = ((long) layer << CHUNKSECTION_SHIFT) + CHUNKSECTION_BASE;
         if (layer >= 0 && layer < sections.length) {
             return UnsafeUtils.getUNSAFE().compareAndSwapObject(sections, offset, expected, value);
@@ -162,11 +165,11 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         return false;
     }
 
-    public static DelegateLock applyLock(ChunkSection section) {
+    protected static DelegateLock applyLock(ChunkSection section) {
         try {
             synchronized (section) {
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                ReentrantLock currentLock = (ReentrantLock) fieldLock.get(blocks);
+                Lock currentLock = (Lock) fieldLock.get(blocks);
                 if (currentLock instanceof DelegateLock) {
                     return (DelegateLock) currentLock;
                 }
