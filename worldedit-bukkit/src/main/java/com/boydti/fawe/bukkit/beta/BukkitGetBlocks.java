@@ -53,7 +53,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
     }
 
     @Override
-    public char[] load(int layer, char[] data) {
+    public synchronized char[] load(int layer, char[] data) {
         ChunkSection section = getSections()[layer];
         // Section is null, return empty array
         if (section == null) {
@@ -126,6 +126,9 @@ public class BukkitGetBlocks extends CharGetBlocks {
                     for (int i = 0; i < 4096; i++) {
                         char paletteVal = data[i];
                         data[i] = paletteToBlockChars[paletteVal];
+                        if (data[i] == Character.MAX_VALUE) {
+                            System.out.println("Invalid " + paletteVal + " | " + num_palette);
+                        }
                     }
                 } finally {
                     for (int i = 0; i < num_palette; i++) {

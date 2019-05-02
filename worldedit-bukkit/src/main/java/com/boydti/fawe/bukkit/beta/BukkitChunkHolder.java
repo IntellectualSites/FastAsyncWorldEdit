@@ -1,18 +1,51 @@
 package com.boydti.fawe.bukkit.beta;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IGetBlocks;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
+import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
+import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
+import com.boydti.fawe.util.ReflectionUtils;
 import com.google.common.util.concurrent.Futures;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.LongTag;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import net.jpountz.util.UnsafeUtils;
+import net.minecraft.server.v1_13_R2.BiomeBase;
+import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.ChunkSection;
+import net.minecraft.server.v1_13_R2.Entity;
+import net.minecraft.server.v1_13_R2.EntityTypes;
+import net.minecraft.server.v1_13_R2.MinecraftKey;
+import net.minecraft.server.v1_13_R2.NBTTagCompound;
+import net.minecraft.server.v1_13_R2.NBTTagInt;
+import net.minecraft.server.v1_13_R2.TileEntity;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
@@ -54,109 +87,263 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
         int Z = getZ();
 
         Chunk nmsChunk = extent.ensureLoaded(X, Z);
+
+        // Remove existing tiles
+        {
+            Map<BlockPosition, TileEntity> tiles = nmsChunk.getTileEntities();
+            if (!tiles.isEmpty()) {
+                final Iterator<Map.Entry<BlockPosition, TileEntity>> iterator = tiles.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    final Map.Entry<BlockPosition, TileEntity> entry = iterator.next();
+                    final BlockPosition pos = entry.getKey();
+                    final int lx = pos.getX() & 15;
+                    final int ly = pos.getY();
+                    final int lz = pos.getZ() & 15;
+                    final int layer = ly >> 4;
+                    final char[] array = set.blocks[layer];
+                    if (array == null) {
+                        continue;
+                    }
+                    final int index = (((ly & 0xF) << 8) | (lz << 4) | lx);
+                    if (array[index] != 0) {
+                        TileEntity tile = entry.getValue();
+                        tile.z();
+                        tile.invalidateBlockCache();
+                    }
+                }
+            }
+        }
+
+
         int bitMask = 0;
-        try {
-            synchronized (nmsChunk) {
-                ChunkSection[] sections = nmsChunk.getSections();
-                World world = extent.getBukkitWorld();
-                boolean hasSky = world.getEnvironment() == World.Environment.NORMAL;
+        synchronized (nmsChunk) {
+            ChunkSection[] sections = nmsChunk.getSections();
+            World world = extent.getBukkitWorld();
+            boolean hasSky = world.getEnvironment() == World.Environment.NORMAL;
 
-                for (int layer = 0; layer < 16; layer++) {
-                    if (!set.hasSection(layer)) continue;
+            for (int layer = 0; layer < 16; layer++) {
+                if (!set.hasSection(layer)) continue;
 
-                    bitMask |= 1 << layer;
+                bitMask |= 1 << layer;
 
-                    char[] setArr = set.blocks[layer];
-                    ChunkSection newSection;
-                    ChunkSection existingSection = sections[layer];
-                    if (existingSection == null) {
-                        newSection = extent.newChunkSection(layer, hasSky, setArr);
-                        if (BukkitQueue.setSectionAtomic(sections, null, newSection, layer)) {
-                            updateGet(get, nmsChunk, sections, newSection, setArr, layer);
+                char[] setArr = set.blocks[layer];
+                ChunkSection newSection;
+                ChunkSection existingSection = sections[layer];
+                if (existingSection == null) {
+                    newSection = extent.newChunkSection(layer, hasSky, setArr);
+                    if (BukkitQueue.setSectionAtomic(sections, null, newSection, layer)) {
+                        updateGet(get, nmsChunk, sections, newSection, setArr, layer);
+                        continue;
+                    } else {
+                        existingSection = sections[layer];
+                        if (existingSection == null) {
+                            System.out.println("Skipping invalid null section. chunk:" + X + "," + Z + " layer: " + layer);
                             continue;
-                        } else {
-                            existingSection = sections[layer];
-                            if (existingSection == null) {
-                                System.out.println("Skipping invalid null section. chunk:" + X + "," + Z + " layer: " + layer);
-                                continue;
-                            }
                         }
                     }
-                    DelegateLock lock = BukkitQueue.applyLock(existingSection);
-                    synchronized (lock) {
-                        lock.untilFree();
-                        synchronized (get) {
-                            ChunkSection getSection;
-                            if (get.nmsChunk != nmsChunk) {
-                                if (get.nmsChunk != null) System.out.println("chunk doesn't match");
-                                get.nmsChunk = nmsChunk;
-                                get.sections = null;
+                }
+                DelegateLock lock = BukkitQueue.applyLock(existingSection);
+                synchronized (lock) {
+                    lock.untilFree();
+                    synchronized (get) {
+                        ChunkSection getSection;
+                        if (get.nmsChunk != nmsChunk) {
+                            if (get.nmsChunk != null) System.out.println("chunk doesn't match");
+                            get.nmsChunk = nmsChunk;
+                            get.sections = null;
+                            get.reset();
+                        } else {
+                            getSection = get.getSections()[layer];
+                            if (getSection != existingSection) {
+                                get.sections[layer] = existingSection;
                                 get.reset();
-                            } else {
-                                getSection = get.getSections()[layer];
-                                if (getSection != existingSection) {
-                                    get.sections[layer] = existingSection;
-                                    get.reset();
-                                    System.out.println("Section doesn't match");
-                                } else if (lock.isModified()) {
-                                    System.out.println("lock is outdated");
-                                    get.reset(layer);
-                                }
+                                System.out.println("Section doesn't match");
+                            } else if (lock.isModified()) {
+                                System.out.println("lock is outdated");
+                                get.reset(layer);
                             }
-                            char[] getArr = get.load(layer);
-                            for (int i = 0; i < 4096; i++) {
-                                char value = setArr[i];
-                                if (value != 0) {
-                                    getArr[i] = value;
-                                }
+                        }
+                        char[] getArr = get.load(layer);
+                        for (int i = 0; i < 4096; i++) {
+                            char value = setArr[i];
+                            if (value != 0) {
+                                getArr[i] = value;
                             }
-                            newSection = extent.newChunkSection(layer, hasSky, getArr);
-                            if (!BukkitQueue.setSectionAtomic(sections, existingSection, newSection, layer)) {
-                                System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
-                                continue;
-                            } else {
-                                updateGet(get, nmsChunk, sections, newSection, setArr, layer);
-                            }
+                        }
+                        newSection = extent.newChunkSection(layer, hasSky, getArr);
+                        if (!BukkitQueue.setSectionAtomic(sections, existingSection, newSection, layer)) {
+                            System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
+                            continue;
+                        } else {
+                            updateGet(get, nmsChunk, sections, newSection, setArr, layer);
                         }
                     }
                 }
             }
-        } finally {
-            if (bitMask != 0) {
-                // Set Modified
-                nmsChunk.f(true);
-                nmsChunk.mustSave = true;
-                nmsChunk.markDirty();
-                // send to player
-                extent.sendChunk(X, Z, bitMask);
+
+            // Biomes
+            if (set.biomes != null) {
+                // set biomes
+                final BiomeBase[] currentBiomes = nmsChunk.getBiomeIndex();
+                for (int i = 0; i < set.biomes.length; i++) {
+                    final BiomeType biome = set.biomes[i];
+                    if (biome != null) {
+                        final Biome craftBiome = BukkitAdapter.adapt(biome);
+                        currentBiomes[i] = CraftBlock.biomeToBiomeBase(craftBiome);
+                    }
+                }
             }
 
-            extent.returnToPool(this);
+            Runnable[] syncTasks = null;
+
+            net.minecraft.server.v1_13_R2.World nmsWorld = nmsChunk.getWorld();
+            int bx = X << 4;
+            int bz = Z << 4;
+
+            if (set.entityRemoves != null && !set.entityRemoves.isEmpty()) {
+                if (syncTasks == null) syncTasks = new Runnable[3];
+
+                HashSet<UUID> entsToRemove = set.entityRemoves;
+
+                syncTasks[2] = new Runnable() {
+                    @Override
+                    public void run() {
+                        final List<Entity>[] entities = nmsChunk.getEntitySlices();
+
+                        for (int i = 0; i < entities.length; i++) {
+                            final Collection<Entity> ents = entities[i];
+                            if (!ents.isEmpty()) {
+                                final Iterator<Entity> iter = ents.iterator();
+                                while (iter.hasNext()) {
+                                    final Entity entity = iter.next();
+                                    if (entsToRemove.contains(entity.getUniqueID())) {
+                                        iter.remove();
+                                        entity.b(false);
+                                        entity.die();
+                                        entity.valid = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
+            if (set.entities != null && !set.entities.isEmpty()) {
+                if (syncTasks == null) syncTasks = new Runnable[2];
+
+                HashSet<CompoundTag> entitiesToSpawn = set.entities;
+
+                syncTasks[1] = new Runnable() {
+                    @Override
+                    public void run() {
+                        for (final CompoundTag nativeTag : entitiesToSpawn) {
+                            final Map<String, Tag> entityTagMap = ReflectionUtils.getMap(nativeTag.getValue());
+                            final StringTag idTag = (StringTag) entityTagMap.get("Id");
+                            final ListTag posTag = (ListTag) entityTagMap.get("Pos");
+                            final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
+                            if (idTag == null || posTag == null || rotTag == null) {
+                                Fawe.debug("Unknown entity tag: " + nativeTag);
+                                continue;
+                            }
+                            final double x = posTag.getDouble(0);
+                            final double y = posTag.getDouble(1);
+                            final double z = posTag.getDouble(2);
+                            final float yaw = rotTag.getFloat(0);
+                            final float pitch = rotTag.getFloat(1);
+                            final String id = idTag.getValue();
+                            final Entity entity = EntityTypes.a(nmsWorld, new MinecraftKey(id));
+                            if (entity != null) {
+                                final UUID uuid = entity.getUniqueID();
+                                entityTagMap.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
+                                entityTagMap.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
+                                if (nativeTag != null) {
+                                    final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
+                                    for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                        tag.remove(name);
+                                    }
+                                    entity.f(tag);
+                                }
+                                entity.setLocation(x, y, z, yaw, pitch);
+                                nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                            }
+                        }
+                    }
+                };
+
+            }
+
+            // set tiles
+            if (set.tiles != null && !set.tiles.isEmpty()) {
+                if (syncTasks == null) syncTasks = new Runnable[1];
+
+                HashMap<Short, CompoundTag> tiles = set.tiles;
+                syncTasks[0] = new Runnable() {
+                    @Override
+                    public void run() {
+                        for (final Map.Entry<Short, CompoundTag> entry : tiles.entrySet()) {
+                            final CompoundTag nativeTag = entry.getValue();
+                            final short blockHash = entry.getKey();
+                            final int x = (blockHash >> 12 & 0xF) + bx;
+                            final int y = (blockHash & 0xFF);
+                            final int z = (blockHash >> 8 & 0xF) + bz;
+                            final BlockPosition pos = new BlockPosition(x, y, z);
+                            synchronized (BukkitQueue_0.class) {
+                                TileEntity tileEntity = nmsWorld.getTileEntity(pos);
+                                if (tileEntity == null || tileEntity.x()) {
+                                    nmsWorld.n(pos);
+                                    tileEntity = nmsWorld.getTileEntity(pos);
+                                }
+                                if (tileEntity != null) {
+                                    final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
+                                    tag.set("x", new NBTTagInt(x));
+                                    tag.set("y", new NBTTagInt(y));
+                                    tag.set("z", new NBTTagInt(z));
+                                    tileEntity.load(tag);
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
+            int finalMask = bitMask;
+            Runnable callback = () -> {
+                if (finalMask != 0) {
+                    // Set Modified
+                    nmsChunk.f(true);
+                    nmsChunk.mustSave = true;
+                    nmsChunk.markDirty();
+                    // send to player
+                    extent.sendChunk(X, Z, finalMask);
+                }
+
+                extent.returnToPool(BukkitChunkHolder.this);
+            };
+            if (syncTasks != null) {
+                QueueHandler queueHandler = Fawe.get().getQueueHandler();
+                Runnable[] finalSyncTasks = syncTasks;
+
+                // Chain the sync tasks and the callback
+                Callable<Future> chain = new Callable<Future>() {
+                    @Override
+                    public Future call() {
+                        // Run the sync tasks
+                        for (int i = 1; i < finalSyncTasks.length; i++) {
+                            Runnable task = finalSyncTasks[i];
+                            if (task != null) {
+                                task.run();
+                            }
+                        }
+                        return queueHandler.async(callback, null);
+                    }
+                };
+                return (T) queueHandler.sync(chain);
+            } else {
+                callback.run();
+            }
         }
-        /*
-
- - getBlocks
- - set ChunkSection lock with a tracking lock
- - synchronize on chunk object (so no other FAWE thread updates it at the same time)
- - verify cached section is same object as NMS chunk section
-	otherwise, fetch the new section, set the tracking lock and reconstruct the getBlocks array
- - Merge raw getBlocks and setBlocks array
- - Construct the ChunkSection
- - In parallel on the main thread
- - if the tracking lock has had no updates and the cached ChunkSection == the NMS chunk section
- - Otherwise, reconstruct the ChunkSection (TODO: Benchmark if this is a performance concern)
- - swap in the new ChunkSection
- - Update tile entities/entities (if necessary)
- - Merge the biome array (if necessary)
- - set chunk status to needs relighting
- - mark as dirty
-
-         */
-
-//        throw new UnsupportedOperationException("Not implemented");
-//        return true;
         return null;
-//        return (T) (Future) Futures.immediateFuture(null);
     }
 
     @Override

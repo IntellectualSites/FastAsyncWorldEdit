@@ -302,9 +302,11 @@ public class RegionCommands extends MethodCommands {
         for (BlockVector3 p : region) {
             queue.setBlock(p.getX(), p.getY(), p.getZ(), block);
         }
+        long start2 = System.currentTimeMillis();
         queue.flush();
         long diff = System.currentTimeMillis() - start;
-        System.out.println(diff);
+        long diff2 = System.currentTimeMillis() - start2;
+        System.out.println(diff + " | " + diff2);
     }
 
     @Command(

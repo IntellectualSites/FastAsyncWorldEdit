@@ -20,11 +20,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -34,7 +36,7 @@ public abstract class QueueHandler implements Trimable {
     private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
     private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
     private ThreadPoolExecutor blockingExecutor = FaweCache.newBlockingExecutor();
-    private ConcurrentLinkedQueue<Runnable> syncTasks = new ConcurrentLinkedQueue();
+    private ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue();
 
     private Map<World, WeakReference<WorldChunkCache>> chunkCache = new HashMap<>();
     private IterableThreadLocal<IQueueExtent> queuePool = new IterableThreadLocal<IQueueExtent>() {
@@ -43,6 +45,32 @@ public abstract class QueueHandler implements Trimable {
             return create();
         }
     };
+
+    public <T> Future<T> async(Runnable run, T value) {
+        return forkJoinPoolSecondary.submit(run, value);
+    }
+
+    public <T> Future<T> async(Callable<T> call) {
+        return forkJoinPoolSecondary.submit(call);
+    }
+
+    public <T> Future<T> sync(Runnable run, T value) {
+        FutureTask<T> result = new FutureTask<>(run, value);
+        syncTasks.add(result);
+        return result;
+    }
+
+    public <T> Future<T> sync(Runnable run) {
+        FutureTask<T> result = new FutureTask<>(run, null);
+        syncTasks.add(result);
+        return result;
+    }
+
+    public <T> Future<T> sync(Callable<T> call) {
+        FutureTask<T> result = new FutureTask<>(call);
+        syncTasks.add(result);
+        return result;
+    }
 
     public <T extends Future<T>> T submit(IChunk<T> chunk) {
         if (MemUtil.isMemoryFree()) {
