@@ -57,7 +57,7 @@ public interface Filter  {
         return this;
     }
 
-    default void join(final Filter parent) {
+    default void join() {
 
     }
 }

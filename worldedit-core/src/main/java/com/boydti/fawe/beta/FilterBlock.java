@@ -1,7 +1,5 @@
 package com.boydti.fawe.beta;
 
-import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
-import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -11,7 +9,7 @@ public interface FilterBlock {
 
     FilterBlock init(int X, int Z, IGetBlocks chunk);
 
-    void filter(IGetBlocks get, ISetBlocks set, Filter filter);
+    void filter(IGetBlocks get, ISetBlocks set, int layer, Filter filter);
 
     void setOrdinal(int ordinal);
 

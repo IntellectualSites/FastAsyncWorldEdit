@@ -12,7 +12,6 @@ import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
@@ -24,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
@@ -163,40 +161,30 @@ public abstract class QueueHandler implements Trimable, Runnable {
                     synchronized (queue) {
                         FilterBlock block = null;
 
-                        try {
-                            while (true) {
-                                // Get the next chunk pos
-                                final int X, Z;
-                                synchronized (chunksIter) {
-                                    if (!chunksIter.hasNext()) break;
-                                    final BlockVector2 pos = chunksIter.next();
-                                    X = pos.getX();
-                                    Z = pos.getZ();
-                                }
-                                IChunk chunk = queue.getCachedChunk(X, Z);
-                                // Initialize
-                                chunk.init(queue, X, Z);
-
-                                if (!newFilter.appliesChunk(X, Z)) {
-                                    continue;
-                                }
-                                chunk = newFilter.applyChunk(chunk);
-
-                                if (chunk == null) continue;
-
-                                if (block == null) block = queue.initFilterBlock();
-                                chunk.filter(newFilter, block);
-
-                                newFilter.finishChunk(chunk);
-
-                                queue.submit(chunk);
+                        while (true) {
+                            // Get the next chunk pos
+                            final int X, Z;
+                            synchronized (chunksIter) {
+                                if (!chunksIter.hasNext()) break;
+                                final BlockVector2 pos = chunksIter.next();
+                                X = pos.getX();
+                                Z = pos.getZ();
                             }
-                        } finally {
-                            if (filter != newFilter) {
-                                synchronized (filter) {
-                                    newFilter.join(filter);
-                                }
+                            IChunk chunk = queue.getCachedChunk(X, Z);
+                            // Initialize
+                            chunk.init(queue, X, Z);
+
+                            if (!newFilter.appliesChunk(X, Z)) {
+                                continue;
                             }
+                            chunk = newFilter.applyChunk(chunk);
+
+                            if (chunk == null) continue;
+
+                            if (block == null) block = queue.initFilterBlock();
+                            chunk.filter(newFilter, block);
+
+                            queue.submit(chunk);
                         }
                         queue.flush();
                     }
@@ -210,5 +198,6 @@ public abstract class QueueHandler implements Trimable, Runnable {
                 task.quietlyJoin();
             }
         }
+        filter.join();
     }
 }

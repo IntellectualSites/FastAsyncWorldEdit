@@ -1,7 +1,6 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
-import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -14,7 +13,8 @@ import static com.sk89q.worldedit.world.block.BlockTypes.states;
 public class CharFilterBlock implements FilterBlock {
     private IQueueExtent queue;
     private CharGetBlocks get;
-    private CharSetBlocks set;
+
+    private ISetBlocks set;
 
     private char[] getArr;
     private @Nullable char[] setArr;
@@ -39,28 +39,26 @@ public class CharFilterBlock implements FilterBlock {
         return this;
     }
 
-    public final void filter(final IGetBlocks iget, final ISetBlocks iset, final Filter filter) {
-        final CharSetBlocks set = (CharSetBlocks) iset;
+    @Override
+    public final void filter(final IGetBlocks iget, final ISetBlocks iset, final int layer, final Filter filter) {
+        this.layer = layer;
         final CharGetBlocks get = (CharGetBlocks) iget;
-        for (int layer = 0; layer < 16; layer++) {
-            if (!get.hasSection(layer)) continue;
-            this.set = set;
-            getArr = get.sections[layer].get(get, layer);
-            if (set.hasSection(layer)) {
-                setArr = set.blocks[layer];
-                delegate = FULL;
-            } else {
-                delegate = NULL;
-                setArr = null;
-            }
-            this.layer = layer;
-            this.yy = layer << 4;
+        if (!get.hasSection(layer)) return;
+        this.set = iset;
+        getArr = get.sections[layer].get(get, layer);
+        if (set.hasSection(layer)) {
+            setArr = set.getArray(layer);
+            delegate = FULL;
+        } else {
+            delegate = NULL;
+            setArr = null;
+        }
+        this.yy = layer << 4;
 
-            for (y = 0, index = 0; y < 16; y++) {
-                for (z = 0; z < 16; z++) {
-                    for (x = 0; x < 16; x++, index++) {
-                        filter.applyBlock(this);
-                    }
+        for (y = 0, index = 0; y < 16; y++) {
+            for (z = 0; z < 16; z++) {
+                for (x = 0; x < 16; x++, index++) {
+                    filter.applyBlock(this);
                 }
             }
         }
@@ -305,7 +303,7 @@ public class CharFilterBlock implements FilterBlock {
     Set delegate
      */
     private SetDelegate initSet() {
-        setArr = set.sections[layer].get(set, layer);
+        setArr = set.getArray(layer);
         return delegate = FULL;
     }
 

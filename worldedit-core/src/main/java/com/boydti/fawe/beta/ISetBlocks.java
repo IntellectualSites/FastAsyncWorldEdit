@@ -2,9 +2,13 @@ package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -26,4 +30,19 @@ public interface ISetBlocks extends IBlocks {
     default void optimize() {
 
     }
+
+    BlockState getBlock(int x, int y, int z);
+
+    char[] getArray(int layer);
+
+    BiomeType[] getBiomes();
+
+    Map<Short, CompoundTag> getTiles();
+
+    Set<CompoundTag> getEntities();
+
+    Set<UUID> getEntityRemoves();
+
+    @Override
+    void reset();
 }

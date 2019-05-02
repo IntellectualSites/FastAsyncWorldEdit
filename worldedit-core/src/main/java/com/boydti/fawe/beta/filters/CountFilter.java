@@ -1,6 +1,5 @@
 package com.boydti.fawe.beta.filters;
 
-import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -12,11 +11,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CountFilter implements Filter {
+public class CountFilter extends ForkedFilter<CountFilter> {
     private final int[] counter = new int[BlockTypes.states.length];
 
+    public CountFilter() {
+        super(null);
+    }
+
+    private CountFilter(CountFilter root) {
+        super(root);
+    }
+
     @Override
-    public void applyBlock(final FilterBlock block) {
+    public CountFilter init() {
+        return new CountFilter(this);
+    }
+
+    @Override
+    public void join(CountFilter filter) {
+        for (int i = 0; i < filter.counter.length; i++) {
+            this.counter[i] += filter.counter[i];
+        }
+    }
+
+    /*
+    Implementation
+     */
+
+    @Override
+    public final void applyBlock(final FilterBlock block) {
         counter[block.getOrdinal()]++;
     }
 
@@ -40,19 +63,6 @@ public class CountFilter implements Filter {
                     c.getAmount() / (double) size * 100,
                     name);
             actor.print(BBC.getPrefix() + str);
-        }
-    }
-
-    @Override
-    public Filter fork() {
-        return new CountFilter();
-    }
-
-    @Override
-    public void join(final Filter parent) {
-        final CountFilter other = (CountFilter) parent;
-        for (int i = 0; i < counter.length; i++) {
-            other.counter[i] += this.counter[i];
         }
     }
 }

@@ -40,7 +40,11 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
         final IGetBlocks get = getOrCreateGet();
         final ISetBlocks set = getOrCreateSet();
         block = block.init(X, Z, get);
-        block.filter(get, set, filter);
+        for (int layer = 0; layer < 16; layer++) {
+            if (!get.hasSection(layer)) continue;
+            block.filter(get, set, layer, filter);
+        }
+        filter.finishChunk(this);
     }
 
     @Override
@@ -94,12 +98,12 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
         return get();
     }
 
-    @Override
-    public void optimize() {
-        if (set != null) {
-            set.optimize();
-        }
-    }
+//    @Override
+//    public void optimize() {
+//        if (set != null) {
+//            set.optimize();
+//        }
+//    }
 
     @Override
     public void init(final IQueueExtent extent, final int X, final int Z) {

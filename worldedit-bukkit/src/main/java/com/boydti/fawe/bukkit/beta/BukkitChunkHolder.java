@@ -2,16 +2,14 @@ package com.boydti.fawe.bukkit.beta;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IGetBlocks;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.ISetBlocks;
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.google.common.util.concurrent.Futures;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.LongTag;
@@ -20,8 +18,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_13_R2.BiomeBase;
 import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.Chunk;
@@ -37,18 +33,14 @@ import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
     @Override
@@ -86,7 +78,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
             int Z = getZ();
             BukkitQueue extent = (BukkitQueue) getExtent();
             BukkitGetBlocks get = (BukkitGetBlocks) getOrCreateGet();
-            CharSetBlocks set = (CharSetBlocks) getOrCreateSet();
+            ISetBlocks set = getOrCreateSet();
 
             Chunk nmsChunk = extent.ensureLoaded(X, Z);
 
@@ -102,12 +94,10 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                         final int ly = pos.getY();
                         final int lz = pos.getZ() & 15;
                         final int layer = ly >> 4;
-                        final char[] array = set.blocks[layer];
-                        if (array == null) {
+                        if (!set.hasSection(layer)) {
                             continue;
                         }
-                        final int index = (((ly & 0xF) << 8) | (lz << 4) | lx);
-                        if (array[index] != 0) {
+                        if (set.getBlock(lx, ly, lz).getOrdinal() != 0) {
                             TileEntity tile = entry.getValue();
                             tile.z();
                             tile.invalidateBlockCache();
@@ -115,7 +105,6 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                     }
                 }
             }
-
 
             int bitMask = 0;
             synchronized (nmsChunk) {
@@ -128,7 +117,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
 
                     bitMask |= 1 << layer;
 
-                    char[] setArr = set.blocks[layer];
+                    char[] setArr = set.getArray(layer);
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
@@ -182,11 +171,12 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                 }
 
                 // Biomes
-                if (set.biomes != null) {
+                BiomeType[] biomes = set.getBiomes();
+                if (biomes != null) {
                     // set biomes
                     final BiomeBase[] currentBiomes = nmsChunk.getBiomeIndex();
-                    for (int i = 0; i < set.biomes.length; i++) {
-                        final BiomeType biome = set.biomes[i];
+                    for (int i = 0; i < biomes.length; i++) {
+                        final BiomeType biome = biomes[i];
                         if (biome != null) {
                             final Biome craftBiome = BukkitAdapter.adapt(biome);
                             currentBiomes[i] = CraftBlock.biomeToBiomeBase(craftBiome);
@@ -200,10 +190,9 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                 int bx = X << 4;
                 int bz = Z << 4;
 
-                if (set.entityRemoves != null && !set.entityRemoves.isEmpty()) {
+                Set<UUID> entityRemoves = set.getEntityRemoves();
+                if (entityRemoves != null && !entityRemoves.isEmpty()) {
                     if (syncTasks == null) syncTasks = new Runnable[3];
-
-                    HashSet<UUID> entsToRemove = set.entityRemoves;
 
                     syncTasks[2] = new Runnable() {
                         @Override
@@ -216,7 +205,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                                     final Iterator<Entity> iter = ents.iterator();
                                     while (iter.hasNext()) {
                                         final Entity entity = iter.next();
-                                        if (entsToRemove.contains(entity.getUniqueID())) {
+                                        if (entityRemoves.contains(entity.getUniqueID())) {
                                             iter.remove();
                                             entity.b(false);
                                             entity.die();
@@ -229,15 +218,14 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                     };
                 }
 
-                if (set.entities != null && !set.entities.isEmpty()) {
+                Set<CompoundTag> entities = set.getEntities();
+                if (entities != null && !entities.isEmpty()) {
                     if (syncTasks == null) syncTasks = new Runnable[2];
-
-                    HashSet<CompoundTag> entitiesToSpawn = set.entities;
 
                     syncTasks[1] = new Runnable() {
                         @Override
                         public void run() {
-                            for (final CompoundTag nativeTag : entitiesToSpawn) {
+                            for (final CompoundTag nativeTag : entities) {
                                 final Map<String, Tag> entityTagMap = ReflectionUtils.getMap(nativeTag.getValue());
                                 final StringTag idTag = (StringTag) entityTagMap.get("Id");
                                 final ListTag posTag = (ListTag) entityTagMap.get("Pos");
@@ -274,10 +262,10 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                 }
 
                 // set tiles
-                if (set.tiles != null && !set.tiles.isEmpty()) {
+                Map<Short, CompoundTag> tiles = set.getTiles();
+                if (tiles != null && !tiles.isEmpty()) {
                     if (syncTasks == null) syncTasks = new Runnable[1];
 
-                    HashMap<Short, CompoundTag> tiles = set.tiles;
                     syncTasks[0] = new Runnable() {
                         @Override
                         public void run() {
@@ -307,19 +295,22 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                     };
                 }
 
-                int finalMask = bitMask;
-                Runnable callback = () -> {
-                    if (finalMask != 0) {
+                Runnable callback;
+                if (bitMask == 0) {
+                    callback = null;
+                } else {
+                    int finalMask = bitMask;
+                    callback = () -> {
                         // Set Modified
                         nmsChunk.f(true);
                         nmsChunk.mustSave = true;
                         nmsChunk.markDirty();
                         // send to player
                         extent.sendChunk(X, Z, finalMask);
-                    }
 
-                    extent.returnToPool(BukkitChunkHolder.this);
-                };
+                        extent.returnToPool(BukkitChunkHolder.this);
+                    };
+                }
                 if (syncTasks != null) {
                     QueueHandler queueHandler = Fawe.get().getQueueHandler();
                     Runnable[] finalSyncTasks = syncTasks;
@@ -335,12 +326,21 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                                     task.run();
                                 }
                             }
-                            return queueHandler.async(callback, null);
+                            if (callback == null) {
+                                extent.returnToPool(BukkitChunkHolder.this);
+                                return null;
+                            } else {
+                                return queueHandler.async(callback, null);
+                            }
                         }
                     };
                     return (T) (Future) queueHandler.sync(chain);
                 } else {
-                    callback.run();
+                    if (callback == null) {
+                        extent.returnToPool(BukkitChunkHolder.this);
+                    } else {
+                        callback.run();
+                    }
                 }
             }
             return null;

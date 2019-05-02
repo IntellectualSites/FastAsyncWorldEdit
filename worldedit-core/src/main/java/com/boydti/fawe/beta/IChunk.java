@@ -27,8 +27,6 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
 
     int getZ();
 
-
-
     /**
      * If the chunk is a delegate, returns it's paren'ts root
      * @return root IChunk
@@ -41,14 +39,6 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
      * @return true if no changes are queued for this chunk
      */
     boolean isEmpty();
-
-    /**
-     * Spend time optimizing for apply<br>
-     * default behavior: do nothing
-     */
-    default void optimize() {
-
-    }
 
     /**
      * Apply the queued changes to the world<br>
