@@ -31,21 +31,22 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
         this.delegate = NULL;
     }
 
-    public ChunkHolder(IBlockDelegate delegate) {
+    public ChunkHolder(final IBlockDelegate delegate) {
         this.delegate = delegate;
     }
 
     @Override
-    public void filter(Filter filter, FilterBlock block) {
-        block.init(X, Z, get);
-        IGetBlocks get = getOrCreateGet();
-        get.filter(filter, block);
+    public void filter(final Filter filter, FilterBlock block) {
+        final IGetBlocks get = getOrCreateGet();
+        final ISetBlocks set = getOrCreateSet();
+        block = block.init(X, Z, get);
+        block.filter(get, set, filter);
     }
 
     @Override
-    public boolean trim(boolean aggressive) {
+    public boolean trim(final boolean aggressive) {
         if (set != null) {
-            boolean result = set.trim(aggressive);
+            final boolean result = set.trim(aggressive);
             if (result) {
                 delegate = NULL;
                 get = null;
@@ -87,7 +88,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
 
     private IGetBlocks newGet() {
         if (extent instanceof SingleThreadQueueExtent) {
-            WorldChunkCache cache = ((SingleThreadQueueExtent) extent).getCache();
+            final WorldChunkCache cache = ((SingleThreadQueueExtent) extent).getCache();
             return cache.get(MathMan.pairInt(X, Z), this);
         }
         return get();
@@ -101,7 +102,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
     }
 
     @Override
-    public void init(IQueueExtent extent, final int X, final int Z) {
+    public void init(final IQueueExtent extent, final int X, final int Z) {
         this.extent = extent;
         this.X = X;
         this.Z = Z;

@@ -10,7 +10,7 @@ import com.boydti.fawe.beta.IChunk;
 public class FinalizedChunk extends DelegateChunk {
     private final IQueueExtent queueExtent;
 
-    public FinalizedChunk(final IChunk parent, IQueueExtent queueExtent) {
+    public FinalizedChunk(final IChunk parent, final IQueueExtent queueExtent) {
         super(parent);
         this.queueExtent = queueExtent;
     }

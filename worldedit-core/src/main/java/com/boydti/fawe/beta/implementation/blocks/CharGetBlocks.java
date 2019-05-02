@@ -20,13 +20,7 @@ public abstract class CharGetBlocks extends CharBlocks implements IGetBlocks {
     }
 
     @Override
-    public void filter(Filter filter, FilterBlock block) {
-        CharFilterBlock b = (CharFilterBlock) block;
-        b.filter(this, filter);
-    }
-
-    @Override
-    public boolean trim(boolean aggressive) {
+    public boolean trim(final boolean aggressive) {
         for (int i = 0; i < 16; i++) {
             sections[i] = NULL;
             blocks[i] = null;

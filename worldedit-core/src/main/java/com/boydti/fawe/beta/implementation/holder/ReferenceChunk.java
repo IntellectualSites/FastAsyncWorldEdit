@@ -14,7 +14,7 @@ import java.lang.ref.Reference;
 public abstract class ReferenceChunk implements IDelegateChunk {
     private final Reference<FinalizedChunk> ref;
 
-    public ReferenceChunk(final IChunk parent, IQueueExtent queueExtent) {
+    public ReferenceChunk(final IChunk parent, final IQueueExtent queueExtent) {
         this.ref = toRef(new FinalizedChunk(parent, queueExtent));
     }
 

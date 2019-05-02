@@ -1,40 +1,58 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
+import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+
+import javax.annotation.Nullable;
+
 import static com.sk89q.worldedit.world.block.BlockTypes.states;
 public class CharFilterBlock implements FilterBlock {
     private IQueueExtent queue;
-    private CharGetBlocks chunk;
-    private char[] section;
+    private CharGetBlocks get;
+    private CharSetBlocks set;
 
-    @Override
-    public final void init(IQueueExtent queue) {
-        this.queue = queue;
-    }
-
-    @Override
-    public final void init(int X, int Z, IGetBlocks chunk) {
-        this.chunk = (CharGetBlocks) chunk;
-        this.X = X;
-        this.Z = Z;
-        this.xx = X << 4;
-        this.zz = Z << 4;
-    }
+    private char[] getArr;
+    private @Nullable char[] setArr;
+    private SetDelegate delegate;
 
     // local
     private int layer, index, x, y, z, xx, yy, zz, X, Z;
 
-    public final void filter(CharGetBlocks blocks, Filter filter) {
-        for (int layer = 0; layer < 16; layer++) {
-            if (!blocks.hasSection(layer)) continue;
-            char[] arr = blocks.sections[layer].get(blocks, layer);
+    @Override
+    public final FilterBlock init(final IQueueExtent queue) {
+        this.queue = queue;
+        return this;
+    }
 
-            this.section = arr;
+    @Override
+    public final FilterBlock init(final int X, final int Z, final IGetBlocks chunk) {
+        this.get = (CharGetBlocks) chunk;
+        this.X = X;
+        this.Z = Z;
+        this.xx = X << 4;
+        this.zz = Z << 4;
+        return this;
+    }
+
+    public final void filter(final IGetBlocks iget, final ISetBlocks iset, final Filter filter) {
+        final CharSetBlocks set = (CharSetBlocks) iset;
+        final CharGetBlocks get = (CharGetBlocks) iget;
+        for (int layer = 0; layer < 16; layer++) {
+            if (!get.hasSection(layer)) continue;
+            this.set = set;
+            getArr = get.sections[layer].get(get, layer);
+            if (set.hasSection(layer)) {
+                setArr = set.blocks[layer];
+                delegate = FULL;
+            } else {
+                delegate = NULL;
+                setArr = null;
+            }
             this.layer = layer;
             this.yy = layer << 4;
 
@@ -45,6 +63,25 @@ public class CharFilterBlock implements FilterBlock {
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void setOrdinal(final int ordinal) {
+        delegate.set(this, (char) ordinal);
+    }
+
+    @Override
+    public void setState(final BlockState state) {
+        delegate.set(this, state.getOrdinalChar());
+    }
+
+    @Override
+    public void setFullBlock(final BaseBlock block) {
+        delegate.set(this, block.getOrdinalChar());
+        final CompoundTag nbt = block.getNbtData();
+        if (nbt != null) { // TODO optimize check via ImmutableBaseBlock
+            set.setTile(x, yy + y, z, nbt);
         }
     }
 
@@ -89,26 +126,26 @@ public class CharFilterBlock implements FilterBlock {
     }
 
     public final char getOrdinalChar() {
-        return section[index];
+        return getArr[index];
     }
 
     @Override
     public final int getOrdinal() {
-        return section[index];
+        return getArr[index];
     }
 
     @Override
     public final BlockState getState() {
-        int ordinal = section[index];
+        final int ordinal = getArr[index];
         return BlockTypes.states[ordinal];
     }
 
     @Override
     public final BaseBlock getBaseBlock() {
-        BlockState state = getState();
-        BlockMaterial material = state.getMaterial();
+        final BlockState state = getState();
+        final BlockMaterial material = state.getMaterial();
         if (material.hasContainer()) {
-            CompoundTag tag = chunk.getTag(x, y + (layer << 4), z);
+            final CompoundTag tag = get.getTag(x, y + (layer << 4), z);
             return state.toBaseBlock(tag);
         }
         return state.toBaseBlock();
@@ -121,11 +158,11 @@ public class CharFilterBlock implements FilterBlock {
 
     public final BlockState getOrdinalBelow() {
         if (y > 0) {
-            return states[section[index - 256]];
+            return states[getArr[index - 256]];
         }
         if (layer > 0) {
             final int newLayer = layer - 1;
-            final CharGetBlocks chunk = this.chunk;
+            final CharGetBlocks chunk = this.get;
             return states[chunk.sections[newLayer].get(chunk, newLayer, index + 3840)];
         }
         return BlockTypes.__RESERVED__.getDefaultState();
@@ -133,22 +170,22 @@ public class CharFilterBlock implements FilterBlock {
 
     public final BlockState getStateAbove() {
         if (y < 16) {
-            return states[section[index + 256]];
+            return states[getArr[index + 256]];
         }
         if (layer < 16) {
             final int newLayer = layer + 1;
-            final CharGetBlocks chunk = this.chunk;
+            final CharGetBlocks chunk = this.get;
             return states[chunk.sections[newLayer].get(chunk, newLayer, index - 3840)];
         }
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-    public final BlockState getStateRelativeY(int y) {
-        int newY = this.y + y;
-        int layerAdd = newY >> 4;
+    public final BlockState getStateRelativeY(final int y) {
+        final int newY = this.y + y;
+        final int layerAdd = newY >> 4;
         switch (layerAdd) {
             case 0:
-                return states[section[this.index + (y << 8)]];
+                return states[getArr[this.index + (y << 8)]];
             case 1:
             case 2:
             case 3:
@@ -164,10 +201,10 @@ public class CharFilterBlock implements FilterBlock {
             case 13:
             case 14:
             case 15: {
-                int newLayer = layer + layerAdd;
+                final int newLayer = layer + layerAdd;
                 if (newLayer < 16) {
-                    int index = this.index + ((y & 15) << 8);
-                    return states[chunk.sections[newLayer].get(chunk, newLayer, index)];
+                    final int index = this.index + ((y & 15) << 8);
+                    return states[get.sections[newLayer].get(get, newLayer, index)];
                 }
                 break;
             }
@@ -186,10 +223,10 @@ public class CharFilterBlock implements FilterBlock {
             case -13:
             case -14:
             case -15: {
-                int newLayer = layer + layerAdd;
+                final int newLayer = layer + layerAdd;
                 if (newLayer >= 0) {
-                    int index = this.index + ((y & 15) << 8);
-                    return states[chunk.sections[newLayer].get(chunk, newLayer, index)];
+                    final int index = this.index + ((y & 15) << 8);
+                    return states[get.sections[newLayer].get(get, newLayer, index)];
                 }
                 break;
             }
@@ -198,15 +235,15 @@ public class CharFilterBlock implements FilterBlock {
     }
 
     public final BlockState getStateRelative(final int x, final int y, final int z) {
-        int newX = this.x + x;
+        final int newX = this.x + x;
         if (newX >> 4 == 0) {
-            int newZ = this.z + z;
+            final int newZ = this.z + z;
             if (newZ >> 4 == 0) {
-                int newY = this.y + y;
-                int layerAdd = newY >> 4;
+                final int newY = this.y + y;
+                final int layerAdd = newY >> 4;
                 switch (layerAdd) {
                     case 0:
-                        return states[section[this.index + ((y << 8) + (z << 4) + x)]];
+                        return states[getArr[this.index + ((y << 8) + (z << 4) + x)]];
                     case 1:
                     case 2:
                     case 3:
@@ -222,10 +259,10 @@ public class CharFilterBlock implements FilterBlock {
                     case 13:
                     case 14:
                     case 15: {
-                        int newLayer = layer + layerAdd;
+                        final int newLayer = layer + layerAdd;
                         if (newLayer < 16) {
-                            int index = ((newY & 15) << 8) + (newZ << 4) + newX;
-                            return states[chunk.sections[newLayer].get(chunk, newLayer, index)];
+                            final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
+                            return states[get.sections[newLayer].get(get, newLayer, index)];
                         }
                         break;
                     }
@@ -244,10 +281,10 @@ public class CharFilterBlock implements FilterBlock {
                     case -13:
                     case -14:
                     case -15: {
-                        int newLayer = layer + layerAdd;
+                        final int newLayer = layer + layerAdd;
                         if (newLayer >= 0) {
-                            int index = ((newY & 15) << 8) + (newZ << 4) + newX;
-                            return states[chunk.sections[newLayer].get(chunk, newLayer, index)];
+                            final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
+                            return states[get.sections[newLayer].get(get, newLayer, index)];
                         }
                         break;
                     }
@@ -257,10 +294,36 @@ public class CharFilterBlock implements FilterBlock {
         }
 //        queue.get
         // TODO return normal get block
-        int newY = this.y + y + yy;
+        final int newY = this.y + y + yy;
         if (newY >= 0 && newY <= 256) {
             return queue.getBlock(xx + newX,  newY, this.zz + this.z + z);
         }
         return BlockTypes.__RESERVED__.getDefaultState();
     }
+
+    /*
+    Set delegate
+     */
+    private SetDelegate initSet() {
+        setArr = set.sections[layer].get(set, layer);
+        return delegate = FULL;
+    }
+
+    private interface SetDelegate {
+        void set(CharFilterBlock block, char value);
+    }
+
+    private static final SetDelegate NULL = new SetDelegate() {
+        @Override
+        public void set(final CharFilterBlock block, final char value) {
+            block.initSet().set(block, value);
+        }
+    };
+
+    private static final SetDelegate FULL = new SetDelegate() {
+        @Override
+        public final void set(final CharFilterBlock block, final char value) {
+            block.setArr[block.index] = value;
+        }
+    };
 }

@@ -22,9 +22,9 @@ package com.sk89q.worldedit.command;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.filters.SetFilter;
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.beta.implementation.WorldChunkCache;
-import com.boydti.fawe.beta.test.CountFilter;
+import com.boydti.fawe.beta.filters.CountFilter;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.object.FaweLimit;
@@ -48,7 +48,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
-import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.NoiseFilter2D;
@@ -66,7 +65,6 @@ import com.sk89q.worldedit.math.convolution.HeightMap;
 import com.sk89q.worldedit.math.convolution.HeightMapFilter;
 import com.sk89q.worldedit.math.noise.RandomNoise;
 import com.sk89q.worldedit.regions.*;
-import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.command.binding.Range;
@@ -79,12 +77,12 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -115,6 +113,41 @@ public class RegionCommands extends MethodCommands {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
     }
+
+
+    @Command(
+            aliases = {"debugtest"},
+            usage = "",
+            desc = "debugtest",
+            help = "debugtest"
+    )
+    public void debugtest(Player player, @Selection Region region) throws WorldEditException {
+        QueueHandler queueHandler = Fawe.get().getQueueHandler();
+        World world = player.getWorld();
+        CountFilter filter = new CountFilter();
+        long start = System.currentTimeMillis();
+        queueHandler.apply(world, region, filter);
+        long diff = System.currentTimeMillis() - start;
+        System.out.println(diff);
+    }
+
+    @Command(
+            aliases = {"db2"},
+            usage = "",
+            desc = "db2",
+            help = "db2"
+    )
+    public void db2(Player player, @Selection Region region, String blockStr) throws WorldEditException {
+        QueueHandler queueHandler = Fawe.get().getQueueHandler();
+        World world = player.getWorld();
+        BlockState block = BlockState.get(blockStr);
+        SetFilter filter = new SetFilter(block);
+        long start = System.currentTimeMillis();
+        queueHandler.apply(world, region, filter);
+        long diff = System.currentTimeMillis() - start;
+        System.out.println(diff);
+    }
+
 
     @Command(
             aliases = {"/fixlighting"},
@@ -269,44 +302,6 @@ public class RegionCommands extends MethodCommands {
         int blocksChanged = editSession.drawLine(pattern, pos1, pos2, thickness, !shell);
 
         BBC.VISITOR_BLOCK.send(player, blocksChanged);
-    }
-
-    @Command(
-            aliases = {"debugtest"},
-            usage = "",
-            desc = "debugtest",
-            help = "debugtest"
-    )
-    public void debugtest(Player player, @Selection Region region) throws WorldEditException {
-        QueueHandler queueHandler = Fawe.get().getQueueHandler();
-        World world = player.getWorld();
-        CountFilter filter = new CountFilter();
-        long start = System.currentTimeMillis();
-        queueHandler.apply(world, region, filter);
-        long diff = System.currentTimeMillis() - start;
-        System.out.println(diff);
-    }
-
-    @Command(
-            aliases = {"db2"},
-            usage = "",
-            desc = "db2",
-            help = "db2"
-    )
-    public void db2(Player player, @Selection Region region) throws WorldEditException {
-        QueueHandler queueHandler = Fawe.get().getQueueHandler();
-        World world = player.getWorld();
-        IQueueExtent queue = queueHandler.getQueue(world);
-        BlockState block = BlockTypes.STONE.getDefaultState();
-        long start = System.currentTimeMillis();
-        for (BlockVector3 p : region) {
-            queue.setBlock(p.getX(), p.getY(), p.getZ(), block);
-        }
-        long start2 = System.currentTimeMillis();
-        queue.flush();
-        long diff = System.currentTimeMillis() - start;
-        long diff2 = System.currentTimeMillis() - start2;
-        System.out.println(diff + " | " + diff2);
     }
 
     @Command(

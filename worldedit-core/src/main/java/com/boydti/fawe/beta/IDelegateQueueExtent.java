@@ -11,27 +11,27 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     IQueueExtent getParent();
 
     @Override
-    default void init(WorldChunkCache cache) {
+    default void init(final WorldChunkCache cache) {
         getParent().init(cache);
     }
 
     @Override
-    default IChunk getCachedChunk(int X, int Z) {
+    default IChunk getCachedChunk(final int X, final int Z) {
         return getParent().getCachedChunk(X, Z);
     }
 
     @Override
-    default Future<?> submit(IChunk chunk) {
+    default Future<?> submit(final IChunk chunk) {
         return getParent().submit(chunk);
     }
 
     @Override
-    default IChunk create(boolean full) {
+    default IChunk create(final boolean full) {
         return getParent().create(full);
     }
 
     @Override
-    default IChunk wrap(IChunk root) {
+    default IChunk wrap(final IChunk root) {
         return getParent().wrap(root);
     }
 
@@ -41,7 +41,7 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default boolean trim(boolean aggressive) {
+    default boolean trim(final boolean aggressive) {
         return getParent().trim(aggressive);
     }
 }

@@ -8,7 +8,7 @@ public class FullCharBlocks implements IBlocks {
     public final char[] blocks = new char[65536];
 
     @Override
-    public boolean hasSection(int layer) {
+    public boolean hasSection(final int layer) {
         return false;
     }
 
@@ -18,7 +18,7 @@ public class FullCharBlocks implements IBlocks {
     }
 
     @Override
-    public boolean trim(boolean aggressive) {
+    public boolean trim(final boolean aggressive) {
         return false;
     }
 }

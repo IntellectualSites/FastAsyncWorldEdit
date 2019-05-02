@@ -70,7 +70,7 @@ public interface IQueueExtent extends Flushable, Trimable {
      * @param root
      * @return wrapped chunk
      */
-    default IChunk wrap(IChunk root) {
+    default IChunk wrap(final IChunk root) {
         return root;
     }
 

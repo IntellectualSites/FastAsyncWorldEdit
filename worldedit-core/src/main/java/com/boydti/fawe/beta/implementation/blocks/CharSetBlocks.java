@@ -17,7 +17,7 @@ public class CharSetBlocks extends CharBlocks implements ISetBlocks {
     public HashSet<UUID> entityRemoves;
 
     @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+    public boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
         if (biomes == null) {
             biomes = new BiomeType[256];
         }
@@ -26,22 +26,22 @@ public class CharSetBlocks extends CharBlocks implements ISetBlocks {
     }
 
     @Override
-    public boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
+    public boolean setBlock(final int x, final int y, final int z, final BlockStateHolder holder) {
         set(x, y, z, holder.getOrdinalChar());
         return true;
     }
 
     @Override
-    public void setTile(int x, int y, int z, CompoundTag tile) {
+    public void setTile(final int x, final int y, final int z, final CompoundTag tile) {
         if (tiles == null) {
             tiles = new HashMap<>();
         }
-        short pair = MathMan.tripleBlockCoord(x, y, z);
+        final short pair = MathMan.tripleBlockCoord(x, y, z);
         tiles.put(pair, tile);
     }
 
     @Override
-    public void setEntity(CompoundTag tag) {
+    public void setEntity(final CompoundTag tag) {
         if (entities == null) {
             entities = new HashSet<>();
         }
@@ -49,7 +49,7 @@ public class CharSetBlocks extends CharBlocks implements ISetBlocks {
     }
 
     @Override
-    public void removeEntity(UUID uuid) {
+    public void removeEntity(final UUID uuid) {
         if (entityRemoves == null) {
             entityRemoves = new HashSet<>();
         }

@@ -13,7 +13,7 @@ public class CharBlocks implements IBlocks {
     }
 
     @Override
-    public boolean trim(boolean aggressive) {
+    public boolean trim(final boolean aggressive) {
         boolean result = true;
         for (int i = 0; i < 16; i++) {
             if (sections[i] == NULL) {
@@ -30,34 +30,42 @@ public class CharBlocks implements IBlocks {
         for (int i = 0; i < 16; i++) sections[i] = NULL;
     }
 
-    public void reset(int layer) {
+    public void reset(final int layer) {
         sections[layer] = NULL;
     }
 
-    protected char[] load(int layer) {
+    public char[] load(final int layer) {
         return new char[4096];
     }
 
-    protected char[] load(int layer, char[] data) {
+    public char[] load(final int layer, final char[] data) {
         for (int i = 0; i < 4096; i++) data[i] = 0;
         return data;
     }
 
     @Override
-    public boolean hasSection(int layer) {
+    public boolean hasSection(final int layer) {
         return sections[layer] == FULL;
     }
 
-    public char get(int x, int y, int z) {
-        int layer = y >> 4;
-        int index = ((y & 15) << 8) | (z << 4) | (x & 15);
+    public char get(final int x, final int y, final int z) {
+        final int layer = y >> 4;
+        final int index = ((y & 15) << 8) | (z << 4) | (x & 15);
         return sections[layer].get(this, layer, index);
     }
 
-    public char set(int x, int y, int z, char value) {
-        int layer = y >> 4;
-        int index = ((y & 15) << 8) | (z << 4) | (x & 15);
-        return sections[layer].set(this, layer, index, value);
+    public void set(final int x, final int y, final int z, final char value) {
+        final int layer = y >> 4;
+        final int index = ((y & 15) << 8) | (z << 4) | (x & 15);
+        set(layer, index, value);
+    }
+
+    public final char get(final int layer, final int index) {
+        return sections[layer].get(this, layer, index);
+    }
+
+    public final void set(final int layer, final int index, final char value) {
+        sections[layer].set(this, layer, index, value);
     }
 
     /*
@@ -67,18 +75,18 @@ public class CharBlocks implements IBlocks {
     public static abstract class Section {
         public abstract char[] get(CharBlocks blocks, int layer);
 
-        public final char get(CharBlocks blocks, int layer, int index) {
+        public final char get(final CharBlocks blocks, final int layer, final int index) {
             return get(blocks, layer)[index];
         }
 
-        public final char set(CharBlocks blocks, int layer, int index, char value) {
-            return get(blocks, layer)[index] = value;
+        public final void set(final CharBlocks blocks, final int layer, final int index, final char value) {
+            get(blocks, layer)[index] = value;
         }
     }
 
     public static final Section NULL = new Section() {
         @Override
-        public final char[] get(CharBlocks blocks, int layer) {
+        public final char[] get(final CharBlocks blocks, final int layer) {
             blocks.sections[layer] = FULL;
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
@@ -92,7 +100,7 @@ public class CharBlocks implements IBlocks {
 
     public static final Section FULL = new Section() {
         @Override
-        public final char[] get(CharBlocks blocks, int layer) {
+        public final char[] get(final CharBlocks blocks, final int layer) {
             return blocks.blocks[layer];
         }
     };

@@ -21,6 +21,8 @@ import net.minecraft.server.v1_13_R2.DataPaletteLinear;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.World;
 
+import java.util.Arrays;
+
 import static com.boydti.fawe.bukkit.v0.BukkitQueue_0.getAdapter;
 
 public class BukkitGetBlocks extends CharGetBlocks {
@@ -29,7 +31,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
     public World nmsWorld;
     public int X, Z;
 
-    public BukkitGetBlocks(World nmsWorld, int X, int Z) {/*d*/
+    public BukkitGetBlocks(World nmsWorld, int X, int Z) {
         this.nmsWorld = nmsWorld;
         this.X = X;
         this.Z = Z;
@@ -71,9 +73,10 @@ public class BukkitGetBlocks extends CharGetBlocks {
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
                 final DataBits bits = (DataBits) BukkitQueue_1_13.fieldBits.get(blocks);
                 final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitQueue_1_13.fieldPalette.get(blocks);
-                final int bitsPerEntry = bits.c();
 
+                final int bitsPerEntry = bits.c();
                 final long[] blockStates = bits.a();
+
                 new BitArray4096(blockStates, bitsPerEntry).toRaw(data);
 
                 int num_palette;
@@ -112,23 +115,20 @@ public class BukkitGetBlocks extends CharGetBlocks {
 
                 char[] paletteToBlockChars = FaweCache.PALETTE_TO_BLOCK_CHAR.get();
                 try {
-                    for (int i = 0; i < num_palette; i++) {
-                        IBlockData ibd = palette.a(i);
-                        char ordinal;
-                        if (ibd == null) {
-                            ordinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
-                            System.out.println("Invalid palette");
-                        } else {
-                            ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToChar(ibd);
+                    final int size = num_palette;
+                    if (size != 1) {
+                        for (int i = 0; i < size; i++) {
+                            char ordinal = ordinal(palette.a(i));
+                            paletteToBlockChars[i] = ordinal;
                         }
-                        paletteToBlockChars[i] = ordinal;
-                    }
-                    for (int i = 0; i < 4096; i++) {
-                        char paletteVal = data[i];
-                        data[i] = paletteToBlockChars[paletteVal];
-                        if (data[i] == Character.MAX_VALUE) {
-                            System.out.println("Invalid " + paletteVal + " | " + num_palette);
+                        for (int i = 0; i < 4096; i++) {
+                            char paletteVal = data[i];
+                            char val = paletteToBlockChars[paletteVal];
+                            data[i] = val;
                         }
+                    } else {
+                        char ordinal = ordinal(palette.a(0));
+                        Arrays.fill(data, ordinal);
                     }
                 } finally {
                     for (int i = 0; i < num_palette; i++) {
@@ -140,6 +140,14 @@ public class BukkitGetBlocks extends CharGetBlocks {
                 throw new RuntimeException(e);
             }
             return data;
+        }
+    }
+
+    private final char ordinal(IBlockData ibd) {
+        if (ibd == null) {
+            return BlockTypes.AIR.getDefaultState().getOrdinalChar();
+        } else {
+            return ((Spigot_v1_13_R2) getAdapter()).adaptToChar(ibd);
         }
     }
 

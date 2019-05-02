@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta.implementation;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlock;
@@ -9,6 +10,7 @@ import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MemUtil;
+import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -32,7 +34,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * Class which handles all the queues {@link IQueueExtent}
  */
-public abstract class QueueHandler implements Trimable {
+public abstract class QueueHandler implements Trimable, Runnable {
     private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
     private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
     private ThreadPoolExecutor blockingExecutor = FaweCache.newBlockingExecutor();
@@ -46,38 +48,52 @@ public abstract class QueueHandler implements Trimable {
         }
     };
 
-    public <T> Future<T> async(Runnable run, T value) {
+    public QueueHandler() {
+        TaskManager.IMP.repeat(this, 1);
+    }
+
+    @Override
+    public void run() {
+        if (!Fawe.isMainThread()) {
+            throw new IllegalStateException("Not main thread");
+        }
+        while (!syncTasks.isEmpty()) {
+            final FutureTask task = syncTasks.poll();
+            if (task != null) task.run();
+        }
+    }
+
+    public <T> Future<T> async(final Runnable run, final T value) {
         return forkJoinPoolSecondary.submit(run, value);
     }
 
-    public <T> Future<T> async(Callable<T> call) {
+    public <T> Future<T> async(final Callable<T> call) {
         return forkJoinPoolSecondary.submit(call);
     }
 
-    public <T> Future<T> sync(Runnable run, T value) {
-        FutureTask<T> result = new FutureTask<>(run, value);
+    public <T> Future<T> sync(final Runnable run, final T value) {
+        final FutureTask<T> result = new FutureTask<>(run, value);
         syncTasks.add(result);
         return result;
     }
 
-    public <T> Future<T> sync(Runnable run) {
-        FutureTask<T> result = new FutureTask<>(run, null);
+    public <T> Future<T> sync(final Runnable run) {
+        final FutureTask<T> result = new FutureTask<>(run, null);
         syncTasks.add(result);
         return result;
     }
 
-    public <T> Future<T> sync(Callable<T> call) {
-        FutureTask<T> result = new FutureTask<>(call);
+    public <T> Future<T> sync(final Callable<T> call) {
+        final FutureTask<T> result = new FutureTask<>(call);
         syncTasks.add(result);
         return result;
     }
 
-    public <T extends Future<T>> T submit(IChunk<T> chunk) {
+    public <T extends Future<T>> T submit(final IChunk<T> chunk) {
         if (MemUtil.isMemoryFree()) {
 //            return (T) forkJoinPoolSecondary.submit(chunk);
         }
         return (T) blockingExecutor.submit(chunk);
-
     }
 
     /**
@@ -104,8 +120,8 @@ public abstract class QueueHandler implements Trimable {
 
     public abstract IQueueExtent create();
 
-    public IQueueExtent getQueue(World world) {
-        IQueueExtent queue = queuePool.get();
+    public IQueueExtent getQueue(final World world) {
+        final IQueueExtent queue = queuePool.get();
         queue.init(getOrCreate(world));
         return queue;
     }
@@ -136,30 +152,31 @@ public abstract class QueueHandler implements Trimable {
 
         // Get a pool, to operate on the chunks in parallel
         final int size = Math.min(chunks.size(), Settings.IMP.QUEUE.PARALLEL_THREADS);
-        ForkJoinTask[] tasks = new ForkJoinTask[size];
+        final ForkJoinTask[] tasks = new ForkJoinTask[size];
         for (int i = 0; i < size; i++) {
             tasks[i] = forkJoinPoolPrimary.submit(new Runnable() {
                 @Override
                 public void run() {
-                    Filter newFilter = filter.fork();
+                    final Filter newFilter = filter.fork();
                     // Create a chunk that we will reuse/reset for each operation
-                    IQueueExtent queue = getQueue(world);
+                    final IQueueExtent queue = getQueue(world);
                     synchronized (queue) {
                         FilterBlock block = null;
 
-                        while (true) {
-                            // Get the next chunk pos
-                            final BlockVector2 pos;
-                            synchronized (chunksIter) {
-                                if (!chunksIter.hasNext()) break;
-                                pos = chunksIter.next();
-                            }
-                            final int X = pos.getX();
-                            final int Z = pos.getZ();
-                            IChunk chunk = queue.getCachedChunk(X, Z);
-                            // Initialize
-                            chunk.init(queue, X, Z);
-                            try {
+                        try {
+                            while (true) {
+                                // Get the next chunk pos
+                                final int X, Z;
+                                synchronized (chunksIter) {
+                                    if (!chunksIter.hasNext()) break;
+                                    final BlockVector2 pos = chunksIter.next();
+                                    X = pos.getX();
+                                    Z = pos.getZ();
+                                }
+                                IChunk chunk = queue.getCachedChunk(X, Z);
+                                // Initialize
+                                chunk.init(queue, X, Z);
+
                                 if (!newFilter.appliesChunk(X, Z)) {
                                     continue;
                                 }
@@ -173,11 +190,11 @@ public abstract class QueueHandler implements Trimable {
                                 newFilter.finishChunk(chunk);
 
                                 queue.submit(chunk);
-                            } finally {
-                                if (filter != newFilter) {
-                                    synchronized (filter) {
-                                        newFilter.join(filter);
-                                    }
+                            }
+                        } finally {
+                            if (filter != newFilter) {
+                                synchronized (filter) {
+                                    newFilter.join(filter);
                                 }
                             }
                         }
@@ -188,7 +205,7 @@ public abstract class QueueHandler implements Trimable {
         }
         // Join filters
         for (int i = 0; i < tasks.length; i++) {
-            ForkJoinTask task = tasks[i];
+            final ForkJoinTask task = tasks[i];
             if (task != null) {
                 task.quietlyJoin();
             }

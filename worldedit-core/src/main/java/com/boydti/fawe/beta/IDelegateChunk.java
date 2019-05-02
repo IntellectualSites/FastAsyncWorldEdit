@@ -65,7 +65,7 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
 
 
     @Override
-    default boolean trim(boolean aggressive) {
+    default boolean trim(final boolean aggressive) {
         return getParent().trim(aggressive);
     }
 
@@ -80,7 +80,7 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default void filter(Filter filter, FilterBlock mutable) {
+    default void filter(final Filter filter, final FilterBlock mutable) {
         getParent().filter(filter, mutable);
     }
 
@@ -100,7 +100,7 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default void set(Filter filter) {
+    default void set(final Filter filter) {
         getParent().set(filter);
     }
 }

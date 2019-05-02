@@ -94,7 +94,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
     public char[] idbToStateOrdinal;
 
-    private boolean init() {
+    private synchronized boolean init() {
         if (idbToStateOrdinal != null) return false;
         idbToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < idbToStateOrdinal.length; i++) {
@@ -527,8 +527,8 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             int id = Block.REGISTRY_ID.getId(ibd);
             return idbToStateOrdinal[id];
         } catch (NullPointerException e) {
-            if (init()) return adaptToInt(ibd);
-            throw e;
+            init();
+            return adaptToInt(ibd);
         }
     }
 
@@ -537,8 +537,8 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             int id = Block.REGISTRY_ID.getId(ibd);
             return idbToStateOrdinal[id];
         } catch (NullPointerException e) {
-            if (init()) return adaptToChar(ibd);
-            throw e;
+            init();
+            return adaptToChar(ibd);
         }
     }
 

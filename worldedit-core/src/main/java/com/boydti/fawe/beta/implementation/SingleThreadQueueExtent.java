@@ -5,6 +5,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.holder.ReferenceChunk;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
@@ -78,12 +79,28 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     // Pool discarded chunks for reuse (can safely be cleared by another thread)
     private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
 
-    public void returnToPool(IChunk chunk) {
+    public void returnToPool(final IChunk chunk) {
         CHUNK_POOL.add(chunk);
     }
 
     @Override
     public <T extends Future<T>> T submit(final IChunk<T> chunk) {
+        if (lastChunk == chunk) {
+            lastPair = Long.MAX_VALUE;
+            lastChunk = null;
+        }
+        final long index = MathMan.pairInt(chunk.getX(), chunk.getZ());
+        chunks.remove(index, chunk);
+        return submitUnchecked(chunk);
+    }
+
+    /**
+     * Submit without first checking that it has been removed from the chunk map
+     * @param chunk
+     * @param <T>
+     * @return
+     */
+    private <T extends Future<T>> T submitUnchecked(final IChunk<T> chunk) {
         if (chunk.isEmpty()) {
             CHUNK_POOL.add(chunk);
             return (T) (Future) Futures.immediateFuture(null);
@@ -97,7 +114,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public synchronized boolean trim(boolean aggressive) {
+    public synchronized boolean trim(final boolean aggressive) {
         // TODO trim individial chunk sections
         CHUNK_POOL.clear();
         if (Thread.currentThread() == currentThread) {
@@ -152,12 +169,12 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
 
         checkThread();
         final int size = chunks.size();
-        boolean lowMem = MemUtil.isMemoryLimited();
+        final boolean lowMem = MemUtil.isMemoryLimited();
         if (lowMem || size > Settings.IMP.QUEUE.TARGET_SIZE) {
             chunk = chunks.removeFirst();
-            Future future = submit(chunk);
+            final Future future = submitUnchecked(chunk);
             if (future != null && !future.isDone()) {
-                int targetSize;
+                final int targetSize;
                 if (lowMem) {
                     targetSize = Settings.IMP.QUEUE.PARALLEL_THREADS;
                 } else {
@@ -177,14 +194,14 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         return chunk;
     }
 
-    private void pollSubmissions(int targetSize, boolean aggressive) {
-        int overflow = submissions.size() - targetSize;
+    private void pollSubmissions(final int targetSize, final boolean aggressive) {
+        final int overflow = submissions.size() - targetSize;
         if (aggressive) {
             for (int i = 0; i < overflow; i++) {
                 Future first = submissions.poll();
                 try {
                     while ((first = (Future) first.get()) != null) ;
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (final InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
@@ -195,7 +212,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
                     if (next.isDone()) {
                         try {
                             next = (Future) next.get();
-                        } catch (InterruptedException | ExecutionException e) {
+                        } catch (final InterruptedException | ExecutionException e) {
                             e.printStackTrace();
                         }
                     } else {
@@ -212,8 +229,8 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         checkThread();
         if (!chunks.isEmpty()) {
             if (MemUtil.isMemoryLimited()) {
-                for (IChunk chunk : chunks.values()) {
-                    Future future = submit(chunk);
+                for (final IChunk chunk : chunks.values()) {
+                    final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         pollSubmissions(Settings.IMP.QUEUE.PARALLEL_THREADS, true);
                         submissions.add(future);
@@ -221,7 +238,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
                 }
             } else {
                 for (final IChunk chunk : chunks.values()) {
-                    Future future = submit(chunk);
+                    final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         submissions.add(future);
                     }

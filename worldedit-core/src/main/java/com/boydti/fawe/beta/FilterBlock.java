@@ -1,14 +1,23 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
+import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
 public interface FilterBlock {
-    void init(IQueueExtent queue);
+    FilterBlock init(IQueueExtent queue);
 
-    void init(int X, int Z, IGetBlocks chunk);
+    FilterBlock init(int X, int Z, IGetBlocks chunk);
+
+    void filter(IGetBlocks get, ISetBlocks set, Filter filter);
+
+    void setOrdinal(int ordinal);
+
+    void setState(BlockState state);
+
+    void setFullBlock(BaseBlock block);
 
     int getOrdinal();
 
@@ -26,7 +35,7 @@ public interface FilterBlock {
         return getStateRelative(0, 1, 0);
     }
 
-    default BlockState getStateRelativeY(int y) {
+    default BlockState getStateRelativeY(final int y) {
         return getStateRelative(0, y, 0);
     }
 

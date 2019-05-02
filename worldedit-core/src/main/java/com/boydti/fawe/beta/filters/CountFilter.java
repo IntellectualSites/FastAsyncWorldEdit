@@ -1,4 +1,4 @@
-package com.boydti.fawe.beta.test;
+package com.boydti.fawe.beta.filters;
 
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlock;
@@ -13,17 +13,17 @@ import java.util.Collections;
 import java.util.List;
 
 public class CountFilter implements Filter {
-    private int[] counter = new int[BlockTypes.states.length];
+    private final int[] counter = new int[BlockTypes.states.length];
 
     @Override
-    public void applyBlock(FilterBlock block) {
+    public void applyBlock(final FilterBlock block) {
         counter[block.getOrdinal()]++;
     }
 
     public List<Countable<BlockState>> getDistribution() {
-        List<Countable<BlockState>> distribution = new ArrayList<>();
+        final List<Countable<BlockState>> distribution = new ArrayList<>();
         for (int i = 0; i < counter.length; i++) {
-            int count = counter[i];
+            final int count = counter[i];
             if (count != 0) {
                 distribution.add(new Countable<>(BlockTypes.states[i], count));
             }
@@ -32,10 +32,10 @@ public class CountFilter implements Filter {
         return distribution;
     }
 
-    public void print(Actor actor, long size) {
-        for (Countable c : getDistribution()) {
-            String name = c.getID().toString();
-            String str = String.format("%-7s (%.3f%%) %s",
+    public void print(final Actor actor, final long size) {
+        for (final Countable c : getDistribution()) {
+            final String name = c.getID().toString();
+            final String str = String.format("%-7s (%.3f%%) %s",
                     String.valueOf(c.getAmount()),
                     c.getAmount() / (double) size * 100,
                     name);
@@ -49,8 +49,8 @@ public class CountFilter implements Filter {
     }
 
     @Override
-    public void join(Filter parent) {
-        CountFilter other = (CountFilter) parent;
+    public void join(final Filter parent) {
+        final CountFilter other = (CountFilter) parent;
         for (int i = 0; i < counter.length; i++) {
             other.counter[i] += this.counter[i];
         }
