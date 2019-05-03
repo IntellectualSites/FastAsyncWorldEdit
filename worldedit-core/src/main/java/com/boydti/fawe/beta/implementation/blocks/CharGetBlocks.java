@@ -1,8 +1,5 @@
 package com.boydti.fawe.beta.implementation.blocks;
 
-import com.boydti.fawe.beta.CharFilterBlock;
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.beta.IGetBlocks;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;

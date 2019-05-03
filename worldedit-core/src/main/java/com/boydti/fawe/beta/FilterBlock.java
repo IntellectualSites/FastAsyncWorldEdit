@@ -1,15 +1,18 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+
+import javax.annotation.Nullable;
 
 public interface FilterBlock {
     FilterBlock init(IQueueExtent queue);
 
     FilterBlock init(int X, int Z, IGetBlocks chunk);
 
-    void filter(IGetBlocks get, ISetBlocks set, int layer, Filter filter);
+    void filter(IGetBlocks get, ISetBlocks set, int layer, Filter filter, @Nullable Region region);
 
     void setOrdinal(int ordinal);
 

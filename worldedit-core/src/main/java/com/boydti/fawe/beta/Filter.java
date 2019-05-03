@@ -1,6 +1,9 @@
 package com.boydti.fawe.beta;
 
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
+import javax.annotation.Nullable;
 
 /**
  * A filter is an interface used for setting blocks
@@ -13,8 +16,8 @@ public interface Filter  {
      * @param cz
      * @return
      */
-    default boolean appliesChunk(final int cx, final int cz) {
-        return true;
+    default Filter appliesChunk(final int cx, final int cz) {
+        return this;
     }
 
     /**
@@ -25,8 +28,12 @@ public interface Filter  {
      * @param chunk
      * @return
      */
-    default IChunk applyChunk(final IChunk chunk) {
+    default IChunk applyChunk(final IChunk chunk, @Nullable Region region) {
         return chunk;
+    }
+
+    default Filter appliesLayer(IChunk chunk, int layer) {
+        return this;
     }
 
     /**

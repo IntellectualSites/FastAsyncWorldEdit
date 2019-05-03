@@ -27,10 +27,6 @@ public interface ISetBlocks extends IBlocks {
 
     void removeEntity(UUID uuid);
 
-    default void optimize() {
-
-    }
-
     BlockState getBlock(int x, int y, int z);
 
     char[] getArray(int layer);
