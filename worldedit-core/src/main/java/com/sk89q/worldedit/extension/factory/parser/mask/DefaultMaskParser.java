@@ -171,8 +171,6 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                             {
                                 try {
                                     builder.addRegex(full);
-                                } catch (SuggestInputParseException rethrow) {
-                                    throw rethrow;
                                 } catch (InputParseException ignore) {}
                             }
                             if (mask == null) {
