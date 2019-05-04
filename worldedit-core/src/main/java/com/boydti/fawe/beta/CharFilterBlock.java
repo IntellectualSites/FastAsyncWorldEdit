@@ -2,6 +2,8 @@ package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -40,7 +42,7 @@ public class CharFilterBlock implements FilterBlock {
     }
 
     @Override
-    public final void filter(final IGetBlocks iget, final ISetBlocks iset, final int layer, final Filter filter) {
+    public final void filter(final IGetBlocks iget, final ISetBlocks iset, final int layer, final Filter filter, final @Nullable Region region, BlockVector3 min, BlockVector3 max) {
         this.layer = layer;
         final CharGetBlocks get = (CharGetBlocks) iget;
         if (!get.hasSection(layer)) return;
@@ -54,7 +56,81 @@ public class CharFilterBlock implements FilterBlock {
             setArr = null;
         }
         this.yy = layer << 4;
+        if (region == null) {
+            if (min != null && max != null) {
+                iterate(min, max, layer, filter);
+            } else {
+                iterate(filter);
+            }
+        } else {
+            if (min != null && max != null) {
+                iterate(region, min, max, layer, filter);
+            } else {
+                iterate(region, filter);
+            }
+        }
+    }
 
+    private void iterate(final Region region, final Filter filter) {
+        for (y = 0, index = 0; y < 16; y++) {
+            int absY = yy + y;
+            for (z = 0; z < 16; z++) {
+                int absZ = zz + z;
+                for (x = 0; x < 16; x++, index++) {
+                    int absX = xx + x;
+                    if (region.contains(absX, absY, absZ)) {
+                        filter.applyBlock(this);
+                    }
+                }
+            }
+        }
+    }
+
+    private void iterate(final Region region, BlockVector3 min, BlockVector3 max, int layer, final Filter filter) {
+        int by = Math.max(min.getY(), layer << 4) & 15;
+        int ty = Math.min(max.getY(), 15 + (layer << 4)) & 15;
+        int bx = min.getX();
+        int bz = min.getZ();
+        int tx = max.getX();
+        int tz = max.getZ();
+        for (y = by; y <= ty; y++) {
+            int yIndex = (y << 8);
+            int absY = yy + y;
+            for (z = bz; z <= tz; z++) {
+                int zIndex = yIndex + ((z) << 4);
+                int absZ = zz + z;
+                for (x = bx; x <= tx; x++) {
+                    index = zIndex + x;
+                    int absX = xx + x;
+                    if (region.contains(absX, absY, absZ)) {
+                        filter.applyBlock(this);
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void iterate(BlockVector3 min, BlockVector3 max, int layer, final Filter filter) {
+        int by = Math.max(min.getY(), layer << 4) & 15;
+        int ty = Math.min(max.getY(), 15 + (layer << 4)) & 15;
+        int bx = min.getX();
+        int bz = min.getZ();
+        int tx = max.getX();
+        int tz = max.getZ();
+        for (y = by; y <= ty; y++) {
+            int yIndex = (y << 8);
+            for (z = bz; z <= tz; z++) {
+                int zIndex = yIndex + ((z) << 4);
+                for (x = bx; x <= tx; x++) {
+                    index = zIndex + x;
+                    filter.applyBlock(this);
+                }
+            }
+        }
+    }
+
+    private final void iterate(final Filter filter) {
         for (y = 0, index = 0; y < 16; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {

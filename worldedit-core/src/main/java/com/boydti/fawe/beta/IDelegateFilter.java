@@ -1,33 +1,25 @@
 package com.boydti.fawe.beta;
 
+import com.sk89q.worldedit.regions.Region;
+
+import javax.annotation.Nullable;
+
 public interface IDelegateFilter extends Filter {
     Filter getParent();
 
     @Override
-    default Filter appliesChunk(int cx, int cz) {
-        Filter copy = getParent().appliesChunk(cx, cz);
-        if (copy == null) return null;
-        if (copy != getParent()) {
-            return newInstance(copy);
-        } else {
-            return this;
-        }
+    default boolean appliesChunk(int cx, int cz) {
+        return getParent().appliesChunk(cx, cz);
     }
 
     @Override
-    default IChunk applyChunk(IChunk chunk) {
-        return getParent().applyChunk(chunk);
+    default IChunk applyChunk(IChunk chunk, @Nullable Region region) {
+        return getParent().applyChunk(chunk, region);
     }
 
     @Override
-    default Filter appliesLayer(IChunk chunk, int layer) {
-        Filter copy = getParent().appliesLayer(chunk, layer);
-        if (copy == null) return null;
-        if (copy != getParent()) {
-            return newInstance(copy);
-        } else {
-            return this;
-        }
+    default boolean appliesLayer(IChunk chunk, int layer) {
+        return getParent().appliesLayer(chunk, layer);
     }
 
     @Override

@@ -349,11 +349,4 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
             return null;
         }
     }
-
-    @Override
-    public void set(final Filter filter) {
-        // for each block
-        // filter.applyBlock(block)
-        throw new UnsupportedOperationException("Not implemented");
-    }
 }

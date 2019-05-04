@@ -1,10 +1,13 @@
 package com.boydti.fawe.beta;
 
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -80,8 +83,8 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default void filter(final Filter filter, final FilterBlock mutable) {
-        getParent().filter(filter, mutable);
+    default void filter(Filter filter, FilterBlock block, @Nullable Region region, MutableBlockVector3 unitialized, MutableBlockVector3 unitialized2) {
+        getParent().filter(filter, block, region, unitialized, unitialized2);
     }
 
     @Override
@@ -97,10 +100,5 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
             if (clazz.isAssignableFrom(root.getClass())) return (T) root;
         }
         return null;
-    }
-
-    @Override
-    default void set(final Filter filter) {
-        getParent().set(filter);
     }
 }

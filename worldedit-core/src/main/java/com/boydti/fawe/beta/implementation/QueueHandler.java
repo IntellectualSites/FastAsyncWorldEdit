@@ -13,6 +13,7 @@ import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 
@@ -155,6 +156,9 @@ public abstract class QueueHandler implements Trimable, Runnable {
             tasks[i] = forkJoinPoolPrimary.submit(new Runnable() {
                 @Override
                 public void run() {
+                    MutableBlockVector3 mbv1 = new MutableBlockVector3();
+                    MutableBlockVector3 mbv2 = new MutableBlockVector3();
+
                     final Filter newFilter = filter.fork();
                     // Create a chunk that we will reuse/reset for each operation
                     final IQueueExtent queue = getQueue(world);
@@ -162,7 +166,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
                         FilterBlock block = null;
 
                         while (true) {
-                            // Get the next chunk pos
+                            // Get the next chunk posWeakChunk
                             final int X, Z;
                             synchronized (chunksIter) {
                                 if (!chunksIter.hasNext()) break;
@@ -177,12 +181,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
                             // Initialize
                             chunk.init(queue, X, Z);
 
-                            chunk = newFilter.applyChunk(chunk);
+                            chunk = newFilter.applyChunk(chunk, region);
 
                             if (chunk == null) continue;
 
                             if (block == null) block = queue.initFilterBlock();
-                            chunk.filter(newFilter, block);
+                            chunk.filter(newFilter, block, region, mbv1, mbv2);
 
                             queue.submit(chunk);
                         }

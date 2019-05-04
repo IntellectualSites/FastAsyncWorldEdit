@@ -21,9 +21,14 @@ package com.sk89q.worldedit.regions;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.regions.Region.Contains.CHECKED;
+import static com.sk89q.worldedit.regions.Region.Contains.FULL;
+import static com.sk89q.worldedit.regions.Region.Contains.NONE;
+import static com.sk89q.worldedit.regions.Region.Contains.PARTIAL;
 
 import com.google.common.collect.Iterators;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.World;
 
 import java.util.ArrayList;

@@ -41,6 +41,7 @@ import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.regions.Region.Contains.*;
 
 /**
  * An axis-aligned cuboid. It can be defined using two corners of the cuboid.
@@ -627,5 +628,36 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return new CuboidRegion(origin.subtract(size), origin.add(size));
     }
 
+    @Override
+    public Contains getChunkBounds(int X, int Z, MutableBlockVector3 min, MutableBlockVector3 max) {
+        int minChunkX = minX >> 4;
+        if (minChunkX <= X) {
+            int maxChunkX = maxX >> 4;
+            if (maxChunkX >= X) {
+                int minChunkZ = minZ >> 4;
+                if (minChunkZ <= X) {
+                    int maxChunkZ = maxZ >> 4;
+                    if (maxChunkZ >= Z) {
+                        int cx1 = X << 4;
+                        int cx2 = cx1 + 15;
+                        int cz1 = Z << 4;
+                        int cz2 = cz1 + 15;
 
+                        int bx = Math.max(cx1, minX);
+                        int bz = Math.max(cz1, minZ);
+                        int tx = Math.min(cx2, maxX);
+                        int tz = Math.min(cz2, maxZ);
+
+                        min.setComponents(bx & 15, minY, bz & 15);
+                        max.setComponents(tx & 15, maxY, tz & 15);
+                        if (min.getX() == 0 && min.getZ() == 0 && max.getX() == 15 && max.getZ() == 15) {
+                            return FULL;
+                        }
+                        return PARTIAL;
+                    }
+                }
+            }
+        }
+        return NONE;
+    }
 }

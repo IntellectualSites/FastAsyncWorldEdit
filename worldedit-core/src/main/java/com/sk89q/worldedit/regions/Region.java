@@ -21,12 +21,16 @@ package com.sk89q.worldedit.regions;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
+
+import static com.sk89q.worldedit.regions.Region.Contains.CHECKED;
+import static com.sk89q.worldedit.regions.Region.Contains.NONE;
 
 /**
  * Represents a physical shape.
@@ -178,4 +182,33 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
      * @return the points.
      */
     List<BlockVector2> polygonize(int maxPoints);
+
+    default Contains getChunkBounds(int X, int Z, MutableBlockVector3 min, MutableBlockVector3 max) {
+        BlockVector3 pos1 = getMinimumPoint();
+        BlockVector3 pos2 = getMaximumPoint();
+        int cx1 = X << 4;
+        int cx2 = cx1 + 15;
+        int cz1 = Z << 4;
+        int cz2 = cz1 + 15;
+
+        int bx = Math.max(cx1, pos1.getX());
+        int bz = Math.max(cz1, pos1.getZ());
+        int tx = Math.min(cx2, pos2.getX());
+        int tz = Math.min(cz2, pos2.getZ());
+
+        min.setComponents(bx & 15, pos1.getY(), bz & 15);
+        max.setComponents(tx & 15, pos2.getY(), tz & 15);
+
+        if (bx > cx2 || bz > cz2 || tx < cx1 || tz < cz1) {
+            return NONE;
+        }
+        return CHECKED;
+    }
+
+    enum Contains {
+        FULL,
+        PARTIAL,
+        CHECKED,
+        NONE;
+    }
 }

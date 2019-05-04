@@ -23,6 +23,7 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.NullRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -145,6 +146,11 @@ public class RequestSelection implements Region {
     @Override
     public List<BlockVector2> polygonize(int maxPoints) {
         return getRegion().polygonize(maxPoints);
+    }
+
+    @Override
+    public Contains getChunkBounds(int X, int Z, MutableBlockVector3 min, MutableBlockVector3 max) {
+        return getRegion().getChunkBounds(X, Z, min, max);
     }
 
     @Override

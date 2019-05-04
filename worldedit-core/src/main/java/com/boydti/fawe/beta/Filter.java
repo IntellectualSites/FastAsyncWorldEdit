@@ -16,8 +16,8 @@ public interface Filter  {
      * @param cz
      * @return
      */
-    default Filter appliesChunk(final int cx, final int cz) {
-        return this;
+    default boolean appliesChunk(final int cx, final int cz) {
+        return true;
     }
 
     /**
@@ -32,8 +32,8 @@ public interface Filter  {
         return chunk;
     }
 
-    default Filter appliesLayer(IChunk chunk, int layer) {
-        return this;
+    default boolean appliesLayer(IChunk chunk, int layer) {
+        return true;
     }
 
     /**

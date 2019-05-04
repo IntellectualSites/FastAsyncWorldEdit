@@ -1,10 +1,13 @@
 package com.boydti.fawe.beta;
 
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -61,16 +64,20 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
         return;
     }
 
+    /**
+     * Filter
+     * @param filter the filter
+     * @param block The filter block
+     * @param region The region allowed to filter (may be null)
+     * @param unitialized a mutable block vector (buffer)
+     * @param unitialized2 a mutable block vector (buffer)
+     */
+    void filter(Filter filter, FilterBlock block, @Nullable Region region, MutableBlockVector3 unitialized, MutableBlockVector3 unitialized2);
+
     /* set - queues a change */
     boolean setBiome(int x, int y, int z, BiomeType biome);
 
     boolean setBlock(int x, int y, int z, BlockStateHolder block);
-
-    /**
-     * Set using the filter
-     * @param filter
-     */
-    void set(Filter filter);
 
     /* get - from the world */
     BiomeType getBiome(int x, int z);
@@ -78,6 +85,4 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
     BlockState getBlock(int x, int y, int z);
 
     BaseBlock getFullBlock(int x, int y, int z);
-
-    void filter(Filter filter, FilterBlock mutable);
 }
