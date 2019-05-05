@@ -14,7 +14,6 @@ public final class BitArray4096 {
         maxEntryValue = (1 << bitsPerEntry) - 1;
         this.longLen = (this.bitsPerEntry * 4096) >> 6;
         if (buffer.length < longLen) {
-            System.out.println("Invalid buffer " + buffer.length + " | " + longLen);
             this.data = new long[longLen];
         } else {
             this.data = buffer;

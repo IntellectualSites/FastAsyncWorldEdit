@@ -168,7 +168,6 @@ public class BukkitPlayer extends AbstractPlayerActor {
             Extent extent = loc.getExtent();
             if (extent instanceof World) {
                 org.bukkit.World world = Bukkit.getWorld(((World) extent).getName());
-               // System.out.println("Teleport to world " + world);
                 player.teleport(new Location(world, pos.getX(), pos.getY(),
                         pos.getZ(), yaw, pitch));
             }

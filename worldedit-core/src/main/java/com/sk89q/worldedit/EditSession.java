@@ -2490,7 +2490,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int makeSphere(final BlockVector3 pos, final Pattern block, double radiusX, double radiusY, double radiusZ, final boolean filled) {
-        System.out.println("Make sphere");
         radiusX += 0.5;
         radiusY += 0.5;
         radiusZ += 0.5;

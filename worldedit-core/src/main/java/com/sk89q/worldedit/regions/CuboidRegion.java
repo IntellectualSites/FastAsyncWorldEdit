@@ -635,7 +635,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             int maxChunkX = maxX >> 4;
             if (maxChunkX >= X) {
                 int minChunkZ = minZ >> 4;
-                if (minChunkZ <= X) {
+                if (minChunkZ <= Z) {
                     int maxChunkZ = maxZ >> 4;
                     if (maxChunkZ >= Z) {
                         int cx1 = X << 4;

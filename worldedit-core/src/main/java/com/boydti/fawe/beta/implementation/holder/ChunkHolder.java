@@ -46,7 +46,6 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
             if (region != null) {
                 switch (region.getChunkBounds(X, Z, min, max)) {
                     case NONE:
-                        System.out.println("NONE");
                         return;
                     case FULL:
                         if (min.getY() == 0 && max.getY() == 255) {
@@ -58,9 +57,8 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
                     default: {
                         int minLayer = min.getY() >> 4;
                         int maxLayer = max.getY() >> 4;
-                        System.out.println("Layers " + minLayer + " | " + maxLayer);
                         block = block.init(X, Z, get);
-                        for (int layer = minLayer; layer < maxLayer; layer++) {
+                        for (int layer = minLayer; layer <= maxLayer; layer++) {
                             if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) continue;
                             block.filter(get, set, layer, filter, region, min, max);
                         }
