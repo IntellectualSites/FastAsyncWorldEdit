@@ -63,8 +63,8 @@ public class WorldEditCommands {
     )
     public void version(Actor actor) throws WorldEditException {
         FaweVersion fVer = Fawe.get().getVersion();
-        String fVerStr = fVer == null ? "unknown" : fVer.year + "." + fVer.month + "." + fVer.day + "-" + Integer.toHexString(fVer.hash) + "-" + fVer.build;
-        actor.print(BBC.getPrefix() + "FastAsyncWorldEdit 1.13-" + fVerStr + " by Empire92");
+        String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
+        actor.print(BBC.getPrefix() + "FastAsyncWorldEdit-1.13" + fVerStr + " by Empire92");
         if (fVer != null) {
             actor.printDebug("------------------------------------");
             FaweVersion version = Fawe.get().getVersion();
@@ -78,7 +78,7 @@ public class WorldEditCommands {
         PlatformManager pm = we.getPlatformManager();
         actor.printDebug("Platforms:");
         for (Platform platform : pm.getPlatforms()) {
-            actor.printDebug(String.format(" - %s (%s)", platform.getPlatformName(), platform.getVersion()));
+            actor.printDebug(String.format(" - %s", platform.getPlatformName()));
         }
         actor.printDebug("Capabilities:");
         for (Capability capability : Capability.values()) {
@@ -92,7 +92,7 @@ public class WorldEditCommands {
     @Command(
             aliases = {"reload"},
             usage = "",
-            desc = "Reload configuration",
+            desc = "Reload configuration and translations",
             min = 0,
             max = 0
     )
@@ -102,7 +102,7 @@ public class WorldEditCommands {
         we.getEventBus().post(new ConfigurationLoadEvent(we.getPlatformManager().queryCapability(Capability.CONFIGURATION).getConfiguration()));
         Fawe.get().setupConfigs();
         CommandManager.getInstance().register(we.getPlatformManager().queryCapability(Capability.USER_COMMANDS));
-        actor.print(BBC.getPrefix() + "Reloaded WorldEdit " + we.getVersion() + " and " + Fawe.get().getVersion() + "");
+        actor.print(BBC.getPrefix() + "Reloaded FastAsyncWorldEdit configuration and translation files");
     }
 
     @Command(

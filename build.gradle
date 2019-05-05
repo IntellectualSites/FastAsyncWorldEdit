@@ -28,8 +28,6 @@ plugins {
 }
 
 apply plugin: 'java'
-clean { delete "target" }
-
 
 def splashFile = new File('splash.txt')
 if (splashFile.exists()) {
@@ -58,22 +56,23 @@ ext {
     }
 }
 
-if ( project.hasProperty("lzNoVersion") ) { // gradle build -PlzNoVersion
-    version = "unknown"
-} else {
-    version = String.format("%s.%s", rootVersion, buildNumber)
-}
+version = String.format("%s.%s", rootVersion, buildNumber)
+
 description = rootProject.name
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'com.github.johnrengelman.shadow'
-    // Enable this requires putting license header files in many, many FAWE files
+    //Enable this requires putting license header files in many, many FAWE files
     //apply plugin: 'net.minecrell.licenser'
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+
+    clean.doFirst {
+        delete "../target"
+    }
 
     compileJava { options.compilerArgs += ["-parameters"] }
 
@@ -94,23 +93,6 @@ subprojects {
         maven {url "http://repo.spongepowered.org/maven"}
         maven {url "http://dl.bintray.com/tastybento/maven-repo"}
         maven {url "http://ci.emc.gs/nexus/content/groups/aikar/" }
-    }
-
-    if (JavaVersion.current().isJava8Compatible()) {
-        // Java 8 turns on doclint which we fail
-        tasks.withType(Javadoc) {
-            options.addStringOption('Xdoclint:none', '-quiet')
-        }
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    artifacts {
-        archives jar
-        archives javadocJar
     }
 
     if (!(name.equals('worldedit-forge') || name.equals('worldedit-sponge'))) {
