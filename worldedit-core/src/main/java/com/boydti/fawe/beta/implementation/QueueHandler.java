@@ -181,13 +181,12 @@ public abstract class QueueHandler implements Trimable, Runnable {
                             // Initialize
                             chunk.init(queue, X, Z);
 
-                            chunk = newFilter.applyChunk(chunk, region);
-
-                            if (chunk == null) continue;
-
-                            if (block == null) block = queue.initFilterBlock();
-                            chunk.filter(newFilter, block, region, mbv1, mbv2);
-
+                            IChunk newChunk = newFilter.applyChunk(chunk, region);
+                            if (newChunk != null) {
+                                chunk = newChunk;
+                                if (block == null) block = queue.initFilterBlock();
+                                chunk.filter(newFilter, block, region, mbv1, mbv2);
+                            }
                             queue.submit(chunk);
                         }
                         queue.flush();

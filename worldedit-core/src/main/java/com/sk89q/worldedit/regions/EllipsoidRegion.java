@@ -44,6 +44,7 @@ public class EllipsoidRegion extends AbstractRegion {
      */
     private Vector3 radius;
     private Vector3 radiusSqr;
+    private Vector3 inverseRadius;
     private int radiusLengthSqr;
     private boolean sphere;
 
@@ -136,7 +137,7 @@ public class EllipsoidRegion extends AbstractRegion {
     public void contract(BlockVector3... changes) throws RegionOperationException {
         center = center.subtract(calculateDiff(changes));
         Vector3 newRadius = radius.subtract(calculateChanges(changes));
-        radius = Vector3.at(1.5, 1.5, 1.5).getMaximum(newRadius);
+        setRadius(Vector3.at(1.5, 1.5, 1.5).getMaximum(newRadius));
     }
 
     @Override
@@ -187,6 +188,7 @@ public class EllipsoidRegion extends AbstractRegion {
         } else {
             this.sphere = false;
         }
+        inverseRadius = Vector3.ONE.divide(radius);
     }
 
     @Override
@@ -233,9 +235,9 @@ public class EllipsoidRegion extends AbstractRegion {
        if (sphere) {
            return cx2 + cy2 + cz2 <= radiusLengthSqr;
        }
-       double cxd = (double) cx / radius.getBlockX();
-       double cyd = (double) cy / radius.getBlockY();
-       double czd = (double) cz / radius.getBlockZ();
+       double cxd = cx * inverseRadius.getX();
+       double cyd = cy * inverseRadius.getY();
+       double czd = cz * inverseRadius.getZ();
        return cxd * cxd + cyd * cyd + czd * czd <= 1;
     }
 

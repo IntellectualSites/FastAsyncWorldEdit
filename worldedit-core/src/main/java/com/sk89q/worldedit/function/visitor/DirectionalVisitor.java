@@ -51,14 +51,15 @@ public class DirectionalVisitor extends RecursiveVisitor {
         checkNotNull(mask);
         this.origin = origin;
         this.dirVec = direction;
-        final Collection<BlockVector3> directions = this.getDirections();
-        directions.clear();
-        directions.add(BlockVector3.at(1, 0, 0));
-        directions.add(BlockVector3.at(-1, 0, 0));
-        directions.add(BlockVector3.at(0, 0, 1));
-        directions.add(BlockVector3.at(0, 0, -1));
-        directions.add(BlockVector3.at(0, -1, 0));
-        directions.add(BlockVector3.at(0, 1, 0));
+
+        setDirections(
+            BlockVector3.at(1, 0, 0),
+            BlockVector3.at(-1, 0, 0),
+            BlockVector3.at(0, 0, 1),
+            BlockVector3.at(0, 0, -1),
+            BlockVector3.at(0, -1, 0),
+            BlockVector3.at(0, 1, 0)
+        );
     }
 
     @Override

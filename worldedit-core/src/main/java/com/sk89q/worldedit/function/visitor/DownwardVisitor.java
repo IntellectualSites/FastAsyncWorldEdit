@@ -60,13 +60,13 @@ public class DownwardVisitor extends RecursiveVisitor {
         checkNotNull(mask);
         this.baseY = baseY;
 
-        Collection<BlockVector3> directions = getDirections();
-        directions.clear();
-        directions.add(BlockVector3.at(1, 0, 0));
-        directions.add(BlockVector3.at(-1, 0, 0));
-        directions.add(BlockVector3.at(0, 0, 1));
-        directions.add(BlockVector3.at(0, 0, -1));
-        directions.add(BlockVector3.at(0, -1, 0));
+        setDirections(
+            BlockVector3.at(1, 0, 0),
+            BlockVector3.at(-1, 0, 0),
+            BlockVector3.at(0, 0, 1),
+            BlockVector3.at(0, 0, -1),
+            BlockVector3.at(0, -1, 0)
+        );
     }
 
     @Override

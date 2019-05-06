@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -73,7 +74,7 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     private final RegionFunction function;
-    private List<BlockVector3> directions = new ArrayList<>();
+    private BlockVector3[] directions;
     private BlockVectorSet visited;
     private final MappedFaweQueue mFaweQueue;
     private BlockVectorSet queue;
@@ -96,23 +97,18 @@ public abstract class BreadthFirstSearch implements Operation {
         this.queue = new BlockVectorSet();
         this.visited = new BlockVectorSet();
         this.function = function;
-        this.directions.addAll(Arrays.asList(DEFAULT_DIRECTIONS));
+        this.directions = DEFAULT_DIRECTIONS;
         this.maxDepth = maxDepth;
     }
 
-    public void setDirections(List<BlockVector3> directions) {
+    public void setDirections(BlockVector3... directions) {
         this.directions = directions;
     }
 
-    private IntegerTrio[] getIntDirections() {
-        IntegerTrio[] array = new IntegerTrio[directions.size()];
-        for (int i = 0; i < array.length; i++) {
-        	BlockVector3 dir = directions.get(i);
-            array[i] = new IntegerTrio(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
-        }
-        return array;
+    public void setDirections(Collection<BlockVector3> directions) {
+        setDirections(directions.toArray(new BlockVector3[0]));
     }
-    
+
     /**
      * Get the list of directions will be visited.
      *
@@ -121,34 +117,36 @@ public abstract class BreadthFirstSearch implements Operation {
      * unit vectors. An example of a valid direction is
      * {@code BlockVector3.at(1, 0, 1)}.</p>
      *
-     * <p>The list of directions can be cleared.</p>
-     *
      * @return the list of directions
      */
-    protected Collection<BlockVector3> getDirections() {
-        return directions;
+    public Collection<BlockVector3> getDirections() {
+        return Arrays.asList(directions);
     }
 
     /**
      * Add the directions along the axes as directions to visit.
      */
-    protected void addAxes() {
-        directions.add(BlockVector3.at(0, -1, 0));
-        directions.add(BlockVector3.at(0, 1, 0));
-        directions.add(BlockVector3.at(-1, 0, 0));
-        directions.add(BlockVector3.at(1, 0, 0));
-        directions.add(BlockVector3.at(0, 0, -1));
-        directions.add(BlockVector3.at(0, 0, 1));
+    public void addAxes() {
+        HashSet<BlockVector3> set = new HashSet<>(Arrays.asList(directions));
+        set.add(BlockVector3.at(0, -1, 0));
+        set.add(BlockVector3.at(0, 1, 0));
+        set.add(BlockVector3.at(-1, 0, 0));
+        set.add(BlockVector3.at(1, 0, 0));
+        set.add(BlockVector3.at(0, 0, -1));
+        set.add(BlockVector3.at(0, 0, 1));
+        setDirections(set);
     }
 
     /**
      * Add the diagonal directions as directions to visit.
      */
-    protected void addDiagonal() {
-        directions.add(BlockVector3.at(1, 0, 1));
-        directions.add(BlockVector3.at(-1, 0, -1));
-        directions.add(BlockVector3.at(1, 0, -1));
-        directions.add(BlockVector3.at(-1, 0, 1));
+    public void addDiagonal() {
+        HashSet<BlockVector3> set = new HashSet<>(Arrays.asList(directions));
+        set.add(BlockVector3.at(1, 0, 1));
+        set.add(BlockVector3.at(-1, 0, -1));
+        set.add(BlockVector3.at(1, 0, -1));
+        set.add(BlockVector3.at(-1, 0, 1));
+        setDirections(set);
     }
 
     public void visit(final BlockVector3 pos) {
@@ -157,12 +155,6 @@ public abstract class BreadthFirstSearch implements Operation {
             queue.add(pos);
             visited.add(pos);
         }
-    }
-
-    public void resetVisited() {
-        queue.clear();
-        visited.clear();
-        affected = 0;
     }
 
     public void setVisited(BlockVectorSet set) {
@@ -179,21 +171,6 @@ public abstract class BreadthFirstSearch implements Operation {
 
     public void setMaxBranch(int maxBranch) {
         this.maxBranch = maxBranch;
-    }
-    /**
-     * Try to visit the given 'to' location.
-     *
-     * @param from the origin block
-     * @param to the block under question
-     */
-    private void visit(BlockVector3 from, BlockVector3 to) {
-        BlockVector3 blockVector = to;
-        if (!visited.contains(blockVector)) {
-            visited.add(blockVector);
-            if (isVisitable(from, to)) {
-                queue.add(blockVector);
-            }
-        }
     }
 
     /**
@@ -220,7 +197,7 @@ public abstract class BreadthFirstSearch implements Operation {
         MutableBlockVector3 mutable = new MutableBlockVector3();
 //        MutableBlockVector3 mutable2 = new MutableBlockVector3();
         boolean shouldTrim = false;
-        IntegerTrio[] dirs = getIntDirections();
+        BlockVector3[] dirs = directions;
         BlockVectorSet tempQueue = new BlockVectorSet();
         BlockVectorSet chunkLoadSet = new BlockVectorSet();
         for (currentDepth = 0; !queue.isEmpty() && currentDepth <= maxDepth; currentDepth++) {
@@ -228,11 +205,11 @@ public abstract class BreadthFirstSearch implements Operation {
                 int cx = Integer.MIN_VALUE;
                 int cz = Integer.MIN_VALUE;
                 for (BlockVector3 from : queue) {
-                    for (IntegerTrio direction : dirs) {
-                        int x = from.getBlockX() + direction.x;
-                        int z = from.getBlockZ() + direction.z;
+                    for (BlockVector3 direction : dirs) {
+                        int x = from.getBlockX() + direction.getX();
+                        int z = from.getBlockZ() + direction.getZ();
                         if (cx != (cx = x >> 4) || cz != (cz = z >> 4)) {
-                            int y = from.getBlockY() + direction.y;
+                            int y = from.getBlockY() + direction.getY();
                             if (y < 0 || y >= 256) {
                                 continue;
                             }
@@ -249,13 +226,13 @@ public abstract class BreadthFirstSearch implements Operation {
             for (BlockVector3 from : queue) {
                 if (function.apply(from)) affected++;
                 for (int i = 0, j = 0; i < dirs.length && j < maxBranch; i++) {
-                    IntegerTrio direction = dirs[i];
-                    int y = from.getBlockY() + direction.y;
+                    BlockVector3 direction = dirs[i];
+                    int y = from.getBlockY() + direction.getY();
                     if (y < 0 || y >= 256) {
                         continue;
                     }
-                    int x = from.getBlockX() + direction.x;
-                    int z = from.getBlockZ() + direction.z;
+                    int x = from.getBlockX() + direction.getX();
+                    int z = from.getBlockZ() + direction.getZ();
                     if (!visited.contains(x, y, z)) {
                         if (isVisitable(from, BlockVector3.at(x, y, z))) {
                             j++;
