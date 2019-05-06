@@ -183,13 +183,9 @@ public class BlockType implements FawePattern {
         return this.settings.defaultState;
     }
 
-//    public FuzzyBlockState getFuzzyMatcher() { //
-//        return new FuzzyBlockState(this);
-//    }
-//
-//    public FuzzyBlockState getFuzzyMatcher() { //
-//        return updateField(emptyFuzzy, () -> new FuzzyBlockState(this));
-//    }
+    public FuzzyBlockState getFuzzyMatcher() { //
+        return new FuzzyBlockState(this);
+    }
 
     /**
      * Slow
