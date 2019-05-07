@@ -37,20 +37,24 @@ import java.util.Objects;
  */
 public class FuzzyBlockState extends BlockState {
 
-    private final Map<PropertyKey, Object> state;
+    private final Map<PropertyKey, Object> props;
 
-    FuzzyBlockState(BlockType blockType) {
-        this(blockType, null);
+    public FuzzyBlockState(BlockType blockType) {
+        this(blockType.getDefaultState(), null);
     }
 
-    private FuzzyBlockState(BlockType blockType, Map<Property<?>, Object> values) {
-        super(blockType, blockType.getDefaultState().getInternalId(), blockType.getDefaultState().getOrdinal());
+    public FuzzyBlockState(BlockState state) {
+        this(state, null);
+    }
+
+    private FuzzyBlockState(BlockState state, Map<Property<?>, Object> values) {
+        super(state.getBlockType(), state.getInternalId(), state.getOrdinal());
         if (values == null || values.isEmpty()) {
-            state = Collections.emptyMap();
+            props = Collections.emptyMap();
         } else {
-            state = new HashMap<>(values.size());
+            props = new HashMap<>(values.size());
             for (Map.Entry<Property<?>, Object> entry : values.entrySet()) {
-                state.put(entry.getKey().getKey(), entry.getValue());
+                props.put(entry.getKey().getKey(), entry.getValue());
             }
         }
     }
@@ -76,14 +80,19 @@ public class FuzzyBlockState extends BlockState {
         if (!getBlockType().equals(o.getBlockType())) {
             return false;
         }
-        if (!state.isEmpty()) {
-            for (Map.Entry<PropertyKey, Object> entry : state.entrySet()) {
+        if (!props.isEmpty()) {
+            for (Map.Entry<PropertyKey, Object> entry : props.entrySet()) {
                 if (!Objects.equals(o.getState(entry.getKey()), entry.getValue())) {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    @Override
+    public BaseBlock toBaseBlock() {
+        return new BaseBlock();
     }
 
     @Override
@@ -158,7 +167,7 @@ public class FuzzyBlockState extends BlockState {
             if (values.isEmpty()) {
                 return type.getFuzzyMatcher();
             }
-            return new FuzzyBlockState(type, values);
+            return new FuzzyBlockState(type.getDefaultState(), values);
         }
 
         /**

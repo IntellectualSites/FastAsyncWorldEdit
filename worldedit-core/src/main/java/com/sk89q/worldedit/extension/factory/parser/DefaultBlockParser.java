@@ -47,6 +47,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -54,9 +55,11 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -249,10 +252,28 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new NoMatchException(BBC.getPrefix() + "Does not match a valid block type: '" + input + "'");
                 }
             }
-//            if (nbt == null) nbt = state.getNbtData();
+            if (nbt == null) nbt = state.getNbtData();
 
             if (stateString != null) {
                 state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state);
+                if (context.isPreferringWildcard()) {
+                    if (stateString.isEmpty()) {
+                        state = new FuzzyBlockState(state);
+                    } else {
+                        BlockType type = state.getBlockType();
+                        FuzzyBlockState.Builder fuzzyBuilder = FuzzyBlockState.builder();
+                        fuzzyBuilder.type(type);
+                        String[] entries = stateString.split(",");
+                        for (String entry : entries) {
+                            String[] split = entry.split("=");
+                            String key = split[0];
+                            String val = split[1];
+                            Property<Object> prop = type.getProperty(key);
+                            fuzzyBuilder.withProperty(prop, prop.getValueFor(val));
+                        }
+                        state = fuzzyBuilder.build();
+                    }
+                }
             }
         }
 
