@@ -79,6 +79,12 @@ public class EditSessionBuilder {
         this.worldName = Fawe.imp().getWorldName(world);
     }
 
+    public EditSessionBuilder(World world, String worldName) {
+        if (world == null && worldName == null) throw new NullPointerException("Both world and worldname cannot be null");
+        this.world = world;
+        this.worldName = worldName;
+    }
+
     public EditSessionBuilder(@Nonnull String worldName) {
         checkNotNull(worldName);
         this.worldName = worldName;
@@ -253,8 +259,16 @@ public class EditSessionBuilder {
         return extent;
     }
 
-    public EditSessionBuilder commit() {
-        // reset
+    private FaweChangeSet changeTask;
+    private AbstractDelegateExtent extent;
+    private int maxY;
+    private HistoryExtent history;
+    private AbstractDelegateExtent bypassHistory;
+    private AbstractDelegateExtent bypassAll;
+
+    public EditSessionBuilder compile() {
+        if (extent != null) return this;
+
         wrapped = false;
         //
         if (worldName == null) {
@@ -336,9 +350,6 @@ public class EditSessionBuilder {
                             // If the edit uses items from the inventory we can't use a delayed task
                             && this.blockBag == null;
         }
-//        if (Settings.IMP.EXPERIMENTAL.ANVIL_QUEUE_MODE && !(queue instanceof MCAQueue)) {
-//            queue = new MCAQueue(queue);
-//        }
         if (!Settings.IMP.QUEUE.PROGRESS.DISPLAY.equalsIgnoreCase("false") && player != null) {
             switch (Settings.IMP.QUEUE.PROGRESS.DISPLAY.toLowerCase()) {
                 case "chat":
@@ -350,76 +361,131 @@ public class EditSessionBuilder {
                     this.queue.setProgressTask(new DefaultProgressTracker(player));
             }
         }
-//        this.bypassAll = wrapExtent(new FastWorldEditExtent(world, queue), eventBus, event, EditSession.Stage.BEFORE_CHANGE);
-//        this.bypassHistory = (this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER));
-//        if (!this.fastMode || changeSet != null) {
-//            if (changeSet == null) {
-//                if (Settings.IMP.HISTORY.USE_DISK) {
-//                    UUID uuid = player == null ? EditSession.CONSOLE : player.getUUID();
-//                    if (Settings.IMP.HISTORY.USE_DATABASE) {
-//                        changeSet = new RollbackOptimizedHistory(world, uuid);
-//                    } else {
-//                        changeSet = new DiskStorageHistory(world, uuid);
+        this.bypassAll = wrapExtent(new FastWorldEditExtent(world, queue), eventBus, event, EditSession.Stage.BEFORE_CHANGE);
+        this.bypassHistory = (this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER));
+        if (!this.fastmode || changeSet != null) {
+            if (changeSet == null) {
+                if (Settings.IMP.HISTORY.USE_DISK) {
+                    UUID uuid = player == null ? EditSession.CONSOLE : player.getUUID();
+                    if (Settings.IMP.HISTORY.USE_DATABASE) {
+                        changeSet = new RollbackOptimizedHistory(world, uuid);
+                    } else {
+                        changeSet = new DiskStorageHistory(world, uuid);
+                    }
+                } else if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0 && !(queue instanceof MCAQueue)) {
+                    changeSet = new CPUOptimizedChangeSet(world);
+                } else {
+                    changeSet = new MemoryOptimizedHistory(world);
+                }
+            }
+            if (this.limit.SPEED_REDUCTION > 0) {
+                this.bypassHistory = new SlowExtent(this.bypassHistory, this.limit.SPEED_REDUCTION);
+            }
+            if (changeSet instanceof NullChangeSet && Fawe.imp().getBlocksHubApi() != null && player != null) {
+                changeSet = LoggingChangeSet.wrap(player, changeSet);
+            }
+            if (!(changeSet instanceof NullChangeSet)) {
+                if (!(changeSet instanceof LoggingChangeSet) && player != null && Fawe.imp().getBlocksHubApi() != null) {
+                    changeSet = LoggingChangeSet.wrap(player, changeSet);
+                }
+                if (this.blockBag != null) {
+                    changeSet = new BlockBagChangeSet(changeSet, blockBag, limit.INVENTORY_MODE == 1);
+                }
+                if (combineStages) {
+                    changeTask = changeSet;
+                    changeSet.addChangeTask(queue);
+                } else {
+                    this.extent = (history = new HistoryExtent(bypassHistory, changeSet, queue));
+//                    if (this.blockBag != null) {
+//                        this.extent = new BlockBagExtent(this.extent, blockBag, limit.INVENTORY_MODE == 1);
 //                    }
-//                } else if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0 && !(queue instanceof MCAQueue)) {
-//                    changeSet = new CPUOptimizedChangeSet(world);
-//                } else {
-//                    changeSet = new MemoryOptimizedHistory(world);
-//                }
-//            }
-//            if (this.limit.SPEED_REDUCTION > 0) {
-//                this.bypassHistory = new SlowExtent(this.bypassHistory, this.limit.SPEED_REDUCTION);
-//            }
-//            if (changeSet instanceof NullChangeSet && Fawe.imp().getBlocksHubApi() != null && player != null) {
-//                changeSet = LoggingChangeSet.wrap(player, changeSet);
-//            }
-//            if (!(changeSet instanceof NullChangeSet)) {
-//                if (!(changeSet instanceof LoggingChangeSet) && player != null && Fawe.imp().getBlocksHubApi() != null) {
-//                    changeSet = LoggingChangeSet.wrap(player, changeSet);
-//                }
-//                if (this.blockBag != null) {
-//                    changeSet = new BlockBagChangeSet(changeSet, blockBag, limit.INVENTORY_MODE == 1);
-//                }
-//                if (combineStages) {
-//                    changeTask = changeSet;
-//                    changeSet.addChangeTask(queue);
-//                } else {
-//                    this.extent = (history = new HistoryExtent(this, bypassHistory, changeSet, queue));
-////                    if (this.blockBag != null) {
-////                        this.extent = new BlockBagExtent(this.extent, blockBag, limit.INVENTORY_MODE == 1);
-////                    }
-//                }
-//            }
-//        }
-//        if (allowedRegions == null) {
-//            if (player != null && !player.hasPermission("fawe.bypass") && !player.hasPermission("fawe.bypass.regions") && !(queue instanceof VirtualWorld)) {
-//                allowedRegions = player.getCurrentRegions();
-//            }
-//        }
-//        this.maxY = getWorld() == null ? 255 : world.getMaxY();
-//        if (allowedRegions != null) {
-//            if (allowedRegions.length == 0) {
-//                this.extent = new NullExtent(this.extent, BBC.WORLDEDIT_CANCEL_REASON_NO_REGION);
-//            } else {
-//                this.extent = new ProcessedWEExtent(this.extent, this.limit);
-//                if (allowedRegions.length == 1) {
-//                    Region region = allowedRegions[0];
-//                    this.extent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
-//                } else {
-//                    this.extent = new MultiRegionExtent(this.extent, this.limit, allowedRegions);
-//                }
-//            }
-//        } else {
-//            this.extent = new HeightBoundExtent(this.extent, this.limit, 0, maxY);
-//        }
-//        if (this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
-//            this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
-//        }
-//        this.extent = wrapExtent(this.extent, bus, event, Stage.BEFORE_HISTORY);
+                }
+            }
+        }
+        if (allowedRegions == null) {
+            if (player != null && !player.hasPermission("fawe.bypass") && !player.hasPermission("fawe.bypass.regions") && !(queue instanceof VirtualWorld)) {
+                allowedRegions = player.getCurrentRegions();
+            }
+        }
+        this.maxY = world == null ? 255 : world.getMaxY();
+        if (allowedRegions != null) {
+            if (allowedRegions.length == 0) {
+                this.extent = new NullExtent(this.extent, BBC.WORLDEDIT_CANCEL_REASON_NO_REGION);
+            } else {
+                this.extent = new ProcessedWEExtent(this.extent, this.limit);
+                if (allowedRegions.length == 1) {
+                    this.extent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
+                } else {
+                    this.extent = new MultiRegionExtent(this.extent, this.limit, allowedRegions);
+                }
+            }
+        } else {
+            this.extent = new HeightBoundExtent(this.extent, this.limit, 0, maxY);
+        }
+        if (this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
+            this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+        }
+        this.extent = wrapExtent(this.extent, eventBus, event, EditSession.Stage.BEFORE_HISTORY);
         return this;
     }
 
     public EditSession build() {
-        return new EditSession(worldName, world, queue, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, eventBus, event);
+        return new EditSession(this);
+    }
+
+    public Extent getExtent() {
+        return extent;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public FaweQueue getQueue() {
+        return queue;
+    }
+
+    public boolean isWrapped() {
+        return wrapped;
+    }
+
+    public boolean hasFastMode() {
+        return fastmode;
+    }
+
+    public HistoryExtent getHistory() {
+        return history;
+    }
+
+    public AbstractDelegateExtent getBypassHistory() {
+        return bypassHistory;
+    }
+
+    public AbstractDelegateExtent getBypassAll() {
+        return bypassAll;
+    }
+
+    public FaweLimit getLimit() {
+        return limit;
+    }
+
+    public FawePlayer getPlayer() {
+        return player;
+    }
+
+    public FaweChangeSet getChangeTask() {
+        return changeTask;
+    }
+
+    public BlockBag getBlockBag() {
+        return blockBag;
+    }
+
+    public int getMaxY() {
+        return maxY;
     }
 }

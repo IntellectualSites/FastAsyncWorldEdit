@@ -57,17 +57,6 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        if (!contains(location)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return false;
-        }
-        return super.setBlock(location, block);
-    }
-
-    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
@@ -76,17 +65,6 @@ public abstract class FaweRegionExtent extends ResettableExtent {
             return false;
         }
         return super.setBlock(x, y, z, block);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        if (!contains(position)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return false;
-        }
-        return super.setBiome(position, biome);
     }
 
     @Override
@@ -110,7 +88,18 @@ public abstract class FaweRegionExtent extends ResettableExtent {
         }
         return super.getBiome(position);
     }
-    
+
+    @Override
+    public BiomeType getBiome(int x, int z) {
+        if (!contains(x, z)) {
+            if (!limit.MAX_FAILS()) {
+                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+            }
+            return null;
+        }
+        return super.getBiome(x, z);
+    }
+
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         if (!contains(position)) {
@@ -131,28 +120,6 @@ public abstract class FaweRegionExtent extends ResettableExtent {
             return EditSession.nullBlock;
         }
         return super.getBlock(position);
-    }
-
-    @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        if (!contains(position)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return EditSession.nullBlock;
-        }
-        return super.getLazyBlock(position);
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
-        if (!contains(x, y, z)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return EditSession.nullBlock;
-        }
-        return super.getLazyBlock(x, y, z);
     }
 
     @Override

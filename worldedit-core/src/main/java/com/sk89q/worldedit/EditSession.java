@@ -204,19 +204,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     private final FaweQueue queue;
     private final boolean wrapped;
     private final boolean fastMode;
-    private final AbstractDelegateExtent extent;
     private final HistoryExtent history;
-    private final AbstractDelegateExtent bypassHistory;
-    private final AbstractDelegateExtent bypassAll;
+    private AbstractDelegateExtent bypassHistory;
+    private AbstractDelegateExtent bypassAll;
     private final FaweLimit originalLimit;
     private final FaweLimit limit;
     private final FawePlayer player;
     private final FaweChangeSet changeTask;
 
-    private MutableBlockVector3 mutablebv = new MutableBlockVector3();
+    private final MutableBlockVector3 mutablebv = new MutableBlockVector3();
 
     private int changes = 0;
-    private BlockBag blockBag;
+    private final BlockBag blockBag;
 
     private final int maxY;
 
@@ -234,163 +233,26 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
-        super(world);
-        this.worldName = worldName == null ? world == null ? queue == null ? "" : queue.getWorldName() : Fawe.imp().getWorldName(world) : worldName;
-        if (world == null && this.worldName != null) world = FaweAPI.getWorld(this.worldName);
-        this.world = world;
-        if (bus == null) {
-            bus = WorldEdit.getInstance().getEventBus();
-        }
-        if (event == null) {
-            event = new EditSessionEvent(world, player == null ? null : (player.getPlayer()), -1, null);
-        }
-        if (player == null && event.getActor() != null) {
-            player = FawePlayer.wrap(event.getActor());
-        }
-        this.player = player;
-        if (limit == null) {
-            if (player == null) {
-                limit = FaweLimit.MAX;
-            } else {
-                limit = player.getLimit();
-            }
-        }
-        if (autoQueue == null) {
-            autoQueue = true;
-        }
-        if (fastmode == null) {
-            if (player == null) {
-                fastmode = !Settings.IMP.HISTORY.ENABLE_FOR_CONSOLE;
-            } else {
-                fastmode = player.getSession().hasFastMode();
-            }
-        }
-        this.fastMode = fastmode;
-        if (checkMemory == null) {
-            checkMemory = player != null && !this.fastMode;
-        }
-        if (checkMemory) {
-            if (MemUtil.isMemoryLimitedSlow()) {
-                if (Perm.hasPermission(player, "worldedit.fast")) {
-                    BBC.WORLDEDIT_OOM_ADMIN.send(player);
-                }
-                throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_LOW_MEMORY);
-            }
-        }
-        this.originalLimit = limit;
-        this.blockBag = limit.INVENTORY_MODE != 0 ? blockBag : null;
-        this.limit = limit.copy();
-
-        if (queue == null) {
-            boolean placeChunks = this.fastMode || this.limit.FAST_PLACEMENT;
-            World unwrapped = WorldWrapper.unwrap(world);
-            if (unwrapped instanceof FaweQueue) {
-                queue = (FaweQueue) unwrapped;
-            } else if (unwrapped instanceof MCAWorld) {
-                queue = ((MCAWorld) unwrapped).getQueue();
-            } else if (player != null && world.equals(player.getWorld())) {
-                queue = player.getFaweQueue(placeChunks, autoQueue);
-            } else {
-                queue = SetQueue.IMP.getNewQueue(world, placeChunks, autoQueue);
-            }
-        }
-        if (combineStages == null) {
-            combineStages =
-                    // If it's enabled in the settings
-                    Settings.IMP.HISTORY.COMBINE_STAGES
-                    // If fast placement is disabled, it's slower to perform a copy on each chunk
-                    && this.limit.FAST_PLACEMENT
-                    // If the specific queue doesn't support it
-                    && queue.supports(FaweQueue.Capability.CHANGE_TASKS)
-                    // If the edit uses items from the inventory we can't use a delayed task
-                    && this.blockBag == null;
-        }
-        if (Settings.IMP.EXPERIMENTAL.ANVIL_QUEUE_MODE && !(queue instanceof MCAQueue)) {
-            queue = new MCAQueue(queue);
-        }
-        this.queue = queue;
-        this.queue.addEditSession(this);
-        if (!Settings.IMP.QUEUE.PROGRESS.DISPLAY.equalsIgnoreCase("false") && player != null) {
-            switch (Settings.IMP.QUEUE.PROGRESS.DISPLAY.toLowerCase()) {
-                case "chat":
-                    this.queue.setProgressTask(new ChatProgressTracker(player));
-                    break;
-                case "title":
-                case "true":
-                default:
-                    this.queue.setProgressTask(new DefaultProgressTracker(player));
-            }
-        }
-        this.bypassAll = wrapExtent(new FastWorldEditExtent(world, queue), bus, event, Stage.BEFORE_CHANGE);
-        this.bypassHistory = (this.extent = wrapExtent(bypassAll, bus, event, Stage.BEFORE_REORDER));
-        if (!this.fastMode || changeSet != null) {
-            if (changeSet == null) {
-                if (Settings.IMP.HISTORY.USE_DISK) {
-                    UUID uuid = player == null ? CONSOLE : player.getUUID();
-                    if (Settings.IMP.HISTORY.USE_DATABASE) {
-                        changeSet = new RollbackOptimizedHistory(world, uuid);
-                    } else {
-                        changeSet = new DiskStorageHistory(world, uuid);
-                    }
-                } else if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0 && !(queue instanceof MCAQueue)) {
-                    changeSet = new CPUOptimizedChangeSet(world);
-                } else {
-                    changeSet = new MemoryOptimizedHistory(world);
-                }
-            }
-            if (this.limit.SPEED_REDUCTION > 0) {
-                this.bypassHistory = new SlowExtent(this.bypassHistory, this.limit.SPEED_REDUCTION);
-            }
-            if (changeSet instanceof NullChangeSet && Fawe.imp().getBlocksHubApi() != null && player != null) {
-                changeSet = LoggingChangeSet.wrap(player, changeSet);
-            }
-            if (!(changeSet instanceof NullChangeSet)) {
-                if (!(changeSet instanceof LoggingChangeSet) && player != null && Fawe.imp().getBlocksHubApi() != null) {
-                    changeSet = LoggingChangeSet.wrap(player, changeSet);
-                }
-                if (this.blockBag != null) {
-                    changeSet = new BlockBagChangeSet(changeSet, blockBag, limit.INVENTORY_MODE == 1);
-                }
-                if (combineStages) {
-                    changeTask = changeSet;
-                    changeSet.addChangeTask(queue);
-                } else {
-                    this.extent = (history = new HistoryExtent(this, bypassHistory, changeSet, queue));
-//                    if (this.blockBag != null) {
-//                        this.extent = new BlockBagExtent(this.extent, blockBag, limit.INVENTORY_MODE == 1);
-//                    }
-                }
-            }
-        }
-        if (allowedRegions == null) {
-            if (player != null && !player.hasPermission("fawe.bypass") && !player.hasPermission("fawe.bypass.regions") && !(queue instanceof VirtualWorld)) {
-                allowedRegions = player.getCurrentRegions();
-            }
-        }
-        this.maxY = getWorld() == null ? 255 : world.getMaxY();
-        if (allowedRegions != null) {
-            if (allowedRegions.length == 0) {
-                this.extent = new NullExtent(this.extent, BBC.WORLDEDIT_CANCEL_REASON_NO_REGION);
-            } else {
-                this.extent = new ProcessedWEExtent(this.extent, this.limit);
-                if (allowedRegions.length == 1) {
-                    Region region = allowedRegions[0];
-                    this.extent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
-                } else {
-                    this.extent = new MultiRegionExtent(this.extent, this.limit, allowedRegions);
-                }
-            }
-        } else {
-            this.extent = new HeightBoundExtent(this.extent, this.limit, 0, maxY);
-        }
-        if (this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
-            this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
-        }
-        this.extent = wrapExtent(this.extent, bus, event, Stage.BEFORE_HISTORY);
+        this(new EditSessionBuilder(world, worldName).queue(queue).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
     }
 
     public EditSession(EditSessionBuilder builder) {
-        super(builder.)
+        super(builder.compile().getExtent());
+        this.world = builder.getWorld();
+        this.worldName = builder.getWorldName();
+        this.queue = builder.getQueue();
+        this.wrapped = builder.isWrapped();
+        this.fastMode = builder.hasFastMode();
+        this.history = builder.getHistory();
+        this.bypassHistory = builder.getBypassHistory();
+        this.bypassAll = builder.getBypassAll();
+        this.originalLimit = builder.getLimit();
+        this.limit = builder.getLimit().copy();
+        this.player = builder.getPlayer();
+        this.changeTask = builder.getChangeTask();
+        this.maxY = builder.getMaxY();
+        this.blockBag = builder.getBlockBag();
+
     }
 
     /**
@@ -442,7 +304,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     public void resetLimit() {
         this.limit.set(this.originalLimit);
-        ExtentTraverser<ProcessedWEExtent> find = new ExtentTraverser(extent).find(ProcessedWEExtent.class);
+        ExtentTraverser<ProcessedWEExtent> find = new ExtentTraverser(this).find(ProcessedWEExtent.class);
         if (find != null && find.get() != null) {
             find.get().setLimit(this.limit);
         }
@@ -481,7 +343,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return FaweRegionExtent (may be null)
      */
     public FaweRegionExtent getRegionExtent() {
-        ExtentTraverser<FaweRegionExtent> traverser = new ExtentTraverser(this.extent).find(FaweRegionExtent.class);
+        ExtentTraverser<FaweRegionExtent> traverser = new ExtentTraverser(this).find(FaweRegionExtent.class);
         return traverser == null ? null : traverser.get();
     }
 
@@ -504,18 +366,17 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public boolean cancel() {
-        ExtentTraverser traverser = new ExtentTraverser(this.extent);
+        ExtentTraverser traverser = new ExtentTraverser(this);
         NullExtent nullExtent = new NullExtent(world, BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
         while (traverser != null) {
-            ExtentTraverser next = traverser.next();
             Extent get = traverser.get();
             if (get instanceof AbstractDelegateExtent && !(get instanceof NullExtent)) {
                 traverser.setNext(nullExtent);
             }
+            ExtentTraverser next = traverser.next();
             traverser = next;
         }
         bypassHistory = nullExtent;
-        this.extent = nullExtent;
         bypassAll = nullExtent;
         dequeue();
         if (!queue.isEmpty()) {
@@ -567,46 +428,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public FaweQueue getQueue() {
         return queue;
-    }
-
-    @Deprecated
-    private AbstractDelegateExtent wrapExtent(final AbstractDelegateExtent extent, final EventBus eventBus, EditSessionEvent event, final Stage stage) {
-        event = event.clone(stage);
-        event.setExtent(extent);
-        eventBus.post(event);
-        if (event.isCancelled()) {
-            return new NullExtent(extent, BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
-        }
-        final Extent toReturn = event.getExtent();
-        if(toReturn instanceof com.sk89q.worldedit.extent.NullExtent) {
-        	return new NullExtent(toReturn, null);
-        }
-        if (!(toReturn instanceof AbstractDelegateExtent)) {
-            Fawe.debug("Extent " + toReturn + " must be AbstractDelegateExtent");
-            return extent;
-        }
-        if (toReturn != extent) {
-            String className = toReturn.getClass().getName().toLowerCase();
-            for (String allowed : Settings.IMP.EXTENT.ALLOWED_PLUGINS) {
-                if (className.contains(allowed.toLowerCase())) {
-                    this.wrapped = true;
-                    return (AbstractDelegateExtent) toReturn;
-                }
-            }
-            if (Settings.IMP.EXTENT.DEBUG) {
-                Fawe.debug("&cPotentially unsafe extent blocked: " + toReturn.getClass().getName());
-                Fawe.debug("&8 - &7For area restrictions, it is recommended to use the FaweAPI");
-                Fawe.debug("&8 - &7For block logging, it is recommended to use use BlocksHub");
-                Fawe.debug("&8 - &7To allow this plugin add it to the FAWE `allowed-plugins` list");
-                Fawe.debug("&8 - &7To hide this message set `debug` to false in the FAWE config.yml");
-                if (toReturn.getClass().getName().contains("CoreProtect")) {
-                    Fawe.debug("Note on CoreProtect: ");
-                    Fawe.debug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
-                    Fawe.debug(" - Use BlocksHub and set `debug` false in the FAWE config");
-                }
-            }
-        }
-        return extent;
     }
 
     // pkg private for TracedEditSession only, may later become public API
@@ -911,20 +732,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     /**
-     * Set a {@link BlockBag} to use.
-     *
-     * @param blockBag the block bag to set, or null to use none
-     */
-    public void setBlockBag(final BlockBag blockBag) {
-        this.blockBag = blockBag;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + ":" + extent;
-    }
-
-    /**
      * Gets the list of missing blocks and clears the list for the next
      * operation.
      *
@@ -1005,19 +812,19 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     @Override
     public BiomeType getBiome(final BlockVector2 position) {
-        return this.extent.getBiome(position);
+        return this.getExtent().getBiome(position);
     }
 
     @Override
     public boolean setBiome(final BlockVector2 position, final BiomeType biome) {
         this.changes++;
-        return this.extent.setBiome(position, biome);
+        return this.getExtent().setBiome(position, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         this.changes++;
-        return this.extent.setBiome(x, y, z, biome);
+        return this.getExtent().setBiome(x, y, z, biome);
     }
 
     @Override
@@ -1046,17 +853,17 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public BlockState getBlock(int x, int y, int z) {
-        return extent.getBlock(x, y, z);
+        return getExtent().getBlock(x, y, z);
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return extent.getBlock(position);
+        return getExtent().getBlock(position);
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return extent.getFullBlock(position);
+        return getExtent().getFullBlock(position);
     }
 
     /**
@@ -1131,7 +938,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         this.changes++;
         switch (stage) {
             case BEFORE_HISTORY:
-                return this.extent.setBlock(position, block);
+                return this.getExtent().setBlock(position, block);
             case BEFORE_CHANGE:
                 return this.bypassHistory.setBlock(position, block);
             case BEFORE_REORDER:
@@ -1177,7 +984,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
         this.changes++;
         try {
-            return this.extent.setBlock(position, block);
+            return this.getExtent().setBlock(position, block);
         } catch (MaxChangedBlocksException e) {
             throw e;
         } catch (WorldEditException e) {
@@ -1188,7 +995,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         this.changes++;
         try {
-            return this.extent.setBlock(x, y, z, block);
+            return this.getExtent().setBlock(x, y, z, block);
         } catch (WorldEditException e) {
             throw new RuntimeException("Unexpected exception", e);
         }
@@ -1198,7 +1005,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         this.changes++;
         try {
             BlockVector3 bv = mutablebv.setComponents(x, y, z);
-            return pattern.apply(extent, bv, bv);
+            return pattern.apply(getExtent(), bv, bv);
         } catch (WorldEditException e) {
             throw new RuntimeException("Unexpected exception", e);
         }
@@ -1208,7 +1015,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public boolean setBlock(final BlockVector3 position, final Pattern pattern) {
         this.changes++;
         try {
-            return pattern.apply(this.extent, position, position);
+            return pattern.apply(this.getExtent(), position, position);
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
@@ -1216,7 +1023,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     @SuppressWarnings("deprecation")
     public int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
-        RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(extent, pattern), this);
+        RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(getExtent(), pattern), this);
         Operations.completeBlindly(visitor);
         changes += visitor.getAffected();
         return changes;

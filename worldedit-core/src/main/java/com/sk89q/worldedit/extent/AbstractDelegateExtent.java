@@ -100,8 +100,8 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     }
 
     @Override
-    public boolean setBiome(int x, int z, BiomeType biome) {
-        return extent.setBiome(x, z, biome);
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return extent.setBiome(x, y, z, biome);
     }
 
     /*

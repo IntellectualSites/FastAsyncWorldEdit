@@ -602,15 +602,19 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         Brush brush = current.getBrush();
         if (brush == null) return;
         FawePlayer<Object> fp = FawePlayer.wrap(player);
-        EditSession editSession = new EditSessionBuilder(player.getWorld())
+        EditSessionBuilder builder = new EditSessionBuilder(player.getWorld())
                 .player(fp)
                 .allowedRegionsEverywhere()
                 .autoQueue(false)
                 .blockBag(null)
                 .changeSetNull()
-                .combineStages(false)
-                .build();
-        VisualExtent newVisualExtent = new VisualExtent(editSession.getExtent(), editSession.getQueue());
+                .combineStages(false);
+
+        builder.commit();
+
+        EditSession editSession = builder.build();
+
+        VisualExtent newVisualExtent = new VisualExtent(builder.getExtent(), builder.getQueue());
         BlockVector3 position = getPosition(editSession, player);
         if (position != null) {
             editSession.setExtent(newVisualExtent);
