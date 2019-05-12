@@ -51,6 +51,7 @@ import com.sk89q.worldedit.function.generator.FloraGenerator;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.NoiseFilter2D;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.LayerVisitor;
@@ -784,7 +785,10 @@ public class RegionCommands extends MethodCommands {
             help =
                     "Hollows out the object contained in this selection.\n" +
                             "Optionally fills the hollowed out part with the given block.\n" +
-                            "Thickness is measured in manhattan distance.",
+                            "Thickness is measured in manhattan distance.\n" +
+                            "Flags:\n" +
+                            "  -m Mask, uses a mask to hollow",
+
             min = 0,
             max = 2
     )
@@ -794,9 +798,11 @@ public class RegionCommands extends MethodCommands {
                        @Selection Region region,
                        @Optional("0") @Range(min = 0) int thickness,
                        @Optional("air") Pattern pattern,
+                       @Switch('m') Mask mask,
                        CommandContext context) throws WorldEditException {
+        Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
         player.checkConfirmationRegion(() -> {
-            int affected = editSession.hollowOutRegion(region, thickness, pattern);
+            int affected = editSession.hollowOutRegion(region, thickness, pattern, finalMask);
             BBC.VISITOR_BLOCK.send(player, affected);
         }, getArguments(context), region, context);
     }

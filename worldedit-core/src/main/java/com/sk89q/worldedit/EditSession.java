@@ -100,6 +100,7 @@ import com.sk89q.worldedit.function.mask.MaskUnion;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.mask.NoiseFilter2D;
 import com.sk89q.worldedit.function.mask.RegionMask;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -2856,6 +2857,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int hollowOutRegion(final Region region, final int thickness, final Pattern pattern) {
+        return hollowOutRegion(region, thickness, pattern, new SolidBlockMask(this));
+    }
+
+    public int hollowOutRegion(final Region region, final int thickness, final Pattern pattern, Mask mask) {
     	try {
         final Set outside = new LocalBlockVectorSet();
 
@@ -2871,22 +2876,22 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
         for (int x = minX; x <= maxX; ++x) {
             for (int y = minY; y <= maxY; ++y) {
-                recurseHollow(region, BlockVector3.at(x, y, minZ), outside);
-                recurseHollow(region, BlockVector3.at(x, y, maxZ), outside);
+                recurseHollow(region, BlockVector3.at(x, y, minZ), outside, mask);
+                recurseHollow(region, BlockVector3.at(x, y, maxZ), outside, mask);
             }
         }
 
         for (int y = minY; y <= maxY; ++y) {
             for (int z = minZ; z <= maxZ; ++z) {
-                recurseHollow(region, BlockVector3.at(minX, y, z), outside);
-                recurseHollow(region, BlockVector3.at(maxX, y, z), outside);
+                recurseHollow(region, BlockVector3.at(minX, y, z), outside, mask);
+                recurseHollow(region, BlockVector3.at(maxX, y, z), outside, mask);
             }
         }
 
         for (int z = minZ; z <= maxZ; ++z) {
             for (int x = minX; x <= maxX; ++x) {
-                recurseHollow(region, BlockVector3.at(x, minY, z), outside);
-                recurseHollow(region, BlockVector3.at(x, maxY, z), outside);
+                recurseHollow(region, BlockVector3.at(x, minY, z), outside, mask);
+                recurseHollow(region, BlockVector3.at(x, maxY, z), outside, mask);
             }
         }
 
@@ -3120,15 +3125,14 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return returnset;
     }
 
-    private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside) {
+    private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside, Mask mask) {
         final LocalBlockVectorSet queue = new LocalBlockVectorSet();
         while (!queue.isEmpty()) {
             Iterator<BlockVector3> iter = queue.iterator();
             while (iter.hasNext()) {
                 BlockVector3 current = iter.next();
                 iter.remove();
-                final BlockState block = getBlock(current);
-                if (block.getBlockType().getMaterial().isMovementBlocker()) {
+                if (mask.test(current)) {
                     continue;
                 }
 
