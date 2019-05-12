@@ -42,7 +42,6 @@ import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
-import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.FastWorldEditExtent;
@@ -61,6 +60,7 @@ import com.boydti.fawe.object.mask.ResettableMask;
 import com.boydti.fawe.object.pattern.ExistingPattern;
 import com.boydti.fawe.object.progress.ChatProgressTracker;
 import com.boydti.fawe.object.progress.DefaultProgressTracker;
+import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
@@ -79,28 +79,18 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.MaskingExtent;
-import com.sk89q.worldedit.extent.cache.LastAccessExtentCache;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
-import com.sk89q.worldedit.extent.reorder.ChunkBatchingExtent;
-import com.sk89q.worldedit.extent.reorder.MultiStageReorder;
-import com.sk89q.worldedit.extent.validation.BlockChangeLimiter;
-import com.sk89q.worldedit.extent.validation.DataValidatorExtent;
-import com.sk89q.worldedit.extent.world.BlockQuirkExtent;
-import com.sk89q.worldedit.extent.world.ChunkLoadingExtent;
-import com.sk89q.worldedit.extent.world.FastModeExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
-import com.sk89q.worldedit.function.block.BlockDistributionCounter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
-import com.sk89q.worldedit.function.mask.BlockStateMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -116,7 +106,6 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.function.pattern.WaterloggedRemover;
 import com.sk89q.worldedit.function.util.RegionOffset;
 import com.sk89q.worldedit.function.visitor.DirectionalVisitor;
 import com.sk89q.worldedit.function.visitor.DownwardVisitor;
@@ -127,12 +116,10 @@ import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.BlockChange;
-import com.sk89q.worldedit.history.changeset.BlockOptimizedHistory;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
-import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.internal.expression.runtime.ExpressionTimeoutException;
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -142,7 +129,6 @@ import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.math.noise.RandomNoise;
@@ -159,21 +145,30 @@ import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
-import com.sk89q.worldedit.util.collection.DoubleArrayList;
 import com.sk89q.worldedit.util.eventbus.EventBus;
-import com.sk89q.worldedit.world.NullWorld;
 import com.sk89q.worldedit.world.SimpleWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.*;
-import com.sk89q.worldedit.world.registry.LegacyMapper;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockCategories;
+import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -204,19 +199,19 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         BEFORE_CHANGE
     }
 
-    private World world;
-    private String worldName;
-    private FaweQueue queue;
-    private boolean wrapped;
-    private boolean fastMode;
-    private AbstractDelegateExtent extent;
-    private HistoryExtent history;
-    private AbstractDelegateExtent bypassHistory;
-    private AbstractDelegateExtent bypassAll;
-    private FaweLimit originalLimit;
-    private FaweLimit limit;
-    private FawePlayer player;
-    private FaweChangeSet changeTask;
+    private final World world;
+    private final String worldName;
+    private final FaweQueue queue;
+    private final boolean wrapped;
+    private final boolean fastMode;
+    private final AbstractDelegateExtent extent;
+    private final HistoryExtent history;
+    private final AbstractDelegateExtent bypassHistory;
+    private final AbstractDelegateExtent bypassAll;
+    private final FaweLimit originalLimit;
+    private final FaweLimit limit;
+    private final FawePlayer player;
+    private final FaweChangeSet changeTask;
 
     private MutableBlockVector3 mutablebv = new MutableBlockVector3();
 
@@ -249,7 +244,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (event == null) {
             event = new EditSessionEvent(world, player == null ? null : (player.getPlayer()), -1, null);
         }
-        event.setEditSession(this);
         if (player == null && event.getActor() != null) {
             player = FawePlayer.wrap(event.getActor());
         }
@@ -393,7 +387,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
         }
         this.extent = wrapExtent(this.extent, bus, event, Stage.BEFORE_HISTORY);
-        setExtent(this.extent);
+    }
+
+    public EditSession(EditSessionBuilder builder) {
+        super(builder.)
     }
 
     /**
@@ -494,15 +491,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     public Extent getBypassHistory() {
         return bypassHistory;
-    }
-
-    public Extent getExtent() {
-        return extent;
-    }
-
-    public void setExtent(AbstractDelegateExtent extent) {
-        this.extent = extent;
-        new ExtentTraverser(this).setNext(extent);
     }
 
     /**
@@ -1057,17 +1045,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return queue.getOpacity(x, y, z);
     }
 
-    @Override
-    public BlockState getLazyBlock(final BlockVector3 position) {
-        return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-    }
-
-    public BlockState getLazyBlock(int x, int y, int z) {
-        return extent.getLazyBlock(x, y, z);
-    }
-
     public BlockState getBlock(int x, int y, int z) {
-        return getLazyBlock(x, y, z);
+        return extent.getBlock(x, y, z);
     }
 
     @Override
@@ -1085,7 +1064,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      *
      * @param position the position
      * @return the block type
-     * @deprecated Use {@link #getLazyBlock(BlockVector3)} or {@link #getBlock(BlockVector3)}
+     * @deprecated Use {@link #getBlock(BlockVector3)} or {@link #getBlock(BlockVector3)}
      */
     @Deprecated
     public BlockType getBlockType(final BlockVector3 position) {
@@ -1099,7 +1078,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param z the Z coordinate
      * @param minY minimal height
      * @param maxY maximal height
-     * @param filter a mask of blocks to consider, or null to consider any solid (movement-blocking) block
      * @return height of highest block found or 'minY'
      */
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
@@ -2918,11 +2896,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Generate a shape for the given expression.
      *
      * @param region the region to generate the shape in
-     * @param zero the coordinate origin for x/y/z variables
-     * @param unit the scale of the x/y/z/ variables
-     * @param pattern the default material to make the shape from
-     * @param expressionString the expression defining the shape
-     * @param hollow whether the shape should be hollow
      * @return number of blocks changed
      * @throws ExpressionException
      * @throws MaxChangedBlocksException
@@ -3433,8 +3406,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         CompoundTag nbt = block.getNbtData();
         if (nbt != null) {
             if (nbt.containsKey("items")) {
-                block.setNbtData(null);
-                return setBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), block);
+                return setBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), block.toBlockState().toBaseBlock());
             }
         }
         return false;

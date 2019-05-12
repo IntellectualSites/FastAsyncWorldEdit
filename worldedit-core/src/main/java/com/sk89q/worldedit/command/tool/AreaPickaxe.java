@@ -49,7 +49,7 @@ public class AreaPickaxe implements BlockTool {
                 for (int x = ox - range; x <= ox + range; ++x) {
                     for (int z = oz - range; z <= oz + range; ++z) {
                         for (int y = oy + range; y >= oy - range; --y) {
-                            if (initialType.equals(editSession.getLazyBlock(x, y, z))) {
+                            if (initialType.equals(editSession.getBlock(x, y, z))) {
                                 continue;
                             }
                             editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());

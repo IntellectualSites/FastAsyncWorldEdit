@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -8,64 +9,97 @@ import com.sk89q.worldedit.world.block.BlockState;
 
 import javax.annotation.Nullable;
 
-public interface FilterBlock {
-    FilterBlock init(IQueueExtent queue);
+public abstract class FilterBlock extends BlockVector3 implements Extent {
+    private final Extent extent;
 
-    FilterBlock init(int X, int Z, IGetBlocks chunk);
+    public FilterBlock(Extent extent) {
+        this.extent = extent;
+    }
 
-    void filter(IGetBlocks get, ISetBlocks set, int layer, Filter filter, @Nullable Region region, BlockVector3 min, BlockVector3 max);
+    public final Extent getExtent() {
+        return extent;
+    }
 
-    void setOrdinal(int ordinal);
+    public abstract void setOrdinal(int ordinal);
 
-    void setState(BlockState state);
+    public abstract void setState(BlockState state);
 
-    void setFullBlock(BaseBlock block);
+    public abstract void setFullBlock(BaseBlock block);
 
-    int getOrdinal();
+    public abstract int getOrdinal();
 
-    BlockState getState();
+    public abstract BlockState getState();
 
-    BaseBlock getBaseBlock();
+    public abstract BaseBlock getBaseBlock();
 
-    CompoundTag getTag();
+    public abstract CompoundTag getTag();
 
-    default BlockState getOrdinalBelow() {
+    @Override
+    public BlockVector3 getMinimumPoint() {
+        return getExtent().getMinimumPoint();
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return getExtent().getMaximumPoint();
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return getStateRelative(x - getX(), y - getY(), z - getZ());
+    }
+
+    @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return getFullBlockRelative(x - getX(), y - getY(), z - getZ());
+    }
+
+    public BlockState getOrdinalBelow() {
         return getStateRelative(0, -1, 0);
     }
 
-    default BlockState getStateAbove() {
+    public BlockState getStateAbove() {
         return getStateRelative(0, 1, 0);
     }
 
-    default BlockState getStateRelativeY(final int y) {
+    public BlockState getStateRelativeY(final int y) {
         return getStateRelative(0, y, 0);
     }
 
-    int getX();
+    public BlockState getStateRelative(final int x, final int y, final int z) {
+        return getFullBlockRelative(x, y, z).toBlockState();
+    }
 
-    int getY();
+    public BaseBlock getFullBlockRelative(int x, int y, int z) {
+        return getExtent().getFullBlock(x + getX(), y + getY(), z + getZ());
+    }
 
-    int getZ();
+    @Override
+    public abstract int getX();
 
-    default int getLocalX() {
+    @Override
+    public abstract int getY();
+
+    @Override
+    public abstract int getZ();
+
+    public int getLocalX() {
         return getX() & 15;
     }
 
-    default int getLocalY() {
+    public int getLocalY() {
         return getY() & 15;
     }
 
-    default int getLocalZ() {
+    public int getLocalZ() {
         return getZ() & 15;
     }
 
-    default int getChunkX() {
+    public int getChunkX() {
         return getX() >> 4;
     }
 
-    default int getChunkZ() {
+    public int getChunkZ() {
         return getZ() >> 4;
     }
-
-    BlockState getStateRelative(final int x, final int y, final int z);
 }

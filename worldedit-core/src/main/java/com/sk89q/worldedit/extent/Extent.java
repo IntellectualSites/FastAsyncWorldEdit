@@ -117,33 +117,11 @@ public interface Extent extends InputExtent, OutputExtent {
         return null;
     }
 
-    @Override
-    default BlockState getBlock(BlockVector3 position) {
-        return getFullBlock(position).toImmutableState();
-    }
-
-    @Override
-    default BlockState getLazyBlock(BlockVector3 position) {
-        return getFullBlock(position).toImmutableState();
-    }
-
-    default BlockState getLazyBlock(int x, int y, int z) {
-        return getLazyBlock(BlockVector3.at(x, y, z));
-    }
-
-    default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T state) throws WorldEditException {
-        return setBlock(BlockVector3.at(x, y, z), state);
-    }
-
-    default boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return setBiome(BlockVector2.at(x, z), biome);
-    }
-
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
         maxY = Math.min(maxY, Math.max(0, maxY));
         minY = Math.max(0, minY);
         for (int y = maxY; y >= minY; --y) {
-            BlockState block = getLazyBlock(x, y, z);
+            BlockState block = getBlock(x, y, z);
             if (block.getBlockType().getMaterial().isMovementBlocker()) {
                 return y;
             }
@@ -167,20 +145,20 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
 
-        BlockState block = getLazyBlock(x, y, z);
+        BlockState block = getBlock(x, y, z);
         boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
         int data1 = PropertyGroup.LEVEL.get(block);
         int data2 = data1;
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            block = getLazyBlock(x, y1, z);
+            block = getBlock(x, y1, z);
             if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
                 return ((y1 - offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data1));
             }
             data1 = PropertyGroup.LEVEL.get(block);
             int y2 = y - d;
-            block = getLazyBlock(x, y2, z);
+            block = getBlock(x, y2, z);
             if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
                 return ((y2 + offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data2));
             }
@@ -189,7 +167,7 @@ public interface Extent extends InputExtent, OutputExtent {
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    block = getLazyBlock(x, layer, z);
+                    block = getBlock(x, layer, z);
                     if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
                         int data = (state ? PropertyGroup.LEVEL.get(block) : data1);
                         return ((layer + offset) << 4) + 0;
@@ -198,7 +176,7 @@ public interface Extent extends InputExtent, OutputExtent {
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    block = getLazyBlock(x, layer, z);
+                    block = getBlock(x, layer, z);
                     if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
                         return ((layer - offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data2));
                     }
@@ -254,33 +232,33 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        BlockStateHolder block = getLazyBlock(x, y, z);
+        BlockStateHolder block = getBlock(x, y, z);
         boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            block = getLazyBlock(x, y1, z);
+            block = getBlock(x, y1, z);
             if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return y1 - offset;
             int y2 = y - d;
-            block = getLazyBlock(x, y2, z);
+            block = getBlock(x, y2, z);
             if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return y2 + offset;
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    block = getLazyBlock(x, layer, z);
+                    block = getBlock(x, layer, z);
                     if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return layer + offset;
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    block = getLazyBlock(x, layer, z);
+                    block = getBlock(x, layer, z);
                     if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return layer - offset;
                 }
             }
         }
         int result = state ? failedMin : failedMax;
         if(result > 0 && !ignoreAir) {
-            block = getLazyBlock(x, result, z);
+            block = getBlock(x, result, z);
             return block.getBlockType().getMaterial().isAir() ? -1 : result;
         }
         return result;
@@ -296,7 +274,7 @@ public interface Extent extends InputExtent, OutputExtent {
         }
     }
 
-    default public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+    default void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
         spawnResource(region, new SchemGen(mask, this, clipboards, rotate), rarity, 1);
     }
 
@@ -320,11 +298,11 @@ public interface Extent extends InputExtent, OutputExtent {
         return (pt.containedWithin(min, max));
     }
 
-    default public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+    default void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
         spawnResource(region, new OreGen(this, mask, material, size, minY, maxY), rarity, frequency);
     }
 
-    default public void addOres(Region region, Mask mask) throws WorldEditException {
+    default void addOres(Region region, Mask mask) throws WorldEditException {
         addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, 0, 255);
         addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, 0, 255);
         addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, 0, 79);

@@ -10,7 +10,4 @@ public abstract class DelegateFilter implements IDelegateFilter {
     public Filter getParent() {
         return parent;
     }
-
-    @Override
-    public abstract Filter fork();
 }

@@ -1,10 +1,9 @@
 package com.boydti.fawe.bukkit.beta;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IGetBlocks;
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.ISetBlocks;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
@@ -49,7 +48,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
     }
 
     @Override
-    public IGetBlocks get() {
+    public IChunkGet get() {
         BukkitQueue extent = (BukkitQueue) getExtent();
         return new BukkitGetBlocks(extent.getNmsWorld(), getX(), getZ());
     }
@@ -78,7 +77,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
             int Z = getZ();
             BukkitQueue extent = (BukkitQueue) getExtent();
             BukkitGetBlocks get = (BukkitGetBlocks) getOrCreateGet();
-            ISetBlocks set = getOrCreateSet();
+            IChunkSet set = getOrCreateSet();
 
             Chunk nmsChunk = extent.ensureLoaded(X, Z);
 

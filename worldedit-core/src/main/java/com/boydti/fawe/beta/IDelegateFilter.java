@@ -39,7 +39,11 @@ public interface IDelegateFilter extends Filter {
 
     @Override
     default Filter fork() {
-        return newInstance(getParent().fork());
+        Filter fork = getParent().fork();
+        if (fork != getParent()) {
+            return newInstance(fork);
+        }
+        return this;
     }
 
     Filter newInstance(Filter other);

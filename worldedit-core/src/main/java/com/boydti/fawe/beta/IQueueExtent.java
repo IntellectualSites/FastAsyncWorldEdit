@@ -1,7 +1,10 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -12,7 +15,7 @@ import java.util.concurrent.Future;
  * TODO: implement Extent (need to refactor Extent first)
  * Interface for a queue based extent which uses chunks
  */
-public interface IQueueExtent extends Flushable, Trimable {
+public interface IQueueExtent extends Flushable, Trimable, Extent {
     void init(WorldChunkCache world);
 
     /**
@@ -51,11 +54,26 @@ public interface IQueueExtent extends Flushable, Trimable {
         return chunk.getBlock(x & 15, y, z & 15);
     }
 
+    @Override
+    default BaseBlock getFullBlock(int x, int y, int z) {
+        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
+        return chunk.getFullBlock(x & 15, y, z & 15);
+    }
+
     default BiomeType getBiome(final int x, final int z) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.getBiome(x & 15, z & 15);
     }
 
+    @Override
+    default BlockVector3 getMinimumPoint() {
+        return getCache().getWorld().getMinimumPoint();
+    }
+
+    @Override
+    default BlockVector3 getMaximumPoint() {
+        return getCache().getWorld().getMaximumPoint();
+    }
     /**
      * Create a new root IChunk object<br>
      *  - Full chunks will be reused, so a more optimized chunk can be returned in that case<br>
@@ -81,5 +99,5 @@ public interface IQueueExtent extends Flushable, Trimable {
     @Override
     void flush();
 
-    FilterBlock initFilterBlock();
+    ChunkFilterBlock initFilterBlock();
 }

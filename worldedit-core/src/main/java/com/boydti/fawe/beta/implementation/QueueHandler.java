@@ -2,6 +2,7 @@ package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.beta.IChunk;
@@ -163,7 +164,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
                     // Create a chunk that we will reuse/reset for each operation
                     final IQueueExtent queue = getQueue(world);
                     synchronized (queue) {
-                        FilterBlock block = null;
+                        ChunkFilterBlock block = null;
 
                         while (true) {
                             // Get the next chunk posWeakChunk

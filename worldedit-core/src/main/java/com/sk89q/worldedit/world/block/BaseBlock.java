@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
@@ -47,9 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BaseBlock implements BlockStateHolder<BaseBlock> {
     private final BlockState blockState;
-
-    @Nullable
-    protected CompoundTag nbtData;
+    private final CompoundTag nbtData;
 
     @Deprecated
     public BaseBlock() {
@@ -83,6 +82,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 
     public BaseBlock(BlockState blockState) {
     	this.blockState = blockState;
+        nbtData = null;
     }
 
     /**
@@ -157,7 +157,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 
     @Override
     public void setNbtData(@Nullable CompoundTag nbtData) {
-        this.nbtData = nbtData;
+        throw new UnsupportedOperationException("Immutable");
     }
 
     /**
@@ -202,7 +202,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
     }
 
     @Override
-    public int getOrdinal() {
+    public final int getOrdinal() {
         return blockState.getOrdinal();
     }
 
@@ -227,6 +227,10 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
         }
     }
 
+    public BlockState toBlockState() {
+        return blockState;
+    }
+
     @Override
     public int hashCode() {
         return getOrdinal();
@@ -246,7 +250,12 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 		return extent.setBlock(set, this);
 	}
 
-	@Override
+    @Override
+    public void apply(FilterBlock block) {
+        block.setFullBlock(this);
+    }
+
+    @Override
 	public boolean hasNbtData() {
 		return this.nbtData != null;
 	}

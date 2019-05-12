@@ -23,6 +23,8 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -50,7 +52,13 @@ public interface OutputExtent {
      * @return true if the block was successfully set (return value may not be accurate)
      * @throws WorldEditException thrown on an error
      */
-    <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException;
+    default <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
+        return setBlock(position.getX(), position.getY(), position.getZ(), block);
+    }
+
+    default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+        return setBlock(MutableBlockVector3.get(x, y, z), block);
+    }
 
     /**
      * Set the biome.
@@ -59,7 +67,13 @@ public interface OutputExtent {
      * @param biome the biome to set to
      * @return true if the biome was successfully set (return value may not be accurate)
      */
-    boolean setBiome(BlockVector2 position, BiomeType biome);
+    default boolean setBiome(BlockVector2 position, BiomeType biome) {
+        return setBiome(position.getX(), 0, position.getBlockZ(), biome);
+    }
+
+    default boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return setBiome(MutableBlockVector2.get(x, z), biome);
+    }
 
     /**
      * Return an {@link Operation} that should be called to tie up loose ends

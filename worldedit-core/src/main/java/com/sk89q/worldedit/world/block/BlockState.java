@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
@@ -62,7 +63,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         this.internalId = internalId;
         this.ordinal = ordinal;
         this.ordinalChar = (char) ordinal;
-        this.emptyBaseBlock = new BaseBlock(this);
+        this.emptyBaseBlock = new ImmutableBaseBlock(this);
     }
 
     /**
@@ -219,6 +220,11 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
 
     @Override
+    public final void apply(FilterBlock block) {
+        block.setOrdinal(ordinal);
+    }
+
+    @Override
     public BaseBlock apply(BlockVector3 position) {
         return this.toBaseBlock();
     }
@@ -333,7 +339,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 	}
 
     @Override
-    public int getOrdinal() {
+    public final int getOrdinal() {
         return this.ordinal;
     }
 

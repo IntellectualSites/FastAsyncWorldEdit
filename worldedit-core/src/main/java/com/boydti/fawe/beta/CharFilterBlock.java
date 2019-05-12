@@ -4,6 +4,7 @@ import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -12,11 +13,10 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.world.block.BlockTypes.states;
-public class CharFilterBlock implements FilterBlock {
-    private IQueueExtent queue;
+public class CharFilterBlock extends ChunkFilterBlock {
     private CharGetBlocks get;
 
-    private ISetBlocks set;
+    private IChunkSet set;
 
     private char[] getArr;
     private @Nullable char[] setArr;
@@ -25,14 +25,12 @@ public class CharFilterBlock implements FilterBlock {
     // local
     private int layer, index, x, y, z, xx, yy, zz, X, Z;
 
-    @Override
-    public final FilterBlock init(final IQueueExtent queue) {
-        this.queue = queue;
-        return this;
+    public CharFilterBlock(IQueueExtent queueExtent) {
+        super(queueExtent);
     }
 
     @Override
-    public final FilterBlock init(final int X, final int Z, final IGetBlocks chunk) {
+    public final ChunkFilterBlock init(final int X, final int Z, final IChunkGet chunk) {
         this.get = (CharGetBlocks) chunk;
         this.X = X;
         this.Z = Z;
@@ -41,11 +39,32 @@ public class CharFilterBlock implements FilterBlock {
         return this;
     }
 
-    @Override
-    public final void filter(final IGetBlocks iget, final ISetBlocks iset, final int layer, final Filter filter, final @Nullable Region region, BlockVector3 min, BlockVector3 max) {
+    public void flood(final IChunkGet iget, final IChunkSet iset, final int layer, Flood flood, FilterBlockMask mask) {
+        final int maxDepth = flood.getMaxDepth();
+        final boolean checkDepth = maxDepth < Character.MAX_VALUE;
+        if (init(iget, iset, layer)) {
+            while ((index = flood.poll()) != -1) {
+                x = index & 15;
+                z = (index >> 4) & 15;
+                y = (index >> 8) & 15;
+
+                if (mask.applyBlock(this)) {
+                    int depth = index >> 12;
+
+                    if (checkDepth && depth > maxDepth) {
+                        continue;
+                    }
+
+                    flood.apply(x, y, z, depth);
+                }
+            }
+        }
+    }
+
+    private final boolean init(final IChunkGet iget, final IChunkSet iset, final int layer) {
         this.layer = layer;
         final CharGetBlocks get = (CharGetBlocks) iget;
-        if (!get.hasSection(layer)) return;
+        if (!get.hasSection(layer)) return false;
         this.set = iset;
         getArr = get.sections[layer].get(get, layer);
         if (set.hasSection(layer)) {
@@ -56,17 +75,24 @@ public class CharFilterBlock implements FilterBlock {
             setArr = null;
         }
         this.yy = layer << 4;
-        if (region == null) {
-            if (min != null && max != null) {
-                iterate(min, max, layer, filter);
+        return true;
+    }
+
+    @Override
+    public final void filter(final IChunkGet iget, final IChunkSet iset, final int layer, final Filter filter, final @Nullable Region region, BlockVector3 min, BlockVector3 max) {
+        if (init(iget, iset, layer)) {
+            if (region == null) {
+                if (min != null && max != null) {
+                    iterate(min, max, layer, filter);
+                } else {
+                    iterate(filter);
+                }
             } else {
-                iterate(filter);
-            }
-        } else {
-            if (min != null && max != null) {
-                iterate(region, min, max, layer, filter);
-            } else {
-                iterate(region, filter);
+                if (min != null && max != null) {
+                    iterate(region, min, max, layer, filter);
+                } else {
+                    iterate(region, filter);
+                }
             }
         }
     }
@@ -227,7 +253,7 @@ public class CharFilterBlock implements FilterBlock {
 
     @Override
     public final CompoundTag getTag() {
-        return null;
+        return get.getTag(x, y + (layer << 4), z);
     }
 
     public final BlockState getOrdinalBelow() {
@@ -310,69 +336,133 @@ public class CharFilterBlock implements FilterBlock {
 
     public final BlockState getStateRelative(final int x, final int y, final int z) {
         final int newX = this.x + x;
-        if (newX >> 4 == 0) {
-            final int newZ = this.z + z;
-            if (newZ >> 4 == 0) {
-                final int newY = this.y + y;
-                final int layerAdd = newY >> 4;
-                switch (layerAdd) {
-                    case 0:
-                        return states[getArr[this.index + ((y << 8) + (z << 4) + x)]];
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15: {
-                        final int newLayer = layer + layerAdd;
-                        if (newLayer < 16) {
-                            final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
-                            return states[get.sections[newLayer].get(get, newLayer, index)];
-                        }
-                        break;
+        final int newZ = this.z + z;
+        if (newX >> 4 == 0 && newZ >> 4 == 0) {
+            final int newY = this.y + y;
+            final int layerAdd = newY >> 4;
+            switch (layerAdd) {
+                case 0:
+                    return states[getArr[this.index + ((y << 8) + (z << 4) + x)]];
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15: {
+                    final int newLayer = layer + layerAdd;
+                    if (newLayer < 16) {
+                        final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
+                        return states[get.sections[newLayer].get(get, newLayer, index)];
                     }
-                    case -1:
-                    case -2:
-                    case -3:
-                    case -4:
-                    case -5:
-                    case -6:
-                    case -7:
-                    case -8:
-                    case -9:
-                    case -10:
-                    case -11:
-                    case -12:
-                    case -13:
-                    case -14:
-                    case -15: {
-                        final int newLayer = layer + layerAdd;
-                        if (newLayer >= 0) {
-                            final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
-                            return states[get.sections[newLayer].get(get, newLayer, index)];
-                        }
-                        break;
-                    }
+                    break;
                 }
-                return BlockTypes.__RESERVED__.getDefaultState();
+                case -1:
+                case -2:
+                case -3:
+                case -4:
+                case -5:
+                case -6:
+                case -7:
+                case -8:
+                case -9:
+                case -10:
+                case -11:
+                case -12:
+                case -13:
+                case -14:
+                case -15: {
+                    final int newLayer = layer + layerAdd;
+                    if (newLayer >= 0) {
+                        final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
+                        return states[get.sections[newLayer].get(get, newLayer, index)];
+                    }
+                    break;
+                }
             }
+            return BlockTypes.__RESERVED__.getDefaultState();
         }
-//        queue.get
-        // TODO return normal get block
         final int newY = this.y + y + yy;
         if (newY >= 0 && newY <= 256) {
-            return queue.getBlock(xx + newX,  newY, this.zz + this.z + z);
+            return getExtent().getBlock(xx + newX,  newY, this.zz + newZ);
         }
         return BlockTypes.__RESERVED__.getDefaultState();
+    }
+
+    public final BaseBlock getFullBlockRelative(final int x, final int y, final int z) {
+        final int newX = this.x + x;
+        final int newZ = this.z + z;
+        if (newX >> 4 == 0 && newZ >> 4 == 0) {
+            final int newY = this.y + y;
+            final int layerAdd = newY >> 4;
+            BlockState state = BlockTypes.__RESERVED__.getDefaultState();
+            switch (layerAdd) {
+                case 0:
+                    state = states[getArr[this.index + ((y << 8) + (z << 4) + x)]];
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15: {
+                    final int newLayer = layer + layerAdd;
+                    if (newLayer < 16) {
+                        final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
+                        state = states[get.sections[newLayer].get(get, newLayer, index)];
+                    }
+                    break;
+                }
+                case -1:
+                case -2:
+                case -3:
+                case -4:
+                case -5:
+                case -6:
+                case -7:
+                case -8:
+                case -9:
+                case -10:
+                case -11:
+                case -12:
+                case -13:
+                case -14:
+                case -15: {
+                    final int newLayer = layer + layerAdd;
+                    if (newLayer >= 0) {
+                        final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
+                        state = states[get.sections[newLayer].get(get, newLayer, index)];
+                    }
+                    break;
+                }
+            }
+            if (state.getMaterial().hasContainer()) {
+                final CompoundTag tag = get.getTag(x, y + (layer << 4), z);
+                return state.toBaseBlock(tag);
+            }
+        }
+        final int newY = this.y + y + yy;
+        if (newY >= 0 && newY <= 256) {
+            return getExtent().getFullBlock(xx + newX,  newY, this.zz + newZ);
+        }
+        return BlockTypes.__RESERVED__.getDefaultState().toBaseBlock();
     }
 
     /*
@@ -381,6 +471,22 @@ public class CharFilterBlock implements FilterBlock {
     private SetDelegate initSet() {
         setArr = set.getArray(layer);
         return delegate = FULL;
+    }
+
+    @Override
+    public BiomeType getBiome(int x, int z) {
+        if ((x >> 4) == X && (z >> 4) == Z) {
+            return get.getBiome(x & 15, z & 15);
+        }
+        return getExtent().getBiome(x, z);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        if ((x >> 4) == X && (z >> 4) == Z) {
+            return set.setBiome(x & 15, z & 15, biome);
+        }
+        return getExtent().setBiome(x, y, z, biome);
     }
 
     private interface SetDelegate {

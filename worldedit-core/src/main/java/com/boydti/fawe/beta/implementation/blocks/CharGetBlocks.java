@@ -1,11 +1,11 @@
 package com.boydti.fawe.beta.implementation.blocks;
 
-import com.boydti.fawe.beta.IGetBlocks;
+import com.boydti.fawe.beta.IChunkGet;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-public abstract class CharGetBlocks extends CharBlocks implements IGetBlocks {
+public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     @Override
     public BaseBlock getFullBlock(final int x, final int y, final int z) {
         return BlockTypes.states[get(x, y, z)].toBaseBlock();

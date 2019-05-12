@@ -1,6 +1,6 @@
 package com.boydti.fawe.beta.implementation.blocks;
 
-import com.boydti.fawe.beta.ISetBlocks;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class CharSetBlocks extends CharBlocks implements ISetBlocks {
+public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public BiomeType[] biomes;
     public HashMap<Short, CompoundTag> tiles;
     public HashSet<CompoundTag> entities;

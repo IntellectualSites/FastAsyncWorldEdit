@@ -27,6 +27,11 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
+    default void flood(Flood flood, FilterBlockMask mask, FilterBlock block) {
+        getParent().flood(flood, mask, block);
+    }
+
+    @Override
     default boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
         return getParent().setBiome(x, y, z, biome);
     }

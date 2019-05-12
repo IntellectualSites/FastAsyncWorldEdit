@@ -1,12 +1,15 @@
 package com.boydti.fawe.beta.implementation.holder;
 
+import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlock;
+import com.boydti.fawe.beta.FilterBlockMask;
+import com.boydti.fawe.beta.Flood;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IGetBlocks;
-import com.boydti.fawe.beta.ISetBlocks;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.SingleThreadQueueExtent;
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.boydti.fawe.util.MathMan;
@@ -23,9 +26,9 @@ import java.util.function.Supplier;
 /**
  * Abstract IChunk class that implements basic get/set blocks
  */
-public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
-    private IGetBlocks get;
-    private ISetBlocks set;
+public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
+    private IChunkGet get;
+    private IChunkSet set;
     private IBlockDelegate delegate;
     private IQueueExtent extent;
     private int X,Z;
@@ -39,9 +42,14 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
     }
 
     @Override
-    public void filter(final Filter filter, FilterBlock block, @Nullable Region region, final MutableBlockVector3 min, final MutableBlockVector3 max) {
-        final IGetBlocks get = getOrCreateGet();
-        final ISetBlocks set = getOrCreateSet();
+    public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
+//        block.flood(get, set, mask, block, );
+    }
+
+    @Override
+    public void filter(final Filter filter, ChunkFilterBlock block, @Nullable Region region, @Nullable final MutableBlockVector3 min, @Nullable final MutableBlockVector3 max) {
+        final IChunkGet get = getOrCreateGet();
+        final IChunkSet set = getOrCreateSet();
         try {
             if (region != null) {
                 switch (region.getChunkBounds(X, Z, min, max)) {
@@ -106,21 +114,21 @@ public abstract class ChunkHolder implements IChunk, Supplier<IGetBlocks> {
         return set == null || set.isEmpty();
     }
 
-    public final IGetBlocks getOrCreateGet() {
+    public final IChunkGet getOrCreateGet() {
         if (get == null) get = newGet();
         return get;
     }
 
-    public final ISetBlocks getOrCreateSet() {
+    public final IChunkSet getOrCreateSet() {
         if (set == null) set = set();
         return set;
     }
 
-    public ISetBlocks set() {
+    public IChunkSet set() {
         return new CharSetBlocks();
     }
 
-    private IGetBlocks newGet() {
+    private IChunkGet newGet() {
         if (extent instanceof SingleThreadQueueExtent) {
             final WorldChunkCache cache = ((SingleThreadQueueExtent) extent).getCache();
             return cache.get(MathMan.pairInt(X, Z), this);

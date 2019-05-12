@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.sk89q.worldedit.WorldEditException;
@@ -25,14 +26,15 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     private final Extent extent;
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private final List<ClipboardHolder> clipboards;
-    private boolean randomRotate;
-    private boolean randomFlip;
+    private final boolean randomRotate;
+    private final boolean randomFlip;
 
     public RandomFullClipboardPattern(Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate, boolean randomFlip) {
         checkNotNull(clipboards);
         this.clipboards = clipboards;
         this.extent = extent;
         this.randomRotate = randomRotate;
+        this.randomFlip = randomFlip;
     }
 
     @Override

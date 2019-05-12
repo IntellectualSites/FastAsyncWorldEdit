@@ -92,11 +92,6 @@ public abstract class AbstractWorld implements World {
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return getBlock(position);
-    }
-
-    @Override
     public boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
         if (taskId == -1) {
             taskId = server.schedule(0, 1, () -> {

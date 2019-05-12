@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.minecraft.util.commands.Link;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -41,6 +42,8 @@ public interface Mask {
      * @return true if the criteria is met
      */
     boolean test(BlockVector3 vector);
+
+//    boolean test(FilterBlock block);
 
     /**
      * Get the 2D version of this mask if one exists.

@@ -1,6 +1,6 @@
 package com.boydti.fawe.beta.implementation;
 
-import com.boydti.fawe.beta.IGetBlocks;
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.Trimable;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  *  - avoids conversion between palette and raw data on every block get
  */
 public class WorldChunkCache implements Trimable {
-    protected final Long2ObjectLinkedOpenHashMap<WeakReference<IGetBlocks>> getCache;
+    protected final Long2ObjectLinkedOpenHashMap<WeakReference<IChunkGet>> getCache;
     private final World world;
 
     protected WorldChunkCache(final World world) {
@@ -37,13 +37,13 @@ public class WorldChunkCache implements Trimable {
      * @param provider used to create if it isn't already cached
      * @return cached IGetBlocks
      */
-    public synchronized IGetBlocks get(final long index, final Supplier<IGetBlocks> provider) {
-        final WeakReference<IGetBlocks> ref = getCache.get(index);
+    public synchronized IChunkGet get(final long index, final Supplier<IChunkGet> provider) {
+        final WeakReference<IChunkGet> ref = getCache.get(index);
         if (ref != null) {
-            final IGetBlocks blocks = ref.get();
+            final IChunkGet blocks = ref.get();
             if (blocks != null) return blocks;
         }
-        final IGetBlocks blocks = provider.get();
+        final IChunkGet blocks = provider.get();
         getCache.put(index, new WeakReference<>(blocks));
         return blocks;
     }
@@ -52,11 +52,11 @@ public class WorldChunkCache implements Trimable {
     public synchronized boolean trim(final boolean aggressive) {
         boolean result = true;
         if (!getCache.isEmpty()) {
-            final ObjectIterator<Long2ObjectMap.Entry<WeakReference<IGetBlocks>>> iter = getCache.long2ObjectEntrySet().fastIterator();
+            final ObjectIterator<Long2ObjectMap.Entry<WeakReference<IChunkGet>>> iter = getCache.long2ObjectEntrySet().fastIterator();
             while (iter.hasNext()) {
-                final Long2ObjectMap.Entry<WeakReference<IGetBlocks>> entry = iter.next();
-                final WeakReference<IGetBlocks> value = entry.getValue();
-                final IGetBlocks igb = value.get();
+                final Long2ObjectMap.Entry<WeakReference<IChunkGet>> entry = iter.next();
+                final WeakReference<IChunkGet> value = entry.getValue();
+                final IChunkGet igb = value.get();
                 if (igb == null) iter.remove();
                 else {
                     result = false;

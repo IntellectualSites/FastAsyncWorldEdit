@@ -21,6 +21,7 @@ package com.sk89q.worldedit.world.block;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -45,7 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class BlockType implements FawePattern {
+public final class BlockType implements FawePattern {
 	private final String id;
     private final BlockTypes.Settings settings;
 
@@ -179,7 +180,7 @@ public class BlockType implements FawePattern {
      *
      * @return The default state
      */
-    public BlockState getDefaultState() {
+    public final BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 
@@ -304,6 +305,11 @@ public class BlockType implements FawePattern {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         return this.getDefaultState().toBaseBlock();
+    }
+
+    @Override
+    public final void apply(FilterBlock block) {
+        block.setOrdinal(getDefaultState().getOrdinal());
     }
 
     public Mask toMask(Extent extent) {

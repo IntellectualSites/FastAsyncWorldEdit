@@ -43,7 +43,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
             int newSize = count + size;
             if (newSize > index) {
                 int localIndex = index - count;
-                MutableBlockVector3 pos = new MutableBlockVector3(set.getIndex(localIndex));
+                BlockVector3 pos = set.getIndex(localIndex);
                 if (pos != null) {
                     int pair = entry.getIntKey();
                     int cx = MathMan.unpairX(pair);
