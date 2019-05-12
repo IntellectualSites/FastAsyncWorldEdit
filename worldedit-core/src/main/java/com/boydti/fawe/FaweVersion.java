@@ -30,9 +30,12 @@ public class FaweVersion {
         }
     }
 
-    @Override
-    public String toString() {
-        return "FastAsyncWorldEdit-" + year + "." + month + "." + day + "-" + Integer.toHexString(hash) + "-" + build;
+    @Override public String toString() {
+        if (hash == 0 && build == 0) {
+            return "FastAsyncWorldEdit-1.13-NoVer-SNAPSHOT";
+        } else {
+            return "FastAsyncWorldEdit-1.13" + build;
+        }
     }
 
     public boolean isNewer(FaweVersion other) {
