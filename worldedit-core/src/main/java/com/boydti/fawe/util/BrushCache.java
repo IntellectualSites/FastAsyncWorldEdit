@@ -77,11 +77,8 @@ public final class BrushCache {
         Map<String, Tag> map;
         if (nbt == null) {
             if (tool == null) {
-                Map<String, Object> raw = nbt.getRaw();
-                if (raw.remove("weBrushJson") != null && raw.isEmpty()) {
-                    item.setNbtData(null);
-                }
-                return null;
+                item.setNbtData(null);
+                return tool;
             }
             nbt = new CompoundTag(map = new HashMap<>());
         } else {
