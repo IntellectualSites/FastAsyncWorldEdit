@@ -337,16 +337,14 @@ public abstract class ChunkListener implements Listener {
                 if (elem == null) return;
                 String className = elem.getClassName();
                 int len = className.length();
-                if (className != null) {
-                    if (len > 15 && className.charAt(len - 15) == 'E' && className.endsWith("EntityFireworks")) {
-                        for (Entity ent : world.getEntities()) {
-                            if (ent.getType() == EntityType.FIREWORK) {
-                                Vector velocity = ent.getVelocity();
-                                double vertical = Math.abs(velocity.getY());
-                                if (Math.abs(velocity.getX()) > vertical || Math.abs(velocity.getZ()) > vertical) {
-                                    Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at " + ent.getLocation());
-                                    ent.remove();
-                                }
+                if (len > 15 && className.charAt(len - 15) == 'E' && className.endsWith("EntityFireworks")) {
+                    for (Entity ent : world.getEntities()) {
+                        if (ent.getType() == EntityType.FIREWORK) {
+                            Vector velocity = ent.getVelocity();
+                            double vertical = Math.abs(velocity.getY());
+                            if (Math.abs(velocity.getX()) > vertical || Math.abs(velocity.getZ()) > vertical) {
+                                Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at " + ent.getLocation());
+                                ent.remove();
                             }
                         }
                     }

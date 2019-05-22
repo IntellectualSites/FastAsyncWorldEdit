@@ -89,7 +89,7 @@ public class CFIPacketListener implements Listener {
                     EnumWrappers.Hand enumHand = hands.isEmpty() ? EnumWrappers.Hand.MAIN_HAND : hands.get(0);
                     PlayerInventory inv = plr.getInventory();
                     ItemStack hand = enumHand == EnumWrappers.Hand.MAIN_HAND ? inv.getItemInMainHand() : inv.getItemInOffHand();
-                    if (hand != null && hand.getType().isBlock()) {
+                    if (hand.getType().isBlock()) {
                         Material type = hand.getType();
                         if (!type.isEmpty()) {
                             BlockStateHolder block = BukkitAdapter.asBlockState(hand);
@@ -281,8 +281,7 @@ public class CFIPacketListener implements Listener {
         BlockPosition loc = position.readSafely(0);
         if (loc == null) return null;
         BlockVector3 origin = generator.getOrigin().toBlockPoint();
-        BlockVector3 pt = BlockVector3.at(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
-        return pt;
+        return BlockVector3.at(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
     }
 
     private void handleBlockEvent(PacketEvent event, boolean relative, RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> task) {

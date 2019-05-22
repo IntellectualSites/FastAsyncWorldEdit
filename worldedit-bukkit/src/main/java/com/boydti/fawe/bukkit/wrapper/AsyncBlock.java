@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.wrapper;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.wrapper.state.AsyncSign;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.TaskManager;

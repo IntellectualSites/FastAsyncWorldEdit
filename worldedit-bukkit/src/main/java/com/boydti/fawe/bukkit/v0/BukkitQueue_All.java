@@ -120,8 +120,8 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
 
             fieldRegionMap = ReflectionUtils.findField(classRegionFileCache, Map.class);
             fieldRegionRAF = ReflectionUtils.findField(classRegionFile, RandomAccessFile.class);
-        } catch (Throwable ignore) {
-            ignore.printStackTrace();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
         }
     }
 

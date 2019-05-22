@@ -110,8 +110,8 @@ public class FaweBukkit implements IFawe, Listener {
             }
             try {
                 Fawe.get().setChatManager(new BukkitChatManager());
-            } catch (Throwable ignore) {
-                ignore.printStackTrace();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
             }
         } catch (final Throwable e) {
             MainUtil.handleError(e);
@@ -226,11 +226,7 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public void debug(final String s) {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
-        if (console != null) {
-            console.sendMessage(BBC.color(s));
-        } else {
-            Bukkit.getLogger().info(BBC.color(s));
-        }
+        console.sendMessage(BBC.color(s));
     }
 
     @Override
@@ -266,7 +262,7 @@ public class FaweBukkit implements IFawe, Listener {
             Player player = (Player) obj;
             FawePlayer existing = Fawe.get().getCachedPlayer(player.getName());
             return existing != null ? existing : new BukkitPlayer(player);
-        } else if (obj != null && obj.getClass().getName().contains("EntityPlayer")) {
+        } else if (obj.getClass().getName().contains("EntityPlayer")) {
             try {
                 Method method = obj.getClass().getDeclaredMethod("getBukkitEntity");
                 return wrap(method.invoke(obj));
@@ -314,7 +310,6 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
-        List<String> pl = new ArrayList<>();
         msg.append("server.version: " + Bukkit.getVersion() + "\n");
         msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
@@ -350,7 +345,7 @@ public class FaweBukkit implements IFawe, Listener {
         }
         try {
             return getQueue(world);
-        } catch (Throwable ignore) {
+        } catch (Throwable throwable) {
             // Disable incompatible settings
             Settings.IMP.QUEUE.PARALLEL_THREADS = 1; // BukkitAPI placer is too slow to parallel thread at the chunk level
             Settings.IMP.HISTORY.COMBINE_STAGES = false; // Performing a chunk copy (if possible) wouldn't be faster using the BukkitAPI
@@ -365,7 +360,7 @@ public class FaweBukkit implements IFawe, Listener {
                 debug("Download the version of FAWE for your platform");
                 debug(" - http://ci.athion.net/job/FastAsyncWorldEdit/lastSuccessfulBuild/artifact/target");
                 debug("=======================================");
-                ignore.printStackTrace();
+                throwable.printStackTrace();
                 debug("=======================================");
                 TaskManager.IMP.laterAsync(
                     () -> MainUtil.sendAdmin("&cNo NMS placer found, see console!"), 1);
@@ -398,11 +393,11 @@ public class FaweBukkit implements IFawe, Listener {
                 } catch (Throwable ignore) {
                 }
             }
-            Throwable error = null;
+            Throwable error;
             try {
                 return getQueue(world);
-            } catch (Throwable ignore) {
-                error = ignore;
+            } catch (Throwable throwable) {
+                error = throwable;
             }
             // Disable incompatible settings
             Settings.IMP.QUEUE.PARALLEL_THREADS = 1; // BukkitAPI placer is too slow to parallel thread at the chunk level
@@ -598,7 +593,7 @@ public class FaweBukkit implements IFawe, Listener {
                     BukkitQueue_0.checkVersion(v.name());
                     this.version = tmp = v;
                     break;
-                } catch (IllegalStateException e) {}
+                } catch (IllegalStateException ignored) {}
             }
         }
         return tmp;

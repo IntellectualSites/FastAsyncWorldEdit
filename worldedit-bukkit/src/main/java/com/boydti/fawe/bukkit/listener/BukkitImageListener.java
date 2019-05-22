@@ -153,8 +153,7 @@ public class BukkitImageListener implements Listener {
         ImageViewer viewer = generator.getImageViewer();
         if (!(viewer instanceof BukkitImageViewer)) return null;
 
-        BukkitImageViewer biv = (BukkitImageViewer) viewer;
-        return biv;
+        return (BukkitImageViewer) viewer;
     }
 
     private void handleInteract(PlayerEvent event, Entity entity, boolean primary) {
@@ -189,7 +188,6 @@ public class BukkitImageListener implements Listener {
             return;
         }
 
-        if (tool == null) return;
         BrushSettings context = primary ? tool.getPrimary() : tool.getSecondary();
         Brush brush = context.getBrush();
         if (brush == null) return;

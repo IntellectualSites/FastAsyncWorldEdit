@@ -410,9 +410,7 @@ public enum BBC {
      */
     BBC(final String d, final boolean prefix, final String cat) {
         this.d = d;
-        if (this.s == null) {
-            this.s = d;
-        }
+        this.s = d;
         this.prefix = prefix;
         this.cat = cat.toLowerCase();
     }
@@ -559,11 +557,7 @@ public enum BBC {
                 Method method = actor.getClass().getMethod("print", String.class);
                 method.setAccessible(true);
                 method.invoke(actor, (PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
