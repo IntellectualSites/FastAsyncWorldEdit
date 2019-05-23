@@ -143,22 +143,19 @@ public class GenerationCommands extends MethodCommands {
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         int[] count = new int[1];
         final BufferedImage finalImage = image;
-        RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 pos) throws WorldEditException {
-                try {
-                    int x = pos.getBlockX() - pos1.getBlockX();
-                    int z = pos.getBlockZ() - pos1.getBlockZ();
-                    int color = finalImage.getRGB(x, z);
-                    BlockType block = tu.getNearestBlock(color);
-                    count[0]++;
-                    if (block != null) return editSession.setBlock(pos, block.getDefaultState());
-                    return false;
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
+        RegionVisitor visitor = new RegionVisitor(region, pos -> {
+            try {
+                int x = pos.getBlockX() - pos1.getBlockX();
+                int z = pos.getBlockZ() - pos1.getBlockZ();
+                int color = finalImage.getRGB(x, z);
+                BlockType block = tu.getNearestBlock(color);
+                count[0]++;
+                if (block != null) return editSession.setBlock(pos, block.getDefaultState());
                 return false;
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
+            return false;
         }, editSession);
         Operations.completeBlindly(visitor);
         BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
@@ -284,7 +281,6 @@ public class GenerationCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.generation.forest")
     @Logging(POSITION)
-    @SuppressWarnings("deprecation")
     public void forestGen(Player player, LocalSession session, EditSession editSession, @Optional("10") int size, @Optional("tree") TreeType type, @Optional("5") @Range(min = 0, max = 100) double density) throws WorldEditException, ParameterException {
         density = density / 100;
         int affected = editSession.makeForest(session.getPlacementPosition(player), size, density, type);

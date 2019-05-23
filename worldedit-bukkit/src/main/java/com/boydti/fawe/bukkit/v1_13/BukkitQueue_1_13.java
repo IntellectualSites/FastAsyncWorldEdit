@@ -754,8 +754,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     public boolean hasEntities(net.minecraft.server.v1_13_R2.Chunk nmsChunk) {
         try {
             final Collection<Entity>[] entities = nmsChunk.entitySlices;
-            for (int i = 0; i < entities.length; i++) {
-                Collection<Entity> slice = entities[i];
+            for (Collection<Entity> slice : entities) {
                 if (slice != null && !slice.isEmpty()) {
                     return true;
                 }
@@ -781,8 +780,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
 
     @Override
     public void setFullbright(ChunkSection[] sections) {
-        for (int i = 0; i < sections.length; i++) {
-            ChunkSection section = sections[i];
+        for (ChunkSection section : sections) {
             if (section != null) {
                 byte[] bytes = section.getSkyLightArray().asBytes();
                 Arrays.fill(bytes, (byte) 255);

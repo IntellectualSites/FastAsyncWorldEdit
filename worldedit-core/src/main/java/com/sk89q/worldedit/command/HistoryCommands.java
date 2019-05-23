@@ -196,12 +196,7 @@ public class HistoryCommands extends MethodCommands {
                 BBC.ROLLBACK_ELEMENT.send(player, Fawe.imp().getWorldName(edit.getWorld()) + "/" + user + "-" + edit.getIndex());
                 count.incrementAndGet();
             }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count);
-            }
-        }, true, restore);
+        }, () -> BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count), true, restore);
     }
 
     @Command(

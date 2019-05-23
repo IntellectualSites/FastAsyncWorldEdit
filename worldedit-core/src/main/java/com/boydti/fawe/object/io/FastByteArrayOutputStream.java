@@ -156,10 +156,8 @@ public class FastByteArrayOutputStream extends OutputStream {
     public void writeTo(OutputStream out) throws IOException {
         // Check if we have a list of buffers
         if (buffers != null) {
-            Iterator iter = buffers.iterator();
 
-            while (iter.hasNext()) {
-                byte[] bytes = (byte[]) iter.next();
+            for (byte[] bytes : buffers) {
                 out.write(bytes, 0, blockSize);
             }
         }
@@ -171,10 +169,8 @@ public class FastByteArrayOutputStream extends OutputStream {
     public void writeTo(RandomAccessFile out) throws IOException {
         // Check if we have a list of buffers
         if (buffers != null) {
-            Iterator iter = buffers.iterator();
 
-            while (iter.hasNext()) {
-                byte[] bytes = (byte[]) iter.next();
+            for (byte[] bytes : buffers) {
                 out.write(bytes, 0, blockSize);
             }
         }

@@ -15,7 +15,6 @@ import java.util.*;
 public abstract class HelpBuilder implements Runnable {
     private final CommandCallable callable;
     private final CommandContext args;
-    private final String prefix;
     private final int perPage;
 
     public HelpBuilder(CommandCallable callable, CommandContext args, final String prefix, int perPage) {
@@ -24,7 +23,6 @@ public abstract class HelpBuilder implements Runnable {
         }
         this.callable = callable;
         this.args = args;
-        this.prefix = prefix;
         this.perPage = perPage;
     }
 
@@ -33,7 +31,6 @@ public abstract class HelpBuilder implements Runnable {
         try {
             CommandCallable callable = this.callable;
             int page = -1;
-            String category = null;
             int effectiveLength = args.argsLength();
 
             // Detect page from args
@@ -84,11 +81,8 @@ public abstract class HelpBuilder implements Runnable {
                         }
                         group = group.replace("/", "");
                         group = StringMan.toProperCase(group);
-                        Map<CommandMapping, String> queue = grouped.get(group);
-                        if (queue == null) {
-                            queue = new LinkedHashMap<>();
-                            grouped.put(group, queue);
-                        }
+                        Map<CommandMapping, String> queue =
+                            grouped.computeIfAbsent(group, k -> new LinkedHashMap<>());
                         if (c instanceof Dispatcher) {
                             for (CommandMapping m : ((Dispatcher) c).getCommands()) {
                                 queue.put(m, mapping.getPrimaryAlias() + " ");
@@ -192,7 +186,7 @@ public abstract class HelpBuilder implements Runnable {
                 }
 //            else
                 {
-                    Collections.sort(aliases, new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
+                    aliases.sort(new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
 
                     // Calculate pagination
                     int offset = perPage * Math.max(0, page);

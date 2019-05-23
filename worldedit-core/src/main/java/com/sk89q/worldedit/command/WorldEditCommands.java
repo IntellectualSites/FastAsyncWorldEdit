@@ -168,8 +168,6 @@ public class WorldEditCommands {
             aliases = {"help"},
             usage = "[<command>]",
             desc = "Displays help for FAWE commands",
-            min = 0,
-            max = -1,
             queued = false
     )
     public void help(Actor actor, CommandContext args) throws WorldEditException {

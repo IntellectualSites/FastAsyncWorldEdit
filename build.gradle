@@ -10,7 +10,6 @@ buildscript {
 
     configurations.all {
         resolutionStrategy {
-            force 'com.google.guava:guava:21.0'
             force 'org.ow2.asm:asm:6.0_BETA'
             force 'commons-io:commons-io:2.4'
         }
@@ -27,14 +26,10 @@ plugins {
     id "org.ajoberstar.grgit" version "3.1.1"
 }
 
-apply plugin: 'java'
-
 def splashFile = new File('splash.txt')
 if (splashFile.exists()) {
     print splashFile.text
 }
-
-group = 'com.boydti.fawe'
 
 def rootVersion = "1.13"
 def revision = ""
@@ -56,29 +51,17 @@ ext {
     }
 }
 
-version = String.format("%s.%s", rootVersion, buildNumber)
+allprojects {
+    group = 'com.boydti.fawe'
+    version = String.format("%s.%s", rootVersion, buildNumber)
+}
 
 description = rootProject.name
-
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'maven'
-    apply plugin: 'com.github.johnrengelman.shadow'
-    //Enable this requires putting license header files in many, many FAWE files
-    //apply plugin: 'net.minecrell.licenser'
-
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-
-    clean.doFirst {
-        delete "../target"
-    }
-
-    compileJava { options.compilerArgs += ["-parameters"] }
-
     repositories {
         mavenCentral()
         maven { url "http://maven.sk89q.com/repo/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "http://repo.maven.apache.org/maven2" }
         // Fawe
         maven {url "https://mvnrepository.com/artifact/"}
@@ -95,6 +78,30 @@ subprojects {
         maven {url "http://dl.bintray.com/tastybento/maven-repo"}
         maven {url "http://ci.emc.gs/nexus/content/groups/aikar/" }
     }
+    configurations.all {
+        resolutionStrategy {
+            cacheChangingModulesFor 5, 'minutes'
+        }
+    }
+}
+
+configure(['core', 'bukkit'].collect { project(":worldedit-$it") }) {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    // apply plugin: 'checkstyle'
+    apply plugin: 'com.github.johnrengelman.shadow'
+    // apply plugin: 'com.jfrog.artifactory'
+    // Enabling this requires putting license header files in many, many FAWE files
+    // apply plugin: 'net.minecrell.licenser'
+    
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    clean.doFirst {
+        delete "../target"
+    }
+
+    compileJava { options.compilerArgs += ["-parameters"] }
 
     if (!(name.equals('worldedit-forge') || name.equals('worldedit-sponge'))) {
         task sourcesJar(type: Jar, dependsOn: classes) {
@@ -108,12 +115,28 @@ subprojects {
         build.dependsOn(sourcesJar)
     }
 
+    //build.dependsOn(checkstyleMain)
+    //build.dependsOn(checkstyleTest)
+    //build.dependsOn(javadocJar)
+
+    // artifactoryPublish {
+    //     publishConfigs('archives')
+    // }
+
+    // Enable this requires putting license header files in many, many FAWE files
+    // license {
+    //     header = rootProject.file("HEADER.txt")
+    //     include '**/*.java'
+    // }
+}
+configure(['bukkit'].collect { project(":worldedit-$it") }) {
     shadowJar {
         classifier 'dist'
         dependencies {
-            include(dependency('com.sk89q:jchronic:0.2.4a'))
-            include(dependency('com.thoughtworks.paranamer:paranamer:2.6'))
-            include(dependency('com.sk89q.lib:jlibnoise:1.0.0'))
+            include(project(":worldedit-libs:core"))
+            include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
+            include(project(":worldedit-core"))
+            // TODO: fix these below
             include(dependency('com.github.luben:zstd-jni:1.1.1'))
             include(dependency('co.aikar:fastutil-lite:1.0'))
         }
@@ -121,13 +144,8 @@ subprojects {
         exclude '.cache'
         exclude 'LICENSE*'
     }
-
-    // Enable this requires putting license header files in many, many FAWE files
-    //license {
-    //    header = rootProject.file("HEADER.txt")
-    //    include '**/*.java'
-    //}
 }
+
 task aggregatedJavadocs(type: Javadoc, description: 'Generate javadocs from all child projects as if it was a single project', group: 'Documentation') {
     destinationDir = file("./docs/javadoc")
     title = "$project.name $version API"

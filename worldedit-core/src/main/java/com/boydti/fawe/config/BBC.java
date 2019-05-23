@@ -4,16 +4,14 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.PseudoRandom;
-import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.chat.Message;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sk89q.worldedit.extension.platform.Actor;
+
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +29,6 @@ public enum BBC {
      */
     PREFIX("&8(&4&lFAWE&8)&r&7", "Info"),
     FILE_DELETED("%s0 has been deleted.", "Info"),
-    SCHEMATIC_PASTING("&7The schematic is pasting. This cannot be undone.", "Info"),
     LIGHTING_PROPOGATE_SELECTION("&7Lighting has been propogated in %s0 chunks. (Note: To remove light use //removelight)", "Info"),
     UPDATED_LIGHTING_SELECTION("&7Lighting has been updated in %s0 chunks. (It may take a second for the packets to send)", "Info"),
     SET_REGION("&7Selection set to your current allowed region", "Info"),
@@ -39,17 +36,11 @@ public enum BBC {
     WORLDEDIT_DELAYED("&7Please wait while we process your FAWE action...", "Info"),
     WORLDEDIT_RUN("&7Apologies for the delay. Now executing: %s", "Info"),
     WORLDEDIT_COMPLETE("&7Edit completed.", "Info"),
-    REQUIRE_SELECTION_IN_MASK("&7%s of your selection is not within your mask. You can only make edits within allowed regions.", "Info"),
-    WORLDEDIT_VOLUME("&7You cannot select a volume of %current%. The maximum volume you can modify is %max%.", "Info"),
     WORLDEDIT_ITERATIONS("&7You cannot iterate %current% times. The maximum number of iterations allowed is %max%.", "Info"),
-    WORLDEDIT_UNSAFE("&7Access to that command has been blocked", "Info"),
-    WORLDEDIT_DANGEROUS_WORLDEDIT("&cProcessed unsafe edit at %s0 by %s1", "Info"),
-    WORLDEDIT_EXTEND("&cYour edit may have extended outside your allowed region.", "Error"),
     WORLDEDIT_TOGGLE_TIPS_ON("&7Disabled FAWE tips.", "Info"),
     WORLDEDIT_TOGGLE_TIPS_OFF("&7Enabled FAWE tips.", "Info"),
 
     WORLDEDIT_BYPASSED("&7Currently bypassing FAWE restriction.", "Info"),
-    WORLDEDIT_UNMASKED("&6Your FAWE edits are now unrestricted.", "Info"),
 
     WORLDEDIT_RESTRICTED("&6Your FAWE edits are now restricted.", "Info"),
     WORLDEDIT_OOM_ADMIN("&cPossible options:\n&8 - &7//fast\n&8 - &7Do smaller edits\n&8 - &7Allocate more memory\n&8 - &7Disable `max-memory-percent`", "Info"),
@@ -299,7 +290,7 @@ public enum BBC {
     WHOOSH("Whoosh!", "Navigation"),
     POOF("Poof!", "Navigation"),
     THRU_FAIL("No free spot ahead of you found.", "Navigation"),
-    NO_BLOCK("No block in sight! (or too far)", "Navigation"),
+    NO_BLOCK("No block in sight!", "Navigation"),
     UP_FAIL("You would hit something above you.", "Navigation"),
 
     SEL_CUBOID("Cuboid: left click for point 1, right click for point 2", "Selection"),
@@ -370,7 +361,7 @@ public enum BBC {
     private static final HashMap<String, String> replacements = new HashMap<>();
     static {
         for (final char letter : "1234567890abcdefklmnor".toCharArray()) {
-            replacements.put("&" + letter, "\u00a7" + letter);
+            replacements.put("&" + letter, "§" + letter);
         }
         replacements.put("\\\\n", "\n");
         replacements.put("\\n", "\n");
@@ -383,45 +374,22 @@ public enum BBC {
     /**
      * Default
      */
-    private String d;
+    private String caption;
     /**
      * What locale category should this translation fall under
      */
-    private String cat;
-    /**
-     * Should the string be prefixed?
-     */
-    private boolean prefix;
-
-    /**
-     * Constructor for custom strings.
-     */
-    BBC() {
-        /*
-         * use setCustomString();
-         */
-    }
+    private String catergory;
 
     /**
      * Constructor
      *
-     * @param d      default
-     * @param prefix use prefix
+     * @param caption      default
+     * @param category use prefix
      */
-    BBC(final String d, final boolean prefix, final String cat) {
-        this.d = d;
-        this.s = d;
-        this.prefix = prefix;
-        this.cat = cat.toLowerCase();
-    }
-
-    /**
-     * Constructor
-     *
-     * @param d default
-     */
-    BBC(final String d, final String cat) {
-        this(d, true, cat.toLowerCase());
+    BBC(final String caption, final String category) {
+        this.caption = caption;
+        this.s = caption;
+        this.catergory = category.toLowerCase();
     }
 
     public String f(final Object... args) {
@@ -456,7 +424,7 @@ public enum BBC {
             final HashSet<String> toRemove = new HashSet<>();
             for (final BBC c : all) {
                 allNames.add(c.name());
-                allCats.add(c.cat.toLowerCase());
+                allCats.add(c.catergory.toLowerCase());
             }
             final HashSet<BBC> captions = new HashSet<>();
             boolean changed = false;
@@ -469,10 +437,10 @@ public enum BBC {
                 final String node = split[split.length - 1].toUpperCase();
                 final BBC caption = allNames.contains(node) ? valueOf(node) : null;
                 if (caption != null) {
-                    if (!split[0].equalsIgnoreCase(caption.cat)) {
+                    if (!split[0].equalsIgnoreCase(caption.catergory)) {
                         changed = true;
                         yml.set(key, null);
-                        yml.set(caption.cat + "." + caption.name().toLowerCase(), value);
+                        yml.set(caption.catergory + "." + caption.name().toLowerCase(), value);
                     }
                     captions.add(caption);
                     caption.s = (String) value;
@@ -487,7 +455,7 @@ public enum BBC {
             for (final BBC caption : all) {
                 if (!captions.contains(caption)) {
                     changed = true;
-                    yml.set(caption.cat + "." + caption.name().toLowerCase(), caption.d);
+                    yml.set(caption.catergory + "." + caption.name().toLowerCase(), caption.caption);
                 }
                 caption.s = StringMan.replaceFromMap(caption.s, replacements);
             }
@@ -530,15 +498,7 @@ public enum BBC {
     }
 
     public String original() {
-        return d;
-    }
-
-    public boolean usePrefix() {
-        return this.prefix;
-    }
-
-    public String getCat() {
-        return this.cat;
+        return caption;
     }
 
     public BBC or(BBC... others) {
@@ -546,20 +506,14 @@ public enum BBC {
         return index == 0 ? this : others[index - 1];
     }
 
-    public void send(Object actor, final Object... args) {
+    public void send(Actor actor, final Object... args) {
         if (isEmpty()) {
             return;
         }
         if (actor == null) {
             Fawe.debug(this.format(args));
         } else {
-            try {
-                Method method = actor.getClass().getMethod("print", String.class);
-                method.setAccessible(true);
-                method.invoke(actor, (PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            actor.print((PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
         }
     }
 
@@ -628,56 +582,6 @@ public enum BBC {
         }
     }
 
-    public static String getColorName(char code) {
-        switch (code) {
-            case '0':
-                return "BLACK";
-            case '1':
-                return "DARK_BLUE";
-            case '2':
-                return "DARK_GREEN";
-            case '3':
-                return "DARK_AQUA";
-            case '4':
-                return "DARK_RED";
-            case '5':
-                return "DARK_PURPLE";
-            case '6':
-                return "GOLD";
-            default:
-            case '7':
-                return "GRAY";
-            case '8':
-                return "DARK_GRAY";
-            case '9':
-                return "BLUE";
-            case 'a':
-                return "GREEN";
-            case 'b':
-                return "AQUA";
-            case 'c':
-                return "RED";
-            case 'd':
-                return "LIGHT_PURPLE";
-            case 'e':
-                return "YELLOW";
-            case 'f':
-                return "WHITE";
-            case 'k':
-                return "OBFUSCATED";
-            case 'l':
-                return "BOLD";
-            case 'm':
-                return "STRIKETHROUGH";
-            case 'n':
-                return "UNDERLINE";
-            case 'o':
-                return "ITALIC";
-            case 'r':
-                return "RESET";
-        }
-    }
-
     private static Object[] append(StringBuilder builder, Map<String, Object> obj, String color, Map<String, Boolean> properties) {
         Object[] style = new Object[] { color, properties };
         for (Map.Entry<String, Object> entry : obj.entrySet()) {
@@ -740,26 +644,4 @@ public enum BBC {
         return builder.toString();
     }
 
-    /**
-     * @param m
-     * @param runPart Part, Color, NewLine
-     */
-    public static void splitMessage(String m, RunnableVal3<String, String, Boolean> runPart) {
-        m = color(m);
-        String color = "GRAY";
-        boolean newline = false;
-        for (String line : m.split("\n")) {
-            boolean hasColor = line.charAt(0) == '\u00A7';
-            String[] splitColor = line.split("\u00A7");
-            for (String part : splitColor) {
-                if (hasColor) {
-                    color = getColorName(part.charAt(0));
-                    part = part.substring(1);
-                }
-                runPart.run(part, color, newline);
-                hasColor = true;
-            }
-            newline = true;
-        }
-    }
 }

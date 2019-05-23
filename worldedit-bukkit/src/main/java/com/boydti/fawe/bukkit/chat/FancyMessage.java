@@ -12,13 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.bukkit.Achievement;
@@ -579,9 +573,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @return This builder instance.
      */
     public FancyMessage translationReplacements(final FancyMessage... replacements) {
-        for (FancyMessage str : replacements) {
-            latest().translationReplacements.add(str);
-        }
+        Collections.addAll(latest().translationReplacements, replacements);
 
         dirty = true;
 

@@ -2,7 +2,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven'
 
 dependencies {
-    compile project(':worldedit-bukkit')
+    compile project(':worldedit-libs:bukkit')
     compile 'com.martiansoftware:jsap:2.1'
 }
 

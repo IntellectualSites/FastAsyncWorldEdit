@@ -10,13 +10,15 @@ repositories {
 
 dependencies {
     compile project(':worldedit-core')
-
-    compile 'net.milkbowl.vault:VaultAPI:1.7'
+    compile project(':worldedit-libs:bukkit')
     compile 'com.sk89q:dummypermscompat:1.10'
     compile 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
     compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
-    compile 'org.slf4j:slf4j-jdk14:1.7.26'
+    compile "io.papermc:paperlib:1.0.1"
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.8.1'
+    //compile 'org.bstats:bstats-bukkit:1.4'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
+    compile 'net.milkbowl.vault:VaultAPI:1.7'
     compile 'com.massivecraft:factions:2.8.0'
     compile 'com.drtshock:factions:1.6.9.5'
     compile 'com.factionsone:FactionsOne:1.2.2'
@@ -81,9 +83,16 @@ task copyFiles {
 shadowJar {
     dependencies {
         relocate "org.slf4j", "com.sk89q.worldedit.slf4j"
+        relocate "org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge"
         include(dependency(':worldedit-core'))
         include(dependency('org.slf4j:slf4j-api'))
-        include(dependency("org.slf4j:slf4j-jdk14"))
+        include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
+        relocate ("org.bstats", "com.sk89q.worldedit.bukkit.bstats") {
+            include(dependency("org.bstats:bstats-bukkit:1.4"))
+        }
+        relocate ("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
+            include(dependency("io.papermc:paperlib:1.0.1"))
+        }
     }
     archiveName = "${parent.name}-${project.name.replaceAll("worldedit-", "")}-${parent.version}.jar"
     destinationDir = file '../target'

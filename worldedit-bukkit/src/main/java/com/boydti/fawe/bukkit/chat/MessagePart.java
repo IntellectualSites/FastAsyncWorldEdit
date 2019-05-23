@@ -108,7 +108,7 @@ final class MessagePart implements JsonRepresentedObject, ConfigurationSerializa
             if (insertionData != null) {
                 json.name("insertion").value(insertionData);
             }
-            if (translationReplacements.size() > 0 && text != null && TextualComponent.isTranslatableText(text)) {
+            if (translationReplacements.size() > 0 && TextualComponent.isTranslatableText(text)) {
                 json.name("with").beginArray();
                 for (JsonRepresentedObject obj : translationReplacements) {
                     obj.writeJson(json);

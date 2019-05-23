@@ -5,6 +5,7 @@ import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.google.common.base.Charsets;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -229,6 +230,10 @@ public class FakePlayer extends AbstractPlayerActor {
             return;
         }
         Fawe.get().debugPlain(msg);
+    }
+
+    @Override public void print(Component component) {
+        parent.print(component);
     }
 
     private FakeSessionKey key;

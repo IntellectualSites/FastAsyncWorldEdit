@@ -33,9 +33,6 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Helper class to 'bake' a transform into a clipboard.
  * <p>

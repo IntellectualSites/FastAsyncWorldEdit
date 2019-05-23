@@ -192,11 +192,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
         byte[] newBlockBytes = newBlockLight.asBytes();
         byte[] blockLightBytes = blockLight.asBytes();
-        for (int i = 0; i < 2048; i++) newBlockBytes[i] = blockLightBytes[i];
+        System.arraycopy(blockLightBytes, 0, newBlockBytes, 0, 2048);
         if (skyLight != null) {
             byte[] newSkyBytes = newSkyLight.asBytes();
             byte[] skyLightBytes = skyLight.asBytes();
-            for (int i = 0; i < 2048; i++) newSkyBytes[i] = skyLightBytes[i];
+            System.arraycopy(skyLightBytes, 0, newSkyBytes, 0, 2048);
         }
 
         // Copy counters
@@ -241,7 +241,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             Object[] currArray = ((Object[]) BukkitQueue_1_13.fieldLinearBlocks.get(currentPalette));
             Object[] newArray = ((Object[]) BukkitQueue_1_13.fieldLinearBlocks.get(newPalette));
             BukkitQueue_1_13.fieldLinearIndex.set(newPalette, BukkitQueue_1_13.fieldLinearIndex.get(currentPalette));
-            for (int i = 0; i < newArray.length; i++) newArray[i] = currArray[i];
+            System.arraycopy(currArray, 0, newArray, 0, newArray.length);
         }
 
         BukkitQueue_1_13.fieldPalette.set(paletteBlock, newPalette);
@@ -296,7 +296,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
     @Override
     public Chunk getNewChunk() {
-        return ((BukkitQueue_1_13) getParent()).getWorld().getChunkAt(getX(), getZ());
+        return getParent().getWorld().getChunkAt(getX(), getZ());
     }
 
     public void optimize() {
@@ -348,8 +348,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             // Remove entities
             HashSet<UUID> entsToRemove = this.getEntityRemoves();
             if (!entsToRemove.isEmpty()) {
-                for (int i = 0; i < entities.length; i++) {
-                    Collection<Entity> ents = entities[i];
+                for (Collection<Entity> ents : entities) {
                     if (!ents.isEmpty()) {
                         Iterator<Entity> iter = ents.iterator();
                         while (iter.hasNext()) {
@@ -445,13 +444,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                             UUID uuid = entity.getUniqueID();
                             entityTagMap.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
                             entityTagMap.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
-                            if (nativeTag != null) {
-                                NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
-                                for (String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-                                    tag.remove(name);
-                                }
-                                entity.f(tag);
+                            NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
+                            for (String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                tag.remove(name);
                             }
+                            entity.f(tag);
                             entity.setLocation(x, y, z, yaw, pitch);
                             synchronized (BukkitQueue_0.class) {
                                 nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
@@ -488,7 +485,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                         section = sections[j] = getParent().newChunkSection(j, flag, array);
                         continue;
                     }
-                } else if (count >= 4096 && false) {
+                } else if ((count >= 4096) && false) {
                     if (countAir >= 4096) {
                         sections[j] = null;
                         continue;
@@ -547,9 +544,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             // Trim tiles
             HashMap<BlockPosition, TileEntity> toRemove = null;
             if (!tiles.isEmpty()) {
-                Iterator<Map.Entry<BlockPosition, TileEntity>> iterator = tiles.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry<BlockPosition, TileEntity> tile = iterator.next();
+                for (Map.Entry<BlockPosition, TileEntity> tile : tiles.entrySet()) {
                     BlockPosition pos = tile.getKey();
                     int lx = pos.getX() & 15;
                     int ly = pos.getY();

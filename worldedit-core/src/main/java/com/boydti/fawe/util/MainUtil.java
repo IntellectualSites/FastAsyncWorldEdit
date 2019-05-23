@@ -11,6 +11,7 @@ import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
@@ -71,12 +72,7 @@ public class MainUtil {
         if (suggestions.getClass() != ArrayList.class) {
             suggestions = new ArrayList<>(suggestions);
         }
-        Iterator<String> iter = suggestions.iterator();
-        while (iter.hasNext()) {
-            if (!iter.next().startsWith(prefix)) {
-                iter.remove();
-            }
-        }
+        suggestions.removeIf(s -> !s.startsWith(prefix));
         return suggestions;
     }
 
@@ -222,20 +218,17 @@ public class MainUtil {
 
     public static int getMaxFileId(File folder) {
         final int[] max = new int[1];
-        folder.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                String name = pathname.getName();
-                Integer val = null;
-                if (pathname.isDirectory()) {
-                    val = StringMan.toInteger(name, 0, name.length());
-                } else {
-                    int i = name.lastIndexOf('.');
-                    if (i != -1) val = StringMan.toInteger(name, 0, i);
-                }
-                if (val != null && val > max[0]) max[0] = val;
-                return false;
+        folder.listFiles(pathname -> {
+            String name = pathname.getName();
+            Integer val = null;
+            if (pathname.isDirectory()) {
+                val = StringMan.toInteger(name, 0, name.length());
+            } else {
+                int i = name.lastIndexOf('.');
+                if (i != -1) val = StringMan.toInteger(name, 0, i);
             }
+            if (val != null && val > max[0]) max[0] = val;
+            return false;
         });
         return max[0] + 1;
     }
@@ -460,7 +453,7 @@ public class MainUtil {
             java.util.Scanner scanner = new java.util.Scanner(con.getInputStream()).useDelimiter("\\A");
             String content = scanner.next().trim();
             scanner.close();
-            if (content != null && !content.startsWith("<")) {
+            if (!content.startsWith("<")) {
                 Fawe.debug(content);
             }
             if (responseCode == 200) {
@@ -621,10 +614,10 @@ public class MainUtil {
             }
             destFile.createNewFile();
         }
-        FileInputStream fIn = null;
         FileOutputStream fOut = null;
         FileChannel source = null;
         FileChannel destination = null;
+        FileInputStream fIn = null;
         try {
             fIn = new FileInputStream(sourceFile);
             source = fIn.getChannel();
@@ -917,11 +910,11 @@ public class MainUtil {
         if (directory.exists()) {
             File[] files = directory.listFiles();
             if (null != files) {
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].isDirectory()) {
-                        iterateFiles(files[i], task);
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        iterateFiles(file, task);
                     } else {
-                        task.accept(files[i]);
+                        task.accept(file);
                     }
                 }
             }
@@ -1078,14 +1071,11 @@ public class MainUtil {
     public static void deleteOlder(File directory, final long timeDiff, boolean printDebug) {
         final long now = System.currentTimeMillis();
         ForkJoinPool pool = new ForkJoinPool();
-        iterateFiles(directory, new Consumer<File>() {
-            @Override
-            public void accept(File file) {
-                long age = now - file.lastModified();
-                if (age > timeDiff) {
-                    pool.submit(() -> file.delete());
-                    if (printDebug) BBC.FILE_DELETED.send(null, file);
-                }
+        iterateFiles(directory, file -> {
+            long age = now - file.lastModified();
+            if (age > timeDiff) {
+                pool.submit(file::delete);
+                if (printDebug) BBC.FILE_DELETED.send((Actor) null, file);
             }
         });
         pool.shutdown();
@@ -1104,13 +1094,14 @@ public class MainUtil {
         if (directory.exists()) {
             File[] files = directory.listFiles();
             if (null != files) {
-                for (int i = 0; i < files.length; i++) {
-                    File file = files[i];
+                for (File file : files) {
                     if (file.isDirectory()) {
-                        deleteDirectory(files[i], printDebug);
+                        deleteDirectory(file, printDebug);
                     } else {
                         file.delete();
-                        if (printDebug) BBC.FILE_DELETED.send(null, file);
+                        if (printDebug) {
+                            BBC.FILE_DELETED.send((Actor) null, file);
+                        }
                     }
                 }
             }
@@ -1141,7 +1132,7 @@ public class MainUtil {
         if (values.size() > 4 && values.containsKey("Text1")) {
             Tag text1 = values.get("Text1");
             Object value = text1.getValue();
-            return value != null && value instanceof String && ((String) value).length() > 0;
+            return value instanceof String && ((String) value).length() > 0;
         }
         return false;
     }
@@ -1152,7 +1143,7 @@ public class MainUtil {
 
     public static File getWorkingDirectory(String applicationName) {
         String userHome = System.getProperty("user.home", ".");
-        File workingDirectory = null;
+        File workingDirectory;
         switch (getPlatform()) {
             case LINUX:
             case SOLARIS:

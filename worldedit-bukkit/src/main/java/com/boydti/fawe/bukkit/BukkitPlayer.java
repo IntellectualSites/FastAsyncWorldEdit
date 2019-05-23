@@ -66,25 +66,15 @@ public class BukkitPlayer extends FawePlayer<Player> {
 
     @Override
     public void resetTitle() {
-        sendTitle("","");
+        parent.resetTitle();
     }
 
     public void sendTitle(String title, String sub) {
-        try {
-            Method methodSendTitle = Player.class.getDeclaredMethod("sendTitle", String.class, String.class, int.class, int.class, int.class);
-            methodSendTitle.invoke(parent, ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
-            return;
-        } catch (Throwable ignore) {
-            try {
-                Method methodSendTitle = Player.class.getDeclaredMethod("sendTitle", String.class, String.class);
-                methodSendTitle.invoke(parent, ChatColor.GOLD + title, ChatColor.GOLD + sub);
-                return;
-            } catch (Throwable ignore2) {}
-        }
+        parent.sendTitle(ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
         if (console == null) {
             console = Bukkit.getConsoleSender();
             Bukkit.getServer().dispatchCommand(console, "gamerule sendCommandFeedback false");
-            Bukkit.getServer().dispatchCommand(console, "title " + getName() + " times 0 60 20");
+            Bukkit.getServer().dispatchCommand(console, "title " + getName() + " times 0 70 20");
         }
         Bukkit.getServer().dispatchCommand(console, "title " + getName() + " subtitle [{\"text\":\"" + sub + "\",\"color\":\"gold\"}]");
         Bukkit.getServer().dispatchCommand(console, "title " + getName() + " title [{\"text\":\"" + title + "\",\"color\":\"gold\"}]");

@@ -98,7 +98,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             FakePlayer fake = new FakePlayer(actor.getName(), actor.getUniqueId(), actor);
             return fake.toFawePlayer();
         }
-        if (obj != null && obj.getClass().getName().contains("CraftPlayer") && !Fawe.imp().getPlatform().equals("bukkit")) {
+        if (obj.getClass().getName().contains("CraftPlayer") && !Fawe.imp().getPlatform().equals("bukkit")) {
             try {
                 Method methodGetHandle = obj.getClass().getDeclaredMethod("getHandle");
                 obj = methodGetHandle.invoke(obj);
@@ -220,7 +220,7 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     public synchronized boolean confirm() {
         Runnable confirm = deleteMeta("cmdConfirm");
-        if (!(confirm instanceof Runnable)) {
+        if (confirm == null) {
             return false;
         }
         queueAction(() -> {
@@ -294,19 +294,19 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     /**
      * Run a task either async, or on the current thread
-     * @param ifFree
+     * @param action the task to be run
      * @param checkFree Whether to first check if a task is running
-     * @param async
+     * @param async should the task be run asynchronous
      * @return false if the task was ran or queued
      */
-    public boolean runAction(final Runnable ifFree, boolean checkFree, boolean async) {
+    public boolean runAction(final Runnable action, boolean checkFree, boolean async) {
         if (checkFree) {
             if (runningCount.get() != 0) return false;
         }
         Runnable wrapped = () -> {
             try {
                 runningCount.addAndGet(1);
-                ifFree.run();
+                action.run();
             } finally {
                 runningCount.decrementAndGet();
             }

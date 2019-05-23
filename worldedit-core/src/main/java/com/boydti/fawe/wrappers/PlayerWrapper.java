@@ -6,6 +6,7 @@ import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -119,6 +120,10 @@ public class PlayerWrapper extends AbstractPlayerActor {
     @Override
     public void printError(String msg) {
         parent.printError(msg);
+    }
+
+    @Override public void print(Component component) {
+        parent.print(component);
     }
 
     @Override

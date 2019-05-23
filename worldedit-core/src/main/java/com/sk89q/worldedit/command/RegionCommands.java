@@ -267,7 +267,7 @@ public class RegionCommands extends MethodCommands {
             desc = "Draws a spline through selected points",
             help =
                     "Draws a spline through selected points.\n" +
-                            "Can only be used with convex polyhedral selections.\n" +
+                            "Can only be used with a convex polyhedral selection\n" +
                             "Flags:\n" +
                             "  -h generates only a shell",
             flags = "h",

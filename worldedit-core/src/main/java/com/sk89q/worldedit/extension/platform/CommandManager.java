@@ -418,7 +418,6 @@ public final class CommandManager {
                 Request.request().setWorld(((World) extent));
             }
         }
-        LocalConfiguration config = worldEdit.getConfiguration();
         final CommandLocals locals = new CommandLocals();
         final FawePlayer fp = FawePlayer.wrap(actor);
         if (fp == null) {
@@ -430,7 +429,7 @@ public final class CommandManager {
         if (actor instanceof Player) {
             Player player = (Player) actor;
             Player unwrapped = LocationMaskedPlayerWrapper.unwrap(player);
-            actor = new LocationMaskedPlayerWrapper((Player) unwrapped, player.getLocation(), true) {
+            actor = new LocationMaskedPlayerWrapper(unwrapped, player.getLocation(), true) {
                 @Override
                 public boolean hasPermission(String permission) {
                     if (!super.hasPermission(permission)) {
@@ -452,7 +451,6 @@ public final class CommandManager {
             };
         }
         locals.put(Actor.class, actor);
-        final Actor finalActor = actor;
         locals.put("arguments", args);
 
         ThrowableSupplier<Throwable> task =
@@ -527,7 +525,6 @@ public final class CommandManager {
             }
         } catch (Throwable e) {
             Exception faweException = FaweException.get(e);
-            String message = e.getMessage();
             if (faweException != null) {
                 BBC.WORLDEDIT_CANCEL_REASON.send(actor, faweException.getMessage());
             } else {

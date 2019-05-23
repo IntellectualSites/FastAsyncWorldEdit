@@ -854,16 +854,6 @@ public class UtilityCommands extends MethodCommands {
             listMine = true;
         }
 
-        FileFilter ignoreUUIDs = f -> {
-            try {
-                if (f.isDirectory()) {
-                    UUID uuid = UUID.fromString(f.getName());
-                    return false;
-                }
-            } catch (IllegalArgumentException ignored) {}
-            return true;
-        };
-
         List<File> toFilter = new ArrayList<>();
         if (!filters.isEmpty()) {
             forEachFile = new DelegateConsumer<File>(forEachFile) {

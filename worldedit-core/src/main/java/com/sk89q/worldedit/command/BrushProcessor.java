@@ -59,7 +59,7 @@ public class BrushProcessor extends MethodCommands implements CallableProcessor<
 
         CommandCallable callable = locals.get(CommandCallable.class);
         String[] perms;
-        if (callable != null && callable instanceof AParametricCallable) {
+        if (callable instanceof AParametricCallable) {
             perms = ((AParametricCallable) callable).getPermissions();
         } else {
             perms = getPermissions();
