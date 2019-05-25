@@ -1,68 +1,68 @@
 # Translated and updated by RainbowGodDouwe
 info:
-  prefix: '&8(&4&lFAWE&8)&r&7'
+  prefix: '(FAWE)'
   file_deleted: '%s0 Is verwijderd.'
-  schematic_pasting: '&7Het schematic wordt geplaatst. dit kan niet veranderd worden.'
-  lighting_propogate_selection: '&7Het licht heeft zich verspreid in %s0 chunks. (Note:
+  schematic_pasting: 'Het schematic wordt geplaatst. dit kan niet veranderd worden.'
+  lighting_propogate_selection: 'Het licht heeft zich verspreid in %s0 chunks. (Note:
     om het licht te verwijderen, doe //removelight)'
-  updated_lighting_selection: '&7Lighting is geüpdatet in %s0 chunks. (het kan even
+  updated_lighting_selection: 'Lighting is geüpdatet in %s0 chunks. (het kan even
     duren voordat de packets worden verstuurd)'
-  set_region: '&7Toegestaande regio geselecteerd'
-  worldedit_command_limit: '&7U kunt weer verder gaan wanneer uw vorige actie voltooid
+  set_region: 'Toegestaande regio geselecteerd'
+  worldedit_command_limit: 'U kunt weer verder gaan wanneer uw vorige actie voltooid
     is'
-  worldedit_delayed: '&7U kunt weer verder gaan wanneer wij uw FAWE action voltooien...'
-  worldedit_run: '&7Sorry voor het ongemak.  huidige uitvoerende actie: %s'
-  worldedit_complete: '&7Verandering voldaan.'
-  require_selection_in_mask: '&7%s Van je selectie is niet binnen je mask. Je kan
+  worldedit_delayed: 'U kunt weer verder gaan wanneer wij uw FAWE action voltooien...'
+  worldedit_run: 'Sorry voor het ongemak.  huidige uitvoerende actie: %s'
+  worldedit_complete: 'Verandering voldaan.'
+  require_selection_in_mask: '%s Van je selectie is niet binnen je mask. Je kan
     alleen veranderingen uitvoeren in de toegestaande regio.'
-  worldedit_volume: '&7Je kan niet een volume van %current% toepassen. Het maximum
+  worldedit_volume: 'Je kan niet een volume van %current% toepassen. Het maximum
     volume dat je kan toepassen is %max%.'
-  worldedit_iterations: '&7Je kan %current% niet zoveel keer herhalen. het maximale
+  worldedit_iterations: 'Je kan %current% niet zoveel keer herhalen. het maximale
     wat toegestaan is, is %max%.'
-  worldedit_unsafe: '&7Toegang tot deze command is geblokkeerd'
-  worldedit_dangerous_worldedit: '&cNnveilige edits zijn verwerkt op %s0 by %s1'
-  worldedit_toggle_tips_on: '&7Disabled FAWE tips.'
-  worldedit_toggle_tips_off: '&7De FAWE tips staan nu aan.'
-  worldedit_bypassed: '&7De restrictie of FAWE wordt nu overscheiden.'
-  worldedit_unmasked: '&6Je FAWE edits hebben nu geen restrictie meer.'
-  worldedit_restricted: '&6Je FAWE edits hebben nu een restrictie.'
+  worldedit_unsafe: 'Toegang tot deze command is geblokkeerd'
+  worldedit_dangerous_worldedit: 'Nnveilige edits zijn verwerkt op %s0 by %s1'
+  worldedit_toggle_tips_on: 'Disabled FAWE tips.'
+  worldedit_toggle_tips_off: 'De FAWE tips staan nu aan.'
+  worldedit_bypassed: 'De restrictie of FAWE wordt nu overscheiden.'
+  worldedit_unmasked: 'Je FAWE edits hebben nu geen restrictie meer.'
+  worldedit_restricted: 'Je FAWE edits hebben nu een restrictie.'
   worldedit_oom_admin: |-
-    &cMogelijke opties:
-    &8 - &7//fast
-    &8 - &7Voer kleinere bewerkingen uit
-    &8 - &7Wijs meer geheugen toe
-    &8 - &7Disable `max-memory-percent`
+    Mogelijke opties:
+     - //fast
+     - Voer kleinere bewerkingen uit
+     - Wijs meer geheugen toe
+     - Disable `max-memory-percent`
   compressed: Geschiedenis gecomprimeerd. Saved ~ %s0b (%s1x kleiner)
   action_complete: Uitvoering is over %s0 voltooid.
 error:
-  worldedit_extend: '&cje edit is waarschijnlijk buiten het toegestaande gebied gekomen.'
+  worldedit_extend: 'je edit is waarschijnlijk buiten het toegestaande gebied gekomen.'
   web_unauthorized: 'alleen links van de configureerde webhost zijn toegestaan: %s0'
-  command_syntax: '&cGebruik: &7%s0'
-  no_perm: '&cje hebt hier geen permission node voor: %s0'
-  setting_disable: '&cSetting ontbreekt: %s0'
-  brush_not_found: '&cBruikbare brushes: %s0'
-  brush_incompatible: '&cDeze brush kan niet in deze versie gebruikt worden'
-  schematic_not_found: '&cSchematic niet gevonden: &7%s0'
-  no_region: '&cJe hebt momenteel geen toegestaand gebied'
-  no_mask: '&cJe hebt momenteel geen brush geselecteerd'
-  not_player: '&cJe moet een speler zijn om dit te doen!'
-  player_not_found: '&cSpeler niet gevonden:&7 %s0'
+  command_syntax: 'Gebruik: %s0'
+  no_perm: 'je hebt hier geen permission node voor: %s0'
+  setting_disable: 'Setting ontbreekt: %s0'
+  brush_not_found: 'Bruikbare brushes: %s0'
+  brush_incompatible: 'Deze brush kan niet in deze versie gebruikt worden'
+  schematic_not_found: 'Schematic niet gevonden: %s0'
+  no_region: 'Je hebt momenteel geen toegestaand gebied'
+  no_mask: 'Je hebt momenteel geen brush geselecteerd'
+  not_player: 'Je moet een speler zijn om dit te doen!'
+  player_not_found: 'Speler niet gevonden: %s0'
   oom: |-
-    &8[&cCritical&8] &cGedetecteerd laag geheugen i.e. < 1%. We zullen de volgende acties ondernemen:
-    &8 - &7Verwijder de huidige WE blok plaatsing
-    &8 - &7Clear WE history
-    &8 - &7Unload non essential chunks
-    &8 - &7Dood de entities
-    &8 - &7Onnodige data collecteren
-    &cNegeer dit als je de server wilt laten crashen.
-    &7Note: Een laag opslagvermogen kan door WE veroorzaakt worden (dit hoeft niet)
-  worldedit_some_fails: '&c%s0 Blokken zijn niet geplaats omdat ze uit je toegestaande
+    [Critical] Gedetecteerd laag geheugen i.e. < 1%. We zullen de volgende acties ondernemen:
+     - Verwijder de huidige WE blok plaatsing
+     - Clear WE history
+     - Unload non essential chunks
+     - Dood de entities
+     - Onnodige data collecteren
+    Negeer dit als je de server wilt laten crashen.
+    Note: Een laag opslagvermogen kan door WE veroorzaakt worden (dit hoeft niet)
+  worldedit_some_fails: '%s0 Blokken zijn niet geplaats omdat ze uit je toegestaande
     gebied werden geplaatst.'
-  worldedit_some_fails_blockbag: '&coOntbrekende blokken: %s0'
+  worldedit_some_fails_blockbag: 'oOntbrekende blokken: %s0'
   block_not_allowed: Het is niet toegestaan om dit te gebruiken
 web:
   generating_link: Uploading %s, even geduld A.U.B...
-  generating_link_failed: '&cDe donwload link kon niet worden gemaakt!'
+  generating_link_failed: 'De donwload link kon niet worden gemaakt!'
   download_link: '%s'
 worldedit:
   general:
@@ -125,7 +125,7 @@ worldedit:
     selection_shift: Region verzet
     selection_cleared: Selectie verwijderd
   navigation:
-    navigation_wand_error: '&cNergens om door heen te gaan'
+    navigation_wand_error: 'Nergens om door heen te gaan'
   anvil:
     world_is_loaded: de wereld zou niet in gebruik moeten zijn wanneer er een uitvoering
       wordt gedaan. onlaad de wereld, of gebruik -f om het te overschrijden (save
@@ -141,8 +141,8 @@ worldedit:
     brush_target_offset_set: Uitschietting van de target gezet tot %s0
     brush_equipped: Brush in gebruik %s0
     brush_try_other: |-
-      &cEr zijn betere brushes hier voor te gebruiken e.g.
-      &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
+      Er zijn betere brushes hier voor te gebruiken e.g.
+       - //br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
     brush_copy: Links klik de fundering van de constructie om te kopieëren, rechts
       klik om te plakken. Verhoog de brush Settings als dat mogelijk is.
     brush_height_invalid: Onvalide hoogte map file (%s0)
@@ -170,8 +170,8 @@ worldedit:
     rollback_element: Aan %s0 het ontdaan maken.
   tool:
     tool_inspect: Inspect tool gebonden aan %s0.
-    tool_inspect_info: '&7%s0 veranderd %s1 to %s2 %s3 geleden'
-    tool_inspect_info_footer: '&6Totaal: &7%s0 veranderingen'
+    tool_inspect_info: '%s0 veranderd %s1 to %s2 %s3 geleden'
+    tool_inspect_info_footer: 'Totaal: %s0 veranderingen'
     tool_none: De tool is niet meer gebonden aan je item.
     tool_info: Info tool gebonden aan %s0.
     tool_tree: Tree tool gebonden aan %s0.
@@ -214,23 +214,23 @@ worldedit:
     nothing_confirmed: Je hebt geen acties die bevestigt moeten worden.
     page_footer: Gebruik %s0 om naar de volgende pagina te gaan
   schematic:
-    schematic_prompt_clear: '&7we raden je aan &c%s0 &7 te gebruiken om je klipbord
+    schematic_prompt_clear: 'we raden je aan %s0  te gebruiken om je klipbord
       te verwijderen first'
     schematic_show: |-
-      &7scematics &a%s0&7 aan het wergeven &a%s1&7:
-      &8 - &aLinks klik &7a het gebouw om er een klipbord van de maken
-      &8 - &aRechts klik &7a om een gebouw toe te voegen aan je multi-klipbord
-      &8 - &7Gebruik &a%s2&7 om terug naar de wereld te gaan
+      scematics %s0 aan het wergeven %s1:
+       - Links klik a het gebouw om er een klipbord van de maken
+       - Rechts klik a om een gebouw toe te voegen aan je multi-klipbord
+       - Gebruik %s2 om terug naar de wereld te gaan
     schematic_format: 'Beschikbare formats (Name: Lookup names)'
-    schematic_move_exists: '&c%s0 bestaat al'
-    schematic_move_success: '&a%s0 -> %s1'
-    schematic_move_failed: '&a%s0 aantal verplaatst: %s1'
+    schematic_move_exists: '%s0 bestaat al'
+    schematic_move_success: '%s0 -> %s1'
+    schematic_move_failed: '%s0 aantal verplaatst: %s1'
     schematic_loaded: '%s0 gelanden. plak met //paste'
     schematic_saved: '%s0 opgeslagen.'
     schematic_page: Pagina moet %s zijn
     schematic_none: Niks gevonden.
     schematic_list: 'Beschikbare files (Filename: Format) [%s0/%s1]:'
-    schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
+    schematic_list_elem: ' - %s0 - %s1'
   clipboard:
     clipboard_uri_not_found: Je hebt %s0 niet geladen
     clipboard_cleared: Jlikbord verwijderd
@@ -255,31 +255,31 @@ worldedit:
   command:
     command_invalid_syntax: De command was niet goed gebruikt (no more help available).
   help:
-    command_clarifying_bracket: '&7 clarifying bracket toegevoegt aan &c%s0'
-    help_suggest: '&7kon %s0 niet binden. misschien één van deze proberen &c%s1 &7?'
+    command_clarifying_bracket: ' clarifying bracket toegevoegt aan %s0'
+    help_suggest: 'kon %s0 niet binden. misschien één van deze proberen %s1 ?'
     help_header_categories: Command Types
     help_header_subcommands: Subcommands
-    help_header_command: '&cHelp voor: &7%s0'
-    help_item_allowed: '&a%s0&8 - &7%s1'
-    help_item_denied: '&c%s0&8 - &7%s1'
+    help_header_command: 'Help voor: %s0'
+    help_item_allowed: '%s0 - %s1'
+    help_item_denied: '%s0 - %s1'
     help_header: 'Help: pagina %s0/%s1'
-    help_footer: '&7Wiki: https://git.io/vSKE5'
+    help_footer: 'Wiki: https://git.io/vSKE5'
   cycler:
     block_cycler_cannot_cycle:  De blok data kan niet worden veranderd.
     block_cycler_limit: Maximale veranderingen in blokken bereikt.
-    block_cycler_no_perm: '&cHet is niet toegestaan om deze blok data te veranderen.'
+    block_cycler_no_perm: 'Het is niet toegestaan om deze blok data te veranderen.'
   scripting:
-    scripting_no_perm: '&cJe hebt onvoldoende rechten om deze craft scriptie uit te voeren. '
+    scripting_no_perm: 'Je hebt onvoldoende rechten om deze craft scriptie uit te voeren. '
     scripting_cs: Gebruik eerst /cs met een scriptie naam.
     scripting_error: Er waren problemen onstaan bij het uitvoeren van de craft scriptie.
 progress:
   progress_message: '%s1/%s0 (%s2%) @%s3cps %s4s left'
   progress_finished: '[ Klaar! ]'
 cancel:
-  worldedit_cancel_count: '&czoveel edits: %s0 ontdaan.'
-  worldedit_cancel_reason_confirm: '&7Het geselecteerde gebied is groot (&c%s0 &7->
-    &c%s1&7, containing &c%s3&7 blocks). Gebruik &c//confirm &7om te bevestigen &c%s2'
-  worldedit_cancel_reason: '&cYour WorldEdit actie was opgeheven:&7 %s0&c.'
+  worldedit_cancel_count: 'zoveel edits: %s0 ontdaan.'
+  worldedit_cancel_reason_confirm: 'Het geselecteerde gebied is groot (%s0 ->
+    %s1, containing %s3 blocks). Gebruik //confirm om te bevestigen %s2'
+  worldedit_cancel_reason: 'Your WorldEdit actie was opgeheven: %s0.'
   worldedit_cancel_reason_manual: manuele opheffing
   worldedit_cancel_reason_low_memory: Lage memory
   worldedit_cancel_reason_max_changes: Teveel blokken verandered
@@ -292,7 +292,7 @@ cancel:
     /wea, or disable `region-restrictions` in config.yml)
   worldedit_cancel_reason_no_region: geen toegestaand gebied (bypass with /wea, or
     disable `region-restrictions` in config.yml)
-  worldedit_failed_load_chunk: '&cChunks laden overgeslaan: &7%s0;%s1&c. probeer het
+  worldedit_failed_load_chunk: 'Chunks laden overgeslaan: %s0;%s1. probeer het
     chunk-wait op te krikken.'
 navigation:
   ascend_fail: Geen vrije plekken boven je gesignaleerd.
@@ -319,47 +319,47 @@ selection:
     klik om toe te voegen. om een lucht holte te selecteren, doe //pos1.'
   sel_convex_polyhedral: 'Convex polyhedral selector: Links klik=First vertex, rechts
     klik om meer toe te voegen.'
-  sel_list: Voor een lijst met selecties doe:&c //sel list
+  sel_list: 'Voor een lijst met selecties doe: //sel list'
   sel_modes: 'Selecteer één van de modes hier:'
 tips:
-  tip_sel_list: 'Tip: Zie de verschillende selectie modes met &c//sel list'
+  tip_sel_list: 'Tip: Zie de verschillende selectie modes met //sel list'
   tip_select_connected: 'Tip: Selecteer alle verbonden blokken met //sel fuzzy'
-  tip_set_pos1: 'Tip: Gebruik pos1 als een punt met &c//set pos1'
-  tip_farwand: 'Tip: Selecteer punten van ver weg met &c//farwand'
-  tip_lazycut: '&7Tip: Het is veiliger om &c//lazycut te gebruiken'
-  tip_fast: '&7Tip: Set fast and without undo using &c//fast'
-  tip_cancel: '&7Tip: gebruik &c//cancel &7 om een edit stop te zetten'
-  tip_mask: '&7Tip: Zet een globale bestemmings mask met &c/gmask'
-  tip_mask_angle: 'Tip: Vervang opwaartse hellingen van 3-20 blocks met&c //replace
+  tip_set_pos1: 'Tip: Gebruik pos1 als een punt met //set pos1'
+  tip_farwand: 'Tip: Selecteer punten van ver weg met //farwand'
+  tip_lazycut: 'Tip: Het is veiliger om //lazycut te gebruiken'
+  tip_fast: 'Tip: Set fast and without undo using //fast'
+  tip_cancel: 'Tip: gebruik //cancel  om een edit stop te zetten'
+  tip_mask: 'Tip: Zet een globale bestemmings mask met /gmask'
+  tip_mask_angle: 'Tip: Vervang opwaartse hellingen van 3-20 blocks met //replace
     /[-20][-3] bedrock'
-  tip_set_linear: '&7Tip: Zet een blok lineaire met &c//set #l3d[wood,bedrock]'
-  tip_surface_spread: '&7Tip: Verpsreid een oppervlakte met &c//set #surfacespread[5][0][5][#existing]'
-  tip_set_hand: '&7Tip: Gebruik je huide hand met &c//set hand'
-  tip_replace_regex: '&7&7Tip: Vervang door regex:&c //replace .*_log <pattern>'
-  tip_replace_regex_2: '&7&7Tip: Vervang door regex:&c //replace .*stairs[facing=(north|south)]
+  tip_set_linear: 'Tip: Zet een blok lineaire met //set #l3d[wood,bedrock]'
+  tip_surface_spread: 'Tip: Verpsreid een oppervlakte met //set #surfacespread[5][0][5][#existing]'
+  tip_set_hand: 'Tip: Gebruik je huide hand met //set hand'
+  tip_replace_regex: 'Tip: Vervang door regex: //replace .*_log <pattern>'
+  tip_replace_regex_2: 'Tip: Vervang door regex: //replace .*stairs[facing=(north|south)]
     <pattern>'
-  tip_replace_regex_3: '&7&7Tip: Vervang door operators:&c //replace water[level>2]
+  tip_replace_regex_3: 'Tip: Vervang door operators: //replace water[level>2]
     sand'
-  tip_replace_regex_4: '&7&7Tip: Vervang door operators:&c //replace true *[waterlogged=false]'
-  tip_replace_regex_5: '&7&7Tip: Vervang door operators:&c //replace true *[level-=1]'
-  tip_replace_id: '&7Tip: Vervang alleen het blok id:&c//replace woodenstair #id[cobblestair]'
-  tip_replace_light: 'Tip: Verwijder licht met with&c//replace #brightness[1][15]'
+  tip_replace_regex_4: 'Tip: Vervang door operators: //replace true *[waterlogged=false]'
+  tip_replace_regex_5: 'Tip: Vervang door operators: //replace true *[level-=1]'
+  tip_replace_id: 'Tip: Vervang alleen het blok id://replace woodenstair #id[cobblestair]'
+  tip_replace_light: 'Tip: Verwijder licht met with//replace #brightness[1][15]'
   tip_tab_complete: 'Tip: The replace command supports tab completion'
-  tip_flip: 'Tip: Mirror met &c//flip'
-  tip_deform: 'Tip: Verander het van vorm met &c//deform'
-  tip_transform: 'Tip: Zet een transform met &c//gtransform'
-  tip_copypaste: 'Tip: Plaats bij klikken met &c//br copypaste'
-  tip_source_mask: 'Tip: Zet een source mask met &c/gsmask <mask>&7'
-  tip_replace_marker: 'Tip: verander een blok in je volle klipbord met &c//replace
+  tip_flip: 'Tip: Mirror met //flip'
+  tip_deform: 'Tip: Verander het van vorm met //deform'
+  tip_transform: 'Tip: Zet een transform met //gtransform'
+  tip_copypaste: 'Tip: Plaats bij klikken met //br copypaste'
+  tip_source_mask: 'Tip: Zet een source mask met /gsmask <mask>'
+  tip_replace_marker: 'Tip: verander een blok in je volle klipbord met //replace
     wool #fullcopy'
-  tip_paste: 'Tip: Plaats met &c//paste'
+  tip_paste: 'Tip: Plaats met //paste'
   tip_lazycopy: 'Tip: Lazycopy is sneller'
-  tip_download: 'Tip: Probeer &c//download'
-  tip_rotate: 'Tip: Orïenteer met &c//rotate'
-  tip_copy_pattern: 'Tip: Om een pattern te gebruiken, probeer &c#copy'
+  tip_download: 'Tip: Probeer //download'
+  tip_rotate: 'Tip: Orïenteer met //rotate'
+  tip_copy_pattern: 'Tip: Om een pattern te gebruiken, probeer #copy'
   tip_regen_0: 'Tip: Gebruik een biome met /regen [biome]'
   tip_regen_1: 'Tip: Gebruik een seed met /regen [biome] [seed]'
-  tip_biome_pattern: 'Tip: Dee &c#biome[forest]&7 pattern kan ik elke opdracht gebruikt
+  tip_biome_pattern: 'Tip: Dee #biome[forest] pattern kan ik elke opdracht gebruikt
     worden'
   tip_biome_mask: 'Tip: Er wordt een restrictie geplaatst op de biome met `$jungle`
     mask'
