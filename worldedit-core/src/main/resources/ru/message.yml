@@ -1,68 +1,68 @@
 info:
-  prefix: '&8(&4&lFAWE&8)&r&7'
+  prefix: '(FAWE)'
   file_deleted: '%s0 был удален.'
-  schematic_pasting: '&7Вставка схематического файла. Это не может быть отменено.'
-  lighting_propogate_selection: '&7Освещение было распространено в %s0 чанках. (Примечание:
+  schematic_pasting: 'Вставка схематического файла. Это не может быть отменено.'
+  lighting_propogate_selection: 'Освещение было распространено в %s0 чанках. (Примечание:
     Для удаления освещения используйте //removelight)'
-  updated_lighting_selection: '&7Освещение было обновлено в %s0 чанках. (Это может
+  updated_lighting_selection: 'Освещение было обновлено в %s0 чанках. (Это может
     занять секунду для отправки пакетов)'
-  set_region: '&7Выделение установлено в вашем текущем регионе WorldEdit'
-  worldedit_command_limit: '&7Пожалуйста, подождите, пока ваше текущее действие завершится'
-  worldedit_delayed: '&7Пожалуйста, подождите, пока мы обрабатываем ваши действия
+  set_region: 'Выделение установлено в вашем текущем регионе WorldEdit'
+  worldedit_command_limit: 'Пожалуйста, подождите, пока ваше текущее действие завершится'
+  worldedit_delayed: 'Пожалуйста, подождите, пока мы обрабатываем ваши действия
     WorldEdit...'
-  worldedit_run: '&7Простите за задержку. Выполнение: %s'
-  worldedit_complete: '&7Действие WorldEdit выполнено.'
-  require_selection_in_mask: '&7%s вашего выделения не находится в пределах вашей
+  worldedit_run: 'Простите за задержку. Выполнение: %s'
+  worldedit_complete: 'Действие WorldEdit выполнено.'
+  require_selection_in_mask: '%s вашего выделения не находится в пределах вашей
     маски. Вы можете только вносить изменения в пределах разрешенных регионов.'
-  worldedit_volume: '&7Вы не можете выбрать значение %current%. Максимальное значение,
+  worldedit_volume: 'Вы не можете выбрать значение %current%. Максимальное значение,
     которое вы можете изменить - %max%.'
-  worldedit_iterations: '&7Вы не можете выполнить интерацию %current% раз. Максимальное
+  worldedit_iterations: 'Вы не можете выполнить интерацию %current% раз. Максимальное
     число допустимых итераций - %max%.'
-  worldedit_unsafe: '&7Доступ к этой команде был заблокирован!'
-  worldedit_dangerous_worldedit: '&cFAWE обрабатывает небезопасный WorldEdit в %s0
+  worldedit_unsafe: 'Доступ к этой команде был заблокирован!'
+  worldedit_dangerous_worldedit: 'FAWE обрабатывает небезопасный WorldEdit в %s0
     на %s1'
-  worldedit_toggle_tips_on: '&7Советы WorldEdit &cвключены&7.'
-  worldedit_toggle_tips_off: '&7Советы WorldEdit &cвключены&7.'
-  worldedit_bypassed: '&7Обход ограничений WorldEdit &cвключен&7.'
-  worldedit_unmasked: '&7Ваш WorldEdit теперь неограниченный.'
-  worldedit_restricted: '&7Обход ограничений WorldEdit &cвыключен&7.'
+  worldedit_toggle_tips_on: 'Советы WorldEdit включены.'
+  worldedit_toggle_tips_off: 'Советы WorldEdit включены.'
+  worldedit_bypassed: 'Обход ограничений WorldEdit включен.'
+  worldedit_unmasked: 'Ваш WorldEdit теперь неограниченный.'
+  worldedit_restricted: 'Обход ограничений WorldEdit выключен.'
   worldedit_oom_admin: |-
-    &cВозможные варианты:
-    &8 - &7//fast
-    &8 - &7Сделать небольшие изменения
-    &8 - &7Выделить больше памяти
-    &8 - &7Отключить `max-memory-percent`
+    Возможные варианты:
+     - //fast
+     - Сделать небольшие изменения
+     - Выделить больше памяти
+     - Отключить `max-memory-percent`
   compressed: История сжата. Сохранено ~ %s0b (%s1x меньше)
   action_complete: Действие выполенено за %s0 секунд
 error:
-  worldedit_extend: '&cВаше выделение WorldEdit может быть расширено за пределами
+  worldedit_extend: 'Ваше выделение WorldEdit может быть расширено за пределами
     разрешенного региона.'
-  command_syntax: '&cИспользование: &7%s0'
-  no_perm: '&cУ вас нет разрешения: %s0'
-  setting_disable: '&cОтсутствует параметр: %s0'
-  schematic_not_found: '&cСхематический файл не найден: &7%s0'
-  no_region: '&cУ вас нет текущего региона WorldEdit'
-  no_mask: '&cУ вас нет текущей установленой маски'
-  not_player: '&cВы должны быть игроком, чтобы выполнить это действие!'
-  player_not_found: '&cИгрок не найден:&7 %s0'
+  command_syntax: 'Использование: %s0'
+  no_perm: 'У вас нет разрешения: %s0'
+  setting_disable: 'Отсутствует параметр: %s0'
+  schematic_not_found: 'Схематический файл не найден: %s0'
+  no_region: 'У вас нет текущего региона WorldEdit'
+  no_mask: 'У вас нет текущей установленой маски'
+  not_player: 'Вы должны быть игроком, чтобы выполнить это действие!'
+  player_not_found: 'Игрок не найден: %s0'
   oom: |-
-    &8[&cОпасно&8] &cОбнаружено мало память, т.е. < 1%. FAWE предпримет следующие действия:
-    &8 - &7Прекратить размещение блоков WE
-    &8 - &7Очистить историю WE
-    &8 - &7Выгрузить не необходимые чанки
-    &8 - &7Убить энтити
-    &8 - &7Собрать мусор
-    &cИгнорирование этого может призвести к крашу сервера.
-    &7Примечание: Нехватка памяти скорее всего (но не обязательно) вызванно WE
-  worldedit_some_fails: '&c%s0 блок(ов) не были размещены, потому что они были за
+    [Опасно] Обнаружено мало память, т.е. < 1%. FAWE предпримет следующие действия:
+     - Прекратить размещение блоков WE
+     - Очистить историю WE
+     - Выгрузить не необходимые чанки
+     - Убить энтити
+     - Собрать мусор
+    Игнорирование этого может призвести к крашу сервера.
+    Примечание: Нехватка памяти скорее всего (но не обязательно) вызванно WE
+  worldedit_some_fails: '%s0 блок(ов) не были размещены, потому что они были за
     пределами вашего региона.'
-  worldedit_some_fails_blockbag: '&cНедостающие блоки: %s0'
+  worldedit_some_fails_blockbag: 'Недостающие блоки: %s0'
   web_unauthorized: 'Разрешены только ссылки с настроенного веб-хостинга: %s0'
-  brush_not_found: '&cДоступные кисти: %s0'
-  brush_incompatible: '&cКисть не совместима с этой версией'
+  brush_not_found: 'Доступные кисти: %s0'
+  brush_incompatible: 'Кисть не совместима с этой версией'
 web:
   generating_link: Загрузка %s, пожалуйста подождите...
-  generating_link_failed: '&cНе удалось создать ссылку!'
+  generating_link_failed: 'Не удалось создать ссылку!'
   download_link: '%s'
 worldedit:
   general:
@@ -88,7 +88,7 @@ worldedit:
   paste:
     command_paste: |-
       Буфер обмена был вставлен в %s0
-      Совет: Вставка по клику - &c//br copypaste
+      Совет: Вставка по клику - //br copypaste
   rotate:
     command_rotate: Буфер обмена был повернут
   flip:
@@ -133,8 +133,8 @@ worldedit:
   brush:
     brush_none: Вы не держите кисть!
     brush_try_other: |-
-      &cFAWE добавляет другие, более подходящие кисти, например,
-      &8 - &7//br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
+      FAWE добавляет другие, более подходящие кисти, например,
+       - //br height [radius=5] [#clipboard|file=null] [rotation=0] [yscale=1.00]
     brush_copy: Кисть копирования сформирована (%s0). ПКМ по обьекту для копирования,
       ПКМ для вставки. При необходимости увеличьте радиус кисти.
     brush_height_invalid: Неверная высота файла карты (%s0)
@@ -167,8 +167,8 @@ worldedit:
     rollback_element: Отмена %s0
   tool:
     tool_inspect: Инструмент проверки связан с %s0.
-    tool_inspect_info: '&7%s0 изменено %s1 на %s2 %s3 назад'
-    tool_inspect_info_footer: '&6Всего: &7%s0 изменений'
+    tool_inspect_info: '%s0 изменено %s1 на %s2 %s3 назад'
+    tool_inspect_info_footer: 'Всего: %s0 изменений'
     tool_none: Инструмент больше не связан с вашим предметом.
     tool_info: Информационный инструмент связан с %s0.
     tool_tree: Инструмент Девера связан с %s0.
@@ -192,16 +192,16 @@ worldedit:
     schematic_page: Страница должна быть %s
     schematic_none: Схематических фалов не найдено.
     schematic_list: 'Доступные схематические файлы (Имя файла: Формат) [%s0/%s1]:'
-    schematic_prompt_clear: '&7Вы можете использовать &c%s0 &7очистить свой первый'
+    schematic_prompt_clear: 'Вы можете использовать %s0 очистить свой первый'
     schematic_show: |-
-      &7Отображение &a%s0&7 схемы из &a%s1&7:
-      &8 - &aЩелчок левой кнопкой мыши &7структура для настройки вашего буфера обмена
-      &8 - &aЩелкните правойt кнопкой мыши &7добавить структуру в ваш мультибуфер
-      &8 - &7использование &a%s2&7 вернуться в мир
-    schematic_move_exists: '&c%s0 уже существует'
-    schematic_move_success: '&a%s0 -> %s1'
-    schematic_move_failed: '&a%s0 нет перемещенных: %s1'
-    schematic_list_elem: '&8 - &a%s0 &8- &7%s1'
+      Отображение %s0 схемы из %s1:
+       - Щелчок левой кнопкой мыши структура для настройки вашего буфера обмена
+       - Щелкните правойt кнопкой мыши добавить структуру в ваш мультибуфер
+       - использование %s2 вернуться в мир
+    schematic_move_exists: '%s0 уже существует'
+    schematic_move_success: '%s0 -> %s1'
+    schematic_move_failed: '%s0 нет перемещенных: %s1'
+    schematic_list_elem: ' - %s0 - %s1'
   clipboard:
     clipboard_cleared: Буфер обмена очищен
     clipboard_invalid_format: 'Неизвестный формат буфера обмена:  %s0'
@@ -239,25 +239,25 @@ worldedit:
     timezone_set: 'Часовой пояс для этой сессии: %s0'
     timezone_display: 'Текущее время в этом часовом поясе:  %s0'
   navigation:
-    navigation_wand_error: '&cНичто не может пройти'
+    navigation_wand_error: 'Ничто не может пройти'
   anvil:
     world_is_loaded: Мир не должен использоваться во время исполнения. Выгрузить или использовать -f переопределить (сохранить сначала)
   help:
-    command_clarifying_bracket: '&7Added clarifying bracket for &c%s0'
-    help_suggest: '&7не мог найти %s0. Возможно, попробуйте один из &c%s1 &7?'
+    command_clarifying_bracket: 'Added clarifying bracket for %s0'
+    help_suggest: 'не мог найти %s0. Возможно, попробуйте один из %s1 ?'
     help_header_categories: Типы команд
     help_header_subcommands: Подкоманды
-    help_header_command: '&cПомогите за: &7%s0'
-    help_item_allowed: '&a%s0&8 - &7%s1'
-    help_item_denied: '&c%s0&8 - &7%s1'
+    help_header_command: 'Помогите за: %s0'
+    help_item_allowed: '%s0 - %s1'
+    help_item_denied: '%s0 - %s1'
     help_header: 'Помогите: страница %s0/%s1'
-    help_footer: '&7Wiki: https://git.io/vSKE5'
+    help_footer: 'Wiki: https://git.io/vSKE5'
 progress:
   progress_message: '[ Очередь: %s0 | Отправляется: %s1 ]'
   progress_finished: '[ Готово! ]'
 cancel:
-  worldedit_cancel_count: '&cОтменено %s0 изменений.'
-  worldedit_cancel_reason: '&cВаше действие WorldEdit было отменено:&7 %s0&c.'
+  worldedit_cancel_count: 'Отменено %s0 изменений.'
+  worldedit_cancel_reason: 'Ваше действие WorldEdit было отменено: %s0.'
   worldedit_cancel_reason_manual: Ручная отмена
   worldedit_cancel_reason_low_memory: Мало памяти
   worldedit_cancel_reason_max_changes: Слишком много блоков изменено
@@ -266,8 +266,8 @@ cancel:
   worldedit_cancel_reason_max_entities: Слишком много энтити
   worldedit_cancel_reason_max_iterations: Максимальное количество итераций
   worldedit_cancel_reason_no_region: Нет разрешенного региона (обход, используя /wea, или выключите `region-restrictions` в config.yml)
-  worldedit_failed_load_chunk: '&cПропущенные загруженные чанки: &7%s0;%s1&c. Попробуйте увеличить ожидание чанка.'
-  worldedit_cancel_reason_confirm: '&7Ваш выбор большой (&c%s0 &7-> &c%s1&7, содержащий &c%s3&7 блоки). использование &c//confirm &7выполнить &c%s2'
+  worldedit_failed_load_chunk: 'Пропущенные загруженные чанки: %s0;%s1. Попробуйте увеличить ожидание чанка.'
+  worldedit_cancel_reason_confirm: 'Ваш выбор большой (%s0 -> %s1, содержащий %s3 блоки). использование //confirm выполнить %s2'
   worldedit_cancel_reason_outside_level: внешний мир
   worldedit_cancel_reason_outside_region: Вне допустимой области (обход с /wea, или отключить `region-restrictions` в config.yml)
 history: {}
@@ -294,36 +294,36 @@ selection:
   sel_max: '%s0 максимум точек.'
   sel_fuzzy: 'Нечеткое выделение: ЛКМ, чтобы выбрать все условные блоки, ПКМ, чтобы добавить'
   sel_convex_polyhedral: 'Выпуклое многогранное выделение: ЛКМ - первая вершина, ПКМ для добавления больше.'
-  sel_list: Для получения списка типов выделения используйте:&c //sel list
+  sel_list: Для получения списка типов выделения используйте: //sel list
   sel_modes: 'Выберите один из перечисленных режимов ниже:'
 tips:
-  tip_sel_list: 'Совет: Смотрите различные режимы выделения - &c//sel list'
+  tip_sel_list: 'Совет: Смотрите различные режимы выделения - //sel list'
   tip_select_connected: 'Совет: Выберите все подключенные блоки - //sel fuzzy'
-  tip_set_pos1: 'Совет: Используйте Pos1 как шаблон - &c//set pos1'
-  tip_farwand: 'Совет: Выберите удаленные точки - &c//farwand'
-  tip_fast: '&7Совет: Установить быстро и без отмены, используя &c//fast'
-  tip_cancel: '&7Совет: Вы можете &c//cancel &7от изменений в процессе'
-  tip_mask: '&7Совет: Задайте маску глобального назначения - &c/gmask'
-  tip_mask_angle: 'Совет: Заменить верхний слой 3-20 блоков -&c //replace /-20:-3 bedrock'
-  tip_set_linear: '&7Совет: Установка блоков -&c //set #l3d:wood,bedrock'
-  tip_surface_spread: '&7Совет: Распространение плоской поверхности -&c //set #surfacespread:5:0:5:#existing'
-  tip_set_hand: '&7Совет: Используйте свою текущую руку - &c//set hand'
-  tip_replace_id: '&7Совет: Заменить только ID блока -&c //replace woodenstair #id:cobblestair'
-  tip_replace_light: 'Совет: Удалить источники света -&c //replace #brightness:1:15 0'
+  tip_set_pos1: 'Совет: Используйте Pos1 как шаблон - //set pos1'
+  tip_farwand: 'Совет: Выберите удаленные точки - //farwand'
+  tip_fast: 'Совет: Установить быстро и без отмены, используя //fast'
+  tip_cancel: 'Совет: Вы можете //cancel от изменений в процессе'
+  tip_mask: 'Совет: Задайте маску глобального назначения - /gmask'
+  tip_mask_angle: 'Совет: Заменить верхний слой 3-20 блоков - //replace /-20:-3 bedrock'
+  tip_set_linear: 'Совет: Установка блоков - //set #l3d:wood,bedrock'
+  tip_surface_spread: 'Совет: Распространение плоской поверхности - //set #surfacespread:5:0:5:#existing'
+  tip_set_hand: 'Совет: Используйте свою текущую руку - //set hand'
+  tip_replace_id: 'Совет: Заменить только ID блока - //replace woodenstair #id:cobblestair'
+  tip_replace_light: 'Совет: Удалить источники света - //replace #brightness:1:15 0'
   tip_tab_complete: 'Совет: Команда replace поддерживает автозаполение'
-  tip_flip: 'Совет: Отобразить - &c//flip'
-  tip_deform: 'Совет: Изменить - &c//deform'
-  tip_transform: 'Совет: Установка преобразования - &c//gtransform'
-  tip_copypaste: 'Совет: Вставка по клику - &c//br copypaste'
-  tip_source_mask: 'Совет: Установить маску источника - &c/gsmask <mask>&7'
-  tip_replace_marker: 'Совет: Замените блок с помощью полного буфера обмена - &c//replace wool #fullcopy'
-  tip_paste: 'Совет: Вставить - &c//paste'
+  tip_flip: 'Совет: Отобразить - //flip'
+  tip_deform: 'Совет: Изменить - //deform'
+  tip_transform: 'Совет: Установка преобразования - //gtransform'
+  tip_copypaste: 'Совет: Вставка по клику - //br copypaste'
+  tip_source_mask: 'Совет: Установить маску источника - /gsmask <mask>'
+  tip_replace_marker: 'Совет: Замените блок с помощью полного буфера обмена - //replace wool #fullcopy'
+  tip_paste: 'Совет: Вставить - //paste'
   tip_lazycopy: 'Совет: lazycopy быстрее'
-  tip_download: 'Совет: Попробовать - &c//download'
-  tip_rotate: 'Совет: Ориентация - &c//rotate'
-  tip_copy_pattern: 'Совет: Для использования шаблона используйте &c#copy'
-  tip_lazycut: '&7Совет: Это безопаснее использовать &c//lazycut'
-  tip_regen_0: 'Совет: Используйте биом - &c/regen [biome]'
-  tip_regen_1: 'Совет: Используйте сид - &c/regen [biome] [seed]'
-  tip_biome_pattern: 'Tip: The &c#biome[forest]&7 pattern can be used in any command'
+  tip_download: 'Совет: Попробовать - //download'
+  tip_rotate: 'Совет: Ориентация - //rotate'
+  tip_copy_pattern: 'Совет: Для использования шаблона используйте #copy'
+  tip_lazycut: 'Совет: Это безопаснее использовать //lazycut'
+  tip_regen_0: 'Совет: Используйте биом - /regen [biome]'
+  tip_regen_1: 'Совет: Используйте сид - /regen [biome] [seed]'
+  tip_biome_pattern: 'Tip: The #biome[forest] pattern can be used in any command'
   tip_biome_mask: 'Tip: Restrict to a biome with the `$jungle` mask'
