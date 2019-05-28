@@ -609,9 +609,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 .blockBag(null)
                 .changeSetNull()
                 .combineStages(false);
-
-        builder.commit();
-
         EditSession editSession = builder.build();
 
         VisualExtent newVisualExtent = new VisualExtent(builder.getExtent(), builder.getQueue());

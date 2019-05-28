@@ -151,7 +151,7 @@ public class CuboidClipboard {
 
     /* ------------------------------------------------------------------------------------------------------------- */
 
-    public BaseBlock getBlock(BlockVector3 position) {
+    public BaseBlock getLazyBlock(BlockVector3 position) {
         return getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
@@ -161,7 +161,7 @@ public class CuboidClipboard {
     	return clipboard.IMP.getBlock(x, y, z);
     }
 
-    public BaseBlock getLazyBlock(BlockVector3 position) {
+    public BaseBlock getBlock(BlockVector3 position) {
         return getBlock(position);
     }
 

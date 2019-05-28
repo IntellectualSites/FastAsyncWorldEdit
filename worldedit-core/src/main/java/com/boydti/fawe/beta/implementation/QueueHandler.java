@@ -4,7 +4,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.Trimable;
@@ -186,7 +185,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
                             if (newChunk != null) {
                                 chunk = newChunk;
                                 if (block == null) block = queue.initFilterBlock();
-                                chunk.filter(newFilter, block, region, mbv1, mbv2);
+                                chunk.filterBlocks(newFilter, block, region, mbv1, mbv2);
                             }
                             queue.submit(chunk);
                         }

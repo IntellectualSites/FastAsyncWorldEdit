@@ -83,12 +83,12 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
+    public BiomeType getBiome(int x, int z) {
         return BiomeTypes.THE_VOID;
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return false;
     }
 
@@ -134,13 +134,18 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public BlockState getBlock(BlockVector3 position) {
-        return BlockTypes.AIR.getDefaultState();
+    public BlockState getBlock(int x, int y, int z) {
+        return EditSession.nullBlock;
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return getBlock(position);
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return EditSession.nullBlock.toBaseBlock();
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+        return false;
     }
 
     @Override

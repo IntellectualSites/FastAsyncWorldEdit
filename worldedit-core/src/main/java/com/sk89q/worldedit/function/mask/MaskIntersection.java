@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.google.common.base.Function;
 
 import com.sk89q.worldedit.math.BlockVector3;
@@ -168,10 +169,6 @@ public class MaskIntersection extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        if (masks.isEmpty()) {
-            return false;
-        }
-
         for (Mask mask : masksArray) {
             if (!mask.test(vector)) {
                 return false;

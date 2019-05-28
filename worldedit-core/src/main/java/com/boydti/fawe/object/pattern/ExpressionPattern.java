@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -23,9 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * greater than {@code 0}.</p>
  */
 public class ExpressionPattern extends AbstractPattern {
-
-    public String input;
-    private transient Expression expression;
+    private final Expression expression;
 
     /**
      * Create a new instance.
@@ -35,7 +34,6 @@ public class ExpressionPattern extends AbstractPattern {
      */
     public ExpressionPattern(String input) throws ExpressionException {
         checkNotNull(input);
-        this.input = input;
         this.expression = Expression.compile(input, "x", "y", "z");
     }
 
@@ -63,15 +61,6 @@ public class ExpressionPattern extends AbstractPattern {
         } catch (Throwable e) {
             e.printStackTrace();
             throw e;
-        }
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        try {
-            this.expression = Expression.compile(input, "x", "y", "z");
-        } catch (ExpressionException e) {
-            e.printStackTrace();
         }
     }
 }

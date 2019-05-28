@@ -135,20 +135,6 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
         this(other.toImmutableState(), other.getNbtData());
     }
 
-    @Override
-    public String getNbtId() {
-        CompoundTag nbtData = getNbtData();
-        if (nbtData == null) {
-            return "";
-        }
-        Tag idTag = nbtData.getValue().get("id");
-        if (idTag instanceof StringTag) {
-            return ((StringTag) idTag).getValue();
-        } else {
-            return "";
-        }
-    }
-
     @Nullable
     @Override
     public CompoundTag getNbtData() {
@@ -247,13 +233,9 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 
 	@Override
 	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-		return extent.setBlock(set, this);
+        set.setFullBlock(extent, this);
+        return true;
 	}
-
-    @Override
-    public void apply(FilterBlock block) {
-        block.setFullBlock(this);
-    }
 
     @Override
 	public boolean hasNbtData() {

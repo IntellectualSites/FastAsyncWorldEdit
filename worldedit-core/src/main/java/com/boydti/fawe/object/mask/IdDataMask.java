@@ -19,9 +19,9 @@ public class IdDataMask extends AbstractExtentMask implements ResettableMask {
     public boolean test(BlockVector3 vector) {
         Extent extent = getExtent();
         if (combined != -1) {
-            return extent.getLazyBlock(vector).getInternalId() == combined;
+            return extent.getBlock(vector).getInternalId() == combined;
         } else {
-            combined = extent.getLazyBlock(vector).getInternalId();
+            combined = extent.getBlock(vector).getInternalId();
             return true;
         }
     }

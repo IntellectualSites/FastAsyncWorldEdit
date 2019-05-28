@@ -104,7 +104,7 @@ public class MCAWorld implements SimpleWorld {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return extent.getLazyBlock(position);
+        return extent.getBlock(position);
     }
 
     @Override

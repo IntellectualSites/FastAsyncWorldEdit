@@ -79,7 +79,7 @@ public class EmptyClipboard implements Clipboard {
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
+    public BlockState getBlock(BlockVector3 position) {
         return EditSession.nullBlock;
     }
 

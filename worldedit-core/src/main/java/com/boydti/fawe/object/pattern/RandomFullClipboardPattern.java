@@ -38,7 +38,7 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         ClipboardHolder holder = clipboards.get(PseudoRandom.random.random(clipboards.size()));
         AffineTransform transform = new AffineTransform();
         if (randomRotate) {
@@ -55,9 +55,9 @@ public class RandomFullClipboardPattern extends AbstractPattern {
         Schematic schematic = new Schematic(clipboard);
         Transform newTransform = holder.getTransform();
         if (newTransform.isIdentity()) {
-            schematic.paste(extent, setPosition, false);
+            schematic.paste(extent, set, false);
         } else {
-            schematic.paste(extent, setPosition, false, newTransform);
+            schematic.paste(extent, set, false, newTransform);
         }
         return true;
     }

@@ -11,60 +11,14 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import javax.annotation.Nullable;
 
 public abstract class SimpleFilterBlock extends FilterBlock {
+    private final Extent extent;
+
     public SimpleFilterBlock(Extent extent) {
-        super(extent);
-    }
-
-    private int x, y, z, ordinal;
-    private CompoundTag nbt;
-
-    public void init(int x, int y, int z, int ordinal) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.ordinal = ordinal;
-    }
-
-    public void init(int x, int y, int z, int ordinal, CompoundTag nbt) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.ordinal = ordinal;
-        this.nbt = nbt;
+        this.extent = extent;
     }
 
     @Override
-    public int getOrdinal() {
-        return ordinal;
-    }
-
-    @Override
-    public BlockState getState() {
-        return BlockTypes.states[ordinal];
-    }
-
-    @Override
-    public BaseBlock getBaseBlock() {
-        return getState().toBaseBlock(nbt);
-    }
-
-    @Override
-    public CompoundTag getTag() {
-        return nbt;
-    }
-
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
-    }
-
-    @Override
-    public int getZ() {
-        return z;
+    public final Extent getExtent() {
+        return extent;
     }
 }

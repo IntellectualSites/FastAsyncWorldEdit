@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -10,7 +11,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.IOException;
 
 public class BiomePattern extends ExistingPattern {
-    private transient MutableBlockVector2 mutable = new MutableBlockVector2();
     private final BiomeType biome;
 
     public BiomePattern(Extent extent, BiomeType biome) {
@@ -24,8 +24,8 @@ public class BiomePattern extends ExistingPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 getPosition) throws WorldEditException {
-        return extent.setBiome(set.getBlockX(), set.getBlockY(), set.getBlockZ(), biome);
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        return set.setBiome(extent, biome);
     }
 
     public class BiomePatternException extends RuntimeException {
@@ -44,10 +44,5 @@ public class BiomePattern extends ExistingPattern {
         public Throwable fillInStackTrace() {
             return this;
         }
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        mutable = new MutableBlockVector2();
     }
 }

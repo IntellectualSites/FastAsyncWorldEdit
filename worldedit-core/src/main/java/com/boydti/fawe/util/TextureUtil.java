@@ -1,25 +1,18 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.SingleFilterBlock;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.pattern.PatternExtent;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-
-import com.sk89q.worldedit.util.command.binding.Text;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.world.registry.BundledBlockData;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
@@ -27,12 +20,23 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -61,14 +65,15 @@ public class TextureUtil implements TextureHolder {
 
     public static TextureUtil fromMask(Mask mask) throws FileNotFoundException {
         HashSet<BlockType> blocks = new HashSet<>();
-        BlockPattern pattern = new BlockPattern(BlockTypes.AIR.getDefaultState());
-        PatternExtent extent = new PatternExtent(pattern);
+
+        SingleFilterBlock extent = new SingleFilterBlock();
         new MaskTraverser(mask).reset(extent);
+
         TextureUtil tu = Fawe.get().getTextureUtil();
         for (int typeId : tu.getValidBlockIds()) {
             BlockType block = BlockTypes.get(typeId);
-            pattern.setBlock(block.getDefaultState());
-            if (mask.test(BlockVector3.ZERO)) {
+            extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
+            if (mask.test(extent)) {
                 blocks.add(block);
             }
         }

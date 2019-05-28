@@ -63,12 +63,12 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         if (!limit.MAX_CHECKS()) {
             WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
             return EditSession.nullBlock;
         } else {
-            return extent.getLazyBlock(x, y, z);
+            return extent.getBlock(x, y, z);
         }
     }
     
@@ -88,8 +88,8 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 location) {
-        return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    public BlockState getBlock(BlockVector3 location) {
+        return getBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override

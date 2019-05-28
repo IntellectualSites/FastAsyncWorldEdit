@@ -441,11 +441,6 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public com.sk89q.worldedit.world.block.BlockState getLazyBlock(BlockVector3 position) {
-        return getBlock(position);
-    }
-
-    @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {

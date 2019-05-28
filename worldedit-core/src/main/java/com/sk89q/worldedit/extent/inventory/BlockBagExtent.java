@@ -93,7 +93,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         if(blockBag != null) {
-            BlockStateHolder lazyBlock = getExtent().getLazyBlock(x, y, z);
+            BlockStateHolder lazyBlock = getExtent().getBlock(x, y, z);
             BlockType fromType = lazyBlock.getBlockType();
         	if(!block.getBlockType().equals(fromType)) {
 				BlockType type = block.getBlockType();

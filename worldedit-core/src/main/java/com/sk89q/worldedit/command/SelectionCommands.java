@@ -25,6 +25,7 @@ import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
 import com.boydti.fawe.object.regions.selector.PolyhedralRegionSelector;
+import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -702,7 +703,7 @@ public class SelectionCommands {
             // TODO multi clipboard distribution
             Clipboard clipboard = session.getClipboard().getClipboard();
             region = clipboard.getRegion();
-            editSession.setExtent(new AbstractDelegateExtent(clipboard));
+            new ExtentTraverser<AbstractDelegateExtent>(editSession).setNext(new AbstractDelegateExtent(clipboard));
         } else {
             region = session.getSelection(player.getWorld());
         }

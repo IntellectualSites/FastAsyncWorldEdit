@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -41,7 +42,7 @@ public class ExistingBlockMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return !getExtent().getBlock(vector).getBlockType().getMaterial().isAir();
+        return !vector.getBlock(getExtent()).getMaterial().isAir();
     }
 
     @Nullable

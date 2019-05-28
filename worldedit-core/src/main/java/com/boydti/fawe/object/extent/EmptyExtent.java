@@ -50,7 +50,7 @@ public class EmptyExtent implements Extent {
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
+    public BlockState getBlock(int x, int y, int z) {
         return EditSession.nullBlock;
     }
 

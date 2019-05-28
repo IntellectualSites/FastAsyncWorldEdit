@@ -43,12 +43,6 @@ public interface Pattern {
     BaseBlock apply(BlockVector3 position);
 
     default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return extent.setBlock(set, apply(get));
-    }
-
-//    void apply(FilterBlock block);
-
-    default void apply(FilterBlock block) {
-        apply((BlockVector3) block).apply(block);
+        return set.setFullBlock(extent, apply(get));
     }
 }

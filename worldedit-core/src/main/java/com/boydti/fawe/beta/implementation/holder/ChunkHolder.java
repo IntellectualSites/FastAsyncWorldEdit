@@ -47,7 +47,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     }
 
     @Override
-    public void filter(final Filter filter, ChunkFilterBlock block, @Nullable Region region, @Nullable final MutableBlockVector3 min, @Nullable final MutableBlockVector3 max) {
+    public void filterBlocks(final Filter filter, ChunkFilterBlock block, @Nullable Region region, @Nullable final MutableBlockVector3 min, @Nullable final MutableBlockVector3 max) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         try {

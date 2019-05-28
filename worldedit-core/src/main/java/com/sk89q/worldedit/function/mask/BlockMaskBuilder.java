@@ -30,6 +30,8 @@ public class BlockMaskBuilder {
     private static final Operator LESS_EQUAL = (a, b) -> a <= b;
     private static final Operator NOT = (a, b) -> a != b;
 
+    private final static long[] ALL = new long[0];
+
     private interface Operator {
         boolean test(int left, int right);
     }
@@ -222,7 +224,7 @@ public class BlockMaskBuilder {
         if (states == null) return false;
         List values = prop.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
-        return (states == BlockMask.ALL || FastBitSet.get(states, localI));
+        return (states == ALL || FastBitSet.get(states, localI));
     }
 
     private void suggest(String input, String property, Collection<BlockType> finalTypes) throws InputParseException {
@@ -239,6 +241,7 @@ public class BlockMaskBuilder {
     ///// end internal /////
 
     private long[][] bitSets;
+    private boolean[] ordinals;
 
     private boolean optimizedStates = true;
 
@@ -257,23 +260,24 @@ public class BlockMaskBuilder {
         this.bitSets = bitSets;
     }
 
-    public BlockMaskBuilder parse(String input) {
+    public BlockMaskBuilder addAll() {
+        for (int i = 0; i < bitSets.length; i++) {
+            bitSets[i] = ALL;
+        }
+        reset(true);
         return this;
     }
 
-    public BlockMaskBuilder addAll() {
-        for (int i = 0; i < bitSets.length; i++) {
-            bitSets[i] = BlockMask.ALL;
-        }
-        optimizedStates = true;
-        return this;
+    private void reset(boolean optimized) {
+        this.ordinals = null;
+        this.optimizedStates = optimized;
     }
 
     public BlockMaskBuilder clear() {
         for (int i = 0; i < bitSets.length; i++) {
             bitSets[i] = null;
         }
-        optimizedStates = true;
+        reset(true);
         return this;
     }
 
@@ -287,13 +291,13 @@ public class BlockMaskBuilder {
         int i = type.getInternalId();
         long[] states = bitSets[i];
         if (states != null) {
-            if (states == BlockMask.ALL) {
+            if (states == ALL) {
                 bitSets[i] = states = FastBitSet.create(type.getMaxStateId() + 1);
                 Arrays.fill(states, -1);
             }
             int stateId = state.getInternalPropertiesId();
             FastBitSet.clear(states, stateId);
-            optimizedStates = false;
+            reset(false);
         }
         return this;
     }
@@ -315,7 +319,7 @@ public class BlockMaskBuilder {
         if (states != null) {
             int stateId = state.getInternalPropertiesId();
             boolean set = true;
-            if (states == BlockMask.ALL) {
+            if (states == ALL) {
                 bitSets[i] = states = FastBitSet.create(type.getMaxStateId() + 1);
             } else {
                 set = FastBitSet.get(states, stateId);
@@ -325,7 +329,7 @@ public class BlockMaskBuilder {
                 FastBitSet.set(states, stateId);
             else
                 bitSets[i] = null;
-            optimizedStates = true;
+            reset(true);
         }
         return this;
     }
@@ -354,14 +358,14 @@ public class BlockMaskBuilder {
                 List values = prop.getValues();
                 for (int j = 0; j < values.size(); j++) {
                     int localI = j << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
-                    if (states == BlockMask.ALL || FastBitSet.get(states, localI)) {
+                    if (states == ALL || FastBitSet.get(states, localI)) {
                         if (!allowed.test(type, new AbstractMap.SimpleEntry(prop, values.get(j)))) {
-                            if (states == BlockMask.ALL) {
+                            if (states == ALL) {
                                 bitSets[i] = states = FastBitSet.create(type.getMaxStateId() + 1);
                                 FastBitSet.setAll(states);
                             }
                             FastBitSet.clear(states, localI);
-                            optimizedStates = false;
+                            reset(false);
                         }
                     }
                 }
@@ -371,7 +375,7 @@ public class BlockMaskBuilder {
     }
 
     public BlockMaskBuilder add(BlockType type) {
-        bitSets[type.getInternalId()] = BlockMask.ALL;
+        bitSets[type.getInternalId()] = ALL;
         return this;
     }
 
@@ -379,13 +383,13 @@ public class BlockMaskBuilder {
         BlockType type = state.getBlockType();
         int i = type.getInternalId();
         long[] states = bitSets[i];
-        if (states != BlockMask.ALL) {
+        if (states != ALL) {
             if (states == null) {
                 bitSets[i] = states = FastBitSet.create(type.getMaxStateId() + 1);
             }
             int stateId = state.getInternalPropertiesId();
             FastBitSet.set(states, stateId);
-            optimizedStates = false;
+            reset(false);
         }
         return this;
     }
@@ -414,7 +418,7 @@ public class BlockMaskBuilder {
         for (int i = 0; i < bitSets.length; i++) {
             BlockType type = BlockTypes.get(i);
             if (allow.test(type)) {
-                bitSets[i] = BlockMask.ALL;
+                bitSets[i] = ALL;
             }
         }
         return this;
@@ -423,7 +427,7 @@ public class BlockMaskBuilder {
     public BlockMaskBuilder addAll(Predicate<BlockType> typePredicate, BiPredicate<BlockType, Map.Entry<Property<?>, ?>> propPredicate) {
         for (int i = 0; i < bitSets.length; i++) {
             long[] states = bitSets[i];
-            if (states == BlockMask.ALL) continue;
+            if (states == ALL) continue;
             BlockType type = BlockTypes.get(i);
             if (!typePredicate.test(type)) {
                 continue;
@@ -438,7 +442,7 @@ public class BlockMaskBuilder {
                                 bitSets[i] = states = FastBitSet.create(type.getMaxStateId() + 1);
                             }
                             FastBitSet.set(states, localI);
-                            optimizedStates = false;
+                            reset(false);
                         }
                     }
                 }
@@ -450,7 +454,7 @@ public class BlockMaskBuilder {
     public BlockMaskBuilder add(BlockType type, Property property, int index) {
         AbstractProperty prop = (AbstractProperty) property;
         long[] states = bitSets[type.getInternalId()];
-        if (states == BlockMask.ALL) return this;
+        if (states == ALL) return this;
 
         List values = property.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
@@ -459,7 +463,7 @@ public class BlockMaskBuilder {
                 bitSets[type.getInternalId()] = states = FastBitSet.create(type.getMaxStateId() + 1);
             }
             set(type, states, property, index);
-            optimizedStates = false;
+            reset(false);
         }
         return this;
     }
@@ -470,13 +474,13 @@ public class BlockMaskBuilder {
         if (states == null) return this;
         List values = property.getValues();
         int localI = index << prop.getBitOffset() >> BlockTypes.BIT_OFFSET;
-        if (states == BlockMask.ALL || FastBitSet.get(states, localI)) {
-            if (states == BlockMask.ALL) {
+        if (states == ALL || FastBitSet.get(states, localI)) {
+            if (states == ALL) {
                 bitSets[type.getInternalId()] = states = FastBitSet.create(type.getMaxStateId() + 1);
                 FastBitSet.setAll(states);
             }
             clear(type, states, property, index);
-            optimizedStates = false;
+            reset(false);
         }
         return this;
     }
@@ -522,7 +526,7 @@ public class BlockMaskBuilder {
         if (!optimizedStates) {
             for (int i = 0; i < bitSets.length; i++) {
                 long[] bitSet = bitSets[i];
-                if (bitSet == null || bitSet == BlockMask.ALL) continue;
+                if (bitSet == null || bitSet == ALL) continue;
                 BlockType type = BlockTypes.get(i);
                 int maxStateId = type.getMaxStateId();
                 if (maxStateId == 0) {
@@ -530,7 +534,7 @@ public class BlockMaskBuilder {
                         bitSets[i] = null;
                         continue;
                     } else {
-                        bitSets[i] = BlockMask.ALL;
+                        bitSets[i] = ALL;
                         continue;
                     }
                 }
@@ -545,19 +549,38 @@ public class BlockMaskBuilder {
                     }
                 }
                 if (set == 0) bitSets[i] = null;
-                else if (clear == 0) bitSets[i] = BlockMask.ALL;
+                else if (clear == 0) bitSets[i] = ALL;
             }
-            optimizedStates = true;
+            reset(true);
         }
         return this;
     }
 
-    protected long[][] getBits() {
-        return this.bitSets;
+    private boolean[] getOrdinals() {
+        if (ordinals == null) {
+            ordinals = new boolean[BlockTypes.states.length];
+            for (int i = 0; i < BlockTypes.values.length; i++) {
+                long[] bitSet = bitSets[i];
+                if (bitSet == null) continue;
+                BlockType type = BlockTypes.values[i];
+                if (bitSet == ALL) {
+                    for (BlockState state : type.getAllStates()) {
+                        ordinals[state.getOrdinal()] = true;
+                    }
+                } else {
+                    for (BlockState state : type.getAllStates()) {
+                        if (FastBitSet.get(bitSet, state.getInternalPropertiesId())) {
+                            ordinals[state.getOrdinal()] = true;
+                        }
+                    }
+
+                }
+            }
+        }
+        return ordinals;
     }
 
     public BlockMask build(Extent extent) {
-        optimize();
-        return new BlockMask(extent, bitSets);
+        return new BlockMask(extent, getOrdinals());
     }
 }

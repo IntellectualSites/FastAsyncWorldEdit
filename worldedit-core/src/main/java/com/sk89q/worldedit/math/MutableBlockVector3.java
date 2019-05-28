@@ -1,13 +1,8 @@
 package com.sk89q.worldedit.math;
 
-public class MutableBlockVector3 extends BlockVector3 {
+import com.boydti.fawe.FaweCache;
 
-    private static ThreadLocal<MutableBlockVector3> MUTABLE_CACHE = new ThreadLocal<MutableBlockVector3>() {
-        @Override
-        protected MutableBlockVector3 initialValue() {
-            return new MutableBlockVector3();
-        }
-    };
+public class MutableBlockVector3 extends BlockVector3 {
 
     public static MutableBlockVector3 at(double x, double y, double z) {
         return at((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
@@ -18,7 +13,7 @@ public class MutableBlockVector3 extends BlockVector3 {
     }
 
     public static MutableBlockVector3 get(int x, int y, int z) {
-        return MUTABLE_CACHE.get().setComponents(x, y, z);
+        return FaweCache.MUTABLE_BLOCKVECTOR3.get().setComponents(x, y, z);
     }
 
     public MutableBlockVector3() {}

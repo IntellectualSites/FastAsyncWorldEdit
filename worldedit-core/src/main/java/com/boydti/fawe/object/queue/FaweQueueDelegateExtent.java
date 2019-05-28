@@ -49,7 +49,7 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
 
     @Override
     public int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return getLazyBlock(x, y, z).getInternalId();
+        return getBlock(x, y, z).getInternalId();
     }
 
     @Override

@@ -22,8 +22,14 @@ package com.sk89q.worldedit.math;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ComparisonChain;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 
 /**
@@ -91,6 +97,42 @@ public abstract class BlockVector3 {
 
     public MutableBlockVector3 mutZ(int z) {
         return new MutableBlockVector3(getX(), getY(), z);
+    }
+
+    public BlockVector3 toImmutable() {
+        return BlockVector3.at(getX(), getY(), getZ());
+    }
+
+    /**
+     * Get the BlockVector3 to the north<br>
+     * Normal use you would use north(this),
+     * To avoid constructing a new Vector, pass e.g. north(some MutableBlockVector3)
+     * There is no gaurantee it will use this provided vector
+     * @param orDefault the vector to use as the result<br>
+     * @return BlockVector3
+     */
+    public BlockVector3 north(BlockVector3 orDefault) {
+        return orDefault.setComponents(getX(), getY(), getZ() - 1);
+    }
+
+    public BlockVector3 east(BlockVector3 orDefault) {
+        return orDefault.setComponents(getX() + 1, getY(), getZ());
+    }
+
+    public BlockVector3 south(BlockVector3 orDefault) {
+        return orDefault.setComponents(getX(), getY(), getZ() + 1);
+    }
+
+    public BlockVector3 west(BlockVector3 orDefault) {
+        return orDefault.setComponents(getX() - 1, getY(), getZ());
+    }
+
+    public BlockVector3 up(BlockVector3 orDefault) {
+        return orDefault.setComponents(getX(), getY() + 1, getZ());
+    }
+
+    public BlockVector3 down(BlockVector3 orDefault) {
+        return orDefault.setComponents(getX(), getY() - 1, getZ());
     }
 
     /**
@@ -575,6 +617,69 @@ public abstract class BlockVector3 {
                 Math.max(getZ(), v2.getZ())
         );
     }
+
+    /*
+    Methods for getting/setting blocks
+
+    Why are these methods here?
+        - Getting a block at a position requires various operations
+            (bounds checks, cache checks, ensuring loaded chunk, get ChunkSection, etc.)
+        - When iterating over a region, it will provide custom BlockVector3 positions
+        - These override the below set/get and avoid lookups (as the iterator shifts it to the chunk level)
+     */
+
+    public boolean setOrdinal(Extent orDefault, int ordinal) {
+        return orDefault.setBlock(this, BlockState.getFromOrdinal(ordinal));
+    }
+
+    public boolean setBlock(Extent orDefault, BlockState state) {
+        return orDefault.setBlock(this, state);
+    }
+
+    public boolean setFullBlock(Extent orDefault, BaseBlock block) {
+        return  orDefault.setBlock(this, block);
+    }
+
+    public boolean setBiome(Extent orDefault, BiomeType biome) {
+        return orDefault.setBiome(getX(), getY(), getZ(), biome);
+    }
+
+    public int getOrdinal(Extent orDefault) {
+        return getBlock(orDefault).getOrdinal();
+    }
+
+    public char getOrdinalChar(Extent orDefault) {
+        return (char) getOrdinal(orDefault);
+    }
+
+    public BlockState getBlock(Extent orDefault) {
+        return orDefault.getBlock(this);
+    }
+
+    public BaseBlock getFullBlock(Extent orDefault) {
+        return orDefault.getFullBlock(this);
+    }
+
+    public CompoundTag getNbtData(Extent orDefault) {
+        return orDefault.getFullBlock(getX(), getY(), getZ()).getNbtData();
+    }
+
+    public BlockState getOrdinalBelow(Extent orDefault) {
+        return orDefault.getBlock(getX(), getY() - 1, getZ());
+    }
+
+    public BlockState getStateAbove(Extent orDefault) {
+        return orDefault.getBlock(getX(), getY() + 1, getZ());
+    }
+
+    public BlockState getStateRelativeY(Extent orDefault, final int y) {
+        return orDefault.getBlock(getX(), getY() + y, getZ());
+    }
+
+
+    /*
+    Adapt
+     */
 
     /**
      * Creates a 2D vector by dropping the Y component from this vector.

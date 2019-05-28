@@ -1,8 +1,19 @@
 package com.sk89q.worldedit.math;
 
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
+
 import javax.annotation.Nullable;
 
 public class MutableVector3 extends Vector3 {
+
+    public static MutableVector3 get(int x, int y, int z) {
+        return FaweCache.MUTABLE_VECTOR3.get().setComponents(x, y, z);
+    }
+
+    public static MutableVector3 get(double x, double y, double z) {
+        return FaweCache.MUTABLE_VECTOR3.get().setComponents(x, y, z);
+    }
 
     public MutableVector3() {}
 

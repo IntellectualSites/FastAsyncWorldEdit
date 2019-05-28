@@ -57,7 +57,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
      *
      * @return the extent
      */
-    public final Extent getExtent() {
+    public Extent getExtent() {
         return extent;
     }
 

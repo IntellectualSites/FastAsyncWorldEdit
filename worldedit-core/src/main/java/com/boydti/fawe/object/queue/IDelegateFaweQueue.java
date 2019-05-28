@@ -61,8 +61,8 @@ public interface IDelegateFaweQueue extends FaweQueue {
     }
 
     @Override
-    default BlockState getLazyBlock(int x, int y, int z) {
-        return getQueue().getLazyBlock(x, y, z);
+    default BlockState getBlock(int x, int y, int z) {
+        return getQueue().getBlock(x, y, z);
     }
 
     @Override
@@ -451,11 +451,6 @@ public interface IDelegateFaweQueue extends FaweQueue {
     @Nullable
     default Entity createEntity(Location location, BaseEntity entity) {
         return getQueue().createEntity(location, entity);
-    }
-
-    @Override
-    default BlockState getLazyBlock(BlockVector3 position) {
-        return getQueue().getLazyBlock(position);
     }
 
     @Nullable

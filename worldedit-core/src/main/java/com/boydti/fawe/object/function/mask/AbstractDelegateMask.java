@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.function.mask;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Mask2D;

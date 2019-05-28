@@ -50,7 +50,7 @@ import java.util.stream.Stream;
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
-public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
+public final class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     private final int internalId;
     private final int ordinal;
     private final char ordinalChar;
@@ -216,12 +216,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return extent.setBlock(set, this);
-    }
-
-    @Override
-    public final void apply(FilterBlock block) {
-        block.setOrdinal(ordinal);
+        return set.setBlock(extent, this);
     }
 
     @Override
@@ -265,6 +260,24 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
         }
+    }
+
+    public <V> BlockState withProperties(final BlockState other) {
+        BlockType ot = other.getBlockType();
+        if (ot == blockType) {
+            return other;
+        }
+        if (ot.getProperties().isEmpty() || blockType.getProperties().isEmpty()) {
+            return this;
+        }
+        BlockState newState = this;
+        for (Property<?> prop: ot.getProperties()) {
+            PropertyKey key = prop.getKey();
+            if (blockType.hasProperty(key)) {
+                newState = newState.with(key, other.getState(key));
+            }
+        }
+        return this;
     }
 
     @Override

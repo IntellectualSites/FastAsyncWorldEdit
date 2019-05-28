@@ -6,7 +6,7 @@ import com.sk89q.worldedit.regions.Region;
 
 import javax.annotation.Nullable;
 
-public abstract class ChunkFilterBlock extends FilterBlock {
+public abstract class ChunkFilterBlock extends SimpleFilterBlock {
     public ChunkFilterBlock(Extent extent) {
         super(extent);
     }

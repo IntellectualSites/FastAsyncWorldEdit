@@ -2,13 +2,11 @@ package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.awt.image.BufferedImage;
-import java.util.concurrent.ThreadLocalRandom;
+import javax.annotation.Nullable;
 
 public class ArrayFilterBlock extends SimpleFilterBlock {
     private final char[] blocks;
@@ -42,7 +40,7 @@ public class ArrayFilterBlock extends SimpleFilterBlock {
     }
 
     @Override
-    public void setState(BlockState state) {
+    public void setBlock(BlockState state) {
         blocks[index] = state.getOrdinalChar();
     }
 
@@ -57,19 +55,22 @@ public class ArrayFilterBlock extends SimpleFilterBlock {
     }
 
     @Override
-    public BlockState getState() {
+    public BlockState getBlock() {
         return BlockTypes.states[ordinal];
     }
 
     @Override
-    public BaseBlock getBaseBlock() {
-        return getState().toBaseBlock();
+    public BaseBlock getFullBlock() {
+        return getBlock().toBaseBlock();
     }
 
     @Override
-    public CompoundTag getTag() {
+    public CompoundTag getNbtData() {
         return null;
     }
+
+    @Override
+    public void setNbtData(@Nullable CompoundTag nbtData) {}
 
     @Override
     public int getX() {

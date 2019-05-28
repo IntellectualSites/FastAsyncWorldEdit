@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -27,11 +28,11 @@ public class Linear2DBlockPattern extends AbstractPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         int index = (get.getBlockX() + get.getBlockZ()) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }
-        return patternsArray[index].apply(extent, set, get);
+        return patternsArray[index].apply(extent, get, set);
     }
 }

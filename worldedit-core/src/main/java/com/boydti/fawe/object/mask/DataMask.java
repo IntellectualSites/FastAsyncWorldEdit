@@ -19,9 +19,9 @@ public class DataMask extends AbstractExtentMask implements ResettableMask {
     public boolean test(BlockVector3 vector) {
         Extent extent = getExtent();
         if (data != -1) {
-            return extent.getLazyBlock(vector).getInternalPropertiesId() == data;
+            return extent.getBlock(vector).getInternalPropertiesId() == data;
         } else {
-            data = extent.getLazyBlock(vector).getInternalPropertiesId();
+            data = extent.getBlock(vector).getInternalPropertiesId();
             return true;
         }
     }

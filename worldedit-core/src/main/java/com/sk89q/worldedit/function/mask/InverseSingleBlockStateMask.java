@@ -9,42 +9,30 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Arrays;
 
-public class SingleBlockStateMask extends ABlockMask {
+public class InverseSingleBlockStateMask extends ABlockMask {
     private final char ordinal;
 
     public BlockStateHolder getBlockState() {
         return BlockState.getFromOrdinal(ordinal);
     }
 
-    public SingleBlockStateMask(Extent extent, BlockState state) {
+    public InverseSingleBlockStateMask(Extent extent, BlockState state) {
         super(extent);
         this.ordinal = state.getOrdinalChar();
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return ordinal == vector.getOrdinal(getExtent());
+        return ordinal != vector.getOrdinal(getExtent());
     }
 
     @Override
     public final boolean test(BlockState state) {
-        return state.getOrdinalChar() == ordinal;
+        return state.getOrdinalChar() != ordinal;
     }
 
     @Override
     public Mask inverse() {
-        return new InverseSingleBlockStateMask(getExtent(), BlockState.getFromOrdinal(ordinal));
-    }
-
-    @Override
-    public Mask and(Mask mask) {
-        if (mask instanceof ABlockMask) {
-            ABlockMask other = (ABlockMask) mask;
-            if (other.test(BlockState.getFromOrdinal(ordinal))) {
-                return this;
-            }
-            return Masks.alwaysFalse();
-        }
-        return null;
+        return new SingleBlockStateMask(getExtent(), BlockState.getFromOrdinal(ordinal));
     }
 }

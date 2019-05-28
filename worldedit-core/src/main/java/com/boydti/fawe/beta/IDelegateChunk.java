@@ -27,7 +27,7 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default void flood(Flood flood, FilterBlockMask mask, FilterBlock block) {
+    default void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
         getParent().flood(flood, mask, block);
     }
 
@@ -88,8 +88,8 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default void filter(Filter filter, FilterBlock block, @Nullable Region region, MutableBlockVector3 unitialized, MutableBlockVector3 unitialized2) {
-        getParent().filter(filter, block, region, unitialized, unitialized2);
+    default void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, MutableBlockVector3 unitialized, MutableBlockVector3 unitialized2) {
+        getParent().filterBlocks(filter, block, region, unitialized, unitialized2);
     }
 
     @Override

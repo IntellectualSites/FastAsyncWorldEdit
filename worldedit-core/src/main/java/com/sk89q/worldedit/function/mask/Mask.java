@@ -43,8 +43,6 @@ public interface Mask {
      */
     boolean test(BlockVector3 vector);
 
-//    boolean test(FilterBlock block);
-
     /**
      * Get the 2D version of this mask if one exists.
      *

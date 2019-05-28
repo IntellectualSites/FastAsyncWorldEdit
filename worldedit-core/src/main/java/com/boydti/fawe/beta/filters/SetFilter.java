@@ -13,6 +13,6 @@ public class SetFilter implements Filter {
 
     @Override
     public void applyBlock(final FilterBlock block) {
-        block.setState(state);
+        block.setBlock(state);
     }
 }

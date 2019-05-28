@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -13,20 +14,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private final Pattern pattern;
-    private int moves;
+    private final int moves;
 
-    private transient MutableBlockVector3 cur;
-    private transient MutableBlockVector3[] buffer;
-    private transient MutableBlockVector3[] allowed;
-    private transient MutableBlockVector3 next;
+    private final MutableBlockVector3 cur;
+    private final MutableBlockVector3[] buffer;
+    private final MutableBlockVector3[] allowed;
+    private MutableBlockVector3 next;
 
     public SurfaceRandomOffsetPattern(Pattern pattern, int distance) {
         this.pattern = pattern;
         this.moves = Math.min(255, distance);
-        init();
-    }
-
-    private void init() {
         cur = new MutableBlockVector3();
         this.buffer = new MutableBlockVector3[BreadthFirstSearch.DIAGONAL_DIRECTIONS.length];
         for (int i = 0; i < buffer.length; i++) {
@@ -109,10 +106,5 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private boolean canPassthrough(BlockVector3 v) {
         BlockStateHolder block = pattern.apply(v);
         return !block.getBlockType().getMaterial().isMovementBlocker();
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        init();
     }
 }

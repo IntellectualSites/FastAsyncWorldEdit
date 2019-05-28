@@ -112,8 +112,6 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
-    
-
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, final B block) throws WorldEditException {
@@ -121,12 +119,12 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 location) {
-        return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    public BlockState getBlock(BlockVector3 location) {
+        return getBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         int combinedId4Data = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combinedId4Data);
         BlockState state = type.withStateId(combinedId4Data);
@@ -155,11 +153,6 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     @Override
     public List<? extends Entity> getEntities(final Region region) {
         return world.getEntities(region);
-    }
-
-    @Override
-    public BlockState getBlock(final BlockVector3 position) {
-        return this.getLazyBlock(position);
     }
 
     @Override

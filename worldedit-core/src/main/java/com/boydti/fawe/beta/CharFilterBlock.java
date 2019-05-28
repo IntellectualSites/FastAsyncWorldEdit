@@ -2,6 +2,7 @@ package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -167,12 +168,17 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
+    public void setBiome(BiomeType biome) {
+        set.setBiome(x, y, z, biome);
+    }
+
+    @Override
     public void setOrdinal(final int ordinal) {
         delegate.set(this, (char) ordinal);
     }
 
     @Override
-    public void setState(final BlockState state) {
+    public void setBlock(final BlockState state) {
         delegate.set(this, state.getOrdinalChar());
     }
 
@@ -235,28 +241,81 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final BlockState getState() {
+    public final BlockState getBlock() {
         final int ordinal = getArr[index];
         return BlockTypes.states[ordinal];
     }
 
     @Override
-    public final BaseBlock getBaseBlock() {
-        final BlockState state = getState();
+    public final BaseBlock getFullBlock() {
+        final BlockState state = getBlock();
         final BlockMaterial material = state.getMaterial();
         if (material.hasContainer()) {
-            final CompoundTag tag = get.getTag(x, y + (layer << 4), z);
+            final CompoundTag tag = get.getTag(x, y + yy, z);
             return state.toBaseBlock(tag);
         }
         return state.toBaseBlock();
     }
 
     @Override
-    public final CompoundTag getTag() {
+    public final CompoundTag getNbtData() {
         return get.getTag(x, y + (layer << 4), z);
     }
 
-    public final BlockState getOrdinalBelow() {
+    @Override
+    public void setNbtData(CompoundTag tag) {
+        if (tag != null) {
+            set.setTile(x, y + yy, z, tag);
+        }
+    }
+
+    @Override
+    public boolean hasNbtData() {
+        final BlockState state = getBlock();
+        final BlockMaterial material = state.getMaterial();
+        return material.hasContainer();
+    }
+    /*
+    NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),
+    EAST(Vector3.at(1, 0, 0), Flag.CARDINAL, 0, 2),
+    SOUTH(Vector3.at(0, 0, 1), Flag.CARDINAL, 1, 3),
+    WEST(Vector3.at(-1, 0, 0), Flag.CARDINAL, 2, 0),
+     */
+
+    @Override
+    public final BlockState getBlockNorth() {
+        if (z > 0) {
+            return states[getArr[index - 16]];
+        }
+        return getExtent().getBlock(getX(),  getY(), getZ() - 1);
+    }
+
+    @Override
+    public final BlockState getBlockEast() {
+        if (x < 15) {
+            return states[getArr[index + 1]];
+        }
+        return getExtent().getBlock(getX() + 1,  getY(), getZ());
+    }
+
+    @Override
+    public final BlockState getBlockSouth() {
+        if (z < 15) {
+            return states[getArr[index + 16]];
+        }
+        return getExtent().getBlock(getX(),  getY(), getZ() + 1);
+    }
+
+    @Override
+    public final BlockState getBlockWest() {
+        if (x > 0) {
+            return states[getArr[index - 1]];
+        }
+        return getExtent().getBlock(getX() - 1,  getY(), getZ());
+    }
+
+    @Override
+    public final BlockState getBlockBelow() {
         if (y > 0) {
             return states[getArr[index - 256]];
         }
@@ -268,7 +327,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-    public final BlockState getStateAbove() {
+    @Override
+    public final BlockState getBlockAbove() {
         if (y < 16) {
             return states[getArr[index + 256]];
         }
@@ -280,7 +340,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-    public final BlockState getStateRelativeY(final int y) {
+    @Override
+    public final BlockState getBlockRelativeY(final int y) {
         final int newY = this.y + y;
         final int layerAdd = newY >> 4;
         switch (layerAdd) {
@@ -334,135 +395,34 @@ public class CharFilterBlock extends ChunkFilterBlock {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-    public final BlockState getStateRelative(final int x, final int y, final int z) {
-        final int newX = this.x + x;
-        final int newZ = this.z + z;
-        if (newX >> 4 == 0 && newZ >> 4 == 0) {
-            final int newY = this.y + y;
-            final int layerAdd = newY >> 4;
-            switch (layerAdd) {
-                case 0:
-                    return states[getArr[this.index + ((y << 8) + (z << 4) + x)]];
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15: {
-                    final int newLayer = layer + layerAdd;
-                    if (newLayer < 16) {
-                        final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
-                        return states[get.sections[newLayer].get(get, newLayer, index)];
-                    }
-                    break;
-                }
-                case -1:
-                case -2:
-                case -3:
-                case -4:
-                case -5:
-                case -6:
-                case -7:
-                case -8:
-                case -9:
-                case -10:
-                case -11:
-                case -12:
-                case -13:
-                case -14:
-                case -15: {
-                    final int newLayer = layer + layerAdd;
-                    if (newLayer >= 0) {
-                        final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
-                        return states[get.sections[newLayer].get(get, newLayer, index)];
-                    }
-                    break;
-                }
-            }
-            return BlockTypes.__RESERVED__.getDefaultState();
-        }
-        final int newY = this.y + y + yy;
-        if (newY >= 0 && newY <= 256) {
-            return getExtent().getBlock(xx + newX,  newY, this.zz + newZ);
-        }
-        return BlockTypes.__RESERVED__.getDefaultState();
+
+
+    @Override
+    public BlockVector3 north() {
+        return this.north;
     }
 
-    public final BaseBlock getFullBlockRelative(final int x, final int y, final int z) {
-        final int newX = this.x + x;
-        final int newZ = this.z + z;
-        if (newX >> 4 == 0 && newZ >> 4 == 0) {
-            final int newY = this.y + y;
-            final int layerAdd = newY >> 4;
-            BlockState state = BlockTypes.__RESERVED__.getDefaultState();
-            switch (layerAdd) {
-                case 0:
-                    state = states[getArr[this.index + ((y << 8) + (z << 4) + x)]];
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15: {
-                    final int newLayer = layer + layerAdd;
-                    if (newLayer < 16) {
-                        final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
-                        state = states[get.sections[newLayer].get(get, newLayer, index)];
-                    }
-                    break;
-                }
-                case -1:
-                case -2:
-                case -3:
-                case -4:
-                case -5:
-                case -6:
-                case -7:
-                case -8:
-                case -9:
-                case -10:
-                case -11:
-                case -12:
-                case -13:
-                case -14:
-                case -15: {
-                    final int newLayer = layer + layerAdd;
-                    if (newLayer >= 0) {
-                        final int index = ((newY & 15) << 8) + (newZ << 4) + newX;
-                        state = states[get.sections[newLayer].get(get, newLayer, index)];
-                    }
-                    break;
-                }
-            }
-            if (state.getMaterial().hasContainer()) {
-                final CompoundTag tag = get.getTag(x, y + (layer << 4), z);
-                return state.toBaseBlock(tag);
-            }
-        }
-        final int newY = this.y + y + yy;
-        if (newY >= 0 && newY <= 256) {
-            return getExtent().getFullBlock(xx + newX,  newY, this.zz + newZ);
-        }
-        return BlockTypes.__RESERVED__.getDefaultState().toBaseBlock();
+    @Override
+    public BlockVector3 east() {
+        return super.east();
+    }
+
+    @Override
+    public BlockVector3 south() {
+        return super.south();
+    }
+
+    @Override
+    public BlockVector3 west() {
+        return super.west();
+    }
+
+    /*
+                    Extent
+                     */
+    @Override
+    public char getOrdinalChar(Extent orDefault) {
+        return getOrdinalChar();
     }
 
     /*
@@ -484,7 +444,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         if ((x >> 4) == X && (z >> 4) == Z) {
-            return set.setBiome(x & 15, z & 15, biome);
+            return set.setBiome(x & 15, y, z & 15, biome);
         }
         return getExtent().setBiome(x, y, z, biome);
     }

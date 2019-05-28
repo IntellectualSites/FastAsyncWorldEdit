@@ -29,7 +29,7 @@ import java.util.Comparator;
 /**
  * An immutable 3-dimensional vector.
  */
-public class BlockVector3Imp extends BlockVector3 {
+public final class BlockVector3Imp extends BlockVector3 {
 
     public static final BlockVector3Imp ZERO   = new BlockVector3Imp(0, 0, 0);
     public static final BlockVector3Imp UNIT_X = new BlockVector3Imp(1, 0, 0);
@@ -78,6 +78,11 @@ public class BlockVector3Imp extends BlockVector3 {
     @Override
     public int hashCode() {
         return (getX() ^ (getZ() << 12)) ^ (getY() << 24);
+    }
+
+    @Override
+    public final BlockVector3 toImmutable() {
+        return this;
     }
 
     @Override

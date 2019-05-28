@@ -8,10 +8,10 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-public class SingleBlockTypeMask extends ABlockMask {
+public class InverseSingleBlockTypeMask extends ABlockMask {
     private final int internalId;
 
-    public SingleBlockTypeMask(Extent extent, BlockType type) {
+    public InverseSingleBlockTypeMask(Extent extent, BlockType type) {
         super(extent);
         this.internalId = type.getInternalId();
     }
@@ -23,12 +23,12 @@ public class SingleBlockTypeMask extends ABlockMask {
 
     @Override
     public final boolean test(BlockState state) {
-        return state.getBlockType().getInternalId() == internalId;
+        return state.getBlockType().getInternalId() != internalId;
     }
 
     @Override
     public Mask inverse() {
-        return new InverseSingleBlockTypeMask(getExtent(), BlockTypes.values[internalId]);
+        return new SingleBlockTypeMask(getExtent(), BlockTypes.values[internalId]);
     }
 
     public BlockType getBlockType() {

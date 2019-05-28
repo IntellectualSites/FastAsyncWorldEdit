@@ -2,10 +2,12 @@ package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.OutputExtent;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,7 +18,7 @@ import java.util.UUID;
  * Interface for setting blocks
  */
 public interface IChunkSet extends IBlocks, OutputExtent {
-    boolean setBiome(int x, int z, BiomeType biome);
+    boolean setBiome(int x, int y, int z, BiomeType biome);
 
     boolean setBlock(int x, int y, int z, BlockStateHolder holder);
 
@@ -42,4 +44,10 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     @Override
     void reset();
+
+    @Nullable
+    @Override
+    default Operation commit() {
+        return null;
+    }
 }

@@ -6,6 +6,8 @@ import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.*;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -33,6 +35,10 @@ public class FaweCache implements Trimable {
         BLOCK_STATES.clean();
         SECTION_BLOCKS.clean();
         PALETTE_CACHE.clean();
+        PALETTE_TO_BLOCK_CHAR.clean();
+
+        MUTABLE_VECTOR3.clean();
+        MUTABLE_BLOCKVECTOR3.clean();
         return false;
     }
 
@@ -188,6 +194,24 @@ public class FaweCache implements Trimable {
             throw e;
         }
     }
+
+    /*
+     * Vector cache
+     */
+
+    public static IterableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new IterableThreadLocal<MutableBlockVector3>() {
+        @Override
+        public MutableBlockVector3 init() {
+            return new MutableBlockVector3();
+        }
+    };
+
+    public static IterableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new IterableThreadLocal<MutableVector3>() {
+        @Override
+        public MutableVector3 init() {
+            return new MutableVector3();
+        }
+    };
 
     /*
     Conversion methods between JNBT tags and raw values

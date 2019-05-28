@@ -19,9 +19,9 @@ public class IdMask extends AbstractExtentMask implements ResettableMask {
     public boolean test(BlockVector3 vector) {
         Extent extent = getExtent();
         if (id != -1) {
-            return extent.getLazyBlock(vector).getInternalBlockTypeId() == id;
+            return extent.getBlock(vector).getInternalBlockTypeId() == id;
         } else {
-            id = extent.getLazyBlock(vector).getInternalBlockTypeId();
+            id = extent.getBlock(vector).getInternalBlockTypeId();
             return true;
         }
     }
