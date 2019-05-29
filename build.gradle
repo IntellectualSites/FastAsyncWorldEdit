@@ -108,6 +108,10 @@ subprojects {
         build.dependsOn(sourcesJar)
     }
 
+    dependencies {
+        compileOnly 'org.jetbrains:annotations:17.0.0'
+    }
+
     shadowJar {
         classifier 'dist'
         dependencies {
@@ -116,6 +120,7 @@ subprojects {
             include(dependency('com.sk89q.lib:jlibnoise:1.0.0'))
             include(dependency('com.github.luben:zstd-jni:1.1.1'))
             include(dependency('co.aikar:fastutil-lite:1.0'))
+            include(dependency('org.jetbrains:annotations:17.0.0'))
         }
         exclude 'GradleStart**'
         exclude '.cache'

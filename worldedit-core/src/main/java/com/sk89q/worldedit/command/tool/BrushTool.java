@@ -382,7 +382,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         switch (targetMode) {
             case TARGET_BLOCK_RANGE:
                 return offset(trace(editSession, player, getRange(), true), loc).toBlockPoint();
-            case FOWARD_POINT_PITCH: {
+            case FORWARD_POINT_PITCH: {
                 int d = 0;
                 float pitch = loc.getPitch();
                 pitch = 23 - (pitch / 4);

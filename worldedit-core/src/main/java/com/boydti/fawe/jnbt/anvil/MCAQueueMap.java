@@ -80,7 +80,7 @@ public class MCAQueueMap implements IFaweQueueMap {
     }
 
     @Override
-    public Collection<FaweChunk> getFaweCunks() {
+    public Collection<FaweChunk> getFaweChunks() {
         final List<FaweChunk> chunks = new ArrayList<>();
         for (Map.Entry<Long, MCAFile> entry : mcaFileMap.entrySet()) {
             MCAFile file = entry.getValue();
@@ -93,7 +93,7 @@ public class MCAQueueMap implements IFaweQueueMap {
 
     @Override
     public void forEachChunk(RunnableVal<FaweChunk> onEach) {
-        for (FaweChunk chunk : getFaweCunks()) {
+        for (FaweChunk chunk : getFaweChunks()) {
             onEach.run(chunk);
         }
     }

@@ -94,7 +94,7 @@ public final class SparseBitSet implements Cloneable, Serializable {
         bits (setting, flipping, clearing, etc.) do not attempt to normalize the
         set, in the interests of speed. However, when a set is scanned as the
         resultant set of some operation, then, in most cases, the set will be
-        normalized--the exception being level2 areas that are not completly scanned
+        normalized--the exception being level2 areas that are not completely scanned
         in a particular pass.
 
         The sizes of the blocks and areas has been the result of some investigation

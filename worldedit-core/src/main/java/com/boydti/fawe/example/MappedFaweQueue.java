@@ -102,7 +102,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
 
     @Override
     public Collection<FaweChunk> getFaweChunks() {
-        return map.getFaweCunks();
+        return map.getFaweChunks();
     }
 
     @Override

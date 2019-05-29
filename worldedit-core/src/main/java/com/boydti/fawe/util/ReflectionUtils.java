@@ -63,8 +63,8 @@ public class ReflectionUtils {
             T newValue = (T) makeEnum(enumType, // The target enum class
                     enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
                     values.size(),
-                    additionalTypes, // can be used to pass values to the enum constuctor
-                    additionalValues); // can be used to pass values to the enum constuctor
+                    additionalTypes, // can be used to pass values to the enum constructor
+                    additionalValues); // can be used to pass values to the enum constructor
 
             // 4. add new value
             values.add(newValue);
@@ -219,9 +219,9 @@ public class ReflectionUtils {
     }
 
     //Utils
-    public static Method makeMethod(final Class<?> clazz, final String methodName, final Class<?>... paramaters) {
+    public static Method makeMethod(final Class<?> clazz, final String methodName, final Class<?>... parameters) {
         try {
-            return clazz.getDeclaredMethod(methodName, paramaters);
+            return clazz.getDeclaredMethod(methodName, parameters);
         } catch (final NoSuchMethodException ex) {
             return null;
         } catch (final Exception ex) {
@@ -230,13 +230,13 @@ public class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T callMethod(final Method method, final Object instance, final Object... paramaters) {
+    public static <T> T callMethod(final Method method, final Object instance, final Object... parameters) {
         if (method == null) {
             throw new RuntimeException("No such method");
         }
         method.setAccessible(true);
         try {
-            return (T) method.invoke(instance, paramaters);
+            return (T) method.invoke(instance, parameters);
         } catch (final InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
         } catch (final Exception ex) {
@@ -245,9 +245,9 @@ public class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Constructor<T> makeConstructor(final Class<?> clazz, final Class<?>... paramaterTypes) {
+    public static <T> Constructor<T> makeConstructor(final Class<?> clazz, final Class<?>... parameterTypes) {
         try {
-            return (Constructor<T>) clazz.getConstructor(paramaterTypes);
+            return (Constructor<T>) clazz.getConstructor(parameterTypes);
         } catch (final NoSuchMethodException ex) {
             return null;
         } catch (final Exception ex) {

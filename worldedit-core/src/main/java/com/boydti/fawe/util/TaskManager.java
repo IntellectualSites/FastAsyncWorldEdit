@@ -4,6 +4,8 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ForkJoinPool;
@@ -21,34 +23,34 @@ public abstract class TaskManager {
     /**
      * Run a repeating task on the main thread
      *
-     * @param r
+     * @param runnable
      * @param interval in ticks
      * @return
      */
-    public abstract int repeat(final Runnable r, final int interval);
+    public abstract int repeat(@NotNull final Runnable runnable, final int interval);
 
     /**
      * Run a repeating task asynchronously
      *
-     * @param r
+     * @param runnable
      * @param interval in ticks
      * @return
      */
-    public abstract int repeatAsync(final Runnable r, final int interval);
+    public abstract int repeatAsync(@NotNull final Runnable runnable, final int interval);
 
     /**
      * Run a task asynchronously
      *
-     * @param r
+     * @param runnable
      */
-    public abstract void async(final Runnable r);
+    public abstract void async(@NotNull final Runnable runnable);
 
     /**
      * Run a task on the main thread
      *
-     * @param r
+     * @param runnable
      */
-    public abstract void task(final Runnable r);
+    public abstract void task(@NotNull final Runnable runnable);
 
     /**
      * Get the public ForkJoinPool<br>
@@ -149,14 +151,14 @@ public abstract class TaskManager {
      * Run a task on the current thread or asynchronously
      * - If it's already the main thread, it will jst call run()
      *
-     * @param r
+     * @param runnable
      * @param async
      */
-    public void taskNow(final Runnable r, boolean async) {
+    public void taskNow(@NotNull final Runnable runnable, boolean async) {
         if (async) {
-            async(r);
-        } else if (r != null) {
-            r.run();
+            async(runnable);
+        } else {
+            runnable.run();
         }
     }
 
@@ -164,40 +166,37 @@ public abstract class TaskManager {
      * Run a task as soon as possible on the main thread
      * - Non blocking if not calling from the main thread
      *
-     * @param r
+     * @param runnable
      */
-    public void taskNowMain(final Runnable r) {
-        if (r == null) {
-            return;
-        }
+    public void taskNowMain(@NotNull final Runnable runnable) {
         if (Fawe.isMainThread()) {
-            r.run();
+            runnable.run();
         } else {
-            task(r);
+            task(runnable);
         }
     }
 
     /**
      * Run a task as soon as possible not on the main thread
      *
-     * @param r
+     * @param runnable
      * @see com.boydti.fawe.Fawe#isMainThread()
      */
-    public void taskNowAsync(final Runnable r) {
-        taskNow(r, Fawe.isMainThread());
+    public void taskNowAsync(@NotNull final Runnable runnable) {
+        taskNow(runnable, Fawe.isMainThread());
     }
 
     /**
      * Run a task on the main thread at the next tick or now async
      *
-     * @param r
+     * @param runnable
      * @param async
      */
-    public void taskSoonMain(final Runnable r, boolean async) {
+    public void taskSoonMain(@NotNull final Runnable runnable, boolean async) {
         if (async) {
-            async(r);
+            async(runnable);
         } else {
-            task(r);
+            task(runnable);
         }
     }
 
@@ -205,18 +204,18 @@ public abstract class TaskManager {
     /**
      * Run a task later on the main thread
      *
-     * @param r
+     * @param runnable
      * @param delay in ticks
      */
-    public abstract void later(final Runnable r, final int delay);
+    public abstract void later(@NotNull final Runnable runnable, final int delay);
 
     /**
      * Run a task later asynchronously
      *
-     * @param r
+     * @param runnable
      * @param delay in ticks
      */
-    public abstract void laterAsync(final Runnable r, final int delay);
+    public abstract void laterAsync(@NotNull final Runnable runnable, final int delay);
 
     /**
      * Cancel a task
@@ -295,11 +294,11 @@ public abstract class TaskManager {
         }
     }
 
-    public <T> T syncWhenFree(final RunnableVal<T> function) {
+    public <T> T syncWhenFree(@NotNull final RunnableVal<T> function) {
         return syncWhenFree(function, Integer.MAX_VALUE);
     }
 
-    public void taskWhenFree(Runnable run) {
+    public void taskWhenFree(@NotNull Runnable run) {
         if (Fawe.isMainThread()) {
             run.run();
         } else {
@@ -317,7 +316,7 @@ public abstract class TaskManager {
      * @param <T>
      * @return
      */
-    public <T> T syncWhenFree(final RunnableVal<T> function, int timeout) {
+    public <T> T syncWhenFree(@NotNull final RunnableVal<T> function, int timeout) {
         if (Fawe.isMainThread()) {
             function.run();
             return function.value;
@@ -366,7 +365,7 @@ public abstract class TaskManager {
      * @param <T>
      * @return
      */
-    public <T> T sync(final RunnableVal<T> function, int timeout) {
+    public <T> T sync(@NotNull final RunnableVal<T> function, int timeout) {
         return sync((Supplier<T>) function, timeout);
     }
 
