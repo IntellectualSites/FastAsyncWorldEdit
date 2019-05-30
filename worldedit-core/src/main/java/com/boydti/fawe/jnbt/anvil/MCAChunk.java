@@ -108,8 +108,8 @@ public class MCAChunk extends FaweChunk<Void> {
             out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
             nbtOut.getOutputStream().writeByte(NBTConstants.TYPE_COMPOUND);
             int len = 0;
-            for (int layer = 0; layer < ids.length; layer++) {
-                if (ids[layer] != null) len++;
+            for (int[] id : ids) {
+                if (id != null) len++;
             }
             nbtOut.getOutputStream().writeInt(len);
             for (int layer = 0; layer < ids.length; layer++) {

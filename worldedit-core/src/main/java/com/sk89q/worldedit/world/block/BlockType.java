@@ -29,6 +29,7 @@ import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -45,7 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class BlockType implements FawePattern {
+public class BlockType implements FawePattern, Keyed {
 	private final String id;
     private final BlockTypes.Settings settings;
 
@@ -68,6 +69,7 @@ public class BlockType implements FawePattern {
      *
      * @return The id
      */
+    @Override
     public String getId() {
     	return this.id;
     }
@@ -188,10 +190,10 @@ public class BlockType implements FawePattern {
     }
 
     /**
-     * Slow
-     * @return collection of states
+     * Gets a list of all possible states for this BlockType.
+     *
+     * @return All possible states
      */
-    @Deprecated
     public List<BlockState> getAllStates() {
         if (settings.stateOrdinals == null) return Collections.singletonList(getDefaultState());
         return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypes.states[i]).collect(Collectors.toList());
@@ -239,7 +241,7 @@ public class BlockType implements FawePattern {
     public ItemType getItemType() {
         if(!initItemType) {
             initItemType = true;
-            itemType = ItemTypes.get(getId());
+            itemType = ItemTypes.get(this.id);
         }
         return itemType;
     }
@@ -278,7 +280,7 @@ public class BlockType implements FawePattern {
 
     @Override
     public int hashCode() {
-        return settings.internalId;
+        return this.id.hashCode();
     }
 
     @Override

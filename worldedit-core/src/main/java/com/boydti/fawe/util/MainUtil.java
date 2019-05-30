@@ -71,12 +71,7 @@ public class MainUtil {
         if (suggestions.getClass() != ArrayList.class) {
             suggestions = new ArrayList<>(suggestions);
         }
-        Iterator<String> iter = suggestions.iterator();
-        while (iter.hasNext()) {
-            if (!iter.next().startsWith(prefix)) {
-                iter.remove();
-            }
-        }
+        suggestions.removeIf(s -> !s.startsWith(prefix));
         return suggestions;
     }
 
@@ -917,11 +912,11 @@ public class MainUtil {
         if (directory.exists()) {
             File[] files = directory.listFiles();
             if (null != files) {
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].isDirectory()) {
-                        iterateFiles(files[i], task);
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        iterateFiles(file, task);
                     } else {
-                        task.accept(files[i]);
+                        task.accept(file);
                     }
                 }
             }

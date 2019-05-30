@@ -165,8 +165,7 @@ public abstract class MCAWriter {
                 pool.submit(() -> {
                     try {
                         int totalLength = 8192;
-                        for (int i = 0; i < compressed.length; i++) {
-                            byte[] compressedBytes = compressed[i];
+                        for (byte[] compressedBytes : compressed) {
                             if (compressedBytes != null) {
                                 int blocks = ((4095 + compressedBytes.length + 5) / 4096) * 4096;
                                 totalLength += blocks;

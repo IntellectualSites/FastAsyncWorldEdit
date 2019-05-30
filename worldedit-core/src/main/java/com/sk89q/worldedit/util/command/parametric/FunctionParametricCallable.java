@@ -44,8 +44,7 @@ public class FunctionParametricCallable extends AParametricCallable {
                 Object[] param = null; // name | type | optional value
                 boolean checkEq = false;
                 int checkEqI = 0;
-                for (int i = 0; i < arguments.size(); i++) {
-                    String arg = arguments.get(i);
+                for (String arg : arguments) {
                     if (arg.equals("=")) {
                         checkEqI++;
                         checkEq = true;
@@ -65,8 +64,7 @@ public class FunctionParametricCallable extends AParametricCallable {
                         if (checkEqI == 1) {
                             param[1] = unqualified.getOrDefault(arg, String.class);
                             checkEq = false;
-                        }
-                        else if (checkEqI == 2) {
+                        } else if (checkEqI == 2) {
                             char c = arg.charAt(0);
                             if (c == '\'' || c == '"') arg = arg.substring(1, arg.length() - 1);
                             param[2] = arg;

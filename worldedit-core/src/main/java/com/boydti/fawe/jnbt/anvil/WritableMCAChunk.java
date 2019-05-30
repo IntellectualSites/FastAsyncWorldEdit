@@ -112,8 +112,8 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                 out.writeNamedTag("Biomes", biomes);
             }
             int len = 0;
-            for (int layer = 0; layer < hasSections.length; layer++) {
-                if (hasSections[layer]) len++;
+            for (boolean hasSection : hasSections) {
+                if (hasSection) len++;
             }
             out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
             nbtOut.writeByte(NBTConstants.TYPE_COMPOUND);

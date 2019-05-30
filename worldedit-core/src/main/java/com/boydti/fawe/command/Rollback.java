@@ -4,18 +4,13 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweCommand;
-import com.boydti.fawe.object.FaweLocation;
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -137,8 +132,8 @@ public class Rollback extends FaweCommand {
         UUID user = null;
         int radius = Integer.MAX_VALUE;
         long time = Long.MAX_VALUE;
-        for (int i = 0; i < args.length; i++) {
-            String[] split = args[i].split(":");
+        for (String arg : args) {
+            String[] split = arg.split(":");
             if (split.length != 2) {
                 BBC.COMMAND_SYNTAX.send(player, "/frb <info|undo> u:<uuid> r:<radius> t:<time>");
                 return;

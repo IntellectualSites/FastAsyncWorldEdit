@@ -507,8 +507,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
         public int getSize() {
             int count = 0;
-            for (int i = 0; i < blocks.length; i++) {
-                count += blocks[i];
+            for (int block : blocks) {
+                count += block;
             }
             return count;
         }
