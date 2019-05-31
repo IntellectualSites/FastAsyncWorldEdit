@@ -40,13 +40,7 @@ public class Registry<V> implements Iterable<V> {
         this.name = name;
     }
 
-    public @Nullable V get(final CharSequence key) {
-        return this.map.get(key);
-    }
-
-    @Nullable
-    public V get(final String key) {
-        checkState(key.equals(key.toLowerCase(Locale.ROOT)), "key must be lowercase");
+    public @Nullable V get(final String key) {
         return this.map.get(key);
     }
 
