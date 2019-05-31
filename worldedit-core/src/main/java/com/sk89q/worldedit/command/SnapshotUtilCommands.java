@@ -56,7 +56,6 @@ public class SnapshotUtilCommands {
             aliases = { "restore", "/restore" },
             usage = "[snapshot]",
             desc = "Restore the selection from a snapshot",
-            min = 0,
             max = 1
     )
     @Logging(REGION)
@@ -112,23 +111,14 @@ public class SnapshotUtilCommands {
             }
         }
 
-        ChunkStore chunkStore = null;
 
         // Load chunk store
-        try {
-            chunkStore = snapshot.getChunkStore();
+        SnapshotRestore restore;
+        try (ChunkStore chunkStore = snapshot.getChunkStore()) {
             BBC.SNAPSHOT_LOADED.send(player, snapshot.getName());
-        } catch (DataException e) {
-            player.printError(BBC.getPrefix() + "Failed to load snapshot: " + e.getMessage());
-            return;
-        } catch (IOException e) {
-            player.printError(BBC.getPrefix() + "Failed to load snapshot: " + e.getMessage());
-            return;
-        }
 
-        try {
             // Restore snapshot
-            SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region);
+            restore = new SnapshotRestore(chunkStore, editSession, region);
             //player.print(restore.getChunksAffected() + " chunk(s) will be loaded.");
 
             restore.restore();
@@ -137,21 +127,18 @@ public class SnapshotUtilCommands {
                 String error = restore.getLastErrorMessage();
                 if (error != null) {
                     BBC.SNAPSHOT_ERROR_RESTORE.send(player);
-                    player.printError(BBC.getPrefix() + "Last error: " + error);
+                    player.printError("Last error: " + error);
                 } else {
                     BBC.SNAPSHOT_ERROR_RESTORE_CHUNKS.send(player);
                 }
             } else {
-                player.print(BBC.getPrefix() + String.format("Restored; %d "
+                player.print(String.format("Restored; %d "
                                 + "missing chunks and %d other errors.",
                         restore.getMissingChunks().size(),
                         restore.getErrorChunks().size()));
             }
-        } finally {
-            try {
-                chunkStore.close();
-            } catch (IOException ignored) {
-            }
+        } catch (DataException | IOException e) {
+            player.printError("Failed to load snapshot: " + e.getMessage());
         }
     }
 }

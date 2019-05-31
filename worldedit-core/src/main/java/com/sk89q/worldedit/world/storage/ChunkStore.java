@@ -114,6 +114,7 @@ public abstract class ChunkStore implements Closeable {
         return new OldChunk(world, tag);
     }
 
+    @Override
     public void close() throws IOException {
     }
 
