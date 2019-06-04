@@ -30,22 +30,18 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Requires that all mutating methods pass a given {@link Mask}.
  */
 public class MaskingExtent extends AbstractDelegateExtent {
 
     private Mask mask;
-//    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     /**
      * Create a new instance.
      *
      * @param extent the extent
-     * @param mask   the mask
+     * @param mask the mask
      */
     public MaskingExtent(Extent extent, Mask mask) {
         super(extent);

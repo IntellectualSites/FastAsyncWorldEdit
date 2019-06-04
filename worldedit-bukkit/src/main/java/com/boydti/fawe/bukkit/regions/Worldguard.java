@@ -26,14 +26,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class Worldguard extends BukkitMaskManager implements Listener {
-    WorldGuardPlugin worldguard;
+    private WorldGuardPlugin worldguard;
     FaweBukkit plugin;
 
     private WorldGuardPlugin getWorldGuard() {
         final Plugin plugin = Bukkit.getPluginManager().getPlugin("WorldGuard");
 
         // WorldGuard may not be loaded
-        if ((plugin == null) || !(plugin instanceof WorldGuardPlugin)) {
+        if (!(plugin instanceof WorldGuardPlugin)) {
             return null; // Maybe you want throw an exception instead
         }
 
@@ -46,13 +46,13 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         this.plugin = p3;
     }
 
-    public ProtectedRegion getRegion(final com.sk89q.worldguard.LocalPlayer player, final Location loc) {
+    public ProtectedRegion getRegion(final LocalPlayer player, final Location location) {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         if (container == null) {
             System.out.println("Region capability is not enabled for WorldGuard.");
             return null;
         }
-        RegionManager manager = container.get(FaweAPI.getWorld(loc.getWorld().getName()));
+        RegionManager manager = container.get(FaweAPI.getWorld(location.getWorld().getName()));
         if (manager == null) {
             System.out.println("Region capability is not enabled for that world.");
             return null;
@@ -61,7 +61,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         if (global != null && isAllowed(player, global)) {
             return global;
         }
-        final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(loc.getX(), loc.getY(), loc.getZ()));
+        final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(location.getX(), location.getY(), location.getZ()));
         for (final ProtectedRegion region : regions) {
             if (isAllowed(player, region)) {
                 return region;
@@ -71,7 +71,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     }
 
     public boolean isAllowed(LocalPlayer localplayer, ProtectedRegion region) {
-        if (region.isOwner(localplayer) || region.isOwner(localplayer.getName())) {
+        if (region.isOwner(localplayer) || region.isOwner(localplayer)) {
             return true;
         } else if (region.getId().toLowerCase().equals(localplayer.getName().toLowerCase())) {
             return true;
@@ -81,7 +81,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
             return true;
         }
         if (localplayer.hasPermission("fawe.worldguard.member")) {
-            if (region.isMember(localplayer) || region.isMember(localplayer.getName())) {
+            if (region.isMember(localplayer) || region.isMember(localplayer)) {
                 return true;
             } else if (region.isMember("*")) {
                 return true;
@@ -93,7 +93,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     @Override
     public FaweMask getMask(FawePlayer<Player> fp, MaskType type) {
         final Player player = fp.parent;
-        final com.sk89q.worldguard.LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
+        final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
         final Location location = player.getLocation();
         final ProtectedRegion myregion = this.getRegion(localplayer, location);
         if (myregion != null) {

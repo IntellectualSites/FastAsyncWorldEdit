@@ -442,7 +442,7 @@ public class Fawe {
     }
 
     public static boolean isMainThread() {
-        return INSTANCE != null ? INSTANCE.thread == Thread.currentThread() : true;
+        return INSTANCE == null || INSTANCE.thread == Thread.currentThread();
     }
 
     /**

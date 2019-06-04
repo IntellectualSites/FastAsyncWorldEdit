@@ -227,14 +227,14 @@ public class SchematicStreamer extends NBTStreamer {
                         if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
                             Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
                             if (forwardFacing == left) {
-                                BlockStateHolder rightBlock = fc.getBlock(x + right.getBlockX(), y + right.getBlockY(), z + right.getBlockZ());
+                                BlockStateHolder rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
                                 BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_left"));
                                 }
                                 return;
                             } else if (forwardFacing == right) {
-                                BlockStateHolder leftBlock = fc.getBlock(x + left.getBlockX(), y + left.getBlockY(), z + left.getBlockZ());
+                                BlockStateHolder leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
                                 BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
@@ -248,14 +248,14 @@ public class SchematicStreamer extends NBTStreamer {
                         if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
                             Direction backwardsFacing = (Direction) backwardsBlock.getState(PropertyKey.FACING);
                             if (backwardsFacing == left) {
-                                BlockStateHolder rightBlock = fc.getBlock(x + right.getBlockX(), y + right.getBlockY(), z + right.getBlockZ());
+                                BlockStateHolder rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
                                 BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_left"));
                                 }
                                 return;
                             } else if (backwardsFacing == right) {
-                                BlockStateHolder leftBlock = fc.getBlock(x + left.getBlockX(), y + left.getBlockY(), z + left.getBlockZ());
+                                BlockStateHolder leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
                                 BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_right"));

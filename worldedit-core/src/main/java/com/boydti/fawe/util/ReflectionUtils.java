@@ -7,11 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import sun.reflect.ConstructorAccessor;
 import sun.reflect.FieldAccessor;
@@ -126,7 +122,7 @@ public class ReflectionUtils {
                                    Class<?>[] additionalTypes, Object[] additionalValues) throws Exception {
         Object[] parms = new Object[additionalValues.length + 2];
         parms[0] = value;
-        parms[1] = Integer.valueOf(ordinal);
+        parms[1] = ordinal;
         System.arraycopy(additionalValues, 0, parms, 2, additionalValues.length);
         return enumClass.cast(getConstructorAccessor(enumClass, additionalTypes).newInstance(parms));
     }
@@ -332,12 +328,12 @@ public class ReflectionUtils {
     }
 
     public static Method[] sortMethods(Method[] methods) {
-        Arrays.sort(methods, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+        Arrays.sort(methods, Comparator.comparing(Method::getName));
         return methods;
     }
 
     public static Field[] sortFields(Field[] fields) {
-        Arrays.sort(fields, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+        Arrays.sort(fields, Comparator.comparing(Field::getName));
         return fields;
     }
 

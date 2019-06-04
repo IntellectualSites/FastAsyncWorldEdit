@@ -222,7 +222,7 @@ public class BrushSettings {
     }
 
     public BrushSettings addPermissions(String... perms) {
-        for (String perm : perms) permissions.add(perm);
+        Collections.addAll(permissions, perms);
         return this;
     }
 

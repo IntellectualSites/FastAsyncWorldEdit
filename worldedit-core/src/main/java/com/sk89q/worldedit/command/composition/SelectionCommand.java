@@ -20,11 +20,7 @@
 package com.sk89q.worldedit.command.composition;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Joiner;
@@ -36,8 +32,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.Contextual;
@@ -53,13 +47,10 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.command.argument.CommandArgs;
 import com.sk89q.worldedit.util.command.composition.CommandExecutor;
 import com.sk89q.worldedit.util.command.composition.SimpleCommand;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.lang.reflect.Field;
 import java.util.List;
-
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

@@ -61,7 +61,7 @@ public class ItemUtil {
                 Int2ObjectOpenHashMap<WeakReference<Tag>> map = hashToNMSTag.get();
                 if (map == null) {
                     map = new Int2ObjectOpenHashMap<>();
-                    hashToNMSTag = new SoftReference(new Int2ObjectOpenHashMap<>(map));
+                    hashToNMSTag = new SoftReference<>(new Int2ObjectOpenHashMap<>(map));
                 }
                 WeakReference<Tag> nativeTagRef = map.get(nmsTag.hashCode());
                 if (nativeTagRef != null) {

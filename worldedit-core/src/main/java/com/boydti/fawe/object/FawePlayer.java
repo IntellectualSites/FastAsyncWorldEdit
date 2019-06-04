@@ -98,7 +98,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             FakePlayer fake = new FakePlayer(actor.getName(), actor.getUniqueId(), actor);
             return fake.toFawePlayer();
         }
-        if (obj != null && obj.getClass().getName().contains("CraftPlayer") && !Fawe.imp().getPlatform().equals("bukkit")) {
+        if (obj.getClass().getName().contains("CraftPlayer") && !Fawe.imp().getPlatform().equals("bukkit")) {
             try {
                 Method methodGetHandle = obj.getClass().getDeclaredMethod("getHandle");
                 obj = methodGetHandle.invoke(obj);
@@ -206,7 +206,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             if (region != null) {
             	BlockVector3 min = region.getMinimumPoint();
             	BlockVector3 max = region.getMaximumPoint();
-                long area = (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1));
+                long area = (max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1);
                 if (area > 2 << 18) {
                     setConfirmTask(task, context, command);
                     BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
@@ -220,7 +220,7 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     public synchronized boolean confirm() {
         Runnable confirm = deleteMeta("cmdConfirm");
-        if (!(confirm instanceof Runnable)) {
+        if (confirm == null) {
             return false;
         }
         queueAction(() -> {
@@ -341,7 +341,7 @@ public abstract class FawePlayer<T> extends Metadatable {
                     if (session.getClipboard() != null) {
                         return;
                     }
-                } catch (EmptyClipboardException e) {
+                } catch (EmptyClipboardException ignored) {
                 }
                 if (player != null) {
                     Clipboard clip = doc.toClipboard();

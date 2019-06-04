@@ -83,6 +83,9 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
     // ------------------------------------------------------------------------
 
     public Spigot_v1_13_R2() throws NoSuchFieldException, NoSuchMethodException {
+        // A simple test
+        CraftServer.class.cast(Bukkit.getServer());
+
         // The list of tags on an NBTTagList
         nbtListTagListField = NBTTagList.class.getDeclaredField("list");
         nbtListTagListField.setAccessible(true);
@@ -139,6 +142,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
     @Nullable
     private static String getEntityId(Entity entity) {
         MinecraftKey minecraftkey = EntityTypes.getName(entity.getBukkitEntity().getHandle().P());
+
         return minecraftkey == null ? null : minecraftkey.toString();
     }
 

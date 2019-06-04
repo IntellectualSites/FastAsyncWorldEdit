@@ -24,6 +24,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import sun.misc.Unsafe;
 
 import java.io.Closeable;
 import java.io.File;
@@ -209,7 +210,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                 MainUtil.handleError(e);
             }
             this.braf = new RandomAccessFile(file, "rw");
-            long volume = (long) width * (long) height * (long) length * 4l + (long) HEADER_SIZE;
+            long volume = (long) width * (long) height * (long) length * 4L + (long) HEADER_SIZE;
             braf.setLength(0);
             braf.setLength(volume);
             if (width * height * length != 0) {
@@ -243,7 +244,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             length = dimensions.getBlockZ();
             area = width * length;
             volume = width * length * height;
-            long size = width * height * length * 4l + HEADER_SIZE + (hasBiomes() ? area : 0);
+            long size = width * height * length * 4L + HEADER_SIZE + (hasBiomes() ? area : 0);
             if (braf.length() < size) {
                 close();
                 this.braf = new RandomAccessFile(file, "rw");
@@ -505,7 +506,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             mbb.putInt(index, combined);
             boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
             if (hasNbt) {
-                setTile(x, y, z, ((BaseBlock)block).getNbtData());
+                setTile(x, y, z, block.getNbtData());
             }
             return true;
         } catch (Exception e) {
@@ -520,13 +521,13 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             int combined = block.getInternalId();
             int index = (HEADER_SIZE) + (i << 2);
             mbb.putInt(index, combined);
-            boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+            boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
             if (hasNbt) {
                 int y = i / area;
                 int newI = (i - (y * area));
                 int z = newI / width;
                 int x = newI - z * width;
-                setTile(x, y, z, ((BaseBlock)block).getNbtData());
+                setTile(x, y, z, block.getNbtData());
             }
             return true;
         } catch (Exception e) {

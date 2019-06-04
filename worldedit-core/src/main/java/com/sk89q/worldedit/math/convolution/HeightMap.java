@@ -1,29 +1,44 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.math.convolution;
 
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.registry.state.PropertyGroup;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Iterator;
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import javax.annotation.Nullable;
 
 /**
  * Allows applications of Kernels onto the region's height map.
- * <p>
+ *
  * <p>Currently only used for smoothing (with a GaussianKernel)</p>.
  */
 public class HeightMap {
@@ -41,7 +56,7 @@ public class HeightMap {
      * Constructs the HeightMap
      *
      * @param session an edit session
-     * @param region  the region
+     * @param region the region
      */
     public HeightMap(EditSession session, Region region) {
         this(session, region, (Mask) null, false);
@@ -68,12 +83,12 @@ public class HeightMap {
         int minZ = region.getMinimumPoint().getBlockZ();
         int maxY = region.getMaximumPoint().getBlockY();
 
+        // Store current heightmap data
         data = new int[width * height];
         invalid = new boolean[data.length];
 
         if (layers) {
         	BlockVector3 min = region.getMinimumPoint();
-        	BlockVector3 max = region.getMaximumPoint();
             int bx = min.getBlockX();
             int bz = min.getBlockZ();
             Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
@@ -128,11 +143,12 @@ public class HeightMap {
     /**
      * Apply the filter 'iterations' amount times.
      *
-     * @param filter     the filter
+     * @param filter the filter
      * @param iterations the number of iterations
      * @return number of blocks affected
      * @throws MaxChangedBlocksException
      */
+
     public int applyFilter(HeightMapFilter filter, int iterations) throws MaxChangedBlocksException {
         checkNotNull(filter);
 
@@ -155,11 +171,11 @@ public class HeightMap {
         int originZ = minY.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();
-        BlockStateHolder fillerAir = EditSession.nullBlock;
+        BlockStateHolder fillerAir = BlockTypes.AIR.getDefaultState();
 
         int blocksChanged = 0;
 
-        BlockStateHolder tmpBlock = EditSession.nullBlock;
+        BlockStateHolder tmpBlock = BlockTypes.AIR.getDefaultState();
 
         // Apply heightmap
         int maxY4 = maxY << 4;
@@ -233,12 +249,11 @@ public class HeightMap {
         int originZ = minY.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();
-        BlockStateHolder fillerAir = EditSession.nullBlock;
+        BlockState fillerAir = BlockTypes.AIR.getDefaultState();
 
         int blocksChanged = 0;
 
-        BlockStateHolder tmpBlock = EditSession.nullBlock;
-
+        BlockState tmpBlock = BlockTypes.AIR.getDefaultState();
         // Apply heightmap
         int index = 0;
         for (int z = 0; z < height; ++z) {
@@ -248,20 +263,20 @@ public class HeightMap {
                 if (this.invalid != null && this.invalid[index]) continue;
                 int newHeight = Math.min(maxY, data[index]);
 
+                // Offset x,z to be 'real' coordinates
                 int xr = x + originX;
 
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight > curHeight) {
                     // Set the top block of the column to be the same type (this might go wrong with rounding)
-                    BlockStateHolder existing = session.getBlock(xr, curHeight, zr);
-
+                    BlockState existing = session.getBlock(BlockVector3.at(xr, curHeight, zr));
 
                     // Skip water/lava
-                    if (existing.getBlockType().getMaterial().isMovementBlocker()) {
+                    if (existing.getBlockType() != BlockTypes.WATER && existing.getBlockType() != BlockTypes.LAVA) {
                         int y0 = newHeight - 1;
                         for (int setY = y0, getY = curHeight - 1; setY >= curHeight; setY--, getY--) {
-                            BlockStateHolder get = session.getBlock(xr, getY, zr);
-                            if (get != EditSession.nullBlock) tmpBlock = get;
+                            BlockState get = session.getBlock(xr, getY, zr);
+                            if (get != BlockTypes.AIR.getDefaultState()) tmpBlock = get;
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
                         }
@@ -282,9 +297,10 @@ public class HeightMap {
                 }
             }
         }
+
+        // Drop trees to the floor -- TODO
+
         return blocksChanged;
     }
-
-
 
 }

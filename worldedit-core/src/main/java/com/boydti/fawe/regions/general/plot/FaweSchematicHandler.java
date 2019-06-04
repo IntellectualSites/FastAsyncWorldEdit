@@ -1,11 +1,8 @@
 package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
-import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.IOUtil;
@@ -22,15 +19,12 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompressedCompoundTag;
 import com.sk89q.jnbt.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -45,7 +39,6 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.zip.GZIPInputStream;
 
 public class FaweSchematicHandler extends SchematicHandler {
     @Override
@@ -62,25 +55,22 @@ public class FaweSchematicHandler extends SchematicHandler {
 
     @Override
     public void getCompoundTag(final String world, final Set<RegionWrapper> regions, final RunnableVal<CompoundTag> whenDone) {
-        TaskManager.IMP.async(new Runnable() {
-            @Override
-            public void run() {
-                Location[] corners = MainUtil.getCorners(world, regions);
-                Location pos1 = corners[0];
-                Location pos2 = corners[1];
-                final CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
-                final EditSession editSession = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+        TaskManager.IMP.async(() -> {
+            Location[] corners = MainUtil.getCorners(world, regions);
+            Location pos1 = corners[0];
+            Location pos2 = corners[1];
+            final CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
+            final EditSession editSession = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
 
-                final int mx = pos1.getX();
-                final int my = pos1.getY();
-                final int mz = pos1.getZ();
+            final int mx = pos1.getX();
+            final int my = pos1.getY();
+            final int mz = pos1.getZ();
 
-                ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region);
+            ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region);
 
-                Clipboard holder = new BlockArrayClipboard(region, clipboard);
-                CompressedSchematicTag tag = new CompressedSchematicTag(holder);
-                whenDone.run(tag);
-            }
+            Clipboard holder = new BlockArrayClipboard(region, clipboard);
+            CompressedSchematicTag tag = new CompressedSchematicTag(holder);
+            whenDone.run(tag);
         });
     }
 
@@ -109,7 +99,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             } else {
                 try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new PGZIPOutputStream(stream))) {
                     Map<String, com.sk89q.jnbt.Tag> map = tag.getValue();
-                    output.writeNamedTag("Schematic", map.containsKey("Schematic") ? map.get("Schematic") : tag);
+                    output.writeNamedTag("Schematic", map.getOrDefault("Schematic", tag));
                 }
             }
         } catch (FileNotFoundException e) {
@@ -136,7 +126,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                         com.sk89q.jnbt.CompoundTag weTag = (com.sk89q.jnbt.CompoundTag) FaweCache.asTag(tag);
                         try (NBTOutputStream nos = new NBTOutputStream(gzip)) {
                             Map<String, com.sk89q.jnbt.Tag> map = weTag.getValue();
-                            nos.writeNamedTag("Schematic", map.containsKey("Schematic") ? map.get("Schematic") : weTag);
+                            nos.writeNamedTag("Schematic", map.getOrDefault("Schematic", weTag));
                         }
                     }
                 } catch (IOException e) {

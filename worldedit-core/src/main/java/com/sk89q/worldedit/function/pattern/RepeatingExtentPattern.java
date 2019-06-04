@@ -95,4 +95,5 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
         int z = (Math.abs((p.getZ() + offset.getZ())) % size.getBlockZ()) + origin.getZ();
         return getExtent().getFullBlock(mutable.setComponents(x, y, z));
     }
+
 }

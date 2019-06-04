@@ -621,8 +621,8 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
 
     @Override
     public boolean supports(Capability capability) {
-        switch (capability) {
-            case CHANGE_TASKS: return false;
+        if (capability == Capability.CHANGE_TASKS) {
+            return false;
         }
         return super.supports(capability);
     }

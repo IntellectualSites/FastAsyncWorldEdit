@@ -293,15 +293,14 @@ public class GenerationCommands extends MethodCommands {
 
     @Command(
             aliases = {"pumpkins"},
-            usage = "[size=10] [density=0.02]",
+            usage = "[size=10]",
             desc = "Generate pumpkin patches",
-            min = 0,
             max = 2
     )
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
-    public void pumpkins(Player player, LocalSession session, EditSession editSession, @Optional("10") int apothem, @Optional("0.02") double density) throws WorldEditException, ParameterException {
-        int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
+    public void pumpkins(Player player, LocalSession session, EditSession editSession, @Optional("10") int apothem) throws WorldEditException, ParameterException {
+        int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem);
         BBC.COMMAND_PUMPKIN.send(player, affected);
     }
 

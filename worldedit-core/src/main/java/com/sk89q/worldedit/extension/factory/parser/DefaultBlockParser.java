@@ -192,7 +192,8 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, data);
                     }
                 }
-            } catch (NumberFormatException ignore) {}
+            } catch (NumberFormatException e) {
+            }
         }
 
         if (state == null) {
@@ -220,10 +221,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new InputParseException("Your selection is not complete.");
                 }
                 state = world.getBlock(primaryPosition);
-            } else if (typeString.equalsIgnoreCase("hand")) {
+            } else if ("hand".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's hand.
                 state = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
-            } else if (typeString.equalsIgnoreCase("offhand")) {
+            } else if ("offhand".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's off hand.
                 state = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
             } else if (typeString.matches("slot[0-9]+")) {
@@ -241,7 +242,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 BaseItem item = slottable.getItem(slot);
 
                 if (!item.getType().hasBlockType()) {
-                    throw new InputParseException(BBC.getPrefix() + "You're not holding a block!");
+                    throw new InputParseException("You're not holding a block!");
                 }
                 state = item.getType().getBlockType().getDefaultState();
                 nbt = item.getNbtData();
@@ -249,7 +250,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 BlockType type = BlockTypes.parse(typeString.toLowerCase());
                 if (type != null) state = type.getDefaultState();
                 if (state == null) {
-                    throw new NoMatchException(BBC.getPrefix() + "Does not match a valid block type: '" + input + "'");
+                    throw new NoMatchException("Does not match a valid block type: '" + input + "'");
                 }
             }
             if (nbt == null) nbt = state.getNbtData();
@@ -309,10 +310,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         break;
                     }
                 }
-                Platform capability = worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS);
-                if (!capability.isValidMobType(mobName)) {
+                if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
                     final String finalMobName = mobName.toLowerCase();
-                    throw new SuggestInputParseException(BBC.getPrefix() + "Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
+                    throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
                     .map(m -> m.getName().toLowerCase())
                     .filter(s -> s.startsWith(finalMobName))
                     .collect(Collectors.toList()));

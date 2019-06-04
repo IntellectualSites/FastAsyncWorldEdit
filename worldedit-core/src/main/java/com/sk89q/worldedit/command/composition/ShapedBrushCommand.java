@@ -82,7 +82,7 @@ public class ShapedBrushCommand extends SimpleCommand<Object> {
             WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter().convert(e);
         }
 
-        player.print(BBC.getPrefix() + "Set brush to " + factory);
+        player.print("Set brush to " + factory);
 
         return true;
     }

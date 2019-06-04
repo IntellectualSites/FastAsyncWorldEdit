@@ -26,7 +26,7 @@ public class ColorUtil {
                 : Float.parseFloat(color));
         switch (type) {
             case PARSE_ALPHA:
-                return (c < 0f) ? 0f : ((c > 1f) ? 1f : c);
+                return (c < 0f) ? 0f : (Math.min(c, 1f));
             case PARSE_PERCENT:
                 return (c <= 0f) ? 0f : ((c >= 100f) ? 1f : (c / 100f));
             case PARSE_COMPONENT:

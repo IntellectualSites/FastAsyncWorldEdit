@@ -88,8 +88,7 @@ public class PlotTrim {
                     return false;
                 }
             });
-            ArrayList<Plot> plots = new ArrayList<>();
-            plots.addAll(PlotSquared.get().getPlots(area));
+            ArrayList<Plot> plots = new ArrayList<>(PlotSquared.get().getPlots(area));
             if (ExpireManager.IMP != null) {
                 plots.removeAll(ExpireManager.IMP.getPendingExpired());
             }

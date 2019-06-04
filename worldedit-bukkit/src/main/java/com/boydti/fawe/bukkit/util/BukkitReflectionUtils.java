@@ -15,48 +15,32 @@ public class BukkitReflectionUtils {
      * prefix of minecraft classes
      */
     private static volatile String preClassM = null;
-    /**
-     * boolean value, TRUE if server uses forge or MCPC+
-     */
-    private static boolean forge = false;
 
     /**
      * check server version and class names
      */
     public static void init() {
-        if (Bukkit.getServer() != null) {
-            if (Bukkit.getVersion().contains("MCPC") || Bukkit.getVersion().contains("Forge")) {
-                forge = true;
-            }
-            final Server server = Bukkit.getServer();
-            final Class<?> bukkitServerClass = server.getClass();
-            String[] pas = bukkitServerClass.getName().split("\\.");
+        final Server server = Bukkit.getServer();
+        final Class<?> bukkitServerClass = server.getClass();
+        String[] pas = bukkitServerClass.getName().split("\\.");
+        if (pas.length == 5) {
+            final String verB = pas[3];
+            preClassB = "org.bukkit.craftbukkit." + verB;
+        }
+        try {
+            final Method getHandle = bukkitServerClass.getDeclaredMethod("getHandle");
+            final Object handle = getHandle.invoke(server);
+            final Class handleServerClass = handle.getClass();
+            pas = handleServerClass.getName().split("\\.");
             if (pas.length == 5) {
-                final String verB = pas[3];
-                preClassB = "org.bukkit.craftbukkit." + verB;
+                final String verM = pas[3];
+                preClassM = "net.minecraft.server." + verM;
             }
-            try {
-                final Method getHandle = bukkitServerClass.getDeclaredMethod("getHandle");
-                final Object handle = getHandle.invoke(server);
-                final Class handleServerClass = handle.getClass();
-                pas = handleServerClass.getName().split("\\.");
-                if (pas.length == 5) {
-                    final String verM = pas[3];
-                    preClassM = "net.minecraft.server." + verM;
-                }
-            } catch (final Exception ignored) {
-                MainUtil.handleError(ignored);
-            }
+        } catch (final Exception e) {
+            MainUtil.handleError(e);
         }
     }
 
-
-    /**
-     * @return true if server has forge classes
-     */
-    public static boolean isForge() {
-        return forge;
-    }
 
     /**
      * Get class for name. Replace {nms} to net.minecraft.server.V*. Replace {cb} to org.bukkit.craftbukkit.V*. Replace

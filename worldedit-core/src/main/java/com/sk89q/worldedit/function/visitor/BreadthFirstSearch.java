@@ -1,3 +1,22 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
@@ -7,25 +26,20 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.object.collection.BlockVectorSet;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Direction;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Queue;
-import java.util.Set;
 
 /**
  * Performs a breadth-first search starting from points added with
@@ -63,26 +77,26 @@ public abstract class BreadthFirstSearch implements Operation {
                 }
             }
         }
-        Collections.sort(list, new Comparator<BlockVector3>() {
-            @Override
-            public int compare(BlockVector3 o1, BlockVector3 o2) {
-                return (int) Math.signum(o1.lengthSq() - o2.lengthSq());
-            }
-        });
+        list.sort((o1, o2) -> (int) Math.signum(o1.lengthSq() - o2.lengthSq()));
         DIAGONAL_DIRECTIONS = list.toArray(new BlockVector3[list.size()]);
     }
 
     private final RegionFunction function;
-    private List<BlockVector3> directions = new ArrayList<>();
     private BlockVectorSet visited;
     private final MappedFaweQueue mFaweQueue;
     private BlockVectorSet queue;
     private int currentDepth = 0;
     private final int maxDepth;
+    private List<BlockVector3> directions = new ArrayList<>();
     private int affected = 0;
     private int maxBranch = Integer.MAX_VALUE;
 
-    public BreadthFirstSearch(final RegionFunction function) {
+    /**
+     * Create a new instance.
+     *
+     * @param function the function to apply to visited blocks
+     */
+    public BreadthFirstSearch(RegionFunction function) {
         this(function, Integer.MAX_VALUE);
     }
 
@@ -133,29 +147,44 @@ public abstract class BreadthFirstSearch implements Operation {
      * Add the directions along the axes as directions to visit.
      */
     protected void addAxes() {
-        directions.add(BlockVector3.at(0, -1, 0));
-        directions.add(BlockVector3.at(0, 1, 0));
-        directions.add(BlockVector3.at(-1, 0, 0));
-        directions.add(BlockVector3.at(1, 0, 0));
-        directions.add(BlockVector3.at(0, 0, -1));
-        directions.add(BlockVector3.at(0, 0, 1));
+        directions.add(BlockVector3.UNIT_MINUS_Y);
+        directions.add(BlockVector3.UNIT_Y);
+        directions.add(BlockVector3.UNIT_MINUS_X);
+        directions.add(BlockVector3.UNIT_X);
+        directions.add(BlockVector3.UNIT_MINUS_Z);
+        directions.add(BlockVector3.UNIT_Z);
     }
 
     /**
      * Add the diagonal directions as directions to visit.
      */
     protected void addDiagonal() {
-        directions.add(BlockVector3.at(1, 0, 1));
-        directions.add(BlockVector3.at(-1, 0, -1));
-        directions.add(BlockVector3.at(1, 0, -1));
-        directions.add(BlockVector3.at(-1, 0, 1));
+        directions.add(Direction.NORTHEAST.toBlockVector());
+        directions.add(Direction.SOUTHEAST.toBlockVector());
+        directions.add(Direction.SOUTHWEST.toBlockVector());
+        directions.add(Direction.NORTHWEST.toBlockVector());
     }
 
-    public void visit(final BlockVector3 pos) {
-        if (!isVisited(pos)) {
-            isVisitable(pos, pos); // Ignore this, just to initialize mask on this point
-            queue.add(pos);
-            visited.add(pos);
+    /**
+     * Add the given location to the list of locations to visit, provided
+     * that it has not been visited. The position passed to this method
+     * will still be visited even if it fails
+     * {@link #isVisitable(BlockVector3, BlockVector3)}.
+     *
+     * <p>This method should be used before the search begins, because if
+     * the position <em>does</em> fail the test, and the search has already
+     * visited it (because it is connected to another root point),
+     * the search will mark the position as "visited" and a call to this
+     * method will do nothing.</p>
+     *
+     * @param position the position
+     */
+
+    public void visit(BlockVector3 position) {
+        if (!isVisited(position)) {
+            isVisitable(position, position); // Ignore this, just to initialize mask on this point
+            queue.add(position);
+            visited.add(position);
         }
     }
 
@@ -217,9 +246,6 @@ public abstract class BreadthFirstSearch implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        MutableBlockVector3 mutable = new MutableBlockVector3();
-//        MutableBlockVector3 mutable2 = new MutableBlockVector3();
-        boolean shouldTrim = false;
         IntegerTrio[] dirs = getIntDirections();
         BlockVectorSet tempQueue = new BlockVectorSet();
         BlockVectorSet chunkLoadSet = new BlockVectorSet();
@@ -268,7 +294,6 @@ public abstract class BreadthFirstSearch implements Operation {
             if (currentDepth == maxDepth) {
                 break;
             }
-            int size = queue.size();
             BlockVectorSet tmp = queue;
             queue = tempQueue;
             tmp.clear();

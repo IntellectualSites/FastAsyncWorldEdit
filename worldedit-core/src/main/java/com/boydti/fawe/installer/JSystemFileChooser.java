@@ -41,7 +41,7 @@ public class JSystemFileChooser extends JFileChooser {
 
     private static FilePane findFilePane(Container parent){
         for(Component comp: parent.getComponents()){
-            if(FilePane.class.isInstance(comp)){
+            if(comp instanceof FilePane){
                 return (FilePane)comp;
             }
             if(comp instanceof Container){

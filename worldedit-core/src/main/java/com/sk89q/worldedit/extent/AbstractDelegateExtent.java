@@ -43,8 +43,12 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import java.util.List;
+
 import javax.annotation.Nullable;
 
+/**
+ * A base class for {@link Extent}s that merely passes extents onto another.
+ */
 public class AbstractDelegateExtent implements LightingExtent {
     private transient final Extent extent;
     protected MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
@@ -264,8 +268,7 @@ public class AbstractDelegateExtent implements LightingExtent {
     }
 
     @Override
-    public @Nullable
-    Operation commit() {
+    public @Nullable Operation commit() {
         Operation ours = commitBefore();
         Operation other = null;
         if (extent != this) other = extent.commit();

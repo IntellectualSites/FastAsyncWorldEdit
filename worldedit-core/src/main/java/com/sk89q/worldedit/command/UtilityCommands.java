@@ -53,14 +53,11 @@ import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
@@ -78,16 +75,12 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.command.binding.Range;
-import com.sk89q.worldedit.session.SessionOwner;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.CommandMapping;
 import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.PrimaryAliasComparator;
 import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
-import com.sk89q.worldedit.util.command.parametric.ParameterData;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.imageio.ImageIO;
@@ -96,7 +89,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.*;
@@ -104,9 +96,6 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-
-
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
 
 /**
  * Utility commands.
@@ -460,7 +449,7 @@ public class UtilityCommands extends MethodCommands {
         we.checkMaxRadius(size);
         final boolean onlyNormalDirt = !args.hasFlag('f');
 
-        final int affected = editSession.green(session.getPlacementPosition(player), size);
+        final int affected = editSession.green(session.getPlacementPosition(player), size, onlyNormalDirt);
         BBC.VISITOR_BLOCK.send(player, affected);
     }
 
@@ -997,13 +986,13 @@ public class UtilityCommands extends MethodCommands {
     }
 
     public static void help(CommandContext args, WorldEdit we, Actor actor) {
-        help(args, we, actor, "/", null);
+        help(args, we, actor, "/", we.getPlatformManager().getCommandManager().getDispatcher());
     }
 
     public static void help(CommandContext args, WorldEdit we, Actor actor, String prefix, CommandCallable callable) {
         final int perPage = actor instanceof Player ? 12 : 20; // More pages for console
 
-        HelpBuilder builder = new HelpBuilder(callable, args, prefix, perPage) {
+        HelpBuilder builder = new HelpBuilder(callable, args, perPage) {
             @Override
             public void displayFailure(String message) {
                 actor.printError(message);
@@ -1023,7 +1012,7 @@ public class UtilityCommands extends MethodCommands {
                     String s1 = Commands.getAlias(UtilityCommands.class, "/help") + " " + entry.getKey();
                     String s2 = entry.getValue().size() + "";
                     msg.text(BBC.HELP_ITEM_ALLOWED, "&a" + s1, s2);
-                    msg.tooltip(StringMan.join(entry.getValue().keySet(), ", ", cm -> cm.getPrimaryAlias()));
+                    msg.tooltip(StringMan.join(entry.getValue().keySet(), ", ", CommandMapping::getPrimaryAlias));
                     msg.command(s1);
                     msg.newline();
                 }

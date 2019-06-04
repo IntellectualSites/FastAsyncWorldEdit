@@ -12,27 +12,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import org.bukkit.Achievement;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.Statistic;
-import org.bukkit.Statistic.Type;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 
 import static com.boydti.fawe.bukkit.chat.TextualComponent.rawText;
@@ -272,162 +262,6 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
     }
 
     /**
-     * Set the behavior of the current editing component to display information about an achievement when the client hovers over the text.
-     * <p>Tooltips do not inherit display characteristics, such as color and styles, from the message component on which they are applied.</p>
-     *
-     * @param name The name of the achievement to display, excluding the "achievement." prefix.
-     * @return This builder instance.
-     */
-    public FancyMessage achievementTooltip(final String name) {
-        onHover("show_achievement", new JsonString("achievement." + name));
-        return this;
-    }
-
-    /**
-     * Set the behavior of the current editing component to display information about an achievement when the client hovers over the text.
-     * <p>Tooltips do not inherit display characteristics, such as color and styles, from the message component on which they are applied.</p>
-     *
-     * @param which The achievement to display.
-     * @return This builder instance.
-     */
-    public FancyMessage achievementTooltip(final Achievement which) {
-        try {
-            Object achievement = Reflection.getMethod(Reflection.getOBCClass("CraftStatistic"), "getNMSAchievement", Achievement.class).invoke(null, which);
-            return achievementTooltip((String) Reflection.getField(Reflection.getNMSClass("Achievement"), "name").get(achievement));
-        } catch (IllegalAccessException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Could not access method.", e);
-            return this;
-        } catch (IllegalArgumentException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Argument could not be passed.", e);
-            return this;
-        } catch (InvocationTargetException e) {
-            Bukkit.getLogger().log(Level.WARNING, "A error has occurred during invoking of method.", e);
-            return this;
-        }
-    }
-
-    /**
-     * Set the behavior of the current editing component to display information about a parameterless statistic when the client hovers over the text.
-     * <p>Tooltips do not inherit display characteristics, such as color and styles, from the message component on which they are applied.</p>
-     *
-     * @param which The statistic to display.
-     * @return This builder instance.
-     * @throws IllegalArgumentException If the statistic requires a parameter which was not supplied.
-     */
-    public FancyMessage statisticTooltip(final Statistic which) {
-        Type type = which.getType();
-        if (type != Type.UNTYPED) {
-            throw new IllegalArgumentException("That statistic requires an additional " + type + " parameter!");
-        }
-        try {
-            Object statistic = Reflection.getMethod(Reflection.getOBCClass("CraftStatistic"), "getNMSStatistic", Statistic.class).invoke(null, which);
-            return achievementTooltip((String) Reflection.getField(Reflection.getNMSClass("Statistic"), "name").get(statistic));
-        } catch (IllegalAccessException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Could not access method.", e);
-            return this;
-        } catch (IllegalArgumentException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Argument could not be passed.", e);
-            return this;
-        } catch (InvocationTargetException e) {
-            Bukkit.getLogger().log(Level.WARNING, "A error has occurred during invoking of method.", e);
-            return this;
-        }
-    }
-
-    /**
-     * Set the behavior of the current editing component to display information about a statistic parameter with a material when the client hovers over the text.
-     * <p>Tooltips do not inherit display characteristics, such as color and styles, from the message component on which they are applied.</p>
-     *
-     * @param which The statistic to display.
-     * @param item  The sole material parameter to the statistic.
-     * @return This builder instance.
-     * @throws IllegalArgumentException If the statistic requires a parameter which was not supplied, or was supplied a parameter that was not required.
-     */
-    public FancyMessage statisticTooltip(final Statistic which, Material item) {
-        Type type = which.getType();
-        if (type == Type.UNTYPED) {
-            throw new IllegalArgumentException("That statistic needs no additional parameter!");
-        }
-        if ((type == Type.BLOCK && item.isBlock()) || type == Type.ENTITY) {
-            throw new IllegalArgumentException("Wrong parameter type for that statistic - needs " + type + "!");
-        }
-        try {
-            Object statistic = Reflection.getMethod(Reflection.getOBCClass("CraftStatistic"), "getMaterialStatistic", Statistic.class, Material.class).invoke(null, which, item);
-            return achievementTooltip((String) Reflection.getField(Reflection.getNMSClass("Statistic"), "name").get(statistic));
-        } catch (IllegalAccessException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Could not access method.", e);
-            return this;
-        } catch (IllegalArgumentException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Argument could not be passed.", e);
-            return this;
-        } catch (InvocationTargetException e) {
-            Bukkit.getLogger().log(Level.WARNING, "A error has occurred during invoking of method.", e);
-            return this;
-        }
-    }
-
-    /**
-     * Set the behavior of the current editing component to display information about a statistic parameter with an entity type when the client hovers over the text.
-     * <p>Tooltips do not inherit display characteristics, such as color and styles, from the message component on which they are applied.</p>
-     *
-     * @param which  The statistic to display.
-     * @param entity The sole entity type parameter to the statistic.
-     * @return This builder instance.
-     * @throws IllegalArgumentException If the statistic requires a parameter which was not supplied, or was supplied a parameter that was not required.
-     */
-    public FancyMessage statisticTooltip(final Statistic which, EntityType entity) {
-        Type type = which.getType();
-        if (type == Type.UNTYPED) {
-            throw new IllegalArgumentException("That statistic needs no additional parameter!");
-        }
-        if (type != Type.ENTITY) {
-            throw new IllegalArgumentException("Wrong parameter type for that statistic - needs " + type + "!");
-        }
-        try {
-            Object statistic = Reflection.getMethod(Reflection.getOBCClass("CraftStatistic"), "getEntityStatistic", Statistic.class, EntityType.class).invoke(null, which, entity);
-            return achievementTooltip((String) Reflection.getField(Reflection.getNMSClass("Statistic"), "name").get(statistic));
-        } catch (IllegalAccessException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Could not access method.", e);
-            return this;
-        } catch (IllegalArgumentException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Argument could not be passed.", e);
-            return this;
-        } catch (InvocationTargetException e) {
-            Bukkit.getLogger().log(Level.WARNING, "A error has occurred during invoking of method.", e);
-            return this;
-        }
-    }
-
-    /**
-     * Set the behavior of the current editing component to display information about an item when the client hovers over the text.
-     * <p>Tooltips do not inherit display characteristics, such as color and styles, from the message component on which they are applied.</p>
-     *
-     * @param itemJSON A string representing the JSON-serialized NBT data tag of an {@link ItemStack}.
-     * @return This builder instance.
-     */
-    public FancyMessage itemTooltip(final String itemJSON) {
-        onHover("show_item", new JsonString(itemJSON)); // Seems a bit hacky, considering we have a JSON object as a parameter
-        return this;
-    }
-
-    /**
-     * Set the behavior of the current editing component to display information about an item when the client hovers over the text.
-     * <p>Tooltips do not inherit display characteristics, such as color and styles, from the message component on which they are applied.</p>
-     *
-     * @param itemStack The stack for which to display information.
-     * @return This builder instance.
-     */
-    public FancyMessage itemTooltip(final ItemStack itemStack) {
-        try {
-            Object nmsItem = Reflection.getMethod(Reflection.getOBCClass("inventory.CraftItemStack"), "asNMSCopy", ItemStack.class).invoke(null, itemStack);
-            return itemTooltip(Reflection.getMethod(Reflection.getNMSClass("ItemStack"), "save", Reflection.getNMSClass("NBTTagCompound")).invoke(nmsItem, Reflection.getNMSClass("NBTTagCompound").newInstance()).toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return this;
-        }
-    }
-
-    /**
      * Set the behavior of the current editing component to display raw text when the client hovers over the text.
      * <p>Tooltips do not inherit display characteristics, such as color and styles, from the message component on which they are applied.</p>
      *
@@ -579,9 +413,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @return This builder instance.
      */
     public FancyMessage translationReplacements(final FancyMessage... replacements) {
-        for (FancyMessage str : replacements) {
-            latest().translationReplacements.add(str);
-        }
+        Collections.addAll(latest().translationReplacements, replacements);
 
         dirty = true;
 
@@ -873,6 +705,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
     /**
      * <b>Internally called method. Not for API consumption.</b>
      */
+    @NotNull
     public Iterator<MessagePart> iterator() {
         return messageParts.iterator();
     }

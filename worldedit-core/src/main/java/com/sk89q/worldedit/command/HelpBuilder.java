@@ -9,22 +9,18 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.CommandManager;
 import com.sk89q.worldedit.util.command.*;
 import com.sk89q.worldedit.util.command.parametric.AParametricCallable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public abstract class HelpBuilder implements Runnable {
     private final CommandCallable callable;
     private final CommandContext args;
-    private final String prefix;
     private final int perPage;
 
-    public HelpBuilder(CommandCallable callable, CommandContext args, final String prefix, int perPage) {
-        if (callable == null) {
-            callable = WorldEdit.getInstance().getPlatformManager().getCommandManager().getDispatcher();
-        }
+    HelpBuilder(@NotNull CommandCallable callable, CommandContext args, int perPage) {
         this.callable = callable;
         this.args = args;
-        this.prefix = prefix;
         this.perPage = perPage;
     }
 
@@ -33,7 +29,6 @@ public abstract class HelpBuilder implements Runnable {
         try {
             CommandCallable callable = this.callable;
             int page = -1;
-            String category = null;
             int effectiveLength = args.argsLength();
 
             // Detect page from args
@@ -84,11 +79,7 @@ public abstract class HelpBuilder implements Runnable {
                         }
                         group = group.replace("/", "");
                         group = StringMan.toProperCase(group);
-                        Map<CommandMapping, String> queue = grouped.get(group);
-                        if (queue == null) {
-                            queue = new LinkedHashMap<>();
-                            grouped.put(group, queue);
-                        }
+                        Map<CommandMapping, String> queue = grouped.computeIfAbsent(group, k -> new LinkedHashMap<>());
                         if (c instanceof Dispatcher) {
                             for (CommandMapping m : ((Dispatcher) c).getCommands()) {
                                 queue.put(m, mapping.getPrimaryAlias() + " ");
@@ -190,28 +181,25 @@ public abstract class HelpBuilder implements Runnable {
                         return;
                     }
                 }
-//            else
-                {
-                    Collections.sort(aliases, new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
+                aliases.sort(new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
 
-                    // Calculate pagination
-                    int offset = perPage * Math.max(0, page);
-                    int pageTotal = (int) Math.ceil(aliases.size() / (double) perPage);
+                // Calculate pagination
+                int offset = perPage * Math.max(0, page);
+                int pageTotal = (int) Math.ceil(aliases.size() / (double) perPage);
 
-                    // Box
-                    if (offset >= aliases.size()) {
-                        displayFailure(String.format(BBC.getPrefix() + "There is no page %d (total number of pages is %d).", page + 1, pageTotal));
-                    } else {
-                        int end = Math.min(offset + perPage, aliases.size());
-                        List<CommandMapping> subAliases = aliases.subList(offset, end);
-                        List<String> subPrefixes = prefixes.subList(offset, end);
-                        Map<CommandMapping, String> commandMap = new LinkedHashMap<>();
-                        for (int i = 0; i < subAliases.size(); i++) {
-                            commandMap.put(subAliases.get(i), subPrefixes.get(i));
-                        }
-                        String visitedString = Joiner.on(" ").join(visited);
-                        displayCommands(commandMap, visitedString, page, pageTotal, effectiveLength);
+                // Box
+                if (offset >= aliases.size()) {
+                    displayFailure(String.format(BBC.getPrefix() + "There is no page %d (total number of pages is %d).", page + 1, pageTotal));
+                } else {
+                    int end = Math.min(offset + perPage, aliases.size());
+                    List<CommandMapping> subAliases = aliases.subList(offset, end);
+                    List<String> subPrefixes = prefixes.subList(offset, end);
+                    Map<CommandMapping, String> commandMap = new LinkedHashMap<>();
+                    for (int i = 0; i < subAliases.size(); i++) {
+                        commandMap.put(subAliases.get(i), subPrefixes.get(i));
                     }
+                    String visitedString = Joiner.on(" ").join(visited);
+                    displayCommands(commandMap, visitedString, page, pageTotal, effectiveLength);
                 }
             } else {
                 String cmd = (WorldEdit.getInstance().getConfiguration().noDoubleSlash ? "" : "/") + Joiner.on(" ").join(visited);

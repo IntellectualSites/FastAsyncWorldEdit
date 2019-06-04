@@ -2,8 +2,6 @@ package com.boydti.fawe.object.clipboard;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -14,12 +12,13 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 
 public class EmptyClipboard implements Clipboard {
 

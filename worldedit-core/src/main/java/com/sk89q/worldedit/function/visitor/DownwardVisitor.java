@@ -30,26 +30,23 @@ import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.Collection;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Visits adjacent points on the same X-Z plane as long as the points
  * pass the given mask, and then executes the provided region
  * function on the entire column.
- * <p>
+ *
  * <p>This is used by {@code //fill}.</p>
  */
 public class DownwardVisitor extends RecursiveVisitor {
 
-    private final int baseY;
+    private int baseY;
 
     /**
      * Create a new visitor.
      *
-     * @param mask     the mask
+     * @param mask the mask
      * @param function the function
-     * @param baseY    the base Y
+     * @param baseY the base Y
      */
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
         this(mask, function, baseY, Integer.MAX_VALUE, null);
@@ -58,15 +55,16 @@ public class DownwardVisitor extends RecursiveVisitor {
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, HasFaweQueue hasFaweQueue) {
         super(mask, function, depth, hasFaweQueue);
         checkNotNull(mask);
+
         this.baseY = baseY;
 
         Collection<BlockVector3> directions = getDirections();
         directions.clear();
-        directions.add(BlockVector3.at(1, 0, 0));
-        directions.add(BlockVector3.at(-1, 0, 0));
-        directions.add(BlockVector3.at(0, 0, 1));
-        directions.add(BlockVector3.at(0, 0, -1));
-        directions.add(BlockVector3.at(0, -1, 0));
+        directions.add(BlockVector3.UNIT_X);
+        directions.add(BlockVector3.UNIT_MINUS_X);
+        directions.add(BlockVector3.UNIT_Z);
+        directions.add(BlockVector3.UNIT_MINUS_Z);
+        directions.add(BlockVector3.UNIT_MINUS_Y);
     }
 
     @Override
@@ -74,6 +72,4 @@ public class DownwardVisitor extends RecursiveVisitor {
         int fromY = from.getBlockY();
         return (fromY == baseY || to.subtract(from).getBlockY() < 0) && super.isVisitable(from, to);
     }
-
-
 }

@@ -8,6 +8,7 @@ import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import javax.annotation.Nonnull;
@@ -27,18 +28,19 @@ public class FastChunkIterator implements Iterable<BlockVector2> {
     }
 
     public FastChunkIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable HasFaweQueue editSession) {
-        this(iter, (FaweQueue) (editSession != null ? editSession.getQueue() : null));
+        this(iter, editSession != null ? editSession.getQueue() : null);
     }
 
     public FastChunkIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable FaweQueue faweQueue) {
         this.iterable = iter;
-        this.queue = faweQueue != null && faweQueue instanceof MappedFaweQueue ? (MappedFaweQueue) faweQueue : null;
+        this.queue = faweQueue instanceof MappedFaweQueue ? (MappedFaweQueue) faweQueue : null;
     }
 
     public Iterable<? extends BlockVector2> getIterable() {
         return iterable;
     }
 
+    @NotNull
     @Override
     public Iterator<BlockVector2> iterator() {
         if (queue == null || Settings.IMP.QUEUE.PRELOAD_CHUNKS <= 1) {

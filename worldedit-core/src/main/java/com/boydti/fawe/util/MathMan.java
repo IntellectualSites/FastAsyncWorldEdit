@@ -81,11 +81,11 @@ public class MathMan {
     }
 
     public static int clamp(int check, int min, int max) {
-        return check > max ? max : (check < min ? min : check);
+        return check > max ? max : (Math.max(check, min));
     }
 
     public static float clamp(float check, float min, float max) {
-        return check > max ? max : (check < min ? min : check);
+        return check > max ? max : (Math.max(check, min));
     }
 
     public static double hypot(final double... pars) {
@@ -104,7 +104,7 @@ public class MathMan {
         return sum;
     }
 
-    public static final int wrap(int value, int min, int max) {
+    public static int wrap(int value, int min, int max) {
         if (max < min) {
             return value;
         }

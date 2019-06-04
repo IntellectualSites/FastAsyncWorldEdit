@@ -170,10 +170,8 @@ public final class CommandManager {
         builder.setAuthorizer(new ActorAuthorizer());
         builder.setDefaultCompleter(new UserCommandCompleter(platformManager));
         builder.addBinding(new WorldEditBinding(worldEdit));
-
         builder.addBinding(new PatternBinding(worldEdit), com.sk89q.worldedit.function.pattern.Pattern.class);
         builder.addBinding(new MaskBinding(worldEdit), com.sk89q.worldedit.function.mask.Mask.class);
-
         builder.addInvokeListener(new LegacyCommandsHandler());
         builder.addInvokeListener(new CommandLoggingHandler(worldEdit, commandLog));
 
@@ -371,7 +369,7 @@ public final class CommandManager {
         setupDispatcher();
     }
 
-    public void unregister() {
+    void unregister() {
         dynamicHandler.setHandler(null);
     }
 
@@ -401,8 +399,7 @@ public final class CommandManager {
 
     public void handleCommandOnCurrentThread(CommandEvent event) {
         Actor actor = platformManager.createProxyActor(event.getActor());
-        final String args = event.getArguments();
-        final String[] split = commandDetection(args.split(" "));
+        String[] split = commandDetection(event.getArguments().split(" "));
         // No command found!
         if (!dispatcher.contains(split[0])) {
             return;
@@ -410,7 +407,7 @@ public final class CommandManager {
         if (!actor.isPlayer()) {
             actor = FakePlayer.wrap(actor.getName(), actor.getUniqueId(), actor);
         }
-        final LocalSession session = worldEdit.getSessionManager().get(actor);
+        LocalSession session = worldEdit.getSessionManager().get(actor);
         Request.request().setSession(session);
         if (actor instanceof Entity) {
             Extent extent = ((Entity) actor).getExtent();
@@ -419,7 +416,8 @@ public final class CommandManager {
             }
         }
         LocalConfiguration config = worldEdit.getConfiguration();
-        final CommandLocals locals = new CommandLocals();
+
+        CommandLocals locals = new CommandLocals();
         final FawePlayer fp = FawePlayer.wrap(actor);
         if (fp == null) {
             throw new IllegalArgumentException("FAWE doesn't support: " + actor);
@@ -430,7 +428,7 @@ public final class CommandManager {
         if (actor instanceof Player) {
             Player player = (Player) actor;
             Player unwrapped = LocationMaskedPlayerWrapper.unwrap(player);
-            actor = new LocationMaskedPlayerWrapper((Player) unwrapped, player.getLocation(), true) {
+            actor = new LocationMaskedPlayerWrapper(unwrapped, player.getLocation(), true) {
                 @Override
                 public boolean hasPermission(String permission) {
                     if (!super.hasPermission(permission)) {
@@ -452,8 +450,7 @@ public final class CommandManager {
             };
         }
         locals.put(Actor.class, actor);
-        final Actor finalActor = actor;
-        locals.put("arguments", args);
+        locals.put("arguments", event.getArguments());
 
         ThrowableSupplier<Throwable> task =
             () -> dispatcher.call(Joiner.on(" ").join(split), locals, new String[0]);
@@ -527,7 +524,6 @@ public final class CommandManager {
             }
         } catch (Throwable e) {
             Exception faweException = FaweException.get(e);
-            String message = e.getMessage();
             if (faweException != null) {
                 BBC.WORLDEDIT_CANCEL_REASON.send(actor, faweException.getMessage());
             } else {
@@ -541,7 +537,7 @@ public final class CommandManager {
                 editSession.flushQueue();
                 worldEdit.flushBlockBag(locals.get(Actor.class), editSession);
                 session.remember(editSession);
-                final long time = System.currentTimeMillis() - start;
+                long time = System.currentTimeMillis() - start;
                 if (time > 1000) {
                     BBC.ACTION_COMPLETE.send(actor, (time / 1000d));
                 }

@@ -35,6 +35,9 @@ public class BlockVector3 {
     public static final BlockVector3 UNIT_X = new BlockVector3(1, 0, 0);
     public static final BlockVector3 UNIT_Y = new BlockVector3(0, 1, 0);
     public static final BlockVector3 UNIT_Z = new BlockVector3(0, 0, 1);
+    public static final BlockVector3 UNIT_MINUS_X = new BlockVector3(-1, 0, 0);
+    public static final BlockVector3 UNIT_MINUS_Y = new BlockVector3(0, -1, 0);
+    public static final BlockVector3 UNIT_MINUS_Z = new BlockVector3(0, 0, -1);
     public static final BlockVector3 ONE = new BlockVector3(1, 1, 1);
 
     public static BlockVector3 at(double x, double y, double z) {

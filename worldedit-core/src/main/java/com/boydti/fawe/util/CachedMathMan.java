@@ -77,7 +77,7 @@ public class CachedMathMan {
             add = 0.0f;
         }
 
-        float invDiv = 1.0f / (((x < y) ? y : x) * INV_ATAN2_DIM_MINUS_1);
+        float invDiv = 1.0f / ((Math.max(x, y)) * INV_ATAN2_DIM_MINUS_1);
 
         int xi = (int) (x * invDiv);
         int yi = (int) (y * invDiv);

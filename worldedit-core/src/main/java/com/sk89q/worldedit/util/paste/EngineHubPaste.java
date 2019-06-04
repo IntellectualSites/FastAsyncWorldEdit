@@ -39,7 +39,7 @@ public class EngineHubPaste implements Paster {
         return Pasters.getExecutor().submit(new PasteTask(content));
     }
 
-    private final class PasteTask implements Callable<URL> {
+    private static final class PasteTask implements Callable<URL> {
         private final String content;
 
         private PasteTask(String content) {
@@ -50,7 +50,7 @@ public class EngineHubPaste implements Paster {
         public URL call() throws IOException, InterruptedException {
             HttpRequest.Form form = HttpRequest.Form.create();
             form.add("content", content);
-            form.add("from", "worldguard");
+            form.add("from", "enginehub");
 
             URL url = HttpRequest.url("http://paste.enginehub.org/paste");
             String result = HttpRequest.post(url)

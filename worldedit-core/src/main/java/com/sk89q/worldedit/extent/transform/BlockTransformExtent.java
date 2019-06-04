@@ -1,3 +1,22 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.extent.transform;
 
 import com.boydti.fawe.object.extent.ResettableExtent;
@@ -32,6 +51,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.util.Direction.*;
 
 public class BlockTransformExtent extends ResettableExtent {
@@ -46,8 +66,14 @@ public class BlockTransformExtent extends ResettableExtent {
         this(parent, new AffineTransform());
     }
 
-    public BlockTransformExtent(Extent parent, Transform transform) {
-        super(parent);
+    /**
+     * Create a new instance.
+     *
+     * @param extent the extent
+     */
+    public BlockTransformExtent(Extent extent, Transform transform) {
+        super(extent);
+        checkNotNull(transform);
         this.transform = transform;
         this.transformInverse = this.transform.inverse();
         cache();
@@ -134,7 +160,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                     continue;
                                 default:
                                     System.out.println("Unknown direction " + value);
-                                    result.add(0l);
+                                    result.add(0L);
                             }
                         }
                         return adapt(result.toArray(new Long[0]));
@@ -174,7 +200,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                     break;
                                 default:
                                     System.out.println("Unknown direction " + value);
-                                    directions.add(0l);
+                                    directions.add(0L);
                             }
                         }
                         return adapt(directions.toArray(new Long[0]));
@@ -268,7 +294,7 @@ public class BlockTransformExtent extends ResettableExtent {
         }
     }
 
-    private static final BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundTag tag, Transform transform) {
+    private static BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundTag tag, Transform transform) {
         if (tag != null) {
             if (tag.containsKey("Rot")) {
                 int rot = tag.asInt("Rot");
@@ -321,7 +347,7 @@ public class BlockTransformExtent extends ResettableExtent {
             newMaskedId = tmp.getInternalId();
         }
 
-        for (AbstractProperty property : (Collection<AbstractProperty>) (Collection) type.getProperties()) {
+        for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
             if (isDirectional(property)) {
                 long[] directions = getDirections(property);
                 if (directions != null) {
@@ -358,7 +384,6 @@ public class BlockTransformExtent extends ResettableExtent {
         BLOCK_ROTATION_BITMASK = new int[BlockTypes.size()];
         BLOCK_TRANSFORM = new int[BlockTypes.size()][];
         BLOCK_TRANSFORM_INVERSE = new int[BlockTypes.size()][];
-        outer:
         for (int i = 0; i < BLOCK_TRANSFORM.length; i++) {
             BLOCK_TRANSFORM[i] = ALL;
             BLOCK_TRANSFORM_INVERSE[i] = ALL;
@@ -392,7 +417,7 @@ public class BlockTransformExtent extends ResettableExtent {
         cache();
     }
 
-    private final BlockState transform(BlockState state, int[][] transformArray, Transform transform) {
+    private BlockState transform(BlockState state, int[][] transformArray, Transform transform) {
         int typeId = state.getInternalBlockTypeId();
         int[] arr = transformArray[typeId];
         if (arr == ALL) {

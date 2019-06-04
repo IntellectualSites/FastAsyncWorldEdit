@@ -75,7 +75,7 @@ public abstract class FaweParser<T> extends InputParser<T> {
                     }
             }
         }
-        inputs.add(toParse.substring(last, toParse.length()));
+        inputs.add(toParse.substring(last));
         for (int i = 0; i < inputs.size(); i++) {
             String full = inputs.get(i);
             String command = full;

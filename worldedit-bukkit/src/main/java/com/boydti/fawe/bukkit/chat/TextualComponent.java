@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.chat;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -73,48 +72,6 @@ public abstract class TextualComponent implements Cloneable {
 
     private static void throwUnsupportedSnapshot() {
         throw new UnsupportedOperationException("This feature is only supported in snapshot releases.");
-    }
-
-    /**
-     * Create a textual component representing a scoreboard value.
-     * The client will see their own score for the specified objective as the text represented by this component.
-     * <p>
-     * <b>This method is currently guaranteed to throw an {@code UnsupportedOperationException} as it is only supported on snapshot clients.</b>
-     * </p>
-     *
-     * @param scoreboardObjective The name of the objective for which to display the score.
-     * @return The text component representing the specified scoreboard score (for the viewing player), or {@code null} if an error occurs during
-     * JSON serialization.
-     */
-    public static TextualComponent objectiveScore(String scoreboardObjective) {
-        return objectiveScore("*", scoreboardObjective);
-    }
-
-    /**
-     * Create a textual component representing a scoreboard value.
-     * The client will see the score of the specified player for the specified objective as the text represented by this component.
-     *
-     * <p><b>This method is currently guaranteed to throw an {@code UnsupportedOperationException}
-     * as it is only supported on snapshot clients.</b>
-     *
-     * @param playerName The name of the player whos score will be shown. If
-     *                   this string represents the single-character sequence
-     *                   "*", the viewing player's score will be displayed.
-     *                   Standard minecraft selectors (@a, @p, etc)
-     *                   are <em>not</em> supported.
-     * @param scoreboardObjective The name of the objective for
-     *                            which to display the score.
-     * @return The text component representing the specified scoreboard score
-     * for the specified player, or {@code null} if an error occurs during JSON serialization.
-     */
-    public static TextualComponent objectiveScore(String playerName, String scoreboardObjective) {
-        throwUnsupportedSnapshot(); // Remove this line when the feature is released to non-snapshot versions, in addition to updating ALL THE
-        // OVERLOADS documentation accordingly
-
-        return new ComplexTextTypeComponent("score", ImmutableMap.<String, String>builder()
-                .put("name", playerName)
-                .put("objective", scoreboardObjective)
-                .build());
     }
 
     /**
