@@ -33,7 +33,6 @@ public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
         Fawe.debug("Optimizing PlotSquared");
-//        PlotSquared.get().worldedit = null;
         setupBlockQueue();
         setupSchematicHandler();
         setupChunkManager();
@@ -43,15 +42,16 @@ public class PlotSquaredFeature extends FaweMaskManager {
         if (MainCommand.getInstance().getCommand("generatebiome") == null) {
             new PlotSetBiome();
         }
+// TODO: revisit this later on
+/*
         try {
-//            new MoveTo512();
             if (Settings.Enabled_Components.WORLDS) {
                 new ReplaceAll();
-//                new CFIRedirect();
             }
         } catch (Throwable e) {
             Fawe.debug("You need to update PlotSquared to access the CFI and REPLACEALL commands");
         }
+*/
     }
 
     public static String getName(UUID uuid) {
@@ -114,7 +114,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 }
             }
         }
-        if (regions == null || regions.size() == 0) {
+        if (regions.size() == 0) {
             return null;
         }
         PlotArea area = pp.getApplicablePlotArea();
