@@ -7,8 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Set_Brush
- *
  * @author Voxel
  */
 public class SetBrush extends PerformBrush {

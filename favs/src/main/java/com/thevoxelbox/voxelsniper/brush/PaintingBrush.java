@@ -6,8 +6,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 
 /**
  * Painting scrolling Brush.
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Painting_Picker_Brush
- *
  * @author Voxel
  */
 public class PaintingBrush extends Brush {

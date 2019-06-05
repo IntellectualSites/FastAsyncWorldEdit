@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Heat_Ray
- *
  * @author Gavjenks
  */
 public class HeatRayBrush extends Brush {

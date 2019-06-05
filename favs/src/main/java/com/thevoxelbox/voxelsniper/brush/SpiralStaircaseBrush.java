@@ -10,8 +10,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Spiral_Staircase_Brush
- *
  * @author giltwist
  */
 public class SpiralStaircaseBrush extends Brush {
@@ -540,7 +538,7 @@ public class SpiralStaircaseBrush extends Brush {
                 this.sopen = par[i];
                 v.sendMessage(ChatColor.BLUE + "Staircase opens: " + this.sopen);
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

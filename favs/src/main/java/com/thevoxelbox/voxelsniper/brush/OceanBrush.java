@@ -10,8 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_OCEANATOR_5000
- *
  * @author Voxel
  */
 public class OceanBrush extends Brush {

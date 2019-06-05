@@ -9,8 +9,6 @@ import org.bukkit.block.Block;
 import java.util.Random;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Splatter_Brushes
- *
  * @author Voxel
  */
 public class SplatterVoxelDiscBrush extends PerformBrush {
@@ -184,7 +182,7 @@ public class SplatterVoxelDiscBrush extends PerformBrush {
                     v.sendMessage(ChatColor.RED + "Recursions must be an integer 1-10!");
                 }
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

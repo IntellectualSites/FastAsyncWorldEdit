@@ -15,8 +15,6 @@ import java.util.Random;
 // Proposal: Use /v and /vr for leave and wood material // or two more parameters -- Monofraps
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#VoxelTrees_Brush
- *
  * @author Ghost8700 @ Voxel
  */
 public class GenerateTreeBrush extends Brush {
@@ -626,7 +624,7 @@ public class GenerateTreeBrush extends Brush {
                     this.nodeMin = 3;
                     v.sendMessage(ChatColor.GOLD + "Brush reset to default parameters.");
                 } else {
-                    v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                    v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
                 }
             } catch (final Exception exception) {
                 v.sendMessage(ChatColor.RED + "Invalid brush parameters! \"" + par[i] + "\" is not a valid statement. Please use the 'info' parameter to display parameter info.");

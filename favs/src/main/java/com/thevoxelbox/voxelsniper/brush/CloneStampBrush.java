@@ -6,8 +6,6 @@ import org.bukkit.ChatColor;
 
 /**
  * The CloneStamp class is used to create a collection of blocks in a cylinder shape according to the selection the player has set.
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Clone_and_CopyPasta_Brushes
- *
  * @author Voxel
  */
 public class CloneStampBrush extends StampBrush {

@@ -8,8 +8,6 @@ import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#CopyPasta_Brush
- *
  * @author giltwist
  */
 public class CopyPastaBrush extends Brush {

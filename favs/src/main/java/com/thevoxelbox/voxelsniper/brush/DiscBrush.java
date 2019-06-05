@@ -8,8 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Disc_Brush
- *
  * @author Voxel
  */
 public class DiscBrush extends PerformBrush {
@@ -76,7 +74,7 @@ public class DiscBrush extends PerformBrush {
                 this.trueCircle = 0;
                 v.sendMessage(ChatColor.AQUA + "True circle mode OFF.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

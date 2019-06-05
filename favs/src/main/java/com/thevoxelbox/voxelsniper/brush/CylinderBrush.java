@@ -104,7 +104,7 @@ public class CylinderBrush extends PerformBrush {
                 v.setcCen((int) Double.parseDouble(parameter.replace("c", "")));
                 v.sendMessage(ChatColor.AQUA + "Cylinder origin set to: " + v.getcCen());
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

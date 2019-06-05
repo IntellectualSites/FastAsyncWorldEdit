@@ -8,8 +8,6 @@ import org.bukkit.ChatColor;
 import java.util.Random;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Blob_Brush
- *
  * @author Giltwist
  */
 public class BlobBrush extends PerformBrush {
@@ -233,7 +231,7 @@ public class BlobBrush extends PerformBrush {
                     v.sendMessage(ChatColor.RED + "Growth percent must be an integer " + GROW_PERCENT_MIN + "-" + GROW_PERCENT_MAX + "!");
                 }
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

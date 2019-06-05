@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Dome_Brush
- *
  * @author Gavjenks
  * @author MikeMatrix
  */
