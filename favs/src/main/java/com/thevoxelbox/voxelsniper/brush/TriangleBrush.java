@@ -62,10 +62,10 @@ public class TriangleBrush extends PerformBrush {
     }
 
     private void triangleP(final SnipeData v) {
-        double lengthOne = 0;
-        double lengthTwo = 0;
-        double lengthThree = 0;
-        double heronBig = 0;
+        double lengthOne;
+        double lengthTwo;
+        double lengthThree;
+        double heronBig;
 
         // Calculate slope vectors
         for (int i = 0; i < 3; i++) {
@@ -85,7 +85,7 @@ public class TriangleBrush extends PerformBrush {
         lengthThree = Math.pow(Math.pow(this.vectorThree[0], 2) + Math.pow(this.vectorThree[1], 2) + Math.pow(this.vectorThree[2], 2), .5);
 
         // Bigger vector determines brush size
-        final int brushSize = (int) Math.ceil((lengthOne > lengthTwo) ? lengthOne : lengthTwo);
+        final int brushSize = (int) Math.ceil(Math.max(lengthOne, lengthTwo));
 
         // Calculate constant term
         final double planeConstant = this.normalVector[0] * this.coordsOne[0] + this.normalVector[1] * this.coordsOne[1] + this.normalVector[2] * this.coordsOne[2];

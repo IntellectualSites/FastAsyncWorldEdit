@@ -29,10 +29,8 @@ public class ScannerBrush extends Brush {
     private int clamp(final int value, final int min, final int max) {
         if (value < min) {
             return min;
-        } else if (value > max) {
-            return max;
         } else {
-            return value;
+            return Math.min(value, max);
         }
     }
 

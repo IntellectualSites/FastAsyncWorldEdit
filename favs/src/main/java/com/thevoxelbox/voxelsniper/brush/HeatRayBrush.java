@@ -84,7 +84,7 @@ public class HeatRayBrush extends Brush {
 
                     if (currentLocation.toVector().isInSphere(targetLocation, v.getBrushSize())) {
                         currentBlock = currentLocation.getBlock();
-                        if (currentBlock == null || currentBlock.getType() == Material.CHEST) {
+                        if (currentBlock.getType() == Material.CHEST) {
                             continue;
                         }
 
@@ -168,13 +168,13 @@ public class HeatRayBrush extends Brush {
                 v.sendMessage(ChatColor.AQUA + "/b hr freq[float] -- Frequency parameter for the noise generator.");
             }
             if (parameter.startsWith("oct")) {
-                this.octaves = Integer.valueOf(parameter.replace("oct", ""));
+                this.octaves = Integer.parseInt(parameter.replace("oct", ""));
                 v.getVoxelMessage().custom(ChatColor.GREEN + "Octaves: " + this.octaves);
             } else if (parameter.startsWith("amp")) {
-                this.amplitude = Double.valueOf(parameter.replace("amp", ""));
+                this.amplitude = Double.parseDouble(parameter.replace("amp", ""));
                 v.getVoxelMessage().custom(ChatColor.GREEN + "Amplitude: " + this.amplitude);
             } else if (parameter.startsWith("freq")) {
-                this.frequency = Double.valueOf(parameter.replace("freq", ""));
+                this.frequency = Double.parseDouble(parameter.replace("freq", ""));
                 v.getVoxelMessage().custom(ChatColor.GREEN + "Frequency: " + this.frequency);
             }
         }

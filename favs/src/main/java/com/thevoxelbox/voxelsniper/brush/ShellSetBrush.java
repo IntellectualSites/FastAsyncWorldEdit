@@ -37,18 +37,18 @@ public class ShellSetBrush extends Brush {
                 return true;
             }
 
-            final int lowX = (this.block.getX() <= bl.getX()) ? this.block.getX() : bl.getX();
-            final int lowY = (this.block.getY() <= bl.getY()) ? this.block.getY() : bl.getY();
-            final int lowZ = (this.block.getZ() <= bl.getZ()) ? this.block.getZ() : bl.getZ();
-            final int highX = (this.block.getX() >= bl.getX()) ? this.block.getX() : bl.getX();
-            final int highY = (this.block.getY() >= bl.getY()) ? this.block.getY() : bl.getY();
-            final int highZ = (this.block.getZ() >= bl.getZ()) ? this.block.getZ() : bl.getZ();
+            final int lowX = Math.min(this.block.getX(), bl.getX());
+            final int lowY = Math.min(this.block.getY(), bl.getY());
+            final int lowZ = Math.min(this.block.getZ(), bl.getZ());
+            final int highX = Math.max(this.block.getX(), bl.getX());
+            final int highY = Math.max(this.block.getY(), bl.getY());
+            final int highZ = Math.max(this.block.getZ(), bl.getZ());
 
-            if (Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY) > MAX_SIZE) {
+            int selectionSize = Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY);
+            if (selectionSize > MAX_SIZE) {
                 v.sendMessage(ChatColor.RED + "Selection size above hardcoded limit, please use a smaller selection.");
             } else {
-                final ArrayList<AsyncBlock> blocks = new ArrayList<>(
-                        ((Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY)) / 2));
+                final ArrayList<AsyncBlock> blocks = new ArrayList<>(selectionSize / 2);
                 for (int y = lowY; y <= highY; y++) {
                     for (int x = lowX; x <= highX; x++) {
                         for (int z = lowZ; z <= highZ; z++) {

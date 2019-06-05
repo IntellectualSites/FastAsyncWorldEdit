@@ -203,7 +203,7 @@ public class StencilBrush extends Brush {
         }
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings("UnstableApiUsage")
     private void stencilSave(final SnipeData v) {
 
         final File file = new File("plugins/VoxelSniper/stencils/" + this.filename + ".vstencil");
@@ -223,9 +223,9 @@ public class StencilBrush extends Brush {
             Files.createParentDirs(file);
             file.createNewFile();
             final FaweOutputStream out = new FaweOutputStream(new DataOutputStream(new PGZIPOutputStream(new BufferedOutputStream(new FileOutputStream(file)))));
-            int blockPositionX = (this.firstPoint[0] > this.secondPoint[0]) ? this.secondPoint[0] : this.firstPoint[0];
-            int blockPositionZ = (this.firstPoint[1] > this.secondPoint[1]) ? this.secondPoint[1] : this.firstPoint[1];
-            int blockPositionY = (this.firstPoint[2] > this.secondPoint[2]) ? this.secondPoint[2] : this.firstPoint[2];
+            int blockPositionX = Math.min(this.firstPoint[0], this.secondPoint[0]);
+            int blockPositionZ = Math.min(this.firstPoint[1], this.secondPoint[1]);
+            int blockPositionY = Math.min(this.firstPoint[2], this.secondPoint[2]);
             out.writeShort(this.x);
             out.writeShort(this.z);
             out.writeShort(this.y);

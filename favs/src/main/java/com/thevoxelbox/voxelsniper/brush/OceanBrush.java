@@ -39,10 +39,6 @@ public class OceanBrush extends Brush {
         return 0;
     }
 
-    /**
-     * @param v
-     * @param undo
-     */
     protected final void oceanator(final SnipeData v, final Undo undo) {
         final AsyncWorld world = this.getWorld();
 
@@ -55,7 +51,7 @@ public class OceanBrush extends Brush {
             for (int z = minZ; z <= maxZ; z++) {
                 final int currentHeight = getHeight(x, z);
                 final int wLevelDiff = currentHeight - (this.waterLevel - 1);
-                final int newSeaFloorLevel = ((this.waterLevel - wLevelDiff) >= LOW_CUT_LEVEL) ? this.waterLevel - wLevelDiff : LOW_CUT_LEVEL;
+                final int newSeaFloorLevel = Math.max((this.waterLevel - wLevelDiff), LOW_CUT_LEVEL);
 
                 final int highestY = this.getWorld().getHighestBlockYAt(x, z);
 

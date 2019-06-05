@@ -28,12 +28,12 @@ public class SetRedstoneRotateBrush extends Brush {
             return true;
         } else {
             this.undo = new Undo();
-            final int lowX = (this.block.getX() <= bl.getX()) ? this.block.getX() : bl.getX();
-            final int lowY = (this.block.getY() <= bl.getY()) ? this.block.getY() : bl.getY();
-            final int lowZ = (this.block.getZ() <= bl.getZ()) ? this.block.getZ() : bl.getZ();
-            final int highX = (this.block.getX() >= bl.getX()) ? this.block.getX() : bl.getX();
-            final int highY = (this.block.getY() >= bl.getY()) ? this.block.getY() : bl.getY();
-            final int highZ = (this.block.getZ() >= bl.getZ()) ? this.block.getZ() : bl.getZ();
+            final int lowX = Math.min(this.block.getX(), bl.getX());
+            final int lowY = Math.min(this.block.getY(), bl.getY());
+            final int lowZ = Math.min(this.block.getZ(), bl.getZ());
+            final int highX = Math.max(this.block.getX(), bl.getX());
+            final int highY = Math.max(this.block.getY(), bl.getY());
+            final int highZ = Math.max(this.block.getZ(), bl.getZ());
 
             for (int y = lowY; y <= highY; y++) {
                 for (int x = lowX; x <= highX; x++) {

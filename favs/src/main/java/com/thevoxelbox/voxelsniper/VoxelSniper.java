@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Bukkit extension point.
@@ -55,15 +56,10 @@ public class VoxelSniper extends JavaPlugin {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, String commandLabel, @NotNull String[] args) {
         if (sender instanceof Player) {
-            String[] arguments = args;
 
-            if (arguments == null) {
-                arguments = new String[0];
-            }
-
-            return voxelSniperListener.onCommand((Player) sender, arguments, command.getName());
+            return voxelSniperListener.onCommand((Player) sender, args, command.getName());
         }
 
         getLogger().info("Only players can execute VoxelSniper commands.");
@@ -90,7 +86,7 @@ public class VoxelSniper extends JavaPlugin {
                     Player player = (Player) fp.parent;
                     return onCommand(player, new Command("p") {
                         @Override
-                        public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+                        public boolean execute(@NotNull CommandSender sender, String commandLabel, @NotNull String[] args) {
                             return false;
                         }
                     }, null, args);
@@ -103,7 +99,7 @@ public class VoxelSniper extends JavaPlugin {
                     Player player = (Player) fp.parent;
                     return onCommand(player, new Command("d") {
                         @Override
-                        public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+                        public boolean execute(@NotNull CommandSender sender, String commandLabel, @NotNull String[] args) {
                             return false;
                         }
                     }, null, args);

@@ -32,12 +32,12 @@ public class SetBrush extends PerformBrush {
                 this.block = null;
                 return true;
             }
-            final int lowX = (this.block.getX() <= bl.getX()) ? this.block.getX() : bl.getX();
-            final int lowY = (this.block.getY() <= bl.getY()) ? this.block.getY() : bl.getY();
-            final int lowZ = (this.block.getZ() <= bl.getZ()) ? this.block.getZ() : bl.getZ();
-            final int highX = (this.block.getX() >= bl.getX()) ? this.block.getX() : bl.getX();
-            final int highY = (this.block.getY() >= bl.getY()) ? this.block.getY() : bl.getY();
-            final int highZ = (this.block.getZ() >= bl.getZ()) ? this.block.getZ() : bl.getZ();
+            final int lowX = Math.min(this.block.getX(), bl.getX());
+            final int lowY = Math.min(this.block.getY(), bl.getY());
+            final int lowZ = Math.min(this.block.getZ(), bl.getZ());
+            final int highX = Math.max(this.block.getX(), bl.getX());
+            final int highY = Math.max(this.block.getY(), bl.getY());
+            final int highZ = Math.max(this.block.getZ(), bl.getZ());
 
             if (Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY) > SELECTION_SIZE_MAX) {
                 v.sendMessage(ChatColor.RED + "Selection size above hardcoded limit, please use a smaller selection.");

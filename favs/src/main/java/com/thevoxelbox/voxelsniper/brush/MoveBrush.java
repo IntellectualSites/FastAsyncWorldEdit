@@ -151,13 +151,13 @@ public class MoveBrush extends Brush {
                 v.getVoxelMessage().custom(ChatColor.AQUA + "Z direction set to: " + this.moveDirections[2]);
             }
             if (par[i].toLowerCase().startsWith("x")) {
-                this.moveDirections[0] = Integer.valueOf(par[i].substring(1));
+                this.moveDirections[0] = Integer.parseInt(par[i].substring(1));
                 v.getVoxelMessage().custom(ChatColor.AQUA + "X direction set to: " + this.moveDirections[0]);
             } else if (par[i].toLowerCase().startsWith("y")) {
-                this.moveDirections[1] = Integer.valueOf(par[i].substring(1));
+                this.moveDirections[1] = Integer.parseInt(par[i].substring(1));
                 v.getVoxelMessage().custom(ChatColor.AQUA + "Y direction set to: " + this.moveDirections[1]);
             } else if (par[i].toLowerCase().startsWith("z")) {
-                this.moveDirections[2] = Integer.valueOf(par[i].substring(1));
+                this.moveDirections[2] = Integer.parseInt(par[i].substring(1));
                 v.getVoxelMessage().custom(ChatColor.AQUA + "Z direction set to: " + this.moveDirections[2]);
             }
         }
@@ -200,12 +200,12 @@ public class MoveBrush extends Brush {
         public boolean calculateRegion() throws Exception {
             if (this.location1 != null && this.location2 != null) {
                 if (this.location1.getWorld().equals(this.location2.getWorld())) {
-                    final int lowX = ((this.location1.getBlockX() <= this.location2.getBlockX()) ? this.location1.getBlockX() : this.location2.getBlockX());
-                    final int lowY = (this.location1.getBlockY() <= this.location2.getBlockY()) ? this.location1.getBlockY() : this.location2.getBlockY();
-                    final int lowZ = (this.location1.getBlockZ() <= this.location2.getBlockZ()) ? this.location1.getBlockZ() : this.location2.getBlockZ();
-                    final int highX = (this.location1.getBlockX() >= this.location2.getBlockX()) ? this.location1.getBlockX() : this.location2.getBlockX();
-                    final int highY = (this.location1.getBlockY() >= this.location2.getBlockY()) ? this.location1.getBlockY() : this.location2.getBlockY();
-                    final int highZ = (this.location1.getBlockZ() >= this.location2.getBlockZ()) ? this.location1.getBlockZ() : this.location2.getBlockZ();
+                    final int lowX = Math.min(this.location1.getBlockX(), this.location2.getBlockX());
+                    final int lowY = Math.min(this.location1.getBlockY(), this.location2.getBlockY());
+                    final int lowZ = Math.min(this.location1.getBlockZ(), this.location2.getBlockZ());
+                    final int highX = Math.max(this.location1.getBlockX(), this.location2.getBlockX());
+                    final int highY = Math.max(this.location1.getBlockY(), this.location2.getBlockY());
+                    final int highZ = Math.max(this.location1.getBlockZ(), this.location2.getBlockZ());
                     if (Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY) > Selection.MAX_BLOCK_COUNT) {
                         throw new Exception(ChatColor.RED + "Selection size above hardcoded limit, please use a smaller selection.");
                     }

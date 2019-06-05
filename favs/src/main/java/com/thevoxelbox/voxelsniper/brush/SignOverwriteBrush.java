@@ -8,6 +8,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * Overwrites signs. (Wiki:
@@ -240,7 +241,7 @@ public class SignOverwriteBrush extends Brush {
             return i;
         }
 
-        String newText = "";
+        StringBuilder newText = new StringBuilder();
 
         // go through the array until the next top level parameter is found
         for (i++; i < params.length; i++) {
@@ -250,16 +251,16 @@ public class SignOverwriteBrush extends Brush {
                 i--;
                 break;
             } else {
-                newText += currentParameter + " ";
+                newText.append(currentParameter).append(" ");
             }
         }
 
-        newText = ChatColor.translateAlternateColorCodes('&', newText);
+        newText = new StringBuilder(ChatColor.translateAlternateColorCodes('&', newText.toString()));
 
         // remove last space or return if the string is empty and the user just wanted to set the status
-        if (!newText.isEmpty() && newText.endsWith(" ")) {
-            newText = newText.substring(0, newText.length() - 1);
-        } else if (newText.isEmpty()) {
+        if ((newText.length() > 0) && newText.toString().endsWith(" ")) {
+            newText = new StringBuilder(newText.substring(0, newText.length() - 1));
+        } else if (newText.length() == 0) {
             if (statusSet) {
                 return i;
             }
@@ -269,10 +270,10 @@ public class SignOverwriteBrush extends Brush {
         // check the line length and cut the text if needed
         if (newText.length() > MAX_SIGN_LINE_LENGTH) {
             v.sendMessage(ChatColor.RED + "Warning: Text on line " + lineNumber + " exceeds the maximum line length of " + MAX_SIGN_LINE_LENGTH + " characters. Your text will be cut.");
-            newText = newText.substring(0, MAX_SIGN_LINE_LENGTH);
+            newText = new StringBuilder(newText.substring(0, MAX_SIGN_LINE_LENGTH));
         }
 
-        this.signTextLines[lineIndex] = newText;
+        this.signTextLines[lineIndex] = newText.toString();
         return i;
     }
 
@@ -298,16 +299,12 @@ public class SignOverwriteBrush extends Brush {
 
         try {
             store.createNewFile();
-            FileWriter outFile = new FileWriter(store);
-            BufferedWriter outStream = new BufferedWriter(outFile);
-
-            for (int i = 0; i < this.signTextLines.length; i++) {
-                outStream.write(this.signLinesEnabled[i] + "\n");
-                outStream.write(this.signTextLines[i] + "\n");
+            try (FileWriter outFile = new FileWriter(store); BufferedWriter outStream = new BufferedWriter(outFile)) {
+                for (int i = 0; i < this.signTextLines.length; i++) {
+                    outStream.write(this.signLinesEnabled[i] + "\n");
+                    outStream.write(this.signTextLines[i] + "\n");
+                }
             }
-
-            outStream.close();
-            outFile.close();
 
             v.sendMessage(ChatColor.BLUE + "File saved successfully.");
         } catch (IOException exception) {
@@ -330,17 +327,12 @@ public class SignOverwriteBrush extends Brush {
             return;
         }
 
-        try {
-            FileReader inFile = new FileReader(store);
-            BufferedReader inStream = new BufferedReader(inFile);
+        try (FileReader inFile = new FileReader(store); BufferedReader inStream = new BufferedReader(inFile)) {
 
-            for (int i = 0; i < this.signTextLines.length; i++) {
-                this.signLinesEnabled[i] = Boolean.valueOf(inStream.readLine());
-                this.signTextLines[i] = inStream.readLine();
-            }
-
-            inStream.close();
-            inFile.close();
+                for (int i = 0; i < this.signTextLines.length; i++) {
+                    this.signLinesEnabled[i] = Boolean.parseBoolean(inStream.readLine());
+                    this.signTextLines[i] = inStream.readLine();
+                }
 
             v.sendMessage(ChatColor.BLUE + "File loaded successfully.");
         } catch (IOException exception) {
@@ -353,18 +345,14 @@ public class SignOverwriteBrush extends Brush {
      * Clears the internal text buffer. (Sets it to empty strings)
      */
     private void clearBuffer() {
-        for (int i = 0; i < this.signTextLines.length; i++) {
-            this.signTextLines[i] = "";
-        }
+        Arrays.fill(this.signTextLines, "");
     }
 
     /**
      * Resets line enabled states to enabled.
      */
     private void resetStates() {
-        for (int i = 0; i < this.signLinesEnabled.length; i++) {
-            this.signLinesEnabled[i] = true;
-        }
+        Arrays.fill(this.signLinesEnabled, true);
     }
 
     @Override

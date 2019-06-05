@@ -15,21 +15,25 @@ public class BlockResetBrush extends Brush {
 
     static {
         BlockResetBrush.DENIED_UPDATES.add(Material.SIGN);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_SIGN_POST);
         BlockResetBrush.DENIED_UPDATES.add(Material.WALL_SIGN);
         BlockResetBrush.DENIED_UPDATES.add(Material.CHEST);
         BlockResetBrush.DENIED_UPDATES.add(Material.FURNACE);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_BURNING_FURNACE);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_REDSTONE_TORCH_OFF);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_REDSTONE_TORCH_ON);
+        BlockResetBrush.DENIED_UPDATES.add(Material.REDSTONE_TORCH);
+        BlockResetBrush.DENIED_UPDATES.add(Material.REDSTONE_WALL_TORCH);
         BlockResetBrush.DENIED_UPDATES.add(Material.REDSTONE_WIRE);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_DIODE_BLOCK_OFF);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_DIODE_BLOCK_ON);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_WOODEN_DOOR);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_WOOD_DOOR);
+        BlockResetBrush.DENIED_UPDATES.add(Material.OAK_DOOR);
+        BlockResetBrush.DENIED_UPDATES.add(Material.DARK_OAK_DOOR);
+        BlockResetBrush.DENIED_UPDATES.add(Material.BIRCH_DOOR);
+        BlockResetBrush.DENIED_UPDATES.add(Material.ACACIA_DOOR);
+        BlockResetBrush.DENIED_UPDATES.add(Material.SPRUCE_DOOR);
+        BlockResetBrush.DENIED_UPDATES.add(Material.JUNGLE_DOOR);
         BlockResetBrush.DENIED_UPDATES.add(Material.IRON_DOOR);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_IRON_DOOR_BLOCK);
-        BlockResetBrush.DENIED_UPDATES.add(Material.LEGACY_FENCE_GATE);
+        BlockResetBrush.DENIED_UPDATES.add(Material.DARK_OAK_FENCE_GATE);
+        BlockResetBrush.DENIED_UPDATES.add(Material.ACACIA_FENCE_GATE);
+        BlockResetBrush.DENIED_UPDATES.add(Material.BIRCH_FENCE_GATE);
+        BlockResetBrush.DENIED_UPDATES.add(Material.SPRUCE_FENCE_GATE);
+        BlockResetBrush.DENIED_UPDATES.add(Material.JUNGLE_FENCE_GATE);
+        BlockResetBrush.DENIED_UPDATES.add(Material.OAK_FENCE_GATE);
     }
 
     /**
@@ -39,7 +43,6 @@ public class BlockResetBrush extends Brush {
         this.setName("Block Reset Brush");
     }
 
-    @SuppressWarnings("deprecation")
     private void applyBrush(final SnipeData v) {
         for (int z = -v.getBrushSize(); z <= v.getBrushSize(); z++) {
             for (int x = -v.getBrushSize(); x <= v.getBrushSize(); x++) {
