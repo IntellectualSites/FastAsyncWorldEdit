@@ -6,7 +6,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 
-
 public class BlendDiscBrush extends BlendBrushBase {
     /**
      *

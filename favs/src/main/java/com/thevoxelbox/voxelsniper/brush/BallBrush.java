@@ -7,7 +7,7 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
 /**
- * A brush that creates a solid ball.*
+ * A brush that creates a solid ball.
  * @author Piotr
  */
 public class BallBrush extends PerformBrush {
