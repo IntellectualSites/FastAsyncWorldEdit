@@ -23,7 +23,6 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.exception.FaweException;
@@ -115,14 +114,14 @@ public class RegionCommands extends MethodCommands {
     @CommandPermissions("worldedit.light.fix")
     public void fixlighting(Player player) throws WorldEditException {
         FawePlayer fp = FawePlayer.wrap(player);
-        final FaweLocation loc = fp.getLocation();
+        final Location loc = player.getLocation();
         Region selection = fp.getSelection();
         if (selection == null) {
-            final int cx = loc.x >> 4;
-            final int cz = loc.z >> 4;
+            final int cx = loc.getBlockX() >> 4;
+            final int cz = loc.getBlockZ() >> 4;
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
-        int count = FaweAPI.fixLighting(loc.world, selection, FaweQueue.RelightMode.ALL);
+        int count = FaweAPI.fixLighting(player.getWorld(), selection,null, FaweQueue.RelightMode.ALL);
         BBC.LIGHTING_PROPOGATE_SELECTION.send(fp, count);
     }
 
@@ -135,9 +134,9 @@ public class RegionCommands extends MethodCommands {
     @CommandPermissions("worldedit.light.fix")
     public void getlighting(Player player) throws WorldEditException {
         FawePlayer fp = FawePlayer.wrap(player);
-        final FaweLocation loc = fp.getLocation();
+        final Location loc = player.getLocation();
         FaweQueue queue = fp.getFaweQueue(false);
-        fp.sendMessage(BBC.getPrefix() + "Light: " + queue.getEmmittedLight(loc.x, loc.y, loc.z) + " | " + queue.getSkyLight(loc.x, loc.y, loc.z));
+        fp.sendMessage(BBC.getPrefix() + "Light: " + queue.getEmmittedLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()) + " | " + queue.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 
     @Command(
@@ -149,14 +148,13 @@ public class RegionCommands extends MethodCommands {
     @CommandPermissions("worldedit.light.remove")
     public void removelighting(Player player) {
         FawePlayer fp = FawePlayer.wrap(player);
-        final FaweLocation loc = fp.getLocation();
         Region selection = fp.getSelection();
         if (selection == null) {
-            final int cx = loc.x >> 4;
-            final int cz = loc.z >> 4;
+            final int cx = player.getLocation().getBlockX() >> 4;
+            final int cz = player.getLocation().getBlockZ() >> 4;
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
-        int count = FaweAPI.fixLighting(loc.world, selection, FaweQueue.RelightMode.NONE);
+        int count = FaweAPI.fixLighting(player.getWorld(), selection, null, FaweQueue.RelightMode.NONE);
         BBC.UPDATED_LIGHTING_SELECTION.send(fp, count);
     }
 
@@ -188,12 +186,9 @@ public class RegionCommands extends MethodCommands {
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
         FawePlayer fp = FawePlayer.wrap(player);
-        final FaweLocation loc = fp.getLocation();
-        final int cx = loc.x >> 4;
-        final int cz = loc.z >> 4;
         final NMSMappedFaweQueue queue = (NMSMappedFaweQueue) fp.getFaweQueue(false);
         for (BlockVector3 pt : region) {
-            queue.setBlockLight((int) pt.getX(), (int) pt.getY(), (int) pt.getZ(), value);
+            queue.setBlockLight(pt.getX(), pt.getY(), pt.getZ(), value);
         }
         int count = 0;
         for (BlockVector2 chunk : region.getChunks()) {
@@ -212,12 +207,9 @@ public class RegionCommands extends MethodCommands {
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
         FawePlayer fp = FawePlayer.wrap(player);
-        final FaweLocation loc = fp.getLocation();
-        final int cx = loc.x >> 4;
-        final int cz = loc.z >> 4;
         final NMSMappedFaweQueue queue = (NMSMappedFaweQueue) fp.getFaweQueue(false);
         for (BlockVector3 pt : region) {
-            queue.setSkyLight((int) pt.getX(), (int) pt.getY(), (int) pt.getZ(), value);
+            queue.setSkyLight(pt.getX(), pt.getY(), pt.getZ(), value);
         }
         int count = 0;
         for (BlockVector2 chunk : region.getChunks()) {
@@ -676,7 +668,7 @@ public class RegionCommands extends MethodCommands {
             if (unit.getY() == 0) unit = unit.withY(1.0);
             if (unit.getZ() == 0) unit = unit.withZ(1.0);
         }
-        
+
         final Vector3 unit1 = unit;
         fp.checkConfirmationRegion(() -> {
             try {
@@ -722,10 +714,10 @@ public class RegionCommands extends MethodCommands {
                 BBC.COMMAND_REGEN_2.send(player);
             } else if (biome == null) {
                 BBC.COMMAND_REGEN_0.send(player);
-                if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) BBC.TIP_REGEN_0.send(player);
+                if (!player.hasPermission("fawe.tips")) BBC.TIP_REGEN_0.send(player);
             } else if (seed == null) {
                 BBC.COMMAND_REGEN_1.send(player);
-                if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) BBC.TIP_REGEN_1.send(player);
+                if (!player.hasPermission("fawe.tips")) BBC.TIP_REGEN_1.send(player);
             } else {
                 BBC.COMMAND_REGEN_2.send(player);
             }

@@ -90,7 +90,7 @@ public class WEManager {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
         FaweLocation loc = player.getLocation();
-        String world = loc.world;
+        String world = player.getWorld().getName();
         if (!world.equals(player.getMeta("lastMaskWorld"))) {
             player.deleteMeta("lastMaskWorld");
             player.deleteMeta("lastMask");
@@ -112,7 +112,7 @@ public class WEManager {
                         FaweMask mask = iter.next();
                         if (mask.isValid(player, type)) {
                             Region region = mask.getRegion();
-                            if (region.contains(loc.x, loc.y, loc.z)) {
+                            if (region.contains(loc.vector)) {
                                 regions.add(region);
                             } else {
                                 removed = true;
@@ -144,12 +144,7 @@ public class WEManager {
                 }
             }
         }
-        if (!tmpMasks.isEmpty()) {
-            masks = tmpMasks;
-            regions = masks.stream().map(FaweMask::getRegion).collect(Collectors.toSet());
-        } else {
-            regions.addAll(backupRegions);
-        }
+        regions.addAll(backupRegions);
         if (!masks.isEmpty()) {
             player.setMeta("lastMask", masks);
         } else {

@@ -11,12 +11,10 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.*;
-import com.boydti.fawe.wrappers.FakePlayer;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.worldedit.*;
-
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.platform.*;
@@ -63,14 +61,8 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @return
      */
     public static <V> FawePlayer<V> wrap(Object obj) {
-        if (obj == null || (obj instanceof String && obj.equals("*"))) {
-            return FakePlayer.getConsole().toFawePlayer();
-        }
         if (obj instanceof FawePlayer) {
             return (FawePlayer<V>) obj;
-        }
-        if (obj instanceof FakePlayer) {
-            return ((FakePlayer) obj).toFawePlayer();
         }
         if (obj instanceof Player) {
             Player actor = LocationMaskedPlayerWrapper.unwrap((Player) obj);
@@ -95,9 +87,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             if (existing != null) {
                 return existing;
             }
-            FakePlayer fake = new FakePlayer(actor.getName(), actor.getUniqueId(), actor);
-            return fake.toFawePlayer();
-        }
+            }
         if (obj.getClass().getName().contains("CraftPlayer") && !Fawe.imp().getPlatform().equals("bukkit")) {
             try {
                 Method methodGetHandle = obj.getClass().getDeclaredMethod("getHandle");

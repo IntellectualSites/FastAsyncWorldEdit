@@ -373,7 +373,7 @@ public class FaweAPI {
             long value = aI - bI;
             return value == 0 ? 0 : value < 0 ? -1 : 1;
         });
-        RegionWrapper bounds = new RegionWrapper(origin.x - radius, origin.x + radius, origin.z - radius, origin.z + radius);
+        RegionWrapper bounds = new RegionWrapper(origin.getX() - radius, origin.getX() + radius, origin.getZ() - radius, origin.getZ() + radius);
         RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
         HashSet<RegionWrapper> regionSet = Sets.<RegionWrapper>newHashSet(bounds);
         ArrayList<DiskStorageHistory> result = new ArrayList<>();

@@ -76,9 +76,9 @@ public class ChunkCommands {
         String filename = "c." + Integer.toString(chunkX, 36)
                 + "." + Integer.toString(chunkZ, 36) + ".dat";
 
-        player.print(BBC.getPrefix() + "Chunk: " + chunkX + ", " + chunkZ);
-        player.print(BBC.getPrefix() + "Old format: " + folder1 + "/" + folder2 + "/" + filename);
-        player.print(BBC.getPrefix() + "McRegion: region/" + McRegionChunkStore.getFilename(
+        player.print("Chunk: " + chunkX + ", " + chunkZ);
+        player.print("Old format: " + folder1 + "/" + folder2 + "/" + filename);
+        player.print("McRegion: region/" + McRegionChunkStore.getFilename(
                 BlockVector2.at(chunkX, chunkZ)));
     }
 
@@ -94,7 +94,7 @@ public class ChunkCommands {
         Set<BlockVector2> chunks = session.getSelection(player.getWorld()).getChunks();
 
         for (BlockVector2 chunk : chunks) {
-            player.print(BBC.getPrefix() + LegacyChunkStore.getFilename(chunk));
+            player.print(LegacyChunkStore.getFilename(chunk));
         }
     }
 
@@ -108,14 +108,14 @@ public class ChunkCommands {
     @CommandPermissions("worldedit.delchunks")
     @Logging(REGION)
     public void deleteChunks(Player player, LocalSession session) throws WorldEditException {
-        player.print(BBC.getPrefix() + "Note that this command does not yet support the mcregion format.");
+        player.print("Note that this command does not yet support the mcregion format.");
         LocalConfiguration config = worldEdit.getConfiguration();
 
         Set<BlockVector2> chunks = session.getSelection(player.getWorld()).getChunks();
         FileOutputStream out = null;
 
         if (config.shellSaveType == null) {
-            player.printError(BBC.getPrefix() + "Shell script type must be configured: 'bat' or 'bash' expected.");
+            player.printError("Shell script type must be configured: 'bat' or 'bash' expected.");
         } else if (config.shellSaveType.equalsIgnoreCase("bat")) {
             try {
                 out = new FileOutputStream("worldedit-delchunks.bat");
@@ -137,7 +137,7 @@ public class ChunkCommands {
                 writer.write("ECHO Complete.\r\n");
                 writer.write("PAUSE\r\n");
                 writer.close();
-                player.print(BBC.getPrefix() + "worldedit-delchunks.bat written. Run it when no one is near the region.");
+                player.print("worldedit-delchunks.bat written. Run it when no one is near the region.");
             } catch (IOException e) {
                 player.printError("Error occurred: " + e.getMessage());
             } finally {
@@ -169,8 +169,8 @@ public class ChunkCommands {
                 writer.write("echo Complete.\n");
                 writer.write("read -p \"Press any key to continue...\"\n");
                 writer.close();
-                player.print(BBC.getPrefix() + "worldedit-delchunks.sh written. Run it when no one is near the region.");
-                player.print(BBC.getPrefix() + "You will have to chmod it to be executable.");
+                player.print("worldedit-delchunks.sh written. Run it when no one is near the region.");
+                player.print("You will have to chmod it to be executable.");
             } catch (IOException e) {
                 player.printError("Error occurred: " + e.getMessage());
             } finally {
@@ -182,7 +182,7 @@ public class ChunkCommands {
                 }
             }
         } else {
-            player.printError(BBC.getPrefix() + "Shell script type must be configured: 'bat' or 'bash' expected.");
+            player.printError("Shell script type must be configured: 'bat' or 'bash' expected.");
         }
     }
 

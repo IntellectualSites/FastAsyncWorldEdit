@@ -250,7 +250,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         this.player = player;
         if (player != null) {
             FaweLocation pos = player.getLocation();
-            this.chunkOffset = BlockVector2.at(1 + (pos.x >> 4), 1 + (pos.z >> 4));
+            this.chunkOffset = BlockVector2.at(1 + (pos.getX() >> 4), 1 + (pos.getZ() >> 4));
         }
     }
 
@@ -292,8 +292,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int OZ = chunkOffset.getBlockZ();
 
             FaweLocation position = player.getLocation();
-            int pcx = (position.x >> 4) - OX;
-            int pcz = (position.z >> 4) - OZ;
+            int pcx = (position.getX() >> 4) - OX;
+            int pcz = (position.getZ() >> 4) - OZ;
 
             int scx = Math.max(0, pcx - 15);
             int scz = Math.max(0, pcz - 15);
@@ -902,8 +902,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int OZ = chunkOffset.getBlockZ();
 
             FaweLocation position = player.getLocation();
-            int pcx = (position.x >> 4) - OX;
-            int pcz = (position.z >> 4) - OZ;
+            int pcx = (position.getX() >> 4) - OX;
+            int pcz = (position.getZ() >> 4) - OZ;
 
             int scx = Math.max(0, pcx - 10);
             int scz = Math.max(0, pcz - 10);

@@ -51,6 +51,7 @@ public class BlockVector3 {
     // thread-safe initialization idiom
     private static final class YzxOrderComparator {
         private static final Comparator<BlockVector3> YZX_ORDER = (a, b) -> {
+            //noinspection SuspiciousNameCombination
             return ComparisonChain.start()
                     .compare(a.y, b.y)
                     .compare(a.z, b.z)
@@ -61,7 +62,7 @@ public class BlockVector3 {
 
     /**
      * Returns a comparator that sorts vectors first by Y, then Z, then X.
-     * 
+     *
      * <p>
      * Useful for sorting by chunk block storage order.
      */

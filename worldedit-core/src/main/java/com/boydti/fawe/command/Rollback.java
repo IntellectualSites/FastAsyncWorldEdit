@@ -67,9 +67,9 @@ public class Rollback extends FaweCommand {
                         long total = 0;
                         player.sendMessage("&d=| Username | Bounds | Distance | Changes | Age |=");
                         for (DiskStorageHistory edit : edits) {
-                            DiskStorageHistory.DiskStorageSummary summary = edit.summarize(new RegionWrapper(origin.x, origin.x, origin.z, origin.z), !player.hasPermission("fawe.rollback.deep"));
+                            DiskStorageHistory.DiskStorageSummary summary = edit.summarize(new RegionWrapper(origin.getX(), origin.getX(), origin.getZ(), origin.getZ()), !player.hasPermission("fawe.rollback.deep"));
                             RegionWrapper region = new RegionWrapper(summary.minX, summary.maxX, summary.minZ, summary.maxZ);
-                            int distance = region.distance(origin.x, origin.z);
+                            int distance = region.distance(origin.getX(), origin.getZ());
                             String name = Fawe.imp().getName(edit.getUUID());
                             long seconds = (System.currentTimeMillis() - edit.getBDFile().lastModified()) / 1000;
                             total += edit.getBDFile().length();
@@ -101,7 +101,7 @@ public class Rollback extends FaweCommand {
                     BBC.NO_PERM.send(player, "fawe.rollback.perform");
                     return false;
                 }
-                final List<DiskStorageHistory> edits = (List<DiskStorageHistory>) player.getMeta(FawePlayer.METADATA_KEYS.ROLLBACK);
+                final List<DiskStorageHistory> edits = player.getMeta(FawePlayer.METADATA_KEYS.ROLLBACK);
                 player.deleteMeta(FawePlayer.METADATA_KEYS.ROLLBACK);
                 if (edits == null) {
                     BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
@@ -148,7 +148,7 @@ public class Rollback extends FaweCommand {
                         } else {
                             user = Fawe.imp().getUUID(split[1]);
                         }
-                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException ignored) {
                     }
                     if (user == null) {
                         player.sendMessage("&dInvalid user: " + split[1]);

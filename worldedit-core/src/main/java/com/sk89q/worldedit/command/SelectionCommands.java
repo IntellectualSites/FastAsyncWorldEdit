@@ -302,7 +302,7 @@ public class SelectionCommands {
     )
     @CommandPermissions("worldedit.wand.toggle")
     public void toggleWand(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-        
+
         session.setToolControl(!session.isToolControlEnabled());
 
         if (session.isToolControlEnabled()) {
@@ -621,17 +621,17 @@ public class SelectionCommands {
                 long numBlocks = ((long) size.getBlockX() * size.getBlockY() * size.getBlockZ());
 
                 String msg = String.format("%1$s: %2$s @ %3$s (%4$d blocks)", name, sizeStr, originStr, numBlocks);
-                player.print(BBC.getPrefix() + msg);
+                player.print(msg);
 
                 index++;
             }
 
 
 
-//            player.print(BBC.getPrefix() + "Cuboid dimensions (max - min): " + size);
-//            player.print(BBC.getPrefix() + "Offset: " + origin);
-//            player.print(BBC.getPrefix() + "Cuboid distance: " + size.distance(Vector.ONE));
-//            player.print(BBC.getPrefix() + "# of blocks: " + (int) (size.getX() * size.getY() * size.getZ()));
+//            player.print("Cuboid dimensions (max - min): " + size);
+//            player.print("Offset: " + origin);
+//            player.print("Cuboid distance: " + size.distance(Vector.ONE));
+//            player.print("# of blocks: " + (int) (size.getX() * size.getY() * size.getZ()));
 //=======
 //    public void size(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
 //        if (args.hasFlag('c')) {
@@ -653,17 +653,17 @@ public class SelectionCommands {
                 .subtract(region.getMinimumPoint())
                 .add(1, 1, 1);
 
-        player.print(BBC.getPrefix() + "Type: " + session.getRegionSelector(player.getWorld())
+        player.print("Type: " + session.getRegionSelector(player.getWorld())
                 .getTypeName());
 
         for (String line : session.getRegionSelector(player.getWorld())
                 .getInformationLines()) {
-            player.print(BBC.getPrefix() + line);
+            player.print(line);
         }
 
-        player.print(BBC.getPrefix() + "Size: " + size);
-        player.print(BBC.getPrefix() + "Cuboid distance: " + region.getMaximumPoint().distance(region.getMinimumPoint()));
-        player.print(BBC.getPrefix() + "# of blocks: " + region.getArea());
+        player.print("Size: " + size);
+        player.print("Cuboid distance: " + region.getMaximumPoint().distance(region.getMinimumPoint()));
+        player.print("# of blocks: " + region.getArea());
     }
 
 
@@ -713,7 +713,7 @@ public class SelectionCommands {
         size = session.getSelection(player.getWorld()).getArea();
 
         if (distributionData.size() <= 0) {
-            player.printError(BBC.getPrefix() + "No blocks counted.");
+            player.printError("No blocks counted.");
             return;
         }
         BBC.SELECTION_DISTR.send(player, size);
@@ -724,7 +724,7 @@ public class SelectionCommands {
                     String.valueOf(c.getAmount()),
                     c.getAmount() / (double) size * 100,
                     name);
-            player.print(BBC.getPrefix() + str);
+            player.print(str);
         }
     }
 
@@ -751,37 +751,37 @@ public class SelectionCommands {
         final RegionSelector selector;
         if (typeName.equalsIgnoreCase("cuboid")) {
             selector = new CuboidRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_CUBOID.s());
+            player.print(BBC.SEL_CUBOID.s());
         } else if (typeName.equalsIgnoreCase("extend")) {
             selector = new ExtendingCuboidRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_CUBOID_EXTEND.s());
+            player.print(BBC.SEL_CUBOID_EXTEND.s());
         } else if (typeName.equalsIgnoreCase("poly")) {
             selector = new Polygonal2DRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_2D_POLYGON.s());
+            player.print(BBC.SEL_2D_POLYGON.s());
             Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolygonVertexLimit();
-            limit.ifPresent(integer -> player.print(BBC.getPrefix() + BBC.SEL_MAX.f(integer)));
-            player.print(BBC.getPrefix() + BBC.SEL_LIST.s());
+            limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+            player.print(BBC.SEL_LIST.s());
         } else if (typeName.equalsIgnoreCase("ellipsoid")) {
             selector = new EllipsoidRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_ELLIPSIOD.s());
+            player.print(BBC.SEL_ELLIPSIOD.s());
         } else if (typeName.equalsIgnoreCase("sphere")) {
             selector = new SphereRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_SPHERE.s());
+            player.print(BBC.SEL_SPHERE.s());
         } else if (typeName.equalsIgnoreCase("cyl")) {
             selector = new CylinderRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_CYLINDRICAL.s());
+            player.print(BBC.SEL_CYLINDRICAL.s());
         } else if (typeName.equalsIgnoreCase("convex") || typeName.equalsIgnoreCase("hull")) {
             selector = new ConvexPolyhedralRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_CONVEX_POLYHEDRAL.s());
+            player.print(BBC.SEL_CONVEX_POLYHEDRAL.s());
             Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolyhedronVertexLimit();
-            limit.ifPresent(integer -> player.print(BBC.getPrefix() + BBC.SEL_MAX.f(integer)));
-            player.print(BBC.getPrefix() + BBC.SEL_LIST.s());
+            limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+            player.print(BBC.SEL_LIST.s());
         } else if (typeName.equalsIgnoreCase("polyhedral") || typeName.equalsIgnoreCase("polyhedron")) {
             selector = new PolyhedralRegionSelector(player.getWorld());
-            player.print(BBC.getPrefix() + BBC.SEL_CONVEX_POLYHEDRAL.s());
+            player.print(BBC.SEL_CONVEX_POLYHEDRAL.s());
             Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolyhedronVertexLimit();
-            limit.ifPresent(integer -> player.print(BBC.getPrefix() + BBC.SEL_MAX.f(integer)));
-            player.print(BBC.getPrefix() + BBC.SEL_LIST.s());
+            limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+            player.print(BBC.SEL_LIST.s());
         } else if (typeName.startsWith("fuzzy") || typeName.startsWith("magic")) {
             Mask mask;
             if (typeName.length() > 6) {
@@ -795,13 +795,13 @@ public class SelectionCommands {
                 mask = new IdMask(editSession);
             }
             selector = new FuzzyRegionSelector(player, editSession, mask);
-            player.print(BBC.getPrefix() + BBC.SEL_FUZZY.f());
-            player.print(BBC.getPrefix() + BBC.SEL_LIST.f());
+            player.print(BBC.SEL_FUZZY.f());
+            player.print(BBC.SEL_LIST.f());
         } else {
             CommandListBox box = new CommandListBox("Selection modes");
             StyledFragment contents = box.getContents();
             StyledFragment tip = contents.createFragment(Style.RED);
-            tip.append(BBC.getPrefix() + BBC.SEL_MODES.s()).newLine();
+            tip.append(BBC.SEL_MODES.s()).newLine();
 
             box.appendCommand("//sel cuboid", "Select two corners of a cuboid");
             box.appendCommand("//sel extend", "Fast cuboid selection mode");

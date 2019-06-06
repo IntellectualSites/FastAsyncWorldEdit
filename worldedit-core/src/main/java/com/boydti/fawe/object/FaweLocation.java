@@ -1,23 +1,58 @@
 package com.boydti.fawe.object;
 
 import com.boydti.fawe.FaweAPI;
+import com.sk89q.worldedit.math.*;
 import com.sk89q.worldedit.world.World;
+import jdk.nashorn.internal.ir.Block;
 
 /**
-
+ * @deprecated This is likely to be removed in favor of {@link com.sk89q.worldedit.util.Location}.
  */
+@Deprecated
 public class FaweLocation {
 
+    public final BlockVector3 vector;
+    @Deprecated
     public final int x;
-    public final int y;
+    @Deprecated
     public final int z;
+    @Deprecated
+    public final int y;
     public final String world;
 
     public FaweLocation(final String world, final int x, final int y, final int z) {
         this.world = world;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.vector = BlockVector3.at(x,y,z);
+        this.x = vector.getX();
+        this.y = vector.getY();
+        this.z = vector.getZ();
+    }
+
+    /**
+     * Get the X coordinate.
+     *
+     * @return the x coordinate
+     */
+    public int getX() {
+        return vector.getX();
+    }
+
+    /**
+     * Get the Y coordinate.
+     *
+     * @return the y coordinate
+     */
+    public int getY() {
+        return vector.getY();
+    }
+
+    /**
+     * Get the Z coordinate.
+     *
+     * @return the z coordinate
+     */
+    public int getZ() {
+        return vector.getZ();
     }
 
     @Override
