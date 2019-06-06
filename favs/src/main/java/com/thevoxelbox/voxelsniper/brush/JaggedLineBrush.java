@@ -13,8 +13,6 @@ import org.bukkit.util.Vector;
 import java.util.Random;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Jagged_Line_Brush
- *
  * @author Giltwist
  * @author Monofraps
  */

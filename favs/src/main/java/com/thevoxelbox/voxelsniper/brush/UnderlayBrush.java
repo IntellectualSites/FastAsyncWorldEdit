@@ -8,8 +8,6 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Underlay_Brush
- *
  * @author jmck95 Credit to GavJenks for framework and 95 of code. Big Thank you to GavJenks
  */
 
@@ -148,7 +146,7 @@ public class UnderlayBrush extends PerformBrush {
                 this.allBlocks = false;
                 v.owner().getPlayer().sendMessage(ChatColor.BLUE + "Will underlay only natural block types." + this.depth);
             } else {
-                v.owner().getPlayer().sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.owner().getPlayer().sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

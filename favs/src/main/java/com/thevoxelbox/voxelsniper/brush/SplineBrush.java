@@ -181,7 +181,7 @@ public class SplineBrush extends PerformBrush {
                     this.render(v);
                 }
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

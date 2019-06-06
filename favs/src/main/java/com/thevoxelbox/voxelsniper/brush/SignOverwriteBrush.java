@@ -11,9 +11,7 @@ import java.io.*;
 import java.util.Arrays;
 
 /**
- * Overwrites signs. (Wiki:
- * http://www.voxelwiki.com/minecraft/VoxelSniper#Sign_Overwrite_Brush)
- *
+ * Overwrites signs.
  * @author Monofraps
  */
 public class SignOverwriteBrush extends Brush {

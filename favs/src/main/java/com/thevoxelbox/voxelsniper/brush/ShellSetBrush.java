@@ -10,8 +10,6 @@ import org.bukkit.block.Block;
 import java.util.ArrayList;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Shell_Brushes
- *
  * @author Piotr
  */
 public class ShellSetBrush extends Brush {

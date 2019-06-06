@@ -8,8 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Extrude_Brush
- *
  * @author psanker
  */
 public class ExtrudeBrush extends Brush {

@@ -7,8 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.util.Vector;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Ruler_Brush
- *
  * @author Gavjenks
  */
 public class RulerBrush extends Brush {
@@ -93,7 +91,7 @@ public class RulerBrush extends Brush {
                 this.xOff = 0;
                 v.sendMessage(ChatColor.BLUE + "Ruler mode.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

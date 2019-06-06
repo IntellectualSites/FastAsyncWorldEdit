@@ -11,8 +11,6 @@ import org.bukkit.ChatColor;
 import java.util.Random;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Splatter_Overlay_Brush
- *
  * @author Gavjenks Splatterized blockPositionY Giltwist
  */
 public class SplatterOverlayBrush extends PerformBrush {
@@ -338,10 +336,10 @@ public class SplatterOverlayBrush extends PerformBrush {
                         v.sendMessage(ChatColor.RED + "Recursions must be an integer 1-10!");
                     }
                 } else {
-                    v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                    v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
                 }
             } catch (Exception exception) {
-                v.sendMessage(String.format("An error occured while processing parameter %s.", parameter));
+                v.sendMessage(String.format("An error occurred while processing parameter %s.", parameter));
             }
         }
     }

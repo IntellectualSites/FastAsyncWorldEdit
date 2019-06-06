@@ -11,8 +11,6 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Eraser_Brush
- *
  * @author Voxel
  */
 public class EraserBrush extends Brush {

@@ -8,8 +8,6 @@ import org.bukkit.block.Block;
 
 /**
  * THIS BRUSH SHOULD NOT USE PERFORMERS.
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Shell_Brushes
- *
  * @author Voxel
  */
 public class ShellBallBrush extends Brush {
@@ -103,7 +101,7 @@ public class ShellBallBrush extends Brush {
         }
         v.owner().storeUndo(undo);
 
-        // This is needed because most uses of this brush will not be sible to the sniper.
+        // This is needed because most uses of this brush will not be sible to the sible sniper.
         v.owner().getPlayer().sendMessage(ChatColor.AQUA + "Shell complete.");
     }
 

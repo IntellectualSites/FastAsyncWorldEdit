@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Punish_Brush
- *
  * @author Monofraps
  * @author Deamon
  * @author MikeMatrix
@@ -213,7 +211,7 @@ public class PunishBrush extends PerformBrush {
                         }
                     } catch (final Exception exception) {
                         exception.printStackTrace();
-                        v.sendMessage("An error occured.");
+                        v.sendMessage("An error occurred.");
                         return;
                     }
                 } else if (v.getBrushSize() == PunishBrush.INFINIPUNISH_SIZE) {

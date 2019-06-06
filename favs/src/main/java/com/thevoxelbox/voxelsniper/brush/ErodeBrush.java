@@ -23,8 +23,6 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 /**
- * http://www.voxelwiki.com/minecraft/VoxelSniper#The_Erosion_Brush
- *
  * @author Piotr
  * @author MikeMatrix
  */

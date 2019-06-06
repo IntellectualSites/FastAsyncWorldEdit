@@ -7,8 +7,6 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Ellipse_Brush
- *
  * @author psanker
  */
 public class EllipseBrush extends PerformBrush {

@@ -6,8 +6,6 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Triangle_Brush
- *
  * @author Giltwist
  */
 public class TriangleBrush extends PerformBrush {

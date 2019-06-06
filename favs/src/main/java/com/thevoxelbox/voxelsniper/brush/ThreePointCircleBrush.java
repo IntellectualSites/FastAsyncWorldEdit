@@ -8,8 +8,6 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Three-Point_Circle_Brush
- *
  * @author Giltwist
  */
 public class ThreePointCircleBrush extends PerformBrush {

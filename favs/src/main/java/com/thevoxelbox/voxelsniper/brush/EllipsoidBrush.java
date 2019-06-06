@@ -6,9 +6,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Ellipsoid_Brush
- */
 public class EllipsoidBrush extends PerformBrush {
     private double xRad;
     private double yRad;

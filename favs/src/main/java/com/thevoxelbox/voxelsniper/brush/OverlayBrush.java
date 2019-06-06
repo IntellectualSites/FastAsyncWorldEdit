@@ -11,8 +11,6 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Overlay_.2F_Topsoil_Brush
- *
  * @author Gavjenks
  */
 public class OverlayBrush extends PerformBrush {
@@ -207,7 +205,7 @@ public class OverlayBrush extends PerformBrush {
                         ChatColor.BLUE + "Will overlay only natural block types." + this.depth);
             } else {
                 v.sendMessage(ChatColor.RED
-                        + "Invalid brush parameters! use the info parameter to display parameter info.");
+                        + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

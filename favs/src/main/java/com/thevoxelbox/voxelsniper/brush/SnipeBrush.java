@@ -5,8 +5,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Snipe_Brush
- *
  * @author Voxel
  */
 public class SnipeBrush extends PerformBrush {

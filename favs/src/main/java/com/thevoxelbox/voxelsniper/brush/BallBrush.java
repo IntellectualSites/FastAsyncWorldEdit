@@ -8,8 +8,6 @@ import org.bukkit.ChatColor;
 
 /**
  * A brush that creates a solid ball.
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Ball_Brush
- *
  * @author Piotr
  */
 public class BallBrush extends PerformBrush {
@@ -111,7 +109,7 @@ public class BallBrush extends PerformBrush {
                 this.trueCircle = TRUE_CIRCLE_OFF_VALUE;
                 v.sendMessage(ChatColor.AQUA + "True circle mode OFF.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

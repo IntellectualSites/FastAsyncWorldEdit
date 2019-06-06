@@ -9,8 +9,6 @@ import com.thevoxelbox.voxelsniper.Undo;
 import java.util.Random;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Random-Erode_Brush
- *
  * @author Piotr
  * @author Giltwist (Randomized blockPositionY)
  */

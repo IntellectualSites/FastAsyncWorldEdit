@@ -22,13 +22,8 @@ package com.sk89q.worldedit.util;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-
 import javax.annotation.Nullable;
+import java.util.*;
 
 /**
  * A collection of cardinal, ordinal, and secondary-ordinal directions.
@@ -87,7 +82,7 @@ public enum Direction {
     }
     
     public static Direction get(CharSequence sequence) {
-        return map.get((String)sequence);
+        return map.get(sequence.toString());
     }
     
     public Direction getLeft() {

@@ -8,8 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Volt-Meter_Brush
- *
  * @author Gavjenks
  */
 public class VoltMeterBrush extends Brush {

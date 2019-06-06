@@ -110,7 +110,7 @@ public class SetRedstoneFlipBrush extends Brush {
                 this.northSouth = false;
                 v.sendMessage(ChatColor.AQUA + "Flip direction set to east/west.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

@@ -11,8 +11,6 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Line_Brush
- *
  * @author Gavjenks
  * @author giltwist
  * @author MikeMatrix

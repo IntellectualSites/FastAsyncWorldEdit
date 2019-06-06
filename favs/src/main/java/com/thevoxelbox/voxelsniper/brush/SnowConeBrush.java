@@ -13,8 +13,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 /**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Snow_cone_brush
- *
  * @author Voxel
  */
 public class SnowConeBrush extends Brush {
