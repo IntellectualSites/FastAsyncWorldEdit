@@ -339,11 +339,6 @@ public class Settings extends Config {
                 "Allows brushes to be persistent (default: true)",
         })
         public boolean PERSISTENT_BRUSHES = true;
-        @Comment({
-                "[SAFE] Enable CUI without needing the mod installed (Requires ProtocolLib)",
-        })
-        public boolean VANILLA_CUI = false;
-
 
         @Comment({
                 "Disable using native libraries",

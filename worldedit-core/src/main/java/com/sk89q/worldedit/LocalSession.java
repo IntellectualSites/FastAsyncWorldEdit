@@ -570,6 +570,7 @@ public class LocalSession implements TextureHolder {
             newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
             return newEditSession;
         }
+
         return null;
     }
 
@@ -626,14 +627,6 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * @deprecated use {@link #getRegionSelector(World)}
-     */
-    @Deprecated
-    public RegionSelector getRegionSelector() {
-        return selector;
-    }
-
-    /**
      * Set the region selector.
      *
      * @param world the world
@@ -644,16 +637,6 @@ public class LocalSession implements TextureHolder {
         checkNotNull(selector);
         selector.setWorld(world);
         this.selector = selector;
-    }
-
-    /**
-     * Returns true if the region is fully defined.
-     *
-     * @return true if a region selection is defined
-     */
-    @Deprecated
-    public boolean isRegionDefined() {
-        return selector.isDefined();
     }
 
     /**
@@ -668,14 +651,6 @@ public class LocalSession implements TextureHolder {
             return false;
         }
         return selector.isDefined();
-    }
-
-    /**
-     * @deprecated use {@link #getSelection(World)}
-     */
-    @Deprecated
-    public Region getRegion() throws IncompleteRegionException {
-        return selector.getRegion();
     }
 
     /**
@@ -907,7 +882,7 @@ public class LocalSession implements TextureHolder {
     public BlockVector3 getPlacementPosition(Player player) throws IncompleteRegionException {
         checkNotNull(player);
         if (!placeAtPos1) {
-            return player.getBlockIn().toBlockPoint();
+            return player.getBlockIn().toVector().toBlockPoint();
         }
 
         return selector.getPrimaryPosition();
@@ -976,6 +951,12 @@ public class LocalSession implements TextureHolder {
         this.pickaxeMode = tool;
     }
 
+    /**
+     * Get the tool assigned to the item.
+     *
+     * @param item the item type
+     * @return the tool, which may be {@code null}
+     */
     @Nullable
     public Tool getTool(ItemType item) {
         return tools[item.getInternalId()];
@@ -1012,11 +993,6 @@ public class LocalSession implements TextureHolder {
         return getBrushTool(item.getDefaultState(), null, true);
     }
 
-    @Deprecated
-    public BrushTool getBrushTool(BaseItem item) throws InvalidToolBindException {
-        return getBrushTool(item, null, true);
-    }
-
     public BrushTool getBrushTool(Player player) throws InvalidToolBindException {
         return getBrushTool(player, true);
     }
@@ -1048,7 +1024,6 @@ public class LocalSession implements TextureHolder {
      * @param tool the tool to set, which can be {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
      */
-    @Deprecated
     public void setTool(ItemType item, @Nullable Tool tool) throws InvalidToolBindException {
         setTool(item.getDefaultState(), tool, null);
     }
@@ -1141,7 +1116,6 @@ public class LocalSession implements TextureHolder {
     public void tellVersion(Actor player) {
     }
 
-
     public boolean shouldUseServerCUI() {
         return this.useServerCUI;
     }
@@ -1209,9 +1183,8 @@ public class LocalSession implements TextureHolder {
 
         if (hasCUISupport) {
             actor.dispatchCUIEvent(event);
-        } else if (actor.isPlayer()) {
-            CUI cui = Fawe.get().getCUI(actor);
-            if (cui != null) cui.dispatchCUIEvent(event);
+        } else if (useServerCUI) {
+            updateServerCUI(actor);
         }
     }
 
@@ -1243,12 +1216,13 @@ public class LocalSession implements TextureHolder {
             CUIRegion tempSel = (CUIRegion) selector;
 
             if (tempSel.getProtocolVersion() > cuiVersion) {
-                dispatchCUIEvent(actor, new SelectionShapeEvent(tempSel.getLegacyTypeID()));
+                actor.dispatchCUIEvent(new SelectionShapeEvent(tempSel.getLegacyTypeID()));
                 tempSel.describeLegacyCUI(this, actor);
             } else {
-                dispatchCUIEvent(actor, new SelectionShapeEvent(tempSel.getTypeID()));
+                actor.dispatchCUIEvent(new SelectionShapeEvent(tempSel.getTypeID()));
                 tempSel.describeCUI(this, actor);
             }
+
         }
     }
 
@@ -1259,6 +1233,11 @@ public class LocalSession implements TextureHolder {
      */
     public void describeCUI(Actor actor) {
         checkNotNull(actor);
+
+        if (!hasCUISupport) {
+            return;
+        }
+
         if (selector instanceof CUIRegion) {
             CUIRegion tempSel = (CUIRegion) selector;
 
@@ -1285,18 +1264,15 @@ public class LocalSession implements TextureHolder {
         String[] split = text.split("\\|", 2);
         if (split.length > 1 && split[0].equalsIgnoreCase("v")) { // enough fields and right message
             if (split[1].length() > 4) {
-                this.failedCuiAttempts++;
+                this.failedCuiAttempts ++;
                 return;
             }
             setCUISupport(true);
             try {
                 setCUIVersion(Integer.parseInt(split[1]));
             } catch (NumberFormatException e) {
-                String msg = e.getMessage();
-                if (msg != null && msg.length() > 256) msg = msg.substring(0, 256);
-                this.failedCuiAttempts++;
-                WorldEdit.logger.warn("Error while reading CUI init message for player " + uuid + ": " + msg);
-
+                WorldEdit.logger.warn("Error while reading CUI init message: " + e.getMessage());
+                this.failedCuiAttempts ++;
             }
         }
     }
@@ -1364,7 +1340,6 @@ public class LocalSession implements TextureHolder {
      * @param player the player
      * @return an edit session
      */
-    @SuppressWarnings("deprecation")
     public EditSession createEditSession(Player player) {
         checkNotNull(player);
 

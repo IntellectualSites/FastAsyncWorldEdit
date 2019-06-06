@@ -19,19 +19,13 @@
 
 package com.sk89q.util;
 
-import sun.reflect.ConstructorAccessor;
-import sun.reflect.FieldAccessor;
-import sun.reflect.ReflectionFactory;
-
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
 
 public final class ReflectionUtil {
 
     private ReflectionUtil() {
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T getField(Object from, String name) {
         if (from instanceof Class)
             return getField((Class) from, null, name);

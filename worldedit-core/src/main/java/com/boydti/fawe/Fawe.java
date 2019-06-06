@@ -9,7 +9,6 @@ import com.boydti.fawe.regions.general.plot.PlotSquaredFeature;
 import com.boydti.fawe.util.*;
 import com.boydti.fawe.util.chat.ChatManager;
 import com.boydti.fawe.util.chat.PlainChatManager;
-import com.boydti.fawe.util.cui.CUI;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -199,25 +198,6 @@ public class Fawe {
     public void onDisable() {
     }
 
-    public CUI getCUI(Actor actor) {
-        FawePlayer<Object> fp = FawePlayer.wrap(actor);
-        CUI cui = fp.getMeta("CUI");
-        if (cui == null) {
-            cui = Fawe.imp().getCUI(fp);
-            if (cui != null) {
-                synchronized (fp) {
-                    CUI tmp = fp.getMeta("CUI");
-                    if (tmp == null) {
-                        fp.setMeta("CUI", cui);
-                    } else {
-                        cui = tmp;
-                    }
-                }
-            }
-        }
-        return cui;
-    }
-
     public ChatManager getChatManager() {
         return chatManager;
     }
@@ -315,11 +295,10 @@ public class Fawe {
         Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
         try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
-          //  java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
             String versionString = br.readLine();
             String commitString = br.readLine();
             String dateString = br.readLine();
-           // scanner.close();
+            br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
             Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-Breaking/" + version.build;
@@ -381,7 +360,7 @@ public class Fawe {
         try {
             String arch = System.getenv("PROCESSOR_ARCHITECTURE");
             String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-            boolean x86OS = arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64") ? false : true;
+            boolean x86OS = !arch.endsWith("64") && (wow64Arch == null || !wow64Arch.endsWith("64"));
             boolean x86JVM = System.getProperty("sun.arch.data.model").equals("32");
             if (x86OS != x86JVM) {
                 debug("====== UPGRADE TO 64-BIT JAVA ======");

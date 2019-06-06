@@ -27,7 +27,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -152,7 +151,6 @@ public class ServerCUIHandler {
         structureTag.put("showboundingbox", new ByteTag((byte) 1));
         structureTag.put("id", new StringTag(BlockTypes.STRUCTURE_BLOCK.getId()));
 
-//        return BlockTypes.STRUCTURE_BLOCK.getDefaultState().toBaseBlock(new CompoundTag(structureTag));
         return BlockTypes.STRUCTURE_BLOCK.getDefaultState().toBaseBlock(new CompoundTag(structureTag));
     }
 }

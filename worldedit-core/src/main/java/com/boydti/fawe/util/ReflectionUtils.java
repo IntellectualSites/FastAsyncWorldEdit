@@ -23,7 +23,6 @@ public class ReflectionUtils {
         return t.isInstance(o) ? t.cast(o) : null;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T extends Enum<?>> T addEnum(Class<T> enumType, String enumName) {
         try {
             return addEnum(enumType, enumName, new Class<?>[]{}, new Object[]{});

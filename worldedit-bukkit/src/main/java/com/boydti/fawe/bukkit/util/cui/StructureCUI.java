@@ -69,6 +69,7 @@ public class StructureCUI extends CUI {
 
     private int viewDistance() {
         Player player = this.<Player>getPlayer().parent;
+        //todo replace with PaperLib.isPaper()
         if (Bukkit.getVersion().contains("paper")) {
             return player.getViewDistance();
         } else {

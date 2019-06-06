@@ -25,7 +25,6 @@ import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
 import com.boydti.fawe.bukkit.util.cui.CUIListener;
-import com.boydti.fawe.bukkit.util.cui.StructureCUI;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_All;
@@ -41,7 +40,6 @@ import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.Jars;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
@@ -64,7 +62,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 public class FaweBukkit implements IFawe, Listener {
@@ -147,32 +144,6 @@ public class FaweBukkit implements IFawe, Listener {
                 Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
             }
         });
-    }
-
-    @Override
-    public CUI getCUI(FawePlayer player) {
-        if (Settings.IMP.EXPERIMENTAL.VANILLA_CUI) {
-            if (listeningCui && cuiListener == null) return null;
-            listeningCui = true;
-            if (cuiListener == null) {
-                Plugin protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
-                if (protocolLib != null && protocolLib.isEnabled()) {
-                    cuiListener = new CUIListener(plugin);
-                } else {
-                    return null;
-                }
-            }
-            return new StructureCUI(player);
-        }
-        return null;
-    }
-
-    @Override
-    public void registerPacketListener() {
-        PluginManager manager = Bukkit.getPluginManager();
-        if (packetListener == null && manager.getPlugin("ProtocolLib") != null) {
-            packetListener = new CFIPacketListener(plugin);
-        }
     }
 
     @Override

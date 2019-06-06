@@ -5,7 +5,6 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.util.cui.CUI;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.world.World;
 
@@ -36,11 +35,7 @@ public interface IFawe {
 
     void startMetrics();
 
-    default CUI getCUI(FawePlayer player) { return null; }
-
     default ImageViewer getImageViewer(FawePlayer player) { return null; }
-
-    default void registerPacketListener() {}
 
     default int getPlayerCount() {
         return Fawe.get().getCachedPlayers().size();
