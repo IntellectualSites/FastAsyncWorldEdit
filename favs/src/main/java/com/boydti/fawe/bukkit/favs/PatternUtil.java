@@ -23,7 +23,7 @@ public class PatternUtil {
             snipeData.sendMessage(ChatColor.GOLD + "Voxel: " + ChatColor.RED + arg);
             return pattern;
         } catch (InputParseException e) {
-            fp.sendMessage(BBC.getPrefix() + e.getMessage());
+            fp.sendMessage(e.getMessage());
             return null;
         }
     }

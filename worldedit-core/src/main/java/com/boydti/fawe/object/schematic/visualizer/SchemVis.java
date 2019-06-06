@@ -214,8 +214,8 @@ public class SchemVis extends ImmutableVirtualWorld {
                 if (chunks.size() > 225) {
                     synchronized (SchemVis.this) {
                         FaweLocation pos = player.getLocation();
-                        int centerX = pos.x >> 4;
-                        int centerZ = pos.z >> 4;
+                        int centerX = pos.getX() >> 4;
+                        int centerZ = pos.getZ() >> 4;
                         ObjectIterator<Long2ObjectMap.Entry<MCAChunk>> iter = chunks.long2ObjectEntrySet().fastIterator();
                         while (iter.hasNext()) {
                             Long2ObjectMap.Entry<MCAChunk> entry = iter.next();
@@ -274,7 +274,7 @@ public class SchemVis extends ImmutableVirtualWorld {
     }
 
     private Map.Entry<File, Long> getEntry(File file, long position) {
-        return new AbstractMap.SimpleEntry(file, position);
+        return new AbstractMap.SimpleEntry<>(file, position);
     }
 
     /**
@@ -554,8 +554,8 @@ public class SchemVis extends ImmutableVirtualWorld {
         int OZ = chunkOffset.getBlockZ();
 
         FaweLocation position = player.getLocation();
-        int pcx = (position.x >> 4) - OX;
-        int pcz = (position.z >> 4) - OZ;
+        int pcx = (position.getX() >> 4) - OX;
+        int pcz = (position.getZ() >> 4) - OZ;
 
         int scx = pcx - 15;
         int scz = pcz - 15;
@@ -564,9 +564,7 @@ public class SchemVis extends ImmutableVirtualWorld {
 
         for (int cz = scz; cz <= ecz; cz++) {
             for (int cx = scx; cx <= ecx; cx++) {
-                final int finalCX = cx;
-                final int finalCZ = cz;
-                send(packetQueue, finalCX, finalCZ);
+                send(packetQueue, cx, cz);
             }
         }
     }
@@ -607,8 +605,8 @@ public class SchemVis extends ImmutableVirtualWorld {
             int OZ = chunkOffset.getBlockZ();
 
             FaweLocation position = player.getLocation();
-            int pcx = (position.x >> 4) - OX;
-            int pcz = (position.z >> 4) - OZ;
+            int pcx = (position.getX() >> 4) - OX;
+            int pcz = (position.getZ() >> 4) - OZ;
 
             int scx = pcx - 15;
             int scz = pcz - 15;

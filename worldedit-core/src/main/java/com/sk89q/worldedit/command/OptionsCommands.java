@@ -256,7 +256,7 @@ public class OptionsCommands {
         int limit = args.argsLength() == 0 ? config.calculationTimeout : Math.max(-1, args.getInteger(0));
         if (!mayDisable && config.maxCalculationTimeout > -1) {
             if (limit > config.maxCalculationTimeout) {
-                player.printError(BBC.getPrefix() + "Your maximum allowable timeout is " + config.maxCalculationTimeout + " ms.");
+                player.printError("Your maximum allowable timeout is " + config.maxCalculationTimeout + " ms.");
                 return;
             }
         }
@@ -264,9 +264,9 @@ public class OptionsCommands {
         session.setTimeout(limit);
 
         if (limit != config.calculationTimeout) {
-            player.print(BBC.getPrefix() + "Timeout time set to " + limit + " ms. (Use //timeout to go back to the default.)");
+            player.print("Timeout time set to " + limit + " ms. (Use //timeout to go back to the default.)");
         } else {
-            player.print(BBC.getPrefix() + "Timeout time set to " + limit + " ms.");
+            player.print("Timeout time set to " + limit + " ms.");
         }
     }
 
@@ -281,27 +281,27 @@ public class OptionsCommands {
     public void drawSelection(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
         if (!WorldEdit.getInstance().getConfiguration().serverSideCUI) {
-            throw new DisallowedUsageException(BBC.getPrefix() + "This functionality is disabled in the configuration!");
+            throw new DisallowedUsageException("This functionality is disabled in the configuration!");
         }
         String newState = args.getString(0, null);
         if (session.shouldUseServerCUI()) {
             if ("on".equals(newState)) {
-                player.printError(BBC.getPrefix() + "Server CUI already enabled.");
+                player.printError("Server CUI already enabled.");
                 return;
             }
 
             session.setUseServerCUI(false);
             session.updateServerCUI(player);
-            player.print(BBC.getPrefix() + "Server CUI disabled.");
+            player.print("Server CUI disabled.");
         } else {
             if ("off".equals(newState)) {
-                player.printError(BBC.getPrefix() + "Server CUI already disabled.");
+                player.printError("Server CUI already disabled.");
                 return;
             }
 
             session.setUseServerCUI(true);
             session.updateServerCUI(player);
-            player.print(BBC.getPrefix() + "Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.");
+            player.print("Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.");
         }
     }
 
@@ -327,29 +327,29 @@ public class OptionsCommands {
         ItemType type = ItemTypes.get(query);
 
         if (type != null) {
-            actor.print(BBC.getPrefix() + type.getId() + " (" + type.getName() + ")");
+            actor.print(type.getId() + " (" + type.getName() + ")");
         } else {
             if (query.length() <= 2) {
-                actor.printError(BBC.getPrefix() + "Enter a longer search string (len > 2).");
+                actor.printError("Enter a longer search string (len > 2).");
                 return;
             }
 
             if (!blocksOnly && !itemsOnly) {
-                actor.print(BBC.getPrefix() + "Searching for: " + query);
+                actor.print("Searching for: " + query);
             } else if (blocksOnly && itemsOnly) {
-                actor.printError(BBC.getPrefix() + "You cannot use both the 'b' and 'i' flags simultaneously.");
+                actor.printError("You cannot use both the 'b' and 'i' flags simultaneously.");
                 return;
             } else if (blocksOnly) {
-                actor.print(BBC.getPrefix() + "Searching for blocks: " + query);
+                actor.print("Searching for blocks: " + query);
             } else {
-                actor.print(BBC.getPrefix() + "Searching for items: " + query);
+                actor.print("Searching for items: " + query);
             }
 
             int found = 0;
 
             for (ItemType searchType : ItemType.REGISTRY) {
                 if (found >= 15) {
-                    actor.print(BBC.getPrefix() + "Too many results!");
+                    actor.print("Too many results!");
                     break;
                 }
 
@@ -363,7 +363,7 @@ public class OptionsCommands {
 
                 for (String alias : Sets.newHashSet(searchType.getId(), searchType.getName())) {
                     if (alias.contains(query)) {
-                        actor.print(BBC.getPrefix() + searchType.getId() + " (" + searchType.getName() + ")");
+                        actor.print(searchType.getId() + " (" + searchType.getName() + ")");
                         ++found;
                         break;
                     }
@@ -371,7 +371,7 @@ public class OptionsCommands {
             }
 
             if (found == 0) {
-                actor.printError(BBC.getPrefix() + "No items found.");
+                actor.printError("No items found.");
             }
         }
     }

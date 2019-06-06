@@ -201,7 +201,7 @@ public class BiomeCommands extends MethodCommands {
                     c.getAmount() / (double) size * 100,
                     data == null ? "Unknown" : data.getName(),
                     c.getID().getInternalId());
-            player.print(BBC.getPrefix() + str);
+            player.print(str);
         }
     }
 

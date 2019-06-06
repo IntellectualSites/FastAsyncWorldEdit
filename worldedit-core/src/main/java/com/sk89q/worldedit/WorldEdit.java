@@ -612,7 +612,7 @@ public final class WorldEdit {
         String ext = filename.substring(index + 1);
 
         if (!ext.equalsIgnoreCase("js")) {
-            player.printError(BBC.getPrefix() + "Only .js scripts are currently supported");
+            player.printError("Only .js scripts are currently supported");
             return;
         }
 
@@ -625,7 +625,7 @@ public final class WorldEdit {
                 file = WorldEdit.class.getResourceAsStream("craftscripts/" + filename);
 
                 if (file == null) {
-                    player.printError(BBC.getPrefix() + "Script does not exist: " + filename);
+                    player.printError("Script does not exist: " + filename);
                     return;
                 }
             } else {
@@ -638,7 +638,7 @@ public final class WorldEdit {
             in.close();
             script = new String(data, 0, data.length, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            player.printError(BBC.getPrefix() + "Script read error: " + e.getMessage());
+            player.printError("Script read error: " + e.getMessage());
             return;
         }
 
@@ -651,8 +651,8 @@ public final class WorldEdit {
         try {
             engine = new RhinoCraftScriptEngine();
         } catch (NoClassDefFoundError e) {
-            player.printError(BBC.getPrefix() + "Failed to find an installed script engine.");
-            player.printError(BBC.getPrefix() + "Please see http://wiki.sk89q.com/wiki/WorldEdit/Installation");
+            player.printError("Failed to find an installed script engine.");
+            player.printError("Please see http://wiki.sk89q.com/wiki/WorldEdit/Installation");
             return;
         }
 
@@ -666,15 +666,15 @@ public final class WorldEdit {
         try {
             engine.evaluate(script, filename, vars);
         } catch (ScriptException e) {
-            player.printError(BBC.getPrefix() + "Failed to execute:");
+            player.printError("Failed to execute:");
             player.printRaw(e.getMessage());
-            logger.warn(BBC.getPrefix() + "Failed to execute script", e);
+            logger.warn("Failed to execute script", e);
         } catch (NumberFormatException | WorldEditException e) {
             throw e;
         } catch (Throwable e) {
-            player.printError(BBC.getPrefix() + "Failed to execute (see console):");
+            player.printError("Failed to execute (see console):");
             player.printRaw(e.getClass().getCanonicalName());
-            logger.warn(BBC.getPrefix() + "Failed to execute script", e);
+            logger.warn("Failed to execute script", e);
         } finally {
             for (EditSession editSession : scriptContext.getEditSessions()) {
                 editSession.flushSession();
