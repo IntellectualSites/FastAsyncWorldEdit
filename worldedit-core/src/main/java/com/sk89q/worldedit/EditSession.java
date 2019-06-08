@@ -3376,30 +3376,27 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside) {
         final LocalBlockVectorSet queue = new LocalBlockVectorSet();
-
+        queue.add(origin);
         while (!queue.isEmpty()) {
-            Iterator<BlockVector3> iter = queue.iterator();
-            while (iter.hasNext()) {
-                BlockVector3 current = iter.next();
-                iter.remove();
-                final BlockState block = getBlock(current);
-                if (block.getBlockType().getMaterial().isMovementBlocker()) {
-                    continue;
-                }
-
-                if (!outside.add(current)) {
-                    continue;
-                }
-
-                if (!region.contains(current)) {
-                    continue;
-                }
-
-                for (BlockVector3 recurseDirection : recurseDirections) {
-                    queue.add(current.add(recurseDirection));
-                }
-            }
-        }
+        	BlockVector3 current = queue.getIndex(0);
+        	queue.remove(current);
+        	final BlockState block = getBlock(current);
+        	if (block.getBlockType().getMaterial().isMovementBlocker()) {
+        		continue;
+        	}
+        	
+        	if (!outside.add(current)) {
+        		continue;
+        	}
+        	
+        	if (!region.contains(current)) {
+        		continue;
+        	}
+        	
+        	for (BlockVector3 recurseDirection : recurseDirections) {
+        		queue.add(current.add(recurseDirection));
+        	}
+        }        
     }
 
     public int makeBiomeShape(final Region region, final Vector3 zero, final Vector3 unit, final BiomeType biomeType,
