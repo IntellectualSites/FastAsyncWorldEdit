@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.internal.command;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -89,7 +88,7 @@ public class WorldEditBinding {
     public Object getSelection(ArgumentStack context) throws IncompleteRegionException, ParameterException {
         Player sender = getPlayer(context);
         LocalSession session = worldEdit.getSessionManager().get(sender);
-        return session.getSelection(FawePlayer.wrap(sender).getWorldForEditing());
+        return session.getSelection(sender.getWorld());
     }
 
     /**
@@ -307,7 +306,7 @@ public class WorldEditBinding {
                   type = BlockVector3.class,
                   behavior = BindingBehavior.CONSUMES,
                   consumedCount = 1)
-    public BlockVector3 getDirection(ArgumentStack context, Direction direction) 
+    public BlockVector3 getDirection(ArgumentStack context, Direction direction)
             throws ParameterException, UnknownDirectionException {
         Player sender = getPlayer(context);
         if (direction.includeDiagonals()) {

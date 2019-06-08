@@ -1,26 +1,19 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.OffsetFaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.blocks.Blocks;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Arrays;
 
 public class ErodeBrush implements Brush {
-
-    private PseudoRandom rand = new PseudoRandom();
 
     private static final BlockVector3[] FACES_TO_CHECK = {BlockVector3.at(0, 0, 1), BlockVector3.at(0, 0, -1), BlockVector3.at(0, 1, 0), BlockVector3.at(0, -1, 0), BlockVector3.at(1, 0, 0), BlockVector3.at(-1, 0, 0)};
 

@@ -49,16 +49,16 @@ public class ImgurUtility {
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         conn.connect();
         StringBuilder stb = new StringBuilder();
-        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-        wr.write(data);
-        wr.flush();
-        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line;
-        while ((line = rd.readLine()) != null) {
-            stb.append(line).append("\n");
+        try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream())) {
+            wr.write(data);
+            wr.flush();
+            try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                String line;
+                while ((line = rd.readLine()) != null) {
+                    stb.append(line).append("\n");
+                }
+            }
         }
-        wr.close();
-        rd.close();
         return stb.toString();
     }
 }

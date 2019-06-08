@@ -19,9 +19,19 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import com.boydti.fawe.object.io.PGZIPOutputStream;
+import com.boydti.fawe.object.io.ResettableFileInputStream;
+import com.boydti.fawe.object.schematic.PNGWriter;
+import com.boydti.fawe.object.schematic.StructureFormat;
+import com.google.common.collect.ImmutableSet;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.NamedTag;
+import com.sk89q.jnbt.Tag;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,28 +42,21 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.boydti.fawe.object.clipboard.AbstractClipboardFormat;
-import com.boydti.fawe.object.io.PGZIPOutputStream;
-import com.boydti.fawe.object.io.ResettableFileInputStream;
-import com.boydti.fawe.object.schematic.PNGWriter;
-import com.boydti.fawe.object.schematic.StructureFormat;
-import com.google.common.collect.ImmutableSet;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.NBTConstants;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.Tag;
-
 /**
  * A collection of supported clipboard formats.
  */
-public enum BuiltInClipboardFormat implements ClipboardFormat{
+public enum BuiltInClipboardFormat implements ClipboardFormat {
+
     /**
      * The Schematic format used by MCEdit.
      */
-    @Deprecated
     MCEDIT_SCHEMATIC("mcedit", "mce", "schematic") {
+
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schematic";
+        }
+
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
             if (inputStream instanceof FileInputStream) {
@@ -73,32 +76,31 @@ public enum BuiltInClipboardFormat implements ClipboardFormat{
 
         @Override
         public boolean isFormat(File file) {
-        	 try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
-                 NamedTag rootTag = str.readNamedTag();
-                 if (!rootTag.getName().equals("Schematic")) {
-                     return false;
-                 }
-                 CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
+            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                NamedTag rootTag = str.readNamedTag();
+                if (!rootTag.getName().equals("Schematic")) {
+                    return false;
+                }
+                CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
 
-                 // Check
-                 Map<String, Tag> schematic = schematicTag.getValue();
-                 if (!schematic.containsKey("Materials")) {
-                     return false;
-                 }
-             } catch (Exception e) {
-                 return false;
-             }
-             return true;
+                // Check
+                Map<String, Tag> schematic = schematicTag.getValue();
+                if (!schematic.containsKey("Materials")) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
         }
+    },
+    SPONGE_SCHEMATIC("sponge", "schem") {
 
         @Override
         public String getPrimaryFileExtension() {
-            return "schematic";
+            return "schem";
         }
-    },
 
-    @Deprecated
-    SPONGE_SCHEMATIC("sponge", "schem") {
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
             if (inputStream instanceof FileInputStream) {
@@ -106,8 +108,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat{
             }
             BufferedInputStream buffered = new BufferedInputStream(inputStream);
             NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            SpongeSchematicReader input = new SpongeSchematicReader(nbtStream);
-            return input;
+            return new SpongeSchematicReader(nbtStream);
         }
 
         @Override
@@ -117,8 +118,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat{
                 gzip = outputStream;
             } else {
                 outputStream = new BufferedOutputStream(outputStream);
-                PGZIPOutputStream pigz = new PGZIPOutputStream(outputStream);
-                gzip = pigz;
+                gzip = new PGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new SpongeSchematicWriter(nbtStream);
@@ -145,10 +145,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat{
             return true;
         }
 
-        @Override
-        public String getPrimaryFileExtension() {
-            return "schem";
-        }
     },
 
     /**
@@ -166,13 +162,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat{
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             outputStream = new BufferedOutputStream(outputStream);
-            OutputStream gzip;
-            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
-                gzip = outputStream;
-            } else {
-                PGZIPOutputStream pigz = new PGZIPOutputStream(outputStream);
-                gzip = pigz;
-            }
+            OutputStream gzip = new PGZIPOutputStream(outputStream);
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new StructureFormat(nbtStream);
         }
@@ -194,7 +184,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat{
     PNG("png", "image") {
 
         @Override
-        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+        public ClipboardReader getReader(InputStream inputStream) {
             return null;
         }
 

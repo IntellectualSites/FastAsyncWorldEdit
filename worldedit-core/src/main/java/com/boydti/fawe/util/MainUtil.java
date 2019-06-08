@@ -15,12 +15,15 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
-import java.awt.Graphics2D;
+import net.jpountz.lz4.*;
+
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -28,6 +31,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ForkJoinPool;
@@ -37,9 +41,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.zip.*;
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
-import net.jpountz.lz4.*;
+
+import static java.lang.System.arraycopy;
 
 public class MainUtil {
     /*
@@ -75,35 +78,6 @@ public class MainUtil {
         return suggestions;
     }
 
-    public static List<String> prepend(String start, List<String> suggestions) {
-        if (start.isEmpty()) {
-            return suggestions;
-        }
-        suggestions = new ArrayList<>(suggestions);
-        for (int i = 0; i < suggestions.size(); i++) {
-            suggestions.set(i, start + suggestions.get(i));
-        }
-        return suggestions;
-    }
-
-    public static <T> T[] joinArrayGeneric(T[]... arrays) {
-        int length = 0;
-        for (T[] array : arrays) {
-            length += array.length;
-        }
-
-        //T[] result = new T[length];
-        final T[] result = (T[]) Array.newInstance(arrays[0].getClass().getComponentType(), length);
-
-        int offset = 0;
-        for (T[] array : arrays) {
-            System.arraycopy(array, 0, result, offset, array.length);
-            offset += array.length;
-        }
-
-        return result;
-    }
-
     public static <T> T getOf(Object[] arr, Class<T> ofType) {
         for (Object a : arr) {
             if (a != null && a.getClass() == ofType) {
@@ -111,22 +85,6 @@ public class MainUtil {
             }
         }
         return null;
-    }
-
-    public static String[] getParameterNames(Method method) {
-        Parameter[] parameters = method.getParameters();
-        List<String> parameterNames = new ArrayList<>();
-
-        for (Parameter parameter : parameters) {
-            if(!parameter.isNamePresent()) {
-                throw new IllegalArgumentException("Parameter names are not present!");
-            }
-
-            String parameterName = parameter.getName();
-            parameterNames.add(parameterName);
-        }
-
-        return parameterNames.toArray(new String[parameterNames.size()]);
     }
 
     public static long getTotalSize(Path path) {
@@ -217,20 +175,17 @@ public class MainUtil {
 
     public static int getMaxFileId(File folder) {
         final int[] max = new int[1];
-        folder.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                String name = pathname.getName();
-                Integer val = null;
-                if (pathname.isDirectory()) {
-                    val = StringMan.toInteger(name, 0, name.length());
-                } else {
-                    int i = name.lastIndexOf('.');
-                    if (i != -1) val = StringMan.toInteger(name, 0, i);
-                }
-                if (val != null && val > max[0]) max[0] = val;
-                return false;
+        folder.listFiles(pathname -> {
+            String name = pathname.getName();
+            Integer val = null;
+            if (pathname.isDirectory()) {
+                val = StringMan.toInteger(name, 0, name.length());
+            } else {
+                int i = name.lastIndexOf('.');
+                if (i != -1) val = StringMan.toInteger(name, 0, i);
             }
+            if (val != null && val > max[0]) max[0] = val;
+            return false;
         });
         return max[0] + 1;
     }
@@ -294,7 +249,7 @@ public class MainUtil {
         return baos.toByteArray();
     }
 
-    public static byte[] decompress(byte[] bytes, byte[] buffer, Inflater inflater) throws IOException, DataFormatException {
+    public static byte[] decompress(byte[] bytes, byte[] buffer, Inflater inflater) throws DataFormatException {
         if (buffer == null) {
             buffer = new byte[8192];
         }
@@ -452,10 +407,11 @@ public class MainUtil {
                 writer.append("--" + boundary + "--").append(CRLF).flush();
             }
             int responseCode = ((HttpURLConnection) con).getResponseCode();
-            java.util.Scanner scanner = new java.util.Scanner(con.getInputStream()).useDelimiter("\\A");
-            String content = scanner.next().trim();
-            scanner.close();
-            if (content != null && !content.startsWith("<")) {
+            String content;
+            try (Scanner scanner = new Scanner(con.getInputStream()).useDelimiter("\\A")) {
+                content = scanner.next().trim();
+            }
+            if (!content.startsWith("<")) {
                 Fawe.debug(content);
             }
             if (responseCode == 200) {
@@ -512,8 +468,8 @@ public class MainUtil {
                     return loader;
                 }
             }
-        } catch (Throwable ignore) {
-            ignore.printStackTrace();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
         }
         return sysloader;
     }
@@ -527,12 +483,13 @@ public class MainUtil {
     public static void download(URL url, File out) throws IOException {
         File parent = out.getParentFile();
         if (!out.exists()) {
-            if (parent != null) parent.mkdirs();
+            if (parent != null) {
+                parent.mkdirs();
+            }
             File tempFile = File.createTempFile(UUID.randomUUID().toString(), ".tmp", parent);
             tempFile.deleteOnExit();
-            try (InputStream is = url.openStream()) {
-                ReadableByteChannel rbc = Channels.newChannel(is);
-                FileOutputStream fos = new FileOutputStream(tempFile);
+            try (InputStream is = url.openStream(); ReadableByteChannel rbc = Channels.newChannel(is);
+                 FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             }
             Files.copy(tempFile.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -616,31 +573,13 @@ public class MainUtil {
             }
             destFile.createNewFile();
         }
-        FileInputStream fIn = null;
-        FileOutputStream fOut = null;
-        FileChannel source = null;
-        FileChannel destination = null;
-        try {
-            fIn = new FileInputStream(sourceFile);
-            source = fIn.getChannel();
-            fOut = new FileOutputStream(destFile);
-            destination = fOut.getChannel();
+        try (FileInputStream fIn = new FileInputStream(sourceFile); FileChannel source = fIn.getChannel();
+             FileOutputStream fOut = new FileOutputStream(destFile); FileChannel destination = fOut.getChannel()) {
             long transfered = 0;
             long bytes = source.size();
             while (transfered < bytes) {
                 transfered += destination.transferFrom(source, 0, source.size());
                 destination.position(transfered);
-            }
-        } finally {
-            if (source != null) {
-                source.close();
-            } else if (fIn != null) {
-                fIn.close();
-            }
-            if (destination != null) {
-                destination.close();
-            } else if (fOut != null) {
-                fOut.close();
             }
         }
         return destFile;
@@ -793,31 +732,6 @@ public class MainUtil {
         return msg;
     }
 
-    public static void smoothArray(int[] data, int width, int radius, int weight) {
-        int[] copy = data.clone();
-        int length = data.length / width;
-        int diameter = 2 * radius + 1;
-        weight += diameter * diameter - 1;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < length; y++) {
-                int index = x + width * y;
-                int value = 0;
-                int count = 0;
-                for (int x2 = Math.max(0, x - radius); x2 <= Math.min(width - 1, x + radius); x2++) {
-                    for (int y2 = Math.max(0, y - radius); y2 <= Math.min(length - 1, y + radius); y2++) {
-                        count++;
-                        int index2 = x2 + width * y2;
-                        value += data[index2];
-
-                    }
-                }
-                value += data[index] * (weight - count);
-                value = value / (weight);
-                data[index] = value;
-            }
-        }
-    }
-
     public static void warnDeprecated(Class... alternatives) {
         StackTraceElement[] stacktrace = new RuntimeException().getStackTrace();
         if (stacktrace.length > 1) {
@@ -838,8 +752,8 @@ public class MainUtil {
                     String myName = Class.forName(deprecatedElement.getClassName()).getSimpleName();
                     Fawe.debug("@" + creator + " used by " + myName + "." + deprecatedElement.getMethodName() + "():" + deprecatedElement.getLineNumber() + " is deprecated.");
                     Fawe.debug(" - Alternatives: " + StringMan.getString(alternatives));
-                } catch (Throwable ignore) {
-                    ignore.printStackTrace();
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
                 } finally {
                     break;
                 }
@@ -972,7 +886,7 @@ public class MainUtil {
             Class component = arr.getClass().getComponentType();
             Object newInnerArray = Array.newInstance(component, innerArrayLength);
             if (component.isPrimitive()) {
-                System.arraycopy(arr, 0, newInnerArray, 0, innerArrayLength);
+                arraycopy(arr, 0, newInnerArray, 0, innerArrayLength);
             } else {
                 //copy each elem of the array
                 for (int i = 0; i < innerArrayLength; i++) {
@@ -1073,14 +987,11 @@ public class MainUtil {
     public static void deleteOlder(File directory, final long timeDiff, boolean printDebug) {
         final long now = System.currentTimeMillis();
         ForkJoinPool pool = new ForkJoinPool();
-        iterateFiles(directory, new Consumer<File>() {
-            @Override
-            public void accept(File file) {
-                long age = now - file.lastModified();
-                if (age > timeDiff) {
-                    pool.submit(() -> file.delete());
-                    if (printDebug) BBC.FILE_DELETED.send(null, file);
-                }
+        iterateFiles(directory, file -> {
+            long age = now - file.lastModified();
+            if (age > timeDiff) {
+                pool.submit(file::delete);
+                if (printDebug) BBC.FILE_DELETED.send(null, file);
             }
         });
         pool.shutdown();
@@ -1099,10 +1010,9 @@ public class MainUtil {
         if (directory.exists()) {
             File[] files = directory.listFiles();
             if (null != files) {
-                for (int i = 0; i < files.length; i++) {
-                    File file = files[i];
+                for (File file : files) {
                     if (file.isDirectory()) {
-                        deleteDirectory(files[i], printDebug);
+                        deleteDirectory(file, printDebug);
                     } else {
                         file.delete();
                         if (printDebug) BBC.FILE_DELETED.send(null, file);
@@ -1131,26 +1041,15 @@ public class MainUtil {
         return true;
     }
 
-    public static boolean isValidSign(CompoundTag tag) {
-        Map<String, Tag> values = tag.getValue();
-        if (values.size() > 4 && values.containsKey("Text1")) {
-            Tag text1 = values.get("Text1");
-            Object value = text1.getValue();
-            return value != null && value instanceof String && ((String) value).length() > 0;
-        }
-        return false;
-    }
-
     public enum OS {
-        LINUX, SOLARIS, WINDOWS, MACOS, UNKNOWN;
+        LINUX, WINDOWS, MACOS, UNKNOWN;
     }
 
     public static File getWorkingDirectory(String applicationName) {
         String userHome = System.getProperty("user.home", ".");
-        File workingDirectory = null;
+        File workingDirectory;
         switch (getPlatform()) {
             case LINUX:
-            case SOLARIS:
                 workingDirectory = new File(userHome, '.' + applicationName + '/');
                 break;
             case WINDOWS:
@@ -1180,12 +1079,6 @@ public class MainUtil {
         }
         if (osName.contains("mac")) {
             return OS.MACOS;
-        }
-        if (osName.contains("solaris")) {
-            return OS.SOLARIS;
-        }
-        if (osName.contains("sunos")) {
-            return OS.SOLARIS;
         }
         if (osName.contains("linux")) {
             return OS.LINUX;

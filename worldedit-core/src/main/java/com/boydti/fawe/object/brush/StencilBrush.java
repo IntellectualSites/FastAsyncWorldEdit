@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.object.mask.AdjacentAnyMask;
 import com.boydti.fawe.util.MathMan;
@@ -13,14 +12,17 @@ import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
+
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class StencilBrush extends HeightBrush {
     private final boolean onlyWhite;
@@ -53,7 +55,7 @@ public class StencilBrush extends HeightBrush {
 
 
         Player player = editSession.getPlayer().getPlayer();
-//        BlockVector3 pos = player.getLocation();
+        // BlockVector3 pos = player.getLocation();
 
 
 
@@ -84,7 +86,7 @@ public class StencilBrush extends HeightBrush {
                     if (val < cutoff) {
                         return true;
                     }
-                    if (val >= 255 || PseudoRandom.random.random(maxY) < val) {
+                    if (val >= 255 || ThreadLocalRandom.current().nextInt(maxY) < val) {
                         editSession.setBlock(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ(), pattern);
                     }
                     return true;
@@ -92,7 +94,7 @@ public class StencilBrush extends HeightBrush {
                 return false;
             }
         }, vector -> true, Integer.MAX_VALUE, editSession);
-        visitor.setDirections(Arrays.asList(visitor.DIAGONAL_DIRECTIONS));
+        visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);
     }

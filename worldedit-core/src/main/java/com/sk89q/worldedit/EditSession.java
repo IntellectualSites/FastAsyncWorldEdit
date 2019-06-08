@@ -1757,7 +1757,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         checkNotNull(region);
         checkNotNull(block);
         boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
-        		
+
         if (canBypassAll(region, false, true) && !hasNbt) {
             return changes = queue.setBlocks((CuboidRegion) region, block.getInternalId());
         }

@@ -33,10 +33,7 @@ public class Metadatable {
      * @return
      */
     public <V> V getMeta(String key) {
-        if (this.meta != null) {
-            return (V) this.meta.get(key);
-        }
-        return null;
+        return (V) this.meta.get(key);
     }
 
     /**
@@ -48,11 +45,8 @@ public class Metadatable {
      * @return
      */
     public <V> V getMeta(String key, V def) {
-        if (this.meta != null) {
-            V value = (V) this.meta.get(key);
-            return value == null ? def : value;
-        }
-        return def;
+        V value = (V) this.meta.get(key);
+        return value == null ? def : value;
     }
 
     /**
@@ -63,6 +57,6 @@ public class Metadatable {
      * @param key
      */
     public <V> V deleteMeta(String key) {
-        return this.meta == null ? null : (V) this.meta.remove(key);
+        return (V) this.meta.remove(key);
     }
 }

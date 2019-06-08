@@ -230,9 +230,7 @@ public class ImageUtil {
             } else {
                 throw new ParameterException("Invalid image " + arg);
             }
-        } catch (IOException e) {
-            throw new ParameterException(e);
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new ParameterException(e);
         }
     }

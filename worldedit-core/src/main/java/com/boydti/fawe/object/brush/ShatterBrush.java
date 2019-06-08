@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.mask.SurfaceMask;
 import com.sk89q.worldedit.EditSession;
@@ -11,6 +10,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ShatterBrush extends ScatterBrush {
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
@@ -61,7 +62,7 @@ public class ShatterBrush extends ScatterBrush {
                 frontier.forEach(new LocalBlockVectorSet.BlockVectorSetVisitor() {
                     @Override
                     public void run(int x, int y, int z, int index) {
-                        if (PseudoRandom.random.random(2) == 0) {
+                        if (ThreadLocalRandom.current().nextInt(2) == 0) {
                             finalTmp.add(x, y, z);
                             return;
                         }

@@ -1,9 +1,7 @@
 package com.boydti.fawe.object.mask;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.PseudoRandom;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+
 import java.util.Set;
 
 // TODO FIXME

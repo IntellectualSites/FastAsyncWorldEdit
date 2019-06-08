@@ -7,7 +7,6 @@ import com.boydti.fawe.example.NMSRelighter;
 import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.schematic.Schematic;
@@ -243,15 +242,6 @@ public class FaweAPI {
      */
     public static boolean isMemoryLimited() {
         return MemUtil.isMemoryLimited();
-    }
-
-    /**
-     * Use ThreadLocalRandom instead
-     *
-     */
-    @Deprecated
-    public static PseudoRandom getFastRandom() {
-        throw new UnsupportedOperationException("Please Use ThreadLocalRandom instead.");
     }
 
     /**

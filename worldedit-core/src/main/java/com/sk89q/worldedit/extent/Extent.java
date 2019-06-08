@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.extent;
 
 import com.boydti.fawe.jnbt.anvil.generator.*;
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -32,7 +31,6 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;

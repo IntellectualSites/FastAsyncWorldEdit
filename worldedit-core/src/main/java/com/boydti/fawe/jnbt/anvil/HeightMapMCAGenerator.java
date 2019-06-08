@@ -595,11 +595,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     continue;
                 }
                 placed.add(x, z);
-                ClipboardHolder holder = clipboards.get(PseudoRandom.random.random(clipboards.size()));
+                ClipboardHolder holder = clipboards.get(ThreadLocalRandom.current().nextInt(clipboards.size()));
                 if (randomRotate) {
-                    int rotate = PseudoRandom.random.random(4) * 90;
+                    int rotate = ThreadLocalRandom.current().nextInt(4) * 90;
                     if (rotate != 0) {
-                        holder.setTransform(new AffineTransform().rotateY(PseudoRandom.random.random(4) * 90));
+                        holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
                     } else {
                         holder.setTransform(identity);
                     }
@@ -644,11 +644,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
                 mutable.mutY(y + 1);
                 placed.add(x, z);
-                ClipboardHolder holder = clipboards.get(PseudoRandom.random.random(clipboards.size()));
+                ClipboardHolder holder = clipboards.get(ThreadLocalRandom.current().nextInt(clipboards.size()));
                 if (randomRotate) {
-                    int rotate = PseudoRandom.random.random(4) * 90;
+                    int rotate = ThreadLocalRandom.current().nextInt(4) * 90;
                     if (rotate != 0) {
-                        holder.setTransform(new AffineTransform().rotateY(PseudoRandom.random.random(4) * 90));
+                        holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
                     } else {
                         holder.setTransform(identity);
                     }

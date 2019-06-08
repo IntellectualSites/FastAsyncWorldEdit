@@ -1,6 +1,5 @@
 package com.boydti.fawe.jnbt.anvil.generator;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;

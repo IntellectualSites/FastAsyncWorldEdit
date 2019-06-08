@@ -98,7 +98,6 @@ public class SelectionCommand extends SimpleCommand<Operation> {
                     CuboidRegion cuboid = (CuboidRegion) selection;
                     RegionFunction function = ((RegionVisitor) operation).function;
                     RegionWrapper current = new RegionWrapper(cuboid.getMinimumPoint(), cuboid.getMaximumPoint());
-                    FawePlayer fp = FawePlayer.wrap(player);
                     FaweRegionExtent regionExtent = editSession.getRegionExtent();
 
                     if (function instanceof BlockReplace && regionExtent == null || regionExtent.isGlobal()) {

@@ -183,8 +183,8 @@ public class UtilityCommands extends MethodCommands {
             desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
     )
     @CommandPermissions("fawe.admin")
-    public void heightmapInterface(FawePlayer player, @Optional("100") int min, @Optional("200") int max) throws IOException {
-        player.sendMessage("Please wait while we generate the minified heightmaps.");
+    public void heightmapInterface(Player player, @Optional("100") int min, @Optional("200") int max) throws IOException {
+        player.print("Please wait while we generate the minified heightmaps.");
         File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
 
         File webSrc = new File(Fawe.imp().getDirectory(), "web" + File.separator + "heightmap");
@@ -206,7 +206,7 @@ public class UtilityCommands extends MethodCommands {
                 BufferedImage img = MainUtil.readImage(file);
                 BufferedImage minImg = ImageUtil.getScaledInstance(img, min, min, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
                 BufferedImage maxImg = max == -1 ? img : ImageUtil.getScaledInstance(img, max, max, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                player.sendMessage("Writing " + name);
+                player.print("Writing " + name);
                 File minFile = new File(minImages, name);
                 File maxFile = new File(maxImages, name);
                 minFile.getParentFile().mkdirs();
@@ -231,9 +231,9 @@ public class UtilityCommands extends MethodCommands {
         config.append("// The local source for the image (used in commands)\n");
         config.append("var src_local = \"file://\";\n");
         File configFile = new File(webSrc, "config.js");
-        player.sendMessage("Writing " + configFile);
+        player.print("Writing " + configFile);
         Files.write(configFile.toPath(), config.toString().getBytes());
-        player.sendMessage("Done! See: `FastAsyncWorldEdit/web/heightmap`");
+        player.print("Done! See: `FastAsyncWorldEdit/web/heightmap`");
     }
 
     @Command(

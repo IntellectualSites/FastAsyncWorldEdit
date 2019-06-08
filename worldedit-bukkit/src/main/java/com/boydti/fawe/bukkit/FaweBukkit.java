@@ -24,7 +24,6 @@ import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
 import com.boydti.fawe.bukkit.util.BukkitTaskMan;
 import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.VaultUtil;
-import com.boydti.fawe.bukkit.util.cui.CUIListener;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_All;
@@ -73,10 +72,10 @@ public class FaweBukkit implements IFawe, Listener {
 
     private boolean listeningImages;
     private BukkitImageListener imageListener;
-    private CFIPacketListener packetListener;
+    //private CFIPacketListener packetListener;
 
-    private boolean listeningCui;
-    private CUIListener cuiListener;
+    //private boolean listeningCui;
+    //private CUIListener cuiListener;
 
     public VaultUtil getVault() {
         return this.vault;
@@ -151,7 +150,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (listeningImages && imageListener == null) return null;
         try {
             listeningImages = true;
-            registerPacketListener();
+            //registerPacketListener();
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {

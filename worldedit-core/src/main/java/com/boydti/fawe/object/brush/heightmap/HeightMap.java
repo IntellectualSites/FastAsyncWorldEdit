@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush.heightmap;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -11,6 +10,8 @@ import com.sk89q.worldedit.math.convolution.HeightMapFilter;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public interface HeightMap {
     public double getHeight(int x, int z);
@@ -108,7 +109,7 @@ public interface HeightMap {
                     int diff = targetY - height;
                     double raiseScaled = diff * (raisePow * sizePowInv);
                     double raiseScaledAbs = Math.abs(raiseScaled);
-                    int random = PseudoRandom.random.random(256) < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(raiseScaledAbs)) * 256) ? (diff > 0 ? 1 : -1) : 0;
+                    int random = ThreadLocalRandom.current().nextInt(256) < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(raiseScaledAbs)) * 256) ? (diff > 0 ? 1 : -1) : 0;
                     int raiseScaledInt = (int) raiseScaled + random;
                     newData[index] = height + raiseScaledInt;
                 }
@@ -148,7 +149,7 @@ public interface HeightMap {
                         continue;
                     }
                     raise = (yscale * raise);
-                    int random = PseudoRandom.random.random(256) < (int) ((raise - (int) raise) * (256)) ? 1 : 0;
+                    int random = ThreadLocalRandom.current().nextInt(256) < (int) ((raise - (int) raise) * (256)) ? 1 : 0;
                     int newHeight = height + (int) raise + random;
                     newData[index] = newHeight;
                 }

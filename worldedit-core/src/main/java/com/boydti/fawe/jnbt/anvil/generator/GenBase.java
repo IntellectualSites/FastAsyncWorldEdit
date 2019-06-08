@@ -1,6 +1,5 @@
 package com.boydti.fawe.jnbt.anvil.generator;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -10,12 +9,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class GenBase {
 
     private final int checkAreaSize;
-    private final PseudoRandom random;
     private final long seed;
     private final long worldSeed1, worldSeed2;
 
     public GenBase(int area) {
-        this.random = new PseudoRandom();
         this.checkAreaSize = area;
         this.seed = ThreadLocalRandom.current().nextLong();
         this.worldSeed1 = ThreadLocalRandom.current().nextLong();
@@ -24,10 +21,6 @@ public abstract class GenBase {
 
     public int getCheckAreaSize() {
         return checkAreaSize;
-    }
-
-    public PseudoRandom getRandom() {
-        return random;
     }
 
     public void generate(BlockVector2 chunkPos, Extent chunk) throws WorldEditException {

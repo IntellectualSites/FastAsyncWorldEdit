@@ -506,7 +506,8 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @return
      */
     public LocalSession getSession() {
-        return (this.session != null || this.getPlayer() == null || Fawe.get() == null) ? this.session : (session = Fawe.get().getWorldEdit().getSessionManager().get(this.getPlayer()));
+        if (this.session != null || this.getPlayer() == null || Fawe.get() == null) return this.session;
+        else return session = Fawe.get().getWorldEdit().getSessionManager().get(this.getPlayer());
     }
 
     /**
@@ -662,7 +663,8 @@ public abstract class FawePlayer<T> extends Metadatable {
 
         PlayerProxy proxy = new PlayerProxy(player, permActor, cuiActor, world);
         if (world instanceof VirtualWorld) {
-            proxy.setOffset(Vector3.ZERO.subtract(((VirtualWorld) world).getOrigin()));
+            //todo fix this
+            //proxy.setOffset(Vector3.ZERO.subtract(((VirtualWorld) world).getOrigin()));
         }
         return proxy;
     }

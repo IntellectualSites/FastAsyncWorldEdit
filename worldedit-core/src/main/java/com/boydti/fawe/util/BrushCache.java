@@ -89,7 +89,7 @@ public final class BrushCache {
             String json = tool.toString(gson);
             map.put("weBrushJson", new StringTag(json));
             if (display == null) {
-                map.put("display", new CompoundTag(displayMap = new HashMap()));
+                map.put("display", new CompoundTag(displayMap = new HashMap<>()));
             } else {
                 displayMap = ReflectionUtils.getMap(display.getValue());
             }

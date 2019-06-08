@@ -20,7 +20,6 @@ public class VisualQueue extends SingleThreadIntervalQueue<FawePlayer> {
         LocalSession session = fp.getSession();
         Player player = fp.getPlayer();
         Tool tool = session.getTool(player);
-        Brush brush;
         if (tool instanceof BrushTool) {
             BrushTool brushTool = (BrushTool) tool;
             if (brushTool.getVisualMode() != VisualMode.NONE) {
