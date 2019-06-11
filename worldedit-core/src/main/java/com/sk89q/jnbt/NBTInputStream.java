@@ -20,16 +20,12 @@
 package com.sk89q.jnbt;
 
 import com.boydti.fawe.jnbt.NBTStreamer;
-import com.boydti.fawe.object.RunnableVal2;
-import com.boydti.fawe.util.StringMan;
 
 import java.io.Closeable;
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +36,7 @@ import java.util.function.Function;
  * This class reads <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * streams, and produces an object graph of subclasses of the {@code Tag}
  * object.
- * 
+ *
  * <p>The NBT format was created by Markus Persson, and the specification may be
  * found at <a href="http://www.minecraft.net/docs/NBT.txt">
  * http://www.minecraft.net/docs/NBT.txt</a>.</p>
@@ -52,7 +48,7 @@ public final class NBTInputStream implements Closeable {
     /**
      * Creates a new {@code NBTInputStream}, which will source its data
      * from the specified input stream.
-     * 
+     *
      * @param is the input stream
      * @throws IOException if an I/O error occurs
      */
@@ -70,7 +66,7 @@ public final class NBTInputStream implements Closeable {
 
     /**
      * Reads an NBT tag from the stream.
-     * 
+     *
      * @return The tag that was read.
      * @throws IOException if an I/O error occurs.
      */
@@ -84,13 +80,13 @@ public final class NBTInputStream implements Closeable {
      * @return The map that was read.
      * @throws IOException if an I/O error occurs.
      */
-    public NamedData readNamedData() throws IOException {
+    public NamedData<? extends Object> readNamedData() throws IOException {
         return readNamedData(0);
     }
 
     /**
      * Reads an NBT from the stream.
-     * 
+     *
      * @param depth the depth of this tag
      * @return The tag that was read.
      * @throws IOException if an I/O error occurs.
@@ -102,7 +98,7 @@ public final class NBTInputStream implements Closeable {
 
     private NamedData readNamedData(int depth) throws IOException {
         int type = is.readByte();
-        return new NamedData(readNamedTagName(type), readDataPayload(type, depth));
+        return new NamedData<>(readNamedTagName(type), readDataPayload(type, depth));
     }
 
     public Tag readTag() throws IOException {
@@ -522,7 +518,7 @@ public final class NBTInputStream implements Closeable {
 
     /**
      * Reads the payload of a tag given the type.
-     * 
+     *
      * @param type the type
      * @param depth the depth
      * @return the tag
@@ -611,7 +607,7 @@ public final class NBTInputStream implements Closeable {
 
     @Override
     public void close() throws IOException {
-        if (is instanceof AutoCloseable) {
+        if (is != null) {
             try {
                 ((AutoCloseable) is).close();
             } catch (Exception e) {

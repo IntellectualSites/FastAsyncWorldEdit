@@ -19,14 +19,14 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.google.common.base.Function;
 import com.sk89q.worldedit.math.BlockVector3;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.function.Function;
 
 /**
  * Combines several masks and requires that one or more masks return true

@@ -61,10 +61,10 @@ public class ExtentEntityCopy implements EntityFunction {
     /**
      * Create a new instance.
      *
-     * @param from        the from position
+     * @param from the from position
      * @param destination the destination {@code Extent}
-     * @param to          the destination position
-     * @param transform   the transformation to apply to both position and orientation
+     * @param to the destination position
+     * @param transform the transformation to apply to both position and orientation
      */
     public ExtentEntityCopy(Vector3 from, Extent destination, Vector3 to, Transform transform) {
         checkNotNull(from);
@@ -111,6 +111,7 @@ public class ExtentEntityCopy implements EntityFunction {
                     : transform.apply(location.getDirection()).subtract(transform.apply(Vector3.ZERO)).normalize();
             newLocation = new Location(destination, newPosition.add(to.round().add(0.5, 0.5, 0.5)), newDirection);
 
+            // Some entities store their position data in NBT
             state = transformNbtData(state);
 
             boolean success = destination.createEntity(newLocation, state) != null;
@@ -135,6 +136,7 @@ public class ExtentEntityCopy implements EntityFunction {
      */
     private BaseEntity transformNbtData(BaseEntity state) {
         CompoundTag tag = state.getNbtData();
+
         if (tag != null) {
             boolean changed = false;
             // Handle hanging entities (paintings, item frames, etc.)

@@ -56,6 +56,7 @@ public class SnapshotUtilCommands {
             aliases = { "restore", "/restore" },
             usage = "[snapshot]",
             desc = "Restore the selection from a snapshot",
+            min = 0,
             max = 1
     )
     @Logging(REGION)
@@ -111,14 +112,20 @@ public class SnapshotUtilCommands {
             }
         }
 
+        ChunkStore chunkStore = null;
 
         // Load chunk store
-        SnapshotRestore restore;
-        try (ChunkStore chunkStore = snapshot.getChunkStore()) {
+        try {
+            chunkStore = snapshot.getChunkStore();
             BBC.SNAPSHOT_LOADED.send(player, snapshot.getName());
+        } catch (DataException | IOException e) {
+            player.printError("Failed to load snapshot: " + e.getMessage());
+            return;
+        }
 
+        try {
             // Restore snapshot
-            restore = new SnapshotRestore(chunkStore, editSession, region);
+            SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region);
             //player.print(restore.getChunksAffected() + " chunk(s) will be loaded.");
 
             restore.restore();
@@ -133,12 +140,15 @@ public class SnapshotUtilCommands {
                 }
             } else {
                 player.print(String.format("Restored; %d "
-                                + "missing chunks and %d other errors.",
+                        + "missing chunks and %d other errors.",
                         restore.getMissingChunks().size(),
                         restore.getErrorChunks().size()));
             }
-        } catch (DataException | IOException e) {
-            player.printError("Failed to load snapshot: " + e.getMessage());
+        } finally {
+            try {
+                chunkStore.close();
+            } catch (IOException ignored) {
+            }
         }
     }
 }

@@ -6,13 +6,13 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public abstract class TaskManager {
 
@@ -78,7 +78,7 @@ public abstract class TaskManager {
     /**
      * Run a bunch of tasks in parallel
      *
-     * @param runnables  The tasks to run
+     * @param runnables The tasks to run
      * @param numThreads Number of threads (null = config.yml parallel threads)
      */
     @Deprecated
@@ -228,8 +228,8 @@ public abstract class TaskManager {
      * Break up a task and run it in fragments of 5ms.<br>
      * - Each task will run on the main thread.<br>
      *
-     * @param objects  - The list of objects to run the task for
-     * @param task     - The task to run on each object
+     * @param objects - The list of objects to run the task for
+     * @param task - The task to run on each object
      * @param whenDone - When the object task completes
      * @param <T>
      */
@@ -312,7 +312,7 @@ public abstract class TaskManager {
      * - Usualy wait time is around 25ms<br>
      *
      * @param function
-     * @param timeout  - How long to wait for execution
+     * @param timeout - How long to wait for execution
      * @param <T>
      * @return
      */
@@ -361,7 +361,7 @@ public abstract class TaskManager {
      * - Usualy wait time is around 25ms<br>
      *
      * @param function
-     * @param timeout  - How long to wait for execution
+     * @param timeout - How long to wait for execution
      * @param <T>
      * @return
      */

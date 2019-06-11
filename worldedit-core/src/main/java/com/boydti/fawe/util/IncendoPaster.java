@@ -5,12 +5,23 @@ import com.google.common.base.Charsets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Single class paster for the Incendo paste service
@@ -28,8 +39,8 @@ public final class IncendoPaster {
      * Valid paste applications
      */
     public static final Collection<String>
-        VALID_APPLICATIONS = Arrays
-        .asList("plotsquared", "fastasyncworldedit", "incendopermissions", "kvantum");
+            VALID_APPLICATIONS = Arrays
+            .asList("plotsquared", "fastasyncworldedit", "incendopermissions", "kvantum");
 
     private final Collection<PasteFile> files = new ArrayList<>();
     private final String pasteApplication;
@@ -45,9 +56,83 @@ public final class IncendoPaster {
         }
         if (!VALID_APPLICATIONS.contains(pasteApplication.toLowerCase(Locale.ENGLISH))) {
             throw new IllegalArgumentException(
-                String.format("Unknown application name: %s", pasteApplication));
+                    String.format("Unknown application name: %s", pasteApplication));
         }
         this.pasteApplication = pasteApplication;
+    }
+
+    public static String debugPaste() throws IOException {
+        final IncendoPaster incendoPaster = new IncendoPaster("fastasyncworldedit");
+
+        StringBuilder b = new StringBuilder();
+        b.append(
+                "# Welcome to this paste\n# It is meant to provide us at IntellectualSites with better information about your "
+                        + "problem\n");
+        b.append("\n# Server Information\n");
+        b.append("server.platform: ").append(Fawe.imp().getPlatform()).append('\n');
+        b.append(Fawe.imp().getDebugInfo()).append('\n');
+        b.append("\n\n# YAY! Now, let's see what we can find in your JVM\n");
+        Runtime runtime = Runtime.getRuntime();
+        b.append("memory.free: ").append(runtime.freeMemory()).append('\n');
+        b.append("memory.max: ").append(runtime.maxMemory()).append('\n');
+        b.append("java.specification.version: '").append(System.getProperty("java.specification.version")).append("'\n");
+        b.append("java.vendor: '").append(System.getProperty("java.vendor")).append("'\n");
+        b.append("java.version: '").append(System.getProperty("java.version")).append("'\n");
+        b.append("os.arch: '").append(System.getProperty("os.arch")).append("'\n");
+        b.append("os.name: '").append(System.getProperty("os.name")).append("'\n");
+        b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
+        b.append("# Okay :D Great. You are now ready to create your bug report!");
+        b.append("\n# You can do so at https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues");
+        b.append("\n# or via our Discord at https://discord.gg/ngZCzbU");
+        incendoPaster.addFile(new IncendoPaster.PasteFile("information", b.toString()));
+
+        try {
+            final File logFile = new File(Fawe.imp().getDirectory(), "../../logs/latest.log");
+            final String file;
+            if (Files.size(logFile.toPath()) > 14_000_000) {
+                file = "too big :(";
+            } else {
+                file = readFile(logFile);
+            }
+            incendoPaster.addFile(new IncendoPaster.PasteFile("latest.log", file));
+        } catch (IOException ignored) {
+        }
+
+        incendoPaster.addFile(new PasteFile("config.yml", readFile(new File(Fawe.imp().getDirectory(), "config.yml"))));
+        incendoPaster.addFile(new PasteFile("config-legacy.yml", readFile(new File(Fawe.imp().getDirectory(), "config-legacy.yml"))));
+        incendoPaster.addFile(new PasteFile("message.yml", readFile(new File(Fawe.imp().getDirectory(), "message.yml"))));
+        incendoPaster.addFile(new PasteFile("commands.yml", readFile(new File(Fawe.imp().getDirectory(), "commands.yml"))));
+
+        final String rawResponse;
+        try {
+            rawResponse = incendoPaster.upload();
+        } catch (Throwable throwable) {
+            throw new IOException(String.format("Failed to upload files: %s", throwable.getMessage()), throwable);
+        }
+        final JsonObject jsonObject = new JsonParser().parse(rawResponse).getAsJsonObject();
+
+        if (jsonObject.has("created")) {
+            final String pasteId = jsonObject.get("paste_id").getAsString();
+            return String.format("https://athion.net/ISPaster/paste/view/%s", pasteId);
+        } else {
+            throw new IOException(String.format("Failed to upload files: %s",
+                                                jsonObject.get("response").getAsString()));
+        }
+    }
+
+    private static String readFile(final File file) throws IOException {
+        final StringBuilder content = new StringBuilder();
+        final List<String> lines = new ArrayList<>();
+        try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+        for (int i = Math.max(0, lines.size() - 1000); i < lines.size(); i++) {
+            content.append(lines.get(i)).append("\n");
+        }
+        return content.toString();
     }
 
     /**
@@ -72,7 +157,7 @@ public final class IncendoPaster {
         for (final PasteFile pasteFile : this.files) {
             if (pasteFile.fileName.equalsIgnoreCase(file.getFileName())) {
                 throw new IllegalArgumentException(String.format("Found duplicate file with name %s",
-                    file.getFileName()));
+                                                                 file.getFileName()));
             }
         }
         this.files.add(file);
@@ -99,7 +184,7 @@ public final class IncendoPaster {
         while (fileIterator.hasNext()) {
             final PasteFile file = fileIterator.next();
             builder.append("\"file-").append(file.getFileName()).append("\": \"")
-                .append(file.getContent().replaceAll("\"", "\\\\\"")).append("\"");
+                   .append(file.getContent().replaceAll("\"", "\\\\\"")).append("\"");
             if (fileIterator.hasNext()) {
                 builder.append(",\n");
             }
@@ -130,7 +215,7 @@ public final class IncendoPaster {
         }
         if (!httpURLConnection.getResponseMessage().contains("OK")) {
             throw new IllegalStateException(String.format("Server returned status: %d %s",
-                httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
+                                                          httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
         }
         final StringBuilder input = new StringBuilder();
         try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()))) {
@@ -184,80 +269,6 @@ public final class IncendoPaster {
         public String getContent() {
             return this.content;
         }
-    }
-
-    public static String debugPaste() throws IOException {
-        final IncendoPaster incendoPaster = new IncendoPaster("fastasyncworldedit");
-
-        StringBuilder b = new StringBuilder();
-        b.append(
-            "# Welcome to this paste\n# It is meant to provide us at IntellectualSites with better information about your "
-                + "problem\n");
-        b.append("\n# Server Information\n");
-        b.append("server.platform: ").append(Fawe.imp().getPlatform()).append('\n');
-        b.append(Fawe.imp().getDebugInfo()).append('\n');
-        b.append("\n\n# YAY! Now, let's see what we can find in your JVM\n");
-        Runtime runtime = Runtime.getRuntime();
-        b.append("memory.free: ").append(runtime.freeMemory()).append('\n');
-        b.append("memory.max: ").append(runtime.maxMemory()).append('\n');
-        b.append("java.specification.version: '").append(System.getProperty("java.specification.version")).append("'\n");
-        b.append("java.vendor: '").append(System.getProperty("java.vendor")).append("'\n");
-        b.append("java.version: '").append(System.getProperty("java.version")).append("'\n");
-        b.append("os.arch: '").append(System.getProperty("os.arch")).append("'\n");
-        b.append("os.name: '").append(System.getProperty("os.name")).append("'\n");
-        b.append("os.version: '").append(System.getProperty("os.version")).append("'\n\n");
-        b.append("# Okay :D Great. You are now ready to create your bug report!");
-        b.append("\n# You can do so at https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues");
-        b.append("\n# or via our Discord at https://discord.gg/ngZCzbU");
-        incendoPaster.addFile(new IncendoPaster.PasteFile("information", b.toString()));
-
-        try {
-            final File logFile = new File(Fawe.imp().getDirectory(), "../../logs/latest.log");
-            final String file;
-            if (Files.size(logFile.toPath()) > 14_000_000) {
-                file = "too big :(";
-            } else {
-                file = readFile(logFile);
-            }
-            incendoPaster.addFile(new IncendoPaster.PasteFile("latest.log", file));
-        } catch (IOException ignored) {
-        }
-
-        incendoPaster.addFile(new PasteFile("config.yml", readFile(new File(Fawe.imp().getDirectory(), "config.yml"))));
-        incendoPaster.addFile(new PasteFile("config-legacy.yml", readFile(new File(Fawe.imp().getDirectory(), "config-legacy.yml"))));
-        incendoPaster.addFile(new PasteFile("message.yml", readFile(new File(Fawe.imp().getDirectory(), "message.yml"))));
-        incendoPaster.addFile(new PasteFile("commands.yml", readFile(new File(Fawe.imp().getDirectory(), "commands.yml"))));
-
-        final String rawResponse;
-        try {
-            rawResponse = incendoPaster.upload();
-        } catch (Throwable throwable) {
-            throw new IOException(String.format("Failed to upload files: %s", throwable.getMessage()), throwable);
-        }
-        final JsonObject jsonObject = new JsonParser().parse(rawResponse).getAsJsonObject();
-
-        if (jsonObject.has("created")) {
-            final String pasteId = jsonObject.get("paste_id").getAsString();
-            return String.format("https://athion.net/ISPaster/paste/view/%s", pasteId);
-        } else {
-            throw new IOException(String.format("Failed to upload files: %s",
-                jsonObject.get("response").getAsString()));
-        }
-    }
-
-    private static String readFile(final File file) throws IOException {
-        final StringBuilder content = new StringBuilder();
-        final List<String> lines = new ArrayList<>();
-        try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        }
-        for (int i = Math.max(0, lines.size() - 1000); i < lines.size(); i++) {
-            content.append(lines.get(i)).append("\n");
-        }
-        return content.toString();
     }
 
 }

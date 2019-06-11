@@ -33,12 +33,9 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Helper class to 'bake' a transform into a clipboard.
- * <p>
+ *
  * <p>This class needs a better name and may need to be made more generic.</p>
  *
  * @see Clipboard
@@ -52,7 +49,7 @@ public class FlattenedClipboardTransform {
     /**
      * Create a new instance.
      *
-     * @param original  the original clipboard
+     * @param original the original clipboard
      * @param transform the transform
      */
     private FlattenedClipboardTransform(Clipboard original, Transform transform) {
@@ -94,10 +91,10 @@ public class FlattenedClipboardTransform {
 
         Vector3 newMinimum = corners[0];
         Vector3 newMaximum = corners[0];
+
         for (int i = 1; i < corners.length; i++) {
-            Vector3 cbv = corners[i];
-            newMinimum = newMinimum.getMinimum(cbv);
-            newMaximum = newMaximum.getMaximum(cbv);
+            newMinimum = newMinimum.getMinimum(corners[i]);
+            newMaximum = newMaximum.getMaximum(corners[i]);
         }
 
         // After transformation, the points may not really sit on a block,
@@ -125,13 +122,12 @@ public class FlattenedClipboardTransform {
     /**
      * Create a new instance to bake the transform with.
      *
-     * @param original  the original clipboard
+     * @param original the original clipboard
      * @param transform the transform
      * @return a builder
      */
     public static FlattenedClipboardTransform transform(Clipboard original, Transform transform) {
         return new FlattenedClipboardTransform(original, transform);
     }
-
 
 }

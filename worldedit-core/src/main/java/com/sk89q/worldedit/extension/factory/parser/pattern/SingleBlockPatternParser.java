@@ -34,7 +34,7 @@ public class SingleBlockPatternParser extends InputParser<Pattern> {
 
     @Override
     public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
-        return (worldEdit.getBlockFactory().parseFromInput(input, context));
+        return new BlockPattern(worldEdit.getBlockFactory().parseFromInput(input, context));
     }
 
 }

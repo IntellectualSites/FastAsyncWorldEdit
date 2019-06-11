@@ -24,28 +24,8 @@ import com.boydti.fawe.command.CFICommands;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
-import com.sk89q.worldedit.command.BiomeCommands;
-import com.sk89q.worldedit.command.BrushCommands;
-import com.sk89q.worldedit.command.BrushOptionsCommands;
-import com.sk89q.worldedit.command.ChunkCommands;
-import com.sk89q.worldedit.command.ClipboardCommands;
-import com.sk89q.worldedit.command.GenerationCommands;
-import com.sk89q.worldedit.command.HistoryCommands;
-import com.sk89q.worldedit.command.MaskCommands;
-import com.sk89q.worldedit.command.NavigationCommands;
-import com.sk89q.worldedit.command.OptionsCommands;
-import com.sk89q.worldedit.command.PatternCommands;
-import com.sk89q.worldedit.command.RegionCommands;
-import com.sk89q.worldedit.command.SchematicCommands;
-import com.sk89q.worldedit.command.ScriptingCommands;
-import com.sk89q.worldedit.command.SelectionCommands;
-import com.sk89q.worldedit.command.SnapshotCommands;
-import com.sk89q.worldedit.command.SnapshotUtilCommands;
-import com.sk89q.worldedit.command.SuperPickaxeCommands;
-import com.sk89q.worldedit.command.ToolCommands;
-import com.sk89q.worldedit.command.TransformCommands;
-import com.sk89q.worldedit.command.UtilityCommands;
-import com.sk89q.worldedit.command.WorldEditCommands;
+import com.sk89q.worldedit.command.*;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -74,9 +54,9 @@ public final class DocumentationPrinter {
 
             stream.print("## Overview\n");
             stream.print("This page is generated from the source. " +
-                    "Click one of the edit buttons below to modify a command class. " +
-                    "You will need to find the parts which correspond to the documentation. " +
-                    "Command documentation will be consistent with what is available ingame");
+                                 "Click one of the edit buttons below to modify a command class. " +
+                                 "You will need to find the parts which correspond to the documentation. " +
+                                 "Command documentation will be consistent with what is available ingame");
             stream.println();
             stream.println();
             stream.print("To view this information ingame use `//help [category|command]`\n");
@@ -179,10 +159,10 @@ public final class DocumentationPrinter {
 
             Command cmd = method.getAnnotation(Command.class);
             String[] aliases = cmd.aliases();
-            String usage = prefix + aliases[0] + " " + cmd.usage();
+            StringBuilder usage = new StringBuilder(prefix + aliases[0] + " " + cmd.usage());
             if (!cmd.flags().isEmpty()) {
                 for (char c : cmd.flags().toCharArray()) {
-                    usage += " [-" + c + "]";
+                    usage.append(" [-").append(c).append("]");
                 }
             }
 //            stream.append("#### [`" + usage + "`](" + "https://github.com/boy0001/FastAsyncWorldedit/wiki/" + aliases[0] + ")\n");
@@ -205,7 +185,9 @@ public final class DocumentationPrinter {
             }
         }
         stream.append("\n");
-        if (title) stream.append("---");
+        if (title) {
+            stream.append("---");
+        }
         stream.append("\n");
         stream.append("\n");
     }

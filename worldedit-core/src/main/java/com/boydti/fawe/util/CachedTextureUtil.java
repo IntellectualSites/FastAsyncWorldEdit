@@ -1,11 +1,8 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.FaweCache;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import java.io.FileNotFoundException;
 
 public class CachedTextureUtil extends DelegateTextureUtil {
@@ -43,7 +40,7 @@ public class CachedTextureUtil extends DelegateTextureUtil {
         }
         BiomeColor result = parent.getNearestBiome(color);
         if (result != null) {
-            colorBiomeMap.put((int) color, (Integer) result.id);
+            colorBiomeMap.put(color, (Integer) result.id);
         }
         return result;
     }
@@ -56,7 +53,7 @@ public class CachedTextureUtil extends DelegateTextureUtil {
         }
         BlockType result = parent.getNearestBlock(color);
         if (result != null) {
-            colorBlockMap.put((int) color, result);
+            colorBlockMap.put(color, result);
         }
         return result;
     }

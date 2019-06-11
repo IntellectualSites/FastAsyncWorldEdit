@@ -1,7 +1,6 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.example.NullFaweChunk;
 import com.boydti.fawe.jnbt.anvil.filters.DelegateMCAFilter;
@@ -18,6 +17,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,11 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
@@ -39,12 +34,7 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
     private NMSMappedFaweQueue parentNMS;
     private final boolean hasSky;
     private final File saveFolder;
-    private final ThreadLocal<MutableMCABackedBaseBlock> blockStore = new ThreadLocal<MutableMCABackedBaseBlock>() {
-        @Override
-        protected MutableMCABackedBaseBlock initialValue() {
-            return new MutableMCABackedBaseBlock();
-        }
-    };
+    private final ThreadLocal<MutableMCABackedBaseBlock> blockStore = ThreadLocal.withInitial(MutableMCABackedBaseBlock::new);
 
     @Override
     protected void finalize() throws Throwable {
@@ -124,7 +114,7 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
         boolean changed = false;
             for (int otherCZ = otherBCZ; otherCZ <= otherTCZ; otherCZ++) {
             for (int otherCX = otherBCX; otherCX <= otherTCX; otherCX++) {
-                FaweChunk chunk;
+                FaweChunk<? extends Object> chunk;
                 synchronized (this) {
                     chunk = this.getFaweChunk(otherCX, otherCZ);
                 }
@@ -202,7 +192,7 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
                             int tz = bz + 15;
                             if (oX == 0 && oZ == 0) {
                                 if (bx >= regionTo.minX && tx <= regionTo.maxX && bz >= regionTo.minZ && tz <= regionTo.maxZ) {
-                                    FaweChunk chunk = from.getFaweChunk(cx - oCX, cz - oCZ);
+                                    FaweChunk<? extends Object> chunk = from.getFaweChunk(cx - oCX, cz - oCZ);
                                     if (!(chunk instanceof NullFaweChunk)) {
 //                                        if (regionTo.minY == 0 && regionTo.maxY == 255) {
 //                                            System.out.println("Vertical");
@@ -251,7 +241,7 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
                             int cbz = (cz << 4) - oZ;
                             for (int otherCZ = otherBCZ; otherCZ <= otherTCZ; otherCZ++) {
                                 for (int otherCX = otherBCX; otherCX <= otherTCX; otherCX++) {
-                                    FaweChunk chunk = from.getFaweChunk(otherCX, otherCZ);
+                                    FaweChunk<? extends Object> chunk = from.getFaweChunk(otherCX, otherCZ);
                                     if (!(chunk instanceof NullFaweChunk)) {
                                         MCAChunk other = (MCAChunk) chunk;
                                         int ocbx = otherCX << 4;
@@ -447,7 +437,7 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
         final int minMCAZ = region.minZ >> 9;
         final int maxMCAX = region.maxX >> 9;
         final int maxMCAZ = region.maxZ >> 9;
-        long mcaArea = (maxMCAX - minMCAX + 1l) * (maxMCAZ - minMCAZ + 1l);
+        long mcaArea = (maxMCAX - minMCAX + 1L) * (maxMCAZ - minMCAZ + 1L);
         if (mcaArea < 128) {
             this.filterWorld(delegate, new RunnableVal2<Path, RunnableVal2<Path, BasicFileAttributes>>() {
                 @Override
@@ -514,49 +504,46 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
                             finalFile.forEachSortedChunk(new RunnableVal4<Integer, Integer, Integer, Integer>() {
                                 @Override
                                 public void run(final Integer rcx, final Integer rcz, Integer offset, Integer size) {
-                                    pool.submit(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try {
-                                                int cx = cbx + rcx;
-                                                int cz = cbz + rcz;
-                                                if (filter.appliesChunk(cx, cz)) {
-                                                    MCAChunk chunk = finalFile.getChunk(cx, cz);
-                                                    try {
-                                                        final G value = filter.get();
-                                                        chunk = filter.applyChunk(chunk, value);
-                                                        if (chunk != null) {
-                                                            final MutableMCABackedBaseBlock mutableBlock = blockStore.get();
-                                                            mutableBlock.setChunk(chunk);
-                                                            int bx = cx << 4;
-                                                            int bz = cz << 4;
-                                                            for (int layer = 0; layer < 16; layer++) {
-                                                                if (chunk.doesSectionExist(layer)) {
-                                                                    mutableBlock.setArrays(layer);
-                                                                    int yStart = layer << 4;
-                                                                    int index = 0;
-                                                                    for (int y = yStart; y < yStart + 16; y++) {
-                                                                        mutableBlock.setY(y);
-                                                                        for (int z = bz; z < bz + 16; z++) {
-                                                                            mutableBlock.setZ(z);
-                                                                            for (int x = bx; x < bx + 16; x++, index++) {
-                                                                                mutableBlock.setX(x);
-                                                                                mutableBlock.setIndex(index);
-                                                                                filter.applyBlock(x, y, z, mutableBlock, value);
-                                                                            }
+                                    pool.submit(() -> {
+                                        try {
+                                            int cx = cbx + rcx;
+                                            int cz = cbz + rcz;
+                                            if (filter.appliesChunk(cx, cz)) {
+                                                MCAChunk chunk = finalFile.getChunk(cx, cz);
+                                                try {
+                                                    final G value = filter.get();
+                                                    chunk = filter.applyChunk(chunk, value);
+                                                    if (chunk != null) {
+                                                        final MutableMCABackedBaseBlock mutableBlock = blockStore.get();
+                                                        mutableBlock.setChunk(chunk);
+                                                        int bx = cx << 4;
+                                                        int bz = cz << 4;
+                                                        for (int layer = 0; layer < 16; layer++) {
+                                                            if (chunk.doesSectionExist(layer)) {
+                                                                mutableBlock.setArrays(layer);
+                                                                int yStart = layer << 4;
+                                                                int index = 0;
+                                                                for (int y = yStart; y < yStart + 16; y++) {
+                                                                    mutableBlock.setY(y);
+                                                                    for (int z = bz; z < bz + 16; z++) {
+                                                                        mutableBlock.setZ(z);
+                                                                        for (int x = bx; x < bx + 16; x++, index++) {
+                                                                            mutableBlock.setX(x);
+                                                                            mutableBlock.setIndex(index);
+                                                                            filter.applyBlock(x, y, z, mutableBlock, value);
                                                                         }
                                                                     }
                                                                 }
                                                             }
-                                                            filter.finishChunk(chunk, value);
                                                         }
-                                                    } catch (Throwable e) {
-                                                        e.printStackTrace();
+                                                        filter.finishChunk(chunk, value);
                                                     }
+                                                } catch (Throwable e) {
+                                                    e.printStackTrace();
                                                 }
-                                            } catch (Throwable e) {
-                                                e.printStackTrace();
                                             }
+                                        } catch (Throwable e) {
+                                            e.printStackTrace();
                                         }
                                     });
                                 }
@@ -568,8 +555,8 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
                                 try {
                                     original.close(pool);
                                     file.delete();
-                                } catch (Throwable ignore) {
-                                    ignore.printStackTrace();
+                                } catch (Throwable e) {
+                                    e.printStackTrace();
                                 }
                             }
                             pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -579,8 +566,8 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
                             file.delete();
                         }
                     }
-                } catch (Throwable ignore) {
-                    ignore.printStackTrace();
+                } catch (Throwable e) {
+                    e.printStackTrace();
                 }
             }
         };
@@ -606,15 +593,6 @@ public class MCAQueue extends NMSMappedFaweQueue<FaweQueue, FaweChunk, FaweChunk
             @Override
             public void run(Path value1, RunnableVal2<Path, BasicFileAttributes> value2) {
                 MainUtil.traverse(value1, value2);
-            }
-        });
-    }
-
-    public <G, T extends MCAFilter<G>> T filterWorld(final T filter, Comparator<File> comparator) {
-        return filterWorld(filter, new RunnableVal2<Path, RunnableVal2<Path, BasicFileAttributes>>() {
-            @Override
-            public void run(Path value1, RunnableVal2<Path, BasicFileAttributes> value2) {
-                MainUtil.forEachFile(value1, value2, comparator);
             }
         });
     }

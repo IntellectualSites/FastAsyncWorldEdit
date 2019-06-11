@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extent.inventory;
 
-import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -27,23 +26,18 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 /**
  * Applies a {@link BlockBag} to operations.
  */
 public class BlockBagExtent extends AbstractDelegateExtent {
 
-    private final boolean mine;
-    private int[] missingBlocks = new int[BlockTypes.size()];
+    private Map<BlockType, Integer> missingBlocks = new HashMap<>();
     private BlockBag blockBag;
 
     /**
@@ -52,15 +46,9 @@ public class BlockBagExtent extends AbstractDelegateExtent {
      * @param extent the extent
      * @param blockBag the block bag
      */
-    public BlockBagExtent(Extent extent, @Nonnull BlockBag blockBag) {
-        this(extent, blockBag, false);
-    }
-
-    public BlockBagExtent(Extent extent, @Nonnull BlockBag blockBag, boolean mine) {
+    public BlockBagExtent(Extent extent, @Nullable BlockBag blockBag) {
         super(extent);
-        checkNotNull(blockBag);
         this.blockBag = blockBag;
-        this.mine = mine;
     }
 
     /**
@@ -88,15 +76,9 @@ public class BlockBagExtent extends AbstractDelegateExtent {
      * @return a map of missing blocks
      */
     public Map<BlockType, Integer> popMissing() {
-        HashMap<BlockType, Integer> map = new HashMap<>();
-        for (int i = 0; i < missingBlocks.length; i++) {
-            int count = missingBlocks[i];
-            if (count > 0) {
-                map.put(BlockTypes.get(i), count);
-            }
-        }
-        Arrays.fill(missingBlocks, 0);
-        return map;
+        Map<BlockType, Integer> missingBlocks = this.missingBlocks;
+        this.missingBlocks = new HashMap<>();
+        return missingBlocks;
     }
 
     @Override
@@ -114,19 +96,21 @@ public class BlockBagExtent extends AbstractDelegateExtent {
                     try {
                         blockBag.fetchPlacedBlock(block.toImmutableState());
                     } catch (UnplaceableBlockException e) {
-                        throw new FaweException.FaweBlockBagException();
+                        return false;
                     } catch (BlockBagException e) {
-                        missingBlocks[block.getBlockType().getInternalId()]++;
-                        throw new FaweException.FaweBlockBagException();
+                        if (!missingBlocks.containsKey(block.getBlockType())) {
+                            missingBlocks.put(block.getBlockType(), 1);
+                        } else {
+                            missingBlocks.put(block.getBlockType(), missingBlocks.get(block.getBlockType()) + 1);
+                        }
+                        return false;
                     }
                 }
-                if (mine) {
 
-                    if (!existing.getBlockType().getMaterial().isAir()) {
-                        try {
-                            blockBag.storeDroppedBlock(existing);
-                        } catch (BlockBagException ignored) {
-                        }
+                if (!existing.getBlockType().getMaterial().isAir()) {
+                    try {
+                        blockBag.storeDroppedBlock(existing);
+                    } catch (BlockBagException ignored) {
                     }
                 }
             }

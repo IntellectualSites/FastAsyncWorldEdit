@@ -151,6 +151,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.weather.WeatherType;
+import net.royawesome.jlibnoise.module.modifier.Abs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -423,7 +424,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     public void resetLimit() {
         this.limit.set(this.originalLimit);
-        ExtentTraverser<ProcessedWEExtent> find = new ExtentTraverser(extent).find(ProcessedWEExtent.class);
+        ExtentTraverser<ProcessedWEExtent> find = new ExtentTraverser<>(extent).find(ProcessedWEExtent.class);
         if (find != null && find.get() != null) {
             find.get().setLimit(this.limit);
         }
@@ -462,7 +463,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return FaweRegionExtent (may be null)
      */
     public FaweRegionExtent getRegionExtent() {
-        ExtentTraverser<FaweRegionExtent> traverser = new ExtentTraverser(this.extent).find(FaweRegionExtent.class);
+        ExtentTraverser<FaweRegionExtent> traverser = new ExtentTraverser<>(this.extent).find(FaweRegionExtent.class);
         return traverser == null ? null : traverser.get();
     }
 
@@ -494,12 +495,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public boolean cancel() {
-        ExtentTraverser traverser = new ExtentTraverser(this.extent);
+        ExtentTraverser<AbstractDelegateExtent> traverser = new ExtentTraverser<>(this.extent);
         NullExtent nullExtent = new NullExtent(world, BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
         while (traverser != null) {
-            ExtentTraverser next = traverser.next();
+            ExtentTraverser<AbstractDelegateExtent> next = traverser.next();
             Extent get = traverser.get();
-            if (get instanceof AbstractDelegateExtent && !(get instanceof NullExtent)) {
+            if (get != null && !(get instanceof NullExtent)) {
                 traverser.setNext(nullExtent);
             }
             traverser = next;
@@ -738,7 +739,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return mask, may be null
      */
     public Mask getMask() {
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser(this.extent).find(MaskingExtent.class);
+        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(MaskingExtent.class);
         return maskingExtent != null ? maskingExtent.get().getMask() : null;
     }
 
@@ -748,16 +749,16 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return mask, may be null
      */
     public Mask getSourceMask() {
-        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser(this.extent).find(SourceMaskExtent.class);
+        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(SourceMaskExtent.class);
         return maskingExtent != null ? maskingExtent.get().getMask() : null;
     }
 
     public void addTransform(ResettableExtent transform) {
         wrapped = true;
         if (transform == null) {
-            ExtentTraverser<AbstractDelegateExtent> traverser = new ExtentTraverser(this.extent).find(ResettableExtent.class);
+            ExtentTraverser<ResettableExtent> traverser = new ExtentTraverser<>(this.extent).find(ResettableExtent.class);
             AbstractDelegateExtent next = extent;
-            while (traverser != null && traverser.get() instanceof ResettableExtent) {
+            while (traverser != null && traverser.get() != null) {
                 traverser = traverser.next();
                 next = traverser.get();
             }
@@ -769,9 +770,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public @Nullable ResettableExtent getTransform() {
-        ExtentTraverser<AbstractDelegateExtent> traverser = new ExtentTraverser(this.extent).find(ResettableExtent.class);
+        ExtentTraverser<ResettableExtent> traverser = new ExtentTraverser<>(this.extent).find(ResettableExtent.class);
         if (traverser != null) {
-            return (ResettableExtent) traverser.get();
+            return traverser.get();
         }
         return null;
     }
@@ -787,7 +788,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         } else {
             new MaskTraverser(mask).reset(this);
         }
-        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser(this.extent).find(SourceMaskExtent.class);
+        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(SourceMaskExtent.class);
         if (maskingExtent != null && maskingExtent.get() != null) {
             Mask oldMask = maskingExtent.get().getMask();
             if (oldMask instanceof ResettableMask) {
@@ -826,7 +827,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         } else {
             new MaskTraverser(mask).reset(this);
         }
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser(this.extent).find(MaskingExtent.class);
+        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(MaskingExtent.class);
         if (maskingExtent != null && maskingExtent.get() != null) {
             Mask oldMask = maskingExtent.get().getMask();
             if (oldMask instanceof ResettableMask) {
@@ -844,13 +845,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return the survival simulation extent
      */
     public SurvivalModeExtent getSurvivalExtent() {
-        ExtentTraverser<SurvivalModeExtent> survivalExtent = new ExtentTraverser(this.extent).find(SurvivalModeExtent.class);
+        ExtentTraverser<SurvivalModeExtent> survivalExtent = new ExtentTraverser<>(this.extent).find(SurvivalModeExtent.class);
         if (survivalExtent != null) {
             return survivalExtent.get();
         } else {
             AbstractDelegateExtent extent = this.extent;
             SurvivalModeExtent survival = new SurvivalModeExtent(extent.getExtent(), getWorld());
-            new ExtentTraverser(extent).setNext(survival);
+            new ExtentTraverser<>(extent).setNext(survival);
             return survival;
         }
     }
@@ -877,21 +878,21 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (history == null) {
             return;
         }
-        ExtentTraverser traverseHistory = new ExtentTraverser(this.extent).find(HistoryExtent.class);
+        ExtentTraverser<HistoryExtent> traverseHistory = new ExtentTraverser<>(this.extent).find(HistoryExtent.class);
         if (disableHistory) {
             if (traverseHistory != null && traverseHistory.exists()) {
-                ExtentTraverser beforeHistory = traverseHistory.previous();
-                ExtentTraverser afterHistory = traverseHistory.next();
+                ExtentTraverser<HistoryExtent> beforeHistory = traverseHistory.previous();
+                ExtentTraverser<HistoryExtent> afterHistory = traverseHistory.next();
                 if (beforeHistory != null && beforeHistory.exists()) {
                     beforeHistory.setNext(afterHistory.get());
                 } else {
-                    extent = (AbstractDelegateExtent) afterHistory.get();
+                    extent = afterHistory.get();
                 }
             }
         } else if (traverseHistory == null || !traverseHistory.exists()) {
-            ExtentTraverser traverseBypass = new ExtentTraverser(this.extent).find(bypassHistory);
+            ExtentTraverser<AbstractDelegateExtent> traverseBypass = new ExtentTraverser<>(this.extent).find(bypassHistory);
             if (traverseBypass != null) {
-                ExtentTraverser beforeHistory = traverseBypass.previous();
+                ExtentTraverser<AbstractDelegateExtent> beforeHistory = traverseBypass.previous();
                 beforeHistory.setNext(history);
             }
         }
@@ -950,7 +951,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             if (changeSet instanceof BlockBagChangeSet) {
                 missingBlocks = ((BlockBagChangeSet) changeSet).popMissing();
             } else {
-                ExtentTraverser<BlockBagExtent> find = new ExtentTraverser(extent).find(BlockBagExtent.class);
+                ExtentTraverser<BlockBagExtent> find = new ExtentTraverser<>(extent).find(BlockBagExtent.class);
                 if (find != null && find.get() != null) {
                     missingBlocks = find.get().popMissing();
                 } else {
@@ -1410,7 +1411,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (used.MAX_FAILS > 0) {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
                 BBC.WORLDEDIT_SOME_FAILS.send(player, used.MAX_FAILS);
-            } else if (new ExtentTraverser(this).findAndGet(FaweRegionExtent.class) != null){
+            } else if (new ExtentTraverser<>(this).findAndGet(FaweRegionExtent.class) != null){
                 BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION.send(player);
             } else {
                 BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_LEVEL.send(player);
@@ -3358,7 +3359,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public Set<BlockVector3> getHollowed(final Set<BlockVector3> vset) {
-        final Set returnset = new LocalBlockVectorSet();
+        final Set<BlockVector3> returnset = new LocalBlockVectorSet();
         final LocalBlockVectorSet newset = new LocalBlockVectorSet();
         newset.addAll(vset);
         for (final BlockVector3 v : newset) {
@@ -3384,19 +3385,19 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         	if (block.getBlockType().getMaterial().isMovementBlocker()) {
         		continue;
         	}
-        	
+
         	if (!outside.add(current)) {
         		continue;
         	}
-        	
+
         	if (!region.contains(current)) {
         		continue;
         	}
-        	
+
         	for (BlockVector3 recurseDirection : recurseDirections) {
         		queue.add(current.add(recurseDirection));
         	}
-        }        
+        }
     }
 
     public int makeBiomeShape(final Region region, final Vector3 zero, final Vector3 unit, final BiomeType biomeType,

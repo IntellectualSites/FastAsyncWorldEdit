@@ -3,7 +3,6 @@ package com.boydti.fawe.jnbt.anvil.filters;
 import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
 import com.boydti.fawe.object.number.MutableLong;
-import com.boydti.fawe.util.ArrayUtil;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Arrays;

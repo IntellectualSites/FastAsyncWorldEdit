@@ -31,30 +31,19 @@ import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.boydti.fawe.util.IOUtil;
-import com.google.common.collect.Maps;
-import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.IntArrayTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.NBTCompatibilityHandler;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
@@ -67,13 +56,11 @@ import org.slf4j.LoggerFactory;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -110,7 +97,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     public Clipboard read(UUID uuid) throws IOException {
         return readVersion1(uuid);
     }
-    
+
     private int width, height, length;
     private int offsetX, offsetY, offsetZ;
     private char[] palette;
@@ -132,8 +119,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             return fc = new MemoryOptimizedClipboard(size, 1, 1);
         }
     }
-    
-    private Clipboard readVersion1(UUID uuid) throws IOException {
+
+    private BlockArrayClipboard readVersion1(UUID uuid) throws IOException {
         width = height = length = offsetX = offsetY = offsetZ = Integer.MIN_VALUE;
 
         final BlockArrayClipboard clipboard = new BlockArrayClipboard(new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(0, 0, 0)), fc);
@@ -176,39 +163,33 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
             }
         });
-        streamer.addReader("Schematic.TileEntities.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag value) {
-                if (fc == null) {
-                    setupClipboard(0, uuid);
-                }
-                int[] pos = value.getIntArray("Pos");
-                int x = pos[0];
-                int y = pos[1];
-                int z = pos[2];
-                fc.setTile(x, y, z, value);
+        streamer.addReader("Schematic.TileEntities.#", (BiConsumer<Integer, CompoundTag>) (index, value) -> {
+            if (fc == null) {
+                setupClipboard(0, uuid);
             }
+            int[] pos = value.getIntArray("Pos");
+            int x = pos[0];
+            int y = pos[1];
+            int z = pos[2];
+            fc.setTile(x, y, z, value);
         });
-        streamer.addReader("Schematic.Entities.#", new BiConsumer<Integer, CompoundTag>() {
-            @Override
-            public void accept(Integer index, CompoundTag compound) {
-                if (fc == null) {
-                    setupClipboard(0, uuid);
-                }
-                String id = compound.getString("id");
-                if (id.isEmpty()) {
-                    return;
-                }
-                ListTag positionTag = compound.getListTag("Pos");
-                ListTag directionTag = compound.getListTag("Rotation");
-                EntityType type = EntityTypes.parse(id);
-                if (type != null) {
-                    compound.getValue().put("Id", new StringTag(type.getId()));
-                    BaseEntity state = new BaseEntity(type, compound);
-                    fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
-                } else {
-                    Fawe.debug("Invalid entity: " + id);
-                }
+        streamer.addReader("Schematic.Entities.#", (BiConsumer<Integer, CompoundTag>) (index, compound) -> {
+            if (fc == null) {
+                setupClipboard(0, uuid);
+            }
+            String id = compound.getString("id");
+            if (id.isEmpty()) {
+                return;
+            }
+            ListTag positionTag = compound.getListTag("Pos");
+            ListTag directionTag = compound.getListTag("Rotation");
+            EntityType type = EntityTypes.parse(id);
+            if (type != null) {
+                compound.getValue().put("Id", new StringTag(type.getId()));
+                BaseEntity state = new BaseEntity(type, compound);
+                fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
+            } else {
+                Fawe.debug("Invalid entity: " + id);
             }
         });
         streamer.readFully();
@@ -235,6 +216,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                     }
                 }
             }
+
         }
         if (biomesOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
@@ -248,7 +230,6 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         clipboard.setOrigin(origin);
         return clipboard;
     }
-
 
     @Override
     public void close() throws IOException {

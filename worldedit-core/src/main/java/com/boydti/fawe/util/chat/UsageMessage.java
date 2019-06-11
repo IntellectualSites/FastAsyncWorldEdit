@@ -15,11 +15,11 @@ import com.sk89q.worldedit.util.command.Parameter;
 import com.sk89q.worldedit.util.command.PrimaryAliasComparator;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
+
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
-
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -27,7 +27,7 @@ public class UsageMessage extends Message {
     /**
      * Create a new usage box.
      *
-     * @param command       the command to describe
+     * @param command the command to describe
      * @param commandString the command that was used, such as "/we" or "/brush sphere"
      */
     public UsageMessage(CommandCallable command, String commandString) {
@@ -37,9 +37,9 @@ public class UsageMessage extends Message {
     /**
      * Create a new usage box.
      *
-     * @param command       the command to describe
+     * @param command the command to describe
      * @param commandString the command that was used, such as "/we" or "/brush sphere"
-     * @param locals        list of locals to use
+     * @param locals list of locals to use
      */
     public UsageMessage(CommandCallable command, String commandString, @Nullable CommandLocals locals) {
         checkNotNull(command);
@@ -85,12 +85,14 @@ public class UsageMessage extends Message {
                 String arg;
                 if (param.getFlag() != null) {
                     arg = "-" + param.getFlag();
-                    if (param.isValueFlag())
+                    if (param.isValueFlag()) {
                         arg += param.getName();
+                    }
                 } else {
                     arg = param.getName();
-                    if (param.getDefaultValue() != null && param.getDefaultValue().length > 0)
+                    if (param.getDefaultValue() != null && param.getDefaultValue().length > 0) {
                         arg += "=" + StringMan.join(param.getDefaultValue(), ",");
+                    }
                 }
                 usage[i] = optional ? ("[" + arg + "]") : ("<" + arg + ">");
             }
@@ -104,7 +106,9 @@ public class UsageMessage extends Message {
             String argStr = usage[i];
             text(separateArg(argStr.replaceAll("[\\[|\\]|<|>]", "&0$0&7")));
 
-            if (params.isEmpty()) continue;
+            if (params.isEmpty()) {
+                continue;
+            }
             Parameter param = params.get(i);
 
             StringBuilder tooltip = new StringBuilder();
@@ -141,7 +145,9 @@ public class UsageMessage extends Message {
                 tooltip.append("\nClick for more info");
             }
             tooltip(tooltip.toString());
-            if (command != null) command(command);
+            if (command != null) {
+                command(command);
+            }
         }
 
         newline();

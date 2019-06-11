@@ -3,6 +3,7 @@ package com.boydti.fawe.util.chat;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +21,12 @@ public class PlainChatManager implements ChatManager<List<StringBuilder>> {
     }
 
     @Override
-    public void tooltip(Message message, Message... tooltips) {}
+    public void tooltip(Message message, Message... tooltips) {
+    }
 
     @Override
-    public void command(Message message, String command) {}
+    public void command(Message message, String command) {
+    }
 
     @Override
     public void text(Message message, String text) {
@@ -40,8 +43,10 @@ public class PlainChatManager implements ChatManager<List<StringBuilder>> {
     }
 
     @Override
-    public void suggest(Message plotMessage, String command) {}
+    public void suggest(Message plotMessage, String command) {
+    }
 
     @Override
-    public void link(Message message, String url) {}
+    public void link(Message message, String url) {
+    }
 }

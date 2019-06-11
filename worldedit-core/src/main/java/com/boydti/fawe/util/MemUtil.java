@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.config.Settings;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -8,6 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MemUtil {
 
     private static AtomicBoolean memory = new AtomicBoolean(false);
+    private static Queue<Runnable> memoryLimitedTasks = new ConcurrentLinkedQueue<>();
+    private static Queue<Runnable> memoryPlentifulTasks = new ConcurrentLinkedQueue<>();
 
     public static boolean isMemoryFree() {
         return !memory.get();
@@ -28,8 +31,7 @@ public class MemUtil {
     }
 
     public static long getUsedBytes() {
-        long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        return used;
+        return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     }
 
     public static long getFreeBytes() {
@@ -51,17 +53,16 @@ public class MemUtil {
         return size;
     }
 
-    private static Queue<Runnable> memoryLimitedTasks = new ConcurrentLinkedQueue<>();
-    private static Queue<Runnable> memoryPlentifulTasks = new ConcurrentLinkedQueue<>();
-
     public static void addMemoryLimitedTask(Runnable run) {
-        if (run != null)
+        if (run != null) {
             memoryLimitedTasks.add(run);
+        }
     }
 
     public static void addMemoryPlentifulTask(Runnable run) {
-        if (run != null)
+        if (run != null) {
             memoryPlentifulTasks.add(run);
+        }
     }
 
     public static void memoryLimitedTask() {

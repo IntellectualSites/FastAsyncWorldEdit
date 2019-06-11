@@ -69,10 +69,10 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> {
 
         if (anyState) {
             blocks.stream().flatMap(blockType -> blockType.getAllStates().stream()).forEach(state ->
-                randomPattern.add((state), 1.0));
+                randomPattern.add(new BlockPattern(state), 1.0));
         } else {
             for (BlockType blockType : blocks) {
-                randomPattern.add((blockType.getDefaultState()), 1.0);
+                randomPattern.add(new BlockPattern(blockType.getDefaultState()), 1.0);
             }
         }
 

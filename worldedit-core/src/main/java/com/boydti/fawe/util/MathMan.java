@@ -4,6 +4,7 @@ public class MathMan {
 
     /**
      * Optimized for i elem 0,65536 (characters)
+     *
      * @param i
      * @return square root
      */
@@ -22,7 +23,7 @@ public class MathMan {
         return CachedMathMan.cosInexact(paramFloat);
     }
 
-    public static int log2nlz( int bits ) {
+    public static int log2nlz(int bits) {
         return Integer.SIZE - Integer.numberOfLeadingZeros(bits);
     }
 
@@ -51,16 +52,6 @@ public class MathMan {
         return max;
     }
 
-    public static int min(int... values) {
-        int min = Integer.MAX_VALUE;
-        for (int d : values) {
-            if (d < min) {
-                min = d;
-            }
-        }
-        return min;
-    }
-
     public static double min(double... values) {
         double min = Double.MAX_VALUE;
         for (double d : values) {
@@ -69,11 +60,6 @@ public class MathMan {
             }
         }
         return min;
-    }
-
-    public static int ceilZero(float floatNumber) {
-        int floor = (int) floatNumber;
-        return floatNumber > (float) floor ? floor + 1 : floor;
     }
 
     public static int sqr(int val) {
@@ -121,72 +107,59 @@ public class MathMan {
         }
     }
 
-    public static final long inverseRound(double val) {
-        long round = Math.round(val);
-        return (long) (round + Math.signum(val - round));
-    }
-
-    public static final int pair(short x, short y) {
+    public static int pair(short x, short y) {
         return (x << 16) | (y & 0xFFFF);
     }
 
-    public static final short unpairX(int hash) {
+    public static short unpairX(int hash) {
         return (short) (hash >> 16);
     }
 
-    public static final short unpairY(int hash) {
+    public static short unpairY(int hash) {
         return (short) (hash & 0xFFFF);
     }
 
-    public static final short pairByte(int x, int y) {
+    public static short pairByte(int x, int y) {
         return (short) ((x << 8) | (y & 0xFF));
     }
 
-    public static final byte unpairShortX(short pair) {
+    public static byte unpairShortX(short pair) {
         return (byte) (pair >> 8);
     }
 
-    public static final byte unpairShortY(short pair) {
+    public static byte unpairShortY(short pair) {
         return (byte) pair;
     }
 
-    public static final long pairInt(int x, int y) {
+    public static long pairInt(int x, int y) {
         return (((long) x) << 32) | (y & 0xffffffffL);
     }
 
-    public static final long tripleWorldCoord(int x, int y, int z) {
-        return y + (((long) x & 0x3FFFFFF) << 8) + (((long) z & 0x3FFFFFF) << 34);
-    }
-
-    public static final long untripleWorldCoordX(long triple) {
+    public static long untripleWorldCoordX(long triple) {
         return (((triple >> 8) & 0x3FFFFFF) << 38) >> 38;
     }
 
-    public static final long untripleWorldCoordY(long triple) {
+    public static long untripleWorldCoordY(long triple) {
         return triple & 0xFF;
     }
 
-    public static final long untripleWorldCoordZ(long triple) {
-        return (((triple >> 34) & 0x3FFFFFF) << 38) >> 38;
-    }
-
-    public static final short tripleBlockCoord(int x, int y, int z) {
+    public static short tripleBlockCoord(int x, int y, int z) {
         return (short) ((x & 15) << 12 | (z & 15) << 8 | y);
     }
 
-    public static final char tripleBlockCoordChar(int x, int y, int z) {
+    public static char tripleBlockCoordChar(int x, int y, int z) {
         return (char) ((x & 15) << 12 | (z & 15) << 8 | y);
     }
 
-    public static final int untripleBlockCoordX(int triple) {
+    public static int untripleBlockCoordX(int triple) {
         return (triple >> 12) & 0xF;
     }
 
-    public static final int untripleBlockCoordY(int triple) {
+    public static int untripleBlockCoordY(int triple) {
         return (triple & 0xFF);
     }
 
-    public static final int untripleBlockCoordZ(int triple) {
+    public static int untripleBlockCoordZ(int triple) {
         return (triple >> 8) & 0xF;
     }
 
@@ -231,31 +204,27 @@ public class MathMan {
         return y3 + (y2 << 4) + (y1 << 12);
     }
 
-    public static final long chunkXZ2Int(int x, int z) {
-        return (long) x & 4294967295L | ((long) z & 4294967295L) << 32;
-    }
-
-    public static final int unpairIntX(long pair) {
+    public static int unpairIntX(long pair) {
         return (int) (pair >> 32);
     }
 
-    public static final int unpairIntY(long pair) {
+    public static int unpairIntY(long pair) {
         return (int) pair;
     }
 
-    public static final byte pair16(int x, int y) {
+    public static byte pair16(int x, int y) {
         return (byte) (x + (y << 4));
     }
 
-    public static final byte unpair16x(byte value) {
+    public static byte unpair16x(byte value) {
         return (byte) (value & 0xF);
     }
 
-    public static final byte unpair16y(byte value) {
+    public static byte unpair16y(byte value) {
         return (byte) ((value >> 4) & 0xF);
     }
 
-    public static final byte pair8(int x, int y) {
+    public static byte pair8(int x, int y) {
         return (byte) (x + (y << 3));
     }
 
@@ -267,18 +236,14 @@ public class MathMan {
         return (byte) ((value >> 3) & 0x7F);
     }
 
-    public static final int lossyFastDivide(int a, int b) {
-        return (a * ((1 << 16) / b)) >> 16;
-    }
-
-    public static final int gcd(int a, int b) {
+    public static int gcd(int a, int b) {
         if (b == 0) {
             return a;
         }
         return gcd(b, a % b);
     }
 
-    public static final int gcd(int[] a) {
+    public static int gcd(int[] a) {
         int result = a[0];
         for (int i = 1; i < a.length; i++) {
             result = gcd(result, a[i]);
@@ -287,15 +252,7 @@ public class MathMan {
     }
 
 
-    public static final double getMean(int[] array) {
-        double count = 0;
-        for (int i : array) {
-            count += i;
-        }
-        return count / array.length;
-    }
-
-    public static final double getMean(double[] array) {
+    public static double getMean(double[] array) {
         double count = 0;
         for (double i : array) {
             count += i;
@@ -310,50 +267,24 @@ public class MathMan {
      * @param pitch
      * @return
      */
-    public static final float[] getDirection(float yaw, float pitch) {
+    public static float[] getDirection(float yaw, float pitch) {
         double pitch_sin = Math.sin(pitch);
         return new float[]{(float) (pitch_sin * Math.cos(yaw)), (float) (pitch_sin * Math.sin(yaw)), (float) Math.cos(pitch)};
     }
 
-    public static final int roundInt(double value) {
+    public static int roundInt(double value) {
         return (int) (value < 0 ? (value == (int) value) ? value : value - 1 : value);
     }
 
-    /**
-     * Returns [ pitch, yaw ]
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @return
-     */
-    public static final float[] getPitchAndYaw(float x, float y, float z) {
-        float distance = sqrtApprox((z * z) + (x * x));
-        return new float[]{atan2(y, distance), atan2(x, z)};
-    }
-
-    public static final float atan2(float y, float x) {
-        return CachedMathMan.atan2(y, x);
-    }
-
-    public static final float sqrtApprox(float f) {
+    public static float sqrtApprox(float f) {
         return f * Float.intBitsToFloat(0x5f375a86 - (Float.floatToIntBits(f) >> 1));
     }
 
-    public static final double sqrtApprox(double d) {
-        return Double.longBitsToDouble(((Double.doubleToLongBits(d) - (1l << 52)) >> 1) + (1l << 61));
+    public static double sqrtApprox(double d) {
+        return Double.longBitsToDouble(((Double.doubleToLongBits(d) - (1L << 52)) >> 1) + (1L << 61));
     }
 
-    public static final float invSqrt(float x) {
-        float xhalf = 0.5f * x;
-        int i = Float.floatToIntBits(x);
-        i = 0x5f3759df - (i >> 1);
-        x = Float.intBitsToFloat(i);
-        x = x * (1.5f - (xhalf * x * x));
-        return x;
-    }
-
-    public static final boolean isInteger(CharSequence str) {
+    public static boolean isInteger(CharSequence str) {
         if (str == null) {
             return false;
         }
@@ -377,41 +308,8 @@ public class MathMan {
         return true;
     }
 
-    public static final double getSD(double[] array, double av) {
-        double sd = 0;
-        for (double element : array) {
-            sd += Math.pow(Math.abs(element - av), 2);
-        }
-        return Math.sqrt(sd / array.length);
-    }
-
-    public static final double getSD(int[] array, double av) {
-        double sd = 0;
-        for (int element : array) {
-            sd += Math.pow(Math.abs(element - av), 2);
-        }
-        return Math.sqrt(sd / array.length);
-    }
-
-    public static final int absByte(int value) {
+    public static int absByte(int value) {
         return (value ^ (value >> 8)) - (value >> 8);
     }
 
-    public static final int mod(int x, int y) {
-        if (isPowerOfTwo(y)) {
-            return x & (y - 1);
-        }
-        return x % y;
-    }
-
-    public static final int unsignedmod(int x, int y) {
-        if (isPowerOfTwo(y)) {
-            return x & (y - 1);
-        }
-        return x % y;
-    }
-
-    public static final boolean isPowerOfTwo(int x) {
-        return (x & (x - 1)) == 0;
-    }
 }

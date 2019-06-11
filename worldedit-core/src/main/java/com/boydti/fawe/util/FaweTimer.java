@@ -3,13 +3,17 @@ package com.boydti.fawe.util;
 public class FaweTimer implements Runnable {
 
     private final double[] history = new double[]{20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d};
+    private final long tickInterval = 5;
+    private final double millisPer20Interval = tickInterval * 50 * 20;
     private int historyIndex = 0;
     private long lastPoll = System.currentTimeMillis();
     private long tickStart = System.currentTimeMillis();
-    private final long tickInterval = 5;
-    private final double millisPer20Interval = tickInterval * 50 * 20;
     private long tick = 0;
     private long tickMod = 0;
+    private long lastGetTPSTick = 0;
+    private double lastGetTPSValue = 20d;
+    private long skip = 0;
+    private long skipTick = 0;
 
     @Override
     public void run() {
@@ -31,9 +35,6 @@ public class FaweTimer implements Runnable {
         }
         lastPoll = tickStart;
     }
-
-    private long lastGetTPSTick = 0;
-    private double lastGetTPSValue = 20d;
 
     public double getTPS() {
         if (tick < lastGetTPSTick + tickInterval) {
@@ -59,9 +60,6 @@ public class FaweTimer implements Runnable {
     public long getTickStart() {
         return tickStart;
     }
-
-    private long skip = 0;
-    private long skipTick = 0;
 
     public boolean isAbove(double tps) {
         if (tps <= 0) {

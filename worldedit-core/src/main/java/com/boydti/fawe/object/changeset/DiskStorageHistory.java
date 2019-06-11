@@ -43,10 +43,10 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     /*
      * Block data
-     * 
+     *
      * [header]
      * {int origin x, int origin z}
-     * 
+     *
      * [contents]...
      * { short rel x, short rel z, unsigned byte y, short combinedFrom, short combinedTo }
      */
@@ -141,10 +141,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         EditSession session = toEditSession(fp, regions);
         session.undo(session);
         deleteFiles();
-    }
-
-    public void undo(FawePlayer fp) {
-        undo(fp, null);
     }
 
     public void redo(FawePlayer fp, Region[] regions) {
@@ -523,6 +519,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 	@Override
 	public void setRecordChanges(boolean recordChanges) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

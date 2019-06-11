@@ -56,7 +56,7 @@ public class SnapshotCommands {
     }
 
     @Command(
-            aliases = {"list"},
+            aliases = { "list" },
             usage = "[num]",
             desc = "List snapshots",
             min = 0,
@@ -81,7 +81,7 @@ public class SnapshotCommands {
 
                 BBC.SNAPSHOT_LIST_HEADER.send(player, player.getWorld().getName());
                 for (byte i = 0; i < Math.min(num, snapshots.size()); i++) {
-                    player.print(BBC.getPrefix() + (i + 1) + ". " + snapshots.get(i).getName());
+                    player.print((i + 1) + ". " + snapshots.get(i).getName());
                 }
 
                 BBC.SNAPSHOT_LIST_FOOTER.send(player);
@@ -92,10 +92,10 @@ public class SnapshotCommands {
                 File dir = config.snapshotRepo.getDirectory();
 
                 try {
-                    WorldEdit.logger.info(BBC.getPrefix() + "WorldEdit found no snapshots: looked in: "
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
                             + dir.getCanonicalPath());
                 } catch (IOException e) {
-                    WorldEdit.logger.info(BBC.getPrefix() + "WorldEdit found no snapshots: looked in "
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
                             + "(NON-RESOLVABLE PATH - does it exist?): "
                             + dir.getPath());
                 }
@@ -222,7 +222,7 @@ public class SnapshotCommands {
 
                 if (snapshot == null) {
                     dateFormat.setTimeZone(session.getTimeZone());
-                    player.printError(BBC.getPrefix() + "Couldn't find a snapshot before "
+                    player.printError("Couldn't find a snapshot before "
                             + dateFormat.format(date.getTime()) + ".");
                 } else {
                     session.setSnapshot(snapshot);
@@ -260,7 +260,7 @@ public class SnapshotCommands {
                 Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, player.getWorld().getName());
                 if (snapshot == null) {
                     dateFormat.setTimeZone(session.getTimeZone());
-                    player.printError(BBC.getPrefix() + "Couldn't find a snapshot after "
+                    player.printError("Couldn't find a snapshot after "
                             + dateFormat.format(date.getTime()) + ".");
                 } else {
                     session.setSnapshot(snapshot);

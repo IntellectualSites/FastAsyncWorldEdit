@@ -23,7 +23,7 @@ public class CFIChange implements Change {
     }
 
     private HeightMapMCAGenerator getQueue(UndoContext context) {
-        ExtentTraverser found = new ExtentTraverser(context.getExtent()).find(HasFaweQueue.class);
+        ExtentTraverser found = new ExtentTraverser<>(context.getExtent()).find(HasFaweQueue.class);
         if (found != null) {
             FaweQueue queue = ((HasFaweQueue) found.get()).getQueue();
             if (queue instanceof HeightMapMCAGenerator) return (HeightMapMCAGenerator) queue;

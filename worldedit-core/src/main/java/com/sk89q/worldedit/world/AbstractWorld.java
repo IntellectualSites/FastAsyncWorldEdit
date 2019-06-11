@@ -154,4 +154,5 @@ public abstract class AbstractWorld implements World {
             return Double.compare(priority, other != null ? other.priority : 0);
         }
     }
+
 }

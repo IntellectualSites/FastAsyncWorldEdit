@@ -8,14 +8,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomTextureUtil extends CachedTextureUtil {
 
-    public RandomTextureUtil(TextureUtil parent) throws FileNotFoundException {
-        super(parent);
-    }
-
     private int index;
     private int[] biomeMixBuffer = new int[3];
     private Int2ObjectOpenHashMap<Integer> offsets = new Int2ObjectOpenHashMap<>();
     private Int2ObjectOpenHashMap<int[]> biomeMixes = new Int2ObjectOpenHashMap<>();
+    public RandomTextureUtil(TextureUtil parent) throws FileNotFoundException {
+        super(parent);
+    }
 
     protected int addRandomColor(int c1, int c2) {
         int red1 = (c1 >> 16) & 0xFF;
@@ -50,7 +49,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
             mix[3] = average;
             biomeMixes.put(color, mix);
         }
-        if (++index > 2) index = 0;
+        if (++index > 2) {
+            index = 0;
+        }
         int biomeId = mix[index];
         int biomeAvColor = mix[3];
         int blockColor = getColor(block);
@@ -73,7 +74,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
             mix[3] = average;
             biomeMixes.put(color, mix);
         }
-        if (++index > 2) index = 0;
+        if (++index > 2) {
+            index = 0;
+        }
         int biomeId = mix[index];
         return getBiome(biomeId);
     }
@@ -87,7 +90,9 @@ public class RandomTextureUtil extends CachedTextureUtil {
             offsetColor = color;
         }
         BlockType res = super.getNearestBlock(offsetColor);
-        if (res == null) return null;
+        if (res == null) {
+            return null;
+        }
         int newColor = getColor(res);
         {
             byte dr = (byte) (((color >> 16) & 0xFF) - ((newColor >> 16) & 0xFF));

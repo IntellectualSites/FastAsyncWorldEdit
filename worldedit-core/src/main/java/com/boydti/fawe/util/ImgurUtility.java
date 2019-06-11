@@ -1,9 +1,12 @@
 package com.boydti.fawe.util;
 
-import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -11,21 +14,6 @@ import java.util.Base64;
 
 public class ImgurUtility {
     public static final String CLIENT_ID = "50e34b65351eb07";
-
-    public static URL uploadImage(File file) throws IOException {
-        return uploadImage(new FileInputStream(file));
-    }
-
-    public static URL uploadImage(InputStream is) throws IOException {
-        is = new BufferedInputStream(is);
-        FastByteArrayOutputStream baos = new FastByteArrayOutputStream(Short.MAX_VALUE);
-        int d;
-        while ((d = is.read()) != -1) {
-            baos.write(d);
-        }
-        baos.flush();
-        return uploadImage(baos.toByteArray());
-    }
 
     public static URL uploadImage(byte[] image) throws IOException {
         String json = getImgurContent(CLIENT_ID, image);

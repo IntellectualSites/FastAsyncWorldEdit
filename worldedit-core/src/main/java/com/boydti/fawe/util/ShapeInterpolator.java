@@ -1,7 +1,6 @@
 package com.boydti.fawe.util;
 
-import java.awt.Rectangle;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.FlatteningPathIterator;
 import java.awt.geom.IllegalPathStateException;
@@ -54,53 +53,6 @@ public class ShapeInterpolator {
         return instance.evaluate(v0, v1, fraction, unionBounds);
     }
 
-    /**
-     * Creates an interpolated shape from tight bounds.
-     */
-    public Shape evaluate(Shape v0, Shape v1, float fraction) {
-        return evaluate(v0, v1, fraction, false);
-    }
-
-    /**
-     * Creates an interpolated shape.
-     *
-     * @param v0          the first shape
-     * @param v1          the second shape
-     * @param fraction    the fraction from zero (just first shape) to one (just second shape)
-     * @param unionBounds if `true`, the shape reports bounds which are the union of
-     *                    the bounds of both shapes, if `false` it reports "tight" bounds
-     *                    using the actual interpolated path.
-     */
-    public Shape evaluate(Shape v0, Shape v1, float fraction, boolean unionBounds) {
-        if (savedV0 != v0 || savedV1 != v1) {
-            if (savedV0 == v1 && savedV1 == v0) {
-                // Just swap the geometries
-                final Geometry tmp = geom0;
-                geom0 = geom1;
-                geom1 = tmp;
-            } else {
-                recalculate(v0, v1);
-            }
-            savedV0 = v0;
-            savedV1 = v1;
-        }
-        return getShape(fraction, unionBounds);
-    }
-
-    private void recalculate(Shape v0, Shape v1) {
-        geom0 = new Geometry(v0);
-        geom1 = new Geometry(v1);
-        final float[] tVals0 = geom0.getTVals();
-        final float[] tVals1 = geom1.getTVals();
-        final float[] masterTVals = mergeTVals(tVals0, tVals1);
-        geom0.setTVals(masterTVals);
-        geom1.setTVals(masterTVals);
-    }
-
-    private Shape getShape(float fraction, boolean unionBounds) {
-        return new MorphedShape(geom0, geom1, fraction, unionBounds);
-    }
-
     private static float[] mergeTVals(float[] tVals0, float[] tVals1) {
         final int count = sortTVals(tVals0, tVals1, null);
         final float[] newTVals = new float[count];
@@ -136,6 +88,53 @@ public class ShapeInterpolator {
 
     private static float interp(float v0, float v1, float t) {
         return (v0 + ((v1 - v0) * t));
+    }
+
+    /**
+     * Creates an interpolated shape from tight bounds.
+     */
+    public Shape evaluate(Shape v0, Shape v1, float fraction) {
+        return evaluate(v0, v1, fraction, false);
+    }
+
+    /**
+     * Creates an interpolated shape.
+     *
+     * @param v0 the first shape
+     * @param v1 the second shape
+     * @param fraction the fraction from zero (just first shape) to one (just second shape)
+     * @param unionBounds if `true`, the shape reports bounds which are the union of
+     * the bounds of both shapes, if `false` it reports "tight" bounds
+     * using the actual interpolated path.
+     */
+    public Shape evaluate(Shape v0, Shape v1, float fraction, boolean unionBounds) {
+        if (savedV0 != v0 || savedV1 != v1) {
+            if (savedV0 == v1 && savedV1 == v0) {
+                // Just swap the geometries
+                final Geometry tmp = geom0;
+                geom0 = geom1;
+                geom1 = tmp;
+            } else {
+                recalculate(v0, v1);
+            }
+            savedV0 = v0;
+            savedV1 = v1;
+        }
+        return getShape(fraction, unionBounds);
+    }
+
+    private void recalculate(Shape v0, Shape v1) {
+        geom0 = new Geometry(v0);
+        geom1 = new Geometry(v1);
+        final float[] tVals0 = geom0.getTVals();
+        final float[] tVals1 = geom1.getTVals();
+        final float[] masterTVals = mergeTVals(tVals0, tVals1);
+        geom0.setTVals(masterTVals);
+        geom1.setTVals(masterTVals);
+    }
+
+    private Shape getShape(float fraction, boolean unionBounds) {
+        return new MorphedShape(geom0, geom1, fraction, unionBounds);
     }
 
     private static class Geometry {
@@ -263,8 +262,8 @@ public class ShapeInterpolator {
                 // Copy all coordinates from minPt to the end of the
                 // array to the beginning of the new array
                 System.arraycopy(bezierCoordinates, minPt,
-                        newCoordinates, 0,
-                        numCoordinates - minPt);
+                                 newCoordinates, 0,
+                                 numCoordinates - minPt);
                 // Now we do not want to copy 0,1 as they are duplicates
                 // of the last 2 coordinates which we just copied.  So
                 // we start the source copy at index 2, but we still
@@ -273,8 +272,8 @@ public class ShapeInterpolator {
                 // of the array, thus ensuring that thew new array starts
                 // and ends with the same pair of coordinates...
                 System.arraycopy(bezierCoordinates, 2,
-                        newCoordinates, numCoordinates - minPt,
-                        minPt);
+                                 newCoordinates, numCoordinates - minPt,
+                                 minPt);
                 bezierCoordinates = newCoordinates;
             }
             /* Clockwise enforcement:
@@ -350,24 +349,24 @@ public class ShapeInterpolator {
         private void appendLineTo(float x0, float y0,
                                   float x1, float y1) {
             appendCubicTo(// A third of the way from xy0 to xy1:
-                    interp(x0, x1, THIRD),
-                    interp(y0, y1, THIRD),
-                    // A third of the way from xy1 back to xy0:
-                    interp(x1, x0, THIRD),
-                    interp(y1, y0, THIRD),
-                    x1, y1);
+                          interp(x0, x1, THIRD),
+                          interp(y0, y1, THIRD),
+                          // A third of the way from xy1 back to xy0:
+                          interp(x1, x0, THIRD),
+                          interp(y1, y0, THIRD),
+                          x1, y1);
         }
 
         private void appendQuadTo(float x0, float y0,
                                   float ctrlX, float ctrlY,
                                   float x1, float y1) {
             appendCubicTo(// A third of the way from ctrl X/Y back to xy0:
-                    interp(ctrlX, x0, THIRD),
-                    interp(ctrlY, y0, THIRD),
-                    // A third of the way from ctrl X/Y to xy1:
-                    interp(ctrlX, x1, THIRD),
-                    interp(ctrlY, y1, THIRD),
-                    x1, y1);
+                          interp(ctrlX, x0, THIRD),
+                          interp(ctrlY, y0, THIRD),
+                          // A third of the way from ctrl X/Y to xy1:
+                          interp(ctrlX, x1, THIRD),
+                          interp(ctrlY, y1, THIRD),
+                          x1, y1);
         }
 
         private void appendCubicTo(float ctrlX1, float ctrlY1,
@@ -672,21 +671,21 @@ public class ShapeInterpolator {
         }
 
         /**
-         * @{inheritDoc}
+         * @inheritDoc
          */
         public int getWindingRule() {
             return (t < 0.5 ? g0.getWindingRule() : g1.getWindingRule());
         }
 
         /**
-         * @{inheritDoc}
+         * @inheritDoc
          */
         public boolean isDone() {
             return (cIndex > g0.getNumCoordinates());
         }
 
         /**
-         * @{inheritDoc}
+         * @inheritDoc
          */
         public void next() {
             if (cIndex == 0) {
@@ -697,7 +696,7 @@ public class ShapeInterpolator {
         }
 
         /**
-         * @{inheritDoc}
+         * @inheritDoc
          */
         public int currentSegment(float[] coordinates) {
             int type;
