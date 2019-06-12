@@ -355,7 +355,7 @@ public class BrushOptionsCommands extends MethodCommands {
     public void mask(Player player, LocalSession session, EditSession editSession, @Optional @Switch('h') boolean offHand, CommandContext context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.getPrefix() + BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.f());
             return;
         }
         if (context.argsLength() == 0) {
@@ -388,7 +388,7 @@ public class BrushOptionsCommands extends MethodCommands {
     public void smask(Player player, LocalSession session, EditSession editSession, @Optional @Switch('h') boolean offHand, CommandContext context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.getPrefix() + BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.f());
             return;
         }
         if (context.argsLength() == 0) {
@@ -420,7 +420,7 @@ public class BrushOptionsCommands extends MethodCommands {
     public void transform(Player player, LocalSession session, EditSession editSession, @Optional @Switch('h') boolean offHand, CommandContext context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.getPrefix() + BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.f());
             return;
         }
         if (context.argsLength() == 0) {
@@ -452,7 +452,7 @@ public class BrushOptionsCommands extends MethodCommands {
     public void material(Player player, EditSession editSession, LocalSession session, Pattern pattern, @Switch('h') boolean offHand, CommandContext context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.getPrefix() + BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.f());
             return;
         }
         if (context.argsLength() == 0) {
@@ -479,7 +479,7 @@ public class BrushOptionsCommands extends MethodCommands {
         int range = Math.max(0, Math.min(256, args.getInteger(0)));
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.getPrefix() + BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.f());
             return;
         }
         tool.setRange(range);
@@ -499,7 +499,7 @@ public class BrushOptionsCommands extends MethodCommands {
         worldEdit.checkMaxBrushRadius(radius);
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.getPrefix() + BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.f());
             return;
         }
         BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();

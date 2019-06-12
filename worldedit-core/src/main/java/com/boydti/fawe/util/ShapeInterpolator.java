@@ -672,21 +672,21 @@ public class ShapeInterpolator {
         }
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public int getWindingRule() {
             return (t < 0.5 ? g0.getWindingRule() : g1.getWindingRule());
         }
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public boolean isDone() {
             return (cIndex > g0.getNumCoordinates());
         }
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public void next() {
             if (cIndex == 0) {
@@ -697,7 +697,7 @@ public class ShapeInterpolator {
         }
 
         /**
-         * @{inheritDoc}
+         * {@inheritDoc}
          */
         public int currentSegment(float[] coordinates) {
             int type;

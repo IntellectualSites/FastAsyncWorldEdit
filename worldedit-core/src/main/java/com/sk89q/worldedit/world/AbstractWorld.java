@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.world;
 
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -32,6 +30,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -144,7 +143,6 @@ public abstract class AbstractWorld implements World {
             this.priority = priority;
         }
 
-        @SuppressWarnings("deprecation")
         public void play() {
             playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4);
         }
@@ -154,4 +152,5 @@ public abstract class AbstractWorld implements World {
             return Double.compare(priority, other != null ? other.priority : 0);
         }
     }
+
 }

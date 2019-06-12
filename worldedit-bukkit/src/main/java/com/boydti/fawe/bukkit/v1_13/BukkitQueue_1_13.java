@@ -194,8 +194,8 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits.setAccessible(true);
 
-            System.out.println(BBC.getPrefix() + "Using adapter: " + getAdapter());
-            System.out.println(BBC.getPrefix() + "=========================================");
+            System.out.println("Using adapter: " + getAdapter());
+            System.out.println("=========================================");
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

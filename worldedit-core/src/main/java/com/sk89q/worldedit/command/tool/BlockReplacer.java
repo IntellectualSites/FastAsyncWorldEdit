@@ -80,7 +80,7 @@ public class BlockReplacer implements DoubleActionBlockTool {
 
         if (type != null) {
             this.pattern = targetBlock;
-            player.print(BBC.getPrefix() + "Replacer tool switched to: " + type.getName());
+            player.print("Replacer tool switched to: " + type.getName());
         }
 
         return true;

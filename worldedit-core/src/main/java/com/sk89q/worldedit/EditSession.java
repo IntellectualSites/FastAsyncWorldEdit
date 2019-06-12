@@ -105,6 +105,7 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.pattern.WaterloggedRemover;
 import com.sk89q.worldedit.function.util.RegionOffset;
 import com.sk89q.worldedit.function.visitor.DirectionalVisitor;
 import com.sk89q.worldedit.function.visitor.DownwardVisitor;
@@ -709,6 +710,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * Returns queue status.
      *
      * @return whether the queue is enabled
+     * @deprecated Use {@link EditSession#getReorderMode()} with MULTI_STAGE instead.
      */
     @Deprecated
     public boolean isQueueEnabled() {
@@ -717,6 +719,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     /**
      * Queue certain types of block for better reproduction of those blocks.
+     *
+     * Uses {@link ReorderMode#MULTI_STAGE}
+     * @deprecated Use {@link EditSession#setReorderMode(ReorderMode)} with MULTI_STAGE instead.
      */
     @Deprecated
     public void enableQueue() {
@@ -2180,17 +2185,19 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 //        if (getWorld() != null) {
 //            liquidMask = getWorld().createLiquidMask();
 //        } else {
-        liquidMask = new BlockTypeMask(this,
-                BlockTypes.LAVA,
-                BlockTypes.WATER);
 //        }
-        final MaskIntersection mask = new MaskIntersection(
-                new BoundedHeightMask(0, EditSession.this.getMaximumPoint().getBlockY()),
+        liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        MaskIntersection mask = new MaskIntersection(
+                new BoundedHeightMask(0, getWorld().getMaxY()),
                 new RegionMask(
                         new EllipsoidRegion(null, origin,
                                 Vector3.at(radius, radius, radius))), liquidMask);
-
-        BlockReplace replace = new BlockReplace(this, BlockTypes.AIR.getDefaultState());
+        BlockReplace replace;
+        if (waterlogged) {
+            replace = new BlockReplace(this, new WaterloggedRemover(this));
+        } else {
+            replace = new BlockReplace(this, new BlockPattern(BlockTypes.AIR.getDefaultState()));
+        }
         RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
 
         // Around the origin in a 3x3 block
@@ -3384,19 +3391,19 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         	if (block.getBlockType().getMaterial().isMovementBlocker()) {
         		continue;
         	}
-        	
+
         	if (!outside.add(current)) {
         		continue;
         	}
-        	
+
         	if (!region.contains(current)) {
         		continue;
         	}
-        	
+
         	for (BlockVector3 recurseDirection : recurseDirections) {
         		queue.add(current.add(recurseDirection));
         	}
-        }        
+        }
     }
 
     public int makeBiomeShape(final Region region, final Vector3 zero, final Vector3 unit, final BiomeType biomeType,

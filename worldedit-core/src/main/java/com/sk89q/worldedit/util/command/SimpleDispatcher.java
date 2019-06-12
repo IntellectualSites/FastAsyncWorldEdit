@@ -142,7 +142,7 @@ public class SimpleDispatcher implements Dispatcher {
 
         }
 
-        throw new InvalidUsageException(BBC.getPrefix() + "Please choose a sub-command.", this, true);
+        throw new InvalidUsageException("Please choose a sub-command.", this, true);
     }
 
     @Override

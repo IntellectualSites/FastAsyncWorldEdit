@@ -208,7 +208,7 @@ public class BrushCommands extends BrushProcessor {
     @CommandPermissions("worldedit.brush.spline")
     public BrushSettings splineBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("25") Expression radius, CommandContext context) throws WorldEditException {
         getWorldEdit().checkMaxBrushRadius(radius);
-        player.print(BBC.getPrefix() + BBC.BRUSH_SPLINE.f(radius));
+        player.print(BBC.BRUSH_SPLINE.f(radius));
         return set(session, context,
                 new SplineBrush(player, session))
                 .setSize(radius)
@@ -227,7 +227,7 @@ public class BrushCommands extends BrushProcessor {
     )
     @CommandPermissions("worldedit.brush.sweep")
     public BrushSettings sweepBrush(Player player, LocalSession session, EditSession editSession, @Optional("-1") int copies, CommandContext context) throws WorldEditException {
-        player.print(BBC.getPrefix() + BBC.BRUSH_SPLINE.s());
+        player.print(BBC.BRUSH_SPLINE.s());
         return set(session, context, new SweepBrush(copies));
     }
 
@@ -263,7 +263,7 @@ public class BrushCommands extends BrushProcessor {
     )
     @CommandPermissions("worldedit.brush.surfacespline") // 0, 0, 0, 10, 0,
     public BrushSettings surfaceSpline(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("0") Expression radius, @Optional("0") double tension, @Optional("0") double bias, @Optional("0") double continuity, @Optional("10") double quality, CommandContext context) throws WorldEditException {
-        player.print(BBC.getPrefix() + BBC.BRUSH_SPLINE.f(radius));
+        player.print(BBC.BRUSH_SPLINE.f(radius));
         getWorldEdit().checkMaxBrushRadius(radius);
         return set(session, context,
                 new SurfaceSpline(tension, bias, continuity, quality))
@@ -794,7 +794,7 @@ public class BrushCommands extends BrushProcessor {
     @CommandPermissions("worldedit.brush.copy")
     public BrushSettings copy(Player player, LocalSession session, @Optional("5") Expression radius, @Switch('r') boolean randomRotate, @Switch('a') boolean autoRotate, CommandContext context) throws WorldEditException {
         getWorldEdit().checkMaxBrushRadius(radius);
-        player.print(BBC.getPrefix() + BBC.BRUSH_COPY.f(radius));
+        player.print(BBC.BRUSH_COPY.f(radius));
 
         return set(session, context,
                 new CopyPastaBrush(player, session, randomRotate, autoRotate))

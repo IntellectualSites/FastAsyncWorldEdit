@@ -157,7 +157,7 @@ public class AnvilCommands {
 //        final FaweBlockMatcher matchTo = FaweBlockMatcher.setBlocks(worldEdit.getBlocks(player, to, true));
 //        ReplaceSimpleFilter filter = new ReplaceSimpleFilter(matchFrom, matchTo);
 //        ReplaceSimpleFilter result = runWithWorld(player, folder, filter, true);
-//        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+//        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -182,7 +182,7 @@ public class AnvilCommands {
         }
         RemapFilter filter = new RemapFilter(from, to);
         RemapFilter result = runWithWorld(player, folder, filter, true);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
 
@@ -202,7 +202,7 @@ public class AnvilCommands {
         long chunkInactivityMillis = fileDurationMillis; // Use same value for now
         DeleteUninhabitedFilter filter = new DeleteUninhabitedFilter(fileDurationMillis, inhabitedTicks, chunkInactivityMillis);
         DeleteUninhabitedFilter result = runWithWorld(player, folder, filter, true);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -223,7 +223,7 @@ public class AnvilCommands {
         DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, chunkInactivityMillis);
         if (debug) filter.enableDebug();
         DeleteUnclaimedFilter result = runWithWorld(player, folder, filter, true);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -244,7 +244,7 @@ public class AnvilCommands {
         DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, chunkInactivityMillis);
         if (debug) filter.enableDebug();
         DeleteUnclaimedFilter result = runWithSelection(player, editSession, selection, filter);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -263,7 +263,7 @@ public class AnvilCommands {
         long duration = MainUtil.timeToSec(time) * 1000l;
         DeleteOldFilter filter = new DeleteOldFilter(duration);
         DeleteOldFilter result = runWithWorld(player, folder, filter, true);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -283,7 +283,7 @@ public class AnvilCommands {
         FaweQueue defaultQueue = SetQueue.IMP.getNewQueue(folder, true, false);
         MCAQueue queue = new MCAQueue(defaultQueue);
         PlotTrimFilter result = queue.filterWorld(filter);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -294,7 +294,7 @@ public class AnvilCommands {
     public void deleteBiome(Player player, String folder, BiomeType biome, @Switch('u') boolean unsafe) {
         DeleteBiomeFilterSimple filter = new DeleteBiomeFilterSimple(biome);
         DeleteBiomeFilterSimple result = runWithWorld(player, folder, filter, true, unsafe);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -305,7 +305,7 @@ public class AnvilCommands {
     public void trimAllAir(Player player, String folder, @Switch('u') boolean unsafe) throws WorldEditException {
         TrimAirFilter filter = new TrimAirFilter();
         TrimAirFilter result = runWithWorld(player, folder, filter, true, unsafe);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -316,7 +316,7 @@ public class AnvilCommands {
     public void debugfixroads(Player player, String folder) throws WorldEditException {
         DebugFixP2Roads filter = new DebugFixP2Roads();
         DebugFixP2Roads result = runWithWorld(player, folder, filter, true, true);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -335,7 +335,7 @@ public class AnvilCommands {
 //                List<String> split = StringMan.split(from, ',');
 //                filter = new MappedReplacePatternFilter(from, (RandomPattern) to, useData);
 //            } else {
-//                player.print(BBC.getPrefix() + "Must be a pattern list!");
+//                player.print("Must be a pattern list!");
 //                return;
 //            }
 //        } else {
@@ -348,7 +348,7 @@ public class AnvilCommands {
 //            filter = new ReplacePatternFilter(matchFrom, to);
 //        }
 //        MCAFilterCounter result = runWithWorld(player, folder, filter, true);
-//        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+//        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 //
     @Command(
@@ -373,7 +373,7 @@ public class AnvilCommands {
 //            filter = counter;
 //        }
 //        MCAFilterCounter result = runWithWorld(player, folder, filter, true);
-//        if (result != null) player.print(BBC.getPrefix() + BBC.SELECTION_COUNT.format(result.getTotal()));
+//        if (result != null) player.print(BBC.SELECTION_COUNT.format(result.getTotal()));
     }
 
     @Command(
@@ -423,7 +423,7 @@ public class AnvilCommands {
             }
         };
         MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
-        if (result != null) player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
 
     @Command(
@@ -448,7 +448,7 @@ public class AnvilCommands {
 //            filter = counter;
 //        }
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
-//        if (result != null) player.print(BBC.getPrefix() + BBC.SELECTION_COUNT.format(result.getTotal()));
+//        if (result != null) player.print(BBC.SELECTION_COUNT.format(result.getTotal()));
     }
 //
     @Command(
@@ -514,7 +514,7 @@ public class AnvilCommands {
 //                        ((c[1] * 10000) / total) / 100d,
 //                        name == null ? "Unknown" : name,
 //                        block.getType(), block.getData());
-//                player.print(BBC.getPrefix() + str);
+//                player.print(str);
 //            }
 //        } else {
 //            for (long[] c : map) {
@@ -523,7 +523,7 @@ public class AnvilCommands {
 //                        String.valueOf(c[1]),
 //                        ((c[1] * 10000) / total) / 100d,
 //                        block == null ? "Unknown" : block.getName(), c[0]);
-//                player.print(BBC.getPrefix() + str);
+//                player.print(str);
 //            }
 //        }
     }
@@ -545,7 +545,7 @@ public class AnvilCommands {
 //        ReplaceSimpleFilter filter = new ReplaceSimpleFilter(matchFrom, matchTo);
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) {
-//            player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
 //        }
     }
 //
@@ -563,7 +563,7 @@ public class AnvilCommands {
 //                List<String> split = StringMan.split(from, ',');
 //                filter = new MappedReplacePatternFilter(from, (RandomPattern) to, useData);
 //            } else {
-//                player.print(BBC.getPrefix() + "Must be a pattern list!");
+//                player.print("Must be a pattern list!");
 //                return;
 //            }
 //        } else {
@@ -577,7 +577,7 @@ public class AnvilCommands {
 //        }
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) {
-//            player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+//            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
 //        }
     }
 
@@ -592,7 +592,7 @@ public class AnvilCommands {
         MCAFilterCounter filter = new SetPatternFilter(to);
         MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
         if (result != null) {
-            player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
         }
     }
 
@@ -611,7 +611,7 @@ public class AnvilCommands {
         RemoveLayerFilter filter = new RemoveLayerFilter(minY, maxY, id);
         MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
         if (result != null) {
-            player.print(BBC.getPrefix() + BBC.VISITOR_BLOCK.format(result.getTotal()));
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
         }
     }
 
@@ -651,7 +651,7 @@ public class AnvilCommands {
 //        FawePlayer fp = FawePlayer.wrap(player);
 //        MCAClipboard clipboard = fp.getMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD);
 //        if (clipboard == null) {
-//            fp.sendMessage(BBC.getPrefix() + "You must first use `//anvil copy`");
+//            fp.sendMessage("You must first use `//anvil copy`");
 //            return;
 //        }
 //        CuboidRegion cuboid = clipboard.getRegion();

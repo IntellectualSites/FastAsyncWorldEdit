@@ -177,7 +177,7 @@ public class CFICommands extends MethodCommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void cancel(FawePlayer fp) throws ParameterException, IOException {
         getSettings(fp).remove();
-        fp.sendMessage(BBC.getPrefix() + "Cancelled!");
+        fp.sendMessage("Cancelled!");
     }
 
     @Command(
@@ -196,12 +196,12 @@ public class CFICommands extends MethodCommands {
                 if (folder != null) {
                     try {
                         generator.setFolder(folder);
-                        fp.sendMessage(BBC.getPrefix() + "Generating " + folder);
+                        fp.sendMessage("Generating " + folder);
                         generator.generate();
                         generator.setPacketViewer(null);
                         generator.setImageViewer(null);
                         settings.remove();
-                        fp.sendMessage(BBC.getPrefix() + "Done!");
+                        fp.sendMessage("Done!");
                         return true;
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -215,8 +215,8 @@ public class CFICommands extends MethodCommands {
 
         try {
             new PlotLoader().load(fp, settings, function);
-        } catch (Throwable ignore) {
-            ignore.printStackTrace();
+        } catch (Throwable e) {
+            e.printStackTrace();
             function.apply(generator.getFolder().getParentFile());
         }
 
@@ -879,7 +879,7 @@ public class CFICommands extends MethodCommands {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "jpg", baos );
         byte[] data = baos.toByteArray();
-        fp.sendMessage(BBC.getPrefix() + "Please wait...");
+        fp.sendMessage("Please wait...");
         URL url = ImgurUtility.uploadImage(data);
         BBC.DOWNLOAD_LINK.send(fp, url);
     }

@@ -117,7 +117,7 @@ public class HistoryCommands extends MethodCommands {
                                             rollback.setTime(historyFile.lastModified());
                                             RollbackDatabase db = DBHandler.IMP.getDatabase(world);
                                             db.logEdit(rollback);
-                                            player.print(BBC.getPrefix() + "Logging: " + historyFile);
+                                            player.print("Logging: " + historyFile);
                                         }
                                     }
                                 } catch (IllegalArgumentException e) {
@@ -127,7 +127,7 @@ public class HistoryCommands extends MethodCommands {
                             }
                         }
                     }
-                    player.print(BBC.getPrefix() + "Done import!");
+                    player.print("Done import!");
                     return;
                 }
                 String toParse = user.substring(1);

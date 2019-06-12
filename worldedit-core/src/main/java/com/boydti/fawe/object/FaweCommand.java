@@ -27,19 +27,9 @@ public abstract class FaweCommand<T> {
                 execute(player, args);
                 return true;
             } else if (player == null) {
-                TaskManager.IMP.async(new Runnable() {
-                    @Override
-                    public void run() {
-                        execute(player, args);
-                    }
-                });
+                TaskManager.IMP.async(() -> execute(player, args));
             } else {
-                if (!player.runAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        execute(player, args);
-                    }
-                }, true, true)) {
+                if (!player.runAction(() -> execute(player, args), true, true)) {
                     BBC.WORLDEDIT_COMMAND_LIMIT.send(player);
                     return true;
                 }

@@ -50,7 +50,7 @@ public class PlotLoader {
             SinglePlotArea area = sManager.getArea();
             PlotPlayer player = PlotPlayer.wrap(fp.parent);
 
-            fp.sendMessage(BBC.getPrefix() + "Claiming world");
+            fp.sendMessage("Claiming world");
             Plot plot = TaskManager.IMP.sync(new RunnableVal<Plot>() {
                 @Override
                 public void run(Plot o) {

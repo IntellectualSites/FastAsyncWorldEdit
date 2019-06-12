@@ -85,6 +85,10 @@ public class BukkitPlayer extends FawePlayer<Player> {
         this.parent.sendMessage(BBC.color(message));
     }
 
+    @Override public void printError(String msg) {
+        this.sendMessage(msg);
+    }
+
     @Override
     public void executeCommand(final String cmd) {
         Bukkit.getServer().dispatchCommand(this.parent, cmd);

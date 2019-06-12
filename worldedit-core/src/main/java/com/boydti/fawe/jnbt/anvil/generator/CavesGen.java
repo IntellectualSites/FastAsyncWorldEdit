@@ -56,7 +56,7 @@ public class CavesGen extends GenBase {
         double f2 = 0.0F;
 
         if (maxAngle <= 0) {
-            int checkAreaSize = this.getCheckAreaSize() * 16 - 16;
+            int checkAreaSize = (this.getCheckAreaSize() * 16) - 16;
             maxAngle = checkAreaSize - ThreadLocalRandom.current().nextInt(checkAreaSize / 4);
         }
         boolean isLargeCave = false;
@@ -70,7 +70,7 @@ public class CavesGen extends GenBase {
         int k = ThreadLocalRandom.current().nextInt(6) == 0 ? 1 : 0;
 
         for (; angle < maxAngle; angle++) {
-            double d3 = 1.5D + MathMan.sinInexact(angle * 3.141593F / maxAngle) * paramdouble1 * 1.0F;
+            double d3 = 1.5D + MathMan.sinInexact(angle * Math.PI / maxAngle) * paramdouble1 * 1.0F;
             double d4 = d3 * paramDouble4;
 
             double f3 = MathMan.cosInexact(paramdouble3);

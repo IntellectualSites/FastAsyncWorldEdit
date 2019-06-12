@@ -71,12 +71,12 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         	BBC.BLOCK_CYCLER_CANNOT_CYCLE.send(player);
         } else {
         	Property<?> currentProperty = selectedProperties.get(player.getUniqueId());
-        	
+
         	if (currentProperty == null || (forward && block.getState(currentProperty) == null)) {
         		currentProperty = block.getStates().keySet().stream().findFirst().get();
         		selectedProperties.put(player.getUniqueId(), currentProperty);
         	}
-		
+
         	if (forward) {
         		block.getState(currentProperty);
         		int index = currentProperty.getValues().indexOf(block.getState(currentProperty));
@@ -84,12 +84,12 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         		@SuppressWarnings("unchecked")
         		Property<Object> objProp = (Property<Object>) currentProperty;
         		BlockState newBlock = block.with(objProp, currentProperty.getValues().get(index));
-	
+
         		try {
         			EditSession editSession = session.createEditSession(player);
         			try {
         				editSession.setBlock(blockPoint, newBlock);
-        				player.print(BBC.getPrefix() + "Value of " + currentProperty.getName() + " is now " + currentProperty.getValues().get(index).toString());
+        				player.print("Value of " + currentProperty.getName() + " is now " + currentProperty.getValues().get(index).toString());
         			} catch (MaxChangedBlocksException e) {
         				BBC.BLOCK_CYCLER_LIMIT.send(player);
         			} finally {
@@ -102,7 +102,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         		index = (index + 1) % properties.size();
         		currentProperty = properties.get(index);
         		selectedProperties.put(player.getUniqueId(), currentProperty);
-        		player.print(BBC.getPrefix() + "Now cycling " + currentProperty.getName());
+        		player.print("Now cycling " + currentProperty.getName());
         	}
         }
 

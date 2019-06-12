@@ -275,14 +275,14 @@ public class FunctionParametricCallable extends AParametricCallable {
             }
             return result;
         } catch (MissingParameterException e) {
-            throw new InvalidUsageException(BBC.getPrefix() + "Too few parameters!", this, true);
+            throw new InvalidUsageException("Too few parameters!", this, true);
         } catch (UnconsumedParameterException e) {
-            throw new InvalidUsageException(BBC.getPrefix() + "Too many parameters! Unused parameters: " + e.getUnconsumed(), this, true);
+            throw new InvalidUsageException("Too many parameters! Unused parameters: " + e.getUnconsumed(), this, true);
         } catch (ParameterException e) {
             assert parameter != null;
             String name = parameter.getName();
 
-            throw new InvalidUsageException(BBC.getPrefix() + "For parameter '" + name + "': " + e.getMessage(), this, true);
+            throw new InvalidUsageException("For parameter '" + name + "': " + e.getMessage(), this, true);
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof CommandException) {
                 throw (CommandException) e.getCause();

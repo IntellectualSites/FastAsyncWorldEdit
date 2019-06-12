@@ -458,6 +458,13 @@ public abstract class FawePlayer<T> extends Metadatable {
     public abstract void sendMessage(final String message);
 
     /**
+     * Print a WorldEdit error.
+     *
+     * @param msg The error message text
+     */
+    public abstract void printError(String msg);
+
+    /**
      * Have the player execute a command
      *
      * @param substring

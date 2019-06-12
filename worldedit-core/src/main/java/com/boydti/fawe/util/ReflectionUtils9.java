@@ -29,7 +29,7 @@ public class ReflectionUtils9 {
 
             // 2. Copy it
             T[] previousValues = (T[]) valuesField.get(enumType);
-            List values = new ArrayList(Arrays.asList(previousValues));
+            List values = new ArrayList<>(Arrays.asList(previousValues));
 
             // 3. build new enum
             T newValue = (T) makeEnum(enumType, // The target enum class

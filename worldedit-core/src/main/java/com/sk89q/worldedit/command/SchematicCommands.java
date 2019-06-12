@@ -183,7 +183,7 @@ public class SchematicCommands extends MethodCommands {
         for (Clipboard clip : session.getClipboard().getClipboards()) {
             remapper.apply(clip);
         }
-        player.print(BBC.getPrefix() + "Remapped schematic");
+        player.print("Remapped schematic");
     }
 
     @Command(
@@ -227,7 +227,7 @@ public class SchematicCommands extends MethodCommands {
                     }
                     f = player.openFileOpenDialog(extensions);
                     if (f == null || !f.exists()) {
-                        player.printError(BBC.getPrefix() + "Schematic " + filename + " does not exist! (" + f + ")");
+                        player.printError("Schematic " + filename + " does not exist! (" + f + ")");
                         return;
                     }
                 } else {
@@ -248,7 +248,7 @@ public class SchematicCommands extends MethodCommands {
                     }
                 }
                 if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
-                    player.printError(BBC.getPrefix() + "Schematic " + filename + " does not exist! (" + ((f != null) && f.exists()) + "|" + f + "|" + (f != null && !MainUtil.isInSubDirectory(working, f)) + ")");
+                    player.printError("Schematic " + filename + " does not exist! (" + ((f != null) && f.exists()) + "|" + f + "|" + (f != null && !MainUtil.isInSubDirectory(working, f)) + ")");
                     return;
                 }
                 if (format == null) {
@@ -264,9 +264,9 @@ public class SchematicCommands extends MethodCommands {
             format.hold(player, uri, in);
             BBC.SCHEMATIC_LOADED.send(player, filename);
         } catch (IllegalArgumentException e) {
-            player.printError(BBC.getPrefix() + "Unknown filename: " + filename);
+            player.printError("Unknown filename: " + filename);
         } catch (URISyntaxException | IOException e) {
-            player.printError(BBC.getPrefix() + "File could not be read or it does not exist: " + e.getMessage());
+            player.printError("File could not be read or it does not exist: " + e.getMessage());
             log.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {
@@ -290,7 +290,7 @@ public class SchematicCommands extends MethodCommands {
         LocalConfiguration config = worldEdit.getConfiguration();
         ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
-            player.printError(BBC.getPrefix() + "Unknown schematic format: " + formatName);
+            player.printError("Unknown schematic format: " + formatName);
             return;
         }
         File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
@@ -322,7 +322,7 @@ public class SchematicCommands extends MethodCommands {
                     Files.createDirectories(parent.toPath());
                 } catch (IOException e) {
                     e.printStackTrace();
-                    log.info(BBC.getPrefix() + "Could not create folder for schematics!");
+                    log.info("Could not create folder for schematics!");
                     return;
                 }
             }
@@ -367,11 +367,11 @@ public class SchematicCommands extends MethodCommands {
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            player.printError(BBC.getPrefix() + "Unknown filename: " + filename);
+            player.printError("Unknown filename: " + filename);
         } catch (IOException e) {
             e.printStackTrace();
-            player.printError(BBC.getPrefix() + "Schematic could not written: " + e.getMessage());
-            log.warn(BBC.getPrefix() + "Failed to write a saved clipboard", e);
+            player.printError("Schematic could not written: " + e.getMessage());
+            log.warn("Failed to write a saved clipboard", e);
         }
     }
 
@@ -390,7 +390,7 @@ public class SchematicCommands extends MethodCommands {
         File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
         File destDir = new File(dir, directory);
         if (!MainUtil.isInSubDirectory(working, destDir)) {
-            player.printError(BBC.getPrefix() + "Directory " + destDir + " does not exist!");
+            player.printError("Directory " + destDir + " does not exist!");
             return;
         }
         if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, destDir) && !player.hasPermission("worldedit.schematic.move.other")) {
@@ -404,7 +404,7 @@ public class SchematicCommands extends MethodCommands {
             return;
         }
         if (!destDir.exists() && !destDir.mkdirs()) {
-            player.printError(BBC.getPrefix() + "Creation of " + destDir + " failed! (check file permissions)");
+            player.printError("Creation of " + destDir + " failed! (check file permissions)");
             return;
         }
         for (File source : sources) {
@@ -457,7 +457,7 @@ public class SchematicCommands extends MethodCommands {
         }
         for (File f : files) {
             if (!MainUtil.isInSubDirectory(working, f) || !f.exists()) {
-                player.printError(BBC.getPrefix() + "Schematic " + filename + " does not exist! (" + f.exists() + "|" + f + "|" + (!MainUtil.isInSubDirectory(working, f)) + ")");
+                player.printError("Schematic " + filename + " does not exist! (" + f.exists() + "|" + f + "|" + (!MainUtil.isInSubDirectory(working, f)) + ")");
                 continue;
             }
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !player.hasPermission("worldedit.schematic.delete.other")) {
@@ -465,7 +465,7 @@ public class SchematicCommands extends MethodCommands {
                 continue;
             }
             if (!delete(f)) {
-                player.printError(BBC.getPrefix() + "Deletion of " + filename + " failed! Maybe it is read-only.");
+                player.printError("Deletion of " + filename + " failed! Maybe it is read-only.");
                 continue;
             }
             BBC.FILE_DELETED.send(player, filename);

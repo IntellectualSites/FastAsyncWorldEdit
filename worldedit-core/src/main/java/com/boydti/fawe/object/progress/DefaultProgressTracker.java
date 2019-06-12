@@ -84,23 +84,14 @@ public class DefaultProgressTracker extends RunnableVal2<FaweQueue.ProgressType,
     }
 
     private final void done() {
-        TaskManager.IMP.task(new Runnable() {
-            @Override
-            public void run() {
-                doneTask();
-            }
-        });
+        TaskManager.IMP.task(this::doneTask);
     }
 
     private long lastTick = 0;
 
     private final void send() {
-        TaskManager.IMP.task(new Runnable() { // Run on main thread
-            @Override
-            public void run() {
-                sendTask();
-            }
-        });
+        // Run on main thread
+        TaskManager.IMP.task(this::sendTask);
     }
 
     public void doneTask() {

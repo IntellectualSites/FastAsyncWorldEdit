@@ -194,9 +194,9 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public void debug(final String s) {
+    public void debug(final String message) {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(BBC.color(s));
+        console.sendMessage(BBC.color(message));
     }
 
     @Override
@@ -273,7 +273,7 @@ public class FaweBukkit implements IFawe, Listener {
         try {
             this.vault = new VaultUtil();
         } catch (final Throwable e) {
-            this.debug(BBC.getPrefix() + "&dVault is used for persistent `/wea` toggles.");
+            this.debug("&dVault is used for persistent `/wea` toggles.");
         }
     }
 
