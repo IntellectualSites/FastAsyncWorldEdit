@@ -16,6 +16,14 @@ public enum Perm {
         this.cat = cat;
     }
 
+    public boolean has(final FawePlayer<?> player) {
+        return this.hasPermission(player, this);
+    }
+
+    public boolean hasPermission(final FawePlayer<?> player, final Perm perm) {
+        return hasPermission(player, perm.s);
+    }
+
     public static boolean hasPermission(final FawePlayer<?> player, final String perm) {
         if ((player == null) || player.hasPermission(ADMIN.s)) {
             return true;
@@ -32,13 +40,5 @@ public enum Perm {
             }
         }
         return false;
-    }
-
-    public boolean has(final FawePlayer<?> player) {
-        return this.hasPermission(player, this);
-    }
-
-    public boolean hasPermission(final FawePlayer<?> player, final Perm perm) {
-        return hasPermission(player, perm.s);
     }
 }

@@ -65,16 +65,16 @@ public class NavigationCommands {
     )
     @CommandPermissions("worldedit.navigation.unstuck")
     public void unstuck(Player player) throws WorldEditException {
-        BBC.UNSTUCK.send(player);
         player.findFreePosition();
+        BBC.UNSTUCK.send(player);
     }
 
     @Command(
-        aliases = { "ascend", "asc" },
-        usage = "[# of levels]",
-        desc = "Go up a floor",
-        min = 0,
-        max = 1
+            aliases = {"ascend", "asc"},
+            usage = "[# of levels]",
+            desc = "Go up a floor",
+            min = 0,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.ascend")
     public void ascend(Player player, @Optional("1") int levelsToAscend) throws WorldEditException {
@@ -97,11 +97,11 @@ public class NavigationCommands {
     }
 
     @Command(
-        aliases = { "descend", "desc" },
-        usage = "[# of floors]",
-        desc = "Go down a floor",
-        min = 0,
-        max = 1
+            aliases = {"descend", "desc"},
+            usage = "[# of floors]",
+            desc = "Go down a floor",
+            min = 0,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.descend")
     public void descend(Player player, @Optional("1") int levelsToDescend) throws WorldEditException {
@@ -124,19 +124,19 @@ public class NavigationCommands {
     }
 
     @Command(
-        aliases = { "ceil" },
-        usage = "[clearance]",
-        desc = "Go to the celing",
-        flags = "fg",
-        min = 0,
-        max = 1
+            aliases = {"ceil"},
+            usage = "[clearance]",
+            desc = "Go to the celing",
+            flags = "fg",
+            min = 0,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.ceiling")
     @Logging(POSITION)
     public void ceiling(Player player, CommandContext args) throws WorldEditException {
 
         final int clearance = args.argsLength() > 0 ?
-            Math.max(0, args.getInteger(0)) : 0;
+                Math.max(0, args.getInteger(0)) : 0;
 
         final boolean alwaysGlass = getAlwaysGlass(args);
         if (player.ascendToCeiling(clearance, alwaysGlass)) {
@@ -147,11 +147,11 @@ public class NavigationCommands {
     }
 
     @Command(
-        aliases = { "thru" },
-        usage = "",
-        desc = "Passthrough walls",
-        min = 0,
-        max = 0
+            aliases = {"thru"},
+            usage = "",
+            desc = "Passthrough walls",
+            min = 0,
+            max = 0
     )
     @CommandPermissions("worldedit.navigation.thru.command")
     public void thru(Player player) throws WorldEditException {
@@ -163,7 +163,7 @@ public class NavigationCommands {
     }
 
     @Command(
-            aliases = { "jumpto", "j" },
+            aliases = {"jumpto", "j"},
             usage = "[world,x,y,z]",
             desc = "Teleport to a location\n" +
                     "Flags:" +
@@ -197,12 +197,12 @@ public class NavigationCommands {
     }
 
     @Command(
-        aliases = { "up" },
-        usage = "<block>",
-        desc = "Go upwards some distance",
-        flags = "fg",
-        min = 1,
-        max = 1
+            aliases = {"up"},
+            usage = "<number>",
+            desc = "Go upwards some distance",
+            flags = "fg",
+            min = 1,
+            max = 1
     )
     @CommandPermissions("worldedit.navigation.up")
     @Logging(POSITION)
@@ -231,4 +231,6 @@ public class NavigationCommands {
 
         return forceGlass || (config.navigationUseGlass && !forceFlight);
     }
+
+
 }

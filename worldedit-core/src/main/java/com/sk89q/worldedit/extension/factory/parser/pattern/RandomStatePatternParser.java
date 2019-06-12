@@ -44,7 +44,7 @@ public class RandomStatePatternParser extends InputParser<Pattern> {
         context.setPreferringWildcard(wasFuzzy);
         if (block.getStates().size() == block.getBlockType().getPropertyMap().size()) {
             // they requested random with *, but didn't leave any states empty - simplify
-            return new BlockPattern(block);
+            return (block);
         } else {
             return null; // only should happen if parseLogic changes
         }

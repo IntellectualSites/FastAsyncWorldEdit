@@ -332,9 +332,7 @@ public class PlatformManager {
                             return;
                         }
                         FawePlayer<?> fp = FawePlayer.wrap(player);
-
                         RegionSelector selector = session.getRegionSelector(player.getWorld());
-
                         final Player maskedPlayerWrapper =
                             new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor),
                                 ((Player) actor).getLocation());
@@ -361,8 +359,7 @@ public class PlatformManager {
                             return;
                         }
                     }
-
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                    Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionBlockTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
@@ -385,7 +382,6 @@ public class PlatformManager {
                         }
                         FawePlayer<?> fp = FawePlayer.wrap(player);
                         if (fp.checkAction()) {
-
                             RegionSelector selector = session.getRegionSelector(player.getWorld());
                             Player maskedPlayerWrapper = new LocationMaskedPlayerWrapper(
                                 PlayerWrapper.wrap((Player) actor),
@@ -404,7 +400,7 @@ public class PlatformManager {
                         return;
                     }
 
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                    Tool tool = session.getTool(player);
                     if (tool instanceof BlockTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
@@ -475,7 +471,7 @@ public class PlatformManager {
                         return;
                     }
 
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                    Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
@@ -502,7 +498,7 @@ public class PlatformManager {
                         return;
                     }
 
-                    Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+                    Tool tool = session.getTool(player);
                     if (tool instanceof TraceTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);

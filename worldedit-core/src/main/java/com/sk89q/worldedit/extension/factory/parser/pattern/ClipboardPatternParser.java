@@ -83,5 +83,4 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
             throw new InputParseException("No session is available, so no clipboard is available");
         }
     }
-
 }

@@ -1,9 +1,5 @@
 package com.boydti.fawe.util;
 
-import sun.reflect.ConstructorAccessor;
-import sun.reflect.FieldAccessor;
-import sun.reflect.ReflectionFactory;
-
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -11,12 +7,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import sun.reflect.ConstructorAccessor;
+import sun.reflect.FieldAccessor;
+import sun.reflect.ReflectionFactory;
 
 /**
  * @author DPOH-VAR
@@ -24,8 +19,6 @@ import java.util.Map;
  */
 @SuppressWarnings({"UnusedDeclaration", "rawtypes"})
 public class ReflectionUtils {
-    private static Class<?> UNMODIFIABLE_MAP = Collections.unmodifiableMap(Collections.EMPTY_MAP).getClass();
-
     public static <T> T as(Class<T> t, Object o) {
         return t.isInstance(o) ? t.cast(o) : null;
     }
@@ -59,21 +52,21 @@ public class ReflectionUtils {
 
             // 2. Copy it
             T[] previousValues = (T[]) valuesField.get(enumType);
-            List<T> values = new ArrayList<>(Arrays.asList(previousValues));
+            List values = new ArrayList(Arrays.asList(previousValues));
 
             // 3. build new enum
             T newValue = (T) makeEnum(enumType, // The target enum class
-                                      enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
-                                      values.size(),
-                                      additionalTypes, // can be used to pass values to the enum constructor
-                                      additionalValues); // can be used to pass values to the enum constructor
+                    enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
+                    values.size(),
+                    additionalTypes, // can be used to pass values to the enum constructor
+                    additionalValues); // can be used to pass values to the enum constructor
 
             // 4. add new value
             values.add(newValue);
 
             // 5. Set new values field
             setFailsafeFieldValue(valuesField, null,
-                                  values.toArray((T[]) Array.newInstance(enumType, 0)));
+                    values.toArray((T[]) Array.newInstance(enumType, 0)));
 
             // 6. Clean enum cache
             cleanEnumCache(enumType);
@@ -114,9 +107,7 @@ public class ReflectionUtils {
             Class<? extends Enum> clazz = dest.getClass();
             Object newEnum = makeEnum(clazz, value, dest.ordinal(), additionalTypes, additionalValues);
             for (Field field : clazz.getDeclaredFields()) {
-                if (Modifier.isStatic(field.getModifiers())) {
-                    continue;
-                }
+                if (Modifier.isStatic(field.getModifiers())) continue;
                 field.setAccessible(true);
                 Object newValue = field.get(newEnum);
                 setField(field, dest, newValue);
@@ -127,7 +118,7 @@ public class ReflectionUtils {
     }
 
     public static Object makeEnum(Class<?> enumClass, String value, int ordinal,
-                                  Class<?>[] additionalTypes, Object[] additionalValues) throws Exception {
+                                   Class<?>[] additionalTypes, Object[] additionalValues) throws Exception {
         Object[] parms = new Object[additionalValues.length + 2];
         parms[0] = value;
         parms[1] = ordinal;
@@ -141,7 +132,7 @@ public class ReflectionUtils {
         parameterTypes[0] = String.class;
         parameterTypes[1] = int.class;
         System.arraycopy(additionalParameterTypes, 0,
-                         parameterTypes, 2, additionalParameterTypes.length);
+                parameterTypes, 2, additionalParameterTypes.length);
         return ReflectionFactory.getReflectionFactory().newConstructorAccessor(enumClass.getDeclaredConstructor(parameterTypes));
     }
 
@@ -189,12 +180,12 @@ public class ReflectionUtils {
         blankField(enumClass, "enumConstants"); // IBM JDK
     }
 
+    private static Class<?> UNMODIFIABLE_MAP = Collections.unmodifiableMap(Collections.EMPTY_MAP).getClass();
+
     public static <T, V> Map<T, V> getMap(Map<T, V> map) {
         try {
             Class<? extends Map> clazz = map.getClass();
-            if (clazz != UNMODIFIABLE_MAP) {
-                return map;
-            }
+            if (clazz != UNMODIFIABLE_MAP) return map;
             Field m = clazz.getDeclaredField("m");
             m.setAccessible(true);
             return (Map<T, V>) m.get(map);
@@ -207,9 +198,7 @@ public class ReflectionUtils {
     public static <T> List<T> getList(List<T> list) {
         try {
             Class<? extends List> clazz = (Class<? extends List>) Class.forName("java.util.Collections$UnmodifiableList");
-            if (!clazz.isInstance(list)) {
-                return list;
-            }
+            if (!clazz.isInstance(list)) return list;
             Field m = clazz.getDeclaredField("list");
             m.setAccessible(true);
             return (List<T>) m.get(list);
@@ -316,25 +305,19 @@ public class ReflectionUtils {
             if (returnType == null || method.getReturnType() == returnType) {
                 Class<?>[] mp = method.getParameterTypes();
                 int mods = method.getModifiers();
-                if ((mods & hasMods) != hasMods || (mods & noMods) != 0) {
-                    continue;
-                }
+                if ((mods & hasMods) != hasMods || (mods & noMods) != 0) continue;
                 if (params == null) {
-                    if (index-- == 0) {
-                        return setAccessible(method);
-                    } else {
+                    if (index-- == 0) return setAccessible(method);
+                    else {
                         continue;
                     }
                 }
                 if (mp.length == params.length) {
                     for (int i = 0; i < mp.length; i++) {
-                        if (mp[i] != params[i]) {
-                            continue outer;
-                        }
+                        if (mp[i] != params[i]) continue outer;
                     }
-                    if (index-- == 0) {
-                        return setAccessible(method);
-                    } else {
+                    if (index-- == 0) return setAccessible(method);
+                    else {
                         continue;
                     }
                 }
@@ -455,7 +438,7 @@ public class ReflectionUtils {
         /**
          * get existing method by name and types
          *
-         * @param name name
+         * @param name  name
          * @param types method parameters. can be Class or RefClass
          * @return RefMethod object
          * @throws RuntimeException if method not found

@@ -124,7 +124,10 @@ public class PlotTrim {
             @Override
             public boolean appliesFile(int mcaX, int mcaZ) {
                 ChunkLoc loc = new ChunkLoc(mcaX, mcaZ);
-                return !mcas.contains(loc);
+                if (mcas.contains(loc)) {
+                    return false;
+                }
+                return true;
             }
 
             @Override

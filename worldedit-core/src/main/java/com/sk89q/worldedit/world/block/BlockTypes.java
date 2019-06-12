@@ -830,15 +830,16 @@ public final class BlockTypes {
                 }
             }
 
-            // Register new blocks
-            int internalId = 1;
-            for (Map.Entry<String, String> entry : blockMap.entrySet()) {
-                String id = entry.getKey();
-                String defaultState = entry.getValue();
-                // Skip already registered ids
-                for (; values[internalId] != null; internalId++);
-                BlockType type = register(defaultState, internalId, stateList);
-                values[internalId] = type;
+            { // Register new blocks
+                int internalId = 1;
+                for (Map.Entry<String, String> entry : blockMap.entrySet()) {
+                    String id = entry.getKey();
+                    String defaultState = entry.getValue();
+                    // Skip already registered ids
+                    for (; values[internalId] != null; internalId++);
+                    BlockType type = register(defaultState, internalId, stateList);
+                    values[internalId] = type;
+                }
             }
 
             // Add to $Registry
@@ -865,7 +866,9 @@ public final class BlockTypes {
         try {
             Field field = BlockTypes.class.getDeclaredField(enumName);
             ReflectionUtils.setFailsafeFieldValue(field, null, existing);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
 
@@ -895,12 +898,12 @@ public final class BlockTypes {
         try {
             BlockStateHolder block = LegacyMapper.getInstance().getBlockFromLegacy(input);
             if (block != null) return block.getBlockType();
-        } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
         }
 
         throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(BlockTypes.values)
             .filter(b -> StringMan.blockStateMatches(inputLower, b.getId()))
-            .map(BlockType::getId)
+            .map(e1 -> e1.getId())
             .sorted(StringMan.blockStateComparator(inputLower))
             .collect(Collectors.toList())
         );
@@ -910,31 +913,31 @@ public final class BlockTypes {
         return $NAMESPACES;
     }
 
-    public static @Nullable BlockType get(final String id) {
+    public static final @Nullable BlockType get(final String id) {
         return $REGISTRY.get(id);
     }
 
-    public static @Nullable BlockType get(final CharSequence id) {
+    public static final @Nullable BlockType get(final CharSequence id) {
         return $REGISTRY.get(id);
     }
 
     @Deprecated
-    public static BlockType get(final int ordinal) {
+    public static final BlockType get(final int ordinal) {
         return values[ordinal];
     }
 
     @Deprecated
-    public static BlockType getFromStateId(final int internalStateId) {
+    public static final BlockType getFromStateId(final int internalStateId) {
         return values[internalStateId & BIT_MASK];
     }
 
     @Deprecated
-    public static BlockType getFromStateOrdinal(final int internalStateOrdinal) {
+    public static final BlockType getFromStateOrdinal(final int internalStateOrdinal) {
         return states[internalStateOrdinal].getBlockType();
     }
 
     public static int size() {
         return values.length;
     }
-
+    
 }

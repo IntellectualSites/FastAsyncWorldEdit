@@ -81,7 +81,7 @@ public class FaweBukkit implements IFawe, Listener {
         return this.vault;
     }
 
-    public FaweBukkit(WorldEditPlugin plugin) {
+    public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
         try {
             Settings.IMP.TICK_LIMITER.ENABLED = !Bukkit.hasWhitelist();

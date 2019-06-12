@@ -28,9 +28,10 @@ import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -47,7 +48,10 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class LegacyMapper {
 
@@ -222,7 +226,7 @@ public class LegacyMapper {
         Integer combinedId = getLegacyCombined(blockState);
         return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
     }
-
+    
     public BaseBlock getBaseBlockFromPlotBlock(PlotBlock plotBlock) {
     	if(plotBlock instanceof StringPlotBlock) {
     		try {

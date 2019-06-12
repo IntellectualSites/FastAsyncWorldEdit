@@ -48,7 +48,7 @@ public class MutableEntityChange implements Change {
 
     public void delete(UndoContext context) {
         Extent extent = context.getExtent();
-        ExtentTraverser<FastWorldEditExtent> find = new ExtentTraverser<>(extent).find(FastWorldEditExtent.class);
+        ExtentTraverser<FastWorldEditExtent> find = new ExtentTraverser(extent).find(FastWorldEditExtent.class);
         if (find != null) {
             FastWorldEditExtent fwee = find.get();
             Map<String, Tag> map = tag.getValue();
@@ -85,7 +85,7 @@ public class MutableEntityChange implements Change {
         if (!checkedQueue) {
             checkedQueue = true;
             Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser<>(extent).find(HasFaweQueue.class);
+            ExtentTraverser found = new ExtentTraverser(extent).find(HasFaweQueue.class);
             if (found != null) {
                 perform(queue = ((HasFaweQueue) found.get()).getQueue());
             } else {

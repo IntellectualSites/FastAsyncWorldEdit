@@ -55,7 +55,7 @@ public class ExpressionMaskParser extends InputParser<Mask> {
             if (context.getActor() instanceof SessionOwner) {
                 SessionOwner owner = (SessionOwner) context.getActor();
                 IntSupplier timeout = () -> WorldEdit.getInstance().getSessionManager().get(owner).getTimeout();
-                return new ExpressionMask(exp, timeout);
+                // TODO timeout
             }
             return new ExpressionMask(exp);
         } catch (ExpressionException e) {

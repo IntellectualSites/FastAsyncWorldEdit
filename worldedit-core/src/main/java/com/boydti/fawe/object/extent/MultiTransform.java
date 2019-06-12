@@ -28,7 +28,7 @@ public class MultiTransform extends RandomTransform {
     @Override
     public void add(ResettableExtent extent, double chance) {
         super.add(extent, chance);
-        this.extents = getExtents().toArray(new ResettableExtent[0]);
+        this.extents = getExtents().toArray(new ResettableExtent[getExtents().size()]);
     }
 
     @Override

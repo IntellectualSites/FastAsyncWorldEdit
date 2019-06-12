@@ -110,7 +110,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "patterns" },
+            aliases = {"patterns"},
             usage = "[page=1|search|pattern]",
             desc = "View help about patterns",
             help = "Patterns determine what blocks are placed\n" +
@@ -125,7 +125,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "masks" },
+            aliases = {"masks"},
             usage = "[page=1|search|mask]",
             desc = "View help about masks",
             help = "Masks determine if a block can be placed\n" +
@@ -141,7 +141,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "transforms" },
+            aliases = {"transforms"},
             usage = "[page=1|search|transform]",
             desc = "View help about transforms",
             help = "Transforms modify how a block is placed\n" +
@@ -179,7 +179,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "/heightmapinterface" },
+            aliases = {"/heightmapinterface"},
             desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
     )
     @CommandPermissions("fawe.admin")
@@ -237,7 +237,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "/cancel", "fcancel" },
+            aliases = {"/cancel", "fcancel"},
             desc = "Cancel your current command",
             max = 0,
             queued = false
@@ -248,11 +248,11 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/fill" },
-        usage = "<pattern> <radius> [depth] [direction]",
-        desc = "Fill a hole",
-        min = 2,
-        max = 4
+            aliases = {"/fill"},
+            usage = "<pattern> <radius> [depth] [direction]",
+            desc = "Fill a hole",
+            min = 2,
+            max = 4
     )
     @CommandPermissions("worldedit.fill")
     @Logging(PLACEMENT)
@@ -261,15 +261,15 @@ public class UtilityCommands extends MethodCommands {
         BlockVector3 pos = session.getPlacementPosition(player);
         int affected;
         affected = editSession.fillDirection(pos, pattern, radius, (int) depth, direction);
-        player.print(affected + " block(s) have been created.");
+        player.print(BBC.getPrefix() + affected + " block(s) have been created.");
     }
 
     @Command(
-        aliases = { "/fillr" },
-        usage = "<pattern> <radius> [depth]",
-        desc = "Fill a hole recursively",
-        min = 2,
-        max = 3
+            aliases = {"/fillr"},
+            usage = "<pattern> <radius> [depth]",
+            desc = "Fill a hole recursively",
+            min = 2,
+            max = 3
     )
     @CommandPermissions("worldedit.fill.recursive")
     @Logging(PLACEMENT)
@@ -278,11 +278,11 @@ public class UtilityCommands extends MethodCommands {
         BlockVector3 pos = session.getPlacementPosition(player);
         if (depth == -1) depth = Integer.MAX_VALUE;
         int affected = editSession.fillXZ(pos, pattern, radius, (int) depth, true);
-        player.print(affected + " block(s) have been created.");
+        player.print(BBC.getPrefix() + affected + " block(s) have been created.");
     }
 
     @Command(
-            aliases = { "/drain" },
+            aliases = {"/drain"},
             usage = "<radius>",
             desc = "Drain a pool",
             min = 1,
@@ -294,31 +294,31 @@ public class UtilityCommands extends MethodCommands {
         worldEdit.checkMaxRadius(radius);
         int affected = editSession.drainArea(
                 session.getPlacementPosition(player), radius);
-        player.print(affected + " block(s) have been changed.");
+        player.print(BBC.getPrefix() + affected + " block(s) have been changed.");
     }
 
     @Command(
-        aliases = { "/fixlava", "fixlava" },
-        usage = "<radius>",
-        desc = "Fix lava to be stationary",
-        min = 1,
-        max = 1
+            aliases = {"/fixlava", "fixlava"},
+            usage = "<radius>",
+            desc = "Fix lava to be stationary",
+            min = 1,
+            max = 1
     )
     @CommandPermissions("worldedit.fixlava")
     @Logging(PLACEMENT)
     public void fixLava(Player player, LocalSession session, EditSession editSession, @Range(min = 0) double radius) throws WorldEditException {
-
         worldEdit.checkMaxRadius(radius);
-        int affected = editSession.fixLiquid(session.getPlacementPosition(player), radius, BlockTypes.LAVA);
-        player.print(affected + " block(s) have been changed.");
+        int affected = editSession.fixLiquid(
+                session.getPlacementPosition(player), radius, BlockTypes.LAVA);
+        player.print(BBC.getPrefix() + affected + " block(s) have been changed.");
     }
 
     @Command(
-        aliases = { "/fixwater", "fixwater" },
-        usage = "<radius>",
-        desc = "Fix water to be stationary",
-        min = 1,
-        max = 1
+            aliases = {"/fixwater", "fixwater"},
+            usage = "<radius>",
+            desc = "Fix water to be stationary",
+            min = 1,
+            max = 1
     )
     @CommandPermissions("worldedit.fixwater")
     @Logging(PLACEMENT)
@@ -330,11 +330,11 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/removeabove", "removeabove" },
-        usage = "[size] [height]",
-        desc = "Remove blocks above your head.",
-        min = 0,
-        max = 2
+            aliases = {"/removeabove", "removeabove"},
+            usage = "[size] [height]",
+            desc = "Remove blocks above your head.",
+            min = 0,
+            max = 2
     )
     @CommandPermissions("worldedit.removeabove")
     @Logging(PLACEMENT)
@@ -345,11 +345,11 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/removebelow", "removebelow" },
-        usage = "[size] [height]",
-        desc = "Remove blocks below you.",
-        min = 0,
-        max = 2
+            aliases = {"/removebelow", "removebelow"},
+            usage = "[size] [height]",
+            desc = "Remove blocks below you.",
+            min = 0,
+            max = 2
     )
     @CommandPermissions("worldedit.removebelow")
     @Logging(PLACEMENT)
@@ -360,11 +360,11 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/removenear", "removenear" },
-        usage = "<mask> [size]",
-        desc = "Remove blocks near you.",
-        min = 1,
-        max = 2
+            aliases = {"/removenear", "removenear"},
+            usage = "<mask> [size]",
+            desc = "Remove blocks near you.",
+            min = 1,
+            max = 2
     )
     @CommandPermissions("worldedit.removenear")
     @Logging(PLACEMENT)
@@ -376,12 +376,12 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/replacenear", "replacenear" },
-        usage = "<size> <from-id> <to-id>",
-        desc = "Replace nearby blocks",
-        flags = "f",
-        min = 3,
-        max = 3
+            aliases = {"/replacenear", "replacenear"},
+            usage = "<size> <from-id> <to-id>",
+            desc = "Replace nearby blocks",
+            flags = "f",
+            min = 3,
+            max = 3
     )
     @CommandPermissions("worldedit.replacenear")
     @Logging(PLACEMENT)
@@ -400,11 +400,11 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/snow", "snow" },
-        usage = "[radius]",
-        desc = "Simulates snow",
-        min = 0,
-        max = 1
+            aliases = {"/snow", "snow"},
+            usage = "[radius]",
+            desc = "Simulates snow",
+            min = 0,
+            max = 1
     )
     @CommandPermissions("worldedit.snow")
     @Logging(PLACEMENT)
@@ -413,11 +413,11 @@ public class UtilityCommands extends MethodCommands {
         we.checkMaxRadius(size);
 
         int affected = editSession.simulateSnow(session.getPlacementPosition(player), size);
-        player.print(affected + " surfaces covered. Let it snow~");
+        player.print(BBC.getPrefix() + affected + " surfaces covered. Let it snow~");
     }
 
     @Command(
-            aliases = { "/thaw", "thaw" },
+            aliases = {"/thaw", "thaw"},
             usage = "[radius]",
             desc = "Thaws the area",
             min = 0,
@@ -430,11 +430,11 @@ public class UtilityCommands extends MethodCommands {
         we.checkMaxRadius(size);
 
         int affected = editSession.thaw(session.getPlacementPosition(player), size);
-        player.print(affected + " surfaces thawed.");
+        player.print(BBC.getPrefix() + affected + " surfaces thawed.");
     }
 
     @Command(
-            aliases = { "/green", "green" },
+            aliases = {"/green", "green"},
             usage = "[radius]",
             desc = "Greens the area",
             help = "Converts dirt to grass blocks. -f also converts coarse dirt.",
@@ -454,7 +454,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "/ex", "/ext", "/extinguish", "ex", "ext", "extinguish" },
+            aliases = {"/ex", "/ext", "/extinguish", "ex", "ext", "extinguish"},
             usage = "[radius]",
             desc = "Extinguish nearby fire",
             min = 0,
@@ -476,7 +476,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "butcher" },
+            aliases = {"butcher"},
             usage = "[radius]",
             flags = "plangbtfr",
             desc = "Kill all or nearby mobs",
@@ -562,7 +562,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "remove", "rem", "rement" },
+            aliases = {"remove", "rem", "rement"},
             usage = "<type> <radius>",
             desc = "Remove all entities of a type",
             min = 2,
@@ -622,7 +622,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "/calc", "/calculate", "/eval", "/evaluate", "/solve" },
+            aliases = {"/calc", "/calculate", "/eval", "/evaluate", "/solve"},
             usage = "<expression>",
             desc = "Evaluate a mathematical expression"
     )
@@ -646,7 +646,7 @@ public class UtilityCommands extends MethodCommands {
             }
 
             executor.shutdownNow();
-            actor.print("= " + result);
+            actor.print(BBC.getPrefix() + "= " + result);
         } catch (EvaluationException e) {
             actor.printError(String.format(
                     "'%s' could not be evaluated (error: %s)", input, e.getMessage()));
@@ -657,7 +657,7 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "/confirm" },
+            aliases = {"/confirm"},
             desc = "Confirm a command"
     )
     public void confirm(FawePlayer fp) throws WorldEditException {
@@ -667,14 +667,13 @@ public class UtilityCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "/help" },
+            aliases = {"/help"},
             usage = "[<command>]",
             desc = "Displays help for WorldEdit commands",
             min = 0,
             max = -1,
             queued = false
     )
-    @CommandPermissions("worldedit.help")
     public void help(Actor actor, CommandContext args) throws WorldEditException {
         help(args, worldEdit, actor);
     }

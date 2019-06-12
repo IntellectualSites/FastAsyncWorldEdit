@@ -19,9 +19,13 @@
 
 package com.sk89q.worldedit.function.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.boydti.fawe.util.ReflectionUtils;
+import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEditException;
+
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.jnbt.CompoundTagBuilder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -32,6 +36,8 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
@@ -48,11 +54,11 @@ public class ExtentBlockCopy implements RegionFunction {
     /**
      * Make a new copy.
      *
-     * @param source the source extent
-     * @param from the source offset
+     * @param source      the source extent
+     * @param from        the source offset
      * @param destination the destination extent
-     * @param to the destination offset
-     * @param transform a transform to apply to positions (after source offset, before destination offset)
+     * @param to          the destination offset
+     * @param transform   a transform to apply to positions (after source offset, before destination offset)
      */
     public ExtentBlockCopy(Extent source, BlockVector3 from, Extent destination, BlockVector3 to, Transform transform) {
         checkNotNull(source);
@@ -69,13 +75,11 @@ public class ExtentBlockCopy implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        BaseBlock block = source.getFullBlock(position);
         BlockVector3 orig = position.subtract(from);
         BlockVector3 transformed = transform.apply(orig.toVector3()).toBlockPoint();
 
         // Apply transformations to NBT data if necessary
-        block = transformNbtData(block);
-
+        BaseBlock block = transformNbtData(source.getFullBlock(position));
         return destination.setBlock(transformed.add(to), block);
     }
 
@@ -113,5 +117,7 @@ public class ExtentBlockCopy implements RegionFunction {
 
         return state;
     }
+
+
 
 }

@@ -44,7 +44,7 @@ public class MutableBlockChange implements Change {
         if (!checkedQueue) {
             checkedQueue = true;
             Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser<>(extent).find(HasFaweQueue.class);
+            ExtentTraverser found = new ExtentTraverser(extent).find(HasFaweQueue.class);
             if (found != null) {
                 (queue = ((HasFaweQueue) found.get()).getQueue()).setBlock(x, y, z, combinedId);
             } else {

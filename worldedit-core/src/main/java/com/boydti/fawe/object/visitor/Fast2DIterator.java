@@ -4,7 +4,9 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 
 import java.util.Iterator;
@@ -20,13 +22,17 @@ public class Fast2DIterator implements Iterable<BlockVector2> {
         this(iter, (HasFaweQueue) extent);
     }
 
+    public Fast2DIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable Extent extent) {
+        this(iter, (HasFaweQueue) (extent != null ? (extent instanceof HasFaweQueue ? extent : new ExtentTraverser(extent).findAndGet(HasFaweQueue.class)) : null));
+    }
+
     public Fast2DIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable HasFaweQueue editSession) {
         this(iter, (FaweQueue) (editSession != null ? editSession.getQueue() : null));
     }
 
     public Fast2DIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable FaweQueue faweQueue) {
         this.iterable = iter;
-        this.queue = faweQueue instanceof MappedFaweQueue ? (MappedFaweQueue) faweQueue : null;
+        this.queue = faweQueue != null && faweQueue instanceof MappedFaweQueue ? (MappedFaweQueue) faweQueue : null;
     }
 
     public Iterable<? extends BlockVector2> getIterable() {

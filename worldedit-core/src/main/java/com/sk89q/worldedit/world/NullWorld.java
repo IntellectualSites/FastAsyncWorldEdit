@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world;
 
+import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -34,6 +35,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -52,7 +54,7 @@ public class NullWorld extends AbstractWorld {
 
     private static final NullWorld INSTANCE = new NullWorld();
 
-    protected NullWorld() {
+    public NullWorld() {
     }
 
     @Override

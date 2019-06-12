@@ -2,11 +2,7 @@ package com.boydti.fawe.util;
 
 import sun.misc.Unsafe;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,12 +29,12 @@ public class ReflectionUtils9 {
 
             // 2. Copy it
             T[] previousValues = (T[]) valuesField.get(enumType);
-            List<T> values = new ArrayList<>(Arrays.asList(previousValues));
+            List values = new ArrayList(Arrays.asList(previousValues));
 
             // 3. build new enum
             T newValue = (T) makeEnum(enumType, // The target enum class
-                                      enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
-                                      values.size()); // can be used to pass values to the enum constuctor
+                    enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
+                    values.size()); // can be used to pass values to the enum constuctor
 
             // 4. add new value
             values.add(newValue);
@@ -46,7 +42,7 @@ public class ReflectionUtils9 {
             // 5. Set new values field
             try {
                 setFailsafeFieldValue(valuesField, null,
-                                      values.toArray((T[]) Array.newInstance(enumType, 0)));
+                        values.toArray((T[]) Array.newInstance(enumType, 0)));
             } catch (Throwable e) {
                 Field ordinalField = Enum.class.getDeclaredField("ordinal");
                 setFailsafeFieldValue(ordinalField, newValue, 0);
@@ -121,11 +117,8 @@ public class ReflectionUtils9 {
         }
 
         try {
-            if (target == null) {
-                field.set(null, value);
-            } else {
-                field.set(target, value);
-            }
+            if (target == null) field.set(null, value);
+            else field.set(target, value);
         } catch (NoSuchMethodError error) {
             field.set(target, value);
         }
