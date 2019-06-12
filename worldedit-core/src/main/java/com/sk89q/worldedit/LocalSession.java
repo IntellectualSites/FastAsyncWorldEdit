@@ -72,6 +72,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
@@ -222,21 +223,18 @@ public class LocalSession implements TextureHolder {
         SparseBitSet set = new SparseBitSet();
         final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + uuid);
         if (folder.isDirectory()) {
-            folder.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    String name = pathname.getName();
-                    Integer val = null;
-                    if (pathname.isDirectory()) {
-                        val = StringMan.toInteger(name, 0, name.length());
+            folder.listFiles(pathname -> {
+                String name = pathname.getName();
+                Integer val = null;
+                if (pathname.isDirectory()) {
+                    val = StringMan.toInteger(name, 0, name.length());
 
-                    } else {
-                        int i = name.lastIndexOf('.');
-                        if (i != -1) val = StringMan.toInteger(name, 0, i);
-                    }
-                    if (val != null) set.set(val);
-                    return false;
+                } else {
+                    int i = name.lastIndexOf('.');
+                    if (i != -1) val = StringMan.toInteger(name, 0, i);
                 }
+                if (val != null) set.set(val);
+                return false;
             });
         }
         if (!set.isEmpty()) {
@@ -256,10 +254,8 @@ public class LocalSession implements TextureHolder {
         }
         File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + uuid + File.separator + "index");
         if (file.exists()) {
-            try {
-                FaweInputStream is = new FaweInputStream(new FileInputStream(file));
+            try (FaweInputStream is = new FaweInputStream(new FileInputStream(file))) {
                 historyNegativeIndex = Math.min(Math.max(0, is.readInt()), history.size());
-                is.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -279,9 +275,9 @@ public class LocalSession implements TextureHolder {
                     file.getParentFile().mkdirs();
                     file.createNewFile();
                 }
-                FaweOutputStream os = new FaweOutputStream(new FileOutputStream(file));
-                os.writeInt(getHistoryNegativeIndex());
-                os.close();
+                try (FaweOutputStream os = new FaweOutputStream(new FileOutputStream(file))) {
+                    os.writeInt(getHistoryNegativeIndex());
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
