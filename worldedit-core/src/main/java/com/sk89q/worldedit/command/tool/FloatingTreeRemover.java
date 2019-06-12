@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
@@ -37,7 +38,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 /**
@@ -67,7 +70,7 @@ public class FloatingTreeRemover implements BlockTool {
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config,
-            Player player, LocalSession session, Location clicked) {
+                              Player player, LocalSession session, Location clicked) {
 
         final World world = (World) clicked.getExtent();
         final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
@@ -118,7 +121,7 @@ public class FloatingTreeRemover implements BlockTool {
      * @return a set containing all blocks in the tree/shroom or null if this is not a floating tree/shroom.
      */
     private Set<BlockVector3> bfs(World world, BlockVector3 origin) throws MaxChangedBlocksException {
-        final Set<BlockVector3> visited = new LocalBlockVectorSet();
+        final LocalBlockVectorSet visited = new LocalBlockVectorSet();
         final LocalBlockVectorSet queue = new LocalBlockVectorSet();
 
         queue.add(origin);

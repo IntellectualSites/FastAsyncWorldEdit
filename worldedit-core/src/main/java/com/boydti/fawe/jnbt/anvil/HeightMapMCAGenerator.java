@@ -217,10 +217,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         super(width, length, regionFolder);
 
         blocks = new DifferentialBlockBuffer(width, length);
-        heights = new DifferentialArray<>(new byte[getArea()]);
-        biomes = new DifferentialArray<>(new byte[getArea()]);
-        floor = new DifferentialArray<>(new int[getArea()]);
-        main = new DifferentialArray<>(new int[getArea()]);
+        heights = new DifferentialArray(new byte[getArea()]);
+        biomes = new DifferentialArray(new byte[getArea()]);
+        floor = new DifferentialArray(new int[getArea()]);
+        main = new DifferentialArray(new int[getArea()]);
 
         int stone = BlockID.STONE;
         int grass = BlockTypes.GRASS_BLOCK.getDefaultState().with(PropertyKey.SNOWY, false).getInternalId();

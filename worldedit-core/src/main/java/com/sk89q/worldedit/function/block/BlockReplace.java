@@ -38,7 +38,7 @@ public class BlockReplace implements RegionFunction {
     /**
      * Create a new instance.
      *
-     * @param extent an extent
+     * @param extent  an extent
      * @param pattern a pattern
      */
     public BlockReplace(Extent extent, Pattern pattern) {

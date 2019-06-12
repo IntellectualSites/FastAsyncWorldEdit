@@ -7,7 +7,9 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 
 import javax.annotation.Nullable;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
@@ -23,56 +25,54 @@ public class ImageUtil {
                                                   int targetWidth,
                                                   int targetHeight,
                                                   Object hint,
-                                                  boolean higherQuality) {
+                                                  boolean higherQuality)
+    {
         if (img.getHeight() == targetHeight && img.getWidth() == targetWidth) {
             return img;
         }
-        int type = (img.getTransparency() == Transparency.OPAQUE) ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+        int type = (img.getTransparency() == Transparency.OPAQUE) ?
+                BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = img;
-        int width, height;
+        int w, h;
         if (higherQuality) {
             // Use multi-step technique: start with original size, then
             // scale down in multiple passes with drawImage()
             // until the target size is reached
-            width = ret.getWidth();
-            height = ret.getHeight();
+            w = ret.getWidth();
+            h = ret.getHeight();
         } else {
             // Use one-step technique: scale directly from original
             // size to target size with a single drawImage() call
-            width = targetWidth;
-            height = targetHeight;
+            w = targetWidth;
+            h = targetHeight;
         }
 
         do {
-            if (higherQuality && width > targetWidth) {
-                width /= 2;
-                if (width < targetWidth) {
-                    width = targetWidth;
+            if (higherQuality && w > targetWidth) {
+                w /= 2;
+                if (w < targetWidth) {
+                    w = targetWidth;
                 }
-            } else if (width < targetWidth) {
-                width = targetWidth;
-            }
+            } else if (w < targetWidth) w = targetWidth;
 
-            if (higherQuality && height > targetHeight) {
-                height /= 2;
-                if (height < targetHeight) {
-                    height = targetHeight;
+            if (higherQuality && h > targetHeight) {
+                h /= 2;
+                if (h < targetHeight) {
+                    h = targetHeight;
                 }
-            } else if (height < targetHeight) {
-                height = targetHeight;
-            }
+            } else if (h < targetHeight) h = targetHeight;
 
-            BufferedImage tmp = new BufferedImage(width, height, type);
+            BufferedImage tmp = new BufferedImage(w, h, type);
             Graphics2D g2 = tmp.createGraphics();
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
             g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
             g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
-            g2.drawImage(ret, 0, 0, width, height, null);
+            g2.drawImage(ret, 0, 0, w, h, null);
             g2.dispose();
 
             ret = tmp;
-        } while (width != targetWidth || height != targetHeight);
+        } while (w != targetWidth || h != targetHeight);
 
         return ret;
     }
@@ -107,9 +107,8 @@ public class ImageUtil {
                 if (alpha != 0) {
                     float dx2 = sqrX[x];
                     float distSqr = dz2 + dx2;
-                    if (distSqr > 1) {
-                        raw[index] = 0;
-                    } else {
+                    if (distSqr > 1) raw[index] = 0;
+                    else {
                         alpha = (int) (alpha * (1 - distSqr));
                         raw[index] = (color & 0x00FFFFFF) + (alpha << 24);
                     }

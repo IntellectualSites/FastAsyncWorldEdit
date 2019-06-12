@@ -27,7 +27,6 @@ public class VoxelUndoCommand extends VoxelCommand {
         } else {
             sniper.undo();
         }
-//        plugin.getLogger().info("Player \"" + player.getName() + "\" used /u");
         return true;
     }
 }

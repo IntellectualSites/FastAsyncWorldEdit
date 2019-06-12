@@ -3,35 +3,19 @@ package com.boydti.fawe.util;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweInputStream;
-import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.RunnableVal2;
+import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
 import com.boydti.fawe.object.changeset.FaweStreamChangeSet;
 import com.boydti.fawe.object.io.AbstractDelegateOutputStream;
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
+import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-import net.jpountz.lz4.LZ4Compressor;
-import net.jpountz.lz4.LZ4Factory;
-import net.jpountz.lz4.LZ4FastDecompressor;
-import net.jpountz.lz4.LZ4InputStream;
-import net.jpountz.lz4.LZ4Utils;
+import net.jpountz.lz4.*;
 
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
@@ -39,49 +23,28 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Array;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.lang.reflect.Method;
+import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.Inflater;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.*;
 
 import static java.lang.System.arraycopy;
 
 public class MainUtil {
-    private static final LZ4Factory FACTORY = LZ4Factory.fastestInstance();
-    private static final LZ4Compressor COMPRESSOR = FACTORY.fastCompressor();
-    private static final LZ4FastDecompressor DECOMPRESSOR = FACTORY.fastDecompressor();
-
     /*
      * Generic non plugin related utils
      *  e.g. sending messages
@@ -142,6 +105,10 @@ public class MainUtil {
         return Double.parseDouble(version.substring(0, pos));
     }
 
+    public static void stacktrace() {
+        new Exception().printStackTrace();
+    }
+
     public static void traverse(Path path, final BiConsumer<Path, BasicFileAttributes> onEach) {
         try {
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -170,9 +137,7 @@ public class MainUtil {
     }
 
     public static File resolveRelative(File file) {
-        if (!file.exists()) {
-            return new File(relativize(file.getPath()));
-        }
+        if (!file.exists()) return new File(relativize(file.getPath()));
         return file;
     }
 
@@ -182,15 +147,11 @@ public class MainUtil {
         int skip = 0;
         int len = split.length - 1;
         for (int i = len; i >= 0; i--) {
-            if (skip > 0) {
-                skip--;
-            } else {
+            if (skip > 0) skip--;
+            else {
                 String arg = split[i];
-                if (arg.equals("..")) {
-                    skip++;
-                } else {
-                    out.insert(0, arg + (i == len ? "" : File.separator));
-                }
+                if (arg.equals("..")) skip++;
+                else out.insert(0, arg + (i == len ? "" : File.separator));
             }
         }
         return out.toString();
@@ -198,13 +159,9 @@ public class MainUtil {
 
     public static void forEachFile(Path path, final RunnableVal2<Path, BasicFileAttributes> onEach, Comparator<File> comparator) {
         File dir = path.toFile();
-        if (!dir.exists()) {
-            return;
-        }
+        if (!dir.exists()) return;
         File[] files = path.toFile().listFiles();
-        if (comparator != null) {
-            Arrays.sort(files, comparator);
-        }
+        if (comparator != null) Arrays.sort(files, comparator);
         for (File file : files) {
             Path filePath = file.toPath();
             try {
@@ -225,13 +182,9 @@ public class MainUtil {
                 val = StringMan.toInteger(name, 0, name.length());
             } else {
                 int i = name.lastIndexOf('.');
-                if (i != -1) {
-                    val = StringMan.toInteger(name, 0, i);
-                }
+                if (i != -1) val = StringMan.toInteger(name, 0, i);
             }
-            if (val != null && val > max[0]) {
-                max[0] = val;
-            }
+            if (val != null && val > max[0]) max[0] = val;
             return false;
         });
         return max[0] + 1;
@@ -269,6 +222,10 @@ public class MainUtil {
         return getCompressedOS(os, amount, Settings.IMP.HISTORY.BUFFER_SIZE);
     }
 
+    private static final LZ4Factory FACTORY = LZ4Factory.fastestInstance();
+    private static final LZ4Compressor COMPRESSOR = FACTORY.fastCompressor();
+    private static final LZ4FastDecompressor DECOMPRESSOR = FACTORY.fastDecompressor();
+
     public static int getMaxCompressedLength(int size) {
         return LZ4Utils.maxCompressedLength(size);
     }
@@ -287,9 +244,7 @@ public class MainUtil {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (!deflate.finished()) {
             int n = deflate.deflate(buffer);
-            if (n != 0) {
-                baos.write(buffer, 0, n);
-            }
+            if (n != 0) baos.write(buffer, 0, n);
         }
         return baos.toByteArray();
     }
@@ -307,9 +262,7 @@ public class MainUtil {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while (!inflater.finished()) {
             int n = inflater.inflate(buffer);
-            if (n != 0) {
-                baos.write(buffer, 0, n);
-            }
+            if (n != 0) baos.write(buffer, 0, n);
         }
         return baos.toByteArray();
     }
@@ -491,6 +444,36 @@ public class MainUtil {
         }
     }
 
+    private static final Class[] parameters = new Class[]{URL.class};
+
+    public static ClassLoader loadURLClasspath(URL u) throws IOException {
+        ClassLoader sysloader = ClassLoader.getSystemClassLoader();
+
+        Class sysclass = URLClassLoader.class;
+
+        try {
+            Method method = sysclass.getDeclaredMethod("addURL", parameters);
+            method.setAccessible(true);
+            if (sysloader instanceof URLClassLoader) {
+                method.invoke(sysloader, new Object[]{u});
+            } else {
+                ClassLoader loader = MainUtil.class.getClassLoader();
+                while (!(loader instanceof URLClassLoader) && loader.getParent() != null) {
+                    loader = loader.getParent();
+                }
+                if (loader instanceof URLClassLoader) {
+                    method.invoke(sysloader, new Object[]{u});
+                } else {
+                    loader = new URLClassLoader(new URL[]{u}, MainUtil.class.getClassLoader());
+                    return loader;
+                }
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        return sysloader;
+    }
+
     public static String getText(String url) throws IOException {
         try (Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8")) {
             return scanner.useDelimiter("\\A").next();
@@ -568,12 +551,12 @@ public class MainUtil {
     }
 
     public static Thread[] getThreads() {
-        ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
+        ThreadGroup rootGroup = Thread.currentThread( ).getThreadGroup( );
         ThreadGroup parentGroup;
-        while ((parentGroup = rootGroup.getParent()) != null) {
+        while ( ( parentGroup = rootGroup.getParent() ) != null ) {
             rootGroup = parentGroup;
         }
-        Thread[] threads = new Thread[rootGroup.activeCount()];
+        Thread[] threads = new Thread[ rootGroup.activeCount() ];
         if (threads.length != 0) {
             while (rootGroup.enumerate(threads, true) == threads.length) {
                 threads = new Thread[threads.length * 2];
@@ -615,9 +598,7 @@ public class MainUtil {
     }
 
     public static BufferedImage toRGB(BufferedImage src) {
-        if (src == null) {
-            return src;
-        }
+        if (src == null) return src;
         BufferedImage img = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
         g2d.drawImage(src, 0, 0, null);
@@ -695,6 +676,60 @@ public class MainUtil {
 //        if (!debug) {
         e.printStackTrace();
         return;
+//        }
+//        String header = "====== FAWE: " + e.getLocalizedMessage() + " ======";
+//        Fawe.debug(header);
+//        String[] trace = getTrace(e);
+//        for (int i = 0; i < trace.length && i < 8; i++) {
+//            Fawe.debug(" - " + trace[i]);
+//        }
+//        String[] cause = getTrace(e.getCause());
+//        Fawe.debug("Cause: " + (cause.length == 0 ? "N/A" : ""));
+//        for (int i = 0; i < cause.length && i < 8; i++) {
+//            Fawe.debug(" - " + cause[i]);
+//        }
+//        Fawe.debug(StringMan.repeat("=", header.length()));
+    }
+
+    public static String[] getTrace(Throwable e) {
+        if (e == null) {
+            return new String[0];
+        }
+        StackTraceElement[] elems = e.getStackTrace();
+        String[] msg = new String[elems.length];//[elems.length + 1];
+//        HashSet<String> packages = new HashSet<>();
+        for (int i = 0; i < elems.length; i++) {
+            StackTraceElement elem = elems[i];
+            elem.getLineNumber();
+            String methodName = elem.getMethodName();
+            int index = elem.getClassName().lastIndexOf('.');
+            String className = elem.getClassName();
+//            if (!(index == -1 || className.startsWith("io.netty") || className.startsWith("javax") || className.startsWith("java") || className.startsWith("sun") || className.startsWith("net.minecraft") || className.startsWith("org.spongepowered") || className.startsWith("org.bukkit") || className.startsWith("com.google"))) {
+//                packages.add(className.substring(0, index-1));
+//            }
+            String name = className.substring(index == -1 ? 0 : index + 1);
+            name = name.length() == 0 ? elem.getClassName() : name;
+            String argString = "(...)";
+            try {
+                for (Method method : Class.forName(elem.getClassName()).getDeclaredMethods()) {
+                    if (method.getName().equals(methodName)) {
+                        Class<?>[] params = method.getParameterTypes();
+                        argString = "";
+                        String prefix = "";
+                        for (Class param : params) {
+                            argString += prefix + param.getSimpleName();
+                            prefix = ",";
+                        }
+                        argString = "[" + method.getReturnType().getSimpleName() + "](" + argString + ")";
+                        break;
+                    }
+                }
+            } catch (Throwable ignore) {
+            }
+            msg[i] = name + "." + methodName + argString + ":" + elem.getLineNumber();
+        }
+//        msg[msg.length-1] = StringMan.getString(packages);
+        return msg;
     }
 
     public static void warnDeprecated(Class... alternatives) {
@@ -711,12 +746,16 @@ public class MainUtil {
                     String className = creatorElement.getClassName();
                     Class clazz = Class.forName(className);
                     String creator = clazz.getSimpleName();
+                    String packageName = clazz.getPackage().getName();
 
-                    String myName = Class.forName(stack.getClassName()).getSimpleName();
-                    Fawe.debug("@" + creator + " used by " + myName + "." + stack.getMethodName() + "():" + stack.getLineNumber() + " is deprecated.");
+                    StackTraceElement deprecatedElement = stack;
+                    String myName = Class.forName(deprecatedElement.getClassName()).getSimpleName();
+                    Fawe.debug("@" + creator + " used by " + myName + "." + deprecatedElement.getMethodName() + "():" + deprecatedElement.getLineNumber() + " is deprecated.");
                     Fawe.debug(" - Alternatives: " + StringMan.getString(alternatives));
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
+                } finally {
+                    break;
                 }
             }
         }
@@ -743,9 +782,7 @@ public class MainUtil {
                     break;
                 case '.':
                     res[index--] = val;
-                    if (index == -1) {
-                        return res;
-                    }
+                    if (index == -1) return res;
                     val = 0;
                     numIndex = 1;
                     break;
@@ -768,26 +805,18 @@ public class MainUtil {
         }
         if (allowDir) {
             File file = MainUtil.resolveRelative(new File(dir, filename));
-            if (file.exists() && file.isDirectory()) {
-                return file;
-            }
+            if (file.exists() && file.isDirectory()) return file;
         }
         for (ClipboardFormat f : ClipboardFormats.getAll()) {
             File file = MainUtil.resolveRelative(new File(dir, filename + "." + f.getPrimaryFileExtension()));
-            if (file.exists()) {
-                return file;
-            }
+            if (file.exists()) return file;
         }
         return null;
     }
 
     public static boolean isInSubDirectory(File dir, File file) throws IOException {
-        if (file == null) {
-            return false;
-        }
-        if (file.equals(dir)) {
-            return true;
-        }
+        if (file == null) return false;
+        if (file.equals(dir)) return true;
         file = file.getCanonicalFile();
         dir = dir.getCanonicalFile();
         return isInSubDirectory(dir, file.getParentFile());
@@ -951,6 +980,10 @@ public class MainUtil {
         return time;
     }
 
+    public static void deleteOlder(File directory, final long timeDiff) {
+        deleteOlder(directory, timeDiff, true);
+    }
+
     public static void deleteOlder(File directory, final long timeDiff, boolean printDebug) {
         final long now = System.currentTimeMillis();
         ForkJoinPool pool = new ForkJoinPool();
@@ -958,9 +991,7 @@ public class MainUtil {
             long age = now - file.lastModified();
             if (age > timeDiff) {
                 pool.submit(file::delete);
-                if (printDebug) {
-                    BBC.FILE_DELETED.send(null, file);
-                }
+                if (printDebug) BBC.FILE_DELETED.send(null, file);
             }
         });
         pool.shutdown();
@@ -969,6 +1000,49 @@ public class MainUtil {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean deleteDirectory(File directory) {
+        return deleteDirectory(directory, true);
+    }
+
+    public static boolean deleteDirectory(File directory, boolean printDebug) {
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            if (null != files) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        deleteDirectory(file, printDebug);
+                    } else {
+                        file.delete();
+                        if (printDebug) BBC.FILE_DELETED.send(null, file);
+                    }
+                }
+            }
+        }
+        return (directory.delete());
+    }
+
+    public static boolean isValidTag(Tag tag) {
+        if (tag instanceof EndTag) {
+            return false;
+        } else if (tag instanceof ListTag) {
+            ListTag lt = (ListTag) tag;
+            if ((lt).getType() == EndTag.class) {
+                return false;
+            }
+        } else if (tag instanceof CompoundTag) {
+            for (Entry<String, Tag> entry : ((CompoundTag) tag).getValue().entrySet()) {
+                if (!isValidTag(entry.getValue())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public enum OS {
+        LINUX, WINDOWS, MACOS, UNKNOWN;
     }
 
     public static File getWorkingDirectory(String applicationName) {
@@ -1013,9 +1087,5 @@ public class MainUtil {
             return OS.LINUX;
         }
         return OS.UNKNOWN;
-    }
-
-    public enum OS {
-        LINUX, WINDOWS, MACOS, UNKNOWN;
     }
 }

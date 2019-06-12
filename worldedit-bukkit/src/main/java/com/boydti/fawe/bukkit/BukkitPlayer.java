@@ -15,13 +15,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class BukkitPlayer extends FawePlayer<Player> {
 
     private static ConsoleCommandSender console;
 
-    public BukkitPlayer(@NotNull final Player parent) {
+    public BukkitPlayer(final Player parent) {
         super(parent);
     }
 

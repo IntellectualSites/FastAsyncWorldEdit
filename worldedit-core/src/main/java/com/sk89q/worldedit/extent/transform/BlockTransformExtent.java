@@ -54,10 +54,6 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.util.Direction.*;
 
-/**
- * Transforms blocks themselves (but not their position) according to a
- * given transform.
- */
 public class BlockTransformExtent extends ResettableExtent {
     private Transform transform;
     private Transform transformInverse;
@@ -411,11 +407,6 @@ public class BlockTransformExtent extends ResettableExtent {
         return super.setExtent(extent);
     }
 
-    /**
-     * Get the transform.
-     *
-     * @return the transform
-     */
     public Transform getTransform() {
         return transform;
     }
@@ -505,36 +496,6 @@ public class BlockTransformExtent extends ResettableExtent {
         return super.setBlock(x, y, z, transformInverse(block));
     }
 
-    /**
-     * Get the new value with the transformed direction.
-     *
-     * @param allowedStates the allowed states
-     * @param transform the transform
-     * @param oldDirection the old direction to transform
-     * @return a new state or null if none could be found
-     */
-    @Nullable
-    private static Vector3 getNewStateValue(List<Direction> allowedStates, Transform transform, Vector3 oldDirection) {
-        Vector3 newDirection = transform.apply(oldDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
-        Vector3 newValue = null;
-        double closest = -2;
-        boolean found = false;
-
-        for (Direction v : allowedStates) {
-            double dot = v.toVector().normalize().dot(newDirection);
-            if (dot >= closest) {
-                closest = dot;
-                newValue = v.toVector();
-                found = true;
-            }
-        }
-
-        if (found) {
-            return newValue;
-        } else {
-            return null;
-        }
-    }
 
     @Override
     public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {

@@ -5,7 +5,6 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
-
 import java.util.Objects;
 
 public class Message {
@@ -98,11 +97,9 @@ public class Message {
 
     public Message cmdOptions(String prefix, String suffix, String... options) {
         for (int i = 0; i < options.length; i++) {
-            if (i != 0) {
-                text(" &8|&7 ");
-            }
+            if (i != 0) text(" &8|&7 ");
             text("&7[&a" + options[i] + "&7]")
-                    .cmdTip(prefix + options[i] + suffix);
+            .cmdTip(prefix + options[i] + suffix);
         }
         return this;
     }
@@ -135,10 +132,10 @@ public class Message {
         }
         if (page < totalPages && page > 1) { // Back | Next
             this.text("&f<<").command(baseCommand + " " + (page - 1)).text("&8 | ").text("&f>>")
-                .command(baseCommand + " " + (page + 1));
+                    .command(baseCommand + " " + (page + 1));
         } else if (page <= 1 && totalPages > page) { // Next
             this.text("&8 -").text(" | ").text("&f>>")
-                .command(baseCommand + " " + (page + 1));
+                    .command(baseCommand + " " + (page + 1));
 
         } else if (page == totalPages && totalPages > 1) { // Back
             this.text("&f<<").command(baseCommand + " " + (page - 1)).text("&8 | ").text("- ");

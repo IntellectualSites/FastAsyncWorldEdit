@@ -28,9 +28,10 @@ public class SummedAreaTable {
 
     public void processSummedAreaTable() {
         int rowSize = source.length / width;
+        int colSize = width;
         int index = 0;
         for (int i = 0; i < rowSize; i++) {
-            for (int j = 0; j < width; j++, index++) {
+            for (int j = 0; j < colSize; j++, index++) {
                 long val = getVal(i, j, index, source[index]);
                 summed[index] = val;
             }

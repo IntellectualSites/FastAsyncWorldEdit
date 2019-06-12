@@ -56,7 +56,7 @@ public class ToolUtilCommands {
         String newState = args.getString(0, null);
         if (session.hasSuperPickAxe()) {
             if ("on".equals(newState)) {
-                player.printError("Super pick axe already enabled.");
+                player.printError(BBC.getPrefix() + "Super pick axe already enabled.");
                 return;
             }
 
@@ -64,7 +64,7 @@ public class ToolUtilCommands {
             player.print("Super pick axe disabled.");
         } else {
             if ("off".equals(newState)) {
-                player.printError("Super pick axe already disabled.");
+                player.printError(BBC.getPrefix() + "Super pick axe already disabled.");
                 return;
             }
             session.enableSuperPickAxe();
@@ -130,7 +130,6 @@ public class ToolUtilCommands {
 
         int radius = args.getInteger(0);
         we.checkMaxBrushRadius(radius);
-
         session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(radius);
         player.print("Brush size set.");
     }

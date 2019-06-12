@@ -3,9 +3,9 @@ package com.boydti.fawe.object;
 import java.util.function.Consumer;
 
 public abstract class DelegateConsumer<T> implements Consumer<T> {
-    private final Consumer<T> parent;
+    private final Consumer parent;
 
-    public DelegateConsumer(Consumer<T> parent) {
+    public DelegateConsumer(Consumer parent) {
         this.parent = parent;
     }
 

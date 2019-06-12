@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extension.factory.parser.pattern;
 
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.factory.BlockFactory;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;

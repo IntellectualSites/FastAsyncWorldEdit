@@ -1,44 +1,30 @@
-/*
- * WorldEdit, a Minecraft world manipulation toolkit
- * Copyright (C) sk89q <http://www.sk89q.com>
- * Copyright (C) WorldEdit team and contributors
- *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.object.collection.FastBitSet;
+import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.registry.state.AbstractProperty;
-import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.registry.state.AbstractProperty;
+import com.sk89q.worldedit.registry.state.Property;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A mask that checks whether blocks at the given positions are matched by
@@ -52,23 +38,17 @@ public class BlockMask extends AbstractExtentMask {
     private final long[][] bitSets;
     protected final static long[] ALL = new long[0];
 
-    /**
-     * Create a new block mask.
-     *
-     * @param extent the extent
-     * @param blocks a list of blocks to match
-     */
     @Deprecated
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         super(extent);
-        checkNotNull(blocks);
+        MainUtil.warnDeprecated(BlockMaskBuilder.class);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
     }
 
     @Deprecated
     public BlockMask(Extent extent, BaseBlock... blocks) {
         super(extent);
-        checkNotNull(blocks);
+        MainUtil.warnDeprecated(BlockMaskBuilder.class);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
     }
 
@@ -77,12 +57,6 @@ public class BlockMask extends AbstractExtentMask {
         this.bitSets = new long[BlockTypes.size()][];
     }
 
-    /**
-     * Create a new block mask.
-     *
-     * @param extent the extent
-     * @param bitSets an array of blocks to match
-     */
     protected BlockMask(Extent extent, long[][] bitSets) {
         super(extent);
         this.bitSets = bitSets;
@@ -142,7 +116,6 @@ public class BlockMask extends AbstractExtentMask {
                 if (states.get(ALL) == 1) return new SingleBlockTypeMask(getExtent(), BlockTypes.get(indexAll));
                 if (states.get(null) == 1)
                     return new SingleBlockTypeMask(getExtent(), BlockTypes.get(indexNull)).inverse();
-
 
                 boolean[] types = new boolean[BlockTypes.size()];
                 for (int i = 0; i < bitSets.length; i++) {
@@ -260,7 +233,7 @@ public class BlockMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        BlockState block = getExtent().getBlock(vector);
+        BlockStateHolder block = getExtent().getBlock(vector);
         long[] bitSet = bitSets[block.getInternalBlockTypeId()];
         if (bitSet == null) return false;
         if (bitSet.length == 0) return true;
@@ -272,5 +245,6 @@ public class BlockMask extends AbstractExtentMask {
     public Mask2D toMask2D() {
         return null;
     }
+
 
 }

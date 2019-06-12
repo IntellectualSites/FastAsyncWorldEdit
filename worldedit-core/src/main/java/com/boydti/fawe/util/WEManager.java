@@ -14,12 +14,9 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-
 import java.lang.reflect.Field;
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class WEManager {
 
@@ -127,9 +124,7 @@ public class WEManager {
                         }
                     }
                 }
-                if (!removed) {
-                    return regions.toArray(new Region[0]);
-                }
+                if (!removed) return regions.toArray(new Region[0]);
                 masks.clear();
             }
         }
@@ -137,16 +132,12 @@ public class WEManager {
         for (final FaweMaskManager manager : managers) {
             if (player.hasPermission("fawe." + manager.getKey())) {
                 try {
-                    if (manager.isExclusive() && !masks.isEmpty()) {
-                        continue;
-                    }
+                    if (manager.isExclusive() && !masks.isEmpty()) continue;
                     final FaweMask mask = manager.getMask(player, FaweMaskManager.MaskType.getDefaultMaskType());
                     if (mask != null) {
                         regions.add(mask.getRegion());
                         masks.add(mask);
-                        if (manager.isExclusive()) {
-                            break;
-                        }
+                        if (manager.isExclusive()) break;
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -164,10 +155,10 @@ public class WEManager {
 
 
     public boolean intersects(final Region region1, final Region region2) {
-        BlockVector3 rg1P1 = region1.getMinimumPoint();
-        BlockVector3 rg1P2 = region1.getMaximumPoint();
-        BlockVector3 rg2P1 = region2.getMinimumPoint();
-        BlockVector3 rg2P2 = region2.getMaximumPoint();
+    	BlockVector3 rg1P1 = region1.getMinimumPoint();
+    	BlockVector3 rg1P2 = region1.getMaximumPoint();
+    	BlockVector3 rg2P1 = region2.getMinimumPoint();
+    	BlockVector3 rg2P2 = region2.getMaximumPoint();
 
         return (rg1P1.getBlockX() <= rg2P2.getBlockX()) && (rg1P2.getBlockX() >= rg2P1.getBlockX()) && (rg1P1.getBlockZ() <= rg2P2.getBlockZ()) && (rg1P2.getBlockZ() >= rg2P1.getBlockZ());
     }

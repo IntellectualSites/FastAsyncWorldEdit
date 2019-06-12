@@ -56,9 +56,24 @@ public class MCAFile {
     private final int X, Z;
     private final Int2ObjectOpenHashMap<MCAChunk> chunks = new Int2ObjectOpenHashMap<>();
 
-    final ThreadLocal<byte[]> byteStore1 = ThreadLocal.withInitial(() -> new byte[4096]);
-    final ThreadLocal<byte[]> byteStore2 = ThreadLocal.withInitial(() -> new byte[4096]);
-    final ThreadLocal<byte[]> byteStore3 = ThreadLocal.withInitial(() -> new byte[1024]);
+    final ThreadLocal<byte[]> byteStore1 = new ThreadLocal<byte[]>() {
+        @Override
+        protected byte[] initialValue() {
+            return new byte[4096];
+        }
+    };
+    final ThreadLocal<byte[]> byteStore2 = new ThreadLocal<byte[]>() {
+        @Override
+        protected byte[] initialValue() {
+            return new byte[4096];
+        }
+    };
+    final ThreadLocal<byte[]> byteStore3 = new ThreadLocal<byte[]>() {
+        @Override
+        protected byte[] initialValue() {
+            return new byte[1024];
+        }
+    };
 
     public MCAFile(FaweQueue parent, File file) {
         this.queue = parent;
@@ -189,10 +204,9 @@ public class MCAFile {
         if (offset == 0) {
             return null;
         }
-        MCAChunk chunk;
-        try (NBTInputStream nis = getChunkIS(offset)) {
-            chunk = new MCAChunk(nis, queue, cx, cz, false);
-        }
+        NBTInputStream nis = getChunkIS(offset);
+        MCAChunk chunk = new MCAChunk(nis, queue, cx, cz, false);
+        nis.close();
         int pair = MathMan.pair((short) (cx & 31), (short) (cz & 31));
         synchronized (chunks) {
             chunks.put(pair, chunk);
@@ -333,6 +347,7 @@ public class MCAFile {
     public void streamChunk(byte[] data, RunnableVal<NBTStreamer> withStream) throws IOException {
         if (data != null) {
             try {
+                FastByteArrayInputStream nbtIn = new FastByteArrayInputStream(data);
                 FastByteArrayInputStream bais = new FastByteArrayInputStream(data);
                 InflaterInputStream iis = new InflaterInputStream(bais, new Inflater(), 1);
                 fieldBuf2.set(iis, byteStore2.get());
@@ -377,7 +392,8 @@ public class MCAFile {
             return null;
         }
         byte[] uncompressed = chunk.toBytes(byteStore3.get());
-        return MainUtil.compress(uncompressed, byteStore2.get(), null);
+        byte[] compressed = MainUtil.compress(uncompressed, byteStore2.get(), null);
+        return compressed;
     }
 
     private byte[] getChunkBytes(int cx, int cz) throws Exception {
@@ -493,21 +509,24 @@ public class MCAFile {
                     modified = true;
                     chunk.setLastUpdate(now);
                     if (!chunk.isDeleted()) {
-                        pool.submit(() -> {
-                            try {
-                                byte[] compressed = toBytes(chunk);
-                                int pair = MathMan.pair((short) (chunk.getX() & 31), (short) (chunk.getZ() & 31));
-                                Int2ObjectOpenHashMap<byte[]> map;
-                                if (getOffset(chunk.getX(), chunk.getZ()) == 0) {
-                                    map = append;
-                                } else {
-                                    map = compressedMap;
+                        pool.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    byte[] compressed = toBytes(chunk);
+                                    int pair = MathMan.pair((short) (chunk.getX() & 31), (short) (chunk.getZ() & 31));
+                                    Int2ObjectOpenHashMap map;
+                                    if (getOffset(chunk.getX(), chunk.getZ()) == 0) {
+                                        map = append;
+                                    } else {
+                                        map = compressedMap;
+                                    }
+                                    synchronized (map) {
+                                        map.put(pair, compressed);
+                                    }
+                                } catch (Throwable e) {
+                                    e.printStackTrace();
                                 }
-                                synchronized (map) {
-                                    map.put(pair, compressed);
-                                }
-                            } catch (Throwable e) {
-                                e.printStackTrace();
                             }
                         });
                     }

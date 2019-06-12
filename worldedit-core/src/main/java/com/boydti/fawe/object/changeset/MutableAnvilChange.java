@@ -34,7 +34,7 @@ public class MutableAnvilChange implements Change {
         if (!checkedQueue) {
             checkedQueue = true;
             Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser<>(extent).find(HasFaweQueue.class);
+            ExtentTraverser found = new ExtentTraverser(extent).find(HasFaweQueue.class);
             if (found != null) {
                 queue = ((HasFaweQueue) found.get()).getQueue();
                 destDir = queue.getSaveFolder().toPath();
@@ -51,11 +51,14 @@ public class MutableAnvilChange implements Change {
             Files.move(source, dest, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException ignore) {
             int[] coords = MainUtil.regionNameToCoords(source.toString());
-            queue.setMCA(coords[0], coords[1], RegionWrapper.GLOBAL(), () -> {
-                try {
-                    Files.move(source, dest, StandardCopyOption.ATOMIC_MOVE);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+            queue.setMCA(coords[0], coords[1], RegionWrapper.GLOBAL(), new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Files.move(source, dest, StandardCopyOption.ATOMIC_MOVE);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }, false, true);
         }

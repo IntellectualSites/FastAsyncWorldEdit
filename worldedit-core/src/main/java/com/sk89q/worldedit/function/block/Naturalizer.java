@@ -76,15 +76,15 @@ public class Naturalizer implements LayerFunction {
             affected++;
             switch (depth) {
                 case 0:
-                    editSession.setBlock(position, BlockTypes.GRASS_BLOCK.getDefaultState());
+                    editSession.setBlock(position, BlockTypes.GRASS_BLOCK);
                     break;
                 case 1:
                 case 2:
                 case 3:
-                    editSession.setBlock(position, BlockTypes.DIRT.getDefaultState());
+                    editSession.setBlock(position, BlockTypes.DIRT);
                     break;
                 default:
-                    editSession.setBlock(position, BlockTypes.STONE.getDefaultState());
+                    editSession.setBlock(position, BlockTypes.STONE);
             }
         }
 

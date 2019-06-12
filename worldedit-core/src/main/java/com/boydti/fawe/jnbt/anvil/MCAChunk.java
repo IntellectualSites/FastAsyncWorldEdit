@@ -6,6 +6,7 @@ import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.object.number.MutableLong;
+import com.boydti.fawe.util.ArrayUtil;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
@@ -190,8 +191,8 @@ public class MCAChunk extends FaweChunk<Void> {
                             setNibble(endIndex, thisSkyLight, (byte) 0);
                             setNibble(endIndex, thisBlockLight, (byte) 0);
                         }
-                        Arrays.fill(thisBlockLight, startIndexShift, endIndex + 1, (byte) 0);
-                        Arrays.fill(thisBlockLight, startIndexShift, endIndexShift + 1, (byte) 0);
+                        ArrayUtil.fill(thisSkyLight, startIndexShift, endIndexShift + 1, (byte) 0);
+                        ArrayUtil.fill(thisBlockLight, startIndexShift, endIndexShift + 1, (byte) 0);
                     }
                 }
                 continue;
@@ -291,8 +292,8 @@ public class MCAChunk extends FaweChunk<Void> {
                     if (otherIds == null) {
                         if (currentIds != null) {
                             Arrays.fill(currentIds, indexStart, indexEnd, 0);
-                            Arrays.fill(skyLight[thisLayer], indexStartShift, indexEndShift, (byte) 0);
-                            Arrays.fill(blockLight[thisLayer], indexStartShift, indexEndShift, (byte) 0);
+                            ArrayUtil.fill(skyLight[thisLayer], indexStartShift, indexEndShift, (byte) 0);
+                            ArrayUtil.fill(blockLight[thisLayer], indexStartShift, indexEndShift, (byte) 0);
                         }
                     } else {
                         if (currentIds == null) {
@@ -319,8 +320,8 @@ public class MCAChunk extends FaweChunk<Void> {
                         continue;
                     }
                     Arrays.fill(thisIds, thisStartIndex, thisStartIndex + 256, 0);
-                    Arrays.fill(this.skyLight[thisLayer], thisStartIndexShift, thisStartIndexShift + 128, (byte) 0);
-                    Arrays.fill(this.blockLight[thisLayer], thisStartIndexShift, thisStartIndexShift + 128, (byte) 0);
+                    ArrayUtil.fill(this.skyLight[thisLayer], thisStartIndexShift, thisStartIndexShift + 128, (byte) 0);
+                    ArrayUtil.fill(this.blockLight[thisLayer], thisStartIndexShift, thisStartIndexShift + 128, (byte) 0);
                     continue;
                 } else if (thisIds == null) {
                     ids[thisLayer] = thisIds = new int[4096];

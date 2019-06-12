@@ -3,7 +3,6 @@ package com.boydti.fawe.util;
 import com.boydti.fawe.object.mask.ResettableMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
-
 import java.lang.reflect.Field;
 import java.util.Collection;
 

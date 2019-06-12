@@ -64,7 +64,7 @@ public class FloodFillTool implements BlockTool {
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
         World world = (World) clicked.getExtent();
 
-        BlockVector3 origin = clicked.toVector().toBlockPoint();
+        BlockVector3 origin = clicked.toBlockPoint();
         BlockType initialType = world.getBlock(origin).getBlockType();
 
         if (initialType.getMaterial().isAir()) {
@@ -88,7 +88,6 @@ public class FloodFillTool implements BlockTool {
                 session.remember(editSession);
             }
         }
-
         return true;
     }
 
@@ -120,5 +119,6 @@ public class FloodFillTool implements BlockTool {
         recurse(editSession, pos.add(0, -1, 0),
                 origin, size, initialType, visited);
     }
+
 
 }

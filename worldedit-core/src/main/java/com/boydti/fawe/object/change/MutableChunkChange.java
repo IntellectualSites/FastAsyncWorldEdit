@@ -43,7 +43,7 @@ public class MutableChunkChange implements Change {
         if (!checkedQueue) {
             checkedQueue = true;
             Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser<>(extent).find(HasFaweQueue.class);
+            ExtentTraverser found = new ExtentTraverser(extent).find(HasFaweQueue.class);
             if (found != null) {
                 perform(queue = ((HasFaweQueue) found.get()).getQueue(), undo);
             } else {

@@ -69,7 +69,7 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
             if (target == null) return true;
 
             RegionSelector selector = session.getRegionSelector(player.getWorld());
-            BlockVector3 blockPoint = target.toVector().toBlockPoint();
+            BlockVector3 blockPoint = target.toBlockPoint();
             if (selector.selectSecondary(blockPoint, ActorSelectorLimits.forActor(player))) {
                 selector.explainSecondarySelection(player, session, blockPoint);
             }
