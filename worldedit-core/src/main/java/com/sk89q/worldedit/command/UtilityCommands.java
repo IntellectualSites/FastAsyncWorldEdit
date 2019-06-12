@@ -121,6 +121,7 @@ public class UtilityCommands extends MethodCommands {
                     "More Info: https://git.io/vSPmA",
             queued = false
     )
+    @CommandPermissions("worldedit.patterns")
     public void patterns(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, DefaultPatternParser.class, args);
     }
@@ -137,6 +138,7 @@ public class UtilityCommands extends MethodCommands {
                     "More Info: https://git.io/v9r4K",
             queued = false
     )
+    @CommandPermissions("worldedit.masks")
     public void masks(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, DefaultMaskParser.class, args);
     }
@@ -152,6 +154,7 @@ public class UtilityCommands extends MethodCommands {
                     "More Info: https://git.io/v9KHO",
             queued = false
     )
+    @CommandPermissions("worldedit.transforms")
     public void transforms(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, DefaultTransformParser.class, args);
     }
@@ -243,6 +246,7 @@ public class UtilityCommands extends MethodCommands {
             max = 0,
             queued = false
     )
+    @CommandPermissions("fawe.cancel")
     public void cancel(FawePlayer player) {
         int cancelled = player.cancel(false);
         BBC.WORLDEDIT_CANCEL_COUNT.send(player, cancelled);
@@ -673,6 +677,7 @@ public class UtilityCommands extends MethodCommands {
             aliases = {"/confirm"},
             desc = "Confirm a command"
     )
+    @CommandPermissions("fawe.confirm")
     public void confirm(FawePlayer fp) throws WorldEditException {
         if (!fp.confirm()) {
             BBC.NOTHING_CONFIRMED.send(fp);

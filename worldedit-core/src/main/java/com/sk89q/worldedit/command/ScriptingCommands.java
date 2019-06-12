@@ -73,6 +73,7 @@ public class ScriptingCommands {
             min = 1,
             max = 1
     )
+    @CommandPermissions("fawe.setupdispatcher")
     public void setupdispatcher(Player player, LocalSession session, final CommandContext args) throws WorldEditException {
         CommandManager.getInstance().setupDispatcher();
     }

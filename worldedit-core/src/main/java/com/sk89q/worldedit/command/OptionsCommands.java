@@ -51,6 +51,7 @@ public class OptionsCommands {
             aliases = {"/tips", "tips"},
             desc = "Toggle FAWE tips"
     )
+    @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
         FawePlayer<Object> fp = FawePlayer.wrap(player);
         if (fp.toggle("fawe.tips")) {
@@ -318,6 +319,7 @@ public class OptionsCommands {
             min = 1,
             max = 1
     )
+    @CommandPermissions("worldedit.searchitem")
     public void searchItem(Actor actor, CommandContext args) throws WorldEditException {
 
         String query = args.getString(0).trim().toLowerCase();

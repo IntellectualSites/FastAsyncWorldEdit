@@ -273,7 +273,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         }
         File pluginsFolder = MainUtil.getJarFile().getParentFile();
         for (File file : pluginsFolder.listFiles()) {
-            if (file.length() == 1988) return;
+            if (file.length() == 2016) return;
         }
         Plugin plugin = Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
         File dummy = MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
