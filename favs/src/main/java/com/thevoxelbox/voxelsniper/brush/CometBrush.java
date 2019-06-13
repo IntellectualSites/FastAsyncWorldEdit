@@ -16,9 +16,6 @@ import org.bukkit.util.Vector;
 public class CometBrush extends Brush {
     private boolean useBigBalls = false;
 
-    /**
-     *
-     */
     public CometBrush() {
         this.setName("Comet");
     }

@@ -21,9 +21,6 @@ public class LineBrush extends PerformBrush {
     private Vector targetCoords = new Vector();
     private AsyncWorld targetWorld;
 
-    /**
-     *
-     */
     public LineBrush() {
         this.setName("Line");
     }

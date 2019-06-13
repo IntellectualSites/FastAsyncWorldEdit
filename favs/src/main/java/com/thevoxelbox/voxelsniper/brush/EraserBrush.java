@@ -20,9 +20,6 @@ public class EraserBrush extends Brush {
     private static final Set<Material> EXCLUSIVE_LIQUIDS = EnumSet.of(
             Material.WATER, Material.WATER, Material.LAVA, Material.LAVA);
 
-    /**
-     *
-     */
     public EraserBrush() {
         this.setName("Eraser");
     }

@@ -15,9 +15,6 @@ public class FlatOceanBrush extends Brush {
     private int waterLevel = DEFAULT_WATER_LEVEL;
     private int floorLevel = DEFAULT_FLOOR_LEVEL;
 
-    /**
-     *
-     */
     public FlatOceanBrush() {
         this.setName("FlatOcean");
     }

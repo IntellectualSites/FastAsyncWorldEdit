@@ -16,9 +16,6 @@ public class ShellSetBrush extends Brush {
     private static final int MAX_SIZE = 5000000;
     private Block block = null;
 
-    /**
-     *
-     */
     public ShellSetBrush() {
         this.setName("Shell Set");
     }
@@ -44,7 +41,7 @@ public class ShellSetBrush extends Brush {
 
             int selectionSize = Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY);
             if (selectionSize > MAX_SIZE) {
-                v.sendMessage(ChatColor.RED + "Selection size above hardcoded limit, please use a smaller selection.");
+                v.sendMessage(ChatColor.RED + "Selection size above hardcoded limit of 5000000, please use a smaller selection.");
             } else {
                 final ArrayList<AsyncBlock> blocks = new ArrayList<>(selectionSize / 2);
                 for (int y = lowY; y <= highY; y++) {

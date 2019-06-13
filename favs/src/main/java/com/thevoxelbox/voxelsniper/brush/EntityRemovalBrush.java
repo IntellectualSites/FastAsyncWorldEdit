@@ -11,15 +11,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
-/**
- *
- */
 public class EntityRemovalBrush extends Brush {
     private final List<String> exemptions = new ArrayList<>(3);
 
-    /**
-     *
-     */
     public EntityRemovalBrush() {
         this.setName("Entity Removal");
 

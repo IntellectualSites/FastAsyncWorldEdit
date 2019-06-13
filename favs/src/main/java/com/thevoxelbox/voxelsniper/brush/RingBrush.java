@@ -13,9 +13,6 @@ public class RingBrush extends PerformBrush {
     private double trueCircle = 0;
     private double innerSize = 0;
 
-    /**
-     *
-     */
     public RingBrush() {
         this.setName("Ring");
     }

@@ -1,6 +1,5 @@
 package com.thevoxelbox.voxelsniper.command;
 
-import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -9,9 +8,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Sniper;
 import com.thevoxelbox.voxelsniper.VoxelSniper;
 import com.thevoxelbox.voxelsniper.api.command.VoxelCommand;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 public class VoxelReplaceCommand extends VoxelCommand

@@ -11,9 +11,7 @@ import org.bukkit.block.Block;
  * @author Voxel
  */
 public class ShellBallBrush extends Brush {
-    /**
-     *
-     */
+
     public ShellBallBrush() {
         this.setName("Shell Ball");
     }

@@ -18,9 +18,6 @@ public class OverlayBrush extends PerformBrush {
     private int depth = DEFAULT_DEPTH;
     private boolean allBlocks = false;
 
-    /**
-     *
-     */
     public OverlayBrush() {
         this.setName("Overlay (Topsoil Filling)");
     }

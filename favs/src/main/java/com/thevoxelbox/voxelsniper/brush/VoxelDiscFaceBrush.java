@@ -10,9 +10,7 @@ import org.bukkit.block.BlockFace;
  * @author Voxel
  */
 public class VoxelDiscFaceBrush extends PerformBrush {
-    /**
-     *
-     */
+
     public VoxelDiscFaceBrush() {
         this.setName("Voxel Disc Face");
     }

@@ -7,9 +7,7 @@ import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 
 public class BlendVoxelBrush extends BlendBrushBase {
-    /**
-     *
-     */
+
     public BlendVoxelBrush() {
         this.setName("Blend Voxel");
     }

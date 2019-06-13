@@ -11,9 +11,6 @@ import org.bukkit.entity.EntityType;
 public class EntityBrush extends Brush {
     private EntityType entityType = EntityType.ZOMBIE;
 
-    /**
-     *
-     */
     public EntityBrush() {
         this.setName("Entity");
     }

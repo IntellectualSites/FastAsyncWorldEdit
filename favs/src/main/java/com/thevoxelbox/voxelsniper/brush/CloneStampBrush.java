@@ -22,7 +22,7 @@ public class CloneStampBrush extends StampBrush {
      * x y z -- initial center of the selection v.brushSize -- the radius of the cylinder v.voxelHeight -- the heigth of the cylinder c.cCen -- the offset on
      * the Y axis of the selection ( bottom of the cylinder ) as blockPositionY: Bottom_Y = targetBlock.y + v.cCen;
      *
-     * @param v the caller
+     * @param v Sniper Caller
      */
     private void clone(final SnipeData v) {
         final int brushSize = v.getBrushSize();

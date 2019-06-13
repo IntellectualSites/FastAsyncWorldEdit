@@ -16,9 +16,6 @@ public class FillDownBrush extends PerformBrush {
     private boolean fillLiquid = true;
     private boolean fromExisting = false;
 
-    /**
-     *
-     */
     public FillDownBrush() {
         this.setName("Fill Down");
     }

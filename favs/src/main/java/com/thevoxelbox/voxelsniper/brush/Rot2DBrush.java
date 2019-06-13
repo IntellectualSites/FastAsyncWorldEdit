@@ -17,9 +17,6 @@ public class Rot2DBrush extends Brush {
     private BlockWrapper[][][] snap;
     private double se;
 
-    /**
-     *
-     */
     public Rot2DBrush() {
         this.setName("2D Rotation");
     }

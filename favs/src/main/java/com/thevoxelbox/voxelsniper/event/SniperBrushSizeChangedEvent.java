@@ -4,9 +4,6 @@ import com.thevoxelbox.voxelsniper.Sniper;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-/**
- *
- */
 public class SniperBrushSizeChangedEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private final Sniper sniper;

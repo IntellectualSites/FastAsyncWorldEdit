@@ -8,9 +8,6 @@ import com.thevoxelbox.voxelsniper.Undo;
 import com.thevoxelbox.voxelsniper.util.BlockWrapper;
 import org.bukkit.ChatColor;
 
-/**
- *
- */
 public class Rot3DBrush extends Brush {
     private final int mode = 0;
     private int bSize;
@@ -20,9 +17,6 @@ public class Rot3DBrush extends Brush {
     private double sePitch;
     private double seRoll;
 
-    /**
-     *
-     */
     public Rot3DBrush() {
         this.setName("3D Rotation");
     }

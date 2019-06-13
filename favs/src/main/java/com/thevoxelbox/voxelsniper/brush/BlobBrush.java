@@ -18,9 +18,6 @@ public class BlobBrush extends PerformBrush {
     private Random randomGenerator = new Random();
     private int growPercent = GROW_PERCENT_DEFAULT; // chance block on recursion pass is made active
 
-    /**
-     *
-     */
     public BlobBrush() {
         this.setName("Blob");
     }

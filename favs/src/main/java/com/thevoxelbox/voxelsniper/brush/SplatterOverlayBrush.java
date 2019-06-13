@@ -32,9 +32,6 @@ public class SplatterOverlayBrush extends PerformBrush {
     private int depth = 3;
     private boolean allBlocks = false;
 
-    /**
-     *
-     */
     public SplatterOverlayBrush() {
         this.setName("Splatter Overlay");
     }

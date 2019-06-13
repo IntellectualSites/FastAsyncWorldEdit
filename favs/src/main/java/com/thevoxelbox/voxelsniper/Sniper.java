@@ -128,10 +128,10 @@ public class Sniper {
     /**
      * Sniper execution call.
      *
-     * @param action       Action player performed
-     * @param itemInHand   Item in hand of player
+     * @param action Action player performed
+     * @param itemInHand Item in hand of player
      * @param clickedBlock Block that the player targeted/interacted with
-     * @param clickedFace  Face of that targeted Block
+     * @param clickedFace Face of that targeted Block
      * @return true if command visibly processed, false otherwise.
      */
     public boolean snipe(final Action action, final Material itemInHand, final Block clickedBlock, final BlockFace clickedFace) {

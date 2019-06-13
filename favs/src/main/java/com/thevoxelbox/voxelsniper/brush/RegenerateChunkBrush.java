@@ -11,9 +11,7 @@ import org.bukkit.Chunk;
  * @author Mick
  */
 public class RegenerateChunkBrush extends Brush {
-    /**
-     *
-     */
+
     public RegenerateChunkBrush() {
         this.setName("Chunk Generator 40k");
     }

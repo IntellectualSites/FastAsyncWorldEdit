@@ -36,9 +36,6 @@ public class BlockResetBrush extends Brush {
         BlockResetBrush.DENIED_UPDATES.add(Material.OAK_FENCE_GATE);
     }
 
-    /**
-     *
-     */
     public BlockResetBrush() {
         this.setName("Block Reset Brush");
     }

@@ -8,9 +8,7 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
  * @author Voxel
  */
 public class SnipeBrush extends PerformBrush {
-    /**
-     *
-     */
+
     public SnipeBrush() {
         this.setName("Snipe");
     }

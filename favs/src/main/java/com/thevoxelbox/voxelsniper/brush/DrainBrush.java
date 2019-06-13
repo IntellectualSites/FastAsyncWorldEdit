@@ -14,9 +14,6 @@ public class DrainBrush extends Brush {
     private double trueCircle = 0;
     private boolean disc = false;
 
-    /**
-     *
-     */
     public DrainBrush() {
         this.setName("Drain");
     }

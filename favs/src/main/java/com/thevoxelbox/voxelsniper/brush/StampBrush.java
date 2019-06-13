@@ -9,9 +9,6 @@ import org.bukkit.ChatColor;
 
 import java.util.HashSet;
 
-/**
- *
- */
 public class StampBrush extends Brush {
     protected HashSet<BlockWrapper> clone = new HashSet<>();
     protected HashSet<BlockWrapper> fall = new HashSet<>();
@@ -20,16 +17,12 @@ public class StampBrush extends Brush {
     protected Undo undo;
     protected boolean sorted = false;
     protected StampType stamp = StampType.DEFAULT;
-    /**
-     *
-     */
+
     public StampBrush() {
         this.setName("Stamp");
     }
 
-    /**
-     *
-     */
+
     public final void reSort() {
         this.sorted = false;
     }

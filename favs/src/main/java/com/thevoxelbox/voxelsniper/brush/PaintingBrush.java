@@ -9,9 +9,7 @@ import com.thevoxelbox.voxelsniper.SnipeData;
  * @author Voxel
  */
 public class PaintingBrush extends Brush {
-    /**
-     *
-     */
+
     public PaintingBrush() {
         this.setName("Painting");
     }

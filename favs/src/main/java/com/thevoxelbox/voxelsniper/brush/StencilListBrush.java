@@ -27,9 +27,6 @@ public class StencilListBrush extends Brush {
     private byte pasteParam = 0;
     private HashMap<Integer, String> stencilList = new HashMap<>();
 
-    /**
-     *
-     */
     public StencilListBrush() {
         this.setName("StencilList");
     }

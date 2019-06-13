@@ -19,7 +19,7 @@ public interface IBrush {
      * Handles parameters passed to brushes.
      *
      * @param par Array of string containing parameters
-     * @param v   Snipe Data
+     * @param v Snipe Data
      */
     void parameters(String[] par, SnipeData v);
 

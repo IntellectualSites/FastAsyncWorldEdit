@@ -19,9 +19,6 @@ public class TriangleBrush extends PerformBrush {
     private double[] vectorThree = new double[3]; // Point 2 to 3, for area calculations
     private double[] normalVector = new double[3];
 
-    /**
-     *
-     */
     public TriangleBrush() {
         this.setName("Triangle");
     }

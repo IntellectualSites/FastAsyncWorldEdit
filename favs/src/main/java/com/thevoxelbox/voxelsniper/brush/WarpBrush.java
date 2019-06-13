@@ -36,9 +36,7 @@ import org.bukkit.entity.Player;
  * @author MikeMatrix
  */
 public class WarpBrush extends Brush {
-    /**
-     *
-     */
+
     public WarpBrush() {
         this.setName("Warp");
     }

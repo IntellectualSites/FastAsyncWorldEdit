@@ -19,9 +19,6 @@ import org.bukkit.block.BlockFace;
 public class TreeSnipeBrush extends Brush {
     private TreeType treeType = TreeType.TREE;
 
-    /**
-     *
-     */
     public TreeSnipeBrush() {
         this.setName("Tree Snipe");
     }

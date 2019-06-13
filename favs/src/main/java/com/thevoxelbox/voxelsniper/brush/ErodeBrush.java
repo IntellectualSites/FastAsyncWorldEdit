@@ -31,9 +31,6 @@ public class ErodeBrush extends Brush {
     private final HelpJSAP parser = new HelpJSAP("/b e", "Brush for eroding landscape.", ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH);
     private ErosionPreset currentPreset = new ErosionPreset(0, 1, 0, 1);
 
-    /**
-     *
-     */
     public ErodeBrush() {
         this.setName("Erode");
 

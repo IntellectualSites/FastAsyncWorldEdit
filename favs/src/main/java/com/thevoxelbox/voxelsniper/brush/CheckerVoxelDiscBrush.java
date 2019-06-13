@@ -20,7 +20,7 @@ public class CheckerVoxelDiscBrush extends PerformBrush {
     }
 
     /**
-     * @param v
+     * @param v Snipe Data
      * @param target
      */
     private void applyBrush(final SnipeData v, final Block target) {

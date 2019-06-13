@@ -24,9 +24,6 @@ public class RandomErodeBrush extends Brush {
     private int fillRecursion = 1;
     private Random generator = new Random();
 
-    /**
-     *
-     */
     public RandomErodeBrush() {
         this.setName("RandomErode");
     }

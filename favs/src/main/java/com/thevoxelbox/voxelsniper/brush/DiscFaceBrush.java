@@ -13,9 +13,6 @@ import org.bukkit.block.BlockFace;
 public class DiscFaceBrush extends PerformBrush {
     private double trueCircle = 0;
 
-    /**
-     *
-     */
     public DiscFaceBrush() {
         this.setName("Disc Face");
     }

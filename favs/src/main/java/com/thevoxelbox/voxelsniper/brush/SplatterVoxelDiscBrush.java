@@ -26,9 +26,6 @@ public class SplatterVoxelDiscBrush extends PerformBrush {
     private int splatterRecursions; // How many times you grow the seeds
     private Random generator = new Random();
 
-    /**
-     *
-     */
     public SplatterVoxelDiscBrush() {
         this.setName("Splatter Voxel Disc");
     }

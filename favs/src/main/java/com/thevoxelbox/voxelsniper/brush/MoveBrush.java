@@ -30,9 +30,6 @@ public class MoveBrush extends Brush {
      */
     private Selection selection = null;
 
-    /**
-     *
-     */
     public MoveBrush() {
         this.setName("Move");
     }
@@ -181,13 +178,7 @@ public class MoveBrush extends Brush {
          * Calculated BlockStates of the selection.
          */
         private final ArrayList<AsyncBlockState> blockStates = new ArrayList<>();
-        /**
-         *
-         */
         private Location location1 = null;
-        /**
-         *
-         */
         private Location location2 = null;
 
         /**
@@ -206,7 +197,7 @@ public class MoveBrush extends Brush {
                     final int highY = Math.max(this.location1.getBlockY(), this.location2.getBlockY());
                     final int highZ = Math.max(this.location1.getBlockZ(), this.location2.getBlockZ());
                     if (Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY) > Selection.MAX_BLOCK_COUNT) {
-                        throw new Exception(ChatColor.RED + "Selection size above hardcoded limit, please use a smaller selection.");
+                        throw new Exception(ChatColor.RED + "Selection size above hardcoded limit of 5000000, please use a smaller selection.");
                     }
                     final AsyncWorld world = (AsyncWorld) this.location1.getWorld();
                     for (int y = lowY; y <= highY; y++) {

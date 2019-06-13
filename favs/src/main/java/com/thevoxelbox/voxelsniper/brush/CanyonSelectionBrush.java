@@ -14,9 +14,6 @@ public class CanyonSelectionBrush extends CanyonBrush {
     private int fx;
     private int fz;
 
-    /**
-     *
-     */
     public CanyonSelectionBrush() {
         this.setName("Canyon Selection");
     }

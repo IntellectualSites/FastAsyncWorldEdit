@@ -13,9 +13,6 @@ import org.bukkit.Material;
 public class CleanSnowBrush extends Brush {
     private double trueCircle = 0;
 
-    /**
-     *
-     */
     public CleanSnowBrush() {
         this.setName("Clean Snow");
     }

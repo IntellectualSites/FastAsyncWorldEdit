@@ -11,9 +11,7 @@ import org.bukkit.block.BlockFace;
  * @author Gavjenks
  */
 public class VoltMeterBrush extends Brush {
-    /**
-     *
-     */
+
     public VoltMeterBrush() {
         this.setName("VoltMeter");
     }

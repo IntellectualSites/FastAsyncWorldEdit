@@ -20,9 +20,6 @@ public class OceanBrush extends Brush {
     private int waterLevel = WATER_LEVEL_DEFAULT;
     private boolean coverFloor = false;
 
-    /**
-     *
-     */
     public OceanBrush() {
         this.setName("OCEANATOR 5000(tm)");
     }

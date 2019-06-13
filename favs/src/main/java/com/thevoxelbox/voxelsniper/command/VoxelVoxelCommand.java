@@ -25,7 +25,6 @@
 
 package com.thevoxelbox.voxelsniper.command;
 
-import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.bukkit.favs.PatternUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;

@@ -17,9 +17,6 @@ public class RulerBrush extends Brush {
     private int yOff = 0;
     private int zOff = 0;
 
-    /**
-     *
-     */
     public RulerBrush() {
         this.setName("Ruler");
     }

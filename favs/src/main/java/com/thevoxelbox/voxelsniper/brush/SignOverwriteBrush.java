@@ -26,9 +26,6 @@ public class SignOverwriteBrush extends Brush {
     private boolean[] signLinesEnabled = new boolean[NUM_SIGN_LINES];
     private boolean rangedMode = false;
 
-    /**
-     *
-     */
     public SignOverwriteBrush() {
         this.setName("Sign Overwrite Brush");
 
@@ -133,7 +130,7 @@ public class SignOverwriteBrush extends Brush {
             try {
                 if (parameter.equalsIgnoreCase("info")) {
                     v.sendMessage(ChatColor.AQUA + "Sign Overwrite Brush Powder/Arrow:");
-                    v.sendMessage(ChatColor.BLUE + "The arrow writes the internal line buffer to the tearget sign.");
+                    v.sendMessage(ChatColor.BLUE + "The arrow writes the internal line buffer to the target sign.");
                     v.sendMessage(ChatColor.BLUE + "The powder reads the text of the target sign into the internal buffer.");
                     v.sendMessage(ChatColor.AQUA + "Sign Overwrite Brush Parameters:");
                     v.sendMessage(ChatColor.GREEN + "-1[:(enabled|disabled)] ... " + ChatColor.BLUE + "-- Sets the text of the first sign line. (e.g. -1 Blah Blah)");

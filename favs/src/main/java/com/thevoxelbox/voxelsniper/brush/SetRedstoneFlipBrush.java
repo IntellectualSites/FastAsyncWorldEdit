@@ -16,9 +16,6 @@ public class SetRedstoneFlipBrush extends Brush {
     private Undo undo;
     private boolean northSouth = true;
 
-    /**
-     *
-     */
     public SetRedstoneFlipBrush() {
         this.setName("Set Redstone Flip");
     }

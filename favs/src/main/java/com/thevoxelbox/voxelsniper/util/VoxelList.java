@@ -1,17 +1,10 @@
 package com.thevoxelbox.voxelsniper.util;
 
-import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.world.block.BlockState;
-import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Container class for multiple ID/Datavalue pairs.

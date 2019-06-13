@@ -23,9 +23,6 @@ public class EllipseBrush extends PerformBrush {
     private double stepSize;
     private boolean fill;
 
-    /**
-     *
-     */
     public EllipseBrush() {
         this.setName("Ellipse");
     }

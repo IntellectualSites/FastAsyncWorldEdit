@@ -13,9 +13,6 @@ public class SetBrush extends PerformBrush {
     private static final int SELECTION_SIZE_MAX = 5000000;
     private Block block = null;
 
-    /**
-     *
-     */
     public SetBrush() {
         this.setName("Set");
     }
@@ -38,7 +35,7 @@ public class SetBrush extends PerformBrush {
             final int highZ = Math.max(this.block.getZ(), bl.getZ());
 
             if (Math.abs(highX - lowX) * Math.abs(highZ - lowZ) * Math.abs(highY - lowY) > SELECTION_SIZE_MAX) {
-                v.sendMessage(ChatColor.RED + "Selection size above hardcoded limit, please use a smaller selection.");
+                v.sendMessage(ChatColor.RED + "Selection size above hardcoded limit of 5000000, please use a smaller selection.");
             } else {
                 for (int y = lowY; y <= highY; y++) {
                     for (int x = lowX; x <= highX; x++) {

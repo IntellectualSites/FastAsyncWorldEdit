@@ -23,7 +23,7 @@ public class DiscBrush extends PerformBrush {
     /**
      * Disc executor.
      *
-     * @param v
+     * @param v Snipe Data
      */
     private void disc(final SnipeData v, final Block targetBlock) {
         final double radiusSquared = (v.getBrushSize() + this.trueCircle) * (v.getBrushSize() + this.trueCircle);

@@ -12,9 +12,6 @@ import org.bukkit.block.Block;
 public class CylinderBrush extends PerformBrush {
     private double trueCircle = 0;
 
-    /**
-     *
-     */
     public CylinderBrush() {
         this.setName("Cylinder");
     }

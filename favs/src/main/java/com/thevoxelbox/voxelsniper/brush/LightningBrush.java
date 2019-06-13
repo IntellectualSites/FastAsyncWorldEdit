@@ -7,9 +7,7 @@ import com.thevoxelbox.voxelsniper.SnipeData;
  * @author Gavjenks
  */
 public class LightningBrush extends Brush {
-    /**
-     *
-     */
+
     public LightningBrush() {
         this.setName("Lightning");
     }

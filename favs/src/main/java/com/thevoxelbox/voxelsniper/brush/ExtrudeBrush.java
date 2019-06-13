@@ -13,9 +13,6 @@ import org.bukkit.block.BlockFace;
 public class ExtrudeBrush extends Brush {
     private double trueCircle;
 
-    /**
-     *
-     */
     public ExtrudeBrush() {
         this.setName("Extrude");
     }
