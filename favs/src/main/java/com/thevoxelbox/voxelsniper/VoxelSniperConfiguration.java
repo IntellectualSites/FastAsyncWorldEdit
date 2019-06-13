@@ -11,7 +11,6 @@ import java.util.List;
 public class VoxelSniperConfiguration {
     public static final String CONFIG_IDENTIFIER_LITESNIPER_MAX_BRUSH_SIZE = "litesniper-max-brush-size";
     public static final String CONFIG_IDENTIFIER_UNDO_CACHE_SIZE = "undo-cache-size";
-    public static final String CONFIG_IDENTIFIER_LITESNIPER_RESTRICTED_ITEMS = "litesniper-restricted-items";
     public static final String CONFIG_IDENTIFIER_MESSAGE_ON_LOGIN_ENABLED = "message-on-login-enabled";
     public static final int DEFAULT_LITESNIPER_MAX_BRUSH_SIZE = 5;
     public static final int DEFAULT_UNDO_CACHE_SIZE = 20;
@@ -59,25 +58,6 @@ public class VoxelSniperConfiguration {
      */
     public void setLiteSniperMaxBrushSize(int size) {
         configuration.set(CONFIG_IDENTIFIER_LITESNIPER_MAX_BRUSH_SIZE, size);
-    }
-
-    /**
-     * Returns List of restricted Litesniper Items.
-     *
-     * @return List of restricted Litesniper Items
-     */
-    public List<Integer> getLiteSniperRestrictedItems() {
-        return configuration.getIntegerList(CONFIG_IDENTIFIER_LITESNIPER_RESTRICTED_ITEMS);
-    }
-
-    /**
-     * Set new list of restricted Litesniper Items.
-     *
-     * @param restrictedItems List of restricted Litesniper Items
-     */
-    public void setLitesniperRestrictedItems(List<Integer> restrictedItems) {
-        Preconditions.checkNotNull(restrictedItems, "Restricted items must be a list.");
-        configuration.set(CONFIG_IDENTIFIER_LITESNIPER_RESTRICTED_ITEMS, restrictedItems);
     }
 
     /**
