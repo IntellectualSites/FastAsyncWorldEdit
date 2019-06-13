@@ -1,5 +1,6 @@
 package com.thevoxelbox.voxelsniper;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.BukkitCommand;
 import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.object.FawePlayer;
@@ -8,8 +9,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Bukkit extension point.
@@ -55,7 +64,42 @@ public class VoxelSniper extends JavaPlugin {
         return sniperManager;
     }
 
-    @Override
+    private static Map<String, Plugin> lookupNames;
+    static {
+        {   // Disable BetterBrushes - FAVS includes the features and BetterBrushes is outdated
+            PluginManager manager = Bukkit.getPluginManager();
+            try {
+                Field pluginsField = manager.getClass().getDeclaredField("plugins");
+                Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
+                pluginsField.setAccessible(true);
+                lookupNamesField.setAccessible(true);
+                List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
+                lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
+                pluginsField.set(manager, new ArrayList<Plugin>(plugins) {
+                    @Override
+                    public boolean add(Plugin plugin) {
+                        if (plugin.getName().startsWith("BetterBrushes")) {
+                            Fawe.debug("Disabling `" + plugin.getName() + "`. FastAsyncVoxelSniper includes all the features.");
+                        } else {
+                            return super.add(plugin);
+                        }
+                        return false;
+                    }
+                });
+                lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
+                    @Override
+                    public Plugin put(@NotNull String key, @NotNull Plugin plugin) {
+                        if (plugin.getName().startsWith("BetterBrushes")) {
+                            return null;
+                        }
+                        return super.put(key, plugin);
+                    }
+                });
+            } catch (Throwable ignore) {}
+        }
+    }
+
+        @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, String commandLabel, @NotNull String[] args) {
         if (sender instanceof Player) {
 
