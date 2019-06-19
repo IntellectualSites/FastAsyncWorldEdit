@@ -52,9 +52,9 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
     public RollbackDatabase(final World world) throws SQLException, ClassNotFoundException {
         this.prefix = "";
-        this.worldName = Fawe.imp().getWorldName(world);
+        this.worldName = world.getName();
         this.world = world;
-        this.dbLocation = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + "summary.db");
+        this.dbLocation = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + "summary.db");
         connection = openConnection();
         CREATE_TABLE = "CREATE TABLE IF NOT EXISTS `" + prefix + "edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL,`x1` INT NOT NULL,`y1` INT NOT NULL,`z1` INT NOT NULL,`x2` INT NOT NULL,`y2` INT NOT NULL,`z2` INT NOT NULL,`time` INT NOT NULL, PRIMARY KEY (player, id))";
         INSERT_EDIT = "INSERT OR REPLACE INTO `" + prefix + "edits` (`player`,`id`,`x1`,`y1`,`z1`,`x2`,`y2`,`z2`,`time`) VALUES(?,?,?,?,?,?,?,?,?)";

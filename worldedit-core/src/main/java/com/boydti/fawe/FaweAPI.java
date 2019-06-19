@@ -38,6 +38,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -66,7 +68,7 @@ public class FaweAPI {
      *
      * @param world
      * @return A new EditSessionBuilder
-     * @see com.boydti.fawe.util.EditSessionBuilder
+     * @see EditSessionBuilder
      */
     public static EditSessionBuilder getEditSessionBuilder(World world) {
         return new EditSessionBuilder(world);
@@ -181,7 +183,7 @@ public class FaweAPI {
      * @param world     The name of the world
      * @param autoqueue If it should start dispatching before you enqueue it.
      * @return
-     * @see com.boydti.fawe.object.FaweQueue#enqueue()
+     * @see FaweQueue#enqueue()
      */
     public static FaweQueue createQueue(World world, boolean autoqueue) {
         return SetQueue.IMP.getNewQueue(world, true, autoqueue);
@@ -190,11 +192,6 @@ public class FaweAPI {
     public static World getWorld(String worldName) {
         Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
         List<? extends World> worlds = platform.getWorlds();
-        for (World current : worlds) {
-            if (Fawe.imp().getWorldName(current).equals(worldName)) {
-                return WorldWrapper.wrap(current);
-            }
-        }
         for (World current : worlds) {
             if (current.getName().equals(worldName)) {
                 return WorldWrapper.wrap(current);
@@ -219,8 +216,8 @@ public class FaweAPI {
      *
      * @param file
      * @return
-     * @see com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat
-     * @see com.boydti.fawe.object.schematic.Schematic
+     * @see ClipboardFormat
+     * @see Schematic
      */
     public static Schematic load(File file) throws IOException {
         return ClipboardFormats.findByFile(file).load(file);
@@ -261,7 +258,7 @@ public class FaweAPI {
      *
      * @param extent
      * @param reason
-     * @see com.sk89q.worldedit.EditSession#getRegionExtent() To get the FaweExtent for an EditSession
+     * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
      */
     public static void cancelEdit(Extent extent, BBC reason) {
         try {
@@ -400,7 +397,7 @@ public class FaweAPI {
      * @param uuid
      * @param index
      * @return
-     * @see com.boydti.fawe.object.changeset.DiskStorageHistory#toEditSession(com.boydti.fawe.object.FawePlayer)
+     * @see DiskStorageHistory#toEditSession(FawePlayer)
      */
     public static DiskStorageHistory getChangeSetFromDisk(World world, UUID uuid, int index) {
         return new DiskStorageHistory(world, uuid, index);
@@ -515,27 +512,6 @@ public class FaweAPI {
      */
     public static BBC[] getTranslations() {
         return BBC.values();
-    }
-
-    /**
-     * @see #getEditSessionBuilder(com.sk89q.worldedit.world.World)
-     * @deprecated
-     */
-    @Deprecated
-    public static EditSession getNewEditSession(@Nonnull FawePlayer player) {
-        if (player == null) {
-            throw new IllegalArgumentException("Player may not be null");
-        }
-        return player.getNewEditSession();
-    }
-
-    /**
-     * @see #getEditSessionBuilder(com.sk89q.worldedit.world.World)
-     * @deprecated
-     */
-    @Deprecated
-    public static EditSession getNewEditSession(World world) {
-        return WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
     }
 
 }

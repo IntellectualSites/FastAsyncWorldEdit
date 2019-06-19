@@ -46,7 +46,7 @@ public class PlotTrimFilter extends DeleteUninhabitedFilter {
         super(fileDuration, inhabitedTicks, chunkInactivity);
         Fawe.debug("Initializing Plot trim...");
 
-        String worldName = Fawe.imp().getWorldName(world);
+        String worldName = world.getName();
         PlotArea area = PlotSquared.get().getPlotAreaByString(worldName);
         IndependentPlotGenerator gen = area.getGenerator();
         if (!(area instanceof HybridPlotWorld) || !(gen instanceof HybridGen)) {
@@ -61,7 +61,7 @@ public class PlotTrimFilter extends DeleteUninhabitedFilter {
         this.unoccupiedChunks = new LongHashSet();
 
         this.reference = calculateReference();
-        
+
         Fawe.debug(" - calculating claims");
         this.calculateClaimedArea();
     }

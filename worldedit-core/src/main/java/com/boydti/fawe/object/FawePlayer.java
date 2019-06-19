@@ -88,15 +88,7 @@ public abstract class FawePlayer<T> extends Metadatable {
                 return existing;
             }
             }
-        if (obj.getClass().getName().contains("CraftPlayer") && !Fawe.imp().getPlatform().equals("bukkit")) {
-            try {
-                Method methodGetHandle = obj.getClass().getDeclaredMethod("getHandle");
-                obj = methodGetHandle.invoke(obj);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
+        obj.getClass().getName();
         return Fawe.imp().wrap(obj);
     }
 

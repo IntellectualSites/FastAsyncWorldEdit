@@ -61,7 +61,7 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public FaweChangeSet(World world) {
         this.world = world;
-        this.worldName = Fawe.imp().getWorldName(world);
+        this.worldName = world.getName();
         this.mainThread = Fawe.isMainThread();
         this.layers = (this.world.getMaxY() + 1) >> 4;
     }

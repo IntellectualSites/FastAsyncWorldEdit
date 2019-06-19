@@ -43,10 +43,10 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     /*
      * Block data
-     * 
+     *
      * [header]
      * {int origin x, int origin z}
-     * 
+     *
      * [contents]...
      * { short rel x, short rel z, unsigned byte y, short combinedFrom, short combinedTo }
      */
@@ -66,7 +66,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     public DiskStorageHistory(World world, UUID uuid) {
         super(world);
-        init(uuid, Fawe.imp().getWorldName(world));
+        init(uuid, world.getName());
     }
 
     public DiskStorageHistory(String world, UUID uuid) {
@@ -116,12 +116,12 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     private void init(UUID uuid, int i) {
         this.uuid = uuid;
         this.index = i;
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(getWorld()) + File.separator + uuid);
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + getWorld().getName() + File.separator + uuid);
         initFiles(folder);
     }
 
     public void delete() {
-        Fawe.debug("Deleting history: " + Fawe.imp().getWorldName(getWorld()) + "/" + uuid + "/" + index);
+        Fawe.debug("Deleting history: " + getWorld().getName() + "/" + uuid + "/" + index);
         deleteFiles();
         if (Settings.IMP.HISTORY.USE_DATABASE) {
             RollbackDatabase db = DBHandler.IMP.getDatabase(getWorld());
@@ -523,6 +523,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 	@Override
 	public void setRecordChanges(boolean recordChanges) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

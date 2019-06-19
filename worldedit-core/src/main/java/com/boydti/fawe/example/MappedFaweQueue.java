@@ -84,7 +84,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
 
     public MappedFaweQueue(final World world, IFaweQueueMap map) {
         this.weWorld = world;
-        if (world != null) this.world = Fawe.imp().getWorldName(world);
+        if (world != null) this.world = world.getName();
         if (map == null) {
             map = getSettings().PREVENT_CRASHES ? new WeakFaweQueueMap(this) : new DefaultFaweQueueMap(this);
         }

@@ -221,7 +221,7 @@ public class LocalSession implements TextureHolder {
 
     private boolean loadHistoryChangeSets(UUID uuid, World world) {
         SparseBitSet set = new SparseBitSet();
-        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + uuid);
+        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid);
         if (folder.isDirectory()) {
             folder.listFiles(pathname -> {
                 String name = pathname.getName();
@@ -252,7 +252,7 @@ public class LocalSession implements TextureHolder {
         if (!Settings.IMP.HISTORY.USE_DISK) {
             return;
         }
-        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + uuid + File.separator + "index");
+        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index");
         if (file.exists()) {
             try (FaweInputStream is = new FaweInputStream(new FileInputStream(file))) {
                 historyNegativeIndex = Math.min(Math.max(0, is.readInt()), history.size());
@@ -268,7 +268,7 @@ public class LocalSession implements TextureHolder {
         if (world == null || !Settings.IMP.HISTORY.USE_DISK) {
             return;
         }
-        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + uuid + File.separator + "index");
+        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index");
         if (getHistoryNegativeIndex() != 0) {
             try {
                 if (!file.exists()) {
@@ -389,10 +389,10 @@ public class LocalSession implements TextureHolder {
             return cs;
         }
         if (o instanceof Integer) {
-            File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(currentWorld) + File.separator + uuid);
+            File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid);
             File specific = new File(folder, o.toString());
             if (specific.isDirectory()) {
-                return new AnvilHistory(Fawe.imp().getWorldName(currentWorld), specific);
+                return new AnvilHistory(currentWorld.getName(), specific);
             } else {
                 return new DiskStorageHistory(currentWorld, this.uuid, (Integer) o);
             }

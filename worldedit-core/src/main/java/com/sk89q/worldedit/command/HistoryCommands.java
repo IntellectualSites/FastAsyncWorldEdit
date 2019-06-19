@@ -142,7 +142,7 @@ public class HistoryCommands extends MethodCommands {
                 if (file.getBDFile().exists()) {
                     if (restore) file.redo(FawePlayer.wrap(player));
                     else file.undo(FawePlayer.wrap(player));
-                    BBC.ROLLBACK_ELEMENT.send(player, Fawe.imp().getWorldName(world) + "/" + user + "-" + index);
+                    BBC.ROLLBACK_ELEMENT.send(player, world.getName() + "/" + user + "-" + index);
                 } else {
                     BBC.TOOL_INSPECT_INFO_FOOTER.send(player, 0);
                 }
@@ -193,15 +193,10 @@ public class HistoryCommands extends MethodCommands {
             @Override
             public void run(DiskStorageHistory edit) {
                 edit.undo(fp, allowedRegions);
-                BBC.ROLLBACK_ELEMENT.send(player, Fawe.imp().getWorldName(edit.getWorld()) + "/" + user + "-" + edit.getIndex());
+                BBC.ROLLBACK_ELEMENT.send(player, edit.getWorld().getName() + "/" + user + "-" + edit.getIndex());
                 count.incrementAndGet();
             }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count);
-            }
-        }, true, restore);
+        }, () -> BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count), true, restore);
     }
 
     @Command(

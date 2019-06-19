@@ -111,7 +111,7 @@ public class AnvilCommands {
         }
         CuboidRegion cuboid = (CuboidRegion) selection;
         RegionWrapper wrappedRegion = new RegionWrapper(cuboid.getMinimumPoint(), cuboid.getMaximumPoint());
-        String worldName = Fawe.imp().getWorldName(editSession.getWorld());
+        String worldName = editSession.getWorld().getName();
         FaweQueue tmp = SetQueue.IMP.getNewQueue(worldName, true, false);
         MCAQueue queue = new MCAQueue(tmp);
         FawePlayer<Object> fp = FawePlayer.wrap(player);
@@ -127,7 +127,7 @@ public class AnvilCommands {
         if (session == null || session.hasFastMode()) {
             run.accept(new NullAnvilHistory());
         } else {
-            AnvilHistory history = new AnvilHistory(Fawe.imp().getWorldName(world), fp.getUUID());
+            AnvilHistory history = new AnvilHistory(world.getName(), fp.getUUID());
             run.accept(history);
             session.remember(fp.getPlayer(), world, history, fp.getLimit());
         }
@@ -173,13 +173,8 @@ public class AnvilCommands {
         ClipboardRemapper mapper;
         ClipboardRemapper.RemapPlatform from;
         ClipboardRemapper.RemapPlatform to;
-        if (Fawe.imp().getPlatform().equalsIgnoreCase("nukkit")) {
-            from = ClipboardRemapper.RemapPlatform.PC;
-            to = ClipboardRemapper.RemapPlatform.PE;
-        } else {
-            from = ClipboardRemapper.RemapPlatform.PE;
-            to = ClipboardRemapper.RemapPlatform.PC;
-        }
+        from = ClipboardRemapper.RemapPlatform.PE;
+        to = ClipboardRemapper.RemapPlatform.PC;
         RemapFilter filter = new RemapFilter(from, to);
         RemapFilter result = runWithWorld(player, folder, filter, true);
         if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
@@ -199,8 +194,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.deleteallunvisited")
     public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Optional("60000") int fileDurationMillis) throws WorldEditException {
-        long chunkInactivityMillis = fileDurationMillis; // Use same value for now
-        DeleteUninhabitedFilter filter = new DeleteUninhabitedFilter(fileDurationMillis, inhabitedTicks, chunkInactivityMillis);
+        DeleteUninhabitedFilter filter = new DeleteUninhabitedFilter(fileDurationMillis, inhabitedTicks, fileDurationMillis);
         DeleteUninhabitedFilter result = runWithWorld(player, folder, filter, true);
         if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
@@ -218,9 +212,8 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.deleteallunclaimed")
     public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Optional("60000") int fileDurationMillis, @Switch('d') boolean debug) throws WorldEditException {
-        String folder = Fawe.imp().getWorldName(player.getWorld());
-        long chunkInactivityMillis = fileDurationMillis; // Use same value for now
-        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, chunkInactivityMillis);
+        String folder = player.getWorld().getName();
+        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
         if (debug) filter.enableDebug();
         DeleteUnclaimedFilter result = runWithWorld(player, folder, filter, true);
         if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
@@ -239,9 +232,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.deleteunclaimed")
     public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Optional("60000") int fileDurationMillis, @Switch('d') boolean debug) throws WorldEditException {
-        String folder = Fawe.imp().getWorldName(player.getWorld());
-        long chunkInactivityMillis = fileDurationMillis; // Use same value for now
-        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, chunkInactivityMillis);
+        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
         if (debug) filter.enableDebug();
         DeleteUnclaimedFilter result = runWithSelection(player, editSession, selection, filter);
         if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
@@ -260,7 +251,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.deletealloldregions")
     public void deleteAllOldRegions(Player player, String folder, String time) throws WorldEditException {
-        long duration = MainUtil.timeToSec(time) * 1000l;
+        long duration = MainUtil.timeToSec(time) * 1000L;
         DeleteOldFilter filter = new DeleteOldFilter(duration);
         DeleteOldFilter result = runWithWorld(player, folder, filter, true);
         if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
@@ -276,7 +267,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.trimallplots")
     public void trimAllPlots(Player player, @Switch('v') boolean deleteUnvisited) throws WorldEditException {
-        String folder = Fawe.imp().getWorldName(player.getWorld());
+        String folder = player.getWorld().getName();
         int visitTime = deleteUnvisited ? 1 : -1;
         PlotTrimFilter filter = new PlotTrimFilter(player.getWorld(), 0, visitTime, 600000);
 //        PlotTrimFilter result = runWithWorld(player, folder, filter, true);
@@ -627,7 +618,7 @@ public class AnvilCommands {
             return;
         }
         CuboidRegion cuboid = (CuboidRegion) selection;
-        String worldName = Fawe.imp().getWorldName(editSession.getWorld());
+        String worldName = editSession.getWorld().getName();
         FaweQueue tmp = SetQueue.IMP.getNewQueue(worldName, true, false);
         MCAQueue queue = new MCAQueue(tmp);
         BlockVector3 origin = session.getPlacementPosition(player);

@@ -244,7 +244,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
         super(world);
-        this.worldName = worldName == null ? world == null ? queue == null ? "" : queue.getWorldName() : Fawe.imp().getWorldName(world) : worldName;
+        this.worldName = worldName == null ? world == null ? queue == null ? "" : queue.getWorldName() : world.getName() : worldName;
         if (world == null && this.worldName != null) world = FaweAPI.getWorld(this.worldName);
         this.world = world;
         if (bus == null) {
