@@ -50,33 +50,28 @@ public class FreeBuildRegion extends BukkitMaskManager {
             currRegList.add(listener);
         }
         if (currRegList.isEmpty()) return null;
-        RegisteredListener[] listeners = currRegList.toArray(new RegisteredListener[currRegList.size()]);
+        RegisteredListener[] listeners = currRegList.toArray(new RegisteredListener[0]);
 
         World bukkitWorld = player.parent.getWorld();
         AsyncWorld asyncWorld = AsyncWorld.wrap(bukkitWorld);
 
         BlockVector3 vec1 = BlockVector3.at(0, 0, 0);
-        BlockVector3 vec2 = vec1;
         Location pos1 = BukkitAdapter.adapt(bukkitWorld, vec1);
-        Location pos2 = BukkitAdapter.adapt(bukkitWorld, vec2);
+        Location pos2 = BukkitAdapter.adapt(bukkitWorld, vec1);
 
         AsyncBlock block = new AsyncBlock(asyncWorld, new NullFaweQueue(asyncWorld.getWorldName(), BlockTypes.STONE.getDefaultState()), 0, 0, 0);
         BlockBreakEvent event = new BlockBreakEvent(block, player.parent);
 
-        return new BukkitMask(pos1, pos2) {
-            @Override
-            public String getName() {
-                return "freebuild-global";
-            }
+        return new FaweMask(BukkitAdapter.adapt(pos1).toBlockPoint(), BukkitAdapter.adapt(pos2).toBlockPoint()) {
 
-            @Override
+        @Override
             public boolean isValid(FawePlayer player, MaskType type) {
                 return bukkitWorld == ((FawePlayer<Player>)player).parent.getWorld() && type == MaskType.MEMBER;
             }
 
             @Override
             public Region getRegion() {
-                return new CuboidRegion(vec1, vec2) {
+                return new CuboidRegion(vec1, vec1) {
 
                     @Override
                     public boolean contains(int x, int z) {

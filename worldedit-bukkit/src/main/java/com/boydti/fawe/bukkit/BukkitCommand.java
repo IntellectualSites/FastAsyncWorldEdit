@@ -7,6 +7,7 @@ import com.boydti.fawe.object.FawePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 public class BukkitCommand implements CommandExecutor {
 
@@ -17,7 +18,7 @@ public class BukkitCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(final CommandSender sender, final Command cmd, final String label, final String[] args) {
+    public boolean onCommand(@NotNull final CommandSender sender, final Command cmd, final String label, final String[] args) {
         final FawePlayer plr = Fawe.imp().wrap(sender);
         if (!sender.hasPermission(this.cmd.getPerm()) && !sender.isOp()) {
             BBC.NO_PERM.send(plr, this.cmd.getPerm());

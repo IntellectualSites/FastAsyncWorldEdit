@@ -115,9 +115,6 @@ public class VoxelSniperListener implements Listener {
         }
     }
 
-    /**
-     * @param event
-     */
     @EventHandler(ignoreCancelled = false)
     public final void onPlayerInteract(final PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -131,14 +128,11 @@ public class VoxelSniperListener implements Listener {
             if (sniper.isEnabled() && sniper.snipe(event.getAction(), event.getMaterial(), event.getClickedBlock(), event.getBlockFace())) {
                 event.setCancelled(true);
             }
-        } catch (final Throwable ignored) {
-            ignored.printStackTrace();
+        } catch (final Throwable throwable) {
+            throwable.printStackTrace();
         }
     }
 
-    /**
-     * @param event
-     */
     @EventHandler
     public final void onPlayerJoin(final PlayerJoinEvent event) {
         Player player = event.getPlayer();

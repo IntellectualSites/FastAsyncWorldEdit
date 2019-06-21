@@ -8,33 +8,19 @@ import com.sk89q.worldedit.regions.Region;
 
 public class FaweMask implements IDelegateRegion {
     private final Region region;
-    private String description = null;
-
-    @Deprecated
-    public FaweMask(final BlockVector3 pos1, final BlockVector3 pos2, final String id) {
-        this(new CuboidRegion(pos1, pos2), id);
-    }
 
     @Deprecated
     public FaweMask(final BlockVector3 pos1, final BlockVector3 pos2) {
-        this(pos1, pos2, null);
-        if ((pos1 == null) || (pos2 == null)) {
-            throw new IllegalArgumentException("BlockVectors cannot be null!");
-        }
+        this(new CuboidRegion(pos1, pos2));
     }
 
-    public FaweMask(Region region, String id) {
+    public FaweMask(Region region) {
         this.region = region;
-        this.description = id;
     }
 
     @Override
     public Region getRegion() {
         return region;
-    }
-
-    public String getName() {
-        return this.description;
     }
 
     public boolean isValid(FawePlayer player, FaweMaskManager.MaskType type) {

@@ -149,7 +149,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
             };
         }
 
-        return new FaweMask(maskedRegion, "PLOT^2") {
+        return new FaweMask(maskedRegion) {
             @Override
             public boolean isValid(FawePlayer player, MaskType type) {
                 if (Settings.Done.RESTRICT_BUILDING && Flags.DONE.isSet(finalPlot)) {

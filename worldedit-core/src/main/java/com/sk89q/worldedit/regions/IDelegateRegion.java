@@ -1,21 +1,21 @@
 package com.sk89q.worldedit.regions;
 
-import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 public interface IDelegateRegion extends Region {
 
-    public Region getRegion();
+    Region getRegion();
 
-    @Override
+    @NotNull @Override
     default Iterator<BlockVector3> iterator() {
         return getRegion().iterator();
     }

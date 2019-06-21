@@ -73,8 +73,6 @@ public class FaweBukkit implements IFawe, Listener {
     private BukkitImageListener imageListener;
     //private CFIPacketListener packetListener;
 
-    //private boolean listeningCui;
-    //private CUIListener cuiListener;
 
     public VaultUtil getVault() {
         return this.vault;
@@ -436,7 +434,7 @@ public class FaweBukkit implements IFawe, Listener {
                     Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
                 } catch (Throwable e2) {
                     try {
-                        managers.add(new FactionsOneFeature(factionsPlugin, this));
+                        managers.add(new FactionsOneFeature(factionsPlugin));
                         Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
                     } catch (Throwable e3) {
                         MainUtil.handleError(e);
@@ -457,7 +455,7 @@ public class FaweBukkit implements IFawe, Listener {
         final Plugin griefpreventionPlugin = Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention");
         if ((griefpreventionPlugin != null) && griefpreventionPlugin.isEnabled()) {
             try {
-                managers.add(new GriefPreventionFeature(griefpreventionPlugin, this));
+                managers.add(new GriefPreventionFeature(griefpreventionPlugin));
                 Fawe.debug("Plugin 'GriefPrevention' found. Using it now.");
             } catch (final Throwable e) {
                 MainUtil.handleError(e);
@@ -477,7 +475,7 @@ public class FaweBukkit implements IFawe, Listener {
         final Plugin aSkyBlock = Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock");
         if ((aSkyBlock != null) && aSkyBlock.isEnabled()) {
             try {
-                managers.add(new ASkyBlockHook(aSkyBlock, this));
+                managers.add(new ASkyBlockHook(aSkyBlock));
                 Fawe.debug("Plugin 'ASkyBlock' found. Using it now.");
             } catch (final Throwable e) {
                 MainUtil.handleError(e);

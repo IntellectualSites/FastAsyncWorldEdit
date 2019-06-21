@@ -166,21 +166,6 @@ public class Fawe {
         this.timer = new FaweTimer();
         Fawe.this.IMP.setupVault();
 
-        File jar = MainUtil.getJarFile();
-        // TODO FIXME remove extrablocks.json
-//        File extraBlocks = MainUtil.copyFile(jar, "extrablocks.json", null);
-//        if (extraBlocks != null && extraBlocks.exists()) {
-//            TaskManager.IMP.task(() -> {
-//                try {
-//                    BundledBlockData.getInstance().loadFromResource();
-//                    BundledBlockData.getInstance().add(extraBlocks.toURI().toURL(), true);
-//                } catch (Throwable ignore) {
-//                    ignore.printStackTrace();
-//                    Fawe.debug("Invalid format: extrablocks.json");
-//                }
-//            });
-//        }
-
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
@@ -206,11 +191,6 @@ public class Fawe {
         checkNotNull(chatManager);
         this.chatManager = chatManager;
     }
-
-    //    @Deprecated
-//    public boolean isJava8() {
-//        return isJava8;
-//    }
 
     public DefaultTransformParser getTransformParser() {
         return transformParser;

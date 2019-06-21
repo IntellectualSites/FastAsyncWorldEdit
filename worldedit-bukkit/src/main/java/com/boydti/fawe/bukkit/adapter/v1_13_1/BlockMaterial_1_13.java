@@ -1,9 +1,11 @@
 package com.boydti.fawe.bukkit.adapter.v1_13_1;
 
-import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_13_R2.Block;
+import net.minecraft.server.v1_13_R2.EnumPistonReaction;
+import net.minecraft.server.v1_13_R2.IBlockData;
+import net.minecraft.server.v1_13_R2.ITileEntity;
+import net.minecraft.server.v1_13_R2.Material;
 import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 
 public class BlockMaterial_1_13 implements BlockMaterial {
@@ -22,7 +24,7 @@ public class BlockMaterial_1_13 implements BlockMaterial {
         this.defaultState = defaultState;
         this.material = defaultState.getMaterial();
         this.craftBlockData = CraftBlockData.fromData(defaultState);
-        this.isTranslucent = ReflectionUtil.getField(Block.class, block, "n");
+        this.isTranslucent = block.f(defaultState); //isSolid
     }
 
     public Block getBlock() {

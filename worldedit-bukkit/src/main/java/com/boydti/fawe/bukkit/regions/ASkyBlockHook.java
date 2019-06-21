@@ -1,8 +1,8 @@
 package com.boydti.fawe.bukkit.regions;
 
-import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
 import com.wasteofplastic.askyblock.Island;
 import org.bukkit.Location;
@@ -12,13 +12,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class ASkyBlockHook extends BukkitMaskManager implements Listener {
-    FaweBukkit plugin;
-    Plugin aSkyBlock;
 
-    public ASkyBlockHook(final Plugin aSkyBlock, final FaweBukkit p3) {
+    public ASkyBlockHook(final Plugin aSkyBlock) {
         super(aSkyBlock.getName());
-        this.aSkyBlock = aSkyBlock;
-        this.plugin = p3;
 
     }
 
@@ -33,8 +29,6 @@ public class ASkyBlockHook extends BukkitMaskManager implements Listener {
 
         Island island = ASkyBlockAPI.getInstance().getIslandAt(location);
         if (island != null && isAllowed(player, island, type)) {
-            int minX = island.getMinProtectedX();
-            int minZ = island.getMinProtectedZ();
 
             World world = location.getWorld();
             Location center = island.getCenter();
@@ -42,7 +36,7 @@ public class ASkyBlockHook extends BukkitMaskManager implements Listener {
             Location pos2 = center.add(center.subtract(pos1));
             pos2.setY(255);
 
-            return new BukkitMask(pos1, pos2, "ISLAND: " + minX + "," + minZ) {
+            return new FaweMask(BukkitAdapter.adapt(pos1).toBlockPoint(), BukkitAdapter.adapt(pos2).toBlockPoint()) {
                 @Override
                 public boolean isValid(FawePlayer player, MaskType type) {
                     return isAllowed((Player) player.parent, island, type);

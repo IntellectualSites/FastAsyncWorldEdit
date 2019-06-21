@@ -4,13 +4,12 @@ import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector2;
-
-import java.util.ArrayDeque;
-import java.util.Collection;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.World;
 
+import java.util.ArrayDeque;
+import java.util.Collection;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,7 +22,7 @@ public class GriefPreventionFilter extends CuboidRegionFilter {
         this.claims = TaskManager.IMP.sync(new RunnableVal<Collection<Claim>>() {
             @Override
             public void run(Collection<Claim> claims) {
-                this.value = new ArrayDeque(GriefPrevention.instance.dataStore.getClaims());
+                this.value = new ArrayDeque<>(GriefPrevention.instance.dataStore.getClaims());
             }
         });
         this.world = world;
