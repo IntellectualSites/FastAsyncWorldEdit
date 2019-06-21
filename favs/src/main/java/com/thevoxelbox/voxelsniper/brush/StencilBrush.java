@@ -42,10 +42,7 @@ public class StencilBrush extends Brush {
     private int[] pastePoint = new int[3];
     private byte point = 1;
 
-    /**
-     *
-     */
-    public StencilBrush() {
+public StencilBrush() {
         this.setName("Stencil");
     }
 
@@ -60,8 +57,7 @@ public class StencilBrush extends Brush {
         final File file = new File("plugins/VoxelSniper/stencils/" + this.filename + ".vstencil");
 
         if (file.exists()) {
-            try {
-                final FaweInputStream in = new FaweInputStream(new DataInputStream(new GZIPInputStream(new BufferedInputStream(new FileInputStream(file)))));
+            try (final FaweInputStream in = new FaweInputStream(new DataInputStream(new GZIPInputStream(new BufferedInputStream(new FileInputStream(file)))))) {
 
                 this.x = in.readShort();
                 this.z = in.readShort();
@@ -222,62 +218,62 @@ public class StencilBrush extends Brush {
 
             Files.createParentDirs(file);
             file.createNewFile();
-            final FaweOutputStream out = new FaweOutputStream(new DataOutputStream(new PGZIPOutputStream(new BufferedOutputStream(new FileOutputStream(file)))));
-            int blockPositionX = Math.min(this.firstPoint[0], this.secondPoint[0]);
-            int blockPositionZ = Math.min(this.firstPoint[1], this.secondPoint[1]);
-            int blockPositionY = Math.min(this.firstPoint[2], this.secondPoint[2]);
-            out.writeShort(this.x);
-            out.writeShort(this.z);
-            out.writeShort(this.y);
-            out.writeShort(this.xRef);
-            out.writeShort(this.zRef);
-            out.writeShort(this.yRef);
+            try (FaweOutputStream out = new FaweOutputStream(new DataOutputStream(new PGZIPOutputStream(new BufferedOutputStream(new FileOutputStream(file)))))) {
+                int blockPositionX = Math.min(this.firstPoint[0], this.secondPoint[0]);
+                int blockPositionZ = Math.min(this.firstPoint[1], this.secondPoint[1]);
+                int blockPositionY = Math.min(this.firstPoint[2], this.secondPoint[2]);
+                out.writeShort(this.x);
+                out.writeShort(this.z);
+                out.writeShort(this.y);
+                out.writeShort(this.xRef);
+                out.writeShort(this.zRef);
+                out.writeShort(this.yRef);
 
-            v.sendMessage(ChatColor.AQUA + "Volume: " + this.x * this.z * this.y + " blockPositionX:" + blockPositionX + " blockPositionZ:" + blockPositionZ + " blockPositionY:" + blockPositionY);
+                v.sendMessage(ChatColor.AQUA + "Volume: " + this.x * this.z * this.y + " blockPositionX:" + blockPositionX + " blockPositionZ:" + blockPositionZ + " blockPositionY:" + blockPositionY);
 
-            int[] blockArray = new int[this.x * this.z * this.y];
-            byte[] runSizeArray = new byte[this.x * this.z * this.y];
+                int[] blockArray = new int[this.x * this.z * this.y];
+                byte[] runSizeArray = new byte[this.x * this.z * this.y];
 
-            int lastId = (this.getWorld().getBlockAt(blockPositionX, blockPositionY, blockPositionZ).getCombinedId());
-            int thisId;
-            int counter = 0;
-            int arrayIndex = 0;
-            for (int y = 0; y < this.y; y++) {
-                for (int z = 0; z < this.z; z++) {
-                    for (int x = 0; x < this.x; x++) {
-                        AsyncBlock currentBlock = getWorld().getBlockAt(blockPositionX + x, blockPositionY + y, blockPositionZ + z);
-                        thisId = (currentBlock.getCombinedId());
-                        if (thisId != lastId || counter == 255) {
-                            blockArray[arrayIndex] = lastId;
-                            runSizeArray[arrayIndex] = (byte) (counter - 128);
-                            arrayIndex++;
-                            counter = 1;
-                            lastId = thisId;
-                        } else {
-                            counter++;
-                            lastId = thisId;
+                int lastId = (this.getWorld().getBlockAt(blockPositionX, blockPositionY, blockPositionZ).getCombinedId());
+                int thisId;
+                int counter = 0;
+                int arrayIndex = 0;
+                for (int y = 0; y < this.y; y++) {
+                    for (int z = 0; z < this.z; z++) {
+                        for (int x = 0; x < this.x; x++) {
+                            AsyncBlock currentBlock = getWorld().getBlockAt(blockPositionX + x, blockPositionY + y, blockPositionZ + z);
+                            thisId = (currentBlock.getCombinedId());
+                            if (thisId != lastId || counter == 255) {
+                                blockArray[arrayIndex] = lastId;
+                                runSizeArray[arrayIndex] = (byte) (counter - 128);
+                                arrayIndex++;
+                                counter = 1;
+                                lastId = thisId;
+                            } else {
+                                counter++;
+                                lastId = thisId;
+                            }
                         }
                     }
                 }
-            }
-            blockArray[arrayIndex] = lastId; // saving last run, which will always be left over.
-            runSizeArray[arrayIndex] = (byte) (counter - 128);
+                blockArray[arrayIndex] = lastId; // saving last run, which will always be left over.
+                runSizeArray[arrayIndex] = (byte) (counter - 128);
 
-            out.writeInt(arrayIndex + 1);
-            // v.sendMessage("number of runs = " + arrayIndex);
-            for (int i = 0; i < arrayIndex + 1; i++) {
-                if (runSizeArray[i] > -127) {
-                    out.writeBoolean(true);
-                    out.writeByte(runSizeArray[i]);
-                    out.writeVarInt(blockArray[i]);
-                } else {
-                    out.writeBoolean(false);
-                    out.writeVarInt(blockArray[i]);
+                out.writeInt(arrayIndex + 1);
+                // v.sendMessage("number of runs = " + arrayIndex);
+                for (int i = 0; i < arrayIndex + 1; i++) {
+                    if (runSizeArray[i] > -127) {
+                        out.writeBoolean(true);
+                        out.writeByte(runSizeArray[i]);
+                        out.writeVarInt(blockArray[i]);
+                    } else {
+                        out.writeBoolean(false);
+                        out.writeVarInt(blockArray[i]);
+                    }
                 }
-            }
 
-            v.sendMessage(ChatColor.BLUE + "Saved as '" + this.filename + "'.");
-            out.close();
+                v.sendMessage(ChatColor.BLUE + "Saved as '" + this.filename + "'.");
+            }
 
         } catch (final Exception exception) {
             v.sendMessage(ChatColor.RED + "Something went wrong.");

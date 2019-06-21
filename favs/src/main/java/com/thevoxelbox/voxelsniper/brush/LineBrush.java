@@ -10,11 +10,6 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
-/**
- * @author Gavjenks
- * @author giltwist
- * @author MikeMatrix
- */
 public class LineBrush extends PerformBrush {
     private static final Vector HALF_BLOCK_OFFSET = new Vector(0.5, 0.5, 0.5);
     private Vector originCoords = null;

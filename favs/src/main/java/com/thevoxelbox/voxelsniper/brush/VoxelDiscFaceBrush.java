@@ -6,9 +6,7 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-/**
- * @author Voxel
- */
+
 public class VoxelDiscFaceBrush extends PerformBrush {
 
     public VoxelDiscFaceBrush() {

@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.regions;
 
-import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.object.FawePlayer;
 import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
@@ -13,11 +12,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 public class FactionsFeature extends BukkitMaskManager implements Listener {
-    FaweBukkit plugin;
 
-    public FactionsFeature(final Plugin factionsPlugin, final FaweBukkit p3) {
+    public FactionsFeature(final Plugin factionsPlugin) {
         super(factionsPlugin.getName());
-        this.plugin = p3;
     }
 
     @Override

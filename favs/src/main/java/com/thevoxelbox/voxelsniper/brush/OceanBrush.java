@@ -9,9 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
-/**
- * @author Voxel
- */
+
 public class OceanBrush extends Brush {
     private static final int WATER_LEVEL_DEFAULT = 62; // y=63 -- we are using array indices here
     private static final int WATER_LEVEL_MIN = 12;

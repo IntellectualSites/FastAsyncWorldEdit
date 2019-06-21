@@ -8,9 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
-/**
- * @author Voxel
- */
+
 public class SetRedstoneFlipBrush extends Brush {
     private Block block = null;
     private Undo undo;

@@ -10,18 +10,35 @@ import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
-import com.boydti.fawe.util.*;
+import com.boydti.fawe.util.EditSessionBuilder;
+import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.SetQueue;
+import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
-import com.sk89q.worldedit.extension.platform.*;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.extension.platform.PlayerProxy;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.regions.*;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CylinderRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionOperationException;
+import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
@@ -32,9 +49,12 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -263,7 +283,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             e = e.getCause();
         }
         if (e instanceof WorldEditException) {
-            sendMessage(BBC.getPrefix() + e.getLocalizedMessage());
+            sendMessage(e.getLocalizedMessage());
         } else {
             FaweException fe = FaweException.get(e);
             if (fe != null) {
@@ -333,7 +353,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             }
         } catch (Exception event) {
             Fawe.debug("====== INVALID CLIPBOARD ======");
-            MainUtil.handleError(event, false);
+            MainUtil.handleError(event);
             Fawe.debug("===============---=============");
             Fawe.debug("This shouldn't result in any failure");
             Fawe.debug("File: " + file.getName() + " (len:" + file.length() + ")");

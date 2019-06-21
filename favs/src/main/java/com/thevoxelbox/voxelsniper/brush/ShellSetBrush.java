@@ -9,9 +9,7 @@ import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 
-/**
- * @author Piotr
- */
+
 public class ShellSetBrush extends Brush {
     private static final int MAX_SIZE = 5000000;
     private Block block = null;

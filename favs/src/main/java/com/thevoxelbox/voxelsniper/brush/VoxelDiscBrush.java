@@ -5,9 +5,7 @@ import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 
-/**
- * @author Voxel
- */
+
 public class VoxelDiscBrush extends PerformBrush {
 
     public VoxelDiscBrush() {

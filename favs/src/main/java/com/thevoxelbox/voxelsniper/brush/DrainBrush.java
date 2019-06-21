@@ -6,10 +6,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 
-/**
- * @author Gavjenks
- * @author psanker
- */
 public class DrainBrush extends Brush {
     private double trueCircle = 0;
     private boolean disc = false;
@@ -18,7 +14,6 @@ public class DrainBrush extends Brush {
         this.setName("Drain");
     }
 
-    @SuppressWarnings("deprecation")
     private void drain(final SnipeData v) {
         final int brushSize = v.getBrushSize();
         final double brushSizeSquared = Math.pow(brushSize + this.trueCircle, 2);

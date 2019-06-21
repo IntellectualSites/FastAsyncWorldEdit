@@ -8,9 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 
-/**
- * @author DivineRage
- */
 public class ScannerBrush extends Brush {
     private static final int DEPTH_MIN = 1;
     private static final int DEPTH_DEFAULT = 24;

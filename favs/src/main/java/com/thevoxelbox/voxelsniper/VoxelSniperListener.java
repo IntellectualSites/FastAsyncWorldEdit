@@ -17,9 +17,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Voxel
- */
+
 public class VoxelSniperListener implements Listener {
 
     private static final String SNIPER_PERMISSION = "voxelsniper.sniper";

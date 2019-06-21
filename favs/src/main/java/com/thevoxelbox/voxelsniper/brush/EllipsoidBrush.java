@@ -72,7 +72,7 @@ public class EllipsoidBrush extends PerformBrush {
     }
 
     @Override
-    public final void parameters(final String[] par, final com.thevoxelbox.voxelsniper.SnipeData v) {
+    public final void parameters(final String[] par, final SnipeData v) {
         this.istrue = false;
         for (int i = 1; i < par.length; i++) {
             final String parameter = par[i];

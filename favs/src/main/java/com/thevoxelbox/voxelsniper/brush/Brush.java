@@ -123,7 +123,7 @@ public abstract class Brush implements IBrush {
         } else {
             RangeBlockHelper rangeBlockHelper;
             if (v.owner().getSnipeData(v.owner().getCurrentToolId()).isRanged()) {
-                rangeBlockHelper = new RangeBlockHelper(v.owner().getPlayer(), v.owner().getWorld(), (double) v.owner().getSnipeData(v.owner().getCurrentToolId()).getRange());
+                rangeBlockHelper = new RangeBlockHelper(v.owner().getPlayer(), v.owner().getWorld(), v.owner().getSnipeData(v.owner().getCurrentToolId()).getRange());
                 this.setTargetBlock(rangeBlockHelper.getRangeBlock());
             } else {
                 rangeBlockHelper = new RangeBlockHelper(v.owner().getPlayer(), v.owner().getWorld());
@@ -190,7 +190,6 @@ public abstract class Brush implements IBrush {
      * @param z Z coordinate
      * @return Type ID of Block at given coordinates in the world of the targeted Block.
      */
-    @SuppressWarnings("deprecation")
     protected int getBlockIdAt(int x, int y, int z) {
         return getWorld().getBlockAt(x, y, z).getTypeId();
     }

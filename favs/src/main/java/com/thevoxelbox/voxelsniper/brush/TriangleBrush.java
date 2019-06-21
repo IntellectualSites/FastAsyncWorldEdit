@@ -5,9 +5,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
-/**
- * @author Giltwist
- */
 public class TriangleBrush extends PerformBrush {
     private double[] coordsOne = new double[3]; // Three corners
     private double[] coordsTwo = new double[3];

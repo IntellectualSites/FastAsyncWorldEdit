@@ -5,9 +5,7 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 
-/**
- * @author Piotr
- */
+
 public class EntityBrush extends Brush {
     private EntityType entityType = EntityType.ZOMBIE;
 

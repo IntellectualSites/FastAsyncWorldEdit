@@ -6,6 +6,7 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 
 /**
  * Painting scrolling Brush.
+ *
  * @author Voxel
  */
 public class PaintingBrush extends Brush {

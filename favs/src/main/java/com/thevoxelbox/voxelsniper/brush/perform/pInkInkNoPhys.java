@@ -2,10 +2,9 @@ package com.thevoxelbox.voxelsniper.brush.perform;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.thevoxelbox.voxelsniper.Message;
+import com.thevoxelbox.voxelsniper.SnipeData;
 
-/**
- * @author Voxel
- */
+
 public class pInkInkNoPhys extends vPerformer {
 
     private int d;
@@ -16,7 +15,7 @@ public class pInkInkNoPhys extends vPerformer {
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
+    public void init(SnipeData v) {
         w = v.getWorld();
         d = v.getPropertyId();
         dr = v.getReplaceData();

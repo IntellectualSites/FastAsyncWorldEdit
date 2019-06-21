@@ -296,7 +296,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
     @Override
     public Chunk getNewChunk() {
-        return ((BukkitQueue_1_13) getParent()).getWorld().getChunkAt(getX(), getZ());
+        return getParent().getWorld().getChunkAt(getX(), getZ());
     }
 
     public void optimize() {

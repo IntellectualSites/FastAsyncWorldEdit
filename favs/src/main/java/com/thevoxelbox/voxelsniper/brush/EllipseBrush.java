@@ -6,9 +6,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
-/**
- * @author psanker
- */
 public class EllipseBrush extends PerformBrush {
     private static final double TWO_PI = (2 * Math.PI);
     private static final int SCL_MIN = 1;
@@ -177,7 +174,7 @@ public class EllipseBrush extends PerformBrush {
     }
 
     @Override
-    public final void parameters(final String[] par, final com.thevoxelbox.voxelsniper.SnipeData v) {
+    public final void parameters(final String[] par, final SnipeData v) {
         for (int i = 1; i < par.length; i++) {
             final String parameter = par[i];
 

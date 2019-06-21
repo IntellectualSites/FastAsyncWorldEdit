@@ -6,9 +6,6 @@ import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 import org.bukkit.util.Vector;
 
-/**
- * @author Gavjenks
- */
 public class RulerBrush extends Brush {
     private boolean first = true;
     private Vector coords = new Vector(0, 0, 0);

@@ -913,31 +913,31 @@ public final class BlockTypes {
         return $NAMESPACES;
     }
 
-    public static final @Nullable BlockType get(final String id) {
+    public static @Nullable BlockType get(final String id) {
         return $REGISTRY.get(id);
     }
 
-    public static final @Nullable BlockType get(final CharSequence id) {
+    public static @Nullable BlockType get(final CharSequence id) {
         return $REGISTRY.get(id);
     }
 
     @Deprecated
-    public static final BlockType get(final int ordinal) {
+    public static BlockType get(final int ordinal) {
         return values[ordinal];
     }
 
     @Deprecated
-    public static final BlockType getFromStateId(final int internalStateId) {
+    public static BlockType getFromStateId(final int internalStateId) {
         return values[internalStateId & BIT_MASK];
     }
 
     @Deprecated
-    public static final BlockType getFromStateOrdinal(final int internalStateOrdinal) {
+    public static BlockType getFromStateOrdinal(final int internalStateOrdinal) {
         return states[internalStateOrdinal].getBlockType();
     }
 
     public static int size() {
         return values.length;
     }
-    
+
 }

@@ -7,9 +7,6 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 import org.bukkit.block.BlockFace;
 
-/**
- * @author Voxel
- */
 public class DiscFaceBrush extends PerformBrush {
     private double trueCircle = 0;
 

@@ -8,9 +8,7 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
-/**
- * @author Voxel
- */
+
 public class FillDownBrush extends PerformBrush {
     private double trueCircle = 0;
     private boolean fillLiquid = true;
@@ -42,7 +40,9 @@ public class FillDownBrush extends PerformBrush {
                                 break;
                             }
                         }
-                        if (!found) continue;
+                        if (!found) {
+                            continue;
+                        }
                         y--;
                     }
                     for (; y >= -targetBlock.getY(); --y) {

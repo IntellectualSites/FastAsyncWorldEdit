@@ -20,8 +20,6 @@
 package com.sk89q.worldedit;
 
 import com.boydti.fawe.object.schematic.Schematic;
-import com.boydti.fawe.util.MainUtil;
-
 import com.sk89q.worldedit.command.ClipboardCommands;
 import com.sk89q.worldedit.command.FlattenedClipboardTransform;
 import com.sk89q.worldedit.command.SchematicCommands;
@@ -97,7 +95,6 @@ public class CuboidClipboard {
      */
     public CuboidClipboard(BlockVector3 size) {
         checkNotNull(size);
-        MainUtil.warnDeprecated(BlockArrayClipboard.class, ClipboardFormat.class);
         this.size = size;
         this.clipboard = this.init(BlockVector3.ZERO, BlockVector3.ZERO);
     }
@@ -117,7 +114,6 @@ public class CuboidClipboard {
     public CuboidClipboard(BlockVector3 size, BlockVector3 origin) {
         checkNotNull(size);
         checkNotNull(origin);
-        MainUtil.warnDeprecated(BlockArrayClipboard.class, ClipboardFormat.class);
         this.size = size;
         this.clipboard = init(BlockVector3.ZERO, origin);
     }
@@ -134,7 +130,6 @@ public class CuboidClipboard {
         checkNotNull(size);
         checkNotNull(origin);
         checkNotNull(offset);
-        MainUtil.warnDeprecated(BlockArrayClipboard.class, ClipboardFormat.class);
         this.size = size;
         this.clipboard = this.init(offset, origin);
     }

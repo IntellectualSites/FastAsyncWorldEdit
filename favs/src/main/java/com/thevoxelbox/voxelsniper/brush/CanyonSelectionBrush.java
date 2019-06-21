@@ -6,9 +6,7 @@ import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 
-/**
- * @author Voxel
- */
+
 public class CanyonSelectionBrush extends CanyonBrush {
     private boolean first = true;
     private int fx;

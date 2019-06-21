@@ -8,9 +8,7 @@ import org.bukkit.ChatColor;
 
 import java.util.Random;
 
-/**
- * @author Voxel
- */
+
 public class SplatterDiscBrush extends PerformBrush {
     private static final int GROW_PERCENT_MIN = 1;
     private static final int GROW_PERCENT_DEFAULT = 1000;
@@ -90,8 +88,9 @@ public class SplatterDiscBrush extends PerformBrush {
 
             // integrate tempsplat back into splat at end of iteration
             for (int x = 2 * v.getBrushSize(); x >= 0; x--) {
-                if (2 * v.getBrushSize() + 1 >= 0)
+                if (2 * v.getBrushSize() + 1 >= 0) {
                     System.arraycopy(tempSplat[x], 0, splat[x], 0, 2 * v.getBrushSize() + 1);
+                }
             }
         }
         this.growPercent = gref;

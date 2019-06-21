@@ -10,9 +10,7 @@ import org.bukkit.block.Block;
 import java.util.EnumSet;
 import java.util.Set;
 
-/**
- * @author Voxel
- */
+
 public class EraserBrush extends Brush {
 
     private static final Set<Material> EXCLUSIVE_MATERIALS = EnumSet.of(

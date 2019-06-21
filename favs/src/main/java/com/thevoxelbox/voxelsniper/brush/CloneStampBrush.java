@@ -6,13 +6,11 @@ import org.bukkit.ChatColor;
 
 /**
  * The CloneStamp class is used to create a collection of blocks in a cylinder shape according to the selection the player has set.
+ *
  * @author Voxel
  */
 public class CloneStampBrush extends StampBrush {
-    /**
-     *
-     */
-    public CloneStampBrush() {
+public CloneStampBrush() {
         this.setName("Clone");
     }
 
@@ -107,7 +105,7 @@ public class CloneStampBrush extends StampBrush {
     }
 
     @Override
-    public final void parameters(final String[] par, final com.thevoxelbox.voxelsniper.SnipeData v) {
+    public final void parameters(final String[] par, final SnipeData v) {
         final String parameter = par[1];
 
         if (parameter.equalsIgnoreCase("info")) {

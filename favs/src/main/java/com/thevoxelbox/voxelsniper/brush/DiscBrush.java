@@ -7,9 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
-/**
- * @author Voxel
- */
 public class DiscBrush extends PerformBrush {
     private double trueCircle = 0;
 

@@ -89,12 +89,10 @@ public class RandomTextureUtil extends CachedTextureUtil {
         BlockType res = super.getNearestBlock(offsetColor);
         if (res == null) return null;
         int newColor = getColor(res);
-        {
-            byte dr = (byte) (((color >> 16) & 0xFF) - ((newColor >> 16) & 0xFF));
-            byte dg = (byte) (((color >> 8) & 0xFF) - ((newColor >> 8) & 0xFF));
-            byte db = (byte) (((color >> 0) & 0xFF) - ((newColor >> 0) & 0xFF));
-            offsets.put(color, (Integer) ((dr << 16) + (dg << 8) + (db << 0)));
-        }
+        byte dr = (byte) (((color >> 16) & 0xFF) - ((newColor >> 16) & 0xFF));
+        byte dg = (byte) (((color >> 8) & 0xFF) - ((newColor >> 8) & 0xFF));
+        byte db = (byte) (((color >> 0) & 0xFF) - ((newColor >> 0) & 0xFF));
+        offsets.put(color, (Integer) ((dr << 16) + (dg << 8) + (db << 0)));
         return res;
     }
 }

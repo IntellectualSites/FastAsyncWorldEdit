@@ -1,5 +1,7 @@
 package com.boydti.fawe.util;
 
+import java.util.Arrays;
+
 public class FaweTimer implements Runnable {
 
     private final double[] history = new double[]{20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d, 20d};
@@ -7,7 +9,6 @@ public class FaweTimer implements Runnable {
     private long lastPoll = System.currentTimeMillis();
     private long tickStart = System.currentTimeMillis();
     private final long tickInterval = 5;
-    private final double millisPer20Interval = tickInterval * 50 * 20;
     private long tick = 0;
     private long tickMod = 0;
 
@@ -24,6 +25,7 @@ public class FaweTimer implements Runnable {
         if (timeSpent == 0) {
             timeSpent = 1;
         }
+        double millisPer20Interval = tickInterval * 50 * 20;
         double tps = millisPer20Interval / timeSpent;
         history[historyIndex++] = tps;
         if (historyIndex >= history.length) {
@@ -39,10 +41,7 @@ public class FaweTimer implements Runnable {
         if (tick < lastGetTPSTick + tickInterval) {
             return lastGetTPSValue;
         }
-        double total = 0;
-        for (double tps : history) {
-            total += tps;
-        }
+        double total = Arrays.stream(history).sum();
         lastGetTPSValue = total / history.length;
         lastGetTPSTick = tick;
         return lastGetTPSValue;

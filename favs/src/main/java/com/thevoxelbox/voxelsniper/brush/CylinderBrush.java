@@ -6,9 +6,6 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
-/**
- * @author Kavutop
- */
 public class CylinderBrush extends PerformBrush {
     private double trueCircle = 0;
 

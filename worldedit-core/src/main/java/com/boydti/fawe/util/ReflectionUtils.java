@@ -1,5 +1,9 @@
 package com.boydti.fawe.util;
 
+import sun.reflect.ConstructorAccessor;
+import sun.reflect.FieldAccessor;
+import sun.reflect.ReflectionFactory;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -7,17 +11,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
-import sun.reflect.ConstructorAccessor;
-import sun.reflect.FieldAccessor;
-import sun.reflect.ReflectionFactory;
-
-/**
- * @author DPOH-VAR
- * @version 1.0
- */
-@SuppressWarnings({"UnusedDeclaration", "rawtypes"})
 public class ReflectionUtils {
     public static <T> T as(Class<T> t, Object o) {
         return t.isInstance(o) ? t.cast(o) : null;
@@ -74,46 +74,6 @@ public class ReflectionUtils {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public static <T extends Enum<?>> void clearEnum(Class<T> enumType) {
-        // 0. Sanity checks
-        if (!Enum.class.isAssignableFrom(enumType)) {
-            throw new RuntimeException("class " + enumType + " is not an instance of Enum");
-        }
-        // 1. Lookup "$VALUES" holder in enum class and get previous enum instances
-        Field valuesField = null;
-        Field[] fields = enumType.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getName().contains("$VALUES")) {
-                valuesField = field;
-                break;
-            }
-        }
-        AccessibleObject.setAccessible(new Field[]{valuesField}, true);
-        try {
-            setFailsafeFieldValue(valuesField, null, Array.newInstance(enumType, 0));
-            // 6. Clean enum cache
-            cleanEnumCache(enumType);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public static <T extends Enum<?>> void copyEnum(T dest, String value, Class<?>[] additionalTypes, Object[] additionalValues) {
-        try {
-            Class<? extends Enum> clazz = dest.getClass();
-            Object newEnum = makeEnum(clazz, value, dest.ordinal(), additionalTypes, additionalValues);
-            for (Field field : clazz.getDeclaredFields()) {
-                if (Modifier.isStatic(field.getModifiers())) continue;
-                field.setAccessible(true);
-                Object newValue = field.get(newEnum);
-                setField(field, dest, newValue);
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
         }
     }
 
@@ -355,15 +315,6 @@ public class ReflectionUtils {
             return (T) field.get(instance);
         } catch (final Exception ex) {
             throw new RuntimeException(ex);
-        }
-    }
-
-    public static void setField(String fieldName, Object instance, Object value) {
-        try {
-            Field field = instance.getClass().getDeclaredField(fieldName);
-            setField(field, instance, value);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
         }
     }
 

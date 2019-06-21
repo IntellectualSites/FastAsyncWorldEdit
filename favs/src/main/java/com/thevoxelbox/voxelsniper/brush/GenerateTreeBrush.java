@@ -14,9 +14,6 @@ import java.util.Random;
 
 // Proposal: Use /v and /vr for leave and wood material // or two more parameters -- Monofraps
 
-/**
- * @author Ghost8700 @ Voxel
- */
 public class GenerateTreeBrush extends Brush {
     // Tree Variables.
     private Random randGenerator = new Random();
@@ -43,10 +40,7 @@ public class GenerateTreeBrush extends Brush {
     private int blockPositionY;
     private int blockPositionZ;
 
-    /**
-     *
-     */
-    public GenerateTreeBrush() {
+public GenerateTreeBrush() {
         this.setName("Generate Tree");
     }
 
@@ -79,7 +73,6 @@ public class GenerateTreeBrush extends Brush {
     }
 
     // Branch Creation based on direction chosen from the parameters passed.
-    @SuppressWarnings("deprecation")
     private void branchCreate(final int xDirection, final int zDirection) {
 
         // Sets branch origin.
@@ -123,7 +116,6 @@ public class GenerateTreeBrush extends Brush {
         blockPositionZ = originZ;
     }
 
-    @SuppressWarnings("deprecation")
     private void leafNodeCreate() {
         // Generates the node size.
         final int nodeRadius = this.randGenerator.nextInt(this.nodeMax - this.nodeMin + 1) + this.nodeMin;
@@ -221,7 +213,6 @@ public class GenerateTreeBrush extends Brush {
      * @param xDirection
      * @param zDirection
      */
-    @SuppressWarnings("deprecation")
     private void rootCreate(final int xDirection, final int zDirection) {
         // Sets Origin.
         final int originX = blockPositionX;
@@ -311,7 +302,6 @@ public class GenerateTreeBrush extends Brush {
         this.rootCreate(-1, -1);
     }
 
-    @SuppressWarnings("deprecation")
     private void trunkCreate() {
         // Creates true circle discs of the set size using the wood type selected.
         final double bSquared = Math.pow(this.thickness + 0.5, 2);

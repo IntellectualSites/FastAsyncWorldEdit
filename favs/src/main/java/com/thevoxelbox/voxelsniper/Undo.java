@@ -1,4 +1,4 @@
-/**
+/*
  This file is part of VoxelSniper, licensed under the MIT License (MIT).
 
  Copyright (c) The VoxelBox <http://thevoxelbox.com>

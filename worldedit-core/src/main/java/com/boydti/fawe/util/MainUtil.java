@@ -3,19 +3,35 @@ package com.boydti.fawe.util;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.*;
+import com.boydti.fawe.object.FaweInputStream;
+import com.boydti.fawe.object.FaweOutputStream;
+import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.RegionWrapper;
+import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
 import com.boydti.fawe.object.changeset.FaweStreamChangeSet;
 import com.boydti.fawe.object.io.AbstractDelegateOutputStream;
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
-import com.sk89q.jnbt.*;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.DoubleTag;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
-import net.jpountz.lz4.*;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
+import net.jpountz.lz4.LZ4InputStream;
+import net.jpountz.lz4.LZ4Utils;
 
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
@@ -24,23 +40,41 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.UUID;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import java.util.zip.*;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.Inflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static java.lang.System.arraycopy;
 
@@ -103,10 +137,6 @@ public class MainUtil {
         int pos = version.indexOf('.');
         pos = version.indexOf('.', pos + 1);
         return Double.parseDouble(version.substring(0, pos));
-    }
-
-    public static void stacktrace() {
-        new Exception().printStackTrace();
     }
 
     public static void traverse(Path path, final BiConsumer<Path, BasicFileAttributes> onEach) {
@@ -201,10 +231,6 @@ public class MainUtil {
         return getFile(base, path.endsWith("." + extension) ? path : path + "." + extension);
     }
 
-    public static FaweOutputStream getCompressedOS(OutputStream os) throws IOException {
-        return getCompressedOS(os, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
-    }
-
     public static long getSize(ChangeSet changeSet) {
         if (changeSet instanceof FaweStreamChangeSet) {
             FaweStreamChangeSet fscs = (FaweStreamChangeSet) changeSet;
@@ -230,7 +256,7 @@ public class MainUtil {
         return LZ4Utils.maxCompressedLength(size);
     }
 
-    public static byte[] compress(byte[] bytes, byte[] buffer, Deflater deflate) throws IOException {
+    public static byte[] compress(byte[] bytes, byte[] buffer, Deflater deflate) {
         if (buffer == null) {
             buffer = new byte[8192];
         }
@@ -359,7 +385,7 @@ public class MainUtil {
     }
 
     public static URL upload(UUID uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
-        return upload(Settings.IMP.WEB.URL, uuid != null, uuid != null ? uuid.toString() : (String) null, file, extension, writeTask);
+        return upload(Settings.IMP.WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
     public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, final RunnableVal<OutputStream> writeTask) {
@@ -397,7 +423,7 @@ public class MainUtil {
                 writer.append(CRLF).flush();
                 OutputStream nonClosable = new AbstractDelegateOutputStream(new BufferedOutputStream(output)) {
                     @Override
-                    public void close() throws IOException {
+                    public void close() {
                     } // Don't close
                 };
                 writeTask.value = nonClosable;
@@ -444,36 +470,6 @@ public class MainUtil {
         }
     }
 
-    private static final Class[] parameters = new Class[]{URL.class};
-
-    public static ClassLoader loadURLClasspath(URL u) throws IOException {
-        ClassLoader sysloader = ClassLoader.getSystemClassLoader();
-
-        Class sysclass = URLClassLoader.class;
-
-        try {
-            Method method = sysclass.getDeclaredMethod("addURL", parameters);
-            method.setAccessible(true);
-            if (sysloader instanceof URLClassLoader) {
-                method.invoke(sysloader, new Object[]{u});
-            } else {
-                ClassLoader loader = MainUtil.class.getClassLoader();
-                while (!(loader instanceof URLClassLoader) && loader.getParent() != null) {
-                    loader = loader.getParent();
-                }
-                if (loader instanceof URLClassLoader) {
-                    method.invoke(sysloader, new Object[]{u});
-                } else {
-                    loader = new URLClassLoader(new URL[]{u}, MainUtil.class.getClassLoader());
-                    return loader;
-                }
-            }
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-        return sysloader;
-    }
-
     public static String getText(String url) throws IOException {
         try (Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8")) {
             return scanner.useDelimiter("\\A").next();
@@ -481,8 +477,8 @@ public class MainUtil {
     }
 
     public static void download(URL url, File out) throws IOException {
-        File parent = out.getParentFile();
         if (!out.exists()) {
+            File parent = out.getParentFile();
             if (parent != null) {
                 parent.mkdirs();
             }
@@ -666,30 +662,10 @@ public class MainUtil {
     }
 
     public static void handleError(Throwable e) {
-        handleError(e, true);
-    }
-
-    public static void handleError(Throwable e, boolean debug) {
         if (e == null) {
             return;
         }
-//        if (!debug) {
-        e.printStackTrace();
-        return;
-//        }
-//        String header = "====== FAWE: " + e.getLocalizedMessage() + " ======";
-//        Fawe.debug(header);
-//        String[] trace = getTrace(e);
-//        for (int i = 0; i < trace.length && i < 8; i++) {
-//            Fawe.debug(" - " + trace[i]);
-//        }
-//        String[] cause = getTrace(e.getCause());
-//        Fawe.debug("Cause: " + (cause.length == 0 ? "N/A" : ""));
-//        for (int i = 0; i < cause.length && i < 8; i++) {
-//            Fawe.debug(" - " + cause[i]);
-//        }
-//        Fawe.debug(StringMan.repeat("=", header.length()));
-    }
+        e.printStackTrace();    }
 
     public static String[] getTrace(Throwable e) {
         if (e == null) {
@@ -732,40 +708,10 @@ public class MainUtil {
         return msg;
     }
 
-    public static void warnDeprecated(Class... alternatives) {
-        StackTraceElement[] stacktrace = new RuntimeException().getStackTrace();
-        if (stacktrace.length > 1) {
-            for (int i = 1; i < stacktrace.length; i++) {
-                StackTraceElement stack = stacktrace[i];
-                String s = stack.toString();
-                if (s.startsWith("com.sk89q")) {
-                    continue;
-                }
-                try {
-                    StackTraceElement creatorElement = stacktrace[1];
-                    String className = creatorElement.getClassName();
-                    Class clazz = Class.forName(className);
-                    String creator = clazz.getSimpleName();
-                    String packageName = clazz.getPackage().getName();
-
-                    StackTraceElement deprecatedElement = stack;
-                    String myName = Class.forName(deprecatedElement.getClassName()).getSimpleName();
-                    Fawe.debug("@" + creator + " used by " + myName + "." + deprecatedElement.getMethodName() + "():" + deprecatedElement.getLineNumber() + " is deprecated.");
-                    Fawe.debug(" - Alternatives: " + StringMan.getString(alternatives));
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                } finally {
-                    break;
-                }
-            }
-        }
-    }
-
     public static int[] regionNameToCoords(String fileName) {
         int[] res = new int[2];
         int len = fileName.length() - 4;
         int val = 0;
-        boolean neg = false;
         boolean reading = false;
         int index = 1;
         int numIndex = 1;
@@ -904,7 +850,9 @@ public class MainUtil {
         StringBuilder toreturn = new StringBuilder();
         if (time >= 33868800) {
             int years = (int) (time / 33868800);
-            time -= years * 33868800;
+            int time1 = years * 33868800;
+            System.out.println(time1);
+            time -= time1;
             toreturn.append(years + "y ");
         }
         if (time >= 604800) {
@@ -980,10 +928,6 @@ public class MainUtil {
         return time;
     }
 
-    public static void deleteOlder(File directory, final long timeDiff) {
-        deleteOlder(directory, timeDiff, true);
-    }
-
     public static void deleteOlder(File directory, final long timeDiff, boolean printDebug) {
         final long now = System.currentTimeMillis();
         ForkJoinPool pool = new ForkJoinPool();
@@ -1000,45 +944,6 @@ public class MainUtil {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean deleteDirectory(File directory) {
-        return deleteDirectory(directory, true);
-    }
-
-    public static boolean deleteDirectory(File directory, boolean printDebug) {
-        if (directory.exists()) {
-            File[] files = directory.listFiles();
-            if (null != files) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        deleteDirectory(file, printDebug);
-                    } else {
-                        file.delete();
-                        if (printDebug) BBC.FILE_DELETED.send(null, file);
-                    }
-                }
-            }
-        }
-        return (directory.delete());
-    }
-
-    public static boolean isValidTag(Tag tag) {
-        if (tag instanceof EndTag) {
-            return false;
-        } else if (tag instanceof ListTag) {
-            ListTag lt = (ListTag) tag;
-            if ((lt).getType() == EndTag.class) {
-                return false;
-            }
-        } else if (tag instanceof CompoundTag) {
-            for (Entry<String, Tag> entry : ((CompoundTag) tag).getValue().entrySet()) {
-                if (!isValidTag(entry.getValue())) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     public enum OS {

@@ -19,11 +19,6 @@ import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.Random;
 
-/**
- * @author Monofraps
- * @author Deamon
- * @author MikeMatrix
- */
 public class PunishBrush extends PerformBrush {
     private static final int MAXIMAL_RANDOM_TELEPORTATION_RANGE = 400;
     private static final int TICKS_PER_SECOND = 20;
@@ -313,9 +308,6 @@ public class PunishBrush extends PerformBrush {
         return "voxelsniper.brush.punish";
     }
 
-    /**
-     * @author Monofraps
-     */
     private enum Punishment {
         // Monofraps
         FIRE, LIGHTNING, BLINDNESS, DRUNK, KILL, RANDOMTP, ALL_POTION,

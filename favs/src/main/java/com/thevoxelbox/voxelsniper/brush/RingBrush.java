@@ -6,9 +6,7 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
-/**
- * @author Voxel
- */
+
 public class RingBrush extends PerformBrush {
     private double trueCircle = 0;
     private double innerSize = 0;

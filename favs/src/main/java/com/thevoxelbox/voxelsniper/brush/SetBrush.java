@@ -6,9 +6,7 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
-/**
- * @author Voxel
- */
+
 public class SetBrush extends PerformBrush {
     private static final int SELECTION_SIZE_MAX = 5000000;
     private Block block = null;

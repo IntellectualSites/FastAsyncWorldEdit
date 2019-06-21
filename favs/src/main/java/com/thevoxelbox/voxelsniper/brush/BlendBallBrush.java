@@ -35,7 +35,7 @@ public class BlendBallBrush extends BlendBrushBase {
         for (int x = 0; x <= brushSizeDoubled; x++) {
             for (int y = 0; y <= brushSizeDoubled; y++) {
                 System.arraycopy(oldMaterials[x + 1][y + 1], 1, newMaterials[x][y], 0,
-                        brushSizeDoubled + 1);
+                                 brushSizeDoubled + 1);
             }
         }
 
@@ -85,7 +85,7 @@ public class BlendBallBrush extends BlendBrushBase {
         final Undo undo = new Undo();
         final double rSquared = Math.pow(brushSize + 1, 2);
 
-        // Make the changes  
+        // Make the changes
         for (int x = brushSizeDoubled; x >= 0; x--) {
             final double xSquared = Math.pow(x - brushSize - 1, 2);
 

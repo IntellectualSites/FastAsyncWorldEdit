@@ -6,7 +6,6 @@ import com.boydti.fawe.bukkit.chat.BukkitChatManager;
 import com.boydti.fawe.bukkit.listener.AsyncTabCompleteListener;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
-import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.RenderListener;
 import com.boydti.fawe.bukkit.listener.SyncTabCompleteListener;
 import com.boydti.fawe.bukkit.regions.ASkyBlockHook;
@@ -429,7 +428,7 @@ public class FaweBukkit implements IFawe, Listener {
         final Plugin factionsPlugin = Bukkit.getServer().getPluginManager().getPlugin("Factions");
         if ((factionsPlugin != null) && factionsPlugin.isEnabled()) {
             try {
-                managers.add(new FactionsFeature(factionsPlugin, this));
+                managers.add(new FactionsFeature(factionsPlugin));
                 Fawe.debug("Plugin 'Factions' found. Using it now.");
             } catch (final Throwable e) {
                 try {

@@ -123,8 +123,8 @@ public class EntityRemovalBrush extends Brush {
 
                 // +#/-# will suppress auto-prefixing
                 final String exemptionPattern = currentParam.startsWith("+#") || currentParam.startsWith("-#") ?
-                        currentParam.substring(2) :
-                        (currentParam.contains(".") ? currentParam.substring(1) : ".*." + currentParam.substring(1));
+                                                currentParam.substring(2) :
+                                                (currentParam.contains(".") ? currentParam.substring(1) : ".*." + currentParam.substring(1));
 
                 if (isAddOperation) {
                     exemptions.add(exemptionPattern);

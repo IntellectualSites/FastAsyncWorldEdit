@@ -4,9 +4,6 @@ import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-/**
- * @author MikeMatrix
- */
 public class BlockWrapper {
 
     private int id;
@@ -17,10 +14,6 @@ public class BlockWrapper {
     private int data;
     private World world;
 
-    /**
-     * @param block
-     */
-    @SuppressWarnings("deprecation")
     public BlockWrapper(final AsyncBlock block) {
         this.setId(block.getTypeId());
         this.setX(block.getX());

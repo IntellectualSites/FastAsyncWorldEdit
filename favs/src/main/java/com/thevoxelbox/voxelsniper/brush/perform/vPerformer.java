@@ -6,12 +6,11 @@ package com.thevoxelbox.voxelsniper.brush.perform;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.thevoxelbox.voxelsniper.Message;
+import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.World;
 
-/**
- * @author Voxel
- */
+
 public abstract class vPerformer {
 
     public String name = "Performer";
@@ -20,7 +19,7 @@ public abstract class vPerformer {
 
     public abstract void info(Message vm);
 
-    public abstract void init(com.thevoxelbox.voxelsniper.SnipeData v);
+    public abstract void init(SnipeData v);
 
     public void setUndo() {
         h = new Undo();

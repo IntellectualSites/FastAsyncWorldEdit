@@ -7,9 +7,6 @@ import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
-/**
- * @author psanker
- */
 public class CleanSnowBrush extends Brush {
     private double trueCircle = 0;
 

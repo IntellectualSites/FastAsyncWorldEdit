@@ -12,10 +12,6 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-/**
- * @author Giltwist
- * @author Monofraps
- */
 public class JaggedLineBrush extends PerformBrush {
     private static final Vector HALF_BLOCK_OFFSET = new Vector(0.5, 0.5, 0.5);
     private static final int RECURSION_MIN = 1;

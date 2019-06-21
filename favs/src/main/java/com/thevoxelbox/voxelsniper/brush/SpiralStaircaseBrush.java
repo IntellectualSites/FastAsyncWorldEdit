@@ -1,7 +1,6 @@
 package com.thevoxelbox.voxelsniper.brush;
 
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
@@ -9,9 +8,6 @@ import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
-/**
- * @author giltwist
- */
 public class SpiralStaircaseBrush extends Brush {
     private String stairtype = "block"; // "block" 1x1 blocks (default), "step" alternating step double step, "stair" staircase with blocks on corners
     private String sdirect = "c"; // "c" clockwise (default), "cc" counter-clockwise
@@ -21,7 +17,6 @@ public class SpiralStaircaseBrush extends Brush {
         this.setName("Spiral Staircase");
     }
 
-    @SuppressWarnings("deprecation")
     private void buildStairWell(final SnipeData v, Block targetBlock) {
         if (v.getVoxelHeight() < 1) {
             v.setVoxelHeight(1);
@@ -32,12 +27,9 @@ public class SpiralStaircaseBrush extends Brush {
 
         // locate first block in staircase
         // Note to self, fix these
-        int startX = 0;
-        int startZ = 0;
+        int startX;
+        int startZ;
         int y = 0;
-        int xOffset = 0;
-        int zOffset = 0;
-        int toggle = 0;
 
         if (this.sdirect.equalsIgnoreCase("cc")) {
             if (this.sopen.equalsIgnoreCase("n")) {
@@ -69,6 +61,9 @@ public class SpiralStaircaseBrush extends Brush {
             }
         }
 
+        int xOffset = 0;
+        int zOffset = 0;
+        int toggle = 0;
         while (y < v.getVoxelHeight()) {
             if (this.stairtype.equalsIgnoreCase("block")) {
                 // 1x1x1 voxel material steps
@@ -218,9 +213,6 @@ public class SpiralStaircaseBrush extends Brush {
 
                             break;
                         case 1:
-                            switch (stairtype) {
-
-                            }
                             if (this.stairtype.equalsIgnoreCase("block")) {
                                 this.setBlockIdAt(blockPositionZ - v.getBrushSize() + z, blockPositionX - v.getBrushSize() + x, blockPositionY + i, v.getVoxelId());
                             } else if (this.stairtype.equalsIgnoreCase("step")) {
@@ -253,7 +245,6 @@ public class SpiralStaircaseBrush extends Brush {
         v.owner().storeUndo(undo);
     }
 
-    @SuppressWarnings("deprecation")
     private void digStairWell(final SnipeData v, Block targetBlock) {
         if (v.getVoxelHeight() < 1) {
             v.setVoxelHeight(1);
@@ -265,12 +256,8 @@ public class SpiralStaircaseBrush extends Brush {
 
         // locate first block in staircase
         // Note to self, fix these
-        int startX = 0;
-        int startZ = 0;
-        int y = 0;
-        int xOffset = 0;
-        int zOffset = 0;
-        int toggle = 0;
+        int startX;
+        int startZ;
 
         if (this.sdirect.equalsIgnoreCase("cc")) {
             if (this.sopen.equalsIgnoreCase("n")) {
@@ -302,6 +289,10 @@ public class SpiralStaircaseBrush extends Brush {
             }
         }
 
+        int xOffset = 0;
+        int zOffset = 0;
+        int toggle = 0;
+        int y = 0;
         while (y < v.getVoxelHeight()) {
             if (this.stairtype.equalsIgnoreCase("block")) {
                 // 1x1x1 voxel material steps
@@ -517,13 +508,10 @@ public class SpiralStaircaseBrush extends Brush {
             // step/slab
 
             try {
-                BlockType type = BlockTypes.parse(par[i]);
                 this.stairtype = par[i].toLowerCase().intern();
                 v.sendMessage(ChatColor.BLUE + "Staircase type: " + this.stairtype);
                 return;
             } catch (InputParseException ignore) {
-            }
-            if ("block".equals(par[i].toLowerCase())) {
             }
             if (par[i].equalsIgnoreCase("block") || par[i].equalsIgnoreCase("step") || par[i].equalsIgnoreCase("woodstair") || par[i].equalsIgnoreCase("cobblestair")) {
                 this.stairtype = par[i].toLowerCase().intern();

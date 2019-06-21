@@ -7,9 +7,6 @@ import org.bukkit.ChatColor;
 
 import java.util.Random;
 
-/**
- * @author Giltwist
- */
 public class BlobBrush extends PerformBrush {
     private static final int GROW_PERCENT_DEFAULT = 1000;
     private static final int GROW_PERCENT_MIN = 1;
@@ -96,7 +93,7 @@ public class BlobBrush extends PerformBrush {
 
         final double rSquared = Math.pow(brushSize + 1, 2);
 
-        // Make the changes        
+        // Make the changes
         for (int x = brushSizeDoubled; x >= 0; x--) {
             final double xSquared = Math.pow(x - brushSize - 1, 2);
 

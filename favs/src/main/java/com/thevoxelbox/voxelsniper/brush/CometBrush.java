@@ -8,11 +8,6 @@ import org.bukkit.entity.LargeFireball;
 import org.bukkit.entity.SmallFireball;
 import org.bukkit.util.Vector;
 
-/**
- * @author Gavjenks Heavily revamped from ruler brush blockPositionY
- * @author Giltwist
- * @author Monofraps (Merged Meteor brush)
- */
 public class CometBrush extends Brush {
     private boolean useBigBalls = false;
 

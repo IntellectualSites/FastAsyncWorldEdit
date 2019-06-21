@@ -7,10 +7,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
-/**
- * @author jmck95 Credit to GavJenks for framework and 95 of code. Big Thank you to GavJenks
- */
-
 public class UnderlayBrush extends PerformBrush {
     private static final int DEFAULT_DEPTH = 3;
     private int depth = DEFAULT_DEPTH;
@@ -43,8 +39,6 @@ public class UnderlayBrush extends PerformBrush {
                                     }
                                     break;
 
-                                } else {
-                                    continue;
                                 }
                             } else {
                                 for (int d = 0; (d < this.depth); d++) {
@@ -86,8 +80,6 @@ public class UnderlayBrush extends PerformBrush {
                                         memory[x + v.getBrushSize()][z + v.getBrushSize()] = 1; // stop it from checking any other blocks in this vertical 1x1 column.
                                     }
                                     break;
-                                } else {
-                                    continue;
                                 }
                             } else {
                                 for (int d = -1; (d < this.depth - 1); d++) {

@@ -7,9 +7,7 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.util.BlockWrapper;
 import org.bukkit.ChatColor;
 
-/**
- * @author Piotr
- */
+
 public class Rot2DBrush extends Brush {
     private int mode = 0;
     private int bSize;

@@ -6,10 +6,9 @@ package com.thevoxelbox.voxelsniper.brush.perform;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.thevoxelbox.voxelsniper.Message;
+import com.thevoxelbox.voxelsniper.SnipeData;
 
-/**
- * @author Voxel
- */
+
 public class pMatCombo extends vPerformer {
 
     private int dr;
@@ -21,7 +20,7 @@ public class pMatCombo extends vPerformer {
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
+    public void init(SnipeData v) {
         w = v.getWorld();
         dr = v.getReplaceData();
         i = v.getVoxelId();

@@ -12,10 +12,6 @@ import org.bukkit.Material;
 import org.bukkit.TreeType;
 import org.bukkit.block.BlockFace;
 
-
-/**
- * @author Mick
- */
 public class TreeSnipeBrush extends Brush {
     private TreeType treeType = TreeType.TREE;
 

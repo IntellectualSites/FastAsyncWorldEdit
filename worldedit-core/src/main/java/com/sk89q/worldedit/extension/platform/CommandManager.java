@@ -477,7 +477,7 @@ public final class CommandManager {
                 }
             } else {
                 String message = e.getMessage();
-                actor.printRaw(BBC.getPrefix() + (message != null ? message : "The command was not used properly (no more help available)."));
+                actor.printRaw((message != null ? message : "The command was not used properly (no more help available)."));
                 BBC.COMMAND_SYNTAX.send(actor, e.getSimpleUsageString("/"));
             }
         } catch (CommandException e) {
@@ -534,7 +534,11 @@ public final class CommandManager {
                     return;
                 }
             }
-            if (!fp.runAction(() -> handleCommandOnCurrentThread(finalEvent), false, true)) {
+            if (!fp.runAction(new Runnable() {
+                @Override public void run() {
+                    CommandManager.this.handleCommandOnCurrentThread(finalEvent);
+                }
+            }, false, true)) {
                 BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
             }
             finalEvent.setCancelled(true);

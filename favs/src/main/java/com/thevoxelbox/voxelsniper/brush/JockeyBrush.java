@@ -12,10 +12,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.List;
 
-/**
- * @author Voxel
- * @author Monofraps
- */
 public class JockeyBrush extends Brush {
     private static final int ENTITY_STACK_LIMIT = 50;
     private JockeyType jockeyType = JockeyType.NORMAL_ALL_ENTITIES;
@@ -138,11 +134,11 @@ public class JockeyBrush extends Brush {
 
     @Override
     public final void parameters(final String[] par, final SnipeData v) {
-        boolean inverse = false;
-        boolean playerOnly = false;
-        boolean stack = false;
 
         try {
+            boolean inverse = false;
+            boolean playerOnly = false;
+            boolean stack = false;
             for (String parameter : par) {
                 if (parameter.startsWith("-i:")) {
                     inverse = parameter.endsWith("y");

@@ -11,10 +11,6 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author Gavjenks
- * @author MikeMatrix
- */
 public class DomeBrush extends Brush {
 
     public DomeBrush() {

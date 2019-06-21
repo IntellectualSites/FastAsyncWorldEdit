@@ -13,25 +13,19 @@ import org.bukkit.util.noise.PerlinNoiseGenerator;
 import java.util.ArrayList;
 import java.util.Random;
 
-/**
- * @author Gavjenks
- */
 public class HeatRayBrush extends Brush {
 
-    /**
-     * @author MikeMatrix
-     */
-//    private enum FlameableBlock
-//    {
-//        WOOD(Material.WOOD), SAPLING(Material.SAPLING), LOG(Material.LOG), LEAVES(Material.LEAVES), SPONGE(Material.SPONGE), WEB(Material.WEB), LONG_GRASS(Material.LONG_GRASS), DEAD_BUSH(Material.DEAD_BUSH), WOOL(Material.WOOL), YELLOW_FLOWER(Material.YELLOW_FLOWER), RED_ROSE(Material.RED_ROSE), TORCH(Material.TORCH), FIRE(Material.FIRE), WOOD_STAIRS(Material.WOOD_STAIRS), CROPS(Material.CROPS), SIGN_POST(Material.SIGN_POST), WOODEN_DOOR(Material.WOODEN_DOOR), LADDER(Material.LADDER), WALL_SIGN(Material.WALL_SIGN), WOOD_PLATE(Material.WOOD_PLATE), SNOW(Material.SNOW), ICE(Material.ICE), SUGAR_CANE_BLOCK(Material.SUGAR_CANE_BLOCK), FENCE(Material.FENCE), TRAP_DOOR(Material.TRAP_DOOR), VINE(Material.VINE), FENCE_GATE(Material.FENCE_GATE), WATER_LILLY(Material.WATER_LILY);
-//
-//        private Material material;
-//
-//        FlameableBlock(final Material material)
-//        {
-//            this.material = material;
-//        }
-//    }
+/*    private enum FlameableBlock
+    {
+        WOOD(Material.WOOD), SAPLING(Material.SAPLING), LOG(Material.LOG), LEAVES(Material.LEAVES), SPONGE(Material.SPONGE), WEB(Material.WEB), LONG_GRASS(Material.LONG_GRASS), DEAD_BUSH(Material.DEAD_BUSH), WOOL(Material.WOOL), YELLOW_FLOWER(Material.YELLOW_FLOWER), RED_ROSE(Material.RED_ROSE), TORCH(Material.TORCH), FIRE(Material.FIRE), WOOD_STAIRS(Material.WOOD_STAIRS), CROPS(Material.CROPS), SIGN_POST(Material.SIGN_POST), WOODEN_DOOR(Material.WOODEN_DOOR), LADDER(Material.LADDER), WALL_SIGN(Material.WALL_SIGN), WOOD_PLATE(Material.WOOD_PLATE), SNOW(Material.SNOW), ICE(Material.ICE), SUGAR_CANE_BLOCK(Material.SUGAR_CANE_BLOCK), FENCE(Material.FENCE), TRAP_DOOR(Material.TRAP_DOOR), VINE(Material.VINE), FENCE_GATE(Material.FENCE_GATE), WATER_LILLY(Material.WATER_LILY);
+
+        private Material material;
+
+        FlameableBlock(final Material material)
+        {
+            this.material = material;
+        }
+    }*/
 
     private static final double REQUIRED_OBSIDIAN_DENSITY = 0.6;
     private static final double REQUIRED_COBBLE_DENSITY = 0.5;

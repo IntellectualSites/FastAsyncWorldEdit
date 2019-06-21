@@ -1,27 +1,21 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.object.collection.FastBitSet;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.extent.NullExtent;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.NullExtent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,14 +35,12 @@ public class BlockMask extends AbstractExtentMask {
     @Deprecated
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         super(extent);
-        MainUtil.warnDeprecated(BlockMaskBuilder.class);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
     }
 
     @Deprecated
     public BlockMask(Extent extent, BaseBlock... blocks) {
         super(extent);
-        MainUtil.warnDeprecated(BlockMaskBuilder.class);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
     }
 
@@ -125,16 +117,14 @@ public class BlockMask extends AbstractExtentMask {
             }
         }
         BlockType type = BlockTypes.get(indexFound);
-        {
-            Mask mask = getOptimizedMask(type, bitSets[indexFound]);
-            if (mask == null) { // Try with inverse
-                long[] newBitSet = bitSets[indexFound];
-                for (int i = 0; i < newBitSet.length; i++) newBitSet[i] = ~newBitSet[i];
-                mask = getOptimizedMask(type, bitSets[indexFound]);
-                if (mask != null) mask = mask.inverse();
-            }
-            return mask;
+        Mask mask = getOptimizedMask(type, bitSets[indexFound]);
+        if (mask == null) { // Try with inverse
+            long[] newBitSet = bitSets[indexFound];
+            for (int i = 0; i < newBitSet.length; i++) newBitSet[i] = ~newBitSet[i];
+            mask = getOptimizedMask(type, bitSets[indexFound]);
+            if (mask != null) mask = mask.inverse();
         }
+        return mask;
     }
 
     private Mask getOptimizedMask(BlockType type, long[] bitSet) {

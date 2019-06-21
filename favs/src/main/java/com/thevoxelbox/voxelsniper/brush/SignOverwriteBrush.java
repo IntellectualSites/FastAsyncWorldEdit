@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 /**
  * Overwrites signs.
+ *
  * @author Monofraps
  */
 public class SignOverwriteBrush extends Brush {
@@ -324,10 +325,10 @@ public class SignOverwriteBrush extends Brush {
 
         try (FileReader inFile = new FileReader(store); BufferedReader inStream = new BufferedReader(inFile)) {
 
-                for (int i = 0; i < this.signTextLines.length; i++) {
-                    this.signLinesEnabled[i] = Boolean.parseBoolean(inStream.readLine());
-                    this.signTextLines[i] = inStream.readLine();
-                }
+            for (int i = 0; i < this.signTextLines.length; i++) {
+                this.signLinesEnabled[i] = Boolean.parseBoolean(inStream.readLine());
+                this.signTextLines[i] = inStream.readLine();
+            }
 
             v.sendMessage(ChatColor.BLUE + "File loaded successfully.");
         } catch (IOException exception) {
