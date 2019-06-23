@@ -19,41 +19,36 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.FlatRegion;
-import java.util.List;
 
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Visits the layers within a region.
- * <p>
+ *
  * <p>This class works by iterating over all the columns in a {@link FlatRegion},
  * finding the first ground block in each column (searching from a given
  * maximum Y down to a minimum Y), and then applies a {@link LayerFunction} to
  * each layer.</p>
  */
-@Deprecated
 public class LayerVisitor implements Operation {
 
+    private final FlatRegion flatRegion;
     private final LayerFunction function;
     private Mask2D mask = Masks.alwaysTrue2D();
-    private final int minY;
-    private final int maxY;
-    private final Iterable<BlockVector2> iterator;
+    private int minY;
+    private int maxY;
 
     /**
      * Create a new visitor.
@@ -63,14 +58,14 @@ public class LayerVisitor implements Operation {
      * @param maxY       the maximum Y to begin the search at
      * @param function   the layer function to apply t blocks
      */
-    public LayerVisitor(final FlatRegion flatRegion, final int minY, final int maxY, final LayerFunction function) {
+    public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function) {
         checkNotNull(flatRegion);
         checkArgument(minY <= maxY, "minY <= maxY required");
         checkNotNull(function);
+        this.flatRegion = flatRegion;
         this.minY = minY;
         this.maxY = maxY;
         this.function = function;
-        this.iterator = flatRegion.asFlatRegion();
     }
 
     /**
@@ -80,7 +75,7 @@ public class LayerVisitor implements Operation {
      * @return a 2D mask
      */
     public Mask2D getMask() {
-        return this.mask;
+        return mask;
     }
 
     /**
@@ -89,15 +84,15 @@ public class LayerVisitor implements Operation {
      *
      * @param mask a 2D mask
      */
-    public void setMask(final Mask2D mask) {
+    public void setMask(Mask2D mask) {
         checkNotNull(mask);
         this.mask = mask;
     }
 
     @Override
-    public Operation resume(final RunContext run) throws WorldEditException {
-        for (final BlockVector2 column : this.iterator) {
-            if (!this.mask.test(column)) {
+    public Operation resume(RunContext run) throws WorldEditException {
+        for (BlockVector2 column : flatRegion.asFlatRegion()) {
+            if (!mask.test(column)) {
                 continue;
             }
 
@@ -111,14 +106,14 @@ public class LayerVisitor implements Operation {
             for (int y = maxY; y >= minY; --y) {
                 BlockVector3 test = column.toBlockVector3(y);
                 if (!found) {
-                    if (this.function.isGround(test)) {
+                    if (function.isGround(test)) {
                         found = true;
                         groundY = y;
                     }
                 }
 
                 if (found) {
-                    if (!this.function.apply(test, groundY - y)) {
+                    if (!function.apply(test, groundY - y)) {
                         break;
                     }
                 }
@@ -132,7 +127,7 @@ public class LayerVisitor implements Operation {
     }
 
     @Override
-    public void addStatusMessages(final List<String> messages) {
+    public void addStatusMessages(List<String> messages) {
     }
 
 

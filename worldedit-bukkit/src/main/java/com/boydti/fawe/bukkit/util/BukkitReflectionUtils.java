@@ -2,9 +2,10 @@ package com.boydti.fawe.bukkit.util;
 
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
-import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
+
+import java.lang.reflect.Method;
 
 public class BukkitReflectionUtils {
     /**
@@ -72,18 +73,6 @@ public class BukkitReflectionUtils {
     public static Class<?> getCbClass(final String name) {
         final String className = "org.bukkit.craftbukkit." + getVersion() + "." + name;
         return ReflectionUtils.getClass(className);
-    }
-
-    public static Class<?> getUtilClass(final String name) {
-        try {
-            return Class.forName(name); //Try before 1.8 first
-        } catch (final ClassNotFoundException ex) {
-            try {
-                return Class.forName("net.minecraft.util." + name); //Not 1.8
-            } catch (final ClassNotFoundException ex2) {
-                return null;
-            }
-        }
     }
 
     public static String getVersion() {

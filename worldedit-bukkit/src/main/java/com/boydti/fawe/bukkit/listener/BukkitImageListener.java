@@ -10,22 +10,15 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.image.ImageViewer;
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
-
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Rotation;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -47,6 +40,13 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.Plugin;
+
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class BukkitImageListener implements Listener {
     private Location mutable = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
@@ -208,7 +208,7 @@ public class BukkitImageListener implements Listener {
         double zRat = Math.sin(yawRad) * a;
 
         BlockFace facing = itemFrame.getFacing();
-        double thickness = 1/32d + 1/128d;
+        double thickness = 1/32D + 1/128D;
         double modX = facing.getModX();
         double modZ = facing.getModZ();
         double dx = source.getX() - target.getX() - modX * thickness;

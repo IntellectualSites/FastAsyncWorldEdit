@@ -9,7 +9,6 @@ import com.boydti.fawe.util.TaskManager;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 
@@ -163,12 +162,11 @@ public class AsyncChunk implements Chunk {
         return load(false);
     }
 
-    @Override
+    //Do not use the safe variable in this method for compatibility with 1.14+
     public boolean unload(boolean save, boolean safe) {
-        return world.unloadChunk(x, z, save, safe);
+        return world.unloadChunk(x, z, save);
     }
 
-    @Override
     public boolean unload(boolean save) {
         return unload(true, false);
     }

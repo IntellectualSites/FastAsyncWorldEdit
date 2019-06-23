@@ -564,7 +564,7 @@ public class RegionCommands extends MethodCommands {
             desc = "Have the blocks in the selection fall",
             help =
                     "Make the blocks in the selection fall\n" +
-                            "The -m flag will only fall within the vertical selection.",
+                    "The -m flag will only fall within the vertical selection.",
             min = 0,
             max = 2
     )

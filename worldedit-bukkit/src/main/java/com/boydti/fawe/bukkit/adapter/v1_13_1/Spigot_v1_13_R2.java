@@ -20,7 +20,6 @@
 package com.boydti.fawe.bukkit.adapter.v1_13_1;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.collection.ObjObjMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.Tag;
@@ -33,42 +32,50 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.registry.state.*;
+import com.sk89q.worldedit.registry.state.BooleanProperty;
+import com.sk89q.worldedit.registry.state.DirectionalProperty;
+import com.sk89q.worldedit.registry.state.EnumProperty;
+import com.sk89q.worldedit.registry.state.IntegerProperty;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_13_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = Logger.getLogger(getClass().getCanonicalName());
 
     private final Field nbtListTagListField;
     private final Method nbtCreateTagMethod;
@@ -193,11 +200,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         return IRegistry.BLOCK.getOrDefault(new MinecraftKey(blockType.getNamespace(), blockType.getResource()));
     }
 
-    // ------------------------------------------------------------------------
-    // Code that is less likely to break
-    // ------------------------------------------------------------------------
-
-    @SuppressWarnings("deprecation")
     @Override
     public BaseBlock getBlock(Location location) {
         checkNotNull(location);
@@ -251,7 +253,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 
         nmsChunk.d(pos); // Force delete the old tile entity
 
-        CompoundTag nativeTag = state instanceof BaseBlock ? ((BaseBlock)state).getNbtData() : null;
+        CompoundTag nativeTag = state instanceof BaseBlock ? state.getNbtData() : null;
         if (nativeTag != null || existing instanceof TileEntityBlock) {
             nmsWorld.setTypeAndData(pos, blockData, 0);
             // remove tile
@@ -352,7 +354,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             return Collections.emptyMap();
         }
         if (block == null) {
-            logger.warn("Failed to find properties for " + blockType.getId());
+            logger.warning("Failed to find properties for " + blockType.getId());
             return Collections.emptyMap();
         }
         Map<String, Property<?>> properties = Maps.newLinkedHashMap();
@@ -418,7 +420,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             try {
                 return toNativeList((NBTTagList) foreign);
             } catch (Throwable e) {
-                logger.warn("Failed to convert NBTTagList", e);
+                logger.log(Level.WARNING, "Failed to convert NBTTagList", e);
                 return new ListTag(ByteTag.class, new ArrayList<ByteTag>());
             }
         } else if (foreign instanceof NBTTagLong) {
@@ -444,7 +446,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
      * @throws IllegalArgumentException on error
      * @throws IllegalAccessException on error
      */
-    public ListTag toNativeList(NBTTagList foreign) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    private ListTag toNativeList(NBTTagList foreign) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         List<Tag> values = new ArrayList<>();
         int type = foreign.d();
 
@@ -545,7 +547,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 	@Override
 	public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -561,6 +563,6 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
 	@Override
 	public void sendFakeOP(Player player) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
