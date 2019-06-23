@@ -21,7 +21,6 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.boydti.fawe.util.chat.Message;
 import com.sk89q.minecraft.util.commands.Command;
@@ -53,7 +52,6 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeData;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -62,9 +60,7 @@ import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
 
@@ -237,7 +233,7 @@ public class BiomeCommands extends MethodCommands {
         Operations.completeLegacy(visitor);
 
         BBC.BIOME_CHANGED.send(player, visitor.getAffected());
-        if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
+        if (!player.hasPermission("fawe.tips"))
             BBC.TIP_BIOME_PATTERN.or(BBC.TIP_BIOME_MASK).send(player);
     }
 }

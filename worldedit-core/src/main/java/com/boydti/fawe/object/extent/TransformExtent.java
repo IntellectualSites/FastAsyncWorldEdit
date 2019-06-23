@@ -16,17 +16,14 @@ public class TransformExtent extends BlockTransformExtent {
 
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private BlockVector3 min;
-    private int maxy;
 
     public TransformExtent(Extent parent) {
         super(parent);
-        this.maxy = parent.getMaximumPoint().getBlockY();
     }
 
     @Override
     public ResettableExtent setExtent(Extent extent) {
         min = null;
-        maxy = extent.getMaximumPoint().getBlockY();
         return super.setExtent(extent);
     }
 
@@ -91,7 +88,7 @@ public class TransformExtent extends BlockTransformExtent {
     public BlockState getBlock(BlockVector3 position) {
         return transform(super.getBlock(getPos(position)));
     }
-    
+
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
     	return transform(super.getFullBlock(getPos(position)));

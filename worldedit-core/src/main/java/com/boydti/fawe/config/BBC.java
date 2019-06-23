@@ -10,6 +10,7 @@ import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.chat.Message;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sk89q.worldedit.extension.platform.Actor;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -547,6 +548,16 @@ public enum BBC {
             Fawe.debug(this.format(args));
         } else {
             player.sendMessage((PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
+        }
+    }
+    public void send(final Actor player, final Object... args) {
+        if (isEmpty()) {
+            return;
+        }
+        if (player == null) {
+            Fawe.debug(this.format(args));
+        } else {
+            player.print(this.format(args));
         }
     }
 
