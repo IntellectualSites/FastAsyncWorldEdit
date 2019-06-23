@@ -17,6 +17,7 @@ import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,7 +150,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                             }
                             task.run(xx, yy, zz, block);
                         } else if (air) {
-                            task.run(xx, yy, zz, EditSession.nullBlock);
+                            task.run(xx, yy, zz, BlockTypes.AIR.getDefaultState());
                         }
                     }
                 }

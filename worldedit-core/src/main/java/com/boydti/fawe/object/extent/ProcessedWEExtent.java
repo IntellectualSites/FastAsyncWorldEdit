@@ -3,8 +3,6 @@ package com.boydti.fawe.object.extent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.util.WEManager;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -18,6 +16,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.List;
 
@@ -66,17 +65,17 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     public BlockState getLazyBlock(int x, int y, int z) {
         if (!limit.MAX_CHECKS()) {
             WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
-            return EditSession.nullBlock;
+            return BlockTypes.AIR.getDefaultState();
         } else {
             return extent.getLazyBlock(x, y, z);
         }
     }
-    
+
     @Override
     public BaseBlock getFullBlock(BlockVector3 pos) {
         if (!limit.MAX_CHECKS()) {
             WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
-            return EditSession.nullBlock.toBaseBlock();
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
         } else {
             return extent.getFullBlock(pos);
         }

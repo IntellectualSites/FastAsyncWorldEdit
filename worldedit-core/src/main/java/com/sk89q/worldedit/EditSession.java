@@ -235,7 +235,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     private final int maxY;
 
     public static final UUID CONSOLE = UUID.fromString("1-1-3-3-7");
-    public static final BlockState nullBlock = BlockTypes.AIR.getDefaultState();
 
     @Deprecated
     public EditSession(@Nonnull World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
@@ -2121,7 +2120,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
 
-        if (replacement == null) replacement = nullBlock;
+        if (replacement == null) replacement = BlockTypes.AIR.getDefaultState();
         final BlockReplace remove = replacement instanceof ExistingPattern ? null : new BlockReplace(this, replacement);
 
         copy.setCopyBiomes(copyBiomes);

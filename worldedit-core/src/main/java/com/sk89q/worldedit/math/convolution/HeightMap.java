@@ -201,7 +201,7 @@ public class HeightMap {
                         // Grow -- start from 1 below top replacing airblocks
                         for (int setY = newBlock - 1, getY = curBlock; setY >= curBlock; --setY, getY--) {
                             BlockStateHolder get = session.getBlock(xr, getY, zr);
-                            if (get != EditSession.nullBlock) tmpBlock = get;
+                            if (get != BlockTypes.AIR.getDefaultState()) tmpBlock = get;
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
                         }

@@ -24,6 +24,7 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -69,7 +70,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
                     if (super.test(vector) && vector.getBlockY() >= minY) {
                     	BaseBlock block = editSession.getFullBlock(vector);
                         if (!block.getBlockType().getMaterial().isAir()) {
-                            builder.add(vector, EditSession.nullBlock.toBaseBlock(), block);
+                            builder.add(vector, BlockTypes.AIR.getDefaultState().toBaseBlock(), block);
                             return true;
                         }
                     }

@@ -3,8 +3,8 @@ package com.boydti.fawe.object.clipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class WorldCutClipboard extends WorldCopyClipboard {
     public WorldCutClipboard(EditSession editSession, Region region, boolean copyEntities, boolean copyBiome) {
@@ -21,13 +21,13 @@ public class WorldCutClipboard extends WorldCopyClipboard {
         int yy = my + y;
         int zz = mz + z;
         BaseBlock block = extent.getFullBlock(BlockVector3.at(xx, yy, zz));
-        extent.setBlock(xx, yy, zz, EditSession.nullBlock);
+        extent.setBlock(xx, yy, zz, BlockTypes.AIR.getDefaultState());
         return block;
     }
 
     public BaseBlock getBlockAbs(int x, int y, int z) {
         BaseBlock block = extent.getFullBlock(BlockVector3.at(x, y, z));
-        extent.setBlock(x, y, z, EditSession.nullBlock);
+        extent.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
         return block;
     }
 

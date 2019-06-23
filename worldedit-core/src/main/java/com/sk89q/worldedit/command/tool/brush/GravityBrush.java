@@ -26,6 +26,7 @@ import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class GravityBrush implements Brush {
 
@@ -52,7 +53,7 @@ public class GravityBrush implements Brush {
                     BlockStateHolder block = editSession.getLazyBlock(x, y, z);
                     if (!block.getBlockType().getMaterial().isAir()) {
                         if (y != freeSpot) {
-                            editSession.setBlock(x, y, z, EditSession.nullBlock);
+                            editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
                             editSession.setBlock(x, freeSpot, z, block);
                         }
                         freeSpot = y + 1;

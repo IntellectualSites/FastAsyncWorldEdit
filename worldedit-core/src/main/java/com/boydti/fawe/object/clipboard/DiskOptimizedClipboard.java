@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.IntegerTrio;
@@ -10,7 +9,6 @@ import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -24,7 +22,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import sun.misc.Unsafe;
 
 import java.io.Closeable;
 import java.io.File;
@@ -446,7 +443,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             e.printStackTrace();
             MainUtil.handleError(e);
         }
-        return EditSession.nullBlock.toBaseBlock();
+        return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
 
     @Override
@@ -485,7 +482,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
         } catch (Exception e) {
             MainUtil.handleError(e);
         }
-        return EditSession.nullBlock.toBaseBlock();
+        return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
 
     @Override

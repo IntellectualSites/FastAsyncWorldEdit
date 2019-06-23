@@ -54,7 +54,7 @@ public class RecursivePickaxe implements BlockTool {
         editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
 
         final int radius = (int) range;
-        final BlockReplace replace = new BlockReplace(editSession, (editSession.nullBlock));
+        final BlockReplace replace = new BlockReplace(editSession, (BlockTypes.AIR.getDefaultState()));
         editSession.setMask((Mask) null);
         RecursiveVisitor visitor = new RecursiveVisitor(new IdMask(editSession), replace, radius, editSession);
         visitor.visit(pos);
