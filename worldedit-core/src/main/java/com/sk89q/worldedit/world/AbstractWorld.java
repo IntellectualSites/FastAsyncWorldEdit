@@ -36,6 +36,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
+import java.util.PriorityQueue;
 
 /**
  * An abstract implementation of {@link World}.
