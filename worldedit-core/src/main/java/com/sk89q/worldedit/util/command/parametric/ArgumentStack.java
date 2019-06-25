@@ -91,8 +91,4 @@ public interface ArgumentStack {
      * @return the consumed arguments
      */
     String reset();
-
-    static Class<ArgumentStack> inject0() {
-        return ArgumentStack.class;
-    }
 }

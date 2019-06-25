@@ -24,12 +24,9 @@ import com.sk89q.worldedit.util.command.binding.PrimitiveBindings;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Text;
 
-import javax.xml.ws.Provider;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
 /**
@@ -62,7 +59,7 @@ public class ParameterData extends SimpleParameter {
 
     /**
      * Set the main type of this parameter.
-     * <p>
+     *
      * <p>The type is normally that is used to determine which binding is used
      * for a particular method's parameter.</p>
      *
@@ -84,7 +81,7 @@ public class ParameterData extends SimpleParameter {
 
     /**
      * Get the classifier annotation.
-     * <p>
+     *
      * <p>Normally, the type determines what binding is called, but classifiers
      * take precedence if one is found (and registered with
      * {@link ParametricBuilder#addBinding(Binding, Type...)}).
@@ -107,7 +104,7 @@ public class ParameterData extends SimpleParameter {
 
     /**
      * Get a list of modifier annotations.
-     * <p>
+     *
      * <p>Modifier annotations are not considered in the process of choosing a binding
      * for a method parameter, but they can be used to modify the behavior of a binding.
      * An example of a modifier annotation is {@link Range}, which can restrict
@@ -120,7 +117,7 @@ public class ParameterData extends SimpleParameter {
         return modifiers;
     }
 
-    public  <T extends Annotation> T getModifier(Class<T> annotatedType) {
+    <T extends Annotation> T getModifier(Class<T> annotatedType) {
         for (Annotation annotation : getModifiers()) {
             if (annotation.getClass() == annotatedType) return (T) annotation;
         }
@@ -141,7 +138,7 @@ public class ParameterData extends SimpleParameter {
      *
      * @return -1 if unknown or unavailable
      */
-    public int getConsumedCount() {
+    int getConsumedCount() {
         return getBinding().getConsumedCount(this);
     }
 
@@ -150,7 +147,7 @@ public class ParameterData extends SimpleParameter {
      *
      * @return true if this parameter is entered by the user.
      */
-    public boolean isUserInput() {
+    boolean isUserInput() {
         return getBinding().getBehavior(this) != BindingBehavior.PROVIDES;
     }
 
@@ -159,7 +156,7 @@ public class ParameterData extends SimpleParameter {
      *
      * @return true if this parameter consumes non-flag arguments
      */
-    public boolean isNonFlagConsumer() {
+    boolean isNonFlagConsumer() {
         return getBinding().getBehavior(this) != BindingBehavior.PROVIDES && !isValueFlag();
     }
 
@@ -167,7 +164,7 @@ public class ParameterData extends SimpleParameter {
      * Validate this parameter and its binding.
      */
     public void validate(Method method, int parameterIndex) throws ParametricException {
-        validate(() -> method.toGenericString(), parameterIndex);
+        validate(method::toGenericString, parameterIndex);
     }
 
     public void validate(Supplier<String> method, int parameterIndex) throws ParametricException {
@@ -205,6 +202,5 @@ public class ParameterData extends SimpleParameter {
                             method.get());
         }
     }
-
 
 }

@@ -27,10 +27,10 @@ import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
+
     private final Vector3 unit;
     private final Vector3 zero2;
     private Vector3 current = new MutableVector3(Vector3.ZERO);
-    private EditSession editSession;
     private Extent extent;
 
     public WorldEditExpressionEnvironment(EditSession editSession, Vector3 unit, Vector3 zero) {
@@ -89,6 +89,5 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     public void setCurrentBlock(Vector3 current) {
         this.current = current;
     }
-
 
 }

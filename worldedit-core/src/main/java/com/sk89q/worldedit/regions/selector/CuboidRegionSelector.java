@@ -22,14 +22,12 @@ package com.sk89q.worldedit.regions.selector;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.util.chat.Message;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.SelectionCommands;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.cui.CUIRegion;
 import com.sk89q.worldedit.internal.cui.SelectionPointEvent;
@@ -39,13 +37,10 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Creates a {@code CuboidRegion} from a user's selections.
@@ -96,6 +91,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
             position1 = oldRegion.getMinimumPoint();
             position2 = oldRegion.getMaximumPoint();
         }
+
         region.setPos1(position1);
         region.setPos2(position2);
     }
@@ -103,7 +99,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     /**
      * Create a new region selector with the given two positions.
      *
-     * @param world     the world
+     * @param world the world
      * @param position1 position 1
      * @param position2 position 2
      */
@@ -115,11 +111,6 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         this.position2 = position2;
         region.setPos1(position1);
         region.setPos2(position2);
-    }
-
-    @Override
-    public List<BlockVector3> getVerticies() {
-        return Arrays.asList(position1, position2);
     }
 
     @Nullable
@@ -316,6 +307,5 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     public String getLegacyTypeID() {
         return "cuboid";
     }
-
 
 }

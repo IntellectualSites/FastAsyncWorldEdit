@@ -95,6 +95,4 @@ public class SimpleCommandMapping implements CommandMapping {
                 '}';
     }
 
-
-
 }

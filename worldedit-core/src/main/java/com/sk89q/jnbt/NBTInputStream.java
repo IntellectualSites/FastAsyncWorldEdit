@@ -20,16 +20,12 @@
 package com.sk89q.jnbt;
 
 import com.boydti.fawe.jnbt.NBTStreamer;
-import com.boydti.fawe.object.RunnableVal2;
-import com.boydti.fawe.util.StringMan;
 
 import java.io.Closeable;
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +36,7 @@ import java.util.function.Function;
  * This class reads <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * streams, and produces an object graph of subclasses of the {@code Tag}
  * object.
- * 
+ *
  * <p>The NBT format was created by Markus Persson, and the specification may be
  * found at <a href="http://www.minecraft.net/docs/NBT.txt">
  * http://www.minecraft.net/docs/NBT.txt</a>.</p>
@@ -52,7 +48,7 @@ public final class NBTInputStream implements Closeable {
     /**
      * Creates a new {@code NBTInputStream}, which will source its data
      * from the specified input stream.
-     * 
+     *
      * @param is the input stream
      * @throws IOException if an I/O error occurs
      */
@@ -64,13 +60,9 @@ public final class NBTInputStream implements Closeable {
         this.is = dis;
     }
 
-    public DataInputStream getInputStream() {
-        return is;
-    }
-
     /**
      * Reads an NBT tag from the stream.
-     * 
+     *
      * @return The tag that was read.
      * @throws IOException if an I/O error occurs.
      */
@@ -79,18 +71,8 @@ public final class NBTInputStream implements Closeable {
     }
 
     /**
-     * Reads an NBT map from the stream.
-     *
-     * @return The map that was read.
-     * @throws IOException if an I/O error occurs.
-     */
-    public NamedData readNamedData() throws IOException {
-        return readNamedData(0);
-    }
-
-    /**
      * Reads an NBT from the stream.
-     * 
+     *
      * @param depth the depth of this tag
      * @return The tag that was read.
      * @throws IOException if an I/O error occurs.
@@ -100,19 +82,9 @@ public final class NBTInputStream implements Closeable {
         return new NamedTag(readNamedTagName(type), readTagPayload(type, depth));
     }
 
-    private NamedData readNamedData(int depth) throws IOException {
-        int type = is.readByte();
-        return new NamedData(readNamedTagName(type), readDataPayload(type, depth));
-    }
-
     public Tag readTag() throws IOException {
         int type = is.readByte();
         return readTagPayload(type, 0);
-    }
-
-    public Object readData() throws IOException {
-        int type = is.readByte();
-        return readDataPayload(type, 0);
     }
 
     public void readNamedTagLazy(Function<String, BiConsumer> getReader) throws IOException {
@@ -522,13 +494,13 @@ public final class NBTInputStream implements Closeable {
 
     /**
      * Reads the payload of a tag given the type.
-     * 
+     *
      * @param type the type
      * @param depth the depth
      * @return the tag
      * @throws IOException if an I/O error occurs.
      */
-    public Tag readTagPayload(int type, int depth) throws IOException {
+    private Tag readTagPayload(int type, int depth) throws IOException {
         switch (type) {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
@@ -598,11 +570,11 @@ public final class NBTInputStream implements Closeable {
             }
             case NBTConstants.TYPE_LONG_ARRAY: {
                 length = is.readInt();
-                long[] data = new long[length];
+                long[] longData = new long[length];
                 for (int i = 0; i < length; i++) {
-                    data[i] = is.readLong();
+                    longData[i] = is.readLong();
                 }
-                return new LongArrayTag(data);
+                return new LongArrayTag(longData);
             }
             default:
                 throw new IOException("Invalid tag type: " + type + ".");

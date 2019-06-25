@@ -60,7 +60,6 @@ public class BlockMask extends AbstractExtentMask {
      * @param extent the extent
      * @param blocks a list of blocks to match
      */
-    @Deprecated
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         super(extent);
         checkNotNull(blocks);
@@ -73,7 +72,6 @@ public class BlockMask extends AbstractExtentMask {
      * @param extent the extent
      * @param block an array of blocks to match
      */
-    @Deprecated
     public BlockMask(Extent extent, BaseBlock... block) {
         super(extent);
         checkNotNull(block);

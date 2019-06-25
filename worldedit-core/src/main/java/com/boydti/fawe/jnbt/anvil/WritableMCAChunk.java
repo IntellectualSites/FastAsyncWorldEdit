@@ -4,6 +4,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.MathMan;
+
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
@@ -91,7 +92,6 @@ public class WritableMCAChunk extends FaweChunk<Void> {
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeNamedTag("DataVersion", 1631);
         nbtOut.writeLazyCompoundTag("Level", out -> {
-//            out.writeNamedTag("V", (byte) 1);
             out.writeNamedTag("Status", "decorated");
             out.writeNamedTag("xPos", getX());
             out.writeNamedTag("zPos", getZ());
@@ -104,21 +104,25 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                 out.writeNamedEmptyList("TileEntities");
             } else {
                 out.writeNamedTag("TileEntities", new ListTag(CompoundTag.class,
-                        new ArrayList<>(tiles.values())));
+                                                              new ArrayList<>(tiles.values())));
             }
             out.writeNamedTag("InhabitedTime", inhabitedTime);
             out.writeNamedTag("LastUpdate", lastUpdate);
             out.writeNamedTag("Biomes", biomes);
             int len = 0;
             for (boolean hasSection : hasSections) {
-                if (hasSection) len++;
+                if (hasSection) {
+                    len++;
+                }
             }
             out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
             nbtOut.writeByte(NBTConstants.TYPE_COMPOUND);
             nbtOut.writeInt(len);
 
             for (int layer = 0; layer < hasSections.length; layer++) {
-                if (!hasSections[layer]) continue;
+                if (!hasSections[layer]) {
+                    continue;
+                }
                 out.writeNamedTag("Y", (byte) layer);
 
                 int blockIndexStart = layer << 12;
@@ -186,7 +190,9 @@ public class WritableMCAChunk extends FaweChunk<Void> {
 
                     out.writeNamedTagName("BlockStates", NBTConstants.TYPE_LONG_ARRAY);
                     out.writeInt(blockBitArrayEnd);
-                    for (int i = 0; i < blockBitArrayEnd; i++) out.writeLong(blockstates[i]);
+                    for (int i = 0; i < blockBitArrayEnd; i++) {
+                        out.writeLong(blockstates[i]);
+                    }
 
 
                     out.writeNamedTagName("BlockLight", NBTConstants.TYPE_BYTE_ARRAY);
@@ -337,12 +343,16 @@ public class WritableMCAChunk extends FaweChunk<Void> {
     }
 
     public int getSkyLight(int x, int y, int z) {
-        if (!hasSections[y >> 4]) return 0;
+        if (!hasSections[y >> 4]) {
+            return 0;
+        }
         return getNibble(getIndex(x, y, z), skyLight);
     }
 
     public int getBlockLight(int x, int y, int z) {
-        if (!hasSections[y >> 4]) return 0;
+        if (!hasSections[y >> 4]) {
+            return 0;
+        }
         return getNibble(getIndex(x, y, z), blockLight);
     }
 

@@ -1,12 +1,11 @@
 package com.boydti.fawe.object.clipboard;
 
-import com.boydti.fawe.object.schematic.StructureFormat;
 import com.google.common.io.ByteSource;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.extent.clipboard.io.SchematicReader;
+
 import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;

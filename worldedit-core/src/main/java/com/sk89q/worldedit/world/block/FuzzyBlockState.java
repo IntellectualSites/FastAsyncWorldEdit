@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.world.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.Maps;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 
@@ -39,7 +37,7 @@ public class FuzzyBlockState extends BlockState {
 
     private final Map<PropertyKey, Object> props;
 
-    public FuzzyBlockState(BlockType blockType) {
+    FuzzyBlockState(BlockType blockType) {
         this(blockType.getDefaultState(), null);
     }
 

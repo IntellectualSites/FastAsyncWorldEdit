@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.math.convolution;
 
 import com.boydti.fawe.object.visitor.Fast2DIterator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -33,8 +35,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Iterator;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Allows applications of Kernels onto the region's height map.
@@ -167,7 +167,6 @@ public class HeightMap {
 
         BlockVector3 minY = region.getMinimumPoint();
         int originX = minY.getBlockX();
-        int originY = minY.getBlockY();
         int originZ = minY.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();
@@ -177,10 +176,10 @@ public class HeightMap {
 
         BlockStateHolder tmpBlock = BlockTypes.AIR.getDefaultState();
 
-        // Apply heightmap
         int maxY4 = maxY << 4;
         int index = 0;
 
+        // Apply heightmap
         for (int z = 0; z < height; ++z) {
             int zr = z + originZ;
             for (int x = 0; x < width; ++x) {

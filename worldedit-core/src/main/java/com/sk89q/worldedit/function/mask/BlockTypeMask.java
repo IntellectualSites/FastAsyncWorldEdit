@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -39,18 +40,8 @@ import java.util.Set;
  * use {@link BlockMask}.</p>
  */
 public class BlockTypeMask extends AbstractExtentMask {
+
     private final boolean[] types;
-
-    protected BlockTypeMask(Extent extent, boolean[] types) {
-        super(extent);
-        this.types = types;
-    }
-
-    public BlockTypeMask(Extent extent, BlockType... types) {
-        super(extent);
-        this.types = new boolean[BlockTypes.size()];
-        for (BlockType type : types) this.types[type.getInternalId()] = true;
-    }
 
     /**
      * Create a new block mask.
@@ -59,7 +50,24 @@ public class BlockTypeMask extends AbstractExtentMask {
      * @param blocks a list of blocks to match
      */
     public BlockTypeMask(Extent extent, Collection<BlockType> blocks) {
-        this(extent, blocks.toArray(new BlockType[blocks.size()]));
+        this(extent, blocks.toArray(new BlockType[0]));
+    }
+
+    /**
+     * Create a new block mask.
+     *
+     * @param extent the extent
+     * @param block an array of blocks to match
+     */
+    public BlockTypeMask(Extent extent, BlockType... block) {
+        super(extent);
+        this.types = new boolean[BlockTypes.size()];
+        for (BlockType type : block) this.types[type.getInternalId()] = true;
+    }
+
+    protected BlockTypeMask(Extent extent, boolean[] types) {
+        super(extent);
+        this.types = types;
     }
 
     /**

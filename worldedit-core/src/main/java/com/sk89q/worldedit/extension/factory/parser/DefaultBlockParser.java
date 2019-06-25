@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
@@ -229,7 +230,13 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new NoMatchException("Does not match a valid block type: '" + input + "'");
                 }
             }
-            nbt = state.getNbtData();
+            if (state != null) {
+                nbt = state.getNbtData();
+            } else {
+                Fawe.debug("State was null.");
+                Fawe.debug("Input was: " + input);
+                Fawe.debug("typestring was: " + typeString);
+            }
 
             if (stateString != null) {
                 state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state);

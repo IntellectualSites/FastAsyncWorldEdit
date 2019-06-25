@@ -284,7 +284,6 @@ public class ClipboardFormats {
                     byte[] buffer = new byte[8192];
                     while ((entry = zip.getNextEntry()) != null) {
                         String filename = entry.getName();
-                        String extension = filename.substring(filename.lastIndexOf('.') + 1, filename.length());
                         ClipboardFormat format = findByExtension(filename);
                         if (format != null) {
                             FastByteArrayOutputStream out = new FastByteArrayOutputStream();

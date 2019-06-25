@@ -25,9 +25,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.function.mask.Masks.negate;
-
 /**
  * Tests whether a given vector meets a criteria.
  */

@@ -21,6 +21,8 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.util.IOUtil;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
 import com.sk89q.jnbt.FloatTag;
@@ -33,12 +35,12 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -55,9 +57,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Writes schematic files using the Sponge schematic format.
@@ -82,8 +81,13 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         write1(clipboard);
     }
 
-    public void write1(Clipboard clipboard) throws IOException {
-        // metadata
+    /**
+     * Writes a version 1 schematic file.
+     *
+     * @param clipboard The clipboard
+     * @throws IOException If an error occurs
+     */
+    private void write1(Clipboard clipboard) throws IOException {
         Region region = clipboard.getRegion();
         BlockVector3 origin = clipboard.getOrigin();
         BlockVector3 min = region.getMinimumPoint();
@@ -91,6 +95,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         int width = region.getWidth();
         int height = region.getHeight();
         int length = region.getLength();
+
         if (width > MAX_SIZE) {
             throw new IllegalArgumentException("Width of region too large for a .schematic");
         }
@@ -100,13 +105,15 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         if (length > MAX_SIZE) {
             throw new IllegalArgumentException("Length of region too large for a .schematic");
         }
-        // output
+
         final DataOutput rawStream = outputStream.getOutputStream();
         outputStream.writeLazyCompoundTag("Schematic", out -> {
             out.writeNamedTag("Version", 1);
             out.writeNamedTag("Width",  (short) width);
             out.writeNamedTag("Height", (short) height);
             out.writeNamedTag("Length", (short) length);
+
+            // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
             out.writeNamedTag("Offset", new int[]{
                     min.getBlockX(),
                     min.getBlockY(),
@@ -124,7 +131,6 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
             ByteArrayOutputStream tilesCompressed = new ByteArrayOutputStream();
             NBTOutputStream tilesOut = new NBTOutputStream(new LZ4BlockOutputStream(tilesCompressed));
-            int[] numTiles = {0};
 
             List<Integer> paletteList = new ArrayList<>();
             char[] palette = new char[BlockTypes.states.length];
@@ -132,27 +138,34 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             int[] paletteMax = {0};
 
 
+            int[] numTiles = {0};
             FaweClipboard.BlockReader reader = new FaweClipboard.BlockReader() {
                 @Override
                 public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                     try {
-                        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+                        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
                         if (hasNbt) {
-                        	BaseBlock localBlock = (BaseBlock)block;
-                            Map<String, Tag> values = localBlock.getNbtData().getValue();
-                            values.remove("id"); // Remove 'id' if it exists. We want 'Id'
-                            // Positions are kept in NBT, we don't want that.
-                            values.remove("x");
-                            values.remove("y");
-                            values.remove("z");
-                            if (!values.containsKey("Id")) values.put("Id", new StringTag(localBlock.getNbtId()));
-                            values.put("Pos", new IntArrayTag(new int[]{
-                                    x,
-                                    y,
-                                    z
-                            }));
-                            numTiles[0]++;
-                            tilesOut.writeTagPayload(localBlock.getNbtData());
+                            if (block.getNbtData() != null) {
+                                BaseBlock localBlock = (BaseBlock) block;
+                                Map<String, Tag> values = localBlock.getNbtData().getValue();
+
+                                values.remove("id"); // Remove 'id' if it exists. We want 'Id'
+
+                                // Positions are kept in NBT, we don't want that.
+                                values.remove("x");
+                                values.remove("y");
+                                values.remove("z");
+                                if (!values.containsKey("Id")) {
+                                    values.put("Id", new StringTag(block.getNbtId()));
+                                }
+                                values.put("Pos", new IntArrayTag(new int[]{
+                                        x,
+                                        y,
+                                        z
+                                }));
+                                numTiles[0]++;
+                                tilesOut.writeTagPayload(localBlock.getNbtData());
+                            }
                         }
                         int ordinal = block.getOrdinal();
                         char value = palette[ordinal];
@@ -185,9 +198,9 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             // close
             tilesOut.close();
             blocksOut.close();
-            // palette max
+
             out.writeNamedTag("PaletteMax", paletteMax[0]);
-            // palette
+
             out.writeLazyCompoundTag("Palette", out12 -> {
                 for (int i = 0; i < paletteList.size(); i++) {
                     int stateOrdinal = paletteList.get(i);
@@ -195,13 +208,13 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                     out12.writeNamedTag(state.getAsString(), i);
                 }
             });
-            // Block data
+
             out.writeNamedTagName("BlockData", NBTConstants.TYPE_BYTE_ARRAY);
             rawStream.writeInt(blocksOut.size());
             try (LZ4BlockInputStream in = new LZ4BlockInputStream(new ByteArrayInputStream(blocksCompressed.toByteArray()))) {
                 IOUtil.copy(in, rawStream);
             }
-            // tiles
+
             if (numTiles[0] != 0) {
                 out.writeNamedTagName("TileEntities", NBTConstants.TYPE_LIST);
                 rawStream.write(NBTConstants.TYPE_COMPOUND);
@@ -213,14 +226,12 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 out.writeNamedEmptyList("TileEntities");
             }
 
-
-            // Entities
-            List<Tag> entities = new ArrayList<Tag>();
+            List<Tag> entities = new ArrayList<>();
             for (Entity entity : clipboard.getEntities()) {
                 BaseEntity state = entity.getState();
 
                 if (state != null) {
-                    Map<String, Tag> values = new HashMap<String, Tag>();
+                    Map<String, Tag> values = new HashMap<>();
 
                     // Put NBT provided data
                     CompoundTag rawTag = state.getNbtData();
@@ -246,7 +257,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
     }
 
     private static Tag writeVector(Vector3 vector, String name) {
-        List<DoubleTag> list = new ArrayList<DoubleTag>();
+        List<DoubleTag> list = new ArrayList<>();
         list.add(new DoubleTag(vector.getX()));
         list.add(new DoubleTag(vector.getY()));
         list.add(new DoubleTag(vector.getZ()));
@@ -254,7 +265,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
     }
 
     private static Tag writeRotation(Location location, String name) {
-        List<FloatTag> list = new ArrayList<FloatTag>();
+        List<FloatTag> list = new ArrayList<>();
         list.add(new FloatTag(location.getYaw()));
         list.add(new FloatTag(location.getPitch()));
         return new ListTag(FloatTag.class, list);

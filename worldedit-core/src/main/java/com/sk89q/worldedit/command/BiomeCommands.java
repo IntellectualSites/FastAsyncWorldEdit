@@ -23,10 +23,12 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.boydti.fawe.util.chat.Message;
+
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -62,8 +64,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
-
 /**
  * Implements biome-related commands such as "/biomelist".
  */
@@ -84,10 +84,10 @@ public class BiomeCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"biomelist", "biomels"},
-            usage = "[page]",
-            desc = "Gets all biomes available.",
-            max = 1
+        aliases = { "biomelist", "biomels" },
+        usage = "[page]",
+        desc = "Gets all biomes available.",
+        max = 1
     )
     @CommandPermissions("worldedit.biome.list")
     public void biomeList(Player player, CommandContext args) throws WorldEditException {
@@ -127,15 +127,15 @@ public class BiomeCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"biomeinfo"},
-            flags = "pt",
-            desc = "Get the biome of the targeted block.",
-            help =
-                    "Get the biome of the block.\n" +
-                            "By default use all the blocks contained in your selection.\n" +
-                            "-t use the block you are looking at.\n" +
-                            "-p use the block you are currently in",
-            max = 0
+        aliases = { "biomeinfo" },
+        flags = "pt",
+        desc = "Get the biome of the targeted block.",
+        help =
+            "Get the biome of the block.\n" +
+            "By default use all the blocks contained in your selection.\n" +
+            "-t use the block you are looking at.\n" +
+            "-p use the block you are currently in",
+        max = 0
     )
     @CommandPermissions("worldedit.biome.info")
     public void biomeInfo(Player player, LocalSession session, final EditSession editSession, CommandContext args) throws WorldEditException {
@@ -192,24 +192,33 @@ public class BiomeCommands extends MethodCommands {
         Collections.sort(distribution);
         for (Countable<BiomeType> c : distribution) {
             BiomeData data = biomeRegistry.getData(c.getID());
-            String str = String.format("%-7s (%.3f%%) %s #%d",
-                    String.valueOf(c.getAmount()),
-                    c.getAmount() / (double) size * 100,
-                    data == null ? "Unknown" : data.getName(),
-                    c.getID().getInternalId());
+            String str;
+            if (data == null) {
+                str = String.format("%-7s (%.3f%%) %s #%d",
+                                    String.valueOf(c.getAmount()),
+                                    c.getAmount() / (double) size * 100,
+                                    "Unknown",
+                                    c.getID().getInternalId());
+            } else {
+                str = String.format("%-7s (%.3f%%) %s #%d",
+                                    String.valueOf(c.getAmount()),
+                                    c.getAmount() / (double) size * 100,
+                                    data.getName(),
+                                    c.getID().getInternalId());
+            }
             player.print(str);
         }
     }
 
     @Command(
-            aliases = {"/setbiome"},
+            aliases = { "/setbiome" },
             usage = "<biome>",
             flags = "p",
             desc = "Sets the biome of the player's current block or region.",
             help =
                     "Set the biome of the region.\n" +
-                            "By default use all the blocks contained in your selection.\n" +
-                            "-p use the block you are currently in"
+                    "By default use all the blocks contained in your selection.\n" +
+                    "-p use the block you are currently in"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.biome.set")
@@ -220,7 +229,7 @@ public class BiomeCommands extends MethodCommands {
         Mask2D mask2d = mask != null ? mask.toMask2D() : null;
 
         if (atPosition) {
-            region = new CuboidRegion(player.getLocation().toBlockPoint(), player.getLocation().toBlockPoint());
+            region = new CuboidRegion(player.getLocation().toVector().toBlockPoint(), player.getLocation().toVector().toBlockPoint());
         } else {
             region = session.getSelection(world);
         }
@@ -236,4 +245,5 @@ public class BiomeCommands extends MethodCommands {
         if (!player.hasPermission("fawe.tips"))
             BBC.TIP_BIOME_PATTERN.or(BBC.TIP_BIOME_MASK).send(player);
     }
+
 }

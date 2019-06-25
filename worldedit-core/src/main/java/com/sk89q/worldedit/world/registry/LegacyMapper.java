@@ -94,7 +94,6 @@ public class LegacyMapper {
         for (Map.Entry<String, String> blockEntry : dataFile.blocks.entrySet()) {
             try {
                 BlockStateHolder blockState = BlockState.get(null, blockEntry.getValue());
-//            	BlockState blockState = WorldEdit.getInstance().getBlockFactory().parseFromInput(blockEntry.getValue(), parserContext).toImmutableState();
                 BlockType type = blockState.getBlockType();
                 if (type.hasProperty(PropertyKey.WATERLOGGED)) {
                     blockState = blockState.with(PropertyKey.WATERLOGGED, false);
@@ -160,7 +159,11 @@ public class LegacyMapper {
     @Nullable
     public int[] getLegacyFromItem(ItemType itemType) {
         Integer combinedId = getLegacyCombined(itemType);
-        return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
+        if (combinedId == null) {
+            return null;
+        } else {
+            return new int[]{combinedId >> 4, combinedId & 0xF};
+        }
     }
 
     @Nullable

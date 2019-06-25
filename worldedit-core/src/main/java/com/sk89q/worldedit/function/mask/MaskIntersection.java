@@ -104,7 +104,8 @@ public class MaskIntersection extends AbstractMask {
         Set<Mask> optimized = new HashSet<>();
         Set<Map.Entry<Mask, Mask>> failedCombines = new HashSet<>();
         // Combine the masks
-        while (combine(pairingFunction(), failedCombines));
+        while (combine(pairingFunction(), failedCombines)) {
+        }
         // Optimize / combine
         do optimizeMasks(optimized);
         while (combine(pairingFunction(), failedCombines));
@@ -122,7 +123,7 @@ public class MaskIntersection extends AbstractMask {
             outer:
             for (Mask mask : masks) {
                 for (Mask other : masks) {
-                    AbstractMap.SimpleEntry pair = new AbstractMap.SimpleEntry(mask, other);
+                    AbstractMap.SimpleEntry<Mask, Mask> pair = new AbstractMap.SimpleEntry<>(mask, other);
                     if (failedCombines.contains(pair)) continue;
                     Mask combined = pairing.apply(pair);
                     if (combined != null) {

@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.regions.selector;
 
 import com.boydti.fawe.config.BBC;
-import static com.google.common.base.Preconditions.checkNotNull;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -35,12 +35,10 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Creates a {@code EllipsoidRegionSelector} from a user's selections.
@@ -250,6 +248,5 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
     public BlockVector3 getPrimaryPosition() throws IncompleteRegionException {
         return region.getCenter().toBlockPoint();
     }
-
 
 }

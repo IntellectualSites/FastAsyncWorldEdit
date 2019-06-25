@@ -183,6 +183,4 @@ public class SelectionCommand extends SimpleCommand<Operation> {
         return locals.get(Actor.class).hasPermission(permission);
     }
 
-
-
 }

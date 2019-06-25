@@ -73,7 +73,7 @@ public final class ListTag extends Tag {
 
     /**
      * Get the tag if it exists at the given index.
-     * 
+     *
      * @param index the index
      * @return the tag or null
      */
@@ -82,7 +82,7 @@ public final class ListTag extends Tag {
         if (index >= value.size()) {
             return null;
         }
-            return value.get(index);
+        return value.get(index);
     }
 
     /**

@@ -166,7 +166,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         hasY = true;
         maxY = y;
     }
-    
+
     @Override
     public BlockVector3 getMinimumPoint() {
         return center.toVector2().subtract(getRadius()).toVector3(minY).toBlockPoint();
@@ -381,4 +381,5 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         int maxY = extent.getMaximumPoint().getBlockY();
         return new CylinderRegion(center, radiusVec, minY, maxY);
     }
+
 }

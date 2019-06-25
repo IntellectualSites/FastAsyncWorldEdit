@@ -19,12 +19,15 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.jnbt.anvil.generator.*;
-import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
+import com.boydti.fawe.jnbt.anvil.generator.CavesGen;
+import com.boydti.fawe.jnbt.anvil.generator.GenBase;
+import com.boydti.fawe.jnbt.anvil.generator.OreGen;
+import com.boydti.fawe.jnbt.anvil.generator.Resource;
+import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
+
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -173,13 +176,13 @@ public interface Extent extends InputExtent, OutputExtent {
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
             block = getLazyBlock(x, y1, z);
-            if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
+            if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
                 return ((y1 - offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data1));
             }
             data1 = PropertyGroup.LEVEL.get(block);
             int y2 = y - d;
             block = getLazyBlock(x, y2, z);
-            if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
+            if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
                 return ((y2 + offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data2));
             }
             data2 = PropertyGroup.LEVEL.get(block);
@@ -188,16 +191,15 @@ public interface Extent extends InputExtent, OutputExtent {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getLazyBlock(x, layer, z);
-                    if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
-                        int data = (state ? PropertyGroup.LEVEL.get(block) : data1);
-                        return ((layer + offset) << 4) + 0;
+                    if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
+                        return layer + offset << 4;
                     }
                     data1 = PropertyGroup.LEVEL.get(block);
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
                     block = getLazyBlock(x, layer, z);
-                    if (!block.getBlockType().getMaterial().isMovementBlocker() != state) {
+                    if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
                         return ((layer - offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data2));
                     }
                     data2 = PropertyGroup.LEVEL.get(block);
@@ -243,8 +245,7 @@ public interface Extent extends InputExtent, OutputExtent {
                 }
             }
         }
-        int result = state ? failedMin : failedMax;
-        return result;
+        return state ? failedMin : failedMax;
     }
 
     default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
@@ -258,21 +259,21 @@ public interface Extent extends InputExtent, OutputExtent {
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
             block = getLazyBlock(x, y1, z);
-            if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return y1 - offset;
+            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return y1 - offset;
             int y2 = y - d;
             block = getLazyBlock(x, y2, z);
-            if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return y2 + offset;
+            if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return y2 + offset;
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getLazyBlock(x, layer, z);
-                    if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return layer + offset;
+                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return layer + offset;
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
                     block = getLazyBlock(x, layer, z);
-                    if (!block.getMaterial().isMovementBlocker() != state && block.getBlockType() != BlockTypes.__RESERVED__) return layer - offset;
+                    if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return layer - offset;
                 }
             }
         }
@@ -294,7 +295,7 @@ public interface Extent extends InputExtent, OutputExtent {
         }
     }
 
-    default public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+    default void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
         spawnResource(region, new SchemGen(mask, this, clipboards, rotate), rarity, 1);
     }
 
@@ -318,11 +319,11 @@ public interface Extent extends InputExtent, OutputExtent {
         return (pt.containedWithin(min, max));
     }
 
-    default public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+    default void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
         spawnResource(region, new OreGen(this, mask, material, size, minY, maxY), rarity, frequency);
     }
 
-    default public void addOres(Region region, Mask mask) throws WorldEditException {
+    default void addOres(Region region, Mask mask) throws WorldEditException {
         addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, 0, 255);
         addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, 0, 255);
         addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, 0, 79);
@@ -396,19 +397,6 @@ public interface Extent extends InputExtent, OutputExtent {
         }
         // Collections.reverse(distribution);
         return distribution;
-    }
-
-    /**
-     * Lazily copy a region
-     *
-     * @param region
-     * @return
-     */
-    default BlockArrayClipboard lazyCopy(Region region) {
-        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(this, region);
-        BlockArrayClipboard weClipboard = new BlockArrayClipboard(region, faweClipboard);
-        weClipboard.setOrigin(region.getMinimumPoint());
-        return weClipboard;
     }
 
     @Nullable

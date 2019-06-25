@@ -834,24 +834,16 @@ public final class ItemTypes {
         }
 
         if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
-        ItemType result = get(input);
-        return result;
+        return get(input);
     }
 
-    public static final @Nullable ItemType get(String id) {
+    public static @Nullable ItemType get(final String id) {
         return ItemType.REGISTRY.get(id);
     }
 
     @Deprecated
-    public static final ItemType get(final int ordinal) {
+    public static ItemType get(final int ordinal) {
         return ItemType.REGISTRY.getByInternalId(ordinal);
     }
 
-    public static int size() {
-        return ItemType.REGISTRY.size();
-    }
-
-    public static Collection<ItemType> values() {
-        return ItemType.REGISTRY.values();
-    }
 }

@@ -26,6 +26,7 @@ public final class ReflectionUtil {
     private ReflectionUtil() {
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getField(Object from, String name) {
         if (from instanceof Class)
             return getField((Class) from, null, name);
@@ -34,12 +35,12 @@ public final class ReflectionUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getField(Class checkClass, Object obj, String name) {
+    public static <T> T getField(Class checkClass, Object from, String name) {
         do {
             try {
                 Field field = checkClass.getDeclaredField(name);
                 field.setAccessible(true);
-                return (T) field.get(obj);
+                return (T) field.get(from);
             } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
         } while (checkClass.getSuperclass() != Object.class && ((checkClass = checkClass.getSuperclass()) != null));

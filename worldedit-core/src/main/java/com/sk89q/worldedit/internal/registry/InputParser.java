@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.internal.registry;
 
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;

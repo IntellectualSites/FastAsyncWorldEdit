@@ -299,7 +299,7 @@ public class ForwardExtentCopy implements Operation {
                 if (copyBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
                     copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
                 }
-                blockCopy = new BackwardsExtentBlockCopy(transExt, region, finalDest, from, transform, copy);
+                blockCopy = new BackwardsExtentBlockCopy(region, from, transform, copy);
             } else {
                 transExt = new PositionTransformExtent(finalDest, currentTransform);
                 transExt.setOrigin(from);

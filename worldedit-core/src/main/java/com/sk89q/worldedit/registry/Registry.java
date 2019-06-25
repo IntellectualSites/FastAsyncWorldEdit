@@ -65,4 +65,5 @@ public class Registry<V> implements Iterable<V> {
     public Iterator<V> iterator() {
         return this.map.values().iterator();
     }
+
 }

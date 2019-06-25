@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.command.composition;
 
-import com.boydti.fawe.config.BBC;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;

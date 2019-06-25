@@ -45,22 +45,22 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Compiles and evaluates expressions.
- * <p>
+ *
  * <p>Supported operators:</p>
- * <p>
+ *
  * <ul>
- * <li>Logical: &amp;&amp;, ||, ! (unary)</li>
- * <li>Bitwise: ~ (unary), &gt;&gt;, &lt;&lt;</li>
- * <li>Arithmetic: +, -, *, /, % (modulo), ^ (power), - (unary), --, ++ (prefix only)</li>
- * <li>Comparison: &lt;=, &gt;=, &gt;, &lt;, ==, !=, ~= (near)</li>
+ *     <li>Logical: &amp;&amp;, ||, ! (unary)</li>
+ *     <li>Bitwise: ~ (unary), &gt;&gt;, &lt;&lt;</li>
+ *     <li>Arithmetic: +, -, *, /, % (modulo), ^ (power), - (unary), --, ++ (prefix only)</li>
+ *     <li>Comparison: &lt;=, &gt;=, &gt;, &lt;, ==, !=, ~= (near)</li>
  * </ul>
- * <p>
+ *
  * <p>Supported functions: abs, acos, asin, atan, atan2, cbrt, ceil, cos, cosh,
  * exp, floor, ln, log, log10, max, max, min, min, rint, round, sin, sinh,
  * sqrt, tan, tanh and more. (See the Functions class or the wiki)</p>
- * <p>
+ *
  * <p>Constants: e, pi</p>
- * <p>
+ *
  * <p>To compile an equation, run
  * {@code Expression.compile("expression here", "var1", "var2"...)}.
  * If you wish to run the equation multiple times, you can then optimize it,
@@ -70,7 +70,7 @@ import java.util.concurrent.TimeoutException;
  * To query variables after evaluation, you can use
  * {@link #getVariable(String, boolean)}. To get a value out of these, use
  * {@link Variable#getValue()}.</p>
- * <p>
+ *
  * <p>Variables are also supported and can be set either by passing values
  * to {@link #evaluate(double...)}.</p>
  */
@@ -146,6 +146,7 @@ public class Expression {
 
             ((Variable) invokable).value = values[i];
         }
+
         try {
             if (timeout < 0) {
                 return evaluateRoot();
@@ -235,7 +236,5 @@ public class Expression {
     public void setEnvironment(ExpressionEnvironment environment) {
         this.environment = environment;
     }
-
-
 
 }

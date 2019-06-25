@@ -38,8 +38,7 @@ import javax.annotation.Nullable;
  */
 public class TargetBlock {
 
-    private final World world;
-
+    private World world;
     private int maxDistance;
     private double checkDistance, curDistance;
     private BlockVector3 targetPos = BlockVector3.ZERO;
@@ -122,7 +121,7 @@ public class TargetBlock {
         this.checkDistance = checkDistance;
         this.curDistance = 0;
         xRotation = (xRotation + 90) % 360;
-        yRotation *= -1;
+        yRotation = yRotation * -1;
 
         double h = (checkDistance * Math.cos(Math.toRadians(yRotation)));
 
@@ -145,15 +144,15 @@ public class TargetBlock {
         boolean searchForLastBlock = true;
         Location lastBlock = null;
         while (getNextBlock() != null) {
-            if (stopMask.test(targetPos)) {
-                break;
-            } else {
+            if (!stopMask.test(targetPos)) {
                 if (searchForLastBlock) {
                     lastBlock = getCurrentBlock();
                     if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
                         searchForLastBlock = false;
                     }
                 }
+            } else {
+                break;
             }
         }
         Location currentBlock = getCurrentBlock();

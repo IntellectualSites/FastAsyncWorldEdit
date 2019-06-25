@@ -36,7 +36,6 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
-import java.util.PriorityQueue;
 
 /**
  * An abstract implementation of {@link World}.
@@ -143,6 +142,7 @@ public abstract class AbstractWorld implements World {
             this.priority = priority;
         }
 
+        @SuppressWarnings("deprecation")
         public void play() {
             playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4);
         }

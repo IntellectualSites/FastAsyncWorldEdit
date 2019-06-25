@@ -100,20 +100,16 @@ public class ItemType implements RegistryItem {
         }
         return this.blockType;
     }
-    
+
     public void setBlockType(BlockType blockType) {
     	this.blockType = blockType;
     }
-    
+
     public BaseItem getDefaultState() {
         if (defaultState == null) {
             this.defaultState = new BaseItemStack(this);
         }
     	return this.defaultState;
-    }
-    
-    public void setDefaultState(BaseItem defaultState) {
-    	this.defaultState = defaultState;
     }
 
     @Override

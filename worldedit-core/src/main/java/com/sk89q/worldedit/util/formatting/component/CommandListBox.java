@@ -38,7 +38,7 @@ public class CommandListBox extends MessageBox {
         return appendCommand(alias, description, true);
     }
 
-    public CommandListBox appendCommand(String alias, String description, boolean allowed) {
+    CommandListBox appendCommand(String alias, String description, boolean allowed) {
         if (!first) {
             getContents().newLine();
         }
@@ -46,6 +46,5 @@ public class CommandListBox extends MessageBox {
         first = false;
         return this;
     }
-
 
 }

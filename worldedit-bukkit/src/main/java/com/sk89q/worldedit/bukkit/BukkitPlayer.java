@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
+
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -41,7 +42,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,11 +51,10 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -168,13 +167,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
             Extent extent = loc.getExtent();
             if (extent instanceof World) {
                 org.bukkit.World world = Bukkit.getWorld(((World) extent).getName());
-               // System.out.println("Teleport to world " + world);
-                player.teleport(new Location(world, pos.getX(), pos.getY(),
-                        pos.getZ(), yaw, pitch));
+                player.teleport(new Location(world, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
             }
         }
-        player.teleport(new Location(player.getWorld(), pos.getX(), pos.getY(),
-                pos.getZ(), yaw, pitch));
+        player.teleport(new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ(), yaw, pitch));
     }
 
     @Override

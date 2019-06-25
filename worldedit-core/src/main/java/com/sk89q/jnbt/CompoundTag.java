@@ -41,15 +41,6 @@ public class CompoundTag extends Tag {
         this.value = value;
     }
 
-    @Override
-    public Map<String, Object> getRaw() {
-        HashMap<String, Object> raw = new HashMap<>();
-        for (Map.Entry<String, Tag> entry : value.entrySet()) {
-            raw.put(entry.getKey(), entry.getValue().getRaw());
-        }
-        return raw;
-    }
-
     /**
      * Returns whether this compound tag contains the given key.
      *

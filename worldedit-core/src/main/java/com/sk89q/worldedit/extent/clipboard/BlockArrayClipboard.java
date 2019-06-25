@@ -58,9 +58,9 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
 
 	private Region region;
     private BlockVector3 origin;
+    private BlockStateHolder[][][] blocks;
     public FaweClipboard IMP;
     private BlockVector3 size;
-    private BlockStateHolder[][][] blocks;
     private final List<ClipboardEntity> entities = new ArrayList<>();
 
     public BlockArrayClipboard(Region region) {

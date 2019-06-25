@@ -34,7 +34,6 @@ import java.util.Set;
 public class ItemCategory extends Category<ItemType> {
 
     public static final NamespacedRegistry<ItemCategory> REGISTRY = new NamespacedRegistry<>("item tag");
-    private int internalId;
 
     public ItemCategory(final String id) {
         super(id);
@@ -57,5 +56,4 @@ public class ItemCategory extends Category<ItemType> {
     public boolean contains(BaseItem baseItem) {
         return this.getAll().contains(baseItem.getType());
     }
-
 }

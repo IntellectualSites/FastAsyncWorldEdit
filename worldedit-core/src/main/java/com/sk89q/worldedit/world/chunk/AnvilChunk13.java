@@ -54,7 +54,7 @@ public class AnvilChunk13 implements Chunk {
 
     /**
      * Construct the chunk with a compound tag.
-     * 
+     *
      * @param tag the tag to read
      * @throws DataException on a data error
      */
@@ -159,12 +159,13 @@ public class AnvilChunk13 implements Chunk {
      * @throws DataException
      */
     private void populateTileEntities() throws DataException {
-        tileEntities = new HashMap<>();
         if (!rootTag.getValue().containsKey("TileEntities")) {
             return;
         }
         List<Tag> tags = NBTUtils.getChildTag(rootTag.getValue(),
                 "TileEntities", ListTag.class).getValue();
+
+        tileEntities = new HashMap<>();
 
         for (Tag tag : tags) {
             if (!(tag instanceof CompoundTag)) {
@@ -221,6 +222,7 @@ public class AnvilChunk13 implements Chunk {
 
         BlockState[] sectionBlocks = blocks[section];
         BlockState state = sectionBlocks != null ? sectionBlocks[(yIndex << 8) | (z << 4) | x] : BlockTypes.AIR.getDefaultState();
+
         if (state.getMaterial().hasContainer()) {
             CompoundTag tileEntity = getBlockTileEntity(position);
             return state.toBaseBlock(tileEntity);

@@ -22,18 +22,9 @@ package com.sk89q.worldedit.world.registry;
 import com.sk89q.worldedit.world.item.ItemType;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
 
 public interface ItemRegistry {
 
-    /**
-     * Register all items
-     */
-    default Collection<String> registerItems() {
-        return Collections.emptyList();
-    }
-    
     /**
      * Gets the name for the given item.
      *

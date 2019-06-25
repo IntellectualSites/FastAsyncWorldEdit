@@ -1,29 +1,25 @@
 package com.sk89q.worldedit.function.operation;
 
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+
 import java.util.List;
 
 public class BackwardsExtentBlockCopy implements Operation {
     private final Region region;
     private final Transform transform;
-    private final Extent destination;
-    private final Extent source;
     private final RegionFunction function;
     private final BlockVector3 origin;
 
 //    private Vector mutable = new MutableBlockVector3();
 
-    public BackwardsExtentBlockCopy(Extent source, Region region, Extent destination, BlockVector3 origin, Transform transform, RegionFunction function) {
-        this.source = source;
+    BackwardsExtentBlockCopy(Region region, BlockVector3 origin, Transform transform, RegionFunction function) {
         this.region = region;
-        this.destination = destination;
         this.transform = transform;
         this.function = function;
         this.origin = origin;

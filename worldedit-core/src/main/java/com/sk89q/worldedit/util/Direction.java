@@ -23,7 +23,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * A collection of cardinal, ordinal, and secondary-ordinal directions.
@@ -65,7 +69,7 @@ public enum Direction {
     private final BlockVector3 blockPoint;
 
     private static HashMap<String, Direction> map = new HashMap<>();
-    
+
     static {
         for (Direction dir : Direction.values()) {
             map.put(dir.name(), dir);
@@ -80,11 +84,11 @@ public enum Direction {
         this.left = left;
         this.right = right;
     }
-    
+
     public static Direction get(CharSequence sequence) {
         return map.get(sequence.toString());
     }
-    
+
     public Direction getLeft() {
         return left != -1 ? values()[left] : null;
     }
