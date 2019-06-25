@@ -11,20 +11,12 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
+
 import com.google.common.collect.MapMaker;
 import com.sk89q.jnbt.CompoundTag;
-import java.io.File;
-import java.io.RandomAccessFile;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayDeque;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -32,6 +24,14 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
+
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayDeque;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot, ChunkSnapshot> {
 
@@ -78,15 +78,6 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
     }
 
     private static Class<?> classRegionFileCache;
-    private static Class<?> classRegionFile;
-    private static Class<?> classCraftChunk;
-    private static Class<?> classCraftWorld;
-    private static Class<?> classNMSChunk;
-    private static Class<?> classNMSWorld;
-    private static Class<?> classChunkProviderServer;
-    private static Class<?> classIChunkLoader;
-    private static Class<?> classChunkRegionLoader;
-    private static Class<?> classIChunkProvider;
     private static Method methodGetHandleChunk;
     private static Method methodGetHandleWorld;
     private static Method methodFlush;
@@ -100,15 +91,15 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
         try {
             BukkitReflectionUtils.init();
             classRegionFileCache = BukkitReflectionUtils.getNmsClass("RegionFileCache");
-            classRegionFile = BukkitReflectionUtils.getNmsClass("RegionFile");
-            classCraftChunk = BukkitReflectionUtils.getCbClass("CraftChunk");
-            classNMSChunk = BukkitReflectionUtils.getNmsClass("Chunk");
-            classCraftWorld = BukkitReflectionUtils.getCbClass("CraftWorld");
-            classNMSWorld = BukkitReflectionUtils.getNmsClass("World");
-            classChunkProviderServer = BukkitReflectionUtils.getNmsClass("ChunkProviderServer");
-            classIChunkProvider = BukkitReflectionUtils.getNmsClass("IChunkProvider");
-            classIChunkLoader = BukkitReflectionUtils.getNmsClass("IChunkLoader");
-            classChunkRegionLoader = BukkitReflectionUtils.getNmsClass("ChunkRegionLoader");
+            Class<?> classRegionFile = BukkitReflectionUtils.getNmsClass("RegionFile");
+            Class<?> classCraftChunk = BukkitReflectionUtils.getCbClass("CraftChunk");
+            Class<?> classNMSChunk = BukkitReflectionUtils.getNmsClass("Chunk");
+            Class<?> classCraftWorld = BukkitReflectionUtils.getCbClass("CraftWorld");
+            Class<?> classNMSWorld = BukkitReflectionUtils.getNmsClass("World");
+            Class<?> classChunkProviderServer = BukkitReflectionUtils.getNmsClass("ChunkProviderServer");
+            Class<?> classIChunkProvider = BukkitReflectionUtils.getNmsClass("IChunkProvider");
+            Class<?> classIChunkLoader = BukkitReflectionUtils.getNmsClass("IChunkLoader");
+            Class<?> classChunkRegionLoader = BukkitReflectionUtils.getNmsClass("ChunkRegionLoader");
 
             methodGetHandleChunk = ReflectionUtils.setAccessible(classCraftChunk.getDeclaredMethod("getHandle"));
             methodGetHandleWorld = ReflectionUtils.setAccessible(classCraftWorld.getDeclaredMethod("getHandle"));
@@ -289,15 +280,15 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
     private ChunkSnapshot tryGetSnasphot(Chunk chunk) {
         try {
             return chunk.getChunkSnapshot(false, true, false);
-        } catch (Throwable ignore) {
-            Throwable cause = ignore;
+        } catch (Throwable throwable) {
+            Throwable cause = throwable;
             while (cause.getCause() != null) {
                 cause = cause.getCause();
             }
             if (cause instanceof IllegalStateException) {
                 return null;
             }
-            throw ignore;
+            throw throwable;
         }
     }
 
@@ -391,8 +382,8 @@ public class BukkitQueue_All extends BukkitQueue_0<ChunkSnapshot, ChunkSnapshot,
         if (disableResult != null) {
             try {
                 fieldNeighbors.set(disableResult[0], disableResult[1]);
-            } catch (Throwable ignore) {
-                ignore.printStackTrace();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
             }
         }
     }

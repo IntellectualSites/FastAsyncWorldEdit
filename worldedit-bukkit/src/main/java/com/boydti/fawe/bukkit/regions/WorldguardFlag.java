@@ -37,7 +37,7 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
         final RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         final RegionManager manager = container.get(fp.getWorld());
 
-        return new FaweMask(new ManagerRegion(manager, localplayer), null) {
+        return new FaweMask(new ManagerRegion(manager, localplayer)) {
             @Override
             public boolean isValid(FawePlayer player, MaskType type) {
                 // We rely on the region mask instead of this

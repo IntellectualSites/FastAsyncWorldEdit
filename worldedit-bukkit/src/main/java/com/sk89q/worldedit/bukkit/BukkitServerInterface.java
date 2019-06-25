@@ -36,13 +36,12 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 public class BukkitServerInterface implements MultiUserPlatform {
     public Server server;

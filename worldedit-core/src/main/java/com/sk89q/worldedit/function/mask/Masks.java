@@ -18,12 +18,12 @@
  */
 package com.sk89q.worldedit.function.mask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Various utility functions related to {@link Mask} and {@link Mask2D}.

@@ -44,17 +44,7 @@ import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.FastWorldEditExtent;
-import com.boydti.fawe.object.extent.FaweRegionExtent;
-import com.boydti.fawe.object.extent.HeightBoundExtent;
-import com.boydti.fawe.object.extent.MultiRegionExtent;
-import com.boydti.fawe.object.extent.NullExtent;
-import com.boydti.fawe.object.extent.ProcessedWEExtent;
-import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.object.extent.SingleRegionExtent;
-import com.boydti.fawe.object.extent.SlowExtent;
-import com.boydti.fawe.object.extent.SourceMaskExtent;
-import com.boydti.fawe.object.extent.StripNBTExtent;
+import com.boydti.fawe.object.extent.*;
 import com.boydti.fawe.object.function.SurfaceRegionFunction;
 import com.boydti.fawe.object.mask.ResettableMask;
 import com.boydti.fawe.object.pattern.ExistingPattern;
@@ -68,6 +58,9 @@ import com.boydti.fawe.util.Perm;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Supplier;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -88,17 +81,7 @@ import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
-import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
-import com.sk89q.worldedit.function.mask.BlockTypeMask;
-import com.sk89q.worldedit.function.mask.BoundedHeightMask;
-import com.sk89q.worldedit.function.mask.ExistingBlockMask;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.MaskIntersection;
-import com.sk89q.worldedit.function.mask.MaskUnion;
-import com.sk89q.worldedit.function.mask.Masks;
-import com.sk89q.worldedit.function.mask.NoiseFilter2D;
-import com.sk89q.worldedit.function.mask.RegionMask;
+import com.sk89q.worldedit.function.mask.*;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -120,8 +103,8 @@ import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
-import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.internal.expression.runtime.ExpressionTimeoutException;
+import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
@@ -139,6 +122,9 @@ import com.sk89q.worldedit.regions.EllipsoidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 import com.sk89q.worldedit.regions.shape.ArbitraryBiomeShape;
 import com.sk89q.worldedit.regions.shape.ArbitraryShape;
 import com.sk89q.worldedit.regions.shape.RegionShape;
@@ -150,21 +136,26 @@ import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.SimpleWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.*;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockCategories;
+import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -213,7 +204,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
     }
 
-    private final World world;
+    @SuppressWarnings("ProtectedField")
+    protected final World world;
     private String worldName;
     private FaweQueue queue;
     private boolean wrapped;
@@ -245,7 +237,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         super(world);
         this.worldName = worldName == null ? world == null ? queue == null ? "" : queue.getWorldName() : world.getName() : worldName;
         if (world == null && this.worldName != null) world = FaweAPI.getWorld(this.worldName);
+
         this.world = world;
+
         if (bus == null) {
             bus = WorldEdit.getInstance().getEventBus();
         }
@@ -650,6 +644,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return changeTask != null ? changeTask : history != null ? history.getChangeSet() : null;
     }
 
+    /**
+     * Will be removed very soon. Use getChangeSet()
+     */
+    @Deprecated
     public FaweChangeSet getChangeTask() {
         return changeTask;
     }
@@ -867,7 +865,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      *
      * @param enabled true to enable
      */
-    public void setFastMode(final boolean enabled) {
+    public void setFastMode(boolean enabled) {
         this.fastMode = enabled;
         disableHistory(enabled);
     }
@@ -1004,6 +1002,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     /**
      * Disable all buffering extents.
      *
+     * @see #setReorderMode(ReorderMode)
      * @see #setBatchingChunks(boolean)
      */
     public void disableBuffering() {
@@ -1021,12 +1020,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     @Override
-    public BiomeType getBiome(final BlockVector2 position) {
+    public BiomeType getBiome(BlockVector2 position) {
         return this.extent.getBiome(position);
     }
 
     @Override
-    public boolean setBiome(final BlockVector2 position, final BiomeType biome) {
+    public boolean setBiome(BlockVector2 position, BiomeType biome) {
         this.changes++;
         return this.extent.setBiome(position, biome);
     }
@@ -1272,19 +1271,11 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public boolean setBlockIfAir(final BlockVector3 position, final BlockStateHolder block) throws MaxChangedBlocksException {
         return this.getBlock(position).getBlockType().getMaterial().isAir() && this.setBlock(position, block);
     }
-//    private int setBlocks(Set<BlockVector3> vset, Pattern pattern) throws MaxChangedBlocksException {
-//        int affected = 0;
-//        for (BlockVector3 v : vset) {
-//            affected += setBlock(v, pattern) ? 1 : 0;
-//        }
-//        return affected;
-//    }
 
     @Override
     @Nullable
-    public Entity createEntity(final com.sk89q.worldedit.util.Location location, final BaseEntity entity) {
-        Entity result = this.extent.createEntity(location, entity);
-        return result;
+    public Entity createEntity(com.sk89q.worldedit.util.Location location, final BaseEntity entity) {
+        return this.extent.createEntity(location, entity);
     }
 
     /**
@@ -1615,7 +1606,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         MaskIntersection mask = new MaskIntersection(
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 new BoundedHeightMask(
-                        Math.max((origin.getBlockY() - depth) + 1, getMinimumPoint().getBlockY()),
+                        Math.max(origin.getBlockY() - depth + 1, getMinimumPoint().getBlockY()),
                         Math.min(getMaximumPoint().getBlockY(), origin.getBlockY())),
                 Masks.negate(new ExistingBlockMask(this)));
 
@@ -1735,6 +1726,15 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return wrapped || getMask() != null || getSourceMask() != null || history != null;
     }
 
+    /**
+     * Remove blocks of a certain type nearby a given position.
+     *
+     * @param position center position of cuboid
+     * @param blockType the block type to match
+     * @param apothem an apothem of the cuboid, where the minimum is 1
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
     public int removeNear(BlockVector3 position, BlockType blockType, int apothem) throws MaxChangedBlocksException {
         checkNotNull(position);
         checkArgument(apothem >= 1, "apothem >= 1");
@@ -1800,8 +1800,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (pattern instanceof BlockStateHolder) {
             return setBlocks(region, (BlockStateHolder) pattern);
         }
-        final BlockReplace replace = new BlockReplace(EditSession.this, pattern);
-        final RegionVisitor visitor = new RegionVisitor(region, replace, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
+        BlockReplace replace = new BlockReplace(this, pattern);
+        RegionVisitor visitor = new RegionVisitor(region, replace, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
         Operations.completeBlindly(visitor);
         return this.changes = visitor.getAffected();
     }
@@ -1900,7 +1900,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int makeCuboidFaces( Region region, Pattern pattern) throws MaxChangedBlocksException {
+    public int makeCuboidFaces(Region region, Pattern pattern) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(pattern);
 
@@ -1972,7 +1972,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int makeWalls(final Region region, Pattern pattern) throws MaxChangedBlocksException  {
+    public int makeWalls(final Region region, Pattern pattern) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(pattern);
 
@@ -2002,6 +2002,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public <B extends BlockStateHolder<B>> int overlayCuboidBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(block);
+
         return overlayCuboidBlocks(region, new BlockPattern(block));
     }
 
@@ -2017,6 +2018,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public int overlayCuboidBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(pattern);
+
         BlockReplace replace = new BlockReplace(this, pattern);
         RegionOffset offset = new RegionOffset(BlockVector3.UNIT_Y, replace);
         int minY = region.getMinimumPoint().getBlockY();
@@ -2045,10 +2047,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return this.changes = naturalizer.getAffected();
     }
 
-    public int stackCuboidRegion(final Region region, final BlockVector3 dir, final int count, final boolean copyAir) {
-        return stackCuboidRegion(region, dir, count, copyAir, true, false);
-    }
-
     /**
      * Stack a cuboid region.
      *
@@ -2063,6 +2061,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         checkNotNull(region);
         checkNotNull(dir);
         checkArgument(count >= 1, "count >= 1 required");
+
         BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
         BlockVector3 to = region.getMinimumPoint();
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
@@ -2094,22 +2093,14 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir, BlockStateHolder replacement) throws MaxChangedBlocksException  {
-        return moveRegion(region, dir, distance, copyAir, true, false, replacement);
-    }
-
-    public int moveRegion(final Region region, final BlockVector3 dir, final int distance, final boolean copyAir, final boolean copyEntities, final boolean copyBiomes, BlockStateHolder replacement) {
-        return moveRegion(region, dir, distance, copyAir, copyEntities, copyBiomes, (Pattern) replacement);
-    }
-
-    public int moveRegion(final Region region, final BlockVector3 dir, final int distance, final boolean copyAir, final boolean copyEntities, final boolean copyBiomes, Pattern replacement) {
+    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir, boolean copyEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(dir);
         checkArgument(distance >= 1, "distance >= 1 required");
-        final BlockVector3 displace = dir.multiply(distance);
+        BlockVector3 to = region.getMinimumPoint().add(dir.multiply(distance));
 
+        final BlockVector3 displace = dir.multiply(distance);
         final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-        final BlockVector3 to = region.getMinimumPoint().add(dir.multiply(distance));
 
         BlockVector3 disAbs = displace.abs();
 
@@ -2122,10 +2113,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
         if (replacement == null) replacement = BlockTypes.AIR.getDefaultState();
         final BlockReplace remove = replacement instanceof ExistingPattern ? null : new BlockReplace(this, replacement);
-
         copy.setCopyBiomes(copyBiomes);
         copy.setCopyingEntities(copyEntities);
-        copy.setSourceFunction(remove);
+        copy.setSourceFunction(remove); // Remove
+        copy.setRemovingEntities(true);
         copy.setRepetitions(1);
         Mask sourceMask = getSourceMask();
         if (sourceMask != null) {
@@ -2179,6 +2170,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public int drainArea(BlockVector3 origin, double radius, boolean waterlogged) throws MaxChangedBlocksException {
         checkNotNull(origin);
         checkArgument(radius >= 0, "radius >= 0 required");
+
         Mask liquidMask;
         // Not thread safe, use hardcoded liquidmask
 //        if (getWorld() != null) {
@@ -2188,9 +2180,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
         MaskIntersection mask = new MaskIntersection(
                 new BoundedHeightMask(0, getWorld().getMaxY()),
-                new RegionMask(
-                        new EllipsoidRegion(null, origin,
-                                Vector3.at(radius, radius, radius))), liquidMask);
+                new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
+                liquidMask);
         BlockReplace replace;
         if (waterlogged) {
             replace = new BlockReplace(this, new WaterloggedRemover(this));
@@ -2207,6 +2198,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
 
         Operations.completeBlindly(visitor);
+
         return this.changes = visitor.getAffected();
     }
 
@@ -2287,11 +2279,14 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     private int makeCylinder(BlockVector3 pos, final Pattern block, double radiusX, double radiusZ, int height, double thickness, final boolean filled) {
+        int affected = 0;
+
         radiusX += 0.5;
         radiusZ += 0.5;
+
         MutableBlockVector3 posv = new MutableBlockVector3(pos);
         if (height == 0) {
-            return this.changes;
+            return 0;
         } else if (height < 0) {
             height = -height;
             posv.mutY(posv.getY() - height);
@@ -2320,8 +2315,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             double nextMinXn = 0;
             final double minInvRadiusX = 1 / (radiusX - thickness);
             final double minInvRadiusZ = 1 / (radiusZ - thickness);
-            forX:
-            for (int x = 0; x <= ceilRadiusX; ++x) {
+            forX: for (int x = 0; x <= ceilRadiusX; ++x) {
                 final double xn = nextXn;
                 double dx2 = nextMinXn * nextMinXn;
                 nextXn = (x + 1) * invRadiusX;
@@ -2329,8 +2323,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 double nextZn = 0;
                 double nextMinZn = 0;
                 dx = xn * xn;
-                forZ:
-                for (int z = 0; z <= ceilRadiusZ; ++z) {
+                forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                     final double zn = nextZn;
                     double dz2 = nextMinZn * nextMinZn;
                     nextZn = (z + 1) * invRadiusZ;
@@ -2357,14 +2350,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 }
             }
         } else {
-            forX:
-            for (int x = 0; x <= ceilRadiusX; ++x) {
+            forX: for (int x = 0; x <= ceilRadiusX; ++x) {
                 final double xn = nextXn;
                 nextXn = (x + 1) * invRadiusX;
                 double nextZn = 0;
                 dx = xn * xn;
-                forZ:
-                for (int z = 0; z <= ceilRadiusZ; ++z) {
+                forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                     final double zn = nextZn;
                     nextZn = (z + 1) * invRadiusZ;
                     dz = zn * zn;
@@ -2509,6 +2500,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int makeSphere(BlockVector3 pos, Pattern block, double radiusX, double radiusY, double radiusZ, boolean filled) throws MaxChangedBlocksException {
+        int affected = 0;
+
         radiusX += 0.5;
         radiusY += 0.5;
         radiusZ += 0.5;
@@ -2526,26 +2519,22 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
 
         double nextXn = invRadiusX;
-        double dx, dy, dz, dxz, dxyz;
-        forX:
-        for (int x = 0; x <= ceilRadiusX; ++x) {
+        forX: for (int x = 0; x <= ceilRadiusX; ++x) {
             final double xn = nextXn;
-            dx = xn * xn;
+            double dx = xn * xn;
             nextXn = (x + 1) * invRadiusX;
             double nextZn = invRadiusZ;
-            forZ:
-            for (int z = 0; z <= ceilRadiusZ; ++z) {
+            forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                 final double zn = nextZn;
-                dz = zn * zn;
-                dxz = dx + dz;
+                double dz = zn * zn;
+                double dxz = dx + dz;
                 nextZn = (z + 1) * invRadiusZ;
                 double nextYn = invRadiusY;
 
-                forY:
-                for (int y = 0; y <= ceilRadiusY; ++y) {
+                forY: for (int y = 0; y <= ceilRadiusY; ++y) {
                     final double yn = nextYn;
-                    dy = yn * yn;
-                    dxyz = dxz + dy;
+                    double dy = yn * yn;
+                    double dxyz = dxz + dy;
                     nextYn = (y + 1) * invRadiusY;
 
                     if (dxyz > 1) {
@@ -2783,13 +2772,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     if (block.getBlockType() == BlockTypes.DIRT ||
                             (!onlyNormalDirt && block.getBlockType() == BlockTypes.COARSE_DIRT)) {
                         if (setBlock(pt, grass)) {
-                            break loop;
+                            break;
                         }
                         break;
                     } else if (block.getBlockType() == BlockTypes.WATER || block.getBlockType() == BlockTypes.LAVA) {
-                        break loop;
+                        break;
                     } else if (block.getBlockType().getMaterial().isMovementBlocker()) {
-                        break loop;
+                        break;
                     }
                 }
             }

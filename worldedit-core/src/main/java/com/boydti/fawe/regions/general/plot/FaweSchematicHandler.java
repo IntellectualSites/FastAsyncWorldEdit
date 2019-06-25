@@ -8,6 +8,7 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
+
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
@@ -19,6 +20,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompressedCompoundTag;
 import com.sk89q.jnbt.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -27,9 +29,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -48,7 +48,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             return true;
         }
         FaweQueue faweQueue = SetQueue.IMP.getNewQueue(((FaweLocalBlockQueue) queue).IMP.getWEWorld(), true, false);
-        faweQueue.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.asTag(compoundTag));
+        faweQueue.setTile(x, y, z, (CompoundTag) FaweCache.asTag(compoundTag));
         faweQueue.flush();
         return false;
     }
@@ -98,7 +98,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                 }
             } else {
                 try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new PGZIPOutputStream(stream))) {
-                    Map<String, com.sk89q.jnbt.Tag> map = tag.getValue();
+                    Map<String, Tag> map = tag.getValue();
                     output.writeNamedTag("Schematic", map.getOrDefault("Schematic", tag));
                 }
             }
@@ -123,9 +123,9 @@ public class FaweSchematicHandler extends SchematicHandler {
             public void run(OutputStream output) {
                 try {
                     try (PGZIPOutputStream gzip = new PGZIPOutputStream(output)) {
-                        com.sk89q.jnbt.CompoundTag weTag = (com.sk89q.jnbt.CompoundTag) FaweCache.asTag(tag);
+                        CompoundTag weTag = (CompoundTag) FaweCache.asTag(tag);
                         try (NBTOutputStream nos = new NBTOutputStream(gzip)) {
-                            Map<String, com.sk89q.jnbt.Tag> map = weTag.getValue();
+                            Map<String, Tag> map = weTag.getValue();
                             nos.writeNamedTag("Schematic", map.getOrDefault("Schematic", weTag));
                         }
                     }

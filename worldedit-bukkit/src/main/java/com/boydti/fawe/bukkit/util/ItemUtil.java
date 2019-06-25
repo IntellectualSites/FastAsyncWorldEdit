@@ -2,20 +2,20 @@ package com.boydti.fawe.bukkit.util;
 
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.util.ReflectionUtils;
+
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.bukkit.inventory.ItemStack;
+
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import org.bukkit.inventory.ItemStack;
 
 public class ItemUtil {
 
-    private final Class<?> classCraftItemStack;
     private final Method methodAsNMSCopy;
-    private final Class<?> classNMSItem;
     private final Method methodGetTag;
     private final Method methodHasTag;
     private final Method methodSetTag;
@@ -25,8 +25,8 @@ public class ItemUtil {
     private SoftReference<Int2ObjectOpenHashMap<WeakReference<Tag>>> hashToNMSTag = new SoftReference(new Int2ObjectOpenHashMap<>());
 
     public ItemUtil() throws Exception {
-        this.classCraftItemStack = BukkitReflectionUtils.getCbClass("inventory.CraftItemStack");
-        this.classNMSItem = BukkitReflectionUtils.getNmsClass("ItemStack");
+        Class<?> classCraftItemStack = BukkitReflectionUtils.getCbClass("inventory.CraftItemStack");
+        Class<?> classNMSItem = BukkitReflectionUtils.getNmsClass("ItemStack");
         this.methodAsNMSCopy = ReflectionUtils.setAccessible(classCraftItemStack.getDeclaredMethod("asNMSCopy", ItemStack.class));
         this.methodHasTag = ReflectionUtils.setAccessible(classNMSItem.getDeclaredMethod("hasTag"));
         this.methodGetTag = ReflectionUtils.setAccessible(classNMSItem.getDeclaredMethod("getTag"));

@@ -26,19 +26,18 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.object.collection.BlockVectorSet;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Direction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -98,13 +97,17 @@ public abstract class BreadthFirstSearch implements Operation {
      */
     public BreadthFirstSearch(RegionFunction function) {
         this(function, Integer.MAX_VALUE);
+        checkNotNull(function);
     }
 
-    public BreadthFirstSearch(final RegionFunction function, int maxDepth) {
+    public BreadthFirstSearch(RegionFunction function, int maxDepth) {
         this(function, maxDepth, null);
+        checkNotNull(function);
+
     }
 
-    public BreadthFirstSearch(final RegionFunction function, int maxDepth, HasFaweQueue faweQueue) {
+    public BreadthFirstSearch(RegionFunction function, int maxDepth, HasFaweQueue faweQueue) {
+        checkNotNull(function);
         FaweQueue fq = faweQueue != null ? faweQueue.getQueue() : null;
         this.mFaweQueue = fq instanceof MappedFaweQueue ? (MappedFaweQueue) fq : null;
         this.queue = new BlockVectorSet();
@@ -126,7 +129,7 @@ public abstract class BreadthFirstSearch implements Operation {
         }
         return array;
     }
-    
+
     /**
      * Get the list of directions will be visited.
      *
@@ -179,19 +182,13 @@ public abstract class BreadthFirstSearch implements Operation {
      *
      * @param position the position
      */
-
     public void visit(BlockVector3 position) {
-        if (!isVisited(position)) {
-            isVisitable(position, position); // Ignore this, just to initialize mask on this point
-            queue.add(position);
-            visited.add(position);
+        BlockVector3 blockVector = position;
+        if (!visited.contains(blockVector)) {
+            isVisitable(blockVector, blockVector); // Ignore this, just to initialize mask on this point
+            queue.add(blockVector);
+            visited.add(blockVector);
         }
-    }
-
-    public void resetVisited() {
-        queue.clear();
-        visited.clear();
-        affected = 0;
     }
 
     public void setVisited(BlockVectorSet set) {

@@ -20,10 +20,15 @@
 package com.sk89q.worldedit.command.composition;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.*;
+import com.boydti.fawe.object.FaweChunk;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.RegionWrapper;
+import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.util.MainUtil;
+
 import com.google.common.base.Joiner;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Lists;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
@@ -51,8 +56,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.lang.reflect.Field;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SelectionCommand extends SimpleCommand<Operation> {
 
@@ -116,11 +119,6 @@ public class SelectionCommand extends SimpleCommand<Operation> {
                                 fc.fillCuboid(0, 15, minY, maxY, 0, 15, block.getInternalId());
                                 fc.optimize();
 
-                                int bcx = (current.minX) >> 4;
-                                int bcz = (current.minZ) >> 4;
-
-                                int tcx = (current.maxX) >> 4;
-                                int tcz = (current.maxZ) >> 4;
                                 // [chunkx, chunkz, pos1x, pos1z, pos2x, pos2z, isedge]
                                 MainUtil.chunkTaskSync(current, new RunnableVal<int[]>() {
                                     @Override
@@ -181,7 +179,7 @@ public class SelectionCommand extends SimpleCommand<Operation> {
     }
 
     @Override
-    public boolean testPermission0(CommandLocals locals) {
+    protected boolean testPermission0(CommandLocals locals) {
         return locals.get(Actor.class).hasPermission(permission);
     }
 

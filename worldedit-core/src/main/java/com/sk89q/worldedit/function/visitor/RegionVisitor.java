@@ -25,14 +25,15 @@ import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.exception.FaweException;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,11 +43,10 @@ import java.util.List;
 public class RegionVisitor implements Operation {
 
     public final Region region;
-    public final Iterable<? extends BlockVector3> iterable;
     public final RegionFunction function;
-    private final MappedFaweQueue queue;
-    private boolean useCuboidIterator = false;
     public int affected = 0;
+    public final Iterable<? extends BlockVector3> iterable;
+    private final MappedFaweQueue queue;
 
     /**
      * Deprecated in favor of the other constructors which will preload chunks during iteration
@@ -68,9 +68,9 @@ public class RegionVisitor implements Operation {
     }
 
     public RegionVisitor(Iterable<? extends BlockVector3> iterable, RegionFunction function, HasFaweQueue hasQueue) {
-        region = (iterable instanceof Region) ? (Region) iterable : null;
-        this.iterable = iterable;
+        this.region = iterable instanceof Region ? (Region) iterable : null;
         this.function = function;
+        this.iterable = iterable;
         this.queue = hasQueue != null && hasQueue.getQueue() instanceof MappedFaweQueue ? (MappedFaweQueue) hasQueue.getQueue() : null;
     }
 
@@ -80,11 +80,11 @@ public class RegionVisitor implements Operation {
      * @return the number of affected
      */
     public int getAffected() {
-        return this.affected;
+        return affected;
     }
 
     @Override
-    public Operation resume(final RunContext run) throws WorldEditException {
+    public Operation resume(RunContext run) throws WorldEditException {
         if (queue != null && Settings.IMP.QUEUE.PRELOAD_CHUNKS > 1) {
         	/*
              * The following is done to reduce iteration cost
@@ -194,9 +194,9 @@ public class RegionVisitor implements Operation {
     }
 
     @Override
-    public void addStatusMessages(final List<String> messages) {
+    public void addStatusMessages(List<String> messages) {
         messages.add(BBC.VISITOR_BLOCK.format(getAffected()));
     }
 
-
 }
+

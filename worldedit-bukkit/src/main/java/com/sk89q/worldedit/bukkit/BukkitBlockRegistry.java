@@ -19,28 +19,21 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.bekvon.bukkit.residence.commands.material;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.command.tool.BlockDataCyler;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BundledBlockRegistry;
-import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.registry.PassthroughBlockMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.Function;
-
-import javax.annotation.Nullable;
 
 public class BukkitBlockRegistry extends BundledBlockRegistry {
 

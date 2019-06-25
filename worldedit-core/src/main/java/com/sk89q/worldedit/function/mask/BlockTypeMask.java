@@ -1,20 +1,43 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
+/**
+ * A mask that checks whether blocks at the given positions are matched by
+ * a block in a list.
+ *
+ * <p>This mask checks for ONLY the block type. If state should also be checked,
+ * use {@link BlockMask}.</p>
+ */
 public class BlockTypeMask extends AbstractExtentMask {
     private final boolean[] types;
 
@@ -57,12 +80,10 @@ public class BlockTypeMask extends AbstractExtentMask {
     /**
      * Add the given blocks to the list of criteria.
      *
-     * @param blocks an array of blocks
+     * @param block an array of blocks
      */
-    public void add(BlockType... blocks) {
-        for (BlockType type : blocks) {
-            this.types[type.getInternalId()] = true;
-        }
+    public void add(BlockType... block) {
+        add(Arrays.asList(checkNotNull(block)));
     }
 
     /**

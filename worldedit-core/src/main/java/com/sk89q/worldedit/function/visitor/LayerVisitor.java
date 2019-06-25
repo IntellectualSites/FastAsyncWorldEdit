@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.Mask2D;
@@ -30,9 +33,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.FlatRegion;
 
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Visits the layers within a region.
@@ -54,14 +54,15 @@ public class LayerVisitor implements Operation {
      * Create a new visitor.
      *
      * @param flatRegion the flat region to visit
-     * @param minY       the minimum Y to stop the search at
-     * @param maxY       the maximum Y to begin the search at
-     * @param function   the layer function to apply t blocks
+     * @param minY the minimum Y to stop the search at
+     * @param maxY the maximum Y to begin the search at
+     * @param function the layer function to apply t blocks
      */
     public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function) {
         checkNotNull(flatRegion);
         checkArgument(minY <= maxY, "minY <= maxY required");
         checkNotNull(function);
+
         this.flatRegion = flatRegion;
         this.minY = minY;
         this.maxY = maxY;
@@ -119,6 +120,7 @@ public class LayerVisitor implements Operation {
                 }
             }
         }
+
         return null;
     }
 
@@ -129,6 +131,5 @@ public class LayerVisitor implements Operation {
     @Override
     public void addStatusMessages(List<String> messages) {
     }
-
 
 }

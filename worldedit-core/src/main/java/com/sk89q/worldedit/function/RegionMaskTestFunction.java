@@ -19,17 +19,14 @@
 
 package com.sk89q.worldedit.function;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.Region;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Passes calls to {@link #apply(com.sk89q.worldedit.Vector)} to the
- * delegate {@link com.sk89q.worldedit.function.RegionFunction} if they
+ * Passes calls to {@link #apply(BlockVector3)} to the
+ * delegate {@link RegionFunction} if they
  * match the given mask.
  */
 public class RegionMaskTestFunction implements RegionFunction {
@@ -41,7 +38,7 @@ public class RegionMaskTestFunction implements RegionFunction {
      * Create a new masking filter.
      *
      * @param mask the mask
-     * @param function the function
+     * @param failure the function
      */
     public RegionMaskTestFunction(Mask mask, RegionFunction success, RegionFunction failure) {
         checkNotNull(success);

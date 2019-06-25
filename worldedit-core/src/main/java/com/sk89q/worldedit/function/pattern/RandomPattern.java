@@ -22,12 +22,10 @@ package com.sk89q.worldedit.function.pattern;
 import com.boydti.fawe.object.collection.RandomCollection;
 import com.boydti.fawe.object.random.SimpleRandom;
 import com.boydti.fawe.object.random.TrueRandom;
-import com.sk89q.worldedit.WorldEditException;
 
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.extent.Extent;
 import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
@@ -35,8 +33,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Uses a random pattern of a weighted list of patterns.
@@ -83,8 +79,8 @@ public class RandomPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 get) {
-        return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(get);
+    public BaseBlock apply(BlockVector3 position) {
+        return collection.next(position.getBlockX(), position.getBlockY(), position.getBlockZ()).apply(position);
     }
 
     @Override

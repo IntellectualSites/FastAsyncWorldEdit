@@ -24,16 +24,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Executes several region functions in order.
  */
 public class CombinedRegionFunction implements RegionFunction {
 
-    private RegionFunction[] functions;
+    private final List<RegionFunction> functions = new ArrayList<>();
 
     /**
      * Create a combined region function.
@@ -48,8 +49,7 @@ public class CombinedRegionFunction implements RegionFunction {
      */
     public CombinedRegionFunction(Collection<RegionFunction> functions) {
         checkNotNull(functions);
-        this.functions = functions.toArray(new RegionFunction[functions.size()]);
-
+        this.functions.addAll(functions);
     }
 
     /**
@@ -58,7 +58,7 @@ public class CombinedRegionFunction implements RegionFunction {
      * @param function an array of functions to match
      */
     public CombinedRegionFunction(RegionFunction... function) {
-        this.functions = function;
+        this(Arrays.asList(checkNotNull(function)));
     }
 
     public static CombinedRegionFunction combine(RegionFunction function, RegionFunction add) {
@@ -82,9 +82,7 @@ public class CombinedRegionFunction implements RegionFunction {
      */
     public void add(Collection<RegionFunction> functions) {
         checkNotNull(functions);
-        ArrayList<RegionFunction> functionsList = new ArrayList<>(Arrays.asList(this.functions));
-        functionsList.addAll(functions);
-        this.functions = functionsList.toArray(new RegionFunction[functionsList.size()]);
+        this.functions.addAll(functions);
     }
 
     /**
@@ -106,7 +104,5 @@ public class CombinedRegionFunction implements RegionFunction {
         }
         return ret;
     }
-
-
 
 }

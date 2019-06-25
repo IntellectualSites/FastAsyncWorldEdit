@@ -1,7 +1,28 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.util.StringMan;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -32,16 +53,31 @@ public class BlockMask extends AbstractExtentMask {
     private final long[][] bitSets;
     protected final static long[] ALL = new long[0];
 
+
+    /**
+     * Create a new block mask.
+     *
+     * @param extent the extent
+     * @param blocks a list of blocks to match
+     */
     @Deprecated
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         super(extent);
+        checkNotNull(blocks);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
     }
 
+    /**
+     * Create a new block mask.
+     *
+     * @param extent the extent
+     * @param block an array of blocks to match
+     */
     @Deprecated
-    public BlockMask(Extent extent, BaseBlock... blocks) {
+    public BlockMask(Extent extent, BaseBlock... block) {
         super(extent);
-        this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
+        checkNotNull(block);
+        this.bitSets = new BlockMaskBuilder().addBlocks(block).optimize().getBits();
     }
 
     public BlockMask() {
@@ -235,6 +271,5 @@ public class BlockMask extends AbstractExtentMask {
     public Mask2D toMask2D() {
         return null;
     }
-
 
 }

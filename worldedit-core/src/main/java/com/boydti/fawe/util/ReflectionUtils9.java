@@ -57,31 +57,6 @@ public class ReflectionUtils9 {
         }
     }
 
-    public static <T extends Enum<?>> void clearEnum(Class<T> enumType) {
-        // 0. Sanity checks
-        if (!Enum.class.isAssignableFrom(enumType)) {
-            throw new RuntimeException("class " + enumType + " is not an instance of Enum");
-        }
-        // 1. Lookup "$VALUES" holder in enum class and get previous enum instances
-        Field valuesField = null;
-        Field[] fields = enumType.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getName().contains("$VALUES")) {
-                valuesField = field;
-                break;
-            }
-        }
-        AccessibleObject.setAccessible(new Field[]{valuesField}, true);
-        try {
-            setFailsafeFieldValue(valuesField, null, Array.newInstance(enumType, 0));
-            // 6. Clean enum cache
-            cleanEnumCache(enumType);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     public static Object makeEnum(Class<?> enumClass, String value, int ordinal) throws Exception {
         Constructor<?> constructor = Unsafe.class.getDeclaredConstructors()[0];
         constructor.setAccessible(true);

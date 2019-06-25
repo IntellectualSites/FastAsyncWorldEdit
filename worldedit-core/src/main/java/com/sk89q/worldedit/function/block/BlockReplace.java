@@ -38,7 +38,7 @@ public class BlockReplace implements RegionFunction {
     /**
      * Create a new instance.
      *
-     * @param extent  an extent
+     * @param extent an extent
      * @param pattern a pattern
      */
     public BlockReplace(Extent extent, Pattern pattern) {
@@ -52,7 +52,5 @@ public class BlockReplace implements RegionFunction {
     public boolean apply(BlockVector3 position) throws WorldEditException {
     	return pattern.apply(extent, position, position);
     }
-
-
 
 }

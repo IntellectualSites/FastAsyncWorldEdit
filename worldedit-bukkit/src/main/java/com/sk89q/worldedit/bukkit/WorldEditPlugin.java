@@ -23,7 +23,9 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
 import com.boydti.fawe.util.MainUtil;
+
 import com.google.common.base.Joiner;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.EditSession;
@@ -61,7 +63,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,8 +77,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Plugin for Bukkit.
@@ -89,39 +93,38 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     private static Map<String, Plugin> lookupNames;
     static {
-        {   // Disable AWE as otherwise both fail to load
-            PluginManager manager = Bukkit.getPluginManager();
-            try {
-                Field pluginsField = manager.getClass().getDeclaredField("plugins");
-                Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
-                pluginsField.setAccessible(true);
-                lookupNamesField.setAccessible(true);
-                List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
-                lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
-                pluginsField.set(manager, new ArrayList<Plugin>(plugins) {
-                    @Override
-                    public boolean add(Plugin plugin) {
-                        if (plugin.getName().startsWith("AsyncWorldEdit")) {
-                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
-                        } else if (plugin.getName().startsWith("BetterShutdown")) {
-                            Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
-                        } else {
-                            return super.add(plugin);
-                        }
-                        return false;
+        // Disable AWE as otherwise both fail to load
+        PluginManager manager = Bukkit.getPluginManager();
+        try {
+            Field pluginsField = manager.getClass().getDeclaredField("plugins");
+            Field lookupNamesField = manager.getClass().getDeclaredField("lookupNames");
+            pluginsField.setAccessible(true);
+            lookupNamesField.setAccessible(true);
+            List<Plugin> plugins = (List<Plugin>) pluginsField.get(manager);
+            lookupNames = (Map<String, Plugin>) lookupNamesField.get(manager);
+            pluginsField.set(manager, new ArrayList<Plugin>(plugins) {
+                @Override
+                public boolean add(Plugin plugin) {
+                    if (plugin.getName().startsWith("AsyncWorldEdit")) {
+                        Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible");
+                    } else if (plugin.getName().startsWith("BetterShutdown")) {
+                        Fawe.debug("Disabling `" + plugin.getName() + "` as it is incompatible (Improperly shaded classes from com.sk89q.minecraft.util.commands)");
+                    } else {
+                        return super.add(plugin);
                     }
-                });
-                lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
-                    @Override
-                    public Plugin put(@NotNull String key, @NotNull Plugin plugin) {
-                        if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
-                            return null;
-                        }
-                        return super.put(key, plugin);
+                    return false;
+                }
+            });
+            lookupNamesField.set(manager, lookupNames = new ConcurrentHashMap<String, Plugin>(lookupNames) {
+                @Override
+                public Plugin put(@NotNull String key, @NotNull Plugin plugin) {
+                    if (plugin.getName().startsWith("AsyncWorldEdit") || plugin.getName().startsWith("BetterShutdown")) {
+                        return null;
                     }
-                });
-            } catch (Throwable ignore) {}
-        }
+                    return super.put(key, plugin);
+                }
+            });
+        } catch (Throwable ignore) {}
     }
 
     public WorldEditPlugin() {
@@ -180,10 +183,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
         // Register CUI
-        fail(() -> {
-            getServer().getMessenger().registerIncomingPluginChannel(INSTANCE, CUI_PLUGIN_CHANNEL, new CUIChannelListener(INSTANCE));
-            getServer().getMessenger().registerOutgoingPluginChannel(INSTANCE, CUI_PLUGIN_CHANNEL);
-        }, "Failed to register CUI");
+        getServer().getMessenger().registerIncomingPluginChannel(this, CUI_PLUGIN_CHANNEL, new CUIChannelListener(this));
+        getServer().getMessenger().registerOutgoingPluginChannel(this, CUI_PLUGIN_CHANNEL);
 
         // Now we can register events
         getServer().getPluginManager().registerEvents(new WorldEditListener(this), this);
@@ -193,12 +194,11 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // platforms to be worried about... at the current time of writing
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
 
-        { // Register 1.13 Material ids with LegacyMapper
-            LegacyMapper legacyMapper = LegacyMapper.getInstance();
-            for (Material m : Material.values()) {
-                if (!m.isLegacy() && m.isBlock()) {
-                    legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
-                }
+        // Register 1.13 Material ids with LegacyMapper
+        LegacyMapper legacyMapper = LegacyMapper.getInstance();
+        for (Material m : Material.values()) {
+            if (!m.isLegacy() && m.isBlock()) {
+                legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
             }
         }
     }
@@ -262,8 +262,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     }
 
     private void rename() {
-        File dir = getDataFolder();
-        dir = new File(dir.getParentFile(), "FastAsyncWorldEdit");
+        File dir = new File(getDataFolder().getParentFile(), "FastAsyncWorldEdit");
         try {
             Field descriptionField = JavaPlugin.class.getDeclaredField("dataFolder");
             descriptionField.setAccessible(true);

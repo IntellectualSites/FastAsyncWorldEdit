@@ -12,6 +12,7 @@ import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
 import com.boydti.fawe.object.changeset.FaweStreamChangeSet;
 import com.boydti.fawe.object.io.AbstractDelegateOutputStream;
+
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.sk89q.jnbt.CompoundTag;
@@ -21,10 +22,12 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
+import static java.lang.System.arraycopy;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 import net.jpountz.lz4.LZ4Compressor;
@@ -39,7 +42,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -75,8 +77,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import static java.lang.System.arraycopy;
 
 public class MainUtil {
     /*
@@ -130,13 +130,6 @@ public class MainUtil {
             }
         });
         return size.get();
-    }
-
-    public static double getJavaVersion() {
-        String version = System.getProperty("java.version");
-        int pos = version.indexOf('.');
-        pos = version.indexOf('.', pos + 1);
-        return Double.parseDouble(version.substring(0, pos));
     }
 
     public static void traverse(Path path, final BiConsumer<Path, BasicFileAttributes> onEach) {
@@ -507,45 +500,6 @@ public class MainUtil {
         return new File(new URL(url.toURI().toString().split("\\!")[0].replaceAll("jar:file", "file")).toURI().getPath());
     }
 
-    public static void sendCompressedMessage(FaweStreamChangeSet set, FawePlayer actor) {
-        try {
-            long elements = set.size();
-            long compressedSize = set.getCompressedSize();
-            if (compressedSize == 0) {
-                return;
-            }
-            /*
-             * BlockVector
-             * - reference to the object --> 8 bytes
-             * - object header (java internals) --> 8 bytes
-             * - double x, y, z --> 24 bytes
-             *
-             * BaseBlock
-             * - reference to the object --> 8 bytes
-             * - object header (java internals) --> 8 bytes
-             * - short id, data --> 4 bytes
-             * - NBTCompound (assuming null) --> 4 bytes
-             *
-             * There are usually two lists for the block changes:
-             * 2 * BlockVector + 2 * BaseBlock = 128b
-             *
-             * WE has a lot more overhead, this is just a generous lower bound
-             *
-             * This compares FAWE's usage to standard WE.
-             */
-            long total = 128 * elements;
-
-            long ratio = total / compressedSize;
-            long saved = total - compressedSize;
-
-            if (ratio > 3 && !Fawe.isMainThread() && actor != null) {
-                BBC.COMPRESSED.send(actor, saved, ratio);
-            }
-        } catch (Exception e) {
-            MainUtil.handleError(e);
-        }
-    }
-
     public static Thread[] getThreads() {
         ThreadGroup rootGroup = Thread.currentThread( ).getThreadGroup( );
         ThreadGroup parentGroup;
@@ -666,47 +620,6 @@ public class MainUtil {
             return;
         }
         e.printStackTrace();    }
-
-    public static String[] getTrace(Throwable e) {
-        if (e == null) {
-            return new String[0];
-        }
-        StackTraceElement[] elems = e.getStackTrace();
-        String[] msg = new String[elems.length];//[elems.length + 1];
-//        HashSet<String> packages = new HashSet<>();
-        for (int i = 0; i < elems.length; i++) {
-            StackTraceElement elem = elems[i];
-            elem.getLineNumber();
-            String methodName = elem.getMethodName();
-            int index = elem.getClassName().lastIndexOf('.');
-            String className = elem.getClassName();
-//            if (!(index == -1 || className.startsWith("io.netty") || className.startsWith("javax") || className.startsWith("java") || className.startsWith("sun") || className.startsWith("net.minecraft") || className.startsWith("org.spongepowered") || className.startsWith("org.bukkit") || className.startsWith("com.google"))) {
-//                packages.add(className.substring(0, index-1));
-//            }
-            String name = className.substring(index == -1 ? 0 : index + 1);
-            name = name.length() == 0 ? elem.getClassName() : name;
-            String argString = "(...)";
-            try {
-                for (Method method : Class.forName(elem.getClassName()).getDeclaredMethods()) {
-                    if (method.getName().equals(methodName)) {
-                        Class<?>[] params = method.getParameterTypes();
-                        argString = "";
-                        String prefix = "";
-                        for (Class param : params) {
-                            argString += prefix + param.getSimpleName();
-                            prefix = ",";
-                        }
-                        argString = "[" + method.getReturnType().getSimpleName() + "](" + argString + ")";
-                        break;
-                    }
-                }
-            } catch (Throwable ignore) {
-            }
-            msg[i] = name + "." + methodName + argString + ":" + elem.getLineNumber();
-        }
-//        msg[msg.length-1] = StringMan.getString(packages);
-        return msg;
-    }
 
     public static int[] regionNameToCoords(String fileName) {
         int[] res = new int[2];
@@ -935,7 +848,7 @@ public class MainUtil {
             long age = now - file.lastModified();
             if (age > timeDiff) {
                 pool.submit(file::delete);
-                if (printDebug) BBC.FILE_DELETED.send(null, file);
+                if (printDebug) BBC.FILE_DELETED.send((Player)null, file);
             }
         });
         pool.shutdown();
@@ -946,51 +859,4 @@ public class MainUtil {
         }
     }
 
-    public enum OS {
-        LINUX, WINDOWS, MACOS, UNKNOWN;
-    }
-
-    public static File getWorkingDirectory(String applicationName) {
-        String userHome = System.getProperty("user.home", ".");
-        File workingDirectory;
-        switch (getPlatform()) {
-            case LINUX:
-                workingDirectory = new File(userHome, '.' + applicationName + '/');
-                break;
-            case WINDOWS:
-                String applicationData = System.getenv("APPDATA");
-                if (applicationData != null) {
-                    workingDirectory = new File(applicationData, "." + applicationName + '/');
-                } else {
-                    workingDirectory = new File(userHome, '.' + applicationName + '/');
-                }
-                break;
-            case MACOS:
-                workingDirectory = new File(userHome, "Library/Application Support/" + applicationName);
-                break;
-            default:
-                workingDirectory = new File(userHome, applicationName + '/');
-        }
-        if ((!workingDirectory.exists()) && (!workingDirectory.mkdirs())) {
-            throw new RuntimeException("The working directory could not be created: " + workingDirectory);
-        }
-        return workingDirectory;
-    }
-
-    public static OS getPlatform() {
-        String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.contains("win")) {
-            return OS.WINDOWS;
-        }
-        if (osName.contains("mac")) {
-            return OS.MACOS;
-        }
-        if (osName.contains("linux")) {
-            return OS.LINUX;
-        }
-        if (osName.contains("unix")) {
-            return OS.LINUX;
-        }
-        return OS.UNKNOWN;
-    }
 }
