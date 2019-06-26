@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta.implementation.blocks;
 
 import com.boydti.fawe.beta.IBlocks;
+import com.boydti.fawe.beta.IChunkSet;
 
 public class CharBlocks implements IBlocks {
     public final char[][] blocks;
@@ -9,14 +10,14 @@ public class CharBlocks implements IBlocks {
     public CharBlocks() {
         blocks = new char[16][];
         sections = new Section[16];
-        for (int i = 0; i < 16; i++) sections[i] = NULL;
+        for (int i = 0; i < 16; i++) sections[i] = EMPTY;
     }
 
     @Override
     public boolean trim(final boolean aggressive) {
         boolean result = true;
         for (int i = 0; i < 16; i++) {
-            if (sections[i] == NULL) {
+            if (sections[i] == EMPTY) {
                 blocks[i] = null;
             } else {
                 result = false;
@@ -26,12 +27,13 @@ public class CharBlocks implements IBlocks {
     }
 
     @Override
-    public void reset() {
-        for (int i = 0; i < 16; i++) sections[i] = NULL;
+    public IChunkSet reset() {
+        for (int i = 0; i < 16; i++) sections[i] = EMPTY;
+        return null;
     }
 
     public void reset(final int layer) {
-        sections[layer] = NULL;
+        sections[layer] = EMPTY;
     }
 
     public char[] load(final int layer) {
@@ -84,7 +86,7 @@ public class CharBlocks implements IBlocks {
         }
     }
 
-    public static final Section NULL = new Section() {
+    public static final Section EMPTY = new Section() {
         @Override
         public final char[] get(final CharBlocks blocks, final int layer) {
             blocks.sections[layer] = FULL;

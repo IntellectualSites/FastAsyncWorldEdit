@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 import static com.sk89q.worldedit.world.block.BlockTypes.states;
 public class CharFilterBlock extends ChunkFilterBlock {
     private CharGetBlocks get;
-
     private IChunkSet set;
 
     private char[] getArr;
@@ -43,7 +42,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     public void flood(final IChunkGet iget, final IChunkSet iset, final int layer, Flood flood, FilterBlockMask mask) {
         final int maxDepth = flood.getMaxDepth();
         final boolean checkDepth = maxDepth < Character.MAX_VALUE;
-        if (init(iget, iset, layer)) {
+        if (init(iget, iset, layer) != null) {
             while ((index = flood.poll()) != -1) {
                 x = index & 15;
                 z = (index >> 4) & 15;
@@ -62,10 +61,11 @@ public class CharFilterBlock extends ChunkFilterBlock {
         }
     }
 
-    private final boolean init(final IChunkGet iget, final IChunkSet iset, final int layer) {
+    @Override
+    public final ChunkFilterBlock init(final IChunkGet iget, final IChunkSet iset, final int layer) {
         this.layer = layer;
         final CharGetBlocks get = (CharGetBlocks) iget;
-        if (!get.hasSection(layer)) return false;
+        if (!get.hasSection(layer)) return null;
         this.set = iset;
         getArr = get.sections[layer].get(get, layer);
         if (set.hasSection(layer)) {
@@ -76,29 +76,44 @@ public class CharFilterBlock extends ChunkFilterBlock {
             setArr = null;
         }
         this.yy = layer << 4;
-        return true;
+        return this;
     }
 
     @Override
-    public final void filter(final IChunkGet iget, final IChunkSet iset, final int layer, final Filter filter, final @Nullable Region region, BlockVector3 min, BlockVector3 max) {
-        if (init(iget, iset, layer)) {
-            if (region == null) {
-                if (min != null && max != null) {
-                    iterate(min, max, layer, filter);
-                } else {
-                    iterate(filter);
-                }
-            } else {
-                if (min != null && max != null) {
-                    iterate(region, min, max, layer, filter);
-                } else {
-                    iterate(region, filter);
+    public void filter(Filter filter, int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.index = x | (z << 4) | (y << 8);
+        filter.applyBlock(this);
+    }
+
+    @Override
+    public void filter(Filter filter, int yStart, int yEnd) {
+        for (y = yStart, index = (yStart << 8); y < yEnd; y++) {
+            for (z = 0; z < 16; z++) {
+                for (x = 0; x < 16; x++, index++) {
+                    filter.applyBlock(this);
                 }
             }
         }
     }
 
-    private void iterate(final Region region, final Filter filter) {
+    @Override
+    public void filter(Filter filter, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        int yis = (minY << 8);
+        int zis = (minZ << 4);
+        for (y = minY, index = yis; y <= maxY; y++) {
+            for (z = minZ, index += zis; z <= maxZ; z++) {
+                for (x = minX, index += minX; x <= maxX; x++, index++) {
+                    filter.applyBlock(this);
+                }
+            }
+        }
+    }
+
+    @Override
+    public final void filter(final Filter filter, final Region region) {
         for (y = 0, index = 0; y < 16; y++) {
             int absY = yy + y;
             for (z = 0; z < 16; z++) {
@@ -113,51 +128,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
         }
     }
 
-    private void iterate(final Region region, BlockVector3 min, BlockVector3 max, int layer, final Filter filter) {
-        int by = Math.max(min.getY(), layer << 4) & 15;
-        int ty = Math.min(max.getY(), 15 + (layer << 4)) & 15;
-        int bx = min.getX();
-        int bz = min.getZ();
-        int tx = max.getX();
-        int tz = max.getZ();
-        for (y = by; y <= ty; y++) {
-            int yIndex = (y << 8);
-            int absY = yy + y;
-            for (z = bz; z <= tz; z++) {
-                int zIndex = yIndex + ((z) << 4);
-                int absZ = zz + z;
-                for (x = bx; x <= tx; x++) {
-                    index = zIndex + x;
-                    int absX = xx + x;
-                    if (region.contains(absX, absY, absZ)) {
-                        filter.applyBlock(this);
-                    }
-
-                }
-            }
-        }
-    }
-
-    private void iterate(BlockVector3 min, BlockVector3 max, int layer, final Filter filter) {
-        int by = Math.max(min.getY(), layer << 4) & 15;
-        int ty = Math.min(max.getY(), 15 + (layer << 4)) & 15;
-        int bx = min.getX();
-        int bz = min.getZ();
-        int tx = max.getX();
-        int tz = max.getZ();
-        for (y = by; y <= ty; y++) {
-            int yIndex = (y << 8);
-            for (z = bz; z <= tz; z++) {
-                int zIndex = yIndex + ((z) << 4);
-                for (x = bx; x <= tx; x++) {
-                    index = zIndex + x;
-                    filter.applyBlock(this);
-                }
-            }
-        }
-    }
-
-    private final void iterate(final Filter filter) {
+    @Override
+    public final void filter(final Filter filter) {
         for (y = 0, index = 0; y < 16; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {

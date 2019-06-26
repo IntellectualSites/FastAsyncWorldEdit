@@ -2,16 +2,15 @@ package com.boydti.fawe.beta.implementation.holder;
 
 import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.beta.FilterBlockMask;
 import com.boydti.fawe.beta.Flood;
-import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.SingleThreadQueueExtent;
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
+import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -47,38 +46,19 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     }
 
     @Override
-    public void filterBlocks(final Filter filter, ChunkFilterBlock block, @Nullable Region region, @Nullable final MutableBlockVector3 min, @Nullable final MutableBlockVector3 max) {
+    public void filterBlocks(final Filter filter, ChunkFilterBlock block, @Nullable Region region) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         try {
             if (region != null) {
-                switch (region.getChunkBounds(X, Z, min, max)) {
-                    case NONE:
-                        return;
-                    case FULL:
-                        if (min.getY() == 0 && max.getY() == 255) {
-                            break;
-                        }
-                    case PARTIAL:
-                        region = null;
-                    case CHECKED:
-                    default: {
-                        int minLayer = min.getY() >> 4;
-                        int maxLayer = max.getY() >> 4;
-                        block = block.init(X, Z, get);
-                        for (int layer = minLayer; layer <= maxLayer; layer++) {
-                            if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) continue;
-                            block.filter(get, set, layer, filter, region, min, max);
-                        }
-                        return;
-                    }
+                region.filter(this, filter, block, get, set);
+            } else {
+                block = block.init(X, Z, get);
+                for (int layer = 0; layer < 16; layer++) {
+                    if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) continue;
+                    block.init(get, set, layer);
+                    block.filter(filter);
                 }
-            }
-
-            block = block.init(X, Z, get);
-            for (int layer = 0; layer < 16; layer++) {
-                if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) continue;
-                block.filter(get, set, layer, filter, region, null, null);
             }
         } finally {
             filter.finishChunk(this);

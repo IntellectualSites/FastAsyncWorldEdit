@@ -71,7 +71,7 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T> {
      * @param unitialized a mutable block vector (buffer)
      * @param unitialized2 a mutable block vector (buffer)
      */
-    void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, MutableBlockVector3 unitialized, MutableBlockVector3 unitialized2);
+    void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region);
 
     void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block);
 

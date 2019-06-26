@@ -149,11 +149,6 @@ public class RequestSelection implements Region {
     }
 
     @Override
-    public Contains getChunkBounds(int X, int Z, MutableBlockVector3 min, MutableBlockVector3 max) {
-        return getRegion().getChunkBounds(X, Z, min, max);
-    }
-
-    @Override
     public Iterator<BlockVector3> iterator() {
         return getRegion().iterator();
     }

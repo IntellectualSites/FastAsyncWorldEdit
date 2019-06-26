@@ -19,29 +19,27 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.Settings;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.object.collection.BlockVectorSet;
-import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
 import java.util.AbstractSet;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.regions.Region.Contains.*;
 
 /**
  * An axis-aligned cuboid. It can be defined using two corners of the cuboid.
@@ -400,13 +398,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     public boolean contains(int x, int z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ;
     }
-	@Override
-    public boolean contains(BlockVector3 position) {
-        BlockVector3 min = getMinimumPoint();
-        BlockVector3 max = getMaximumPoint();
 
-        return position.containedWithin(min, max);
-    }
     @Override
     public Iterator<BlockVector3> iterator() {
         if (Settings.IMP.HISTORY.COMPRESSION_LEVEL >= 9 || useOldIterator) {
@@ -629,35 +621,49 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-    public Contains getChunkBounds(int X, int Z, MutableBlockVector3 min, MutableBlockVector3 max) {
-        int minChunkX = minX >> 4;
-        if (minChunkX <= X) {
-            int maxChunkX = maxX >> 4;
-            if (maxChunkX >= X) {
-                int minChunkZ = minZ >> 4;
-                if (minChunkZ <= Z) {
-                    int maxChunkZ = maxZ >> 4;
-                    if (maxChunkZ >= Z) {
-                        int cx1 = X << 4;
-                        int cx2 = cx1 + 15;
-                        int cz1 = Z << 4;
-                        int cz2 = cz1 + 15;
+    public int getMinY() {
+        return minY;
+    }
 
-                        int bx = Math.max(cx1, minX);
-                        int bz = Math.max(cz1, minZ);
-                        int tx = Math.min(cx2, maxX);
-                        int tz = Math.min(cz2, maxZ);
+    @Override
+    public int getMaxY() {
+        return maxY;
+    }
 
-                        min.setComponents(bx & 15, minY, bz & 15);
-                        max.setComponents(tx & 15, maxY, tz & 15);
-                        if (min.getX() == 0 && min.getZ() == 0 && max.getX() == 15 && max.getZ() == 15) {
-                            return FULL;
-                        }
-                        return PARTIAL;
-                    }
-                }
-            }
+    @Override
+    public void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
+        int X = chunk.getX();
+        int Z = chunk.getZ();
+        block = block.init(X, Z, get);
+
+        if ((minX + 15) >> 4 <= X && (maxX - 15) >> 4 >= X && (minZ + 15) >> 4 <= Z && (maxZ - 15) >> 4 >= Z) {
+            filter(chunk, filter, block, get, set, minY, maxY);
+            return;
         }
-        return NONE;
+        int localMinX = Math.max(minX, X << 4) & 15;
+        int localMaxX = Math.min(maxX, 15 + X << 4) & 15;
+        int localMinZ = Math.max(minZ, Z << 4) & 15;
+        int localMaxZ = Math.min(maxZ, 15 + Z << 4) & 15;
+
+        int yStart = (minY & 15);
+        int yEnd = (maxY & 15);
+
+        int minSection = minY >> 4;
+        int maxSection = maxY >> 4;
+        if (minSection == maxSection) {
+            filter(chunk, filter, block, get, set, minSection, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ);
+            return;
+        }
+        if (yStart != 0) {
+            filter(chunk, filter, block, get, set, minSection, localMinX, yStart, localMinZ, localMaxX, 15, localMaxZ);
+            minSection++;
+        }
+        if (yEnd != 15) {
+            filter(chunk, filter, block, get, set, minSection, localMinX, 0, localMinZ, localMaxX, 15, localMaxZ);
+            maxSection--;
+        }
+        for (int layer = minSection; layer < maxSection; layer++) {
+            filter(chunk, filter, block, get, set, layer, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ);
+        }
     }
 }

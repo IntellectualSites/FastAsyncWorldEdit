@@ -8,8 +8,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -43,7 +41,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     Set<UUID> getEntityRemoves();
 
     @Override
-    void reset();
+    IChunkSet reset();
 
     @Nullable
     @Override

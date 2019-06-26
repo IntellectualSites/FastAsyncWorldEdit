@@ -102,11 +102,12 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void reset() {
+    public IChunkSet reset() {
         biomes = null;
         tiles = null;
         entities = null;
         entityRemoves = null;
         super.reset();
+        return null;
     }
 }

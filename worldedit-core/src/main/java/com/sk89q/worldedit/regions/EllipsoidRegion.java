@@ -20,6 +20,11 @@
 package com.sk89q.worldedit.regions;
 
 
+import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -215,19 +220,19 @@ public class EllipsoidRegion extends AbstractRegion {
         return chunks;
     }
 
-    @Override
-   public boolean contains(BlockVector3 position) {
-       int cx = position.getBlockX() - center.getBlockX();
+   @Override
+   public boolean contains(int x, int y, int z) {
+       int cx = x - center.getBlockX();
        int cx2 = cx * cx;
        if (cx2 > radiusSqr.getBlockX()) {
            return false;
        }
-       int cz = position.getBlockZ() - center.getBlockZ();
+       int cz = z - center.getBlockZ();
        int cz2 = cz * cz;
        if (cz2 > radiusSqr.getBlockZ()) {
            return false;
        }
-       int cy = position.getBlockY() - center.getBlockY();
+       int cy = y - center.getBlockY();
        int cy2 = cy * cy;
        if (radiusSqr.getBlockY() < 255 && cy2 > radiusSqr.getBlockY()) {
            return false;
@@ -235,10 +240,30 @@ public class EllipsoidRegion extends AbstractRegion {
        if (sphere) {
            return cx2 + cy2 + cz2 <= radiusLengthSqr;
        }
-       double cxd = cx * inverseRadius.getX();
-       double cyd = cy * inverseRadius.getY();
-       double czd = cz * inverseRadius.getZ();
-       return cxd * cxd + cyd * cyd + czd * czd <= 1;
+       double cxd = cx2 * inverseRadius.getX();
+       double cyd = cy2 * inverseRadius.getY();
+       double czd = cz2 * inverseRadius.getZ();
+       return cxd + cyd + czd <= 1;
+    }
+
+    @Override
+    public boolean contains(int x, int z) {
+        int cx = x - center.getBlockX();
+        int cx2 = cx * cx;
+        if (cx2 > radiusSqr.getBlockX()) {
+            return false;
+        }
+        int cz = z - center.getBlockZ();
+        int cz2 = cz * cz;
+        if (cz2 > radiusSqr.getBlockZ()) {
+            return false;
+        }
+        if (sphere) {
+            return cx2 + cz2 <= radiusLengthSqr;
+        }
+        double cxd = cx2 * inverseRadius.getX();
+        double czd = cz2 * inverseRadius.getZ();
+        return cxd + czd <= 1;
     }
 
     /**
@@ -259,5 +284,97 @@ public class EllipsoidRegion extends AbstractRegion {
     @Override
     public EllipsoidRegion clone() {
         return (EllipsoidRegion) super.clone();
+    }
+
+    @Override
+    public void filter(IChunk chunk, Filter filter, ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+        int cx1 = bx - center.getBlockX();
+        int cx2 = tx - center.getBlockX();
+        int cxMax, cxMin;
+        if (cx1 < cx2) {
+            cxMin = cx1;
+            cxMax = cx2;
+        } else {
+            cxMin = cx2;
+            cxMax = cx1;
+        }
+        int cxMin2 = cxMin * cxMin;
+        int cxMax2 = cxMax * cxMax;
+        int cz1 = bz - center.getBlockZ();
+        int cz2 = tz - center.getBlockZ();
+        int czMax, czMin;
+        if (cz1 < cz2) {
+            czMin = cz1;
+            czMax = cz2;
+        } else {
+            czMin = cz2;
+            czMax = cz1;
+        }
+        int czMin2 = czMin * czMin;
+        int czMax2 = czMax * czMax;
+
+
+        if (sphere) {
+            if (cxMin2 + czMin2 >= radiusLengthSqr) {
+                return;
+            }
+            int diffY2 = radiusLengthSqr - cxMax2 - czMax2;
+            if (diffY2 > 0) {
+                diffy2
+            }
+
+
+
+        } else {
+            if (cxMin2 * inverseRadius.getX() + czMin2 * inverseRadius.getZ() > 1) {
+                return;
+            }
+            partial = cxMax2 * inverseRadius.getX() + czMax2 * inverseRadius.getZ() > 1;
+        }
+        if (partial) {
+
+        } else {
+            // get min y and max y
+            for (int layer = 0; layer < 16; layer++) {
+                // if contains all
+                {
+                    filter(chunk, )
+                }
+            }
+        }
+
+
+        int cy1 = 0 - center.getBlockY();
+        int cy2 = 255 - center.getBlockY();
+        int cyMax, cyMin;
+        if (cy1 < cy2) {
+            cyMin = cy1;
+            cyMax = cy2;
+        } else {
+            cyMin = cy2;
+            cyMax = cy1;
+        }
+        int cyMin2 = cyMin * cyMin;
+        int cyMax2 = cyMax * cyMax;
+
+        boolean containsMin = contains(bx, bz);
+        boolean containsMax = contains(tx, tz);
+        if (containsMin && containsMax) {
+            // set all
+            return;
+        }
+
+
+        for (int layer = 0; layer < 16; layer++) {
+            if (contains())
+        }
+        TODO optimize;
+        int minY = getMinY();
+        int maxY = getMaxY();
+        contains()
     }
 }

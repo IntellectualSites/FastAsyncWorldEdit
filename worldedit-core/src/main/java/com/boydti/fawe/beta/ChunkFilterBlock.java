@@ -13,7 +13,18 @@ public abstract class ChunkFilterBlock extends SimpleFilterBlock {
 
     public abstract ChunkFilterBlock init(int X, int Z, IChunkGet chunk);
 
+    public abstract ChunkFilterBlock init(final IChunkGet iget, final IChunkSet iset, final int layer);
+
     public abstract void flood(final IChunkGet iget, final IChunkSet iset, final int layer, Flood flood, FilterBlockMask mask);
 
-    public abstract void filter(IChunkGet get, IChunkSet set, int layer, Filter filter, @Nullable Region region, BlockVector3 min, BlockVector3 max);
+
+    public abstract void filter(Filter filter, int x, int y, int z);
+
+    public abstract void filter(Filter filter, int minX, int minY, int minZ, int maxX, int maxY, int maxZ);
+
+    public abstract void filter(Filter filter);
+
+    public abstract void filter(Filter filter, int yStart, int yEnd);
+
+    public abstract void filter(final Filter filter, final Region region);
 }
