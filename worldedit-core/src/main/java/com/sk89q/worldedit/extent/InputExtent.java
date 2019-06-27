@@ -65,7 +65,7 @@ public interface InputExtent {
      * modifiable copy is required, then the block should be cloned.</p>
      *
      * <p>This method exists because it is sometimes important to inspect the block
-     * at a given location, but {@link #getBlock(Vector)} may be too expensive in
+     * at a given location, but {@link #getBlock(BlockVector3)} may be too expensive in
      * the underlying implementation. It is also not possible to implement
      * caching if the returned object is mutable, so this methods allows caching
      * implementations to be used.</p>

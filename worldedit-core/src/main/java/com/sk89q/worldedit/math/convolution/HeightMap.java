@@ -170,7 +170,8 @@ public class HeightMap {
         int originZ = minY.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();
-        BlockStateHolder fillerAir = BlockTypes.AIR.getDefaultState();
+
+        BlockState fillerAir = BlockTypes.AIR.getDefaultState();
 
         int blocksChanged = 0;
 
@@ -181,14 +182,19 @@ public class HeightMap {
 
         // Apply heightmap
         for (int z = 0; z < height; ++z) {
-            int zr = z + originZ;
             for (int x = 0; x < width; ++x) {
                 int curHeight = this.data[index];
                 if (this.invalid != null && this.invalid[index]) continue;
+
+                //Clamp newHeight within the selection area
                 int newHeight = Math.min(maxY4, data[index++]);
+
                 int curBlock = (curHeight) >> 4;
                 int newBlock = (newHeight + 15) >> 4;
+
+                // Offset x,z to be 'real' coordinates
                 int xr = x + originX;
+                int zr = z + originZ;
 
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight > curHeight) {
@@ -239,6 +245,13 @@ public class HeightMap {
         return blocksChanged;
     }
 
+    /**
+     * Apply a raw heightmap to the region
+     *
+     * @param data the data
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException
+     */
     public int apply(int[] data) throws MaxChangedBlocksException {
         checkNotNull(data);
 
@@ -256,14 +269,17 @@ public class HeightMap {
         // Apply heightmap
         int index = 0;
         for (int z = 0; z < height; ++z) {
-            int zr = z + originZ;
             for (int x = 0; x < width; ++x, index++) {
-                int curHeight = this.data[index];
                 if (this.invalid != null && this.invalid[index]) continue;
+
+                int curHeight = this.data[index];
+
+                // Clamp newHeight within the selection area
                 int newHeight = Math.min(maxY, data[index]);
 
                 // Offset x,z to be 'real' coordinates
                 int xr = x + originX;
+                int zr = z + originZ;
 
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight > curHeight) {
@@ -279,7 +295,7 @@ public class HeightMap {
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
                         }
-                        session.setBlock(xr, newHeight, zr, existing);
+                        session.setBlock(BlockVector3.at(xr, newHeight, zr), existing);
                         ++blocksChanged;
                     }
                 } else if (curHeight > newHeight) {

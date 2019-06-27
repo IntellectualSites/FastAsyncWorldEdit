@@ -382,7 +382,7 @@ public class Fawe {
             }
         } catch (Throwable e) {
             debug("====== MEMORY LISTENER ERROR ======");
-            MainUtil.handleError(e);
+            e.printStackTrace();
             debug("===================================");
             debug("FAWE needs access to the JVM memory system:");
             debug(" - Change your Java security settings");

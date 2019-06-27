@@ -107,7 +107,7 @@ public abstract class FaweChangeSet implements ChangeSet {
                 }
             }
         } catch (InterruptedException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return true;
     }
@@ -194,7 +194,7 @@ public abstract class FaweChangeSet implements ChangeSet {
             BaseBlock to = change.getCurrent();
             add(loc, from, to);
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -222,7 +222,7 @@ public abstract class FaweChangeSet implements ChangeSet {
             add(x, y, z, combinedFrom, combinedTo);
 
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -241,7 +241,7 @@ public abstract class FaweChangeSet implements ChangeSet {
             add(x, y, z, combinedFrom, combinedTo);
 
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -343,7 +343,7 @@ public abstract class FaweChangeSet implements ChangeSet {
                             }
                         }
                     } catch (Throwable e) {
-                        MainUtil.handleError(e);
+                        e.printStackTrace();
                     } finally {
                         if (FaweChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
                             synchronized (FaweChangeSet.this.waitingAsync) {

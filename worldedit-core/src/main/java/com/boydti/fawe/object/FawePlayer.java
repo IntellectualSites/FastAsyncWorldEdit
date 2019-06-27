@@ -42,6 +42,7 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
+import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.World;
 
@@ -353,7 +354,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             }
         } catch (Exception event) {
             Fawe.debug("====== INVALID CLIPBOARD ======");
-            MainUtil.handleError(event);
+            event.printStackTrace();
             Fawe.debug("===============---=============");
             Fawe.debug("This shouldn't result in any failure");
             Fawe.debug("File: " + file.getName() + " (len:" + file.length() + ")");
@@ -560,19 +561,14 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     public void setSelection(Region region) {
         RegionSelector selector;
-        switch (region.getClass().getName()) {
-            case "ConvexPolyhedralRegion":
-                selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
-                break;
-            case "CylinderRegion":
-                selector = new CylinderRegionSelector((CylinderRegion) region);
-                break;
-            case "Polygonal2DRegion":
-                selector = new com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector((Polygonal2DRegion) region);
-                break;
-            default:
-                selector = new CuboidRegionSelector(null, region.getMinimumPoint(), region.getMaximumPoint());
-                break;
+        if (region instanceof ConvexPolyhedralRegion) {
+            selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
+        } else if (region instanceof CylinderRegion) {
+            selector = new CylinderRegionSelector((CylinderRegion) region);
+        } else if (region instanceof Polygonal2DRegion) {
+            selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
+        } else {
+            selector = new CuboidRegionSelector(null, region.getMinimumPoint(), region.getMaximumPoint());
         }
         selector.setWorld(region.getWorld());
 

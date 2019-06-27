@@ -99,7 +99,6 @@ public class ChangeSetExecutor implements Operation {
      * @param context an undo context
      * @return an operation
      */
-    @Deprecated
     public static ChangeSetExecutor createUndo(ChangeSet changeSet, UndoContext context) {
         return new ChangeSetExecutor(changeSet, Type.UNDO, context, null, 0);
     }
@@ -111,7 +110,6 @@ public class ChangeSetExecutor implements Operation {
      * @param context an undo context
      * @return an operation
      */
-    @Deprecated
     public static ChangeSetExecutor createRedo(ChangeSet changeSet, UndoContext context) {
         return new ChangeSetExecutor(changeSet, Type.REDO, context, null, 0);
     }

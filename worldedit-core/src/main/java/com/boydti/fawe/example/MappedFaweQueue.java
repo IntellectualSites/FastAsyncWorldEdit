@@ -10,7 +10,6 @@ import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
@@ -229,7 +228,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
                 try {
                     task.run();
                 } catch (Throwable e) {
-                    MainUtil.handleError(e);
+                    e.printStackTrace();
                 }
             }
         }
@@ -246,7 +245,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
             try {
                 run.run();
             } catch (Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
     }

@@ -56,6 +56,7 @@ import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Parses block input strings.
@@ -112,8 +113,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
      * @param string Input string
      * @return Mapped string
      */
+    @SuppressWarnings("ConstantConditions")
     private String woolMapper(String string) {
-        switch (string.toLowerCase()) {
+        switch (string.toLowerCase(Locale.ROOT)) {
             case "white":
                 return BlockTypes.WHITE_WOOL.getId();
             case "black":

@@ -609,17 +609,11 @@ public class MainUtil {
                 return newFile;
             }
         } catch (IOException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             Fawe.debug("&cCould not save " + resource);
         }
         return null;
     }
-
-    public static void handleError(Throwable e) {
-        if (e == null) {
-            return;
-        }
-        e.printStackTrace();    }
 
     public static int[] regionNameToCoords(String fileName) {
         int[] res = new int[2];

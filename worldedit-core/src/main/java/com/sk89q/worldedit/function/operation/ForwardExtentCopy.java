@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 
 /**
  * Makes a copy of a portion of one extent to another extent or another point.
- *
+ * <p>
  * <p>This is a forward extent copy, meaning that it iterates over the blocks
  * in the source extent, and will copy as many blocks as there are in the
  * source. Therefore, interpolation will not occur to fill in the gaps.</p>
@@ -73,11 +73,11 @@ public class ForwardExtentCopy implements Operation {
     private int repetitions = 1;
     private Mask sourceMask = Masks.alwaysTrue();
     private boolean removingEntities;
-    private boolean copyingEntities = true; // default to true for backwards compatibility, sort of
     private RegionFunction sourceFunction = null;
     private Transform transform = new Identity();
     private Transform currentTransform = null;
     private int affected;
+    private boolean copyEntities = true;
     private boolean copyBiomes = false;
     private RegionFunction filterFunction;
 
@@ -119,7 +119,7 @@ public class ForwardExtentCopy implements Operation {
 
     /**
      * Get the transformation that will occur on every point.
-     *
+     * <p>
      * <p>The transformation will stack with each repetition.</p>
      *
      * @return a transformation
@@ -141,13 +141,31 @@ public class ForwardExtentCopy implements Operation {
 
     /**
      * Get the mask that gets applied to the source extent.
-     *
+     * <p>
      * <p>This mask can be used to filter what will be copied from the source.</p>
      *
      * @return a source mask
      */
     public Mask getSourceMask() {
         return sourceMask;
+    }
+
+    /**
+     * Set whether entities should be copied along with blocks.
+     *
+     * @param copyEntities true if copying
+     */
+    public void setCopyingEntities(boolean copyEntities) {
+        this.copyEntities = copyEntities;
+    }
+
+    /**
+     * Return whether entities should be copied along with blocks.
+     *
+     * @return true if copying
+     */
+    public boolean isCopyingEntities() {
+        return copyEntities;
     }
 
     public void setCopyBiomes(boolean copyBiomes) {
@@ -189,6 +207,7 @@ public class ForwardExtentCopy implements Operation {
      *
      * @param function a source function, or null if none is to be applied
      */
+    @Deprecated
     public void setSourceFunction(RegionFunction function) {
         this.sourceFunction = function;
     }
@@ -210,24 +229,6 @@ public class ForwardExtentCopy implements Operation {
     public void setRepetitions(int repetitions) {
         checkArgument(repetitions >= 0, "number of repetitions must be non-negative");
         this.repetitions = repetitions;
-    }
-
-    /**
-     * Return whether entities should be copied along with blocks.
-     *
-     * @return true if copying
-     */
-    public boolean isCopyingEntities() {
-        return copyingEntities;
-    }
-
-    /**
-     * Set whether entities should be copied along with blocks.
-     *
-     * @param copyingEntities true if copying
-     */
-    public void setCopyingEntities(boolean copyingEntities) {
-        this.copyingEntities = copyingEntities;
     }
 
     /**

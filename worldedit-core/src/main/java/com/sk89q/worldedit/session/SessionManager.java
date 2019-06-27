@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.session;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -48,10 +49,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Session manager for WorldEdit.
@@ -245,12 +242,7 @@ public class SessionManager {
      * @return the key object
      */
     protected UUID getKey(SessionKey key) {
-//        String forcedKey = System.getProperty("worldedit.session.uuidOverride");
-//        if (forcedKey != null) {
-//            return UUID.fromString(forcedKey);
-//        } else {
             return key.getUniqueId();
-//        }
     }
 
     /**
@@ -268,6 +260,7 @@ public class SessionManager {
      */
     public synchronized void unload() {
         clear();
+        timer.cancel();
     }
 
     /**
@@ -290,7 +283,7 @@ public class SessionManager {
 
                 if (stored.session.compareAndResetDirty()) {
                     // Don't save unless player disconnects
-//                    saveQueue.put(stored.key, stored.session);
+                    // saveQueue.put(stored.key, stored.session);
                 }
             } else {
                 if (now - stored.lastActive > EXPIRATION_GRACE) {

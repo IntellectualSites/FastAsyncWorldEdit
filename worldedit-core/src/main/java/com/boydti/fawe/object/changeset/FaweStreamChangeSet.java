@@ -320,7 +320,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
             posDel.write(stream, x - originX, y, z - originZ);
             idDel.writeChange(stream, combinedFrom, combinedTo);
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -340,7 +340,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
             os.writeVarInt(from.getInternalId());
             os.writeVarInt(to.getInternalId());
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -353,7 +353,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
             NBTOutputStream nbtos = getTileCreateOS();
             nbtos.writeTag(tag);
         } catch (IOException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -366,7 +366,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
             NBTOutputStream nbtos = getTileRemoveOS();
             nbtos.writeTag(tag);
         } catch (IOException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -379,7 +379,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
             NBTOutputStream nbtos = getEntityRemoveOS();
             nbtos.writeTag(tag);
         } catch (IOException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -392,7 +392,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
             NBTOutputStream nbtos = getEntityCreateOS();
             nbtos.writeTag(tag);
         } catch (IOException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -415,12 +415,12 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
                     e.printStackTrace();
-                    MainUtil.handleError(e);
+                    e.printStackTrace();
                 }
                 try {
                     is.close();
                 } catch (IOException e) {
-                    MainUtil.handleError(e);
+                    e.printStackTrace();
                 }
                 return null;
             }
@@ -470,12 +470,12 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
                     e.printStackTrace();
-                    MainUtil.handleError(e);
+                    e.printStackTrace();
                 }
                 try {
                     is.close();
                 } catch (IOException e) {
-                    MainUtil.handleError(e);
+                    e.printStackTrace();
                 }
                 return null;
             }
@@ -530,12 +530,12 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                 } catch (EOFException ignored) {
                 } catch (Exception e) {
                     e.printStackTrace();
-                    MainUtil.handleError(e);
+                    e.printStackTrace();
                 }
                 try {
                     is.close();
                 } catch (IOException e) {
-                    MainUtil.handleError(e);
+                    e.printStackTrace();
                 }
                 return null;
             }
@@ -562,7 +562,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
         };
     }
 
-    public Iterator<MutableEntityChange> getEntityIterator(final NBTInputStream is, final boolean create, final boolean dir) {
+    public Iterator<MutableEntityChange> getEntityIterator(final NBTInputStream is, final boolean create) {
         if (is == null) {
             return new ArrayList<MutableEntityChange>().iterator();
         }
@@ -580,7 +580,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                     try {
                         is.close();
                     } catch (IOException e) {
-                        MainUtil.handleError(e);
+                        e.printStackTrace();
                     }
                     return null;
                 }
@@ -606,12 +606,12 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                 }
             };
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return null;
         }
     }
 
-    public Iterator<MutableTileChange> getTileIterator(final NBTInputStream is, final boolean create, final boolean dir) {
+    public Iterator<MutableTileChange> getTileIterator(final NBTInputStream is, final boolean create) {
         if (is == null) {
             return new ArrayList<MutableTileChange>().iterator();
         }
@@ -629,7 +629,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                     try {
                         is.close();
                     } catch (IOException e) {
-                        MainUtil.handleError(e);
+                        e.printStackTrace();
                     }
                     return null;
                 }
@@ -655,7 +655,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                 }
             };
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return null;
         }
     }
@@ -663,11 +663,11 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
     public Iterator<Change> getIterator(final boolean dir) {
         close();
         try {
-            final Iterator<MutableTileChange> tileCreate = getTileIterator(getTileCreateIS(), true, dir);
-            final Iterator<MutableTileChange> tileRemove = getTileIterator(getTileRemoveIS(), false, dir);
+            final Iterator<MutableTileChange> tileCreate = getTileIterator(getTileCreateIS(), true);
+            final Iterator<MutableTileChange> tileRemove = getTileIterator(getTileRemoveIS(), false);
 
-            final Iterator<MutableEntityChange> entityCreate = getEntityIterator(getEntityCreateIS(), true, dir);
-            final Iterator<MutableEntityChange> entityRemove = getEntityIterator(getEntityRemoveIS(), false, dir);
+            final Iterator<MutableEntityChange> entityCreate = getEntityIterator(getEntityCreateIS(), true);
+            final Iterator<MutableEntityChange> entityRemove = getEntityIterator(getEntityRemoveIS(), false);
 
             final Iterator<MutableBlockChange> blockChange = getBlockIterator(dir);
 
@@ -709,7 +709,7 @@ public abstract class FaweStreamChangeSet extends FaweChangeSet {
                 }
             };
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return new ArrayList<Change>().iterator();
     }

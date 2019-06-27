@@ -107,7 +107,7 @@ public class FaweBukkit implements IFawe, Listener {
                 throwable.printStackTrace();
             }
         } catch (final Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             Bukkit.getServer().shutdown();
         }
 
@@ -411,7 +411,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new WorldguardFlag(worldguardPlugin, this));
                 Fawe.debug("Plugin 'WorldGuard' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         final Plugin townyPlugin = Bukkit.getServer().getPluginManager().getPlugin("Towny");
@@ -420,7 +420,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new TownyFeature(townyPlugin, this));
                 Fawe.debug("Plugin 'Towny' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         final Plugin factionsPlugin = Bukkit.getServer().getPluginManager().getPlugin("Factions");
@@ -437,7 +437,7 @@ public class FaweBukkit implements IFawe, Listener {
                         managers.add(new FactionsOneFeature(factionsPlugin));
                         Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
                     } catch (Throwable e3) {
-                        MainUtil.handleError(e);
+                        e.printStackTrace();
                     }
 
                 }
@@ -449,7 +449,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new ResidenceFeature(residencePlugin, this));
                 Fawe.debug("Plugin 'Residence' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         final Plugin griefpreventionPlugin = Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention");
@@ -458,7 +458,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
                 Fawe.debug("Plugin 'GriefPrevention' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         final Plugin preciousstonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("PreciousStones");
@@ -467,7 +467,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new PreciousStonesFeature(preciousstonesPlugin, this));
                 Fawe.debug("Plugin 'PreciousStones' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
 
@@ -478,7 +478,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new ASkyBlockHook(aSkyBlock));
                 Fawe.debug("Plugin 'ASkyBlock' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
@@ -486,7 +486,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new FreeBuildRegion());
                 Fawe.debug("Plugin '<internal.freebuild>' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
 

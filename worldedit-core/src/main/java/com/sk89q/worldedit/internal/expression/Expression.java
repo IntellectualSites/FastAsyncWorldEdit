@@ -104,12 +104,12 @@ public class Expression {
     }
 
     private Expression(List<Token> tokens, String... variableNames) throws ExpressionException {
+        this.variableNames = variableNames;
         variables.put("e", new Constant(-1, Math.E));
         variables.put("pi", new Constant(-1, Math.PI));
         variables.put("true", new Constant(-1, 1));
         variables.put("false", new Constant(-1, 0));
 
-        this.variableNames = variableNames;
         variableArray = new Variable[variableNames.length];
         for (int i = 0; i < variableNames.length; i++) {
             String variableName = variableNames[i];

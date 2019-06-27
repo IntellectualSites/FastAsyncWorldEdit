@@ -25,8 +25,9 @@ import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard.ClipboardEntity;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.boydti.fawe.object.extent.LightingExtent;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -36,6 +37,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -48,8 +50,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
  * other data as lists or maps.
@@ -58,7 +58,8 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
 
 	private Region region;
     private BlockVector3 origin;
-    private BlockStateHolder[][][] blocks;
+    private BaseBlock[][][] blocks;
+    private BiomeType[][] biomes = null;
     public FaweClipboard IMP;
     private BlockVector3 size;
     private final List<ClipboardEntity> entities = new ArrayList<>();
@@ -69,7 +70,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.size = getDimensions();
         this.IMP = Settings.IMP.CLIPBOARD.USE_DISK ? new DiskOptimizedClipboard(size.getBlockX(), size.getBlockY(), size.getBlockZ()) : new MemoryOptimizedClipboard(size.getBlockX(), size.getBlockY(), size.getBlockZ());
         this.origin = region.getMinimumPoint();
-        this.blocks = new BlockStateHolder[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
+        this.blocks = new BaseBlock[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
     }
 
     /**
@@ -85,7 +86,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.size = getDimensions();
         this.IMP = Settings.IMP.CLIPBOARD.USE_DISK ? new DiskOptimizedClipboard(size.getBlockX(), size.getBlockY(), size.getBlockZ(), clipboardId) : new MemoryOptimizedClipboard(size.getBlockX(), size.getBlockY(), size.getBlockZ());
         this.origin = region.getMinimumPoint();
-        this.blocks = new BlockStateHolder[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
+        this.blocks = new BaseBlock[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
     }
 
     public BlockArrayClipboard(Region region, FaweClipboard clipboard) {
@@ -94,7 +95,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.size = getDimensions();
         this.origin = region.getMinimumPoint();
         this.IMP = clipboard;
-        this.blocks = new BlockStateHolder[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
+        this.blocks = new BaseBlock[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
     }
 
     public void init(Region region, FaweClipboard fc) {
@@ -104,7 +105,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.size = getDimensions();
         this.IMP = fc;
         this.origin = region.getMinimumPoint();
-        this.blocks = new BlockStateHolder[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
+        this.blocks = new BaseBlock[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
     }
 
     @Override
@@ -157,7 +158,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     public List<? extends Entity> getEntities(Region region) {
         List<Entity> filtered = new ArrayList<>();
         for (Entity entity : getEntities()) {
-            if (region.contains(entity.getLocation().toBlockPoint())) {
+            if (region.contains(entity.getLocation().toVector().toBlockPoint())) {
                 filtered.add(entity);
             }
         }
@@ -185,10 +186,6 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         return BlockTypes.AIR.getDefaultState();
     }
 
-    public BlockState getBlockAbs(int x, int y, int z) {
-        return IMP.getBlock(x, y, z).toImmutableState();
-    }
-
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
         return getBlock(position);
@@ -205,11 +202,11 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        if (region.contains(location)) {
-            final int x = location.getBlockX();
-            final int y = location.getBlockY();
-            final int z = location.getBlockZ();
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
+        if (region.contains(position)) {
+            final int x = position.getBlockX();
+            final int y = position.getBlockY();
+            final int z = position.getBlockZ();
             return setBlock(x, y, z, block);
         }
         return false;
@@ -228,16 +225,37 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
+    public boolean hasBiomes() {
+        return biomes != null;
+    }
+
+    @Override
     public BiomeType getBiome(BlockVector2 position) {
-        BlockVector2 v = position.subtract(region.getMinimumPoint().toBlockVector2());
-        return IMP.getBiome(v.getX(), v.getZ());
+        if (biomes != null
+                && position.containedWithin(getMinimumPoint().toBlockVector2(), getMaximumPoint().toBlockVector2())) {
+            BlockVector2 v = position.subtract(region.getMinimumPoint().toBlockVector2());
+            BiomeType biomeType = biomes[v.getBlockX()][v.getBlockZ()];
+            if (biomeType != null) {
+                return IMP.getBiome(v.getX(), v.getZ());
+                //TODO Remove the line above and replace with this: return biomeType;
+            }
+            return IMP.getBiome(v.getX(), v.getZ());
+        }
+        return BiomeTypes.OCEAN;
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        BlockVector2 v = position.subtract(region.getMinimumPoint().toBlockVector2());
-        IMP.setBiome(v.getX(), v.getZ(), biome);
-        return true;
+        if (position.containedWithin(getMinimumPoint().toBlockVector2(), getMaximumPoint().toBlockVector2())) {
+            BlockVector2 v = position.subtract(region.getMinimumPoint().toBlockVector2());
+            IMP.setBiome(v.getX(), v.getZ(), biome);
+            if (biomes == null) {
+                biomes = new BiomeType[region.getWidth()][region.getLength()];
+            }
+            biomes[v.getBlockX()][v.getBlockZ()] = biome;
+            return true;
+        }
+        return false;
     }
 
     @Nullable

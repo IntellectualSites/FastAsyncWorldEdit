@@ -64,7 +64,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     @Override
     public int getBlockTypeAbs(double x, double y, double z) {
-        return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
+        return extent.getBlock(BlockVector3.at(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     @Override
     public int getBlockTypeRel(double x, double y, double z) {
-        return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
+        return extent.getBlock(toWorldRel(x, y, z).toBlockPoint()).getBlockType().getLegacyCombinedId() >> 4;
     }
 
     @Override

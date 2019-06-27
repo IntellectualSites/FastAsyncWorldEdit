@@ -26,6 +26,7 @@ import org.bukkit.OfflinePlayer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
 
         Map<String, Set<String>> userGroupPermissions = new HashMap<>();
 
-        List<String> groupKeys = config.getStringList("permissions.groups", null);
+        List<String> groupKeys = config.getKeys("permissions.groups");
 
         if (groupKeys != null) {
             for (String key : groupKeys) {
@@ -76,7 +77,7 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
             }
         }
 
-        List<String> userKeys = config.getStringList("permissions.users", null);
+        List<String> userKeys = config.getKeys("permissions.users");
 
         if (userKeys != null) {
             for (String key : userKeys) {
@@ -102,8 +103,8 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
                     }
                 }
 
-                userPermissionsCache.put(key.toLowerCase(), permsCache);
-                userGroups.put(key.toLowerCase(), new HashSet<>(groups));
+                userPermissionsCache.put(key.toLowerCase(Locale.ROOT), permsCache);
+                userGroups.put(key.toLowerCase(Locale.ROOT), new HashSet<>(groups));
             }
         }
     }
@@ -117,7 +118,7 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
             }
         }
 
-        Set<String> perms = userPermissionsCache.get(player.toLowerCase());
+        Set<String> perms = userPermissionsCache.get(player.toLowerCase(Locale.ROOT));
         if (perms == null) {
             return defaultPermissionsCache.contains(permission)
                     || defaultPermissionsCache.contains("*");
@@ -134,7 +135,7 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
 
     @Override
     public boolean inGroup(String player, String group) {
-        Set<String> groups = userGroups.get(player.toLowerCase());
+        Set<String> groups = userGroups.get(player.toLowerCase(Locale.ROOT));
         if (groups == null) {
             return false;
         }
@@ -144,12 +145,12 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
 
     @Override
     public String[] getGroups(String player) {
-        Set<String> groups = userGroups.get(player.toLowerCase());
+        Set<String> groups = userGroups.get(player.toLowerCase(Locale.ROOT));
         if (groups == null) {
             return new String[0];
         }
 
-        return groups.toArray(new String[groups.size()]);
+        return groups.toArray(new String[0]);
     }
 
     @Override

@@ -334,7 +334,7 @@ public class BukkitChunk_All extends IntFaweChunk<Chunk, BukkitQueue_All> {
                     index = 0;
                 }
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         } while (System.currentTimeMillis() - start < recommended);
         if (more || place) {

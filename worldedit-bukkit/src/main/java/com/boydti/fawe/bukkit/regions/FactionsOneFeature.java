@@ -3,7 +3,6 @@ package com.boydti.fawe.bukkit.regions;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.Perm;
 import com.massivecraft.factions.FLocation;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -107,7 +106,7 @@ public class FactionsOneFeature extends BukkitMaskManager implements Listener {
             }
             return true;
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return false;
         }
     }

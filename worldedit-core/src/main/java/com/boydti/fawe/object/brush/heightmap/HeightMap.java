@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.brush.heightmap;
 
-import com.boydti.fawe.util.MainUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -14,21 +13,19 @@ import com.sk89q.worldedit.util.Location;
 import java.util.concurrent.ThreadLocalRandom;
 
 public interface HeightMap {
-    public double getHeight(int x, int z);
+    double getHeight(int x, int z);
 
-    public void setSize(int size);
+    void setSize(int size);
 
 
     default void perform(EditSession session, Mask mask, BlockVector3 pos, int size, int rotationMode, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
         int[][] data = generateHeightData(session, mask, pos, size, rotationMode, yscale, smooth, towards, layers);
-        applyHeightMapData(data, session, mask, pos, size, rotationMode, yscale, smooth, towards, layers);
+        applyHeightMapData(data, session, pos, size, yscale, smooth, towards, layers);
     }
 
-    default void applyHeightMapData(int[][] data, EditSession session, Mask mask, BlockVector3 pos, int size, int rotationMode, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
+    default void applyHeightMapData(int[][] data, EditSession session, BlockVector3 pos, int size, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
     	BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
-        int diameter = 2 * size + 1;
-        int iterations = 1;
         Location min = new Location(session.getWorld(), pos.subtract(size, maxY, size).toVector3());
         BlockVector3 max = pos.add(size, maxY, size);
         Region region = new CuboidRegion(session.getWorld(), min.toBlockPoint(), max);
@@ -36,19 +33,16 @@ public interface HeightMap {
         if (smooth) {
             try {
                 HeightMapFilter filter = (HeightMapFilter) HeightMapFilter.class.getConstructors()[0].newInstance(GaussianKernel.class.getConstructors()[0].newInstance(5, 1));
+                int diameter = 2 * size + 1;
                 data[1] = filter.filter(data[1], diameter, diameter);
             } catch (Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
-        try {
-            if (layers) {
-                heightMap.applyLayers(data[1]);
-            } else {
-                heightMap.apply(data[1]);
-            }
-        } catch (MaxChangedBlocksException e) {
-            throw e;
+        if (layers) {
+            heightMap.applyLayers(data[1]);
+        } else {
+            heightMap.apply(data[1]);
         }
     }
 
@@ -59,22 +53,18 @@ public interface HeightMap {
         int centerX = pos.getBlockX();
         int centerZ = pos.getBlockZ();
         int centerY = pos.getBlockY();
-        int endY = pos.getBlockY() + size;
-        int startY = pos.getBlockY() - size;
         int[] oldData = new int[diameter * diameter];
         int[] newData = new int[oldData.length];
         if (layers) { // Pixel accuracy
             centerY <<= 3;
             maxY <<= 3;
         }
-//        Vector mutablePos = new Vector(0, 0, 0);
         if (towards) {
             double sizePowInv = 1d / Math.pow(size, yscale);
             int targetY = pos.getBlockY();
             int tmpY = targetY;
             for (int x = -size; x <= size; x++) {
                 int xx = centerX + x;
-//                mutablePos.mutX(xx);
                 for (int z = -size; z <= size; z++) {
                     int index = (z + size) * diameter + (x + size);
                     int zz = centerZ + z;
@@ -118,7 +108,6 @@ public interface HeightMap {
             int height = pos.getBlockY();
             for (int x = -size; x <= size; x++) {
                 int xx = centerX + x;
-//                mutablePos.mutX(xx);
                 for (int z = -size; z <= size; z++) {
                     int index = (z + size) * diameter + (x + size);
                     int zz = centerZ + z;

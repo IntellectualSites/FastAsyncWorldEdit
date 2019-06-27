@@ -13,7 +13,6 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.brush.visualization.VisualChunk;
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
 
@@ -701,7 +700,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             tile.save(tag); // readTagIntoEntity
             return (CompoundTag) toNative(tag);
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return null;
         }
     }

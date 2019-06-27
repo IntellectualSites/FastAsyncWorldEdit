@@ -58,4 +58,15 @@ public interface Clipboard extends Extent {
      */
     void setOrigin(BlockVector3 origin);
 
+    /**
+     * Returns true if the clipboard has biome data. This can be checked since {@link Extent#getBiome(BlockVector2)}
+     * strongly suggests returning {@link com.sk89q.worldedit.world.biome.BiomeTypes.OCEAN} instead of {@code null}
+     * if biomes aren't present. However, it might not be desired to set areas to ocean if the clipboard is defaulting
+     * to ocean, instead of having biomes explicitly set.
+     *
+     * @return true if the clipboard has biome data set
+     */
+    default boolean hasBiomes() {
+        return false;
+    }
 }

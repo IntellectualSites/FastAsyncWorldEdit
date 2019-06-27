@@ -149,7 +149,7 @@ public class SelectionCommand extends SimpleCommand<Operation> {
                                 return null;
                             }
                         } catch (Throwable e) {
-                            MainUtil.handleError(e);
+                            e.printStackTrace();
                         }
                     }
                 }

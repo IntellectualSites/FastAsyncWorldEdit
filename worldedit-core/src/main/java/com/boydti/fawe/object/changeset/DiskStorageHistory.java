@@ -13,13 +13,12 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -181,7 +180,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 if (osENTCF != null) osENTCF.flush();
                 if (osENTCT != null) osENTCT.flush();
             } catch (Exception e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
             return flushed;
         }
@@ -218,7 +217,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                     osENTCT = null;
                 }
             } catch (Exception e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
             return flushed;
         }
@@ -418,7 +417,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 }
                 return summary;
             } catch (IOException e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         return null;
@@ -439,7 +438,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 fis.close();
                 gis.close();
             } catch (IOException e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         return new IntegerPair(ox, oz);

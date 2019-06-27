@@ -5,7 +5,6 @@ import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal3;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.chat.Message;
 import com.google.gson.Gson;
@@ -472,7 +471,7 @@ public enum BBC {
                 yml.save(file);
             }
         } catch (final Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 

@@ -14,9 +14,9 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class WEManager {
 
@@ -33,7 +33,7 @@ public class WEManager {
                 field.set(parent, new NullExtent((Extent) field.get(parent), reason));
             }
         } catch (final Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         throw new FaweException(reason);
     }
@@ -189,7 +189,7 @@ public class WEManager {
                     }), 2);
                 });
             } catch (final Exception e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }, false, false);
     }

@@ -284,7 +284,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                     copy.sectionPalettes[i] = copy(current);
                 }
             } catch (Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         return copy;
@@ -620,7 +620,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                 getParent().getChangeTask().run(copy, this);
             }
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return this;
     }

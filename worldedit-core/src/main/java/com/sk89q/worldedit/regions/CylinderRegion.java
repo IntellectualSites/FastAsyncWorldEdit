@@ -20,10 +20,9 @@
 package com.sk89q.worldedit.regions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.geom.Polygons;
@@ -33,8 +32,6 @@ import com.sk89q.worldedit.world.World;
 
 import java.util.Iterator;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a cylindrical region.
@@ -206,7 +203,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public int getHeight() {
-        return getMaximumY() - getMinimumY() + 1;
+        return maxY - minY + 1;
     }
 
     @Override
@@ -299,6 +296,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         if (blockY < minY || blockY > maxY) {
             return false;
         }
+        //todo the following lines can possibly be removed and replaced with upstream
         int px = position.getBlockX();
         int pz = position.getBlockZ();
 

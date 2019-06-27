@@ -150,7 +150,7 @@ public class ReflectionUtils {
             m.setAccessible(true);
             return (Map<T, V>) m.get(map);
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return map;
         }
     }
@@ -163,7 +163,7 @@ public class ReflectionUtils {
             m.setAccessible(true);
             return (List<T>) m.get(list);
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return list;
         }
     }

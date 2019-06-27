@@ -77,7 +77,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         try {
             return BlockState.getFromInternalId(combinedId4Data);
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return BlockTypes.AIR.getDefaultState();
         }
     }
@@ -100,7 +100,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
             }
             return block;
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
     }

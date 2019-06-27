@@ -24,7 +24,6 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.pattern.PatternTraverser;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.boydti.fawe.wrappers.WorldWrapper;
@@ -434,7 +433,7 @@ public class PlatformManager {
         } else {
             actor.printError("Please report this error: [See console]");
             actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -518,7 +517,7 @@ public class PlatformManager {
             } else {
                 player.printError("Please report this error: [See console]");
                 player.printRaw(e.getClass().getName() + ": " + e.getMessage());
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         } finally {
             Request.reset();

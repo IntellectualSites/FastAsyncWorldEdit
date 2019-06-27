@@ -4,15 +4,16 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
+
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public abstract class TaskManager {
 
@@ -283,7 +284,7 @@ public abstract class TaskManager {
                 }
             }
         } catch (InterruptedException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -330,7 +331,7 @@ public abstract class TaskManager {
                 } catch (RuntimeException e) {
                     this.value = e;
                 } catch (Throwable neverHappens) {
-                    MainUtil.handleError(neverHappens);
+                    neverHappens.printStackTrace();
                 } finally {
                     running.set(false);
                 }
@@ -347,7 +348,7 @@ public abstract class TaskManager {
                 }
             }
         } catch (InterruptedException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         if (run.value != null) {
             throw run.value;
@@ -382,7 +383,7 @@ public abstract class TaskManager {
                 } catch (RuntimeException e) {
                     this.value = e;
                 } catch (Throwable neverHappens) {
-                    MainUtil.handleError(neverHappens);
+                    neverHappens.printStackTrace();
                 } finally {
                     running.set(false);
                     synchronized (function) {
@@ -399,7 +400,7 @@ public abstract class TaskManager {
                 }
             }
         } catch (InterruptedException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         if (run.value instanceof RuntimeException) {
             throw (RuntimeException) run.value;

@@ -78,9 +78,9 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
             init();
-            width = (int) mbb.getChar(2);
-            height = (int) mbb.getChar(4);
-            length = (int) mbb.getChar(6);
+            width = mbb.getChar(2);
+            height = mbb.getChar(4);
+            length = mbb.getChar(6);
             area = width * length;
             this.volume = length * width * height;
 
@@ -180,7 +180,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             clipboard.setOrigin(BlockVector3.at(ox, oy, oz));
             return clipboard;
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return null;
     }
@@ -204,7 +204,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                     file.createNewFile();
                 }
             } catch (Exception e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
             this.braf = new RandomAccessFile(file, "rw");
             long volume = (long) width * (long) height * (long) length * 4L + (long) HEADER_SIZE;
@@ -229,7 +229,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             mbb.putShort(10, (short) offset.getBlockY());
             mbb.putShort(12, (short) offset.getBlockZ());
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -252,7 +252,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             mbb.putChar(4, (char) height);
             mbb.putChar(6, (char) length);
         } catch (IOException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -289,7 +289,6 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                 System.gc();
             }
         }
-        cb = null;
     }
 
     @Override
@@ -311,7 +310,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                 braf = null;
             }
         } catch (IOException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -350,7 +349,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                 }
             }
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -441,7 +440,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
         } catch (IndexOutOfBoundsException ignore) {
         } catch (Exception e) {
             e.printStackTrace();
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
@@ -480,7 +479,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             return base;
         } catch (IndexOutOfBoundsException ignore) {
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
@@ -501,13 +500,13 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             int index = (HEADER_SIZE) + ((getIndex(x, y, z) << 2));
             int combined = block.getInternalId();
             mbb.putInt(index, combined);
-            boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+            boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
             if (hasNbt) {
                 setTile(x, y, z, block.getNbtData());
             }
             return true;
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return false;
     }
@@ -528,7 +527,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             }
             return true;
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return false;
     }

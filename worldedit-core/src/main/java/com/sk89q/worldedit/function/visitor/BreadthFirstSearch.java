@@ -77,7 +77,7 @@ public abstract class BreadthFirstSearch implements Operation {
             }
         }
         list.sort((o1, o2) -> (int) Math.signum(o1.lengthSq() - o2.lengthSq()));
-        DIAGONAL_DIRECTIONS = list.toArray(new BlockVector3[list.size()]);
+        DIAGONAL_DIRECTIONS = list.toArray(new BlockVector3[0]);
     }
 
     private final RegionFunction function;

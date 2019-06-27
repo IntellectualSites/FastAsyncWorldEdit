@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.util;
 
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -38,7 +37,7 @@ public class BukkitReflectionUtils {
                 preClassM = "net.minecraft.server." + verM;
             }
         } catch (final Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
