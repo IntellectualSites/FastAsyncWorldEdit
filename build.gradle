@@ -143,6 +143,7 @@ configure(['worldedit-core', 'worldedit-bukkit', 'favs'].collect { project("$it"
                 include(project(":worldedit-libs:core"))
                 include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
                 include(project(":worldedit-core"))
+                include(dependency('com.github.luben:zstd-jni:1.1.1'))
             }
             exclude 'GradleStart**'
             exclude '.cache'
