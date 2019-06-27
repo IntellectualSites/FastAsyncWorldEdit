@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser;
 
-import com.boydti.fawe.Fawe;
+import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
@@ -57,6 +57,8 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Parses block input strings.
@@ -159,7 +161,6 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     }
 
     private BaseBlock parseLogic(String input, ParserContext context) throws InputParseException {
-        BlockType blockType = null;
         String[] blockAndExtraData = input.trim().split("\\|", 2);
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
 
@@ -203,10 +204,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 typeString = blockAndExtraData[0].substring(0, stateStart);
                 stateString = blockAndExtraData[0].substring(stateStart + 1, blockAndExtraData[0].length() - 1);
             }
-            if (typeString == null || typeString.isEmpty()) {
+            if (typeString.isEmpty()) {
                 throw new InputParseException("Invalid format");
             }
-            String[] stateProperties = EMPTY_STRING_ARRAY;
+            // PosX
             if (typeString.matches("pos[0-9]+")) {
                 int index = Integer.parseInt(typeString.replaceAll("[a-z]+", ""));
                 // Get the block type from the "primary position"
@@ -218,27 +219,25 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new InputParseException("Your selection is not complete.");
                 }
                 state = world.getBlock(primaryPosition);
-            } else if ("hand".equalsIgnoreCase(typeString)) {
+            } else {
+                if ("hand".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's hand.
                 state = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
             } else if ("offhand".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's off hand.
                 state = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
-            } else {
-                // Attempt to lookup a block from ID or name.
-                BlockType type = BlockTypes.parse(typeString.toLowerCase());
+                } else {
+                    BlockType type = BlockTypes.parse(typeString.toLowerCase());
 
-                if (type == null) {
-                    throw new NoMatchException("Does not match a valid block type: '" + input + "'");
+                        if (type != null) {
+                            state = type.getDefaultState();
+                        }
+                        if (state == null) {
+                        throw new NoMatchException("Does not match a valid block type: '" + input + "'");
+                    }
                 }
             }
-            if (state != null) {
-                nbt = state.getNbtData();
-            } else {
-                Fawe.debug("State was null.");
-                Fawe.debug("Input was: " + input);
-                Fawe.debug("typestring was: " + typeString);
-            }
+            if (nbt == null) nbt = state.getNbtData();
 
             if (stateString != null) {
                 state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state);
@@ -273,14 +272,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
 
         // Check if the item is allowed
-        blockType = state.getBlockType();
-        if (context.isRestricted()) {
-            Actor actor = context.requireActor();
-            if (actor != null && !actor.hasPermission("worldedit.anyblock")
-                    && worldEdit.getConfiguration().checkDisallowedBlocks(state)) {
-                throw new DisallowedUsageException("You are not allowed to use '" + input + "'");
-            }
-        }
+        BlockType blockType = state.getBlockType();
 
         if (nbt != null) return validate(context, state.toBaseBlock(nbt));
 
@@ -291,7 +283,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             text[1] = blockAndExtraData.length > 2 ? blockAndExtraData[2] : "";
             text[2] = blockAndExtraData.length > 3 ? blockAndExtraData[3] : "";
             text[3] = blockAndExtraData.length > 4 ? blockAndExtraData[4] : "";
-            return new SignBlock(state, text);
+            return validate(context, new SignBlock(state, text));
         } else if (blockType == BlockTypes.SPAWNER) {
             // Allow setting mob spawn type
             if (blockAndExtraData.length > 1) {
@@ -303,23 +295,27 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     }
                 }
                 if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
-                    throw new NoMatchException("Unknown mob type '" + mobName + "'");
+                    String finalMobName = mobName.toLowerCase();
+                    throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
+                                                                                                                    .map(m -> m.getName().toLowerCase())
+                                                                                                                    .filter(s -> s.startsWith(finalMobName))
+                                                                                                                    .collect(Collectors.toList()));
                 }
-                return new MobSpawnerBlock(state, mobName);
+                return validate(context, new MobSpawnerBlock(state, mobName));
             } else {
-                return new MobSpawnerBlock(state, MobType.PIG.getName());
+                return validate(context, new MobSpawnerBlock(state, MobType.PIG.getName()));
             }
         } else if (blockType == BlockTypes.PLAYER_HEAD || blockType == BlockTypes.PLAYER_WALL_HEAD) {
             // allow setting type/player/rotation
             if (blockAndExtraData.length <= 1) {
-                return new SkullBlock(state);
+                return validate(context, new SkullBlock(state));
             }
 
             String type = blockAndExtraData[1];
 
-            return new SkullBlock(state, type.replace(" ", "_")); // valid MC usernames
+            return validate(context, new SkullBlock(state, type.replace(" ", "_"))); // valid MC usernames
         } else {
-            return state.toBaseBlock();
+            return validate(context, state.toBaseBlock());
         }
     }
 
