@@ -846,4 +846,7 @@ public final class ItemTypes {
         return ItemType.REGISTRY.getByInternalId(ordinal);
     }
 
+    public static int size() {
+        return ItemType.REGISTRY.size();
+    }
 }

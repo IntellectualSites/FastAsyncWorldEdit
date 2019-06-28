@@ -128,7 +128,7 @@ public class LocalSession implements TextureHolder {
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
     private transient boolean hasTool = false;
-    private transient Map<ItemType, Tool> tools = new HashMap<>();
+    private transient Tool[] tools = new Tool[ItemTypes.size()];
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
@@ -374,9 +374,6 @@ public class LocalSession implements TextureHolder {
     public void remember(EditSession editSession) {
         checkNotNull(editSession);
 
-        // Don't store anything if no changes were made
-        if (editSession.size() == 0) return;
-
         FawePlayer fp = editSession.getPlayer();
         int limit = fp == null ? Integer.MAX_VALUE : fp.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
@@ -573,7 +570,7 @@ public class LocalSession implements TextureHolder {
     }
 
     public void unregisterTools(Player player) {
-        for (Tool tool : tools.values()) {
+        for (Tool tool : tools) {
             if (tool instanceof BrushTool) {
                 ((BrushTool) tool).clear(player);
             }
@@ -689,7 +686,7 @@ public class LocalSession implements TextureHolder {
             }
         }
         if (world != null) {
-            //Fawe.imp().registerPacketListener();
+            Fawe.imp().registerPacketListener();
             world.update();
         }
     }
@@ -957,7 +954,7 @@ public class LocalSession implements TextureHolder {
      */
     @Nullable
     public Tool getTool(ItemType item) {
-        return tools.get(item);
+        return tools[item.getInternalId()];
     }
 
     @Nullable
@@ -1004,7 +1001,7 @@ public class LocalSession implements TextureHolder {
         Tool tool = getTool(item, player);
         if (!(tool instanceof BrushTool)) {
             if (create) {
-                tool = new BrushTool("worldedit.brush.sphere");
+                tool = new BrushTool();
                 setTool(item, tool, player);
             } else {
                 return null;
@@ -1039,7 +1036,7 @@ public class LocalSession implements TextureHolder {
 
     public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {
         ItemType type = item.getType();
-        if (type.hasBlockType()) {
+        if (type.hasBlockType() && type.getBlockType().getMaterial().isAir()) {
             throw new InvalidToolBindException(type, "Blocks can't be used");
         } else if (type.getId().equalsIgnoreCase(config.wandItem)) {
             throw new InvalidToolBindException(type, "Already used for the wand");
@@ -1053,20 +1050,18 @@ public class LocalSession implements TextureHolder {
             if (tool != null) {
                 ((BrushTool) tool).setHolder(item);
             } else {
-                this.tools.remove(type);
+                this.tools[type.getInternalId()] = null;
             }
         } else {
-            previous = this.tools.get(type);
-            this.tools.put(type, tool);
+            previous = this.tools[type.getInternalId()];
+            this.tools[type.getInternalId()] = tool;
             if (tool != null) {
                 hasTool = true;
             } else {
                 hasTool = false;
-                for (Tool i : this.tools.values()) {
-                    if (i != null) {
-                        hasTool = true;
-                        break;
-                    }
+                for (Tool i : this.tools) if (i != null) {
+                    hasTool = true;
+                    break;
                 }
             }
         }

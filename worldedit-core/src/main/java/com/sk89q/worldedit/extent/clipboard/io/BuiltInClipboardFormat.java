@@ -162,7 +162,12 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             outputStream = new BufferedOutputStream(outputStream);
-            OutputStream gzip = new PGZIPOutputStream(outputStream);
+            OutputStream gzip;
+            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+                gzip = outputStream;
+            } else {
+                gzip = new PGZIPOutputStream(outputStream);
+            }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new StructureFormat(nbtStream);
         }
