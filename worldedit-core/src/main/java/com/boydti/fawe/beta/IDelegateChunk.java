@@ -88,8 +88,8 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, MutableBlockVector3 unitialized, MutableBlockVector3 unitialized2) {
-        getParent().filterBlocks(filter, block, region, unitialized, unitialized2);
+    default void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region) {
+        getParent().filterBlocks(filter, block, region);
     }
 
     @Override

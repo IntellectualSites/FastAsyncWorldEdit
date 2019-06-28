@@ -298,25 +298,25 @@ public class DelegateFilterBlock extends FilterBlock {
         return parent.toImmutable();
     }
 
-    @Override
-    public BlockVector3 north() {
-        return parent.north();
-    }
-
-    @Override
-    public BlockVector3 east() {
-        return parent.east();
-    }
-
-    @Override
-    public BlockVector3 south() {
-        return parent.south();
-    }
-
-    @Override
-    public BlockVector3 west() {
-        return parent.west();
-    }
+//    @Override
+//    public BlockVector3 north() {
+//        return parent.north();
+//    }
+//
+//    @Override
+//    public BlockVector3 east() {
+//        return parent.east();
+//    }
+//
+//    @Override
+//    public BlockVector3 south() {
+//        return parent.south();
+//    }
+//
+//    @Override
+//    public BlockVector3 west() {
+//        return parent.west();
+//    }
 
     @Override
     public int getBlockX() {

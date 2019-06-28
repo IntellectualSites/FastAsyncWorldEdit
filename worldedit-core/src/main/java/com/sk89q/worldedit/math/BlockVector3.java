@@ -103,37 +103,37 @@ public abstract class BlockVector3 {
         return BlockVector3.at(getX(), getY(), getZ());
     }
 
-    /**
-     * Get the BlockVector3 to the north<br>
-     * Normal use you would use north(this),
-     * To avoid constructing a new Vector, pass e.g. north(some MutableBlockVector3)
-     * There is no gaurantee it will use this provided vector
-     * @param orDefault the vector to use as the result<br>
-     * @return BlockVector3
-     */
-    public BlockVector3 north(BlockVector3 orDefault) {
-        return orDefault.setComponents(getX(), getY(), getZ() - 1);
-    }
-
-    public BlockVector3 east(BlockVector3 orDefault) {
-        return orDefault.setComponents(getX() + 1, getY(), getZ());
-    }
-
-    public BlockVector3 south(BlockVector3 orDefault) {
-        return orDefault.setComponents(getX(), getY(), getZ() + 1);
-    }
-
-    public BlockVector3 west(BlockVector3 orDefault) {
-        return orDefault.setComponents(getX() - 1, getY(), getZ());
-    }
-
-    public BlockVector3 up(BlockVector3 orDefault) {
-        return orDefault.setComponents(getX(), getY() + 1, getZ());
-    }
-
-    public BlockVector3 down(BlockVector3 orDefault) {
-        return orDefault.setComponents(getX(), getY() - 1, getZ());
-    }
+//    /**
+//     * Get the BlockVector3 to the north<br>
+//     * Normal use you would use north(this),
+//     * To avoid constructing a new Vector, pass e.g. north(some MutableBlockVector3)
+//     * There is no gaurantee it will use this provided vector
+//     * @param orDefault the vector to use as the result<br>
+//     * @return BlockVector3
+//     */
+//    public BlockVector3 north(BlockVector3 orDefault) {
+//        return orDefault.setComponents(getX(), getY(), getZ() - 1);
+//    }
+//
+//    public BlockVector3 east(BlockVector3 orDefault) {
+//        return orDefault.setComponents(getX() + 1, getY(), getZ());
+//    }
+//
+//    public BlockVector3 south(BlockVector3 orDefault) {
+//        return orDefault.setComponents(getX(), getY(), getZ() + 1);
+//    }
+//
+//    public BlockVector3 west(BlockVector3 orDefault) {
+//        return orDefault.setComponents(getX() - 1, getY(), getZ());
+//    }
+//
+//    public BlockVector3 up(BlockVector3 orDefault) {
+//        return orDefault.setComponents(getX(), getY() + 1, getZ());
+//    }
+//
+//    public BlockVector3 down(BlockVector3 orDefault) {
+//        return orDefault.setComponents(getX(), getY() - 1, getZ());
+//    }
 
     /**
      * Get the X coordinate.

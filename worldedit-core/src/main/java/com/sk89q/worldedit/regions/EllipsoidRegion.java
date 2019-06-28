@@ -25,6 +25,7 @@ import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -286,14 +287,54 @@ public class EllipsoidRegion extends AbstractRegion {
         return (EllipsoidRegion) super.clone();
     }
 
+    private void filterSpherePartial(int y1, int y2, int bx, int bz, Filter filter, ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+        int sectionStart = y1 >> 4;
+        int sectionEnd = y2 >> 4;
+
+    }
+
+    private void filterSpherePartial(int layer, int y1, int y2, int bx, int bz, Filter filter, ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+        int cx = center.getBlockX();
+        int cy = center.getBlockY();
+        int cz = center.getBlockZ();
+
+        block.init(get, set, layer);
+
+        int by = layer << 4;
+        int diffY;
+        for (int y = y1, yy = by + y1; y <= y2; y++, yy++) {
+            diffY = cy - yy;
+            int remainderY = radiusLengthSqr - (diffY * diffY);
+            if (remainderY >= 0) {
+                for (int z = 0; z < 16; z++) {
+                    int zz = z + bz;
+                    int diffZ = cz - zz;
+                    int remainderZ = remainderY - (diffZ * diffZ);
+                    if (remainderZ >= 0) {
+                        int diffX = MathMan.usqrt(remainderZ);
+                        int minX = Math.max(0, cx - diffX - bx);
+                        int maxX = Math.min(15, cx + diffX - bx);
+                        if (minX != maxX) {
+                            block.filter(filter, minX, y, z, maxX, y, z);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void filter(IChunk chunk, Filter filter, ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+        // Check bounds
+        // This needs to be able to perform 50M blocks/sec otherwise it becomes a bottleneck
+        int cx = center.getBlockX();
+        int cz = center.getBlockZ();
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
         int tx = bx + 15;
         int tz = bz + 15;
-        int cx1 = bx - center.getBlockX();
-        int cx2 = tx - center.getBlockX();
+        int cx1 = bx - cx;
+        int cx2 = tx - cx;
         int cxMax, cxMin;
         if (cx1 < cx2) {
             cxMin = cx1;
@@ -304,8 +345,8 @@ public class EllipsoidRegion extends AbstractRegion {
         }
         int cxMin2 = cxMin * cxMin;
         int cxMax2 = cxMax * cxMax;
-        int cz1 = bz - center.getBlockZ();
-        int cz2 = tz - center.getBlockZ();
+        int cz1 = bz - cz;
+        int cz2 = tz - cz;
         int czMax, czMin;
         if (cz1 < cz2) {
             czMin = cz1;
@@ -319,62 +360,41 @@ public class EllipsoidRegion extends AbstractRegion {
 
 
         if (sphere) {
+            // Does not contain chunk
             if (cxMin2 + czMin2 >= radiusLengthSqr) {
                 return;
             }
             int diffY2 = radiusLengthSqr - cxMax2 - czMax2;
-            if (diffY2 > 0) {
-                diffy2
-            }
+            // (shortcut) Contains all of certain layers
+            if (diffY2 >= 0) {
+                // Get the solid layers
+                int cy = center.getBlockY();
+                int diffYFull = MathMan.usqrt(diffY2);
+                int yBotFull = Math.max(0, cy - diffYFull);
+                int yTopFull = Math.min(255, cy + diffYFull);
+                // Set those layers
+                filter(chunk, filter, block, get, set, yBotFull, yTopFull);
 
+                // Fill the remaining layers
+                if (yBotFull != 0 || yTopFull != 255) {
+                    int diffYPartial = MathMan.usqrt(radiusLengthSqr - cxMin * cxMin - czMin * czMin);
 
+                    if (yBotFull != 0) {
+                        int yBotPartial = Math.max(0, cy - diffYPartial);
+                        filterSpherePartial(yBotPartial, yBotFull - 1, bx, bz, filter, block, get, set);
+                    }
 
-        } else {
-            if (cxMin2 * inverseRadius.getX() + czMin2 * inverseRadius.getZ() > 1) {
-                return;
-            }
-            partial = cxMax2 * inverseRadius.getX() + czMax2 * inverseRadius.getZ() > 1;
-        }
-        if (partial) {
-
-        } else {
-            // get min y and max y
-            for (int layer = 0; layer < 16; layer++) {
-                // if contains all
-                {
-                    filter(chunk, )
+                    if (yTopFull != 255) {
+                        int yTopPartial = Math.min(255, cy + diffYPartial);
+                        filterSpherePartial(yTopFull + 1, yTopPartial - 1, bx, bz, filter, block, get, set);
+                    }
                 }
             }
-        }
 
 
-        int cy1 = 0 - center.getBlockY();
-        int cy2 = 255 - center.getBlockY();
-        int cyMax, cyMin;
-        if (cy1 < cy2) {
-            cyMin = cy1;
-            cyMax = cy2;
         } else {
-            cyMin = cy2;
-            cyMax = cy1;
+            super.filter(chunk, filter, block, get, set);
+            // TODO optimize
         }
-        int cyMin2 = cyMin * cyMin;
-        int cyMax2 = cyMax * cyMax;
-
-        boolean containsMin = contains(bx, bz);
-        boolean containsMax = contains(tx, tz);
-        if (containsMin && containsMax) {
-            // set all
-            return;
-        }
-
-
-        for (int layer = 0; layer < 16; layer++) {
-            if (contains())
-        }
-        TODO optimize;
-        int minY = getMinY();
-        int maxY = getMaxY();
-        contains()
     }
 }

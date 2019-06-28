@@ -7,6 +7,11 @@ public class CharBlocks implements IBlocks {
     public final char[][] blocks;
     public final Section[] sections;
 
+    public CharBlocks(CharBlocks other) {
+        this.blocks = other.blocks;
+        this.sections = other.sections;
+    }
+
     public CharBlocks() {
         blocks = new char[16][];
         sections = new Section[16];

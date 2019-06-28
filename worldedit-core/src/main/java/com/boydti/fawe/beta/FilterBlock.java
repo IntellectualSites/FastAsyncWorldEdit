@@ -119,7 +119,6 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     /*
     Extent
      */
-
     public boolean setOrdinal(Extent orDefault, int ordinal) {
         setOrdinal(ordinal);
         return true;

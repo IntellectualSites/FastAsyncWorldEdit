@@ -14,10 +14,10 @@ public class NorthVector extends BlockVector3 {
         this.parent = parent;
     }
 
-    @Override
-    public BlockVector3 south(BlockVector3 orDefault) {
-        return parent;
-    }
+//    @Override
+//    public BlockVector3 south(BlockVector3 orDefault) {
+//        return parent;
+//    }
 
     @Override
     public int getX() {

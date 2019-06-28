@@ -103,7 +103,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     private <T extends Future<T>> T submitUnchecked(final IChunk<T> chunk) {
         if (chunk.isEmpty()) {
             CHUNK_POOL.add(chunk);
-            return (T) (Future) Futures.immediateFuture(null);
+            return (T) Futures.immediateFuture(null);
         }
 
         if (Fawe.isMainThread()) {

@@ -20,6 +20,17 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
 
+    public CharSetBlocks(CharBlocks other) {
+        super(other);
+        if (other instanceof CharSetBlocks) {
+
+        }
+    }
+
+    public CharSetBlocks() {
+
+    }
+
     @Override
     public char[] getArray(int layer) {
         return sections[layer].get(this, layer);

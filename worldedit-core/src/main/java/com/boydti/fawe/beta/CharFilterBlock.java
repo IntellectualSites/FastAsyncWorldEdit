@@ -3,7 +3,6 @@ package com.boydti.fawe.beta;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -367,31 +366,9 @@ public class CharFilterBlock extends ChunkFilterBlock {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-
-
-    @Override
-    public BlockVector3 north() {
-        return this.north;
-    }
-
-    @Override
-    public BlockVector3 east() {
-        return super.east();
-    }
-
-    @Override
-    public BlockVector3 south() {
-        return super.south();
-    }
-
-    @Override
-    public BlockVector3 west() {
-        return super.west();
-    }
-
     /*
-                    Extent
-                     */
+    Extent
+     */
     @Override
     public char getOrdinalChar(Extent orDefault) {
         return getOrdinalChar();

@@ -156,9 +156,6 @@ public abstract class QueueHandler implements Trimable, Runnable {
             tasks[i] = forkJoinPoolPrimary.submit(new Runnable() {
                 @Override
                 public void run() {
-                    MutableBlockVector3 mbv1 = new MutableBlockVector3();
-                    MutableBlockVector3 mbv2 = new MutableBlockVector3();
-
                     final Filter newFilter = filter.fork();
                     // Create a chunk that we will reuse/reset for each operation
                     final IQueueExtent queue = getQueue(world);
@@ -185,7 +182,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
                             if (newChunk != null) {
                                 chunk = newChunk;
                                 if (block == null) block = queue.initFilterBlock();
-                                chunk.filterBlocks(newFilter, block, region, mbv1, mbv2);
+                                chunk.filterBlocks(newFilter, block, region);
                             }
                             queue.submit(chunk);
                         }

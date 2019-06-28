@@ -51,10 +51,10 @@ public class SingleFilterBlock extends FilterBlock {
         return block.getOrdinal();
     }
 
-    @Override
-    public BaseBlock getFullBlockRelative(int x, int y, int z) {
-        return block;
-    }
+//    @Override
+//    public BaseBlock getFullBlockRelative(int x, int y, int z) {
+//        return block;
+//    }
 
     @Override
     public BlockState getBlock() {
