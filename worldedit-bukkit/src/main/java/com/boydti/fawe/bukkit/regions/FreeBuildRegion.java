@@ -70,7 +70,7 @@ public class FreeBuildRegion extends BukkitMaskManager {
 
             @Override
             public Region getRegion() {
-                return new CuboidRegion(vec1, vec1) {
+                return new CuboidRegion(BlockVector3.ZERO, BlockVector3.ZERO) {
 
                     @Override
                     public boolean contains(int x, int z) {
