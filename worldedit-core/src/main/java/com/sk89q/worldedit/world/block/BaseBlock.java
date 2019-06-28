@@ -46,24 +46,13 @@ import java.util.Objects;
  */
 public class BaseBlock implements BlockStateHolder<BaseBlock> {
 
-    private final BlockState blockState;
-
+    private BlockState blockState;
     @Nullable protected CompoundTag nbtData;
 
     @Deprecated
     public BaseBlock() {
         this(BlockTypes.AIR.getDefaultState());
     }
-
-//    /**
-//     * Construct a block with a state.
-//     * @deprecated Just use the BlockStateHolder instead
-//     * @param blockState The blockstate
-//     */
-//    @Deprecated
-//    public BaseBlock(BlockStateHolder blockState) {
-//        this(blockState, blockState.getNbtData());
-//    }
 
     /**
      * Construct a block with the given type and default data.

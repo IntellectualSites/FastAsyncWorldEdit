@@ -19,15 +19,16 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.function.pattern.FawePattern;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -198,9 +199,11 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePat
         if (getStates().isEmpty()) {
             return this.getBlockType().getId();
         } else {
-            String properties =
-                    getStates().entrySet().stream().map(entry -> entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase()).collect(Collectors.joining(
-                    ","));
+            String properties = getStates().entrySet().stream()
+                .map(entry -> entry.getKey().getName()
+                    + "="
+                    + entry.getValue().toString().toLowerCase(Locale.ROOT))
+                .collect(Collectors.joining(","));
             return this.getBlockType().getId() + "[" + properties + "]";
         }
     }
