@@ -849,4 +849,8 @@ public final class ItemTypes {
     public static int size() {
         return ItemType.REGISTRY.size();
     }
+
+    public static Collection<ItemType> values() {
+        return ItemType.REGISTRY.values();
+    }
 }

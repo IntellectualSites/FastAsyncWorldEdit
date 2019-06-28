@@ -143,11 +143,10 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 @Override
                 public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                     try {
-                        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
-                        if (hasNbt) {
-                            if (block.getNbtData() != null) {
-                                BaseBlock localBlock = (BaseBlock) block;
-                                Map<String, Tag> values = localBlock.getNbtData().getValue();
+                        if (block.hasNbtData()) {
+                            CompoundTag nbt = block.getNbtData();
+                            if (nbt != null) {
+                                Map<String, Tag> values = nbt.getValue();
 
                                 values.remove("id"); // Remove 'id' if it exists. We want 'Id'
 
@@ -164,7 +163,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                                         z
                                 }));
                                 numTiles[0]++;
-                                tilesOut.writeTagPayload(localBlock.getNbtData());
+                                tilesOut.writeTagPayload(block.getNbtData());
                             }
                         }
                         int ordinal = block.getOrdinal();

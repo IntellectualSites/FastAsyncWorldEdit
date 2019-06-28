@@ -192,20 +192,11 @@ public class BiomeCommands extends MethodCommands {
         Collections.sort(distribution);
         for (Countable<BiomeType> c : distribution) {
             BiomeData data = biomeRegistry.getData(c.getID());
-            String str;
-            if (data == null) {
-                str = String.format("%-7s (%.3f%%) %s #%d",
-                                    String.valueOf(c.getAmount()),
-                                    c.getAmount() / (double) size * 100,
-                                    "Unknown",
-                                    c.getID().getInternalId());
-            } else {
-                str = String.format("%-7s (%.3f%%) %s #%d",
-                                    String.valueOf(c.getAmount()),
-                                    c.getAmount() / (double) size * 100,
-                                    data.getName(),
-                                    c.getID().getInternalId());
-            }
+            String str = String.format("%-7s (%.3f%%) %s #%d",
+                    String.valueOf(c.getAmount()),
+                    c.getAmount() / (double) size * 100,
+                    data == null ? "Unknown" : data.getName(),
+                    c.getID().getInternalId());
             player.print(str);
         }
     }

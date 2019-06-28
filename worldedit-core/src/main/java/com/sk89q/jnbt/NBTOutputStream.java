@@ -19,6 +19,8 @@
 
 package com.sk89q.jnbt;
 
+import com.boydti.fawe.object.io.LittleEndianOutputStream;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.Closeable;
@@ -67,6 +69,15 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     }
 
     /**
+     * Use a little endian output stream
+     */
+    public void setLittleEndian() {
+        if (!(os instanceof LittleEndianOutputStream)) {
+            this.os = new LittleEndianOutputStream((OutputStream) os);
+        }
+    }
+
+    /**
      * Writes a tag.
      *
      * @param tag
@@ -79,11 +90,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         checkNotNull(tag);
 
         int type = NBTUtils.getTypeCode(tag.getClass());
-        byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
-
-        os.writeByte(type);
-        os.writeShort(nameBytes.length);
-        os.write(nameBytes);
+        writeNamedTagName(name, type);
 
         if (type == NBTConstants.TYPE_END) {
             throw new IOException("Named TAG_End not permitted.");

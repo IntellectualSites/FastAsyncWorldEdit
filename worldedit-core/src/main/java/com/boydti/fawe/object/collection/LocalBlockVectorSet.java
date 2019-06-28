@@ -257,12 +257,21 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return c.stream().allMatch(this::contains);
+        for (Object o : c) {
+            if (!contains(o)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean addAll(Collection<? extends BlockVector3> c) {
-        return c.stream().map(this::add).reduce(false, (a, b) -> a || b);
+        boolean result = false;
+        for (BlockVector3 v : c) {
+            result |= add(v);
+        }
+        return result;
     }
 
     @Override
@@ -290,7 +299,11 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return c.stream().map(this::remove).reduce(false, (a, b) -> a || b);
+        boolean result = false;
+        for (Object o : c) {
+            result |= remove(o);
+        }
+        return result;
     }
 
     public void forEach(BlockVectorSetVisitor visitor) {

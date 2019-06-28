@@ -25,9 +25,11 @@ import com.boydti.fawe.jnbt.anvil.generator.OreGen;
 import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
 
+import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -407,5 +409,18 @@ public interface Extent extends InputExtent, OutputExtent {
 
     default int getMaxY() {
         return 255;
+    }
+
+    /**
+     * Lazily copy a region
+     *
+     * @param region
+     * @return
+     */
+    default BlockArrayClipboard lazyCopy(Region region) {
+        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(this, region);
+        BlockArrayClipboard weClipboard = new BlockArrayClipboard(region, faweClipboard);
+        weClipboard.setOrigin(region.getMinimumPoint());
+        return weClipboard;
     }
 }

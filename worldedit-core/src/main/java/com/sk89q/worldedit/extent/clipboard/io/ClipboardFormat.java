@@ -33,6 +33,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -111,7 +112,7 @@ public interface ClipboardFormat {
      * @param in
      * @throws IOException
      */
-    default void hold(Player player, URI uri, InputStream in) throws IOException {
+    default URIClipboardHolder hold(Player player, URI uri, InputStream in) throws IOException {
         checkNotNull(player);
         checkNotNull(uri);
         checkNotNull(in);
@@ -125,6 +126,7 @@ public interface ClipboardFormat {
         clipboard = reader.read(player.getUniqueId());
         URIClipboardHolder holder = new URIClipboardHolder(uri, clipboard);
         session.setClipboard(holder);
+        return holder;
     }
 
     default Schematic load(File file) throws IOException {
