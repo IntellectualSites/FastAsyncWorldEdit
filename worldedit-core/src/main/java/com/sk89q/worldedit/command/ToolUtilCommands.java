@@ -83,10 +83,10 @@ public class ToolUtilCommands {
     @CommandPermissions("worldedit.brush.options.mask")
     public void mask(Player player, LocalSession session, @Optional Mask mask) throws WorldEditException {
         if (mask == null) {
-            session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setMask(null);
+            session.getBrushTool(player).setMask(null);
             player.print("Brush mask disabled.");
         } else {
-            session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setMask(mask);
+            session.getBrushTool(player).setMask(mask);
             player.print("Brush mask set.");
         }
     }
@@ -100,7 +100,7 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.options.material")
     public void material(Player player, LocalSession session, Pattern pattern) throws WorldEditException {
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setFill(pattern);
+        session.getBrushTool(player).setFill(pattern);
         player.print("Brush material set.");
     }
 
@@ -114,7 +114,7 @@ public class ToolUtilCommands {
     @CommandPermissions("worldedit.brush.options.range")
     public void range(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         int range = args.getInteger(0);
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setRange(range);
+        session.getBrushTool(player).setRange(range);
         player.print("Brush range set.");
     }
 
@@ -130,7 +130,7 @@ public class ToolUtilCommands {
 
         int radius = args.getInteger(0);
         we.checkMaxBrushRadius(radius);
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(radius);
+        session.getBrushTool(player).setSize(radius);
         player.print("Brush size set.");
     }
 }

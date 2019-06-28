@@ -128,7 +128,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
 
             try {
-            Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
+                Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
                 Bukkit.getPluginManager().registerEvents(new AsyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
             } catch (Throwable ignore) {
                 debug("====== USE PAPER ======");
