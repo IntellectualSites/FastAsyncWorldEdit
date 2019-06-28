@@ -33,6 +33,7 @@ import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.extension.platform.PlayerProxy;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
@@ -369,7 +370,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @return
      */
     public World getWorld() {
-        return FaweAPI.getWorld(getLocation().world);
+        return getPlayer().getWorld();
     }
 
     public FaweQueue getFaweQueue(boolean autoQueue) {
@@ -681,8 +682,7 @@ public abstract class FawePlayer<T> extends Metadatable {
 
         PlayerProxy proxy = new PlayerProxy(player, permActor, cuiActor, world);
         if (world instanceof VirtualWorld) {
-            //todo fix this
-            //proxy.setOffset(Vector3.ZERO.subtract(((VirtualWorld) world).getOrigin()));
+            proxy.setOffset(Vector3.ZERO.subtract(((VirtualWorld) world).getOrigin()));
         }
         return proxy;
     }

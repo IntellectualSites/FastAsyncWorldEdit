@@ -340,7 +340,7 @@ public class Fawe {
         try {
             String arch = System.getenv("PROCESSOR_ARCHITECTURE");
             String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-            boolean x86OS = !arch.endsWith("64") && (wow64Arch == null || !wow64Arch.endsWith("64"));
+            boolean x86OS = !(arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64"));
             boolean x86JVM = System.getProperty("sun.arch.data.model").equals("32");
             if (x86OS != x86JVM) {
                 debug("====== UPGRADE TO 64-BIT JAVA ======");

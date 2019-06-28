@@ -47,6 +47,7 @@ public class PlayerProxy extends AbstractPlayerActor {
     private final Actor permActor;
     private final Actor cuiActor;
     private final World world;
+    private Vector3 offset = Vector3.ZERO;
 
     public PlayerProxy(Player basePlayer, Actor permActor, Actor cuiActor, World world) {
         checkNotNull(basePlayer);
@@ -59,6 +60,9 @@ public class PlayerProxy extends AbstractPlayerActor {
         this.world = world;
     }
 
+    public void setOffset(Vector3 position) {
+        this.offset = position;
+    }
 
     @Override
     public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
@@ -102,7 +106,8 @@ public class PlayerProxy extends AbstractPlayerActor {
 
     @Override
     public Location getLocation() {
-        return basePlayer.getLocation();
+        Location loc = this.basePlayer.getLocation();
+        return new Location(loc.getExtent(), loc.add(offset), loc.getDirection());
     }
 
     @Override
