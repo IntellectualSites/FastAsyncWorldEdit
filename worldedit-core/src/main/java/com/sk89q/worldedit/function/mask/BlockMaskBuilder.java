@@ -257,10 +257,6 @@ public class BlockMaskBuilder {
         this.bitSets = bitSets;
     }
 
-    public BlockMaskBuilder parse(String input) {
-        return this;
-    }
-
     public BlockMaskBuilder addAll() {
         for (int i = 0; i < bitSets.length; i++) {
             bitSets[i] = BlockMask.ALL;
