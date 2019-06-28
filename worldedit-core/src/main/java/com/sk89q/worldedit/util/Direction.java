@@ -69,7 +69,7 @@ public enum Direction {
     private final int right;
     private final BlockVector3 blockPoint;
 
-    private static HashMap<String, Direction> map = new HashMap<>();
+    private static HashMap<CharSequence, Direction> map = new HashMap<>();
 
     static {
         for (Direction dir : Direction.values()) {
@@ -87,7 +87,7 @@ public enum Direction {
     }
 
     public static Direction get(CharSequence sequence) {
-        return map.get(sequence.toString());
+        return map.get(sequence);
     }
 
     public Direction getLeft() {
