@@ -2686,7 +2686,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     continue;
                 }
 
-                for (int y = world.getMaxY(); y >= 1; --y) {
+                for (int y = maxY; y >= 1; --y) {
                     BlockVector3 pt = BlockVector3.at(x, y, z);
                     BlockType id = getBlock(pt).getBlockType();
 
