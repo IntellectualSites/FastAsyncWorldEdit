@@ -287,7 +287,7 @@ public class HeightMap {
                     BlockState existing = session.getBlock(BlockVector3.at(xr, curHeight, zr));
 
                     // Skip water/lava
-                    if (existing.getBlockType() != BlockTypes.WATER && existing.getBlockType() != BlockTypes.LAVA) {
+                    if (existing.getBlockType().getMaterial().isMovementBlocker()) {
                         int y0 = newHeight - 1;
                         for (int setY = y0, getY = curHeight - 1; setY >= curHeight; setY--, getY--) {
                             BlockState get = session.getBlock(xr, getY, zr);

@@ -19,6 +19,7 @@ import java.util.*;
  */
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements Set<BlockVector3> {
     private Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
     public int size() {
@@ -37,12 +38,12 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
             int newSize = count + size;
             if (newSize > index) {
                 int localIndex = index - count;
-                MutableBlockVector3 pos = new MutableBlockVector3(set.getIndex(localIndex));
+                BlockVector3 pos = mutable.setComponents(set.getIndex(localIndex));
                 int pair = entry.getIntKey();
                 int cx = MathMan.unpairX(pair);
                 int cz = MathMan.unpairY(pair);
-                pos.mutX((cx << 11) + pos.getBlockX());
-                pos.mutZ((cz << 11) + pos.getBlockZ());
+                pos = pos.mutX((cx << 11) + pos.getBlockX());
+                pos = pos.mutZ((cz << 11) + pos.getBlockZ());
                 return pos;
             }
             count += newSize;

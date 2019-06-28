@@ -8,14 +8,17 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Arrays;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class ErodeBrush implements Brush {
 
-    private static final BlockVector3[] FACES_TO_CHECK = {BlockVector3.at(0, 0, 1), BlockVector3.at(0, 0, -1), BlockVector3.at(0, 1, 0), BlockVector3.at(0, -1, 0), BlockVector3.at(1, 0, 0), BlockVector3.at(-1, 0, 0)};
+    private static final BlockVector3[] FACES_TO_CHECK = Direction.valuesOf(Direction.Flag.CARDINAL).stream().map(direction -> direction.toBlockVector()).toArray(size -> new BlockVector3[size]);
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {

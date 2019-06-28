@@ -55,9 +55,8 @@ public class FreeBuildRegion extends BukkitMaskManager {
         World bukkitWorld = player.parent.getWorld();
         AsyncWorld asyncWorld = AsyncWorld.wrap(bukkitWorld);
 
-        BlockVector3 vec1 = BlockVector3.at(0, 0, 0);
-        Location pos1 = BukkitAdapter.adapt(bukkitWorld, vec1);
-        Location pos2 = BukkitAdapter.adapt(bukkitWorld, vec1);
+        Location pos1 = BukkitAdapter.adapt(bukkitWorld, BlockVector3.ZERO);
+        Location pos2 = BukkitAdapter.adapt(bukkitWorld, BlockVector3.ZERO);
 
         AsyncBlock block = new AsyncBlock(asyncWorld, new NullFaweQueue(asyncWorld.getWorldName(), BlockTypes.STONE.getDefaultState()), 0, 0, 0);
         BlockBreakEvent event = new BlockBreakEvent(block, player.parent);

@@ -108,7 +108,9 @@ public class WritableMCAChunk extends FaweChunk<Void> {
             }
             out.writeNamedTag("InhabitedTime", inhabitedTime);
             out.writeNamedTag("LastUpdate", lastUpdate);
-            out.writeNamedTag("Biomes", biomes);
+            if (hasBiomes) {
+                out.writeNamedTag("Biomes", biomes);
+            }
             int len = 0;
             for (boolean hasSection : hasSections) {
                 if (hasSection) {

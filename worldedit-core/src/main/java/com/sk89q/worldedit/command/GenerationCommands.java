@@ -53,6 +53,7 @@ import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 
@@ -293,15 +294,15 @@ public class GenerationCommands extends MethodCommands {
 
     @Command(
         aliases = { "pumpkins" },
-        usage = "[size]",
+        usage = "[size=10] [density=0.02]",
         desc = "Generate pumpkin patches",
         min = 0,
         max = 2
     )
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
-    public void pumpkins(Player player, LocalSession session, EditSession editSession, @Optional("10") int apothem) throws WorldEditException {
-        int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem);
+    public void pumpkins(Player player, LocalSession session, EditSession editSession, @Optional("10") int apothem, @Optional("0.02") double density) throws WorldEditException, ParameterException {
+        int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
         BBC.COMMAND_PUMPKIN.send(player, affected);
     }
 

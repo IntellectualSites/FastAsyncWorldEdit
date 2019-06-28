@@ -54,7 +54,7 @@ public class EditSessionBuilder {
     public EditSessionBuilder(@Nonnull World world) {
         checkNotNull(world);
         this.world = world;
-        this.worldName = world.getName();
+        this.worldName = Fawe.imp().getWorldName(world);
     }
 
     public EditSessionBuilder(@Nonnull String worldName) {

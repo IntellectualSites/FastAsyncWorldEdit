@@ -82,8 +82,13 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
+        return setBlock(position.getX(), position.getY(), position.getZ(), block);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         if (blockBag != null) {
-            BlockState existing = getExtent().getBlock(position);
+            BlockState existing = getLazyBlock(x, y, z);
 
             if (!block.getBlockType().equals(existing.getBlockType())) {
                 if (!block.getBlockType().getMaterial().isAir()) {
@@ -110,11 +115,6 @@ public class BlockBagExtent extends AbstractDelegateExtent {
             }
         }
 
-        return super.setBlock(position, block);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return setBlock(BlockVector3.at(x,y,z),block);
+        return super.setBlock(x, y, z, block);
     }
 }

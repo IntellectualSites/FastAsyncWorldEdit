@@ -33,6 +33,7 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Direction;
 
 import java.util.ArrayList;
@@ -243,6 +244,7 @@ public abstract class BreadthFirstSearch implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
+        MutableBlockVector3 mutable = new MutableBlockVector3();
         IntegerTrio[] dirs = getIntDirections();
         BlockVectorSet tempQueue = new BlockVectorSet();
         BlockVectorSet chunkLoadSet = new BlockVectorSet();
@@ -280,7 +282,7 @@ public abstract class BreadthFirstSearch implements Operation {
                     int x = from.getBlockX() + direction.x;
                     int z = from.getBlockZ() + direction.z;
                     if (!visited.contains(x, y, z)) {
-                        if (isVisitable(from, BlockVector3.at(x, y, z))) {
+                        if (isVisitable(from, mutable.setComponents(x, y, z))) {
                             j++;
                             visited.add(x, y, z);
                             tempQueue.add(x, y, z);

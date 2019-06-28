@@ -76,7 +76,7 @@ public class BlockReplacer implements DoubleActionBlockTool {
         BlockState targetBlock = editSession.getBlock(clicked.toVector().toBlockPoint());
 
         if (targetBlock != null) {
-            pattern = new BlockPattern(targetBlock);
+            pattern = (targetBlock);
             player.print("Replacer tool switched to: " + targetBlock.getBlockType().getName());
         }
 

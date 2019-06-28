@@ -74,7 +74,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     }
 
     public boolean isAllowed(LocalPlayer localplayer, ProtectedRegion region) {
-        if (region.isOwner(localplayer) || region.isOwner(localplayer)) {
+        if (region.isOwner(localplayer) || region.isOwner(localplayer.getName())) {
             return true;
         } else if (region.getId().toLowerCase().equals(localplayer.getName().toLowerCase())) {
             return true;
@@ -84,7 +84,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
             return true;
         }
         if (localplayer.hasPermission("fawe.worldguard.member")) {
-            if (region.isMember(localplayer) || region.isMember(localplayer)) {
+            if (region.isMember(localplayer) || region.isMember(localplayer.getName())) {
                 return true;
             } else if (region.isMember("*")) {
                 return true;

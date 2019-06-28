@@ -613,7 +613,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param reorderMode The reorder mode
      */
     public void setReorderMode(ReorderMode reorderMode) {
-        //TODO Not working yet.
+        //TODO Not working yet. - It shouldn't need to work. FAWE doesn't need reordering.
     }
 
     //TODO: Reorder mode.
@@ -1106,7 +1106,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return height of highest block found or 'minY'
      */
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
-        return getHighestTerrainBlock(x, z, minY, maxY, null);
+        for (int y = maxY; y >= minY; --y) {
+            if (getBlock(x, y, z).getBlockType().getMaterial().isMovementBlocker()) {
+                return y;
+            }
+        }
+        return minY;
     }
 
     /**
@@ -1121,10 +1126,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
         for (int y = maxY; y >= minY; --y) {
-            BlockVector3 pt = BlockVector3.at(x, y, z);
-            if (filter == null
-                    ? getBlock(pt).getBlockType().getMaterial().isMovementBlocker()
-                    : filter.test(pt)) {
+            if (filter.test(mutablebv.setComponents(x, y, z))) {
                 return y;
             }
         }
@@ -1583,7 +1585,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int fillXZ(BlockVector3 origin, B block, double radius, int depth, boolean recursive) throws MaxChangedBlocksException {
-        return fillXZ(origin, new BlockPattern(block), radius, depth, recursive);
+        return fillXZ(origin, (block), radius, depth, recursive);
     }
 
     /**
@@ -1648,7 +1650,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 getWorld(), // Causes clamping of Y range
                 position.add(-apothem + 1, 0, -apothem + 1),
                 position.add(apothem - 1, height - 1, apothem - 1));
-        Pattern pattern = new BlockPattern(BlockTypes.AIR.getDefaultState());
+        Pattern pattern = (BlockTypes.AIR.getDefaultState());
         return setBlocks(region, pattern);
     }
 
@@ -1670,7 +1672,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 getWorld(), // Causes clamping of Y range
                 position.add(-apothem + 1, 0, -apothem + 1),
                 position.add(apothem - 1, -height + 1, apothem - 1));
-        Pattern pattern = new BlockPattern(BlockTypes.AIR.getDefaultState());
+        Pattern pattern = (BlockTypes.AIR.getDefaultState());
         return setBlocks(region, pattern);
     }
 
@@ -1745,7 +1747,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 getWorld(), // Causes clamping of Y range
                 position.add(adjustment.multiply(-1)),
                 position.add(adjustment));
-        Pattern pattern = new BlockPattern(BlockTypes.AIR.getDefaultState());
+        Pattern pattern = (BlockTypes.AIR.getDefaultState());
         return replaceBlocks(region, mask, pattern);
     }
 
@@ -1817,7 +1819,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
-        return replaceBlocks(region, filter, new BlockPattern(replacement));
+        return replaceBlocks(region, filter, (replacement));
     }
 
     /**
@@ -1889,7 +1891,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int makeCuboidFaces(Region region, B block) throws MaxChangedBlocksException {
-        return makeCuboidFaces(region, new BlockPattern(block));
+        return makeCuboidFaces(region, (block));
     }
 
     /**
@@ -1941,7 +1943,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int makeCuboidWalls(Region region, B block) throws MaxChangedBlocksException {
-        return makeCuboidWalls(region, new BlockPattern(block));
+        return makeCuboidWalls(region, (block));
     }
 
     /**
@@ -2003,7 +2005,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public <B extends BlockStateHolder<B>> int overlayCuboidBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(block);
 
-        return overlayCuboidBlocks(region, new BlockPattern(block));
+        return overlayCuboidBlocks(region, (block));
     }
 
     /**
@@ -2186,7 +2188,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (waterlogged) {
             replace = new BlockReplace(this, new WaterloggedRemover(this));
         } else {
-            replace = new BlockReplace(this, new BlockPattern(BlockTypes.AIR.getDefaultState()));
+            replace = new BlockReplace(this, (BlockTypes.AIR.getDefaultState()));
         }
         RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
 
@@ -2228,7 +2230,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 blockMask
         );
 
-        BlockReplace replace = new BlockReplace(this, new BlockPattern(fluid.getDefaultState()));
+        BlockReplace replace = new BlockReplace(this, (fluid.getDefaultState()));
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
 
         // Around the origin in a 3x3 block
@@ -2585,7 +2587,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int makePyramid(BlockVector3 position, Pattern block, int size, boolean filled) throws MaxChangedBlocksException {
-        int affected = 0;
+        int bx = position.getX();
+        int by = position.getY();
+        int bz = position.getZ();
 
         int height = size;
 
@@ -2595,19 +2599,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 for (int z = 0; z <= size; ++z) {
 
                     if ((filled && z <= size && x <= size) || z == size || x == size) {
-
-                        if (setBlock(position.add(x, y, z), block)) {
-                            ++affected;
-                        }
-                        if (setBlock(position.add(-x, y, z), block)) {
-                            ++affected;
-                        }
-                        if (setBlock(position.add(x, y, -z), block)) {
-                            ++affected;
-                        }
-                        if (setBlock(position.add(-x, y, -z), block)) {
-                            ++affected;
-                        }
+                        setBlock(x + bx, y + by, z + bz, block);
+                        setBlock(-x + bx, y + by, z + bz, block);
+                        setBlock(x + bx, y + by, -z + bz, block);
+                        setBlock(-x + bx, y + by, -z + bz, block);
                     }
                 }
             }
@@ -2643,16 +2638,15 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     continue;
                 }
 
-                for (int y = world.getMaxY(); y >= 1; --y) {
-                    BlockVector3 pt = BlockVector3.at(x, y, z);
-                    BlockType id = getBlock(pt).getBlockType();
+                for (int y = maxY; y >= 1; --y) {
+                    BlockType id = getBlock(x, y, z).getBlockType();
 
                     if (id == BlockTypes.ICE) {
-                        if (setBlock(pt, water)) {
+                        if (setBlock(x, y, z, water)) {
                             ++affected;
                         }
                     } else if (id == BlockTypes.SNOW) {
-                        if (setBlock(pt, air)) {
+                        if (setBlock(x, y, z, air)) {
                             ++affected;
                         }
                     } else if (id.getMaterial().isAir()) {
@@ -2718,7 +2712,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     // Too high?
-                    if (y == world.getMaxY()) {
+                    if (y == maxY) {
                         break;
                     }
 
@@ -2743,13 +2737,11 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int green(BlockVector3 position, double radius, boolean onlyNormalDirt)
+    public int green(BlockVector3 position, double radius, final boolean onlyNormalDirt)
             throws MaxChangedBlocksException {
-        int affected = 0;
         final double radiusSq = radius * radius;
 
         final int ox = position.getBlockX();
-        final int oy = position.getBlockY();
         final int oz = position.getBlockZ();
 
         final BlockState grass = BlockTypes.GRASS_BLOCK.getDefaultState();
@@ -2765,20 +2757,20 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     continue;
                 }
                 loop:
-                for (int y = world.getMaxY(); y >= 1; --y) {
-                    final BlockVector3 pt = BlockVector3.at(x, y, z);
-                    final BlockState block = getBlock(pt);
-
-                    if (block.getBlockType() == BlockTypes.DIRT ||
-                            (!onlyNormalDirt && block.getBlockType() == BlockTypes.COARSE_DIRT)) {
-                        if (setBlock(pt, grass)) {
-                            break;
-                        }
-                        break;
-                    } else if (block.getBlockType() == BlockTypes.WATER || block.getBlockType() == BlockTypes.LAVA) {
-                        break;
-                    } else if (block.getBlockType().getMaterial().isMovementBlocker()) {
-                        break;
+                for (int y = maxY; y >= 1; --y) {
+                    BlockType block = getBlockType(x, y, z);
+                    switch (block.getInternalId()) {
+                        case BlockID.COARSE_DIRT:
+                            if (onlyNormalDirt) break loop;
+                        case BlockID.DIRT:
+                            this.setBlock(x, y, z, BlockTypes.GRASS_BLOCK.getDefaultState());
+                            break loop;
+                        case BlockID.WATER:
+                        case BlockID.LAVA:
+                        default:
+                            if (block.getMaterial().isMovementBlocker()) {
+                                break loop;
+                            }
                     }
                 }
             }
@@ -2795,7 +2787,11 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of patches created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int makePumpkinPatches(BlockVector3 position, int apothem) throws MaxChangedBlocksException {
+    public int makePumpkinPatches(final BlockVector3 position, final int apothem) {
+        return makePumpkinPatches(position, apothem, 0.02);
+    }
+
+    public int makePumpkinPatches(final BlockVector3 position, final int apothem, double density) {
         // We want to generate pumpkins
         GardenPatchGenerator generator = new GardenPatchGenerator(this);
         generator.setPlant(GardenPatchGenerator.getPumpkinPattern());
@@ -2805,7 +2801,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 getWorld(), // Causes clamping of Y range
                 position.add(-apothem, -5, -apothem),
                 position.add(apothem, 10, apothem));
-        double density = 0.02;
 
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
         LayerVisitor visitor = new LayerVisitor(region, minimumBlockY(region), maximumBlockY(region), ground);

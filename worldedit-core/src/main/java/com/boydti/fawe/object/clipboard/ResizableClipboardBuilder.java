@@ -77,7 +77,7 @@ public class ResizableClipboardBuilder extends MemoryOptimizedHistory {
                     int x = tileChange.tag.getInt("x");
                     int y = tileChange.tag.getInt("y");
                     int z = tileChange.tag.getInt("z");
-                    clipboard.setTile(BlockVector3.at(x,y,z), tileChange.tag);
+                    clipboard.setTile(x,y,z, tileChange.tag);
                 }
             }
         } catch (WorldEditException e) {
