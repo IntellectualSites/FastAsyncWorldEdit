@@ -723,7 +723,7 @@ public class SelectionCommands {
     @Command(
             aliases = {"/sel", ";", "/desel", "/deselect"},
             flags = "d",
-            usage = "[cuboid|extend|poly|ellipsoid|sphere|cyl|convex]",
+            usage = "[cuboid|extend|poly|polyhedron|ellipsoid|sphere|cyl|convex|fuzzy]",
             desc = "Choose a region selector",
             min = 0,
             max = 1
