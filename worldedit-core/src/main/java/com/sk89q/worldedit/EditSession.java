@@ -205,6 +205,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     @SuppressWarnings("ProtectedField")
+    protected final World world;
     private String worldName;
     private FaweQueue queue;
     private boolean wrapped;
