@@ -346,8 +346,6 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         return equalsFuzzy((BlockState) obj);
     }
 
-    private Integer hashCodeCache = null;
-
     @Override
     public int hashCode() {
         return getOrdinal();

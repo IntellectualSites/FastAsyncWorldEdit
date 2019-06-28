@@ -280,7 +280,7 @@ public class BlockType implements FawePattern, Keyed {
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return settings.internalId;
     }
 
     @Override

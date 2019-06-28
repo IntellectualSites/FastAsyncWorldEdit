@@ -192,11 +192,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
         byte[] newBlockBytes = newBlockLight.asBytes();
         byte[] blockLightBytes = blockLight.asBytes();
-        System.arraycopy(blockLightBytes, 0, newBlockBytes, 0, 2048);
+        for (int i = 0; i < 2048; i++) newBlockBytes[i] = blockLightBytes[i];
         if (skyLight != null) {
             byte[] newSkyBytes = newSkyLight.asBytes();
             byte[] skyLightBytes = skyLight.asBytes();
-            System.arraycopy(skyLightBytes, 0, newSkyBytes, 0, 2048);
+            for (int i = 0; i < 2048; i++) newSkyBytes[i] = skyLightBytes[i];
         }
 
         // Copy counters
@@ -241,7 +241,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             Object[] currArray = ((Object[]) BukkitQueue_1_13.fieldLinearBlocks.get(currentPalette));
             Object[] newArray = ((Object[]) BukkitQueue_1_13.fieldLinearBlocks.get(newPalette));
             BukkitQueue_1_13.fieldLinearIndex.set(newPalette, BukkitQueue_1_13.fieldLinearIndex.get(currentPalette));
-            System.arraycopy(currArray, 0, newArray, 0, newArray.length);
+            for (int i = 0; i < newArray.length; i++) newArray[i] = currArray[i];
         }
 
         BukkitQueue_1_13.fieldPalette.set(paletteBlock, newPalette);
