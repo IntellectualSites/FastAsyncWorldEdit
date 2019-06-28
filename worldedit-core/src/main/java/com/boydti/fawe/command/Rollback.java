@@ -9,6 +9,7 @@ import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 
@@ -60,16 +61,16 @@ public class Rollback extends FaweCommand {
                     return false;
                 }
                 player.deleteMeta(FawePlayer.METADATA_KEYS.ROLLBACK);
-                final FaweLocation origin = player.getLocation();
+                Location origin = player.getPlayer().getLocation();
                 rollback(player, !player.hasPermission("fawe.rollback.deep"), Arrays.copyOfRange(args, 1, args.length), new RunnableVal<List<DiskStorageHistory>>() {
                     @Override
                     public void run(List<DiskStorageHistory> edits) {
                         long total = 0;
                         player.sendMessage("&d=| Username | Bounds | Distance | Changes | Age |=");
                         for (DiskStorageHistory edit : edits) {
-                            DiskStorageHistory.DiskStorageSummary summary = edit.summarize(new RegionWrapper(origin.getX(), origin.getX(), origin.getZ(), origin.getZ()), !player.hasPermission("fawe.rollback.deep"));
+                            DiskStorageHistory.DiskStorageSummary summary = edit.summarize(new RegionWrapper(origin.getBlockX(), origin.getBlockX(), origin.getBlockZ(), origin.getBlockZ()), !player.hasPermission("fawe.rollback.deep"));
                             RegionWrapper region = new RegionWrapper(summary.minX, summary.maxX, summary.minZ, summary.maxZ);
-                            int distance = region.distance(origin.getX(), origin.getZ());
+                            int distance = region.distance(origin.getBlockX(), origin.getBlockZ());
                             String name = Fawe.imp().getName(edit.getUUID());
                             long seconds = (System.currentTimeMillis() - edit.getBDFile().lastModified()) / 1000;
                             total += edit.getBDFile().length();
@@ -176,7 +177,7 @@ public class Rollback extends FaweCommand {
                 }
             }
         }
-        FaweLocation origin = player.getLocation();
+        Location origin = player.getLocation();
         List<DiskStorageHistory> edits = FaweAPI.getBDFiles(origin, user, radius, time, shallow);
         if (edits == null) {
             player.sendMessage("&cToo broad, try refining your search!");

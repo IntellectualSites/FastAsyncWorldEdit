@@ -2,7 +2,6 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.exception.FaweException;
@@ -14,6 +13,7 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -89,7 +89,7 @@ public class WEManager {
         if (!Settings.IMP.REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
-        FaweLocation loc = player.getLocation();
+        Location loc = player.getLocation();
         String world = player.getWorld().getName();
         if (!world.equals(player.getMeta("lastMaskWorld"))) {
             player.deleteMeta("lastMaskWorld");
@@ -112,7 +112,7 @@ public class WEManager {
                         FaweMask mask = iter.next();
                         if (mask.isValid(player, type)) {
                             Region region = mask.getRegion();
-                            if (region.contains(loc.vector)) {
+                            if (region.contains(loc.toBlockPoint())) {
                                 regions.add(region);
                             } else {
                                 removed = true;

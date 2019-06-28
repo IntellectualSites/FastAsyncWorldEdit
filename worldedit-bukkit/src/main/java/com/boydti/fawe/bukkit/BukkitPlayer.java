@@ -2,19 +2,14 @@ package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.wrappers.PlayerWrapper;
-import java.lang.reflect.Method;
-import java.util.UUID;
-
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public class BukkitPlayer extends FawePlayer<Player> {
 
@@ -92,12 +87,6 @@ public class BukkitPlayer extends FawePlayer<Player> {
     @Override
     public void executeCommand(final String cmd) {
         Bukkit.getServer().dispatchCommand(this.parent, cmd);
-    }
-
-    @Override
-    public FaweLocation getLocation() {
-        final Location loc = this.parent.getLocation();
-        return new FaweLocation(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
     }
 
     @Override

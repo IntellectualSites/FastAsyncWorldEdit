@@ -21,6 +21,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -249,8 +250,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public void setPacketViewer(FawePlayer player) {
         this.player = player;
         if (player != null) {
-            FaweLocation pos = player.getLocation();
-            this.chunkOffset = BlockVector2.at(1 + (pos.getX() >> 4), 1 + (pos.getZ() >> 4));
+            Location pos = player.getLocation();
+            this.chunkOffset = BlockVector2.at(1 + (pos.getBlockX() >> 4), 1 + (pos.getBlockZ() >> 4));
         }
     }
 
@@ -291,9 +292,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int OX = chunkOffset.getBlockX();
             int OZ = chunkOffset.getBlockZ();
 
-            FaweLocation position = player.getLocation();
-            int pcx = (position.getX() >> 4) - OX;
-            int pcz = (position.getZ() >> 4) - OZ;
+            Location position = player.getLocation();
+            int pcx = (position.getBlockX() >> 4) - OX;
+            int pcz = (position.getBlockZ() >> 4) - OZ;
 
             int scx = Math.max(0, pcx - 15);
             int scz = Math.max(0, pcz - 15);
@@ -901,9 +902,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int OX = chunkOffset.getBlockX();
             int OZ = chunkOffset.getBlockZ();
 
-            FaweLocation position = player.getLocation();
-            int pcx = (position.getX() >> 4) - OX;
-            int pcz = (position.getZ() >> 4) - OZ;
+            Location position = player.getLocation();
+            int pcx = (position.getBlockX() >> 4) - OX;
+            int pcz = (position.getBlockZ() >> 4) - OZ;
 
             int scx = Math.max(0, pcx - 10);
             int scz = Math.max(0, pcz - 10);

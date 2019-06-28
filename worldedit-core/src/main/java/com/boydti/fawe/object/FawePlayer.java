@@ -44,6 +44,7 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
 import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
@@ -489,7 +490,9 @@ public abstract class FawePlayer<T> extends Metadatable {
      *
      * @return
      */
-    public abstract FaweLocation getLocation();
+    public Location getLocation() {
+        return getPlayer().getLocation();
+    }
 
     /**
      * Get the WorldEdit player object

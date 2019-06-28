@@ -4,7 +4,6 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.example.NMSRelighter;
-import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RegionWrapper;
@@ -36,6 +35,7 @@ import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -319,8 +319,13 @@ public class FaweAPI {
      *                 Reading only part of the file will result in unreliable bounds info for large edits
      * @return
      */
-    public static List<DiskStorageHistory> getBDFiles(FaweLocation origin, UUID user, int radius, long timediff, boolean shallow) {
-        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + origin.world);
+    public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
+        Extent extent = origin.getExtent();
+        if (!(extent instanceof World)) {
+            throw new IllegalArgumentException("Origin is not a valid world");
+        }
+        World world = (World) extent;
+        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world));
         if (!history.exists()) {
             return new ArrayList<>();
         }
@@ -351,7 +356,6 @@ public class FaweAPI {
                 }
             }
         }
-        World world = origin.getWorld();
         files.sort((a, b) -> {
             String aName = a.getName();
             String bName = b.getName();
@@ -360,7 +364,7 @@ public class FaweAPI {
             long value = aI - bI;
             return value == 0 ? 0 : value < 0 ? -1 : 1;
         });
-        RegionWrapper bounds = new RegionWrapper(origin.getX() - radius, origin.getX() + radius, origin.getZ() - radius, origin.getZ() + radius);
+        RegionWrapper bounds = new RegionWrapper(origin.getBlockX() - radius, origin.getBlockX() + radius, origin.getBlockZ() - radius, origin.getBlockZ() + radius);
         RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
         HashSet<RegionWrapper> regionSet = Sets.<RegionWrapper>newHashSet(bounds);
         ArrayList<DiskStorageHistory> result = new ArrayList<>();
