@@ -184,8 +184,8 @@ public abstract class BreadthFirstSearch implements Operation {
      * @param position the position
      */
     public void visit(BlockVector3 position) {
-        BlockVector3 blockVector = position;
-        if (!visited.contains(blockVector)) {
+        if (!visited.contains(position)) {
+            BlockVector3 blockVector = position;
             isVisitable(blockVector, blockVector); // Ignore this, just to initialize mask on this point
             queue.add(blockVector);
             visited.add(blockVector);
@@ -314,7 +314,8 @@ public abstract class BreadthFirstSearch implements Operation {
 
     @Override
     public void cancel() {
+        queue.clear();
+        visited.clear();
+        affected = 0;
     }
-
-
 }

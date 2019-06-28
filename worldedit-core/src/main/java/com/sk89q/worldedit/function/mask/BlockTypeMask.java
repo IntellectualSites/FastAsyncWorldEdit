@@ -91,7 +91,9 @@ public class BlockTypeMask extends AbstractExtentMask {
      * @param block an array of blocks
      */
     public void add(BlockType... block) {
-        add(Arrays.asList(checkNotNull(block)));
+        for (BlockType type : block) {
+            this.types[type.getInternalId()] = true;
+        }
     }
 
     /**

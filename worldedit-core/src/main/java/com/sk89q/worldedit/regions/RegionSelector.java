@@ -156,4 +156,12 @@ public interface RegionSelector {
      */
     List<String> getInformationLines();
 
+    /**
+     * Get the verticies
+     * @return
+     * @throws IncompleteRegionException
+     */
+    default List<BlockVector3> getVerticies() throws IncompleteRegionException {
+        return Collections.singletonList(getPrimaryPosition());
+    }
 }

@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.bekvon.bukkit.residence.commands.message;
+import com.bekvon.bukkit.residence.containers.cmd;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
@@ -183,8 +185,10 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
         // Register CUI
+        fail(() -> {
         getServer().getMessenger().registerIncomingPluginChannel(this, CUI_PLUGIN_CHANNEL, new CUIChannelListener(this));
         getServer().getMessenger().registerOutgoingPluginChannel(this, CUI_PLUGIN_CHANNEL);
+        }, "Failed to register CUI");
 
         // Now we can register events
         getServer().getPluginManager().registerEvents(new WorldEditListener(this), this);

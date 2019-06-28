@@ -153,4 +153,9 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
         }
         return lines;
     }
+
+    @Override
+    public List<BlockVector3> getVerticies() {
+        return positions;
+    }
 }

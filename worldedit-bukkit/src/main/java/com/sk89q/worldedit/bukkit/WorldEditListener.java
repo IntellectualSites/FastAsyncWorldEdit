@@ -28,6 +28,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.CommandMapping;
+import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event.Result;
@@ -108,6 +109,8 @@ public class WorldEditListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandSendEvent event) {
+        Dispatcher dispatcher = plugin.getWorldEdit().getPlatformManager().getCommandManager().getDispatcher();
+        if (dispatcher != null) {
         CommandLocals locals = new CommandLocals();
         locals.put(Actor.class, plugin.wrapCommandSender(event.getPlayer()));
         Set<String> toRemove = plugin.getWorldEdit().getPlatformManager().getCommandManager().getDispatcher().getCommands().stream()
@@ -115,6 +118,7 @@ public class WorldEditListener implements Listener {
                 .map(CommandMapping::getPrimaryAlias)
                 .collect(Collectors.toSet());
         event.getCommands().removeIf(toRemove::contains);
+        }
     }
 
     /**

@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class CombinedRegionFunction implements RegionFunction {
 
-    private final List<RegionFunction> functions = new ArrayList<>();
+    private RegionFunction[] functions;
 
     /**
      * Create a combined region function.
@@ -49,7 +49,7 @@ public class CombinedRegionFunction implements RegionFunction {
      */
     public CombinedRegionFunction(Collection<RegionFunction> functions) {
         checkNotNull(functions);
-        this.functions.addAll(functions);
+        this.functions = functions.toArray(new RegionFunction[functions.size()]);
     }
 
     /**
@@ -58,7 +58,7 @@ public class CombinedRegionFunction implements RegionFunction {
      * @param function an array of functions to match
      */
     public CombinedRegionFunction(RegionFunction... function) {
-        this(Arrays.asList(checkNotNull(function)));
+        this.functions = function;
     }
 
     public static CombinedRegionFunction combine(RegionFunction function, RegionFunction add) {
@@ -82,7 +82,9 @@ public class CombinedRegionFunction implements RegionFunction {
      */
     public void add(Collection<RegionFunction> functions) {
         checkNotNull(functions);
-        this.functions.addAll(functions);
+        ArrayList<RegionFunction> functionsList = new ArrayList<>(Arrays.asList(this.functions));
+        functionsList.addAll(functions);
+        this.functions = functionsList.toArray(new RegionFunction[functionsList.size()]);
     }
 
     /**
@@ -98,9 +100,7 @@ public class CombinedRegionFunction implements RegionFunction {
     public boolean apply(BlockVector3 position) throws WorldEditException {
         boolean ret = false;
         for (RegionFunction function : functions) {
-            if (function.apply(position)) {
-                ret = true;
-            }
+            ret |= (function.apply(position));
         }
         return ret;
     }

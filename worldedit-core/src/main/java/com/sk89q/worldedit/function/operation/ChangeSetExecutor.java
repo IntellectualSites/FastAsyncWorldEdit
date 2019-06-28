@@ -68,15 +68,15 @@ public class ChangeSetExecutor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        while (iterator.hasNext()) {
-            Change change = iterator.next();
-            if (type == Type.UNDO) {
-                change.undo(context);
-            } else {
-                change.redo(context);
+        if (type == Type.UNDO) {
+            while (iterator.hasNext()) {
+                iterator.next().undo(context);
+            }
+        } else {
+            while (iterator.hasNext()) {
+                iterator.next().redo(context);
             }
         }
-
         return null;
     }
 

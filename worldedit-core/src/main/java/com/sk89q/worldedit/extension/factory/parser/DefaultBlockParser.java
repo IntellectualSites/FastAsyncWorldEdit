@@ -31,6 +31,7 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.MobSpawnerBlock;
 import com.sk89q.worldedit.blocks.SignBlock;
 import com.sk89q.worldedit.blocks.SkullBlock;
@@ -42,6 +43,8 @@ import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -106,8 +109,6 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             throw e;
         }
     }
-
-    private static String[] EMPTY_STRING_ARRAY = new String[]{};
 
     /**
      * Backwards compatibility for wool colours in block syntax.
@@ -214,18 +215,37 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 final World world = context.requireWorld();
                 final BlockVector3 primaryPosition;
                 try {
-                    primaryPosition = context.requireSession().getRegionSelector(world).getPrimaryPosition();
+                    primaryPosition = context.requireSession().getRegionSelector(world).getVerticies().get(index - 1);
                 } catch (IncompleteRegionException e) {
                     throw new InputParseException("Your selection is not complete.");
                 }
                 state = world.getBlock(primaryPosition);
             } else {
                 if ("hand".equalsIgnoreCase(typeString)) {
-                // Get the block type from the item in the user's hand.
-                state = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
-            } else if ("offhand".equalsIgnoreCase(typeString)) {
-                // Get the block type from the item in the user's off hand.
-                state = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
+                    // Get the block type from the item in the user's hand.
+                    state = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
+                } else if ("offhand".equalsIgnoreCase(typeString)) {
+                    // Get the block type from the item in the user's off hand.
+                    state = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
+                } else if (typeString.matches("slot[0-9]+")) {
+                    int slot = Integer.parseInt(typeString.substring(4)) - 1;
+                    Actor actor = context.requireActor();
+                    if (!(actor instanceof Player)) {
+                        throw new InputParseException("The user is not a player!");
+                    }
+                    Player player = (Player) actor;
+                    BlockBag bag = player.getInventoryBlockBag();
+                    if (bag == null || !(bag instanceof SlottableBlockBag)) {
+                        throw new InputParseException("Unsupported!");
+                    }
+                    SlottableBlockBag slottable = (SlottableBlockBag) bag;
+                    BaseItem item = slottable.getItem(slot);
+
+                    if (!item.getType().hasBlockType()) {
+                        throw new InputParseException("You're not holding a block!");
+                    }
+                    state = item.getType().getBlockType().getDefaultState();
+                    nbt = item.getNbtData();
                 } else {
                     BlockType type = BlockTypes.parse(typeString.toLowerCase());
 

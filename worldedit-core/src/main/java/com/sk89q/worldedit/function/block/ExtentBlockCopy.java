@@ -69,12 +69,11 @@ public class ExtentBlockCopy implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        BaseBlock block = source.getFullBlock(position);
         BlockVector3 orig = position.subtract(from);
         BlockVector3 transformed = transform.apply(orig.toVector3()).toBlockPoint();
 
         // Apply transformations to NBT data if necessary
-        block = transformNbtData(block);
+        BaseBlock block = transformNbtData(source.getFullBlock(position));
 
         return destination.setBlock(transformed.add(to), block);
     }
