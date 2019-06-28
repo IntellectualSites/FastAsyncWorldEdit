@@ -51,6 +51,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Adapts between Bukkit and WorldEdit equivalent objects.
@@ -199,7 +200,7 @@ public enum BukkitAdapter {
      * @param blockType The WorldEdit BlockType
      * @return The Bukkit Material
      */
-    public static Material adapt(BlockType blockType) {
+    public static Material adapt(@NotNull BlockType blockType) {
         return getAdapter().adapt(blockType);
     }
 
@@ -248,7 +249,7 @@ public enum BukkitAdapter {
      * @param material The material
      * @return The blocktype
      */
-    public static BlockType asBlockType(Material material) {
+    public static BlockType asBlockType(@NotNull Material material) {
         return getAdapter().asBlockType(material);
     }
 
@@ -270,7 +271,7 @@ public enum BukkitAdapter {
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
      */
-    public static BlockState adapt(BlockData blockData) {
+    public static BlockState adapt(@NotNull BlockData blockData) {
         return getAdapter().adapt(blockData);
     }
 
@@ -284,7 +285,7 @@ public enum BukkitAdapter {
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
      */
-    public static BlockData adapt(BlockStateHolder block) {
+    public static BlockData adapt(@NotNull BlockStateHolder block) {
 		return getAdapter().adapt(block);
     }
 
