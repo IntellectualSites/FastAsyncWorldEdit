@@ -36,13 +36,7 @@ public class SignCompatibilityHandler implements NBTCompatibilityHandler {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean isAffectedBlock(B block) {
-        switch (block.getBlockType().getInternalId()) {
-            case BlockID.SIGN:
-            case BlockID.WALL_SIGN:
-                return true;
-            default:
-                return false;
-        }
+        return block.getBlockType() == BlockTypes.SIGN || block.getBlockType() == BlockTypes.WALL_SIGN;
     }
 
     @Override
