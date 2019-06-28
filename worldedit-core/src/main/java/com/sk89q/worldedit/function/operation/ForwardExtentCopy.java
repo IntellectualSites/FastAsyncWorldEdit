@@ -53,6 +53,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -365,7 +366,7 @@ public class ForwardExtentCopy implements Operation {
                     .filter(e -> e.getType() != EntityTypes.PLAYER)
                     .collect(Collectors.toList());
         } else {
-            entities = new ArrayList<>();
+            entities = Collections.emptyList();
         }
 
 
@@ -374,8 +375,6 @@ public class ForwardExtentCopy implements Operation {
 
             if (!entities.isEmpty()) {
                 ExtentEntityCopy entityCopy = new ExtentEntityCopy(from.toVector3(), destination, to.toVector3(), currentTransform);
-//            if (copyingEntities) {
-//                ExtentEntityCopy entityCopy = new ExtentEntityCopy(from, destination, to, currentTransform);
                 entityCopy.setRemoving(removingEntities);
                 EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
                 Operations.completeBlindly(entityVisitor);
