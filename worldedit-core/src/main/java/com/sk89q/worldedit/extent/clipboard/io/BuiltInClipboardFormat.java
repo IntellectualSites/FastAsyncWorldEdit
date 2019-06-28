@@ -71,27 +71,13 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            throw new IOException("This format does not support saving, use `schem` as format");
+            throw new IOException("This format does not support saving, use `.schem` as format");
         }
 
         @Override
         public boolean isFormat(File file) {
-            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
-                NamedTag rootTag = str.readNamedTag();
-                if (!rootTag.getName().equals("Schematic")) {
-                    return false;
-                }
-                CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
-
-                // Check
-                Map<String, Tag> schematic = schematicTag.getValue();
-                if (!schematic.containsKey("Materials")) {
-                    return false;
-                }
-            } catch (Exception e) {
-                return false;
-            }
-            return true;
+            String name = file.getName().toLowerCase();
+            return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
         }
     },
     SPONGE_SCHEMATIC("sponge", "schem") {
@@ -126,23 +112,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
-            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
-                NamedTag rootTag = str.readNamedTag();
-                if (!rootTag.getName().equals("Schematic")) {
-                    return false;
-                }
-                CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
-
-                // Check
-                Map<String, Tag> schematic = schematicTag.getValue();
-                if (!schematic.containsKey("Version")) {
-                    return false;
-                }
-            } catch (Exception e) {
-                return false;
-            }
-
-            return true;
+            String name = file.getName().toLowerCase();
+            return name.endsWith(".schem") || name.endsWith(".sponge");
         }
 
     },
@@ -174,7 +145,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public boolean isFormat(File file) {
-            return file.getName().endsWith(".nbt");
+            return file.getName().toLowerCase().endsWith(".nbt");
         }
 
         @Override
