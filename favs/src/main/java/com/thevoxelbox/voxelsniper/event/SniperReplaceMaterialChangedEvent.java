@@ -4,9 +4,6 @@ import com.thevoxelbox.voxelsniper.Sniper;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.event.HandlerList;
 
-/**
- *
- */
 public class SniperReplaceMaterialChangedEvent extends SniperMaterialChangedEvent {
     private static final HandlerList handlers = new HandlerList();
 
