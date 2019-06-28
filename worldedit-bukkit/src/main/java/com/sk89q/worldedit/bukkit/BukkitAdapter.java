@@ -200,7 +200,6 @@ public enum BukkitAdapter {
      * @return The Bukkit Material
      */
     public static Material adapt(BlockType blockType) {
-        checkNotNull(blockType);
         return getAdapter().adapt(blockType);
     }
 
@@ -250,7 +249,6 @@ public enum BukkitAdapter {
      * @return The blocktype
      */
     public static BlockType asBlockType(Material material) {
-        checkNotNull(material);
         return getAdapter().asBlockType(material);
     }
 
@@ -273,7 +271,6 @@ public enum BukkitAdapter {
      * @return The WorldEdit BlockState
      */
     public static BlockState adapt(BlockData blockData) {
-        checkNotNull(blockData);
         return getAdapter().adapt(blockData);
     }
 
@@ -288,7 +285,6 @@ public enum BukkitAdapter {
      * @return The Bukkit BlockData
      */
     public static BlockData adapt(BlockStateHolder block) {
-	    checkNotNull(block);
 		return getAdapter().adapt(block);
     }
 
