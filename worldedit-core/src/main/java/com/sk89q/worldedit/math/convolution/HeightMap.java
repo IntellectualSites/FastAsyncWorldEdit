@@ -182,9 +182,10 @@ public class HeightMap {
 
         // Apply heightmap
         for (int z = 0; z < height; ++z) {
+            int zr = z + originZ;
             for (int x = 0; x < width; ++x) {
-                int curHeight = this.data[index];
                 if (this.invalid != null && this.invalid[index]) continue;
+                int curHeight = this.data[index];
 
                 //Clamp newHeight within the selection area
                 int newHeight = Math.min(maxY4, data[index++]);
@@ -194,7 +195,6 @@ public class HeightMap {
 
                 // Offset x,z to be 'real' coordinates
                 int xr = x + originX;
-                int zr = z + originZ;
 
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight > curHeight) {
@@ -269,6 +269,7 @@ public class HeightMap {
         // Apply heightmap
         int index = 0;
         for (int z = 0; z < height; ++z) {
+            int zr = z + originZ;
             for (int x = 0; x < width; ++x, index++) {
                 if (this.invalid != null && this.invalid[index]) continue;
 
@@ -279,12 +280,11 @@ public class HeightMap {
 
                 // Offset x,z to be 'real' coordinates
                 int xr = x + originX;
-                int zr = z + originZ;
 
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight > curHeight) {
                     // Set the top block of the column to be the same type (this might go wrong with rounding)
-                    BlockState existing = session.getBlock(BlockVector3.at(xr, curHeight, zr));
+                    BlockState existing = session.getBlock(xr, curHeight, zr);
 
                     // Skip water/lava
                     if (existing.getBlockType().getMaterial().isMovementBlocker()) {
@@ -295,18 +295,18 @@ public class HeightMap {
                             session.setBlock(xr, setY, zr, tmpBlock);
                             ++blocksChanged;
                         }
-                        session.setBlock(BlockVector3.at(xr, newHeight, zr), existing);
+                        session.setBlock(xr, newHeight, zr, existing);
                         ++blocksChanged;
                     }
                 } else if (curHeight > newHeight) {
                     // Set the top block of the column to be the same type
                     // (this could otherwise go wrong with rounding)
-                    session.setBlock(BlockVector3.at(xr, newHeight, zr), session.getBlock(BlockVector3.at(xr, curHeight, zr)));
+                    session.setBlock(xr, newHeight, zr, session.getBlock(xr, curHeight, zr));
                     ++blocksChanged;
 
                     // Fill rest with air
                     for (int y = newHeight + 1; y <= curHeight; ++y) {
-                        session.setBlock(BlockVector3.at(xr, y, zr), fillerAir);
+                        session.setBlock(xr, y, zr, fillerAir);
                         ++blocksChanged;
                     }
                 }

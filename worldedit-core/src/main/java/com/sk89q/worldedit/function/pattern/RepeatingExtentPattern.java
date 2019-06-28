@@ -90,10 +90,10 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        int x = Math.abs(position.getX() + offset.getX()) % size.getBlockX();
-        int y = Math.abs(position.getY() + offset.getY()) % size.getBlockY();
-        int z = Math.abs(position.getZ() + offset.getZ()) % size.getBlockZ();
-        return getExtent().getFullBlock(mutable.setComponents(x, y, z).add(origin));
+        int x = Math.abs(position.getX() + offset.getX()) % size.getBlockX() + origin.getX();
+        int y = Math.abs(position.getY() + offset.getY()) % size.getBlockY() + origin.getY();
+        int z = Math.abs(position.getZ() + offset.getZ()) % size.getBlockZ() + origin.getZ();
+        return getExtent().getFullBlock(mutable.setComponents(x, y, z));
     }
 
 }
