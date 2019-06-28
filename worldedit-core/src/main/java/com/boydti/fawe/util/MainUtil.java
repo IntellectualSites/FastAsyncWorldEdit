@@ -853,4 +853,33 @@ public class MainUtil {
         }
     }
 
+    public static void warnDeprecated(Class... alternatives) {
+        StackTraceElement[] stacktrace = new RuntimeException().getStackTrace();
+        if (stacktrace.length > 1) {
+            for (int i = 1; i < stacktrace.length; i++) {
+                StackTraceElement stack = stacktrace[i];
+                String s = stack.toString();
+                if (s.startsWith("com.sk89q")) {
+                    continue;
+                }
+                try {
+                    StackTraceElement creatorElement = stacktrace[1];
+                    String className = creatorElement.getClassName();
+                    Class clazz = Class.forName(className);
+                    String creator = clazz.getSimpleName();
+                    String packageName = clazz.getPackage().getName();
+
+                    StackTraceElement deprecatedElement = stack;
+                    String myName = Class.forName(deprecatedElement.getClassName()).getSimpleName();
+                    Fawe.debug("@" + creator + " used by " + myName + "." + deprecatedElement.getMethodName() + "():" + deprecatedElement.getLineNumber() + " is deprecated.");
+                    Fawe.debug(" - Alternatives: " + StringMan.getString(alternatives));
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                } finally {
+                    break;
+                }
+            }
+        }
+    }
+
 }

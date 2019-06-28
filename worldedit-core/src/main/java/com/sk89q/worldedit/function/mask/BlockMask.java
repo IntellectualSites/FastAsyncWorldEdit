@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.object.collection.FastBitSet;
+import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,7 +48,9 @@ import java.util.Map;
  *
  * <p>This mask checks for both an exact block type and state value match,
  * respecting fuzzy status of the BlockState.</p>
+ * @deprecated use BlockMaskBuilder
  */
+@Deprecated
 public class BlockMask extends AbstractExtentMask {
 
     private final long[][] bitSets;
@@ -62,6 +65,7 @@ public class BlockMask extends AbstractExtentMask {
      */
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         super(extent);
+        MainUtil.warnDeprecated(BlockMaskBuilder.class);
         checkNotNull(blocks);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
     }
@@ -74,6 +78,7 @@ public class BlockMask extends AbstractExtentMask {
      */
     public BlockMask(Extent extent, BaseBlock... block) {
         super(extent);
+        MainUtil.warnDeprecated(BlockMaskBuilder.class);
         checkNotNull(block);
         this.bitSets = new BlockMaskBuilder().addBlocks(block).optimize().getBits();
     }

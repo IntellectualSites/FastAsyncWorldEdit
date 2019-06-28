@@ -1833,7 +1833,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
-        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMask(this, filter);
+        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMaskBuilder().addBlocks(filter).build(this);
         return replaceBlocks(region, mask, pattern);
     }
 
