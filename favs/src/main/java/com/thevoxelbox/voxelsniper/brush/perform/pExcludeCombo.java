@@ -6,11 +6,10 @@ package com.thevoxelbox.voxelsniper.brush.perform;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.thevoxelbox.voxelsniper.Message;
+import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.util.VoxelList;
 
-/**
- * @author Voxel
- */
+
 public class pExcludeCombo extends vPerformer {
 
     private VoxelList excludeList;
@@ -30,7 +29,7 @@ public class pExcludeCombo extends vPerformer {
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
+    public void init(SnipeData v) {
         w = v.getWorld();
         id = v.getVoxelId();
         data = v.getPropertyId();

@@ -2,7 +2,6 @@ package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweChunk;
@@ -14,9 +13,6 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockID;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
@@ -27,7 +23,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockID;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -58,13 +55,13 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public FaweChangeSet(String world) {
         this.worldName = world;
-        this.mainThread = (Fawe.get() != null) ? Fawe.isMainThread() : true;
+        this.mainThread = (Fawe.get() == null) || Fawe.isMainThread();
         this.layers = FaweChunk.HEIGHT >> 4;
     }
 
     public FaweChangeSet(World world) {
         this.world = world;
-        this.worldName = Fawe.imp().getWorldName(world);
+        this.worldName = world.getName();
         this.mainThread = Fawe.isMainThread();
         this.layers = (this.world.getMaxY() + 1) >> 4;
     }
@@ -85,15 +82,12 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public boolean closeAsync() {
         waitingAsync.incrementAndGet();
-        TaskManager.IMP.async(new Runnable() {
-            @Override
-            public void run() {
-                waitingAsync.decrementAndGet();
-                synchronized (waitingAsync) {
-                    waitingAsync.notifyAll();
-                }
-                close();
+        TaskManager.IMP.async(() -> {
+            waitingAsync.decrementAndGet();
+            synchronized (waitingAsync) {
+                waitingAsync.notifyAll();
             }
+            close();
         });
         return true;
     }
@@ -113,7 +107,7 @@ public abstract class FaweChangeSet implements ChangeSet {
                 }
             }
         } catch (InterruptedException e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return true;
     }
@@ -152,8 +146,6 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public void delete() {
     }
-
-    ;
 
     public EditSession toEditSession(FawePlayer player) {
         return toEditSession(player, null);
@@ -202,7 +194,7 @@ public abstract class FaweChangeSet implements ChangeSet {
             BaseBlock to = change.getCurrent();
             add(loc, from, to);
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -230,7 +222,7 @@ public abstract class FaweChangeSet implements ChangeSet {
             add(x, y, z, combinedFrom, combinedTo);
 
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -249,7 +241,7 @@ public abstract class FaweChangeSet implements ChangeSet {
             add(x, y, z, combinedFrom, combinedTo);
 
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -258,113 +250,107 @@ public abstract class FaweChangeSet implements ChangeSet {
             @Override
             public void run(final FaweChunk previous, final FaweChunk next) {
                 FaweChangeSet.this.waitingCombined.incrementAndGet();
-                Runnable run = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            int cx = previous.getX();
-                            int cz = previous.getZ();
-                            int bx = cx << 4;
-                            int bz = cz << 4;
-                            synchronized (FaweChangeSet.this) {
-                                BiomeType[] previousBiomes = previous.getBiomeArray();
-                                if (previousBiomes != null) {
-                                    BiomeType[] nextBiomes = next.getBiomeArray();
-                                    int index = 0;
-                                    for (int z = 0; z < 16; z++) {
-                                        int zz = bz + z;
-                                        for (int x = 0; x < 16; x++) {
-                                            BiomeType idFrom = previousBiomes[index];
-                                            BiomeType idTo = nextBiomes[index];
-                                            if (idFrom != idTo && idTo != null) {
-                                                addBiomeChange(bx + x, zz, idFrom, idTo);
-                                            }
-                                            index++;
+                Runnable run = () -> {
+                    try {
+                        int cx = previous.getX();
+                        int cz = previous.getZ();
+                        int bx = cx << 4;
+                        int bz = cz << 4;
+                        synchronized (FaweChangeSet.this) {
+                            BiomeType[] previousBiomes = previous.getBiomeArray();
+                            if (previousBiomes != null) {
+                                BiomeType[] nextBiomes = next.getBiomeArray();
+                                int index = 0;
+                                for (int z = 0; z < 16; z++) {
+                                    int zz = bz + z;
+                                    for (int x = 0; x < 16; x++) {
+                                        BiomeType idFrom = previousBiomes[index];
+                                        BiomeType idTo = nextBiomes[index];
+                                        if (idFrom != idTo && idTo != null) {
+                                            addBiomeChange(bx + x, zz, idFrom, idTo);
                                         }
+                                        index++;
                                     }
                                 }
-                                // Block changes
-                                for (int layer = 0; layer < layers; layer++) {
-                                    int[] currentLayer = next.getIdArray(layer);
-                                    int[] previousLayer = previous.getIdArray(layer);
-                                    if (currentLayer == null) {
-                                        continue;
-                                    }
-                                    int startY = layer << 4;
-                                    int index = 0;
-                                    for (int y = 0; y < 16; y++) {
-                                        int yy = y + startY;
-                                        for (int z = 0; z < 16; z++) {
-                                            int zz = z + bz;
-                                            for (int x = 0; x < 16; x++, index++) {
-                                                int xx = x + bx;
-                                                int combinedIdCurrent = currentLayer[index];
-                                                switch (combinedIdCurrent) {
-                                                    case 0:
-                                                        continue;
-                                                    default:
-                                                        int combinedIdPrevious;
-                                                        if (previousLayer != null) {
-                                                            combinedIdPrevious = previousLayer[index];
-                                                            if (combinedIdPrevious == 0) {
-                                                                combinedIdPrevious = BlockID.AIR;
-                                                            }
-                                                        }  else {
-                                                            combinedIdPrevious = BlockID.AIR;
-                                                        }
-                                                        if (combinedIdCurrent != combinedIdPrevious) {
-                                                            add(xx, yy, zz, combinedIdPrevious, combinedIdCurrent);
-                                                        }
+                            }
+                            // Block changes
+                            for (int layer = 0; layer < layers; layer++) {
+                                int[] currentLayer = next.getIdArray(layer);
+                                int[] previousLayer = previous.getIdArray(layer);
+                                if (currentLayer == null) {
+                                    continue;
+                                }
+                                int startY = layer << 4;
+                                int index = 0;
+                                for (int y = 0; y < 16; y++) {
+                                    int yy = y + startY;
+                                    for (int z = 0; z < 16; z++) {
+                                        int zz = z + bz;
+                                        for (int x = 0; x < 16; x++, index++) {
+                                            int xx = x + bx;
+                                            int combinedIdCurrent = currentLayer[index];
+                                            if (combinedIdCurrent != 0) {
+                                                int combinedIdPrevious;
+                                                if (previousLayer != null) {
+                                                    combinedIdPrevious = previousLayer[index];
+                                                    if (combinedIdPrevious == 0) {
+                                                        combinedIdPrevious = BlockID.AIR;
+                                                    }
+                                                } else {
+                                                    combinedIdPrevious = BlockID.AIR;
+                                                }
+                                                if (combinedIdCurrent != combinedIdPrevious) {
+                                                    add(xx, yy, zz, combinedIdPrevious, combinedIdCurrent);
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                // Tile changes
-                                {
-                                    // Tiles created
-                                    Map<Short, CompoundTag> tiles = next.getTiles();
-                                    if (!tiles.isEmpty()) {
-                                        for (Map.Entry<Short, CompoundTag> entry : tiles.entrySet()) {
-                                            addTileCreate(entry.getValue());
-                                        }
-                                    }
-                                    // Tiles removed
-                                    tiles = previous.getTiles();
-                                    if (!tiles.isEmpty()) {
-                                        for (Map.Entry<Short, CompoundTag> entry : tiles.entrySet()) {
-                                            addTileRemove(entry.getValue());
-                                        }
+                            }
+                            // Tile changes
+                            {
+                                // Tiles created
+                                Map<Short, CompoundTag> tiles = next.getTiles();
+                                if (!tiles.isEmpty()) {
+                                    for (Map.Entry<Short, CompoundTag> entry : tiles.entrySet()) {
+                                        addTileCreate(entry.getValue());
                                     }
                                 }
-                                // Entity changes
-                                {
-                                    // Entities created
-                                    Set<CompoundTag> entities = next.getEntities();
-                                    if (!entities.isEmpty()) {
-                                        for (CompoundTag entityTag : entities) {
-                                            addEntityCreate(entityTag);
-                                        }
-                                    }
-                                    // Entities removed
-                                    entities = previous.getEntities();
-                                    if (!entities.isEmpty()) {
-                                        for (CompoundTag entityTag : entities) {
-                                            addEntityRemove(entityTag);
-                                        }
+                                // Tiles removed
+                                tiles = previous.getTiles();
+                                if (!tiles.isEmpty()) {
+                                    for (Map.Entry<Short, CompoundTag> entry : tiles.entrySet()) {
+                                        addTileRemove(entry.getValue());
                                     }
                                 }
                             }
-                        } catch (Throwable e) {
-                            MainUtil.handleError(e);
-                        } finally {
-                            if (FaweChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
-                                synchronized (FaweChangeSet.this.waitingAsync) {
-                                    FaweChangeSet.this.waitingAsync.notifyAll();
+                            // Entity changes
+                            {
+                                // Entities created
+                                Set<CompoundTag> entities = next.getEntities();
+                                if (!entities.isEmpty()) {
+                                    for (CompoundTag entityTag : entities) {
+                                        addEntityCreate(entityTag);
+                                    }
                                 }
-                                synchronized (FaweChangeSet.this.waitingCombined) {
-                                    FaweChangeSet.this.waitingCombined.notifyAll();
+                                // Entities removed
+                                entities = previous.getEntities();
+                                if (!entities.isEmpty()) {
+                                    for (CompoundTag entityTag : entities) {
+                                        addEntityRemove(entityTag);
+                                    }
                                 }
+                            }
+                        }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (FaweChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
+                            synchronized (FaweChangeSet.this.waitingAsync) {
+                                FaweChangeSet.this.waitingAsync.notifyAll();
+                            }
+                            synchronized (FaweChangeSet.this.waitingCombined) {
+                                FaweChangeSet.this.waitingCombined.notifyAll();
                             }
                         }
                     }

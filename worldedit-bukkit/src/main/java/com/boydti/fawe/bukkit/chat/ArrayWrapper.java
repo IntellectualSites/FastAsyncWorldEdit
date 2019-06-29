@@ -23,6 +23,7 @@ public final class ArrayWrapper<E> {
      *
      * @param elements The elements of the array.
      */
+    @SafeVarargs
     public ArrayWrapper(E... elements) {
         setArray(elements);
     }

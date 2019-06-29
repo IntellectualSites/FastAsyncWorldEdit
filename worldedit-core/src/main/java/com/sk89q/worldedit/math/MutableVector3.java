@@ -1,7 +1,5 @@
 package com.sk89q.worldedit.math;
 
-import javax.annotation.Nullable;
-
 public class MutableVector3 extends Vector3 {
 
     public MutableVector3() {}

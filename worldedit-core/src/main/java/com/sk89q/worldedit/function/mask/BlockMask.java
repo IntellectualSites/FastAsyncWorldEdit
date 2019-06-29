@@ -1,27 +1,43 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.extent.NullExtent;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.NullExtent;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,24 +48,39 @@ import java.util.Map;
  *
  * <p>This mask checks for both an exact block type and state value match,
  * respecting fuzzy status of the BlockState.</p>
+ * @deprecated use BlockMaskBuilder
  */
+@Deprecated
 public class BlockMask extends AbstractExtentMask {
 
     private final long[][] bitSets;
     protected final static long[] ALL = new long[0];
 
-    @Deprecated
+
+    /**
+     * Create a new block mask.
+     *
+     * @param extent the extent
+     * @param blocks a list of blocks to match
+     */
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         super(extent);
         MainUtil.warnDeprecated(BlockMaskBuilder.class);
+        checkNotNull(blocks);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
     }
 
-    @Deprecated
-    public BlockMask(Extent extent, BaseBlock... blocks) {
+    /**
+     * Create a new block mask.
+     *
+     * @param extent the extent
+     * @param block an array of blocks to match
+     */
+    public BlockMask(Extent extent, BaseBlock... block) {
         super(extent);
         MainUtil.warnDeprecated(BlockMaskBuilder.class);
-        this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
+        checkNotNull(block);
+        this.bitSets = new BlockMaskBuilder().addBlocks(block).optimize().getBits();
     }
 
     public BlockMask() {
@@ -125,16 +156,14 @@ public class BlockMask extends AbstractExtentMask {
             }
         }
         BlockType type = BlockTypes.get(indexFound);
-        {
-            Mask mask = getOptimizedMask(type, bitSets[indexFound]);
-            if (mask == null) { // Try with inverse
-                long[] newBitSet = bitSets[indexFound];
-                for (int i = 0; i < newBitSet.length; i++) newBitSet[i] = ~newBitSet[i];
-                mask = getOptimizedMask(type, bitSets[indexFound]);
-                if (mask != null) mask = mask.inverse();
-            }
-            return mask;
+        Mask mask = getOptimizedMask(type, bitSets[indexFound]);
+        if (mask == null) { // Try with inverse
+            long[] newBitSet = bitSets[indexFound];
+            for (int i = 0; i < newBitSet.length; i++) newBitSet[i] = ~newBitSet[i];
+            mask = getOptimizedMask(type, bitSets[indexFound]);
+            if (mask != null) mask = mask.inverse();
         }
+        return mask;
     }
 
     private Mask getOptimizedMask(BlockType type, long[] bitSet) {
@@ -245,6 +274,5 @@ public class BlockMask extends AbstractExtentMask {
     public Mask2D toMask2D() {
         return null;
     }
-
 
 }

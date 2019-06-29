@@ -84,16 +84,16 @@ public abstract class IntFaweChunk<T, V extends FaweQueue> extends FaweChunk<T> 
 
     public int getTotalCount() {
         int total = 0;
-        for (int i = 0; i < count.length; i++) {
-            total += Math.min(4096, this.count[i]);
+        for (short value : count) {
+            total += Math.min(4096, value);
         }
         return total;
     }
 
     public int getTotalAir() {
         int total = 0;
-        for (int i = 0; i < air.length; i++) {
-            total += Math.min(4096, this.air[i]);
+        for (short value : air) {
+            total += Math.min(4096, value);
         }
         return total;
     }

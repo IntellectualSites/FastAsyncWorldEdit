@@ -1,21 +1,20 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.mask.SurfaceMask;
 import com.boydti.fawe.object.pattern.BiomePattern;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SplatterBrush extends ScatterBrush {
     private final boolean solid;
@@ -45,24 +44,16 @@ public class SplatterBrush extends ScatterBrush {
         SurfaceMask surface = new SurfaceMask(editSession);
         final SolidBlockMask solid = new SolidBlockMask(editSession);
 
-        RecursiveVisitor visitor = new RecursiveVisitor(new Mask() {
-            @Override
-            public boolean test(BlockVector3 vector) {
-                double dist = vector.distanceSq(position);
-                if (dist < size2 && !placed.contains(vector) && (PseudoRandom.random.random(5) < 2) && surface.test(vector)) {
-                    placed.add(vector);
-                    return true;
-                }
-                return false;
+        RecursiveVisitor visitor = new RecursiveVisitor(vector -> {
+            double dist = vector.distanceSq(position);
+            if (dist < size2 && !placed.contains(vector) && (ThreadLocalRandom.current().nextInt(5) < 2) && surface.test(vector)) {
+                placed.add(vector);
+                return true;
             }
-        }, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 vector) throws WorldEditException {
-                return editSession.setBlock(vector, finalPattern);
-            }
-        }, recursion, editSession);
+            return false;
+        }, vector -> editSession.setBlock(vector, finalPattern), recursion, editSession);
         visitor.setMaxBranch(2);
-        visitor.setDirections(Arrays.asList(visitor.DIAGONAL_DIRECTIONS));
+        visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);
     }

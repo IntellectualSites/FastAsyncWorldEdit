@@ -12,18 +12,9 @@ import org.bukkit.Material;
 import org.bukkit.TreeType;
 import org.bukkit.block.BlockFace;
 
-
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Tree_Brush
- *
- * @author Mick
- */
 public class TreeSnipeBrush extends Brush {
     private TreeType treeType = TreeType.TREE;
 
-    /**
-     *
-     */
     public TreeSnipeBrush() {
         this.setName("Tree Snipe");
     }

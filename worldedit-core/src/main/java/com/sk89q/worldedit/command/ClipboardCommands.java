@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
@@ -36,16 +35,14 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
-import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.*;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
 
 import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -76,6 +73,7 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -88,9 +86,10 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.PLACEMENT;
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
+
 
 /**
  * Clipboard commands.
@@ -105,11 +104,11 @@ public class ClipboardCommands extends MethodCommands {
      */
     public ClipboardCommands(WorldEdit worldEdit) {
         super(worldEdit);
+        checkNotNull(worldEdit);
     }
 
-
     @Command(
-            aliases = {"/lazycopy"},
+            aliases = { "/lazycopy" },
             flags = "em",
             desc = "Lazily copy the selection to the clipboard",
             help = "Lazily copy the selection to the clipboard\n" +
@@ -142,13 +141,13 @@ public class ClipboardCommands extends MethodCommands {
         clipboard.setOrigin(session.getPlacementPosition(player));
         session.setClipboard(new ClipboardHolder(clipboard));
         BBC.COMMAND_COPY.send(player, region.getArea());
-        if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
+        if (!player.hasPermission("fawe.tips"))
             BBC.TIP_PASTE.or(BBC.TIP_LAZYCOPY, BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(player);
     }
 
 
     @Command(
-            aliases = {"/copy", "/c"},
+            aliases = { "/copy", "/c" },
             flags = "em",
             desc = "Copy the selection to the clipboard",
             help = "Copy the selection to the clipboard\n" +
@@ -192,7 +191,7 @@ public class ClipboardCommands extends MethodCommands {
             }
             Operations.completeLegacy(copy);
             BBC.COMMAND_COPY.send(player, region.getArea());
-            if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) {
+            if (!player.hasPermission("fawe.tips")) {
                 BBC.TIP_PASTE.or(BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(player);
             }
         }, getArguments(context), region, context);
@@ -237,18 +236,17 @@ public class ClipboardCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/cut"},
-            flags = "em",
-            usage = "[leave-id]",
-            desc = "Cut the selection to the clipboard",
-            help = "Copy the selection to the clipboard\n" +
-                    "Flags:\n" +
-                    "  -e skips entity copy\n" +
-                    "  -m sets a source mask so that excluded blocks become air\n" +
-                    "  -b copies biomes\n" +
-                    "WARNING: Cutting and pasting entities cannot yet be undone!",
-            min = 0,
-            max = 1
+        aliases = { "/cut" },
+        flags = "em",
+        usage = "[leave-id]",
+        desc = "Cut the selection to the clipboard",
+        help = "Copy the selection to the clipboard\n" +
+                "Flags:\n" +
+                "  -e skips entity copy\n" +
+                "  -m sets a source mask so that excluded blocks become air\n" +
+                "  -b copies biomes\n" +
+                "WARNING: Cutting and pasting entities cannot yet be undone!",
+        max = 1
     )
     @CommandPermissions("worldedit.clipboard.cut")
     @Logging(REGION)
@@ -273,6 +271,7 @@ public class ClipboardCommands extends MethodCommands {
             ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
             copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
             copy.setCopyingEntities(!skipEntities);
+            copy.setRemovingEntities(true);
             copy.setCopyBiomes(copyBiomes);
             Mask sourceMask = editSession.getSourceMask();
             if (sourceMask != null) {
@@ -287,12 +286,15 @@ public class ClipboardCommands extends MethodCommands {
             session.setClipboard(new ClipboardHolder(clipboard));
 
             BBC.COMMAND_CUT_SLOW.send(player, region.getArea());
-            if (!FawePlayer.wrap(player).hasPermission("fawe.tips")) BBC.TIP_LAZYCUT.send(player);
+            if (!player.hasPermission("fawe.tips")) BBC.TIP_LAZYCUT.send(player);
         }, getArguments(context), region, context);
 
     }
 
-    @Command(aliases = {"download"}, desc = "Downloads your clipboard through the configured web interface")
+    @Command(
+            aliases = {"download"},
+            desc = "Downloads your clipboard through the configured web interface"
+    )
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.download"})
     public void download(final Player player, final LocalSession session, @Optional("schem") final String formatName) throws CommandException, WorldEditException {
@@ -435,26 +437,28 @@ public class ClipboardCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/paste"},
-            usage = "",
-            flags = "saobe",
-            desc = "Paste the clipboard's contents",
-            help =
-                    "Pastes the clipboard's contents.\n" +
-                            "Flags:\n" +
-                            "  -a skips air blocks\n" +
-                            "  -b skips pasting biomes\n" +
-                            "  -e skips pasting entities\n" +
-                            "  -o pastes at the original position\n" +
-                            "  -s selects the region after pasting",
-            min = 0,
-            max = 0
+        aliases = { "/paste" },
+        usage = "",
+        flags = "saobe",
+        desc = "Paste the clipboard's contents",
+        help =
+            "Pastes the clipboard's contents.\n" +
+            "Flags:\n" +
+            "  -a skips air blocks\n" +
+            "  -b skips pasting biomes\n" +
+            "  -e skips pasting entities\n" +
+            "  -o pastes at the original position\n" +
+            "  -s selects the region after pasting",
+        min = 0,
+        max = 0
     )
     @CommandPermissions("worldedit.clipboard.paste")
     @Logging(PLACEMENT)
     public void paste(Player player, LocalSession session, EditSession editSession,
-                      @Switch('a') boolean ignoreAirBlocks, @Switch('b') boolean ignoreBiomes, @Switch('e') boolean ignoreEntities, @Switch('o') boolean atOrigin,
+                      @Switch('a') boolean ignoreAirBlocks, @Switch('o') boolean atOrigin,
+                      @Switch('b') boolean ignoreBiomes, @Switch('e') boolean ignoreEntities,
                       @Switch('s') boolean selectPasted) throws WorldEditException {
+
         ClipboardHolder holder = session.getClipboard();
         if (holder.getTransform().isIdentity() && editSession.getSourceMask() == null) {
             place(player, session, editSession, ignoreAirBlocks, atOrigin, selectPasted);
@@ -462,6 +466,7 @@ public class ClipboardCommands extends MethodCommands {
         }
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
+
         BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
         checkPaste(player, editSession, to, holder, clipboard);
         Operation operation = holder
@@ -483,7 +488,7 @@ public class ClipboardCommands extends MethodCommands {
             selector.explainRegionAdjust(player, session);
         }
         BBC.COMMAND_PASTE.send(player, to);
-        if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
+        if (!player.hasPermission("fawe.tips"))
             BBC.TIP_COPYPASTE.or(BBC.TIP_SOURCE_MASK, BBC.TIP_REPLACE_MARKER).send(player, to);
     }
 
@@ -536,19 +541,19 @@ public class ClipboardCommands extends MethodCommands {
             selector.explainRegionAdjust(player, session);
         }
         BBC.COMMAND_PASTE.send(player, to);
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
-        if (!fp.hasPermission("fawe.tips")) {
-            BBC.TIP_COPYPASTE.send(fp);
+
+        if (!player.hasPermission("fawe.tips")) {
+            BBC.TIP_COPYPASTE.send(player);
         }
     }
 
     @Command(
-            aliases = {"/rotate"},
-            usage = "<y-axis> [<x-axis>] [<z-axis>]",
-            desc = "Rotate the contents of the clipboard",
-            help = "Non-destructively rotate the contents of the clipboard.\n" +
-                    "Angles are provided in degrees and a positive angle will result in a clockwise rotation. " +
-                    "Multiple rotations can be stacked. Interpolation is not performed so angles should be a multiple of 90 degrees.\n"
+        aliases = { "/rotate" },
+        usage = "<y-axis> [<x-axis>] [<z-axis>]",
+        desc = "Rotate the contents of the clipboard",
+        help = "Non-destructively rotate the contents of the clipboard.\n" +
+               "Angles are provided in degrees and a positive angle will result in a clockwise rotation. " +
+               "Multiple rotations can be stacked. Interpolation is not performed so angles should be a multiple of 90 degrees.\n"
     )
     @CommandPermissions("worldedit.clipboard.rotate")
     public void rotate(Player player, LocalSession session, Double yRotate, @Optional Double xRotate, @Optional Double zRotate) throws WorldEditException {
@@ -557,20 +562,20 @@ public class ClipboardCommands extends MethodCommands {
         transform = transform.rotateY(-(yRotate != null ? yRotate : 0));
         transform = transform.rotateX(-(xRotate != null ? xRotate : 0));
         transform = transform.rotateZ(-(zRotate != null ? zRotate : 0));
-        holder.setTransform(transform.combine(holder.getTransform()));
+        holder.setTransform(holder.getTransform().combine(transform));
         BBC.COMMAND_ROTATE.send(player);
-        if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
+        if (!player.hasPermission("fawe.tips"))
             BBC.TIP_FLIP.or(BBC.TIP_DEFORM, BBC.TIP_TRANSFORM).send(player);
     }
 
     @Command(
-            aliases = {"/flip"},
-            usage = "[<direction>]",
-            desc = "Flip the contents of the clipboard",
-            help =
-                    "Flips the contents of the clipboard across the point from which the copy was made.\n",
-            min = 0,
-            max = 1
+        aliases = { "/flip" },
+        usage = "[<direction>]",
+        desc = "Flip the contents of the clipboard",
+        help =
+            "Flips the contents of the clipboard across the point from which the copy was made.\n",
+        min = 0,
+        max = 1
     )
     @CommandPermissions("worldedit.clipboard.flip")
     public void flip(Player player, LocalSession session,
@@ -578,23 +583,20 @@ public class ClipboardCommands extends MethodCommands {
         ClipboardHolder holder = session.getClipboard();
         AffineTransform transform = new AffineTransform();
         transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());
-        holder.setTransform(transform.combine(holder.getTransform()));
+        holder.setTransform(holder.getTransform().combine(transform));
         BBC.COMMAND_FLIPPED.send(player);
     }
 
-    @Deprecated // See SchematicCommands#clear
     @Command(
-            aliases = {"clearclipboard", "/clearclipboard"},
-            usage = "",
-            desc = "Clear your clipboard",
-            min = 0,
-            max = 0
+        aliases = { "clearclipboard" },
+        usage = "",
+        desc = "Clear your clipboard",
+        min = 0,
+        max = 0
     )
     @CommandPermissions("worldedit.clipboard.clear")
     public void clearClipboard(Player player, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
         BBC.CLIPBOARD_CLEARED.send(player);
     }
-
-
 }

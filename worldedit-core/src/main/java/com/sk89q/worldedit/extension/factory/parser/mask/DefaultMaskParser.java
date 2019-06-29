@@ -171,12 +171,10 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                             {
                                 try {
                                     builder.addRegex(full);
-                                } catch (SuggestInputParseException rethrow) {
-                                    throw rethrow;
                                 } catch (InputParseException ignore) {}
                             }
                             if (mask == null) {
-                                context.setPreferringWildcard(true);
+                                context.setPreferringWildcard(false);
                                 context.setRestricted(false);
                                 BlockStateHolder block = worldEdit.getBlockFactory().parseFromInput(full, context);
                                 builder.add(block);

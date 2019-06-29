@@ -37,7 +37,6 @@ public class WeatherTypes {
     private WeatherTypes() {
     }
 
-
     public static @Nullable WeatherType get(final String id) {
         return WeatherType.REGISTRY.get(id);
     }

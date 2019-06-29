@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Base64;
+import java.util.stream.Collectors;
 
 public class ImgurUtility {
     public static final String CLIENT_ID = "50e34b65351eb07";
@@ -48,17 +49,14 @@ public class ImgurUtility {
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         conn.connect();
-        StringBuilder stb = new StringBuilder();
-        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-        wr.write(data);
-        wr.flush();
-        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line;
-        while ((line = rd.readLine()) != null) {
-            stb.append(line).append("\n");
+        String stb;
+        try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream())) {
+            wr.write(data);
+            wr.flush();
+            try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                stb = rd.lines().map(line -> line + "\n").collect(Collectors.joining());
+            }
         }
-        wr.close();
-        rd.close();
-        return stb.toString();
+        return stb;
     }
 }

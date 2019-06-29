@@ -3,7 +3,6 @@ package com.boydti.fawe.object.extent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.util.WEManager;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -16,6 +15,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
@@ -110,14 +110,14 @@ public abstract class FaweRegionExtent extends ResettableExtent {
         }
         return super.getBiome(position);
     }
-    
+
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
             }
-            return EditSession.nullBlock.toBaseBlock();
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
         return super.getFullBlock(position);
     }
@@ -128,7 +128,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
             }
-            return EditSession.nullBlock;
+            return BlockTypes.AIR.getDefaultState();
         }
         return super.getBlock(position);
     }
@@ -139,7 +139,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
             }
-            return EditSession.nullBlock;
+            return BlockTypes.AIR.getDefaultState();
         }
         return super.getLazyBlock(position);
     }
@@ -150,7 +150,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
             }
-            return EditSession.nullBlock;
+            return BlockTypes.AIR.getDefaultState();
         }
         return super.getLazyBlock(x, y, z);
     }

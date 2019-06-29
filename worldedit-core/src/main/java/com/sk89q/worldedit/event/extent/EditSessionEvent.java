@@ -19,33 +19,32 @@
 
 package com.sk89q.worldedit.event.extent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.EditSession;
+import static com.sk89q.worldedit.EditSession.Stage;
 import com.sk89q.worldedit.event.Cancellable;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
+
 import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.EditSession.Stage;
 
 /**
  * Raised (several times) when a new {@link EditSession} is being instantiated.
- * <p>
+ *
  * <p></p>Block loggers, as well as block set interceptors, can use this event to wrap
  * the given {@link Extent} with their own, which would allow them to intercept
  * all changes made to the world. For example, the code below would wrap the
  * existing extent with a custom one, and the custom extent would receive
  * all method calls <strong>before</strong> the extent fetched from
  * {@link #getExtent()} would.</p>
- * <p>
+ *
  * <pre>
  * event.setExtent(new MyExtent(event.getExtent())
  * </pre>
- * <p>
+ *
  * <p></p>This event is fired several times during the creation of a single
  * {@link EditSession}, but {@link #getStage()} will differ each time.
  * The stage determines at which point {@link Extent}s added to this event

@@ -19,9 +19,10 @@
 
 package com.sk89q.jnbt;
 
+import com.boydti.fawe.object.io.LittleEndianOutputStream;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.object.io.LittleEndianOutputStream;
 import java.io.Closeable;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
@@ -34,7 +35,7 @@ import java.util.Map;
 /**
  * This class writes <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * {@code Tag} objects to an underlying {@code OutputStream}.
- * 
+ *
  * <p>The NBT format was created by Markus Persson, and the specification may be
  * found at <a href="http://www.minecraft.net/docs/NBT.txt">
  * http://www.minecraft.net/docs/NBT.txt</a>.</p>
@@ -49,7 +50,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     /**
      * Creates a new {@code NBTOutputStream}, which will write data to the
      * specified underlying output stream.
-     * 
+     *
      * @param os
      *            The output stream.
      * @throws IOException
@@ -67,6 +68,9 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         return os;
     }
 
+    /**
+     * Use a little endian output stream
+     */
     public void setLittleEndian() {
         if (!(os instanceof LittleEndianOutputStream)) {
             this.os = new LittleEndianOutputStream((OutputStream) os);
@@ -75,7 +79,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a tag.
-     * 
+     *
      * @param tag
      *            The tag to write.
      * @throws IOException
@@ -87,9 +91,11 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
         int type = NBTUtils.getTypeCode(tag.getClass());
         writeNamedTagName(name, type);
+
         if (type == NBTConstants.TYPE_END) {
             throw new IOException("Named TAG_End not permitted.");
         }
+
         writeTagPayload(tag);
     }
 
@@ -149,16 +155,6 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         }
     }
 
-    public void writeNamedTag(String name, long[] data) throws IOException {
-        checkNotNull(name);
-        int type = NBTConstants.TYPE_LONG_ARRAY;
-        writeNamedTagName(name, type);
-        os.writeInt(data.length);
-        for (long aData : data) {
-            os.writeLong(aData);
-        }
-    }
-
     public void writeNamedEmptyList(String name) throws IOException {
         writeNamedEmptyList(name, NBTConstants.TYPE_COMPOUND);
     }
@@ -171,6 +167,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     public void writeNamedTagName(String name, int type) throws IOException {
         byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
+
         os.writeByte(type);
         os.writeShort(nameBytes.length);
         os.write(nameBytes);
@@ -201,7 +198,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes tag payload.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -256,7 +253,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Byte} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -268,7 +265,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Byte_Array} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -282,7 +279,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Compound} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -292,12 +289,12 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         for (Map.Entry<String, Tag> entry : tag.getValue().entrySet()) {
             writeNamedTag(entry.getKey(), entry.getValue());
         }
-        os.writeByte(NBTConstants.TYPE_END); // end tag - better way?
+        os.writeByte((byte) 0); // end tag - better way?
     }
 
     /**
      * Writes a {@code TAG_List} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -324,7 +321,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_String} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -338,7 +335,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Double} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -350,7 +347,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Float} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -362,7 +359,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Long} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -374,7 +371,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Int} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -386,7 +383,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Short} tag.
-     * 
+     *
      * @param tag
      *            The tag.
      * @throws IOException
@@ -398,19 +395,19 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     /**
      * Writes a {@code TAG_Empty} tag.
-     * 
+     *
      * @param tag the tag
      */
     private void writeEndTagPayload(EndTag tag) {
         /* empty */
     }
-    
+
     private void writeIntArrayTagPayload(IntArrayTag tag) throws IOException {
         int[] data = tag.getValue();
         os.writeInt(data.length);
         for (int aData : data) {
             os.writeInt(aData);
-        } 
+        }
     }
 
     private void writeLongArrayTagPayload(LongArrayTag tag) throws IOException {

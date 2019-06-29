@@ -48,7 +48,7 @@ public class WeakFaweQueueMap implements IFaweQueueMap {
     };
 
     @Override
-    public Collection<FaweChunk> getFaweCunks() {
+    public Collection<FaweChunk> getFaweChunks() {
         HashSet<FaweChunk> set = new HashSet<>();
         synchronized (blocks) {
             Iterator<Map.Entry<Long, Reference<FaweChunk>>> iter = blocks.entrySet().iterator();

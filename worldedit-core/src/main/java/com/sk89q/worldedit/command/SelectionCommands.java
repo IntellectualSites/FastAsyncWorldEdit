@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
@@ -34,7 +33,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -42,9 +40,6 @@ import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.block.BlockDistributionCounter;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -60,23 +55,20 @@ import com.sk89q.worldedit.regions.selector.RegionSelectorType;
 import com.sk89q.worldedit.regions.selector.SphereRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.formatting.ColorCodeBuilder;
 import com.sk89q.worldedit.util.formatting.Style;
 import com.sk89q.worldedit.util.formatting.StyledFragment;
 import com.sk89q.worldedit.util.formatting.component.CommandListBox;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.storage.ChunkStore;
+
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.POSITION;
 import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
@@ -289,7 +281,7 @@ public class SelectionCommands {
     public void wand(Player player) throws WorldEditException {
         player.giveItem(new BaseItemStack(ItemTypes.parse(we.getConfiguration().wandItem), 1));
         BBC.SELECTION_WAND.send(player);
-        if (!FawePlayer.wrap(player).hasPermission("fawe.tips"))
+        if (!player.hasPermission("fawe.tips"))
             BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND, BBC.TIP_DISCORD).send(player);
     }
 
@@ -302,7 +294,7 @@ public class SelectionCommands {
     )
     @CommandPermissions("worldedit.wand.toggle")
     public void toggleWand(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-        
+
         session.setToolControl(!session.isToolControlEnabled());
 
         if (session.isToolControlEnabled()) {
@@ -621,17 +613,17 @@ public class SelectionCommands {
                 long numBlocks = ((long) size.getBlockX() * size.getBlockY() * size.getBlockZ());
 
                 String msg = String.format("%1$s: %2$s @ %3$s (%4$d blocks)", name, sizeStr, originStr, numBlocks);
-                player.print(BBC.getPrefix() + msg);
+                player.print(msg);
 
                 index++;
             }
 
 
 
-//            player.print(BBC.getPrefix() + "Cuboid dimensions (max - min): " + size);
-//            player.print(BBC.getPrefix() + "Offset: " + origin);
-//            player.print(BBC.getPrefix() + "Cuboid distance: " + size.distance(Vector.ONE));
-//            player.print(BBC.getPrefix() + "# of blocks: " + (int) (size.getX() * size.getY() * size.getZ()));
+//            player.print("Cuboid dimensions (max - min): " + size);
+//            player.print("Offset: " + origin);
+//            player.print("Cuboid distance: " + size.distance(Vector.ONE));
+//            player.print("# of blocks: " + (int) (size.getX() * size.getY() * size.getZ()));
 //=======
 //    public void size(Player player, LocalSession session, EditSession editSession, CommandContext args) throws WorldEditException {
 //        if (args.hasFlag('c')) {
@@ -653,17 +645,17 @@ public class SelectionCommands {
                 .subtract(region.getMinimumPoint())
                 .add(1, 1, 1);
 
-        player.print(BBC.getPrefix() + "Type: " + session.getRegionSelector(player.getWorld())
+        player.print("Type: " + session.getRegionSelector(player.getWorld())
                 .getTypeName());
 
         for (String line : session.getRegionSelector(player.getWorld())
                 .getInformationLines()) {
-            player.print(BBC.getPrefix() + line);
+            player.print(line);
         }
 
-        player.print(BBC.getPrefix() + "Size: " + size);
-        player.print(BBC.getPrefix() + "Cuboid distance: " + region.getMaximumPoint().distance(region.getMinimumPoint()));
-        player.print(BBC.getPrefix() + "# of blocks: " + region.getArea());
+        player.print("Size: " + size);
+        player.print("Cuboid distance: " + region.getMaximumPoint().distance(region.getMinimumPoint()));
+        player.print("# of blocks: " + region.getArea());
     }
 
 
@@ -713,7 +705,7 @@ public class SelectionCommands {
         size = session.getSelection(player.getWorld()).getArea();
 
         if (distributionData.size() <= 0) {
-            player.printError(BBC.getPrefix() + "No blocks counted.");
+            player.printError("No blocks counted.");
             return;
         }
         BBC.SELECTION_DISTR.send(player, size);
@@ -724,14 +716,14 @@ public class SelectionCommands {
                     String.valueOf(c.getAmount()),
                     c.getAmount() / (double) size * 100,
                     name);
-            player.print(BBC.getPrefix() + str);
+            player.print(str);
         }
     }
 
     @Command(
             aliases = {"/sel", ";", "/desel", "/deselect"},
             flags = "d",
-            usage = "[cuboid|extend|poly|ellipsoid|sphere|cyl|convex]",
+            usage = "[cuboid|extend|poly|polyhedron|ellipsoid|sphere|cyl|convex|fuzzy]",
             desc = "Choose a region selector",
             min = 0,
             max = 1
@@ -751,37 +743,37 @@ public class SelectionCommands {
         final RegionSelector selector;
         if (typeName.equalsIgnoreCase("cuboid")) {
             selector = new CuboidRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_CUBOID.s());
+            player.print(BBC.SEL_CUBOID.s());
         } else if (typeName.equalsIgnoreCase("extend")) {
             selector = new ExtendingCuboidRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_CUBOID_EXTEND.s());
+            player.print(BBC.SEL_CUBOID_EXTEND.s());
         } else if (typeName.equalsIgnoreCase("poly")) {
             selector = new Polygonal2DRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_2D_POLYGON.s());
+            player.print(BBC.SEL_2D_POLYGON.s());
             Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolygonVertexLimit();
-            limit.ifPresent(integer -> player.print(BBC.getPrefix() + BBC.SEL_MAX.f(integer)));
-            player.print(BBC.getPrefix() + BBC.SEL_LIST.s());
+            limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+            player.print(BBC.SEL_LIST.s());
         } else if (typeName.equalsIgnoreCase("ellipsoid")) {
             selector = new EllipsoidRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_ELLIPSIOD.s());
+            player.print(BBC.SEL_ELLIPSIOD.s());
         } else if (typeName.equalsIgnoreCase("sphere")) {
             selector = new SphereRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_SPHERE.s());
+            player.print(BBC.SEL_SPHERE.s());
         } else if (typeName.equalsIgnoreCase("cyl")) {
             selector = new CylinderRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_CYLINDRICAL.s());
+            player.print(BBC.SEL_CYLINDRICAL.s());
         } else if (typeName.equalsIgnoreCase("convex") || typeName.equalsIgnoreCase("hull")) {
             selector = new ConvexPolyhedralRegionSelector(oldSelector);
-            player.print(BBC.getPrefix() + BBC.SEL_CONVEX_POLYHEDRAL.s());
+            player.print(BBC.SEL_CONVEX_POLYHEDRAL.s());
             Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolyhedronVertexLimit();
-            limit.ifPresent(integer -> player.print(BBC.getPrefix() + BBC.SEL_MAX.f(integer)));
-            player.print(BBC.getPrefix() + BBC.SEL_LIST.s());
+            limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+            player.print(BBC.SEL_LIST.s());
         } else if (typeName.equalsIgnoreCase("polyhedral") || typeName.equalsIgnoreCase("polyhedron")) {
             selector = new PolyhedralRegionSelector(player.getWorld());
-            player.print(BBC.getPrefix() + BBC.SEL_CONVEX_POLYHEDRAL.s());
+            player.print(BBC.SEL_CONVEX_POLYHEDRAL.s());
             Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolyhedronVertexLimit();
-            limit.ifPresent(integer -> player.print(BBC.getPrefix() + BBC.SEL_MAX.f(integer)));
-            player.print(BBC.getPrefix() + BBC.SEL_LIST.s());
+            limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+            player.print(BBC.SEL_LIST.s());
         } else if (typeName.startsWith("fuzzy") || typeName.startsWith("magic")) {
             Mask mask;
             if (typeName.length() > 6) {
@@ -795,13 +787,13 @@ public class SelectionCommands {
                 mask = new IdMask(editSession);
             }
             selector = new FuzzyRegionSelector(player, editSession, mask);
-            player.print(BBC.getPrefix() + BBC.SEL_FUZZY.f());
-            player.print(BBC.getPrefix() + BBC.SEL_LIST.f());
+            player.print(BBC.SEL_FUZZY.f());
+            player.print(BBC.SEL_LIST.f());
         } else {
             CommandListBox box = new CommandListBox("Selection modes");
             StyledFragment contents = box.getContents();
             StyledFragment tip = contents.createFragment(Style.RED);
-            tip.append(BBC.getPrefix() + BBC.SEL_MODES.s()).newLine();
+            tip.append(BBC.SEL_MODES.s()).newLine();
 
             box.appendCommand("//sel cuboid", "Select two corners of a cuboid");
             box.appendCommand("//sel extend", "Fast cuboid selection mode");

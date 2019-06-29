@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,25 +34,20 @@ import javax.annotation.Nullable;
 
 public class Registry<V> implements Iterable<V> {
     private final Map<String, V> map = new HashMap<>();
-    private Collection<V> values = Collections.unmodifiableCollection(map.values());
     private final String name;
 
     public Registry(final String name) {
         this.name = name;
     }
 
-    public @Nullable V get(final CharSequence key) {
-        return this.map.get(key);
-    }
-
     public @Nullable V get(final String key) {
-        return get((CharSequence) key);
+        return this.map.get(key);
     }
 
     public V register(final String key, final V value) {
         requireNonNull(key, "key");
         requireNonNull(value, "value");
-        checkState(key.equals(key.toLowerCase()), "key must be lowercase");
+        checkState(key.equals(key.toLowerCase(Locale.ROOT)), "key must be lowercase");
         checkState(!this.map.containsKey(key), "key '%s' already has an associated %s", key, this.name);
         this.map.put(key, value);
         return value;
@@ -62,11 +58,12 @@ public class Registry<V> implements Iterable<V> {
     }
 
     public Collection<V> values() {
-        return values;
+        return Collections.unmodifiableCollection(this.map.values());
     }
 
     @Override
     public Iterator<V> iterator() {
         return this.map.values().iterator();
     }
+
 }

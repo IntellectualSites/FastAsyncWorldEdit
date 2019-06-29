@@ -20,14 +20,15 @@
 package com.sk89q.worldedit.util.command.fluent;
 
 import com.boydti.fawe.config.Commands;
+
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.worldedit.util.command.CallableProcessor;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.util.command.SimpleDispatcher;
 import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
+
 import javax.annotation.Nullable;
-import java.lang.annotation.Annotation;
 
 /**
  * A collection of commands.
@@ -41,12 +42,12 @@ public class DispatcherNode {
     /**
      * Create a new instance.
      *
-     * @param graph      the root fluent graph object
-     * @param parent     the parent node, or null
+     * @param graph the root fluent graph object
+     * @param parent the parent node, or null
      * @param dispatcher the dispatcher for this node
      */
-    public DispatcherNode(CommandGraph graph, DispatcherNode parent,
-                          SimpleDispatcher dispatcher) {
+    DispatcherNode(CommandGraph graph, DispatcherNode parent,
+            SimpleDispatcher dispatcher) {
         this.graph = graph;
         this.parent = parent;
         this.dispatcher = dispatcher;
@@ -54,7 +55,7 @@ public class DispatcherNode {
 
     /**
      * Set the description.
-     * <p>
+     *
      * <p>This can only be used on {@link DispatcherNode}s returned by
      * {@link #group(String...)}.</p>
      *
@@ -70,7 +71,7 @@ public class DispatcherNode {
      * Register a command with this dispatcher.
      *
      * @param callable the executor
-     * @param alias    the list of aliases, where the first alias is the primary one
+     * @param alias the list of aliases, where the first alias is the primary one
      */
     public DispatcherNode register(CommandCallable callable, String... alias) {
         dispatcher.registerCommand(callable, alias);
@@ -145,7 +146,7 @@ public class DispatcherNode {
 
     /**
      * Create a new command that will contain sub-commands.
-     * <p>
+     *
      * <p>The object returned by this method can be used to add sub-commands. To
      * return to this "parent" context, use {@link DispatcherNode#graph()}.</p>
      *
@@ -155,8 +156,7 @@ public class DispatcherNode {
     public DispatcherNode group(String... alias) {
         SimpleDispatcher command = new SimpleDispatcher();
         getDispatcher().registerCommand(command, alias);
-        DispatcherNode res = new DispatcherNode(graph, this, command);
-        return res;
+        return new DispatcherNode(graph, this, command);
     }
 
     /**
@@ -190,6 +190,5 @@ public class DispatcherNode {
     public Dispatcher getDispatcher() {
         return dispatcher;
     }
-
 
 }

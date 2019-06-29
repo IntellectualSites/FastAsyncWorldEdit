@@ -21,6 +21,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -249,8 +250,8 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public void setPacketViewer(FawePlayer player) {
         this.player = player;
         if (player != null) {
-            FaweLocation pos = player.getLocation();
-            this.chunkOffset = BlockVector2.at(1 + (pos.x >> 4), 1 + (pos.z >> 4));
+            Location pos = player.getLocation();
+            this.chunkOffset = BlockVector2.at(1 + (pos.getBlockX() >> 4), 1 + (pos.getBlockZ() >> 4));
         }
     }
 
@@ -291,9 +292,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int OX = chunkOffset.getBlockX();
             int OZ = chunkOffset.getBlockZ();
 
-            FaweLocation position = player.getLocation();
-            int pcx = (position.x >> 4) - OX;
-            int pcz = (position.z >> 4) - OZ;
+            Location position = player.getLocation();
+            int pcx = (position.getBlockX() >> 4) - OX;
+            int pcz = (position.getBlockZ() >> 4) - OZ;
 
             int scx = Math.max(0, pcx - 15);
             int scz = Math.max(0, pcz - 15);
@@ -595,11 +596,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                     continue;
                 }
                 placed.add(x, z);
-                ClipboardHolder holder = clipboards.get(PseudoRandom.random.random(clipboards.size()));
+                ClipboardHolder holder = clipboards.get(ThreadLocalRandom.current().nextInt(clipboards.size()));
                 if (randomRotate) {
-                    int rotate = PseudoRandom.random.random(4) * 90;
+                    int rotate = ThreadLocalRandom.current().nextInt(4) * 90;
                     if (rotate != 0) {
-                        holder.setTransform(new AffineTransform().rotateY(PseudoRandom.random.random(4) * 90));
+                        holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
                     } else {
                         holder.setTransform(identity);
                     }
@@ -644,11 +645,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
                 mutable.mutY(y + 1);
                 placed.add(x, z);
-                ClipboardHolder holder = clipboards.get(PseudoRandom.random.random(clipboards.size()));
+                ClipboardHolder holder = clipboards.get(ThreadLocalRandom.current().nextInt(clipboards.size()));
                 if (randomRotate) {
-                    int rotate = PseudoRandom.random.random(4) * 90;
+                    int rotate = ThreadLocalRandom.current().nextInt(4) * 90;
                     if (rotate != 0) {
-                        holder.setTransform(new AffineTransform().rotateY(PseudoRandom.random.random(4) * 90));
+                        holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
                     } else {
                         holder.setTransform(identity);
                     }
@@ -901,9 +902,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             int OX = chunkOffset.getBlockX();
             int OZ = chunkOffset.getBlockZ();
 
-            FaweLocation position = player.getLocation();
-            int pcx = (position.x >> 4) - OX;
-            int pcz = (position.z >> 4) - OZ;
+            Location position = player.getLocation();
+            int pcx = (position.getBlockX() >> 4) - OX;
+            int pcz = (position.getBlockZ() >> 4) - OZ;
 
             int scx = Math.max(0, pcx - 10);
             int scz = Math.max(0, pcz - 10);

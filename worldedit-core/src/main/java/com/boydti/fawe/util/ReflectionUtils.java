@@ -1,5 +1,9 @@
 package com.boydti.fawe.util;
 
+import sun.reflect.ConstructorAccessor;
+import sun.reflect.FieldAccessor;
+import sun.reflect.ReflectionFactory;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -10,24 +14,15 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import sun.reflect.ConstructorAccessor;
-import sun.reflect.FieldAccessor;
-import sun.reflect.ReflectionFactory;
-
-/**
- * @author DPOH-VAR
- * @version 1.0
- */
-@SuppressWarnings({"UnusedDeclaration", "rawtypes"})
 public class ReflectionUtils {
     public static <T> T as(Class<T> t, Object o) {
         return t.isInstance(o) ? t.cast(o) : null;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T extends Enum<?>> T addEnum(Class<T> enumType, String enumName) {
         try {
             return addEnum(enumType, enumName, new Class<?>[]{}, new Object[]{});
@@ -63,8 +58,8 @@ public class ReflectionUtils {
             T newValue = (T) makeEnum(enumType, // The target enum class
                     enumName, // THE NEW ENUM INSTANCE TO BE DYNAMICALLY ADDED
                     values.size(),
-                    additionalTypes, // can be used to pass values to the enum constuctor
-                    additionalValues); // can be used to pass values to the enum constuctor
+                    additionalTypes, // can be used to pass values to the enum constructor
+                    additionalValues); // can be used to pass values to the enum constructor
 
             // 4. add new value
             values.add(newValue);
@@ -82,51 +77,11 @@ public class ReflectionUtils {
         }
     }
 
-    public static <T extends Enum<?>> void clearEnum(Class<T> enumType) {
-        // 0. Sanity checks
-        if (!Enum.class.isAssignableFrom(enumType)) {
-            throw new RuntimeException("class " + enumType + " is not an instance of Enum");
-        }
-        // 1. Lookup "$VALUES" holder in enum class and get previous enum instances
-        Field valuesField = null;
-        Field[] fields = enumType.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getName().contains("$VALUES")) {
-                valuesField = field;
-                break;
-            }
-        }
-        AccessibleObject.setAccessible(new Field[]{valuesField}, true);
-        try {
-            setFailsafeFieldValue(valuesField, null, Array.newInstance(enumType, 0));
-            // 6. Clean enum cache
-            cleanEnumCache(enumType);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public static <T extends Enum<?>> void copyEnum(T dest, String value, Class<?>[] additionalTypes, Object[] additionalValues) {
-        try {
-            Class<? extends Enum> clazz = dest.getClass();
-            Object newEnum = makeEnum(clazz, value, dest.ordinal(), additionalTypes, additionalValues);
-            for (Field field : clazz.getDeclaredFields()) {
-                if (Modifier.isStatic(field.getModifiers())) continue;
-                field.setAccessible(true);
-                Object newValue = field.get(newEnum);
-                setField(field, dest, newValue);
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
     public static Object makeEnum(Class<?> enumClass, String value, int ordinal,
                                    Class<?>[] additionalTypes, Object[] additionalValues) throws Exception {
         Object[] parms = new Object[additionalValues.length + 2];
         parms[0] = value;
-        parms[1] = Integer.valueOf(ordinal);
+        parms[1] = ordinal;
         System.arraycopy(additionalValues, 0, parms, 2, additionalValues.length);
         return enumClass.cast(getConstructorAccessor(enumClass, additionalTypes).newInstance(parms));
     }
@@ -195,7 +150,7 @@ public class ReflectionUtils {
             m.setAccessible(true);
             return (Map<T, V>) m.get(map);
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return map;
         }
     }
@@ -208,7 +163,7 @@ public class ReflectionUtils {
             m.setAccessible(true);
             return (List<T>) m.get(list);
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return list;
         }
     }
@@ -219,9 +174,9 @@ public class ReflectionUtils {
     }
 
     //Utils
-    public static Method makeMethod(final Class<?> clazz, final String methodName, final Class<?>... paramaters) {
+    public static Method makeMethod(final Class<?> clazz, final String methodName, final Class<?>... parameters) {
         try {
-            return clazz.getDeclaredMethod(methodName, paramaters);
+            return clazz.getDeclaredMethod(methodName, parameters);
         } catch (final NoSuchMethodException ex) {
             return null;
         } catch (final Exception ex) {
@@ -230,13 +185,13 @@ public class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T callMethod(final Method method, final Object instance, final Object... paramaters) {
+    public static <T> T callMethod(final Method method, final Object instance, final Object... parameters) {
         if (method == null) {
             throw new RuntimeException("No such method");
         }
         method.setAccessible(true);
         try {
-            return (T) method.invoke(instance, paramaters);
+            return (T) method.invoke(instance, parameters);
         } catch (final InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
         } catch (final Exception ex) {
@@ -245,9 +200,9 @@ public class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Constructor<T> makeConstructor(final Class<?> clazz, final Class<?>... paramaterTypes) {
+    public static <T> Constructor<T> makeConstructor(final Class<?> clazz, final Class<?>... parameterTypes) {
         try {
-            return (Constructor<T>) clazz.getConstructor(paramaterTypes);
+            return (Constructor<T>) clazz.getConstructor(parameterTypes);
         } catch (final NoSuchMethodException ex) {
             return null;
         } catch (final Exception ex) {
@@ -332,12 +287,12 @@ public class ReflectionUtils {
     }
 
     public static Method[] sortMethods(Method[] methods) {
-        Arrays.sort(methods, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+        Arrays.sort(methods, Comparator.comparing(Method::getName));
         return methods;
     }
 
     public static Field[] sortFields(Field[] fields) {
-        Arrays.sort(fields, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+        Arrays.sort(fields, Comparator.comparing(Field::getName));
         return fields;
     }
 
@@ -360,15 +315,6 @@ public class ReflectionUtils {
             return (T) field.get(instance);
         } catch (final Exception ex) {
             throw new RuntimeException(ex);
-        }
-    }
-
-    public static void setField(String fieldName, Object instance, Object value) {
-        try {
-            Field field = instance.getClass().getDeclaredField(fieldName);
-            setField(field, instance, value);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
         }
     }
 

@@ -9,9 +9,9 @@ import com.boydti.fawe.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.world.World;
+
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * ChangeSet optimized for low memory usage
@@ -66,7 +66,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
                 if (tileRStream != null) tileRStreamZip.flush();
                 return true;
             } catch (IOException e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         return false;
@@ -115,7 +115,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
                 }
                 return true;
             } catch (IOException e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         return false;
@@ -248,6 +248,6 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
 	@Override
 	public void setRecordChanges(boolean recordChanges) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

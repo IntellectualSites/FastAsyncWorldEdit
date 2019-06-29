@@ -17,17 +17,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.internal.annotation;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+package com.sk89q.worldedit.registry;
 
 /**
- * Marks features that should be replaced with Google Guava but cannot
- * yet because Bukkit uses such an old version of Guava.
+ * Represents an objects that can be added to a registry and referenced by an id which is unique within its registry.
  */
-@Retention(RetentionPolicy.SOURCE)
-@Documented
-public @interface RequiresNewerGuava {
+public interface Keyed {
+    /**
+     * The id of this object in the registry. Must be unique, and lowercase. Certain registries (e.g Namespaced ones) may have additional restrictions.
+     * @return an id
+     */
+    String getId();
 }

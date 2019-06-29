@@ -32,37 +32,14 @@ import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.chat.UsageMessage;
-import com.boydti.fawe.wrappers.FakePlayer;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.google.common.base.Joiner;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandLocals;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.minecraft.util.commands.*;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.BiomeCommands;
-import com.sk89q.worldedit.command.BrushCommands;
-import com.sk89q.worldedit.command.BrushOptionsCommands;
-import com.sk89q.worldedit.command.ChunkCommands;
-import com.sk89q.worldedit.command.ClipboardCommands;
-import com.sk89q.worldedit.command.GenerationCommands;
-import com.sk89q.worldedit.command.HistoryCommands;
-import com.sk89q.worldedit.command.NavigationCommands;
-import com.sk89q.worldedit.command.OptionsCommands;
-import com.sk89q.worldedit.command.RegionCommands;
-import com.sk89q.worldedit.command.SchematicCommands;
-import com.sk89q.worldedit.command.ScriptingCommands;
-import com.sk89q.worldedit.command.SelectionCommands;
-import com.sk89q.worldedit.command.SnapshotCommands;
-import com.sk89q.worldedit.command.SnapshotUtilCommands;
-import com.sk89q.worldedit.command.SuperPickaxeCommands;
-import com.sk89q.worldedit.command.ToolCommands;
-import com.sk89q.worldedit.command.UtilityCommands;
-import com.sk89q.worldedit.command.WorldEditCommands;
+import com.sk89q.worldedit.command.*;
 import com.sk89q.worldedit.command.argument.ReplaceParser;
 import com.sk89q.worldedit.command.argument.TreeGeneratorParser;
 import com.sk89q.worldedit.command.composition.ApplyCommand;
@@ -76,19 +53,11 @@ import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Deform.Mode;
-import com.sk89q.worldedit.internal.command.ActorAuthorizer;
-import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
-import com.sk89q.worldedit.internal.command.UserCommandCompleter;
-import com.sk89q.worldedit.internal.command.WorldEditBinding;
-import com.sk89q.worldedit.internal.command.WorldEditExceptionConverter;
+import com.sk89q.worldedit.internal.command.*;
 import com.sk89q.worldedit.scripting.CommandScriptLoader;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.util.command.CallableProcessor;
-import com.sk89q.worldedit.util.command.CommandCallable;
-import com.sk89q.worldedit.util.command.CommandMapping;
-import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.InvalidUsageException;
+import com.sk89q.worldedit.util.command.*;
 import com.sk89q.worldedit.util.command.composition.ProvidedValue;
 import com.sk89q.worldedit.util.command.fluent.CommandGraph;
 import com.sk89q.worldedit.util.command.fluent.DispatcherNode;
@@ -170,10 +139,8 @@ public final class CommandManager {
         builder.setAuthorizer(new ActorAuthorizer());
         builder.setDefaultCompleter(new UserCommandCompleter(platformManager));
         builder.addBinding(new WorldEditBinding(worldEdit));
-
         builder.addBinding(new PatternBinding(worldEdit), com.sk89q.worldedit.function.pattern.Pattern.class);
         builder.addBinding(new MaskBinding(worldEdit), com.sk89q.worldedit.function.mask.Mask.class);
-
         builder.addInvokeListener(new LegacyCommandsHandler());
         builder.addInvokeListener(new CommandLoggingHandler(worldEdit, commandLog));
 
@@ -371,7 +338,7 @@ public final class CommandManager {
         setupDispatcher();
     }
 
-    public void unregister() {
+    void unregister() {
         dynamicHandler.setHandler(null);
     }
 
@@ -401,16 +368,12 @@ public final class CommandManager {
 
     public void handleCommandOnCurrentThread(CommandEvent event) {
         Actor actor = platformManager.createProxyActor(event.getActor());
-        final String args = event.getArguments();
-        final String[] split = commandDetection(args.split(" "));
+        String[] split = commandDetection(event.getArguments().split(" "));
         // No command found!
         if (!dispatcher.contains(split[0])) {
             return;
         }
-        if (!actor.isPlayer()) {
-            actor = FakePlayer.wrap(actor.getName(), actor.getUniqueId(), actor);
-        }
-        final LocalSession session = worldEdit.getSessionManager().get(actor);
+        LocalSession session = worldEdit.getSessionManager().get(actor);
         Request.request().setSession(session);
         if (actor instanceof Entity) {
             Extent extent = ((Entity) actor).getExtent();
@@ -419,7 +382,8 @@ public final class CommandManager {
             }
         }
         LocalConfiguration config = worldEdit.getConfiguration();
-        final CommandLocals locals = new CommandLocals();
+
+        CommandLocals locals = new CommandLocals();
         final FawePlayer fp = FawePlayer.wrap(actor);
         if (fp == null) {
             throw new IllegalArgumentException("FAWE doesn't support: " + actor);
@@ -430,7 +394,7 @@ public final class CommandManager {
         if (actor instanceof Player) {
             Player player = (Player) actor;
             Player unwrapped = LocationMaskedPlayerWrapper.unwrap(player);
-            actor = new LocationMaskedPlayerWrapper((Player) unwrapped, player.getLocation(), true) {
+            actor = new LocationMaskedPlayerWrapper(unwrapped, player.getLocation(), true) {
                 @Override
                 public boolean hasPermission(String permission) {
                     if (!super.hasPermission(permission)) {
@@ -452,8 +416,7 @@ public final class CommandManager {
             };
         }
         locals.put(Actor.class, actor);
-        final Actor finalActor = actor;
-        locals.put("arguments", args);
+        locals.put("arguments", event.getArguments());
 
         ThrowableSupplier<Throwable> task =
             () -> dispatcher.call(Joiner.on(" ").join(split), locals, new String[0]);
@@ -514,24 +477,23 @@ public final class CommandManager {
                 }
             } else {
                 String message = e.getMessage();
-                actor.printRaw(BBC.getPrefix() + (message != null ? message : "The command was not used properly (no more help available)."));
+                actor.printRaw((message != null ? message : "The command was not used properly (no more help available)."));
                 BBC.COMMAND_SYNTAX.send(actor, e.getSimpleUsageString("/"));
             }
         } catch (CommandException e) {
             String message = e.getMessage();
             if (message != null) {
-                actor.printError(BBC.getPrefix() + e.getMessage());
+                actor.printError(e.getMessage());
             } else {
-                actor.printError(BBC.getPrefix() + "An unknown FAWE error has occurred! Please see console.");
+                actor.printError("An unknown FAWE error has occurred! Please see console.");
                 log.error("An unknown FAWE error occurred", e);
             }
         } catch (Throwable e) {
             Exception faweException = FaweException.get(e);
-            String message = e.getMessage();
             if (faweException != null) {
                 BBC.WORLDEDIT_CANCEL_REASON.send(actor, faweException.getMessage());
             } else {
-                actor.printError(BBC.getPrefix() + "There was an error handling a FAWE command: [See console]");
+                actor.printError("There was an error handling a FAWE command: [See console]");
                 actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
                 log.error("An unexpected error occurred while handling a FAWE command", e);
             }
@@ -541,7 +503,7 @@ public final class CommandManager {
                 editSession.flushQueue();
                 worldEdit.flushBlockBag(locals.get(Actor.class), editSession);
                 session.remember(editSession);
-                final long time = System.currentTimeMillis() - start;
+                long time = System.currentTimeMillis() - start;
                 if (time > 1000) {
                     BBC.ACTION_COMPLETE.send(actor, (time / 1000d));
                 }
@@ -572,7 +534,11 @@ public final class CommandManager {
                     return;
                 }
             }
-            if (!fp.runAction(() -> handleCommandOnCurrentThread(finalEvent), false, true)) {
+            if (!fp.runAction(new Runnable() {
+                @Override public void run() {
+                    CommandManager.this.handleCommandOnCurrentThread(finalEvent);
+                }
+            }, false, true)) {
                 BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
             }
             finalEvent.setCancelled(true);

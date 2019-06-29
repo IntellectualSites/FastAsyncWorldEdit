@@ -9,9 +9,9 @@ import com.boydti.fawe.util.TaskManager;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 public class AsyncChunk implements Chunk {
 
@@ -130,18 +130,18 @@ public class AsyncChunk implements Chunk {
         });
     }
 
-//    @Override
-//    public BlockState[] getTileEntities(boolean b) {
-//        if (!isLoaded()) {
-//            return new BlockState[0];
-//        }
-//        return TaskManager.IMP.sync(new RunnableVal<BlockState[]>() {
-//            @Override
-//            public void run(BlockState[] value) {
-//                this.value = world.getChunkAt(x, z).getTileEntities(b);
-//            }
-//        });
-//    }
+    @Override
+    public @NotNull BlockState[] getTileEntities(boolean useSnapshot) {
+        if (!isLoaded()) {
+            return new BlockState[0];
+        }
+        return TaskManager.IMP.sync(new RunnableVal<BlockState[]>() {
+            @Override
+            public void run(BlockState[] value) {
+                this.value = world.getChunkAt(x, z).getTileEntities(useSnapshot);
+            }
+        });
+    }
 
     @Override
     public boolean isLoaded() {
@@ -163,7 +163,6 @@ public class AsyncChunk implements Chunk {
         return load(false);
     }
 
-    @Override
     public boolean unload(boolean save) {
         return world.unloadChunk(x, z, save);
     }

@@ -29,7 +29,7 @@ public class ATabCompleteListener implements Listener {
         Dispatcher dispatcher = CommandManager.getInstance().getDispatcher();
         CommandMapping weCommand = dispatcher.get(label);
         if (weCommand != null) {
-            CommandSuggestionEvent event = new CommandSuggestionEvent(worldEdit.wrapCommandSender(sender), buffer.substring(index, buffer.length()));
+            CommandSuggestionEvent event = new CommandSuggestionEvent(worldEdit.wrapCommandSender(sender), buffer.substring(index));
             worldEdit.getWorldEdit().getEventBus().post(event);
             List<String> suggestions = event.getSuggestions();
             if (suggestions != null && !suggestions.isEmpty()) {

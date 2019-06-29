@@ -33,9 +33,9 @@ public abstract class Brush implements IBrush {
     private String name = "Undefined";
 
     /**
-     * @param x
-     * @param y
-     * @param z
+     * @param x X coordinate
+     * @param y Y coordinate
+     * @param z Z coordinate
      * @return {@link Block}
      */
     public final AsyncBlock clampY(final int x, final int y, final int z) {
@@ -103,9 +103,9 @@ public abstract class Brush implements IBrush {
     /**
      * Overridable getTarget method.
      *
-     * @param v
-     * @param clickedBlock
-     * @param clickedFace
+     * @param v Sniper caller
+     * @param clickedBlock Block that the player targeted/interacted with
+     * @param clickedFace Face of that targeted Block
      * @return boolean
      */
     protected final boolean getTarget(final SnipeData v, final AsyncBlock clickedBlock, final BlockFace clickedFace) {
@@ -123,7 +123,7 @@ public abstract class Brush implements IBrush {
         } else {
             RangeBlockHelper rangeBlockHelper;
             if (v.owner().getSnipeData(v.owner().getCurrentToolId()).isRanged()) {
-                rangeBlockHelper = new RangeBlockHelper(v.owner().getPlayer(), v.owner().getWorld(), (double) v.owner().getSnipeData(v.owner().getCurrentToolId()).getRange());
+                rangeBlockHelper = new RangeBlockHelper(v.owner().getPlayer(), v.owner().getWorld(), v.owner().getSnipeData(v.owner().getCurrentToolId()).getRange());
                 this.setTargetBlock(rangeBlockHelper.getRangeBlock());
             } else {
                 rangeBlockHelper = new RangeBlockHelper(v.owner().getPlayer(), v.owner().getWorld());
@@ -190,7 +190,6 @@ public abstract class Brush implements IBrush {
      * @param z Z coordinate
      * @return Type ID of Block at given coordinates in the world of the targeted Block.
      */
-    @SuppressWarnings("deprecation")
     protected int getBlockIdAt(int x, int y, int z) {
         return getWorld().getBlockAt(x, y, z).getTypeId();
     }
@@ -243,9 +242,9 @@ public abstract class Brush implements IBrush {
     /**
      * Sets the Id of the block at the passed coordinate.
      *
-     * @param z  Z coordinate
-     * @param x  X coordinate
-     * @param y  Y coordinate
+     * @param z Z coordinate
+     * @param x X coordinate
+     * @param y Y coordinate
      * @param id The id the block will be set to
      */
     @SuppressWarnings("deprecation")
@@ -256,10 +255,10 @@ public abstract class Brush implements IBrush {
     /**
      * Sets the id and data value of the block at the passed coordinate.
      *
-     * @param x    X coordinate
-     * @param y    Y coordinate
-     * @param z    Z coordinate
-     * @param id   The id the block will be set to
+     * @param x X coordinate
+     * @param y Y coordinate
+     * @param z Z coordinate
+     * @param id The id the block will be set to
      * @param data The data value the block will be set to
      */
     @SuppressWarnings("deprecation")
@@ -270,10 +269,10 @@ public abstract class Brush implements IBrush {
     /**
      * Sets the id and data value of the block at the passed coordinate.
      *
-     * @param x    X coordinate
-     * @param y    Y coordinate
-     * @param z    Z coordinate
-     * @param id   The id the block will be set to
+     * @param x X coordinate
+     * @param y Y coordinate
+     * @param z Z coordinate
+     * @param id The id the block will be set to
      * @param data The data value the block will be set to
      */
     @SuppressWarnings("deprecation")

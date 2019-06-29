@@ -16,7 +16,7 @@ public class DeleteUnclaimedFilter extends DeleteUninhabitedFilter {
     public DeleteUnclaimedFilter(World world, long fileDuration, long inhabitedTicks, long chunkInactivity) {
         super(fileDuration, inhabitedTicks, chunkInactivity);
         for (FaweMaskManager m : FaweAPI.getMaskManagers()) {
-            RegionFilter filter = m.getFilter(Fawe.imp().getWorldName(world));
+            RegionFilter filter = m.getFilter(world.getName());
             if (filter != null) {
                 filters.add(filter);
             }

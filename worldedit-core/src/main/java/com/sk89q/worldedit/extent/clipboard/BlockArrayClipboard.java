@@ -25,15 +25,10 @@ import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard.ClipboardEntity;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
 import com.boydti.fawe.object.extent.LightingExtent;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEditException;
 
-import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockState;
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -41,17 +36,19 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
@@ -66,9 +63,8 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     private int mx;
     private int my;
     private int mz;
-    private BlockStateHolder[][][] blocks;
     private final List<ClipboardEntity> entities = new ArrayList<>();
-    
+
     public BlockArrayClipboard(Region region) {
         checkNotNull(region);
         this.region = region.clone();
@@ -78,12 +74,11 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.mx = origin.getBlockX();
         this.my = origin.getBlockY();
         this.mz = origin.getBlockZ();
-        this.blocks = new BlockStateHolder[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
     }
 
     /**
      * Create a new instance.
-     * <p>
+     *
      * <p>The origin will be placed at the region's lowest minimum point.</p>
      *
      * @param region the bounding region
@@ -97,7 +92,6 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.mx = origin.getBlockX();
         this.my = origin.getBlockY();
         this.mz = origin.getBlockZ();
-        this.blocks = new BlockStateHolder[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
     }
 
     public BlockArrayClipboard(Region region, FaweClipboard clipboard) {
@@ -105,11 +99,10 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.region = region.clone();
         this.size = getDimensions();
         this.origin = region.getMinimumPoint();
+        this.IMP = clipboard;
         this.mx = origin.getBlockX();
         this.my = origin.getBlockY();
         this.mz = origin.getBlockZ();
-        this.IMP = clipboard;
-        this.blocks = new BlockStateHolder[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
     }
 
     public void init(Region region, FaweClipboard fc) {
@@ -122,7 +115,6 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         this.mx = origin.getBlockX();
         this.my = origin.getBlockY();
         this.mz = origin.getBlockZ();
-        this.blocks = new BlockStateHolder[size.getBlockX()][size.getBlockY()][size.getBlockZ()];
     }
 
     @Override
@@ -175,7 +167,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     public List<? extends Entity> getEntities(Region region) {
         List<Entity> filtered = new ArrayList<>();
         for (Entity entity : getEntities()) {
-            if (region.contains(entity.getLocation().toBlockPoint())) {
+            if (region.contains(entity.getLocation().toVector().toBlockPoint())) {
                 filtered.add(entity);
             }
         }
@@ -201,11 +193,8 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
             int z = position.getBlockZ() - mz;
             return IMP.getBlock(x, y, z).toImmutableState();
         }
-        return EditSession.nullBlock;
-    }
 
-    public BlockState getBlockAbs(int x, int y, int z) {
-        return IMP.getBlock(x, y, z).toImmutableState();
+        return BlockTypes.AIR.getDefaultState();
     }
 
     @Override
@@ -215,21 +204,21 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-    	if(region.contains(position)) {
+        if(region.contains(position)) {
             int x = position.getBlockX() - mx;
             int y = position.getBlockY() - my;
             int z = position.getBlockZ() - mz;
-    		return IMP.getBlock(x, y, z);
-    	}
-    	return EditSession.nullBlock.toBaseBlock();
+            return IMP.getBlock(x, y, z);
+        }
+    	return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        if (region.contains(location)) {
-            final int x = location.getBlockX();
-            final int y = location.getBlockY();
-            final int z = location.getBlockZ();
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
+        if (region.contains(position)) {
+            final int x = position.getBlockX();
+            final int y = position.getBlockY();
+            final int z = position.getBlockZ();
             return setBlock(x, y, z, block);
         }
         return false;
@@ -242,6 +231,10 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         return IMP.setTile(x, y, z, tag);
     }
 
+    public boolean setTile(BlockVector3 position, CompoundTag tag) {
+        return setTile(position.getX(), position.getY(), position.getZ(), tag);
+    }
+
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         x -= mx;
@@ -251,18 +244,21 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
+    public boolean hasBiomes() {
+        return IMP.hasBiomes();
+    }
+
+    @Override
     public BiomeType getBiome(BlockVector2 position) {
-        int x = position.getBlockX() - mx;
-        int z = position.getBlockZ() - mz;
-        return IMP.getBiome(x, z);
+        BlockVector2 v = position.subtract(region.getMinimumPoint().toBlockVector2());
+        return IMP.getBiome(v.getX(), v.getZ());
     }
 
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         int x = position.getBlockX() - mx;
         int z = position.getBlockZ() - mz;
-        IMP.setBiome(x, z, biome);
-        return true;
+        return IMP.setBiome(x, z, biome);
     }
 
     @Nullable

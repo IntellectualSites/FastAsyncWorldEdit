@@ -24,14 +24,11 @@ import org.bukkit.Material;
  * @author GavJenks
  */
 public class BlockResetSurfaceBrush extends Brush {
-    /**
-     *
-     */
+
     public BlockResetSurfaceBrush() {
         this.setName("Block Reset Brush Surface Only");
     }
 
-    @SuppressWarnings("deprecation")
     private void applyBrush(final SnipeData v) {
         final AsyncWorld world = this.getWorld();
 

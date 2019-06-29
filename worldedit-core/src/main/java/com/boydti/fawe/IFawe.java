@@ -37,8 +37,6 @@ public interface IFawe {
 
     default ImageViewer getImageViewer(FawePlayer player) { return null; }
 
-    default void registerPacketListener() {}
-
     default int getPlayerCount() {
         return Fawe.get().getCachedPlayers().size();
     }

@@ -19,12 +19,9 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Player;
@@ -36,13 +33,13 @@ import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
-
-import javax.annotation.Nullable;
 
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 public class PlayerProxy extends AbstractPlayerActor {
 
@@ -66,7 +63,6 @@ public class PlayerProxy extends AbstractPlayerActor {
     public void setOffset(Vector3 position) {
         this.offset = position;
     }
-
 
     @Override
     public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
@@ -105,7 +101,7 @@ public class PlayerProxy extends AbstractPlayerActor {
 
     @Override
     public BaseEntity getState() {
-        throw new UnsupportedOperationException("Can't withPropertyId() on a player");
+        throw new UnsupportedOperationException("Can't getState() on a player");
     }
 
     @Override
@@ -194,4 +190,3 @@ public class PlayerProxy extends AbstractPlayerActor {
         return basePlayer;
     }
 }
-

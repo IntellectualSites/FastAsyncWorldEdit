@@ -110,7 +110,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     public Clipboard read(UUID uuid) throws IOException {
         return readVersion1(uuid);
     }
-    
+
     private int width, height, length;
     private int offsetX, offsetY, offsetZ;
     private char[] palette;
@@ -132,7 +132,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             return fc = new MemoryOptimizedClipboard(size, 1, 1);
         }
     }
-    
+
     private Clipboard readVersion1(UUID uuid) throws IOException {
         width = height = length = offsetX = offsetY = offsetZ = Integer.MIN_VALUE;
 
@@ -248,7 +248,6 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         clipboard.setOrigin(origin);
         return clipboard;
     }
-
 
     @Override
     public void close() throws IOException {

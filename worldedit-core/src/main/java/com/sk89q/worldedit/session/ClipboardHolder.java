@@ -33,6 +33,7 @@ import java.util.List;
  * Holds the clipboard and the current transform on the clipboard.
  */
 public class ClipboardHolder {
+
     private Clipboard clipboard;
     private Transform transform = new Identity();
 

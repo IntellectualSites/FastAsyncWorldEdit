@@ -1,15 +1,31 @@
 package com.sk89q.worldedit.util.command.parametric;
 
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.util.StringMan;
+
 import com.google.common.primitives.Chars;
-import com.sk89q.minecraft.util.commands.*;
-import com.sk89q.worldedit.util.command.*;
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandLocals;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import com.sk89q.worldedit.util.command.CommandCallable;
+import com.sk89q.worldedit.util.command.InvalidUsageException;
+import com.sk89q.worldedit.util.command.MissingParameterException;
+import com.sk89q.worldedit.util.command.Parameter;
+import com.sk89q.worldedit.util.command.SimpleDescription;
+import com.sk89q.worldedit.util.command.UnconsumedParameterException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public class FunctionParametricCallable extends AParametricCallable {
@@ -33,50 +49,46 @@ public class FunctionParametricCallable extends AParametricCallable {
         this.group = group;
 
         List<Object[]> paramParsables = new ArrayList<>();
+        Map<String, Type> unqualified = new HashMap<>();
+        for (Type type : builder.getBindings().getTypes()) {
+            String typeStr = type.getTypeName();
+            unqualified.put(typeStr, type);
+            unqualified.put(typeStr.substring(typeStr.lastIndexOf('.') + 1), type);
+        }
         {
-            Map<String, Type> unqualified = new HashMap<>();
-            for (Type type : builder.getBindings().getTypes()) {
-                String typeStr = type.getTypeName();
-                unqualified.put(typeStr, type);
-                unqualified.put(typeStr.substring(typeStr.lastIndexOf('.') + 1), type);
-            }
-            {
-                Object[] param = null; // name | type | optional value
-                boolean checkEq = false;
-                int checkEqI = 0;
-                for (int i = 0; i < arguments.size(); i++) {
-                    String arg = arguments.get(i);
-                    if (arg.equals("=")) {
-                        checkEqI++;
-                        checkEq = true;
-                    } else if (param == null || !checkEq) {
-                        if (param != null) paramParsables.add(param);
-                        param = new Object[3];
-                        param[0] = arg;
-                        if (arg.length() == 1 && command.flags().contains(arg)) {
-                            param[1] = Boolean.class;
-                        } else {
-                            param[1] = String.class;
-                        }
-                        param[2] = null;
+            Object[] param = null; // name | type | optional value
+            boolean checkEq = false;
+            int checkEqI = 0;
+            for (String arg : arguments) {
+                if (arg.equals("=")) {
+                    checkEqI++;
+                    checkEq = true;
+                } else if (param == null || !checkEq) {
+                    if (param != null) paramParsables.add(param);
+                    param = new Object[3];
+                    param[0] = arg;
+                    if (arg.length() == 1 && command.flags().contains(arg)) {
+                        param[1] = Boolean.class;
+                    } else {
+                        param[1] = String.class;
+                    }
+                    param[2] = null;
+                    checkEqI = 0;
+                    checkEq = false;
+                } else {
+                    if (checkEqI == 1) {
+                        param[1] = unqualified.getOrDefault(arg, String.class);
+                        checkEq = false;
+                    } else if (checkEqI == 2) {
+                        char c = arg.charAt(0);
+                        if (c == '\'' || c == '"') arg = arg.substring(1, arg.length() - 1);
+                        param[2] = arg;
                         checkEqI = 0;
                         checkEq = false;
-                    } else {
-                        if (checkEqI == 1) {
-                            param[1] = unqualified.getOrDefault(arg, String.class);
-                            checkEq = false;
-                        }
-                        else if (checkEqI == 2) {
-                            char c = arg.charAt(0);
-                            if (c == '\'' || c == '"') arg = arg.substring(1, arg.length() - 1);
-                            param[2] = arg;
-                            checkEqI = 0;
-                            checkEq = false;
-                        }
                     }
                 }
-                if (param != null) paramParsables.add(param);
             }
+            if (param != null) paramParsables.add(param);
         }
 
         parameters = new ParameterData[paramParsables.size()];
@@ -277,14 +289,14 @@ public class FunctionParametricCallable extends AParametricCallable {
             }
             return result;
         } catch (MissingParameterException e) {
-            throw new InvalidUsageException(BBC.getPrefix() + "Too few parameters!", this, true);
+            throw new InvalidUsageException("Too few parameters!", this, true);
         } catch (UnconsumedParameterException e) {
-            throw new InvalidUsageException(BBC.getPrefix() + "Too many parameters! Unused parameters: " + e.getUnconsumed(), this, true);
+            throw new InvalidUsageException("Too many parameters! Unused parameters: " + e.getUnconsumed(), this, true);
         } catch (ParameterException e) {
             assert parameter != null;
             String name = parameter.getName();
 
-            throw new InvalidUsageException(BBC.getPrefix() + "For parameter '" + name + "': " + e.getMessage(), this, true);
+            throw new InvalidUsageException("For parameter '" + name + "': " + e.getMessage(), this, true);
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof CommandException) {
                 throw (CommandException) e.getCause();

@@ -1,4 +1,4 @@
-/**
+/*
  This file is part of VoxelSniper, licensed under the MIT License (MIT).
 
  Copyright (c) The VoxelBox <http://thevoxelbox.com>
@@ -281,8 +281,8 @@ public class RangeBlockHelper {
         this.range = range;
         this.step = step;
         this.length = 0.0D;
-        this.rotX = (double)((this.playerLoc.getYaw() + 90.0F) % 360.0F);
-        this.rotY = (double)(this.playerLoc.getPitch() * -1.0F);
+        this.rotX = (this.playerLoc.getYaw() + 90.0F) % 360.0F;
+        this.rotY = this.playerLoc.getPitch() * -1.0F;
         this.rotYCos = Math.cos(Math.toRadians(this.rotY));
         this.rotYSin = Math.sin(Math.toRadians(this.rotY));
         this.rotXCos = Math.cos(Math.toRadians(this.rotX));

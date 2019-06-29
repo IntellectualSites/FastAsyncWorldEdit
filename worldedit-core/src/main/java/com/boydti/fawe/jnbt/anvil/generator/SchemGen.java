@@ -1,6 +1,5 @@
 package com.boydti.fawe.jnbt.anvil.generator;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
@@ -12,6 +11,7 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SchemGen extends Resource {
 
@@ -40,9 +40,9 @@ public class SchemGen extends Resource {
             return false;
         }
         mutable.mutY(y + 1);
-        ClipboardHolder holder = clipboards.get(PseudoRandom.random.random(clipboards.size()));
+        ClipboardHolder holder = clipboards.get(ThreadLocalRandom.current().nextInt(clipboards.size()));
         if (randomRotate) {
-            holder.setTransform(new AffineTransform().rotateY(PseudoRandom.random.random(4) * 90));
+            holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
         }
         Clipboard clipboard = holder.getClipboard();
         Schematic schematic = new Schematic(clipboard);

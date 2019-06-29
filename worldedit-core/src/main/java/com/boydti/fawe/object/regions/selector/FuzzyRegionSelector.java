@@ -41,11 +41,6 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
         new MaskTraverser(mask).reset(getExtent());
     }
 
-    @Override
-    public List<BlockVector3> getVerticies() {
-        return positions;
-    }
-
     @Nullable
     @Override
     public World getWorld() {
@@ -157,5 +152,10 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
             lines.add("Position " + i + ": " + positions.get(i));
         }
         return lines;
+    }
+
+    @Override
+    public List<BlockVector3> getVerticies() {
+        return positions;
     }
 }

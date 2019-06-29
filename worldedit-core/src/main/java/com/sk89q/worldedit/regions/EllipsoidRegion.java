@@ -19,13 +19,12 @@
 
 package com.sk89q.worldedit.regions;
 
-
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,6 +42,7 @@ public class EllipsoidRegion extends AbstractRegion {
      * Stores the radii plus 0.5 on each axis.
      */
     private Vector3 radius;
+
     private Vector3 radiusSqr;
     private int radiusLengthSqr;
     private boolean sphere;
@@ -57,11 +57,10 @@ public class EllipsoidRegion extends AbstractRegion {
         this(null, pos1, pos2);
     }
 
-
     /**
      * Construct a new instance of this ellipsoid region.
      *
-     * @param world  the world
+     * @param world the world
      * @param center the center
      * @param radius the radius
      */
@@ -87,7 +86,6 @@ public class EllipsoidRegion extends AbstractRegion {
 
     @Override
     public int getArea() {
-        if (radius == null) return 0;
         return (int) Math.floor((4.0 / 3.0) * Math.PI * radius.getX() * radius.getY() * radius.getZ());
     }
 
@@ -136,7 +134,7 @@ public class EllipsoidRegion extends AbstractRegion {
     public void contract(BlockVector3... changes) throws RegionOperationException {
         center = center.subtract(calculateDiff(changes));
         Vector3 newRadius = radius.subtract(calculateChanges(changes));
-        radius = Vector3.at(1.5, 1.5, 1.5).getMaximum(newRadius);
+        setRadius(Vector3.at(1.5, 1.5, 1.5).getMaximum(newRadius));
     }
 
     @Override
@@ -169,7 +167,6 @@ public class EllipsoidRegion extends AbstractRegion {
      * @return radii
      */
     public Vector3 getRadius() {
-        if (radius == null) return null;
         return radius.subtract(0.5, 0.5, 0.5);
     }
 
@@ -214,29 +211,29 @@ public class EllipsoidRegion extends AbstractRegion {
     }
 
     @Override
-   public boolean contains(BlockVector3 position) {
-       int cx = position.getBlockX() - center.getBlockX();
-       int cx2 = cx * cx;
-       if (cx2 > radiusSqr.getBlockX()) {
-           return false;
-       }
-       int cz = position.getBlockZ() - center.getBlockZ();
-       int cz2 = cz * cz;
-       if (cz2 > radiusSqr.getBlockZ()) {
-           return false;
-       }
-       int cy = position.getBlockY() - center.getBlockY();
-       int cy2 = cy * cy;
-       if (radiusSqr.getBlockY() < 255 && cy2 > radiusSqr.getBlockY()) {
-           return false;
-       }
-       if (sphere) {
-           return cx2 + cy2 + cz2 <= radiusLengthSqr;
-       }
-       double cxd = (double) cx / radius.getBlockX();
-       double cyd = (double) cy / radius.getBlockY();
-       double czd = (double) cz / radius.getBlockZ();
-       return cxd * cxd + cyd * cyd + czd * czd <= 1;
+    public boolean contains(BlockVector3 position) {
+        int cx = position.getBlockX() - center.getBlockX();
+        int cx2 = cx * cx;
+        if (cx2 > radiusSqr.getBlockX()) {
+            return false;
+        }
+        int cz = position.getBlockZ() - center.getBlockZ();
+        int cz2 = cz * cz;
+        if (cz2 > radiusSqr.getBlockZ()) {
+            return false;
+        }
+        int cy = position.getBlockY() - center.getBlockY();
+        int cy2 = cy * cy;
+        if (radiusSqr.getBlockY() < 255 && cy2 > radiusSqr.getBlockY()) {
+            return false;
+        }
+        if (sphere) {
+            return cx2 + cy2 + cz2 <= radiusLengthSqr;
+        }
+        double cxd = (double) cx / radius.getBlockX();
+        double cyd = (double) cy / radius.getBlockY();
+        double czd = (double) cz / radius.getBlockZ();
+        return cxd * cxd + cyd * cyd + czd * czd <= 1;
     }
 
     /**
@@ -258,4 +255,5 @@ public class EllipsoidRegion extends AbstractRegion {
     public EllipsoidRegion clone() {
         return (EllipsoidRegion) super.clone();
     }
+
 }

@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.command.composition;
 
-import com.boydti.fawe.config.BBC;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -74,7 +72,7 @@ public class ShapedBrushCommand extends SimpleCommand<Object> {
 
         try {
             WorldEdit.getInstance().checkMaxBrushRadius(radius);
-            BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+            BrushTool tool = session.getBrushTool(player);
             tool.setSize(radius);
             tool.setFill(null);
             tool.setBrush(new OperationFactoryBrush(factory, regionFactory, session), permission);
@@ -82,7 +80,7 @@ public class ShapedBrushCommand extends SimpleCommand<Object> {
             WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter().convert(e);
         }
 
-        player.print(BBC.getPrefix() + "Set brush to " + factory);
+        player.print("Set brush to " + factory);
 
         return true;
     }

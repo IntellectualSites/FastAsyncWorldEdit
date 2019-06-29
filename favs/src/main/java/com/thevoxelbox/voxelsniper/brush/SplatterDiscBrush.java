@@ -8,11 +8,7 @@ import org.bukkit.ChatColor;
 
 import java.util.Random;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Splatter_Brushes
- *
- * @author Voxel
- */
+
 public class SplatterDiscBrush extends PerformBrush {
     private static final int GROW_PERCENT_MIN = 1;
     private static final int GROW_PERCENT_DEFAULT = 1000;
@@ -28,9 +24,6 @@ public class SplatterDiscBrush extends PerformBrush {
     private int splatterRecursions; // How many times you grow the seeds
     private Random generator = new Random();
 
-    /**
-     *
-     */
     public SplatterDiscBrush() {
         this.setName("Splatter Disc");
     }
@@ -95,8 +88,9 @@ public class SplatterDiscBrush extends PerformBrush {
 
             // integrate tempsplat back into splat at end of iteration
             for (int x = 2 * v.getBrushSize(); x >= 0; x--) {
-                if (2 * v.getBrushSize() + 1 >= 0)
+                if (2 * v.getBrushSize() + 1 >= 0) {
                     System.arraycopy(tempSplat[x], 0, splat[x], 0, 2 * v.getBrushSize() + 1);
+                }
             }
         }
         this.growPercent = gref;
@@ -186,7 +180,7 @@ public class SplatterDiscBrush extends PerformBrush {
                     v.sendMessage(ChatColor.RED + "Recursions must be an integer 1-10!");
                 }
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

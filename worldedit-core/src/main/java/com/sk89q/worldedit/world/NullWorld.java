@@ -19,11 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
-import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -54,7 +52,7 @@ public class NullWorld extends AbstractWorld {
 
     private static final NullWorld INSTANCE = new NullWorld();
 
-    public NullWorld() {
+    protected NullWorld() {
     }
 
     @Override

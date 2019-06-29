@@ -104,7 +104,7 @@ public class GardenPatchGenerator implements RegionFunction {
         int h = random.nextInt(3) - 1;
         BlockVector3 p;
 
-        BlockStateHolder log = BlockTypes.OAK_LOG.getDefaultState();
+        BlockState log = BlockTypes.OAK_LOG.getDefaultState();
 
         switch (t) {
             case 0:
@@ -167,7 +167,7 @@ public class GardenPatchGenerator implements RegionFunction {
             return false;
         }
 
-        BlockStateHolder leavesBlock = BlockTypes.OAK_LEAVES.getDefaultState();
+        BlockState leavesBlock = BlockTypes.OAK_LEAVES.getDefaultState();
 
         if (editSession.getBlock(position).getBlockType().getMaterial().isAir()) {
             editSession.setBlock(position, leavesBlock);
@@ -187,7 +187,7 @@ public class GardenPatchGenerator implements RegionFunction {
      * @return a pumpkin pattern
      */
     public static Pattern getPumpkinPattern() {
-        return BlockTypes.PUMPKIN.getDefaultState();
+        return (BlockTypes.PUMPKIN.getDefaultState());
     }
 
     /**

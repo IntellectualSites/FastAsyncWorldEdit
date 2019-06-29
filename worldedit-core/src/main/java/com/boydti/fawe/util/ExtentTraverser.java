@@ -2,6 +2,7 @@ package com.boydti.fawe.util;
 
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+
 import java.lang.reflect.Field;
 
 public class ExtentTraverser<T extends Extent> {
@@ -75,7 +76,7 @@ public class ExtentTraverser<T extends Extent> {
             }
             return null;
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return null;
         }
     }
@@ -91,7 +92,7 @@ public class ExtentTraverser<T extends Extent> {
             }
             return null;
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return null;
         }
     }

@@ -32,18 +32,28 @@ import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.collection.SparseBitSet;
 import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.util.*;
+import com.boydti.fawe.util.BrushCache;
+import com.boydti.fawe.util.EditSessionBuilder;
+import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.StringMan;
+import com.boydti.fawe.util.TextureHolder;
+import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.wrappers.WorldWrapper;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;
 import com.sk89q.jchronic.utils.Time;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.command.tool.*;
+import com.sk89q.worldedit.command.tool.BlockTool;
+import com.sk89q.worldedit.command.tool.BrushTool;
+import com.sk89q.worldedit.command.tool.InvalidToolBindException;
+import com.sk89q.worldedit.command.tool.SinglePickaxe;
+import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -63,6 +73,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
@@ -70,13 +81,11 @@ import com.sk89q.worldedit.world.snapshot.Snapshot;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -84,11 +93,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores session information.
@@ -126,10 +130,8 @@ public class LocalSession implements TextureHolder {
     private transient boolean toolControl = true;
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
-
     private transient boolean hasTool = false;
     private transient Tool[] tools = new Tool[ItemTypes.size()];
-
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
@@ -222,23 +224,20 @@ public class LocalSession implements TextureHolder {
 
     private boolean loadHistoryChangeSets(UUID uuid, World world) {
         SparseBitSet set = new SparseBitSet();
-        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + uuid);
+        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid);
         if (folder.isDirectory()) {
-            folder.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    String name = pathname.getName();
-                    Integer val = null;
-                    if (pathname.isDirectory()) {
-                        val = StringMan.toInteger(name, 0, name.length());
+            folder.listFiles(pathname -> {
+                String name = pathname.getName();
+                Integer val = null;
+                if (pathname.isDirectory()) {
+                    val = StringMan.toInteger(name, 0, name.length());
 
-                    } else {
-                        int i = name.lastIndexOf('.');
-                        if (i != -1) val = StringMan.toInteger(name, 0, i);
-                    }
-                    if (val != null) set.set(val);
-                    return false;
+                } else {
+                    int i = name.lastIndexOf('.');
+                    if (i != -1) val = StringMan.toInteger(name, 0, i);
                 }
+                if (val != null) set.set(val);
+                return false;
             });
         }
         if (!set.isEmpty()) {
@@ -256,12 +255,10 @@ public class LocalSession implements TextureHolder {
         if (!Settings.IMP.HISTORY.USE_DISK) {
             return;
         }
-        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + uuid + File.separator + "index");
+        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index");
         if (file.exists()) {
-            try {
-                FaweInputStream is = new FaweInputStream(new FileInputStream(file));
+            try (FaweInputStream is = new FaweInputStream(new FileInputStream(file))) {
                 historyNegativeIndex = Math.min(Math.max(0, is.readInt()), history.size());
-                is.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -274,16 +271,16 @@ public class LocalSession implements TextureHolder {
         if (world == null || !Settings.IMP.HISTORY.USE_DISK) {
             return;
         }
-        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world) + File.separator + uuid + File.separator + "index");
+        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index");
         if (getHistoryNegativeIndex() != 0) {
             try {
                 if (!file.exists()) {
                     file.getParentFile().mkdirs();
                     file.createNewFile();
                 }
-                FaweOutputStream os = new FaweOutputStream(new FileOutputStream(file));
-                os.writeInt(getHistoryNegativeIndex());
-                os.close();
+                try (FaweOutputStream os = new FaweOutputStream(new FileOutputStream(file))) {
+                    os.writeInt(getHistoryNegativeIndex());
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -378,6 +375,8 @@ public class LocalSession implements TextureHolder {
      * @param editSession the edit session
      */
     public void remember(EditSession editSession) {
+        checkNotNull(editSession);
+
         FawePlayer fp = editSession.getPlayer();
         int limit = fp == null ? Integer.MAX_VALUE : fp.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
@@ -390,10 +389,10 @@ public class LocalSession implements TextureHolder {
             return cs;
         }
         if (o instanceof Integer) {
-            File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(currentWorld) + File.separator + uuid);
+            File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid);
             File specific = new File(folder, o.toString());
             if (specific.isDirectory()) {
-                return new AnvilHistory(Fawe.imp().getWorldName(currentWorld), specific);
+                return new AnvilHistory(currentWorld.getName(), specific);
             } else {
                 return new DiskStorageHistory(currentWorld, this.uuid, (Integer) o);
             }
@@ -451,7 +450,7 @@ public class LocalSession implements TextureHolder {
         }
         // It should have already been flushed, but just in case!
         editSession.flushQueue();
-        if (editSession == null || editSession.getChangeSet() == null || limitMb == 0 || ((historySize >> 20) > limitMb && !append)) {
+        if (editSession.getChangeSet() == null || limitMb == 0 || historySize >> 20 > limitMb && !append) {
             return;
         }
         // Don't store anything if no changes were made
@@ -569,6 +568,7 @@ public class LocalSession implements TextureHolder {
             newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
             return newEditSession;
         }
+
         return null;
     }
 
@@ -625,14 +625,6 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * @deprecated use {@link #getRegionSelector(World)}
-     */
-    @Deprecated
-    public RegionSelector getRegionSelector() {
-        return selector;
-    }
-
-    /**
      * Set the region selector.
      *
      * @param world the world
@@ -643,16 +635,6 @@ public class LocalSession implements TextureHolder {
         checkNotNull(selector);
         selector.setWorld(world);
         this.selector = selector;
-    }
-
-    /**
-     * Returns true if the region is fully defined.
-     *
-     * @return true if a region selection is defined
-     */
-    @Deprecated
-    public boolean isRegionDefined() {
-        return selector.isDefined();
     }
 
     /**
@@ -667,14 +649,6 @@ public class LocalSession implements TextureHolder {
             return false;
         }
         return selector.isDefined();
-    }
-
-    /**
-     * @deprecated use {@link #getSelection(World)}
-     */
-    @Deprecated
-    public Region getRegion() throws IncompleteRegionException {
-        return selector.getRegion();
     }
 
     /**
@@ -715,7 +689,7 @@ public class LocalSession implements TextureHolder {
             }
         }
         if (world != null) {
-            Fawe.imp().registerPacketListener();
+            //TODO FIXME Fawe.imp().registerPacketListener();
             world.update();
         }
     }
@@ -906,7 +880,7 @@ public class LocalSession implements TextureHolder {
     public BlockVector3 getPlacementPosition(Player player) throws IncompleteRegionException {
         checkNotNull(player);
         if (!placeAtPos1) {
-            return player.getBlockIn().toBlockPoint();
+            return player.getBlockIn().toVector().toBlockPoint();
         }
 
         return selector.getPrimaryPosition();
@@ -975,6 +949,12 @@ public class LocalSession implements TextureHolder {
         this.pickaxeMode = tool;
     }
 
+    /**
+     * Get the tool assigned to the item.
+     *
+     * @param item the item type
+     * @return the tool, which may be {@code null}
+     */
     @Nullable
     public Tool getTool(ItemType item) {
         return tools[item.getInternalId()];
@@ -1006,14 +986,8 @@ public class LocalSession implements TextureHolder {
      * @return the tool, or {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
      */
-    @Deprecated
     public BrushTool getBrushTool(ItemType item) throws InvalidToolBindException {
         return getBrushTool(item.getDefaultState(), null, true);
-    }
-
-    @Deprecated
-    public BrushTool getBrushTool(BaseItem item) throws InvalidToolBindException {
-        return getBrushTool(item, null, true);
     }
 
     public BrushTool getBrushTool(Player player) throws InvalidToolBindException {
@@ -1028,7 +1002,7 @@ public class LocalSession implements TextureHolder {
 
     public BrushTool getBrushTool(BaseItem item, Player player, boolean create) throws InvalidToolBindException {
         Tool tool = getTool(item, player);
-        if ((tool == null || !(tool instanceof BrushTool))) {
+        if (!(tool instanceof BrushTool)) {
             if (create) {
                 tool = new BrushTool();
                 setTool(item, tool, player);
@@ -1047,8 +1021,14 @@ public class LocalSession implements TextureHolder {
      * @param tool the tool to set, which can be {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
      */
-    @Deprecated
     public void setTool(ItemType item, @Nullable Tool tool) throws InvalidToolBindException {
+        if (item.hasBlockType()) {
+            throw new InvalidToolBindException(item, "Blocks can't be used");
+        } else if (item.getId().equalsIgnoreCase(config.wandItem)) {
+            throw new InvalidToolBindException(item, "Already used for the wand");
+        } else if (item.getId().equalsIgnoreCase(config.navigationWand)) {
+            throw new InvalidToolBindException(item, "Already used for the navigation wand");
+        }
         setTool(item.getDefaultState(), tool, null);
     }
 
@@ -1139,7 +1119,6 @@ public class LocalSession implements TextureHolder {
      */
     public void tellVersion(Actor player) {
     }
-
 
     public boolean shouldUseServerCUI() {
         return this.useServerCUI;
@@ -1241,12 +1220,13 @@ public class LocalSession implements TextureHolder {
             CUIRegion tempSel = (CUIRegion) selector;
 
             if (tempSel.getProtocolVersion() > cuiVersion) {
-                dispatchCUIEvent(actor, new SelectionShapeEvent(tempSel.getLegacyTypeID()));
+                actor.dispatchCUIEvent(new SelectionShapeEvent(tempSel.getLegacyTypeID()));
                 tempSel.describeLegacyCUI(this, actor);
             } else {
-                dispatchCUIEvent(actor, new SelectionShapeEvent(tempSel.getTypeID()));
+                actor.dispatchCUIEvent(new SelectionShapeEvent(tempSel.getTypeID()));
                 tempSel.describeCUI(this, actor);
             }
+
         }
     }
 
@@ -1257,6 +1237,11 @@ public class LocalSession implements TextureHolder {
      */
     public void describeCUI(Actor actor) {
         checkNotNull(actor);
+
+        if (!hasCUISupport) {
+            return;
+        }
+
         if (selector instanceof CUIRegion) {
             CUIRegion tempSel = (CUIRegion) selector;
 
@@ -1283,18 +1268,15 @@ public class LocalSession implements TextureHolder {
         String[] split = text.split("\\|", 2);
         if (split.length > 1 && split[0].equalsIgnoreCase("v")) { // enough fields and right message
             if (split[1].length() > 4) {
-                this.failedCuiAttempts++;
+                this.failedCuiAttempts ++;
                 return;
             }
             setCUISupport(true);
             try {
                 setCUIVersion(Integer.parseInt(split[1]));
             } catch (NumberFormatException e) {
-                String msg = e.getMessage();
-                if (msg != null && msg.length() > 256) msg = msg.substring(0, 256);
-                this.failedCuiAttempts++;
-                WorldEdit.logger.warn("Error while reading CUI init message for player " + uuid + ": " + msg);
-
+                WorldEdit.logger.warn("Error while reading CUI init message: " + e.getMessage());
+                this.failedCuiAttempts ++;
             }
         }
     }
@@ -1362,7 +1344,6 @@ public class LocalSession implements TextureHolder {
      * @param player the player
      * @return an edit session
      */
-    @SuppressWarnings("deprecation")
     public EditSession createEditSession(Player player) {
         checkNotNull(player);
 

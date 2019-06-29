@@ -2,7 +2,6 @@ package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
 
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;

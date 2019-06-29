@@ -6,15 +6,9 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
-/**
- * @author Kavutop
- */
 public class CylinderBrush extends PerformBrush {
     private double trueCircle = 0;
 
-    /**
-     *
-     */
     public CylinderBrush() {
         this.setName("Cylinder");
     }
@@ -104,7 +98,7 @@ public class CylinderBrush extends PerformBrush {
                 v.setcCen((int) Double.parseDouble(parameter.replace("c", "")));
                 v.sendMessage(ChatColor.AQUA + "Cylinder origin set to: " + v.getcCen());
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

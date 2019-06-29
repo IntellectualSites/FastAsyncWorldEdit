@@ -19,12 +19,7 @@
 
 package com.sk89q.util;
 
-import sun.reflect.ConstructorAccessor;
-import sun.reflect.FieldAccessor;
-import sun.reflect.ReflectionFactory;
-
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
 
 public final class ReflectionUtil {
 
@@ -40,12 +35,12 @@ public final class ReflectionUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getField(Class checkClass, Object obj, String name) {
+    public static <T> T getField(Class checkClass, Object from, String name) {
         do {
             try {
                 Field field = checkClass.getDeclaredField(name);
                 field.setAccessible(true);
-                return (T) field.get(obj);
+                return (T) field.get(from);
             } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
         } while (checkClass.getSuperclass() != Object.class && ((checkClass = checkClass.getSuperclass()) != null));

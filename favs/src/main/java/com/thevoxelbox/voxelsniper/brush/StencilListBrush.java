@@ -12,9 +12,6 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Scanner;
 
-/**
- * @author Gavjenks
- */
 public class StencilListBrush extends Brush {
     private byte pasteOption = 1; // 0 = full, 1 = fill, 2 = replace
     private String filename = "NoFileLoaded";
@@ -27,20 +24,17 @@ public class StencilListBrush extends Brush {
     private byte pasteParam = 0;
     private HashMap<Integer, String> stencilList = new HashMap<>();
 
-    /**
-     *
-     */
     public StencilListBrush() {
         this.setName("StencilList");
     }
 
-    private String readRandomStencil(final SnipeData v) {
+    private String readRandomStencil() {
         double rand = Math.random() * (this.stencilList.size());
         final int choice = (int) rand;
         return this.stencilList.get(choice);
     }
 
-    private void readStencilList(final String listname, final SnipeData v) {
+    private void readStencilList() {
         final File file = new File("plugins/VoxelSniper/stencilLists/" + this.filename + ".txt");
         if (file.exists()) {
             try {
@@ -64,16 +58,14 @@ public class StencilListBrush extends Brush {
             return;
         }
 
-        final String stencilName = this.readRandomStencil(v);
+        final String stencilName = this.readRandomStencil();
         v.sendMessage(stencilName);
 
         final Undo undo = new Undo();
         final File file = new File("plugins/VoxelSniper/stencils/" + stencilName + ".vstencil");
 
         if (file.exists()) {
-            try {
-                final DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-
+            try (final DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))){
                 this.x = in.readShort();
                 this.z = in.readShort();
                 this.y = in.readShort();
@@ -224,14 +216,13 @@ public class StencilListBrush extends Brush {
             return;
         }
 
-        final String stencilName = this.readRandomStencil(v);
+        final String stencilName = this.readRandomStencil();
 
         final Undo undo = new Undo();
         final File file = new File("plugins/VoxelSniper/stencils/" + stencilName + ".vstencil");
 
         if (file.exists()) {
-            try {
-                final DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+            try (final DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
 
                 this.x = in.readShort();
                 this.z = in.readShort();
@@ -383,14 +374,13 @@ public class StencilListBrush extends Brush {
             return;
         }
 
-        final String stencilName = this.readRandomStencil(v);
+        final String stencilName = this.readRandomStencil();
 
         final Undo undo = new Undo();
         final File file = new File("plugins/VoxelSniper/stencils/" + stencilName + ".vstencil");
 
         if (file.exists()) {
-            try {
-                final DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+            try (final DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
 
                 this.x = in.readShort();
                 this.z = in.readShort();
@@ -550,7 +540,7 @@ public class StencilListBrush extends Brush {
             return;
         }
 
-        final String stencilName = this.readRandomStencil(v);
+        final String stencilName = this.readRandomStencil();
 
         final Undo undo = new Undo();
         final File file = new File("plugins/VoxelSniper/stencils/" + stencilName + ".vstencil");
@@ -704,7 +694,7 @@ public class StencilListBrush extends Brush {
 
     private void stencilPasteRotation(final SnipeData v) {
         // just randomly chooses a rotation and then calls stencilPaste.
-        this.readStencilList(this.filename, v);
+        this.readStencilList();
         final double random = Math.random();
         if (random < 0.26) {
             this.stencilPaste(v);
@@ -756,7 +746,7 @@ public class StencilListBrush extends Brush {
             final File file = new File("plugins/VoxelSniper/stencilLists/" + this.filename + ".txt");
             if (file.exists()) {
                 v.sendMessage(ChatColor.RED + "Stencil List '" + this.filename + "' exists and was loaded.");
-                this.readStencilList(this.filename, v);
+                this.readStencilList();
             } else {
                 v.sendMessage(ChatColor.AQUA + "Stencil List '" + this.filename + "' does not exist.  This brush will not function without a valid stencil list.");
                 this.filename = "NoFileLoaded";

@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -38,9 +38,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Set;
 
 /**
@@ -70,7 +68,7 @@ public class FloatingTreeRemover implements BlockTool {
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config,
-                              Player player, LocalSession session, Location clicked) {
+            Player player, LocalSession session, Location clicked) {
 
         final World world = (World) clicked.getExtent();
         final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());

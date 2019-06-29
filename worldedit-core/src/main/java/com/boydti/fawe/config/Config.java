@@ -441,7 +441,7 @@ public class Config {
     }
 
     /**
-     * Set some field to be accesible
+     * Set some field to be accessible
      *
      * @param field
      * @throws NoSuchFieldException

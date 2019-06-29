@@ -6,15 +6,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
-/**
- *
- */
 public class BiomeBrush extends Brush {
+
     private Biome selectedBiome = Biome.PLAINS;
 
-    /**
-     *
-     */
     public BiomeBrush() {
         this.setName("Biome (/b biome [Biome Name])");
     }
@@ -78,7 +73,7 @@ public class BiomeBrush extends Brush {
                 }
 
                 availableBiomes.append(ChatColor.RED + ", " + ChatColor.DARK_GREEN)
-                        .append(biome.name());
+                               .append(biome.name());
 
             }
             v.sendMessage(ChatColor.DARK_BLUE + "Available biomes: " + availableBiomes);

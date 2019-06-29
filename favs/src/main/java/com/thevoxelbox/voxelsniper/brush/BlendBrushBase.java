@@ -4,17 +4,10 @@ import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import org.bukkit.ChatColor;
 
-/**
- * @author Monofraps
- */
-@SuppressWarnings("deprecation")
 public abstract class BlendBrushBase extends Brush {
     protected boolean excludeAir = true;
     protected boolean excludeWater = true;
 
-    /**
-     * @param v
-     */
     protected abstract void blend(final SnipeData v);
 
     @Override
@@ -47,30 +40,18 @@ public abstract class BlendBrushBase extends Brush {
         }
     }
 
-    /**
-     * @return
-     */
     protected final boolean isExcludeAir() {
         return excludeAir;
     }
 
-    /**
-     * @param excludeAir
-     */
     protected final void setExcludeAir(boolean excludeAir) {
         this.excludeAir = excludeAir;
     }
 
-    /**
-     * @return
-     */
     protected final boolean isExcludeWater() {
         return excludeWater;
     }
 
-    /**
-     * @param excludeWater
-     */
     protected final void setExcludeWater(boolean excludeWater) {
         this.excludeWater = excludeWater;
     }

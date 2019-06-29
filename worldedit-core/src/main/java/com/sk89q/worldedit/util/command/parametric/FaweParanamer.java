@@ -32,11 +32,9 @@ package com.sk89q.worldedit.util.command.parametric;
 
 import com.thoughtworks.paranamer.CachingParanamer;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Parameter;
 
 /**

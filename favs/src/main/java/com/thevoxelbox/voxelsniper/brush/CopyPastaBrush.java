@@ -7,11 +7,6 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#CopyPasta_Brush
- *
- * @author giltwist
- */
 public class CopyPastaBrush extends Brush {
     private static final int BLOCK_LIMIT = 10000;
 
@@ -25,16 +20,12 @@ public class CopyPastaBrush extends Brush {
     private int[] offsetPoint = new int[3];
     private int[] blockArray;
     private int[] arraySize = new int[3];
-    private int pivot = 0; // ccw degrees    
+    private int pivot = 0; // ccw degrees
 
-    /**
-     *
-     */
     public CopyPastaBrush() {
         this.setName("CopyPasta");
     }
 
-    @SuppressWarnings("deprecation")
     private void doCopy(final SnipeData v) {
         for (int i = 0; i < 3; i++) {
             this.arraySize[i] = Math.abs(this.firstPoint[i] - this.secondPoint[i]) + 1;
@@ -103,7 +94,7 @@ public class CopyPastaBrush extends Brush {
     }
 
     @Override
-    protected final void arrow(final com.thevoxelbox.voxelsniper.SnipeData v) {
+    protected final void arrow(final SnipeData v) {
         switch (this.points) {
             case 0:
                 this.firstPoint[0] = this.getTargetBlock().getX();
@@ -131,7 +122,7 @@ public class CopyPastaBrush extends Brush {
     }
 
     @Override
-    protected final void powder(final com.thevoxelbox.voxelsniper.SnipeData v) {
+    protected final void powder(final SnipeData v) {
         if (this.points == 2) {
             if (this.numBlocks == 0) {
                 this.doCopy(v);
@@ -156,7 +147,7 @@ public class CopyPastaBrush extends Brush {
     }
 
     @Override
-    public final void parameters(final String[] par, final com.thevoxelbox.voxelsniper.SnipeData v) {
+    public final void parameters(final String[] par, final SnipeData v) {
         final String parameter = par[1];
 
         if (parameter.equalsIgnoreCase("info")) {

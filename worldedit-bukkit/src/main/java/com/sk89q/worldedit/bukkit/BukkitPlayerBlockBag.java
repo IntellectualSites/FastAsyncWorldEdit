@@ -38,7 +38,7 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
 
     /**
      * Construct the object.
-     * 
+     *
      * @param player the player
      */
     public BukkitPlayerBlockBag(Player player) {
@@ -56,11 +56,24 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
 
     /**
      * Get the player.
-     * 
+     *
      * @return the player
      */
     public Player getPlayer() {
         return player;
+    }
+
+    @Override
+    public BaseItem getItem(int slot) {
+        loadInventory();
+        return BukkitAdapter.adapt(items[slot]);
+    }
+
+    @Override
+    public void setItem(int slot, BaseItem block) {
+        loadInventory();
+        BaseItemStack stack = block instanceof BaseItemStack ? (BaseItemStack) block : new BaseItemStack(block.getType(), block.getNbtData(), 1);
+        items[slot] = BukkitAdapter.adapt(stack);
     }
 
     @Override
@@ -182,16 +195,4 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
     public void addSingleSourcePosition(Location pos) {
     }
 
-    @Override
-    public BaseItem getItem(int slot) {
-        loadInventory();
-        return BukkitAdapter.adapt(items[slot]);
-    }
-
-    @Override
-    public void setItem(int slot, BaseItem block) {
-        loadInventory();
-        BaseItemStack stack = block instanceof BaseItemStack ? (BaseItemStack) block : new BaseItemStack(block.getType(), block.getNbtData(), 1);
-        items[slot] = BukkitAdapter.adapt(stack);
-    }
 }

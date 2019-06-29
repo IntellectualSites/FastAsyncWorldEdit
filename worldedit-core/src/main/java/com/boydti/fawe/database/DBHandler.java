@@ -11,7 +11,7 @@ public class DBHandler {
     private Map<String, RollbackDatabase> databases = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public RollbackDatabase getDatabase(World world) {
-        String worldName = Fawe.imp().getWorldName(world);
+        String worldName = world.getName();
         RollbackDatabase database = databases.get(worldName);
         if (database != null) {
             return database;

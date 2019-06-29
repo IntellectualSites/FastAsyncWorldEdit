@@ -22,21 +22,14 @@ package com.sk89q.worldedit.extent.clipboard.io;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.jnbt.CorruptSchematicStreamer;
 import com.boydti.fawe.jnbt.SchematicStreamer;
-import com.sk89q.jnbt.CompoundTag;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads schematic files based that are compatible with MCEdit and other editors.
@@ -74,36 +67,6 @@ public class SchematicReader implements ClipboardReader {
             return new CorruptSchematicStreamer(rootStream, clipboardId).recover();
         }
     }
-
-    private static <T extends Tag> T requireTag(Map<String, Tag> items, String key, Class<T> expected) throws IOException {
-        if (!items.containsKey(key)) {
-            throw new IOException("Schematic file is missing a \"" + key + "\" tag");
-        }
-
-        Tag tag = items.get(key);
-        if (!expected.isInstance(tag)) {
-            throw new IOException(key + " tag is not of tag type " + expected.getName());
-        }
-
-        return expected.cast(tag);
-    }
-
-    @Nullable
-    private static <T extends Tag> T getTag(CompoundTag tag, Class<T> expected, String key) {
-        Map<String, Tag> items = tag.getValue();
-
-        if (!items.containsKey(key)) {
-            return null;
-        }
-
-        Tag test = items.get(key);
-        if (!expected.isInstance(test)) {
-            return null;
-        }
-
-        return expected.cast(test);
-    }
-
 
 
     @Override

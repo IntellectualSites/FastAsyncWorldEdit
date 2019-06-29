@@ -70,7 +70,7 @@ public class CommandLoggingHandler extends AbstractInvokeListener implements Inv
         Logging loggingAnnotation = method.getAnnotation(Logging.class);
         Logging.LogMode logMode;
         StringBuilder builder = new StringBuilder();
-        
+
         if (loggingAnnotation == null) {
             logMode = null;
         } else {
@@ -96,15 +96,15 @@ public class CommandLoggingHandler extends AbstractInvokeListener implements Inv
         }
 
         builder.append(": ").append(context.getCommand());
-        
+
         if (context.argsLength() > 0) {
             builder.append(" ").append(context.getJoinedStrings(0));
         }
-        
+
         if (logMode != null && sender.isPlayer()) {
-            Vector3 position = player.getLocation();
+            Vector3 position = player.getLocation().toVector();
             LocalSession session = worldEdit.getSessionManager().get(player);
-            
+
             switch (logMode) {
             case PLACEMENT:
                 try {

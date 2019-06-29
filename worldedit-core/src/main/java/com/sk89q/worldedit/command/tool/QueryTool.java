@@ -45,10 +45,10 @@ public class QueryTool implements BlockTool {
 
         World world = (World) clicked.getExtent();
         EditSession editSession = session.createEditSession(player);
-        BlockVector3 blockPoint = clicked.toBlockPoint();
+        BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
         BaseBlock block = editSession.getFullBlock(blockPoint);
 
-        player.print("\u00A79@" + blockPoint + ": " + "\u00A7e"
+        player.print("\u00A79@" + clicked.toVector() + ": " + "\u00A7e"
                 + block.getBlockType().getName() + "\u00A77" + " ("
                 + block.toString() + ") "
                 + "\u00A7f"

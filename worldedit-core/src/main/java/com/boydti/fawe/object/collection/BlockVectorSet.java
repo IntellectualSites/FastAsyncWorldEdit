@@ -7,13 +7,9 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import java.util.AbstractCollection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 /**
  * The BlockVectorSet is a Memory optimized Set for storing BlockVectors
@@ -23,6 +19,7 @@ import java.util.Set;
  */
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements Set<BlockVector3> {
     private Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
     public int size() {
@@ -35,23 +32,19 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
 
     public BlockVector3 get(int index) {
         int count = 0;
-        ObjectIterator<Int2ObjectMap.Entry<LocalBlockVectorSet>> iter = localSets.int2ObjectEntrySet().iterator();
-        while (iter.hasNext()) {
-            Int2ObjectMap.Entry<LocalBlockVectorSet> entry = iter.next();
+        for (Int2ObjectMap.Entry<LocalBlockVectorSet> entry : localSets.int2ObjectEntrySet()) {
             LocalBlockVectorSet set = entry.getValue();
             int size = set.size();
             int newSize = count + size;
             if (newSize > index) {
                 int localIndex = index - count;
-                MutableBlockVector3 pos = new MutableBlockVector3(set.getIndex(localIndex));
-                if (pos != null) {
-                    int pair = entry.getIntKey();
-                    int cx = MathMan.unpairX(pair);
-                    int cz = MathMan.unpairY(pair);
-                    pos.mutX((cx << 11) + pos.getBlockX());
-                    pos.mutZ((cz << 11) + pos.getBlockZ());
-                    return pos;
-                }
+                BlockVector3 pos = mutable.setComponents(set.getIndex(localIndex));
+                int pair = entry.getIntKey();
+                int cx = MathMan.unpairX(pair);
+                int cz = MathMan.unpairY(pair);
+                pos = pos.mutX((cx << 11) + pos.getBlockX());
+                pos = pos.mutZ((cz << 11) + pos.getBlockZ());
+                return pos;
             }
             count += newSize;
         }
@@ -83,11 +76,12 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
         return false;
     }
 
+    @NotNull
     @Override
     public Iterator<BlockVector3> iterator() {
         final ObjectIterator<Int2ObjectMap.Entry<LocalBlockVectorSet>> entries = localSets.int2ObjectEntrySet().iterator();
         if (!entries.hasNext()) {
-            return new ArrayList<BlockVector3>().iterator();
+            return Collections.emptyIterator();
         }
         return new Iterator<BlockVector3>() {
             Int2ObjectMap.Entry<LocalBlockVectorSet> entry = entries.next();
@@ -182,7 +176,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(@NotNull Collection<?> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
         Iterator it = iterator();

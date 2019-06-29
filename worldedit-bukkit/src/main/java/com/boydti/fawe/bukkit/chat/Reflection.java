@@ -40,10 +40,6 @@ public final class Reflection {
      */
     public synchronized static String getVersion() {
         if (_versionString == null) {
-            if (Bukkit.getServer() == null) {
-                // The server hasn't started, static initializer call?
-                return null;
-            }
             String name = Bukkit.getServer().getClass().getPackage().getName();
             _versionString = name.substring(name.lastIndexOf('.') + 1) + ".";
         }

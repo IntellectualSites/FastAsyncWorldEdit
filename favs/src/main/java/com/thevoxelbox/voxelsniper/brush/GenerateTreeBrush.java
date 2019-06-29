@@ -14,11 +14,6 @@ import java.util.Random;
 
 // Proposal: Use /v and /vr for leave and wood material // or two more parameters -- Monofraps
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#VoxelTrees_Brush
- *
- * @author Ghost8700 @ Voxel
- */
 public class GenerateTreeBrush extends Brush {
     // Tree Variables.
     private Random randGenerator = new Random();
@@ -35,7 +30,7 @@ public class GenerateTreeBrush extends Brush {
     private int thickness = 1;
     private int slopeChance = 40;
     private int twistChance = 5; // This is a hidden value not available through Parameters. Otherwise messy.
-    private int heightMininmum = 14;
+    private int heightMinimum = 14;
     private int heightMaximum = 18;
     private int branchLength = 8;
     private int nodeMax = 4;
@@ -45,10 +40,7 @@ public class GenerateTreeBrush extends Brush {
     private int blockPositionY;
     private int blockPositionZ;
 
-    /**
-     *
-     */
-    public GenerateTreeBrush() {
+public GenerateTreeBrush() {
         this.setName("Generate Tree");
     }
 
@@ -81,7 +73,6 @@ public class GenerateTreeBrush extends Brush {
     }
 
     // Branch Creation based on direction chosen from the parameters passed.
-    @SuppressWarnings("deprecation")
     private void branchCreate(final int xDirection, final int zDirection) {
 
         // Sets branch origin.
@@ -125,7 +116,6 @@ public class GenerateTreeBrush extends Brush {
         blockPositionZ = originZ;
     }
 
-    @SuppressWarnings("deprecation")
     private void leafNodeCreate() {
         // Generates the node size.
         final int nodeRadius = this.randGenerator.nextInt(this.nodeMax - this.nodeMin + 1) + this.nodeMin;
@@ -223,7 +213,6 @@ public class GenerateTreeBrush extends Brush {
      * @param xDirection
      * @param zDirection
      */
-    @SuppressWarnings("deprecation")
     private void rootCreate(final int xDirection, final int zDirection) {
         // Sets Origin.
         final int originX = blockPositionX;
@@ -313,7 +302,6 @@ public class GenerateTreeBrush extends Brush {
         this.rootCreate(-1, -1);
     }
 
-    @SuppressWarnings("deprecation")
     private void trunkCreate() {
         // Creates true circle discs of the set size using the wood type selected.
         final double bSquared = Math.pow(this.thickness + 0.5, 2);
@@ -368,7 +356,7 @@ public class GenerateTreeBrush extends Brush {
         // ----------
         // Main Trunk
         // ----------
-        // Sets diretional preferences.
+        // Sets directional preferences.
         int xPreference = this.randGenerator.nextInt(this.slopeChance);
         int zPreference = this.randGenerator.nextInt(this.slopeChance);
 
@@ -384,7 +372,7 @@ public class GenerateTreeBrush extends Brush {
         }
 
         // Generates a height for trunk.
-        int height = this.randGenerator.nextInt(this.heightMaximum - this.heightMininmum + 1) + this.heightMininmum;
+        int height = this.randGenerator.nextInt(this.heightMaximum - this.heightMinimum + 1) + this.heightMinimum;
 
         for (int p = 0; p < height; p++) {
             if (p > 3) {
@@ -409,7 +397,7 @@ public class GenerateTreeBrush extends Brush {
             blockPositionY = blockPositionY + 1;
         }
 
-        // Generates branchs at top of trunk for each quadrant.
+        // Generates branches at top of trunk for each quadrant.
         this.branchCreate(1, 1);
         this.branchCreate(-1, 1);
         this.branchCreate(1, -1);
@@ -423,7 +411,7 @@ public class GenerateTreeBrush extends Brush {
         // ---------------
         // Secondary Trunk
         // ---------------
-        // Sets diretional preferences.
+        // Sets directional preferences.
         xPreference = this.randGenerator.nextInt(this.slopeChance);
         zPreference = this.randGenerator.nextInt(this.slopeChance);
 
@@ -439,7 +427,7 @@ public class GenerateTreeBrush extends Brush {
         }
 
         // Generates a height for trunk.
-        height = this.randGenerator.nextInt(this.heightMaximum - this.heightMininmum + 1) + this.heightMininmum;
+        height = this.randGenerator.nextInt(this.heightMaximum - this.heightMinimum + 1) + this.heightMinimum;
 
         if (height > 4) {
             for (int p = 0; p < height; p++) {
@@ -463,7 +451,7 @@ public class GenerateTreeBrush extends Brush {
                 blockPositionY = blockPositionY + 1;
             }
 
-            // Generates branchs at top of trunk for each quadrant.
+            // Generates branches at top of trunk for each quadrant.
             this.branchCreate(1, 1);
             this.branchCreate(-1, 1);
             this.branchCreate(1, -1);
@@ -581,17 +569,17 @@ public class GenerateTreeBrush extends Brush {
                     this.slopeChance = Integer.parseInt(parameter.replace("ts", ""));
                     v.sendMessage(ChatColor.BLUE + "Trunk Slope set to " + this.slopeChance);
                 } else if (parameter.startsWith("minh")) { // Height Minimum
-                    this.heightMininmum = Integer.parseInt(parameter.replace("minh", ""));
-                    if (this.heightMininmum > this.heightMaximum) {
-                        this.heightMininmum = this.heightMaximum;
-                        v.sendMessage(ChatColor.RED + "Minimum Height exceed than Maximum Height, has been set to " + this.heightMininmum + " Instead!");
+                    this.heightMinimum = Integer.parseInt(parameter.replace("minh", ""));
+                    if (this.heightMinimum > this.heightMaximum) {
+                        this.heightMinimum = this.heightMaximum;
+                        v.sendMessage(ChatColor.RED + "Minimum Height exceed than Maximum Height, has been set to " + this.heightMinimum + " Instead!");
                     } else {
-                        v.sendMessage(ChatColor.BLUE + "Minimum Height set to " + this.heightMininmum);
+                        v.sendMessage(ChatColor.BLUE + "Minimum Height set to " + this.heightMinimum);
                     }
                 } else if (parameter.startsWith("maxh")) { // Height Maximum
                     this.heightMaximum = Integer.parseInt(parameter.replace("maxh", ""));
-                    if (this.heightMininmum > this.heightMaximum) {
-                        this.heightMaximum = this.heightMininmum;
+                    if (this.heightMinimum > this.heightMaximum) {
+                        this.heightMaximum = this.heightMinimum;
                         v.sendMessage(ChatColor.RED + "Maximum Height can't be lower than Minimum Height, has been set to " + this.heightMaximum + " Instead!");
                     } else {
                         v.sendMessage(ChatColor.BLUE + "Maximum Roots set to " + this.heightMaximum);
@@ -619,14 +607,14 @@ public class GenerateTreeBrush extends Brush {
                     this.minRoots = 1;
                     this.thickness = 1;
                     this.slopeChance = 40;
-                    this.heightMininmum = 14;
+                    this.heightMinimum = 14;
                     this.heightMaximum = 18;
                     this.branchLength = 8;
                     this.nodeMax = 4;
                     this.nodeMin = 3;
                     v.sendMessage(ChatColor.GOLD + "Brush reset to default parameters.");
                 } else {
-                    v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                    v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
                 }
             } catch (final Exception exception) {
                 v.sendMessage(ChatColor.RED + "Invalid brush parameters! \"" + par[i] + "\" is not a valid statement. Please use the 'info' parameter to display parameter info.");

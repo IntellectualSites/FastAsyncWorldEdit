@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.v1_13;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.BukkitPlayer;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.BlockMaterial_1_13;
@@ -14,10 +13,9 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.brush.visualization.VisualChunk;
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
+
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
@@ -25,32 +23,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import net.minecraft.server.v1_13_R2.BiomeBase;
-import net.minecraft.server.v1_13_R2.Block;
-import net.minecraft.server.v1_13_R2.BlockPosition;
-import net.minecraft.server.v1_13_R2.ChunkProviderServer;
-import net.minecraft.server.v1_13_R2.ChunkSection;
-import net.minecraft.server.v1_13_R2.DataBits;
-import net.minecraft.server.v1_13_R2.DataPalette;
-import net.minecraft.server.v1_13_R2.DataPaletteBlock;
-import net.minecraft.server.v1_13_R2.DataPaletteHash;
-import net.minecraft.server.v1_13_R2.DataPaletteLinear;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityPlayer;
-import net.minecraft.server.v1_13_R2.EnumSkyBlock;
-import net.minecraft.server.v1_13_R2.GameProfileSerializer;
-import net.minecraft.server.v1_13_R2.IBlockData;
-import net.minecraft.server.v1_13_R2.NBTTagCompound;
-import net.minecraft.server.v1_13_R2.Packet;
-import net.minecraft.server.v1_13_R2.PacketDataSerializer;
-import net.minecraft.server.v1_13_R2.PacketPlayOutMultiBlockChange;
-import net.minecraft.server.v1_13_R2.PlayerChunk;
-import net.minecraft.server.v1_13_R2.PlayerChunkMap;
-import net.minecraft.server.v1_13_R2.RegistryID;
-import net.minecraft.server.v1_13_R2.TileEntity;
-import net.minecraft.server.v1_13_R2.WorldChunkManager;
-import net.minecraft.server.v1_13_R2.WorldData;
-import net.minecraft.server.v1_13_R2.WorldServer;
+import net.minecraft.server.v1_13_R2.*;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
@@ -64,51 +37,34 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.function.Supplier;
 
 public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R2.Chunk, ChunkSection[], ChunkSection> {
 
     protected final static Field fieldBits;
-    protected final static Field fieldPalette;
-    protected final static Field fieldSize;
+    final static Field fieldPalette;
+    final static Field fieldSize;
 
-    protected final static Field fieldHashBlocks;
-    protected final static Field fieldLinearBlocks;
-    protected final static Field fieldHashIndex;
-    protected final static Field fieldRegistryb;
-    protected final static Field fieldRegistryc;
-    protected final static Field fieldRegistryd;
-    protected final static Field fieldRegistrye;
-    protected final static Field fieldRegistryf;
+    final static Field fieldHashBlocks;
+    final static Field fieldLinearBlocks;
+    private final static Field fieldHashIndex;
+    final static Field fieldRegistryb;
+    final static Field fieldRegistryc;
+    final static Field fieldRegistryd;
+    final static Field fieldRegistrye;
+    final static Field fieldRegistryf;
 
-    protected final static Field fieldLinearIndex;
-    protected final static Field fieldDefaultBlock;
+    final static Field fieldLinearIndex;
+    final static Field fieldDefaultBlock;
 
-    protected final static Field fieldFluidCount;
-    protected final static Field fieldTickingBlockCount;
-    protected final static Field fieldNonEmptyBlockCount;
-    protected final static Field fieldSection;
-    protected final static Field fieldLiquidCount;
-    protected final static Field fieldEmittedLight;
-    protected final static Field fieldSkyLight;
+    private final static Field fieldFluidCount;
+    final static Field fieldTickingBlockCount;
+    final static Field fieldNonEmptyBlockCount;
+    final static Field fieldSection;
+    final static Field fieldLiquidCount;
+    private final static ChunkSection emptySection;
 
-
-//    protected final static Field fieldBiomes;
-
-    protected final static Field fieldChunkGenerator;
-    protected final static Field fieldSeed;
-//    protected final static Field fieldBiomeCache;
-//    protected final static Field fieldBiomes2;
-    protected final static Field fieldGenLayer1;
-    protected final static Field fieldGenLayer2;
-    protected final static Field fieldSave;
-//    protected final static MutableGenLayer genLayer;
-    protected final static ChunkSection emptySection;
-
-//    protected static final Method methodResize;
-
-    protected final static Field fieldDirtyCount;
-    protected final static Field fieldDirtyBits;
+    private final static Field fieldDirtyCount;
+    private final static Field fieldDirtyBits;
 
     static {
         try {
@@ -116,12 +72,8 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             Arrays.fill(emptySection.getSkyLightArray().asBytes(), (byte) 255);
             fieldSection = ChunkSection.class.getDeclaredField("blockIds");
             fieldLiquidCount = ChunkSection.class.getDeclaredField("e");
-            fieldEmittedLight = ChunkSection.class.getDeclaredField("emittedLight");
-            fieldSkyLight = ChunkSection.class.getDeclaredField("skyLight");
             fieldSection.setAccessible(true);
             fieldLiquidCount.setAccessible(true);
-            fieldEmittedLight.setAccessible(true);
-            fieldSkyLight.setAccessible(true);
 
             fieldFluidCount = ChunkSection.class.getDeclaredField("e");
             fieldTickingBlockCount = ChunkSection.class.getDeclaredField("tickingBlockCount");
@@ -129,27 +81,6 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             fieldFluidCount.setAccessible(true);
             fieldTickingBlockCount.setAccessible(true);
             fieldNonEmptyBlockCount.setAccessible(true);
-
-
-
-//            fieldBiomes = ChunkProviderGenerate.class.getDeclaredField("D"); // *
-//            fieldBiomes.setAccessible(true);
-
-            fieldChunkGenerator = ChunkProviderServer.class.getDeclaredField("chunkGenerator");
-            fieldChunkGenerator.setAccessible(true);
-            fieldSeed = WorldData.class.getDeclaredField("e");
-            fieldSeed.setAccessible(true);
-
-//            fieldBiomeCache = WorldChunkManager.class.getDeclaredField("d"); // *
-//            fieldBiomeCache.setAccessible(true);
-//            fieldBiomes2 = WorldChunkManager.class.getDeclaredField("e"); // *
-//            fieldBiomes2.setAccessible(true);
-            fieldGenLayer1 = WorldChunkManager.class.getDeclaredField("b") ;
-            fieldGenLayer2 = WorldChunkManager.class.getDeclaredField("c") ;
-            fieldGenLayer1.setAccessible(true);
-            fieldGenLayer2.setAccessible(true);
-
-            fieldSave = ReflectionUtils.setAccessible(net.minecraft.server.v1_13_R2.Chunk.class.getDeclaredField("s")); //*
 
             fieldHashBlocks = DataPaletteHash.class.getDeclaredField("b");
             fieldHashBlocks.setAccessible(true);
@@ -185,16 +116,13 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
             fieldPalette = DataPaletteBlock.class.getDeclaredField("h");
             fieldPalette.setAccessible(true);
 
-//            methodResize = DataPaletteBlock.class.getDeclaredMethod("b", int.class);
-//            methodResize.setAccessible(true);
-
             fieldDirtyCount = PlayerChunk.class.getDeclaredField("dirtyCount");
             fieldDirtyBits = PlayerChunk.class.getDeclaredField("h");
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits.setAccessible(true);
 
-            Fawe.debug("Using adapter: " + getAdapter());
-            Fawe.debug("=========================================");
+            System.out.println("Using adapter: " + getAdapter());
+            System.out.println("=========================================");
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -258,54 +186,6 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
 
     @Override
     public boolean regenerateChunk(World world, int x, int z, BiomeType biome, Long seed) {
-//        if (biome != null) {
-//            try {
-//                if (seed == null) {
-//                    seed = world.getSeed();
-//                }
-//                nmsWorld.worldData.getSeed();
-//                boolean result;
-//                ChunkProviderGenerate generator = new ChunkProviderGenerate(nmsWorld, seed, false, "");
-//                Biome bukkitBiome = getAdapter().getBiome(biome.getId());
-//                BiomeBase base = BiomeBase.getBiome(biome.getId());
-//                fieldBiomes.set(generator, new BiomeBase[]{base});
-//                boolean cold = base.getTemperature() <= 1;
-//                net.minecraft.server.v1_13_R2.ChunkGenerator existingGenerator = nmsWorld.getChunkProvider().chunkGenerator;
-//                long existingSeed = world.getSeed();
-//                {
-//                    if (genLayer == null) genLayer = new MutableGenLayer(seed);
-//                    genLayer.set(biome.getId());
-//                    Object existingGenLayer1 = fieldGenLayer1.get(nmsWorld.getWorldChunkManager());
-//                    Object existingGenLayer2 = fieldGenLayer2.get(nmsWorld.getWorldChunkManager());
-//                    fieldGenLayer1.set(nmsWorld.getWorldChunkManager(), genLayer);
-//                    fieldGenLayer2.set(nmsWorld.getWorldChunkManager(), genLayer);
-//
-//                    fieldSeed.set(nmsWorld.worldData, seed);
-//
-//                    ReflectionUtils.setFailsafeFieldValue(fieldBiomeCache, this.nmsWorld.getWorldChunkManager(), new BiomeCache(this.nmsWorld.getWorldChunkManager()));
-//
-//                    ReflectionUtils.setFailsafeFieldValue(fieldChunkGenerator, this.nmsWorld.getChunkProvider(), generator);
-//
-//                    keepLoaded.remove(MathMan.pairInt(x, z));
-//                    result = getWorld().regenerateChunk(x, z);
-//                    net.minecraft.server.v1_13_R2.Chunk nmsChunk = getCachedChunk(world, x, z);
-//                    if (nmsChunk != null) {
-//                        nmsChunk.f(true); // Set Modified
-//                        nmsChunk.mustSave = true;
-//                    }
-//
-//                    ReflectionUtils.setFailsafeFieldValue(fieldChunkGenerator, this.nmsWorld.getChunkProvider(), existingGenerator);
-//
-//                    fieldSeed.set(nmsWorld.worldData, existingSeed);
-//
-//                    fieldGenLayer1.set(nmsWorld.getWorldChunkManager(), existingGenLayer1);
-//                    fieldGenLayer2.set(nmsWorld.getWorldChunkManager(), existingGenLayer2);
-//                }
-//                return result;
-//            } catch (Throwable e) {
-//                e.printStackTrace();
-//            }
-//        }
         return super.regenerateChunk(world, x, z, biome, seed);
     }
 
@@ -437,89 +317,6 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
     public void setBlockLight(ChunkSection section, int x, int y, int z, int value) {
         section.getEmittedLightArray().a(x & 15, y & 15, z & 15, value);
     }
-
-//    @Override
-//    public World createWorld(final WorldCreator creator) {
-//        final String name = creator.name();
-//        ChunkGenerator generator = creator.generator();
-//        final CraftServer server = (CraftServer) Bukkit.getServer();
-//        final MinecraftServer console = server.getServer();
-//        final File folder = new File(server.getWorldContainer(), name);
-//        final World world = server.getWorld(name);
-//        final WorldType type = WorldType.getType(creator.type().getName());
-//        final boolean generateStructures = creator.generateStructures();
-//        if (world != null) {
-//            return world;
-//        }
-//        if (folder.exists() && !folder.isDirectory()) {
-//            throw new IllegalArgumentException("File exists with the name '" + name + "' and isn't a folder");
-//        }
-//        TaskManager.IMP.sync(new RunnableVal<Object>() {
-//            @Override
-//            public void run(Object value) {
-//                try {
-//                    Field field = CraftServer.class.getDeclaredField("worlds");
-//                    field.setAccessible(true);
-//                    Map<Object, Object> existing = (Map<Object, Object>) field.get(server);
-//                    if (!existing.getClass().getName().contains("SynchronizedMap")) {
-//                        field.set(server, Collections.synchronizedMap(existing));
-//                    }
-//                } catch (Throwable e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//        if (generator == null) {
-//            generator = server.getGenerator(name);
-//        }
-//        int dimension = 10 + console.worlds.size();
-//        boolean used = false;
-//        do {
-//            for (final WorldServer ws : console.worlds) {
-//                used = (ws.dimension == dimension);
-//                if (used) {
-//                    ++dimension;
-//                    break;
-//                }
-//            }
-//        } while (used);
-//        final boolean hardcore = false;
-//        final IDataManager sdm = new ServerNBTManager(server.getWorldContainer(), name, true, server.getHandle().getServer().dataConverterManager);
-//        WorldData worlddata = sdm.getWorldData();
-//        final WorldSettings worldSettings;
-//        if (worlddata == null) {
-//            worldSettings = new WorldSettings(creator.seed(), EnumGamemode.getById(server.getDefaultGameMode().getValue()), generateStructures, hardcore, type);
-//            worldSettings.setGeneratorSettings(creator.generatorSettings());
-//            worlddata = new WorldData(worldSettings, name);
-//        } else {
-//            worldSettings = null;
-//        }
-//        worlddata.checkName(name);
-//        final WorldServer internal = (WorldServer)new WorldServer(console, sdm, worlddata, dimension, console.methodProfiler, creator.environment(), generator).b();
-//        startSet(true); // Temporarily allow async chunk load since the world isn't added yet
-//        if (worldSettings != null) {
-//            internal.a(worldSettings);
-//        }
-//        endSet(true);
-//        internal.scoreboard = server.getScoreboardManager().getMainScoreboard().getHandle();
-//        internal.tracker = new EntityTracker(internal);
-//        internal.addIWorldAccess(new WorldManager(console, internal));
-//        internal.worldData.setDifficulty(EnumDifficulty.EASY);
-//        internal.setSpawnFlags(true, true);
-//        if (generator != null) {
-//            internal.getWorld().getPopulators().addAll(generator.getDefaultPopulators(internal.getWorld()));
-//        }
-//        // Add the world
-//        return TaskManager.IMP.sync(new RunnableVal<World>() {
-//            @Override
-//            public void run(World value) {
-//                console.worlds.add(internal);
-//                server.getPluginManager().callEvent(new WorldInitEvent(internal.getWorld()));
-//                server.getPluginManager().callEvent(new WorldLoadEvent(internal.getWorld()));
-//                this.value = internal.getWorld();
-//            }
-//        });
-//    }
 
     @Override
     public int getCombinedId4Data(ChunkSection lastSection, int x, int y, int z) {
@@ -679,7 +476,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
         return playerChunk;
     }
 
-    public boolean sendChunk(PlayerChunk playerChunk, net.minecraft.server.v1_13_R2.Chunk nmsChunk, int mask) {
+    private boolean sendChunk(PlayerChunk playerChunk, net.minecraft.server.v1_13_R2.Chunk nmsChunk, int mask) {
         if (playerChunk == null) {
             return false;
         }
@@ -690,71 +487,33 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                     sections[layer] = new ChunkSection(layer << 4, nmsWorld.worldProvider.g());
                 }
             }
-            TaskManager.IMP.sync(new Supplier<Object>() {
-                @Override
-                public Object get() {
-                    try {
-                        int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                        if (dirtyBits == 0) {
-                            ((CraftWorld) getWorld()).getHandle().getPlayerChunkMap().a(playerChunk);
-                        }
-                        if (mask == 0) {
-                            dirtyBits = 65535;
-                        } else {
-                            dirtyBits |= mask;
-                        }
-
-                        fieldDirtyBits.set(playerChunk, dirtyBits);
-                        fieldDirtyCount.set(playerChunk, 64);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+            TaskManager.IMP.sync(() -> {
+                try {
+                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
+                    if (dirtyBits == 0) {
+                        ((CraftWorld) getWorld()).getHandle().getPlayerChunkMap().a(playerChunk);
                     }
-                    return null;
+                    if (mask == 0) {
+                        dirtyBits = 65535;
+                    } else {
+                        dirtyBits |= mask;
+                    }
+
+                    fieldDirtyBits.set(playerChunk, dirtyBits);
+                    fieldDirtyCount.set(playerChunk, 64);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                 }
+                return null;
             });
         }
-//        if (mask == 0) {
-//            PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, 65535);
-//            for (EntityPlayer player : playerChunk.players) {
-//                player.playerConnection.sendPacket(packet);
-//            }
-//            return true;
-//        }
-//        // Send chunks
-//        boolean empty = false;
-//        ChunkSection[] sections = nmsChunk.getSections();
-//        for (int i = 0; i < sections.length; i++) {
-//            if (sections[i] == null) {
-//                sections[i] = emptySection;
-//                empty = true;
-//            }
-//        }
-//        if (mask == 0 || mask == 65535 && hasEntities(nmsChunk)) {
-//            PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, 65280);
-//            for (EntityPlayer player : playerChunk.players) {
-//                player.playerConnection.sendPacket(packet);
-//            }
-//            mask = 255;
-//        }
-//        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(nmsChunk, mask);
-//        for (EntityPlayer player : playerChunk.players) {
-//            player.playerConnection.sendPacket(packet);
-//        }
-//        if (empty) {
-//            for (int i = 0; i < sections.length; i++) {
-//                if (sections[i] == emptySection) {
-//                    sections[i] = null;
-//                }
-//            }
-//        }
         return true;
     }
 
     public boolean hasEntities(net.minecraft.server.v1_13_R2.Chunk nmsChunk) {
         try {
             final Collection<Entity>[] entities = nmsChunk.entitySlices;
-            for (int i = 0; i < entities.length; i++) {
-                Collection<Entity> slice = entities[i];
+            for (Collection<Entity> slice : entities) {
                 if (slice != null && !slice.isEmpty()) {
                     return true;
                 }
@@ -780,8 +539,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
 
     @Override
     public void setFullbright(ChunkSection[] sections) {
-        for (int i = 0; i < sections.length; i++) {
-            ChunkSection section = sections[i];
+        for (ChunkSection section : sections) {
             if (section != null) {
                 byte[] bytes = section.getSkyLightArray().asBytes();
                 Arrays.fill(bytes, (byte) 255);
@@ -817,7 +575,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
         nmsWorld.r(pos);
     }
 
-    protected WorldServer nmsWorld;
+    private WorldServer nmsWorld;
 
     @Override
     public World getImpWorld() {
@@ -830,13 +588,13 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
         }
     }
 
-    public static void setCount(int tickingBlockCount, int nonEmptyBlockCount, ChunkSection section) throws NoSuchFieldException, IllegalAccessException {
+    static void setCount(int tickingBlockCount, int nonEmptyBlockCount, ChunkSection section) throws NoSuchFieldException, IllegalAccessException {
         fieldFluidCount.set(section, 0); // TODO FIXME
         fieldTickingBlockCount.set(section, tickingBlockCount);
         fieldNonEmptyBlockCount.set(section, nonEmptyBlockCount);
     }
 
-    public int getNonEmptyBlockCount(ChunkSection section) throws IllegalAccessException {
+    int getNonEmptyBlockCount(ChunkSection section) throws IllegalAccessException {
         return (int) fieldNonEmptyBlockCount.get(section);
     }
 
@@ -845,7 +603,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
         Arrays.fill(section.getEmittedLightArray().asBytes(), (byte) 0);
     }
 
-    public static ChunkSection newChunkSection(int y2, boolean flag, int[] blocks) {
+    static ChunkSection newChunkSection(int y2, boolean flag, int[] blocks) {
         if (blocks == null) {
             return new ChunkSection(y2 << 4, flag);
         } else {
@@ -899,9 +657,7 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
                 // protected DataBits a;
                 long[] bits = Arrays.copyOfRange(blockstates, 0, blockBitArrayEnd);
                 DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
-                DataPalette<IBlockData> palette;
-//                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);
-                palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d);
+                DataPalette<IBlockData> palette = new DataPaletteLinear<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d);
 
                 // set palette
                 for (int i = 0; i < num_palette; i++) {
@@ -938,13 +694,13 @@ public class BukkitQueue_1_13 extends BukkitQueue_0<net.minecraft.server.v1_13_R
         return tile != null ? getTag(tile) : null;
     }
 
-    public CompoundTag getTag(TileEntity tile) {
+    CompoundTag getTag(TileEntity tile) {
         try {
             NBTTagCompound tag = new NBTTagCompound();
             tile.save(tag); // readTagIntoEntity
             return (CompoundTag) toNative(tag);
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return null;
         }
     }

@@ -12,12 +12,6 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Jagged_Line_Brush
- *
- * @author Giltwist
- * @author Monofraps
- */
 public class JaggedLineBrush extends PerformBrush {
     private static final Vector HALF_BLOCK_OFFSET = new Vector(0.5, 0.5, 0.5);
     private static final int RECURSION_MIN = 1;
@@ -31,9 +25,6 @@ public class JaggedLineBrush extends PerformBrush {
     private int recursion = RECURSION_DEFAULT;
     private int spread = SPREAD_DEFAULT;
 
-    /**
-     *
-     */
     public JaggedLineBrush() {
         this.setName("Jagged Line");
     }

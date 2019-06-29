@@ -25,6 +25,7 @@ import com.boydti.fawe.jnbt.JSON2NBT;
 import com.boydti.fawe.jnbt.NBTException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
+
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.NotABlockException;
@@ -42,11 +43,11 @@ import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -54,9 +55,11 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -107,16 +110,15 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
     }
 
-    private static String[] EMPTY_STRING_ARRAY = new String[]{};
-
     /**
      * Backwards compatibility for wool colours in block syntax.
      *
      * @param string Input string
      * @return Mapped string
      */
+    @SuppressWarnings("ConstantConditions")
     private String woolMapper(String string) {
-        switch (string.toLowerCase()) {
+        switch (string.toLowerCase(Locale.ROOT)) {
             case "white":
                 return BlockTypes.WHITE_WOOL.getId();
             case "black":
@@ -164,7 +166,6 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
 
         BlockState state = null;
-        CompoundTag nbt = null;
 
         // Legacy matcher
         if (context.isTryingLegacy()) {
@@ -189,9 +190,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, data);
                     }
                 }
-            } catch (NumberFormatException ignore) {}
+            } catch (NumberFormatException e) {
+            }
         }
 
+        CompoundTag nbt = null;
         if (state == null) {
             String typeString;
             String stateString = null;
@@ -202,7 +205,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 typeString = blockAndExtraData[0].substring(0, stateStart);
                 stateString = blockAndExtraData[0].substring(stateStart + 1, blockAndExtraData[0].length() - 1);
             }
-            if (typeString == null || typeString.isEmpty()) {
+            if (typeString.isEmpty()) {
                 throw new InputParseException("Invalid format");
             }
             // PosX
@@ -217,42 +220,65 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new InputParseException("Your selection is not complete.");
                 }
                 state = world.getBlock(primaryPosition);
-            } else if (typeString.equalsIgnoreCase("hand")) {
-                // Get the block type from the item in the user's hand.
-                state = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
-            } else if (typeString.equalsIgnoreCase("offhand")) {
-                // Get the block type from the item in the user's off hand.
-                state = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
-            } else if (typeString.matches("slot[0-9]+")) {
-                int slot = Integer.parseInt(typeString.substring(4)) - 1;
-                Actor actor = context.requireActor();
-                if (!(actor instanceof Player)) {
-                    throw new InputParseException("The user is not a player!");
-                }
-                Player player = (Player) actor;
-                BlockBag bag = player.getInventoryBlockBag();
-                if (bag == null || !(bag instanceof SlottableBlockBag)) {
-                    throw new InputParseException("Unsupported!");
-                }
-                SlottableBlockBag slottable = (SlottableBlockBag) bag;
-                BaseItem item = slottable.getItem(slot);
-
-                if (!item.getType().hasBlockType()) {
-                    throw new InputParseException(BBC.getPrefix() + "You're not holding a block!");
-                }
-                state = item.getType().getBlockType().getDefaultState();
-                nbt = item.getNbtData();
             } else {
-                BlockType type = BlockTypes.parse(typeString.toLowerCase());
-                if (type != null) state = type.getDefaultState();
-                if (state == null) {
-                    throw new NoMatchException(BBC.getPrefix() + "Does not match a valid block type: '" + input + "'");
+                if ("hand".equalsIgnoreCase(typeString)) {
+                    // Get the block type from the item in the user's hand.
+                    state = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
+                } else if ("offhand".equalsIgnoreCase(typeString)) {
+                    // Get the block type from the item in the user's off hand.
+                    state = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
+                } else if (typeString.matches("slot[0-9]+")) {
+                    int slot = Integer.parseInt(typeString.substring(4)) - 1;
+                    Actor actor = context.requireActor();
+                    if (!(actor instanceof Player)) {
+                        throw new InputParseException("The user is not a player!");
+                    }
+                    Player player = (Player) actor;
+                    BlockBag bag = player.getInventoryBlockBag();
+                    if (bag == null || !(bag instanceof SlottableBlockBag)) {
+                        throw new InputParseException("Unsupported!");
+                    }
+                    SlottableBlockBag slottable = (SlottableBlockBag) bag;
+                    BaseItem item = slottable.getItem(slot);
+
+                    if (!item.getType().hasBlockType()) {
+                        throw new InputParseException("You're not holding a block!");
+                    }
+                    state = item.getType().getBlockType().getDefaultState();
+                    nbt = item.getNbtData();
+                } else {
+                    BlockType type = BlockTypes.parse(typeString.toLowerCase());
+
+                        if (type != null) {
+                            state = type.getDefaultState();
+                        }
+                        if (state == null) {
+                        throw new NoMatchException("Does not match a valid block type: '" + input + "'");
+                    }
                 }
             }
-//            if (nbt == null) nbt = state.getNbtData();
+            if (nbt == null) nbt = state.getNbtData();
 
             if (stateString != null) {
                 state = BlockState.get(state.getBlockType(), "[" + stateString + "]", state);
+                if (context.isPreferringWildcard()) {
+                    if (stateString.isEmpty()) {
+                        state = new FuzzyBlockState(state);
+                    } else {
+                        BlockType type = state.getBlockType();
+                        FuzzyBlockState.Builder fuzzyBuilder = FuzzyBlockState.builder();
+                        fuzzyBuilder.type(type);
+                        String[] entries = stateString.split(",");
+                        for (String entry : entries) {
+                            String[] split = entry.split("=");
+                            String key = split[0];
+                            String val = split[1];
+                            Property<Object> prop = type.getProperty(key);
+                            fuzzyBuilder.withProperty(prop, prop.getValueFor(val));
+                        }
+                        state = fuzzyBuilder.build();
+                    }
+                }
             }
         }
 
@@ -288,13 +314,12 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         break;
                     }
                 }
-                Platform capability = worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS);
-                if (!capability.isValidMobType(mobName)) {
-                    final String finalMobName = mobName.toLowerCase();
-                    throw new SuggestInputParseException(BBC.getPrefix() + "Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
-                    .map(m -> m.getName().toLowerCase())
-                    .filter(s -> s.startsWith(finalMobName))
-                    .collect(Collectors.toList()));
+                if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
+                    String finalMobName = mobName.toLowerCase();
+                    throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
+                                                                                                                    .map(m -> m.getName().toLowerCase())
+                                                                                                                    .filter(s -> s.startsWith(finalMobName))
+                                                                                                                    .collect(Collectors.toList()));
                 }
                 return validate(context, new MobSpawnerBlock(state, mobName));
             } else {

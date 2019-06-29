@@ -20,9 +20,9 @@
 package com.sk89q.worldedit.session;
 
 import com.boydti.fawe.util.MaskTraverser;
-import com.sk89q.worldedit.EditSession;
-import static com.google.common.base.Preconditions.checkNotNull;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -34,9 +34,6 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.Transform;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Builds an operation to paste the contents of a clipboard.
@@ -56,10 +53,10 @@ public class PasteBuilder {
     /**
      * Create a new instance.
      *
-     * @param holder          the clipboard holder
-     * @param targetExtent    an extent
+     * @param holder the clipboard holder
+     * @param targetExtent an extent
      */
-    public PasteBuilder(ClipboardHolder holder, Extent targetExtent) {
+    PasteBuilder(ClipboardHolder holder, Extent targetExtent) {
         checkNotNull(holder);
         checkNotNull(targetExtent);
         this.clipboard = holder.getClipboard();
@@ -133,6 +130,5 @@ public class PasteBuilder {
         }
         return copy;
     }
-
 
 }

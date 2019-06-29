@@ -7,20 +7,11 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Underlay_Brush
- *
- * @author jmck95 Credit to GavJenks for framework and 95 of code. Big Thank you to GavJenks
- */
-
 public class UnderlayBrush extends PerformBrush {
     private static final int DEFAULT_DEPTH = 3;
     private int depth = DEFAULT_DEPTH;
     private boolean allBlocks = false;
 
-    /**
-     *
-     */
     public UnderlayBrush() {
         this.setName("Underlay (Reverse Overlay)");
     }
@@ -48,8 +39,6 @@ public class UnderlayBrush extends PerformBrush {
                                     }
                                     break;
 
-                                } else {
-                                    continue;
                                 }
                             } else {
                                 for (int d = 0; (d < this.depth); d++) {
@@ -91,8 +80,6 @@ public class UnderlayBrush extends PerformBrush {
                                         memory[x + v.getBrushSize()][z + v.getBrushSize()] = 1; // stop it from checking any other blocks in this vertical 1x1 column.
                                     }
                                     break;
-                                } else {
-                                    continue;
                                 }
                             } else {
                                 for (int d = -1; (d < this.depth - 1); d++) {
@@ -148,7 +135,7 @@ public class UnderlayBrush extends PerformBrush {
                 this.allBlocks = false;
                 v.owner().getPlayer().sendMessage(ChatColor.BLUE + "Will underlay only natural block types." + this.depth);
             } else {
-                v.owner().getPlayer().sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.owner().getPlayer().sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

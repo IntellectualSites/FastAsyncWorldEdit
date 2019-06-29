@@ -75,17 +75,16 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     default BlockState getLazyBlock(int x, int y, int z) {
         int combinedId4Data = getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
         try {
-            BlockState state = BlockState.getFromInternalId(combinedId4Data);
-            return state;
+            return BlockState.getFromInternalId(combinedId4Data);
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return BlockTypes.AIR.getDefaultState();
         }
     }
 
     @Override
     default <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return setBlock(x, y, z, block.getInternalId(), block instanceof BaseBlock ? ((BaseBlock)block).getNbtData() : null);
+        return setBlock(x, y, z, block.getInternalId(), block instanceof BaseBlock ? block.getNbtData() : null);
     }
 
     @Override
@@ -101,7 +100,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
             }
             return block;
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
     }

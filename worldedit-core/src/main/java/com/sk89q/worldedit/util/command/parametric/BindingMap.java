@@ -1,7 +1,5 @@
 package com.sk89q.worldedit.util.command.parametric;
 
-import com.boydti.fawe.util.ArrayUtil;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -10,13 +8,6 @@ import com.sk89q.worldedit.util.command.CommandMapping;
 import com.sk89q.worldedit.util.command.MissingParameterException;
 import com.sk89q.worldedit.util.command.SimpleDispatcher;
 import com.sk89q.worldedit.util.command.binding.Range;
-import com.sk89q.worldedit.util.command.parametric.ArgumentStack;
-import com.sk89q.worldedit.util.command.parametric.Binding;
-import com.sk89q.worldedit.util.command.parametric.BindingBehavior;
-import com.sk89q.worldedit.util.command.parametric.BindingMatch;
-import com.sk89q.worldedit.util.command.parametric.ParameterData;
-import com.sk89q.worldedit.util.command.parametric.ParameterException;
-import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

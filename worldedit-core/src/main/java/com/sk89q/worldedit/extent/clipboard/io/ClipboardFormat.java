@@ -19,6 +19,22 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.object.clipboard.URIClipboardHolder;
+import com.boydti.fawe.object.io.PGZIPOutputStream;
+import com.boydti.fawe.object.schematic.Schematic;
+import com.boydti.fawe.util.MainUtil;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.gson.Gson;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,23 +44,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.io.PGZIPOutputStream;
-import com.boydti.fawe.object.schematic.Schematic;
-import com.boydti.fawe.util.MainUtil;
-import com.google.gson.Gson;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.ClipboardHolder;
 
 /**
  * A collection of supported clipboard formats.
@@ -105,16 +104,15 @@ public interface ClipboardFormat {
      * @return The file extensions this format might be known by
      */
     Set<String> getFileExtensions();
-    
+
     /**
      * Set the player's clipboard
      * @param player
      * @param uri
      * @param in
-     * @return the held clipboard
      * @throws IOException
      */
-    default ClipboardHolder hold(Player player, URI uri, InputStream in) throws IOException {
+    default URIClipboardHolder hold(Player player, URI uri, InputStream in) throws IOException {
         checkNotNull(player);
         checkNotNull(uri);
         checkNotNull(in);
@@ -130,7 +128,7 @@ public interface ClipboardFormat {
         session.setClipboard(holder);
         return holder;
     }
-    
+
     default Schematic load(File file) throws IOException {
         return load(new FileInputStream(file));
     }
@@ -138,8 +136,8 @@ public interface ClipboardFormat {
     default Schematic load(InputStream stream) throws IOException {
         return new Schematic(getReader(stream).read());
     }
-    
-    
+
+
     default URL uploadPublic(final Clipboard clipboard, String category, String user) {
         // summary
         // blocks
@@ -158,7 +156,7 @@ public interface ClipboardFormat {
             }
         });
     }
-    
+
     default URL uploadAnonymous(final Clipboard clipboard) {
         return MainUtil.upload(null, null, getPrimaryFileExtension(), new RunnableVal<OutputStream>() {
             @Override
@@ -167,7 +165,7 @@ public interface ClipboardFormat {
             }
         });
     }
-    
+
     default void write(OutputStream value, Clipboard clipboard) {
         try {
             try (PGZIPOutputStream gzip = new PGZIPOutputStream(value)) {

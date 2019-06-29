@@ -7,17 +7,9 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 import org.bukkit.block.BlockFace;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Disc_Face_Brush
- *
- * @author Voxel
- */
 public class DiscFaceBrush extends PerformBrush {
     private double trueCircle = 0;
 
-    /**
-     *
-     */
     public DiscFaceBrush() {
         this.setName("Disc Face");
     }
@@ -139,7 +131,7 @@ public class DiscFaceBrush extends PerformBrush {
                 this.trueCircle = 0;
                 v.sendMessage(ChatColor.AQUA + "True circle mode OFF.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

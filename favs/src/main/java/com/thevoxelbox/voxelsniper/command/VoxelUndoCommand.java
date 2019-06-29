@@ -22,12 +22,11 @@ public class VoxelUndoCommand extends VoxelCommand {
                 int amount = Integer.parseInt(args[0]);
                 sniper.undo(amount);
             } catch (NumberFormatException exception) {
-                player.sendMessage(BBC.getPrefix() + "Number expected; string given.");
+                player.sendMessage("Number expected; string given.");
             }
         } else {
             sniper.undo();
         }
-//        plugin.getLogger().info("Player \"" + player.getName() + "\" used /u");
         return true;
     }
 }

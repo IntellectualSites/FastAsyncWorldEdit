@@ -29,7 +29,7 @@ public class ReflectionUtils9 {
 
             // 2. Copy it
             T[] previousValues = (T[]) valuesField.get(enumType);
-            List values = new ArrayList(Arrays.asList(previousValues));
+            List values = new ArrayList<>(Arrays.asList(previousValues));
 
             // 3. build new enum
             T newValue = (T) makeEnum(enumType, // The target enum class
@@ -51,31 +51,6 @@ public class ReflectionUtils9 {
             // 6. Clean enum cache
             cleanEnumCache(enumType);
             return newValue;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public static <T extends Enum<?>> void clearEnum(Class<T> enumType) {
-        // 0. Sanity checks
-        if (!Enum.class.isAssignableFrom(enumType)) {
-            throw new RuntimeException("class " + enumType + " is not an instance of Enum");
-        }
-        // 1. Lookup "$VALUES" holder in enum class and get previous enum instances
-        Field valuesField = null;
-        Field[] fields = enumType.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getName().contains("$VALUES")) {
-                valuesField = field;
-                break;
-            }
-        }
-        AccessibleObject.setAccessible(new Field[]{valuesField}, true);
-        try {
-            setFailsafeFieldValue(valuesField, null, Array.newInstance(enumType, 0));
-            // 6. Clean enum cache
-            cleanEnumCache(enumType);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e.getMessage(), e);

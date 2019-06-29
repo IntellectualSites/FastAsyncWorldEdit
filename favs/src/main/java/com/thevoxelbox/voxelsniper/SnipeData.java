@@ -1,4 +1,4 @@
-/**
+/*
  This file is part of VoxelSniper, licensed under the MIT License (MIT).
 
  Copyright (c) The VoxelBox <http://thevoxelbox.com>
@@ -33,9 +33,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-/**
- * @author Piotr
- */
 public class SnipeData {
 
     public static final int DEFAULT_REPLACE_DATA_VALUE = 0;
@@ -87,9 +84,6 @@ public class SnipeData {
     private Pattern pattern;
     private String patternInfo;
 
-    /**
-     * @param vs
-     */
     public SnipeData(final Sniper vs) {
         this.owner = vs;
     }
@@ -219,9 +213,6 @@ public class SnipeData {
         this.voxelList = new VoxelList();
     }
 
-    /**
-     * @param message
-     */
     public final void sendMessage(final String message) {
         this.owner.getPlayer().sendMessage(message);
     }

@@ -22,20 +22,11 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-/**
- * http://www.voxelwiki.com/minecraft/VoxelSniper#The_Erosion_Brush
- *
- * @author Piotr
- * @author MikeMatrix
- */
 public class ErodeBrush extends Brush {
     private static final Vector[] FACES_TO_CHECK = {new Vector(0, 0, 1), new Vector(0, 0, -1), new Vector(0, 1, 0), new Vector(0, -1, 0), new Vector(1, 0, 0), new Vector(-1, 0, 0)};
     private final HelpJSAP parser = new HelpJSAP("/b e", "Brush for eroding landscape.", ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH);
     private ErosionPreset currentPreset = new ErosionPreset(0, 1, 0, 1);
 
-    /**
-     *
-     */
     public ErodeBrush() {
         this.setName("Erode");
 
@@ -49,12 +40,6 @@ public class ErodeBrush extends Brush {
         }
     }
 
-    /**
-     * @param result
-     * @param player
-     * @param helpJSAP
-     * @return if a message was sent.
-     */
     public static boolean sendHelpOrErrorMessageToPlayer(final JSAPResult result, final Player player, final HelpJSAP helpJSAP) {
         final List<String> output = helpJSAP.writeHelpOrErrorMessageIfRequired(result);
         if (!output.isEmpty()) {
@@ -252,11 +237,12 @@ public class ErodeBrush extends Brush {
         return "voxelsniper.brush.erode";
     }
 
-    /**
-     * @author MikeMatrix
-     */
     private enum Preset {
-        MELT(new ErosionPreset(2, 1, 5, 1)), FILL(new ErosionPreset(5, 1, 2, 1)), SMOOTH(new ErosionPreset(3, 1, 3, 1)), LIFT(new ErosionPreset(6, 0, 1, 1)), FLOATCLEAN(new ErosionPreset(6, 1, 6, 1));
+        MELT(new ErosionPreset(2, 1, 5, 1)),
+        FILL(new ErosionPreset(5, 1, 2, 1)),
+        SMOOTH(new ErosionPreset(3, 1, 3, 1)),
+        LIFT(new ErosionPreset(6, 0, 1, 1)),
+        FLOATCLEAN(new ErosionPreset(6, 1, 6, 1));
         private ErosionPreset preset;
 
         Preset(final ErosionPreset preset) {
@@ -267,21 +253,20 @@ public class ErodeBrush extends Brush {
          * Generates a concat string of all options.
          *
          * @param seperator Seperator for delimiting entries.
-         * @return
          */
         public static String getValuesString(String seperator) {
-            String valuesString = "";
+            StringBuilder valuesString = new StringBuilder();
 
             boolean delimiterHelper = true;
             for (final Preset preset : Preset.values()) {
                 if (delimiterHelper) {
                     delimiterHelper = false;
                 } else {
-                    valuesString += seperator;
+                    valuesString.append(seperator);
                 }
-                valuesString += preset.name();
+                valuesString.append(preset.name());
             }
-            return valuesString;
+            return valuesString.toString();
         }
 
         public ErosionPreset getPreset() {
@@ -291,9 +276,6 @@ public class ErodeBrush extends Brush {
 
     }
 
-    /**
-     * @author MikeMatrix
-     */
     private static final class BlockChangeTracker {
         private final Map<Integer, Map<Vector, BlockWrapper>> blockChanges;
         private final Map<Vector, BlockWrapper> flatChanges;
@@ -307,7 +289,7 @@ public class ErodeBrush extends Brush {
         }
 
         public BlockWrapper get(final Vector position, final int iteration) {
-            BlockWrapper changedBlock = null;
+            BlockWrapper changedBlock;
 
             for (int i = iteration - 1; i >= 0; --i) {
                 if (this.blockChanges.containsKey(i) && this.blockChanges.get(i).containsKey(position)) {
@@ -339,16 +321,12 @@ public class ErodeBrush extends Brush {
         }
     }
 
-    /**
-     * @author MikeMatrix
-     */
     private static final class BlockWrapper {
 
         private final AsyncBlock block;
         private final Material material;
         private final int data;
 
-        @SuppressWarnings("deprecation")
         public BlockWrapper(final AsyncBlock block) {
             this.block = block;
             this.data = block.getPropertyId();
@@ -411,9 +389,6 @@ public class ErodeBrush extends Brush {
 
     }
 
-    /**
-     * @author MikeMatrix
-     */
     private static final class ErosionPreset {
         private final int erosionFaces;
         private final int erosionRecursion;

@@ -13,7 +13,7 @@ public class FaweVersion {
 
     public FaweVersion(String version, String commit, String date) {
         String[] split = version.substring(version.indexOf('=') + 1).split("\\.");
-        this.build = Integer.parseInt(split[1]);
+        this.build = Integer.parseInt(split[2]);
         this.hash = Integer.parseInt(commit.substring(commit.indexOf('=') + 1), 16);
         String[] split1 = date.substring(date.indexOf('=') + 1).split("\\.");
         this.year = Integer.parseInt(split1[0]);
@@ -30,9 +30,12 @@ public class FaweVersion {
         }
     }
 
-    @Override
-    public String toString() {
-        return "FastAsyncWorldEdit-" + year + "." + month + "." + day + "-" + Integer.toHexString(hash) + "-" + build;
+    @Override public String toString() {
+        if (hash == 0 && build == 0) {
+            return "FastAsyncWorldEdit-1.13-NoVer-SNAPSHOT";
+        } else {
+            return "FastAsyncWorldEdit-1.13" + build;
+        }
     }
 
     public boolean isNewer(FaweVersion other) {

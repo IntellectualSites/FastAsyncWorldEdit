@@ -20,16 +20,17 @@
 package com.sk89q.worldedit.function.operation;
 
 import com.boydti.fawe.object.changeset.FaweChangeSet;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+
 import java.util.Iterator;
 import java.util.List;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Performs an undo or redo from a given {@link ChangeSet}.
@@ -46,13 +47,14 @@ public class ChangeSetExecutor implements Operation {
      * Create a new instance.
      *
      * @param changeSet the change set
-     * @param type      type of change
-     * @param context   the undo context
+     * @param type type of change
+     * @param context the undo context
      */
     private ChangeSetExecutor(ChangeSet changeSet, Type type, UndoContext context, BlockBag blockBag, int inventory) {
         checkNotNull(changeSet);
         checkNotNull(type);
         checkNotNull(context);
+
         this.type = type;
         this.context = context;
         if (changeSet instanceof FaweChangeSet) {
@@ -94,10 +96,9 @@ public class ChangeSetExecutor implements Operation {
      * Create a new undo operation.
      *
      * @param changeSet the change set
-     * @param context   an undo context
+     * @param context an undo context
      * @return an operation
      */
-    @Deprecated
     public static ChangeSetExecutor createUndo(ChangeSet changeSet, UndoContext context) {
         return new ChangeSetExecutor(changeSet, Type.UNDO, context, null, 0);
     }
@@ -106,13 +107,11 @@ public class ChangeSetExecutor implements Operation {
      * Create a new redo operation.
      *
      * @param changeSet the change set
-     * @param context   an undo context
+     * @param context an undo context
      * @return an operation
      */
-    @Deprecated
     public static ChangeSetExecutor createRedo(ChangeSet changeSet, UndoContext context) {
         return new ChangeSetExecutor(changeSet, Type.REDO, context, null, 0);
     }
-
 
 }

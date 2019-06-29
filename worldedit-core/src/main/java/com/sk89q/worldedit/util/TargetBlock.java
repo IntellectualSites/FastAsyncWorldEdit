@@ -20,9 +20,14 @@
 package com.sk89q.worldedit.util;
 
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
+
+import javax.annotation.Nullable;
 
 /**
  * This class uses an inefficient method to figure out what block a player
@@ -33,13 +38,19 @@ import com.sk89q.worldedit.world.World;
  */
 public class TargetBlock {
 
-    private World world;
+    private final World world;
+
     private int maxDistance;
     private double checkDistance, curDistance;
     private BlockVector3 targetPos = BlockVector3.ZERO;
     private Vector3 targetPosDouble = Vector3.ZERO;
     private BlockVector3 prevPos = BlockVector3.ZERO;
     private Vector3 offset = Vector3.ZERO;
+
+    // the mask which dictates when to stop a trace - defaults to stopping at non-air blocks
+    private Mask stopMask;
+    // the mask which dictates when to stop a solid block trace - default to BlockMaterial#isMovementBlocker
+    private Mask solidMask;
 
     /**
      * Constructor requiring a player, uses default values
@@ -48,7 +59,10 @@ public class TargetBlock {
      */
     public TargetBlock(Player player) {
         this.world = player.getWorld();
-        this.setValues(player.getLocation(), player.getLocation().getYaw(), player.getLocation().getPitch(), 300, 1.65, 0.2);
+        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(),
+                300, 1.65, 0.2);
+        this.stopMask = new ExistingBlockMask(world);
+        this.solidMask = new SolidBlockMask(world);
     }
 
     /**
@@ -60,7 +74,37 @@ public class TargetBlock {
      */
     public TargetBlock(Player player, int maxDistance, double checkDistance) {
         this.world = player.getWorld();
-        this.setValues(player.getLocation(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
+        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
+        this.stopMask = new ExistingBlockMask(world);
+        this.solidMask = new SolidBlockMask(world);
+    }
+
+    /**
+     * Set the mask used for determine where to stop traces.
+     * Setting to null will restore the default.
+     *
+     * @param stopMask the mask used to stop traces
+     */
+    public void setStopMask(@Nullable Mask stopMask) {
+        if (stopMask == null) {
+            this.stopMask = new ExistingBlockMask(world);
+        } else {
+            this.stopMask = stopMask;
+        }
+    }
+
+    /**
+     * Set the mask used for determine where to stop solid block traces.
+     * Setting to null will restore the default.
+     *
+     * @param solidMask the mask used to stop solid block traces
+     */
+    public void setSolidMask(@Nullable Mask solidMask) {
+        if (solidMask == null) {
+            this.solidMask = new SolidBlockMask(world);
+        } else {
+            this.solidMask = solidMask;
+        }
     }
 
     /**
@@ -78,7 +122,7 @@ public class TargetBlock {
         this.checkDistance = checkDistance;
         this.curDistance = 0;
         xRotation = (xRotation + 90) % 360;
-        yRotation = yRotation * -1;
+        yRotation *= -1;
 
         double h = (checkDistance * Math.cos(Math.toRadians(yRotation)));
 
@@ -101,15 +145,15 @@ public class TargetBlock {
         boolean searchForLastBlock = true;
         Location lastBlock = null;
         while (getNextBlock() != null) {
-            if (world.getBlock(targetPos).getBlockType().getMaterial().isAir()) {
+            if (stopMask.test(targetPos)) {
+                break;
+            } else {
                 if (searchForLastBlock) {
                     lastBlock = getCurrentBlock();
                     if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
                         searchForLastBlock = false;
                     }
                 }
-            } else {
-                break;
             }
         }
         Location currentBlock = getCurrentBlock();
@@ -123,7 +167,8 @@ public class TargetBlock {
      * @return Block
      */
     public Location getTargetBlock() {
-        while (getNextBlock() != null && world.getBlock(targetPos).getBlockType().getMaterial().isAir()) ;
+        //noinspection StatementWithEmptyBody
+        while (getNextBlock() != null && !stopMask.test(targetPos)) ;
         return getCurrentBlock();
     }
 
@@ -134,7 +179,8 @@ public class TargetBlock {
      * @return Block
      */
     public Location getSolidTargetBlock() {
-        while (getNextBlock() != null && !world.getBlock(targetPos).getBlockType().getMaterial().isMovementBlocker()) ;
+        //noinspection StatementWithEmptyBody
+        while (getNextBlock() != null && !solidMask.test(targetPos)) ;
         return getCurrentBlock();
     }
 
@@ -149,8 +195,8 @@ public class TargetBlock {
             curDistance += checkDistance;
 
             targetPosDouble = offset.add(targetPosDouble.getX(),
-                    targetPosDouble.getY(),
-                    targetPosDouble.getZ());
+                                         targetPosDouble.getY(),
+                                         targetPosDouble.getZ());
             targetPos = targetPosDouble.toBlockPoint();
         } while (curDistance <= maxDistance
                 && targetPos.getBlockX() == prevPos.getBlockX()
@@ -188,12 +234,17 @@ public class TargetBlock {
 
     public Location getAnyTargetBlockFace() {
         getAnyTargetBlock();
-        return getCurrentBlock().setDirection(getCurrentBlock().subtract(getPreviousBlock()));
+        Location current = getCurrentBlock();
+        if (current != null)
+            return current.setDirection(current.toVector().subtract(getPreviousBlock().toVector()));
+        else
+            return new Location(world, targetPos.toVector3(), Float.NaN, Float.NaN);
     }
 
     public Location getTargetBlockFace() {
-        getAnyTargetBlock();
-        return getCurrentBlock().setDirection(getCurrentBlock().subtract(getPreviousBlock()));
+        getTargetBlock();
+        if (getCurrentBlock() == null) return null;
+        return getCurrentBlock().setDirection(getCurrentBlock().toVector().subtract(getPreviousBlock().toVector()));
     }
 
 }

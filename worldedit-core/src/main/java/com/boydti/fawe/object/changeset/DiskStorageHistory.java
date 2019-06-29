@@ -13,13 +13,12 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -43,10 +42,10 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     /*
      * Block data
-     * 
+     *
      * [header]
      * {int origin x, int origin z}
-     * 
+     *
      * [contents]...
      * { short rel x, short rel z, unsigned byte y, short combinedFrom, short combinedTo }
      */
@@ -66,7 +65,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
     public DiskStorageHistory(World world, UUID uuid) {
         super(world);
-        init(uuid, Fawe.imp().getWorldName(world));
+        init(uuid, world.getName());
     }
 
     public DiskStorageHistory(String world, UUID uuid) {
@@ -116,12 +115,12 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     private void init(UUID uuid, int i) {
         this.uuid = uuid;
         this.index = i;
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(getWorld()) + File.separator + uuid);
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + getWorld().getName() + File.separator + uuid);
         initFiles(folder);
     }
 
     public void delete() {
-        Fawe.debug("Deleting history: " + Fawe.imp().getWorldName(getWorld()) + "/" + uuid + "/" + index);
+//        Fawe.debug("Deleting history: " + getWorld().getName() + "/" + uuid + "/" + index);
         deleteFiles();
         if (Settings.IMP.HISTORY.USE_DATABASE) {
             RollbackDatabase db = DBHandler.IMP.getDatabase(getWorld());
@@ -181,7 +180,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 if (osENTCF != null) osENTCF.flush();
                 if (osENTCT != null) osENTCT.flush();
             } catch (Exception e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
             return flushed;
         }
@@ -218,7 +217,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                     osENTCT = null;
                 }
             } catch (Exception e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
             return flushed;
         }
@@ -418,7 +417,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 }
                 return summary;
             } catch (IOException e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         return null;
@@ -439,7 +438,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
                 fis.close();
                 gis.close();
             } catch (IOException e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         return new IntegerPair(ox, oz);
@@ -507,8 +506,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 
         public int getSize() {
             int count = 0;
-            for (int i = 0; i < blocks.length; i++) {
-                count += blocks[i];
+            for (int block : blocks) {
+                count += block;
             }
             return count;
         }
@@ -523,6 +522,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
 	@Override
 	public void setRecordChanges(boolean recordChanges) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

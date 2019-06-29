@@ -24,9 +24,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Executes several region functions in order.
@@ -49,7 +50,6 @@ public class CombinedRegionFunction implements RegionFunction {
     public CombinedRegionFunction(Collection<RegionFunction> functions) {
         checkNotNull(functions);
         this.functions = functions.toArray(new RegionFunction[functions.size()]);
-
     }
 
     /**
@@ -100,13 +100,9 @@ public class CombinedRegionFunction implements RegionFunction {
     public boolean apply(BlockVector3 position) throws WorldEditException {
         boolean ret = false;
         for (RegionFunction function : functions) {
-            if (function.apply(position)) {
-                ret = true;
-            }
+            ret |= (function.apply(position));
         }
         return ret;
     }
-
-
 
 }

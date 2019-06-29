@@ -42,8 +42,7 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutY(((pos.getY() - min.getY())));
         mutable.mutZ(((pos.getZ() - min.getZ())));
         MutableVector3 tmp = new MutableVector3(transform.apply(mutable.toVector3()));
-        BlockVector3 result = min.add(tmp.toBlockPoint());
-        return result;
+        return min.add(tmp.toBlockPoint());
     }
 
     @Override
@@ -60,7 +59,7 @@ public class PositionTransformExtent extends ResettableExtent {
     public BlockState getBlock(BlockVector3 position) {
         return super.getBlock(getPos(position));
     }
-    
+
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
     	return super.getFullBlock(getPos(position));

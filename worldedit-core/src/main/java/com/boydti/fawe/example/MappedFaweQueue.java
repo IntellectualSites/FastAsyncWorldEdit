@@ -10,7 +10,6 @@ import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
@@ -84,7 +83,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
 
     public MappedFaweQueue(final World world, IFaweQueueMap map) {
         this.weWorld = world;
-        if (world != null) this.world = Fawe.imp().getWorldName(world);
+        if (world != null) this.world = world.getName();
         if (map == null) {
             map = getSettings().PREVENT_CRASHES ? new WeakFaweQueueMap(this) : new DefaultFaweQueueMap(this);
         }
@@ -102,7 +101,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
 
     @Override
     public Collection<FaweChunk> getFaweChunks() {
-        return map.getFaweCunks();
+        return map.getFaweChunks();
     }
 
     @Override
@@ -229,7 +228,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
                 try {
                     task.run();
                 } catch (Throwable e) {
-                    MainUtil.handleError(e);
+                    e.printStackTrace();
                 }
             }
         }
@@ -246,7 +245,7 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
             try {
                 run.run();
             } catch (Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
     }

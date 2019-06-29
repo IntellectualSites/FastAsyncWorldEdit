@@ -3,6 +3,7 @@ package com.boydti.fawe.object.collection;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -115,14 +116,13 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             int b3 = ((byte) (index >> 15)) & 0xFF;
             int b4 = ((byte) (index >> 23)) & 0xFF;
             int x = offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21);
-            int y = b1;
             int z = offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21);
-            return MutableBlockVector3.get(x, y, z);
+            return MutableBlockVector3.get(x, b1, z);
         }
         return null;
     }
 
-    @Override
+    @NotNull @Override
     public Iterator<BlockVector3> iterator() {
         return new Iterator<BlockVector3>() {
             int index = set.nextSetBit(0);
@@ -158,12 +158,12 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         };
     }
 
-    @Override
+    @NotNull @Override
     public Object[] toArray() {
         return toArray(null);
     }
 
-    @Override
+    @NotNull @Override
     public <T> T[] toArray(T[] array) {
         int size = size();
         if (array == null || array.length < size) {
@@ -177,9 +177,8 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             int b3 = ((byte) (index >> 15)) & 0xFF;
             int b4 = ((byte) (index >> 23)) & 0xFF;
             int x = offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21);
-            int y = b1;
             int z = offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21);
-            array[i] = (T) BlockVector3.at(x, y, z);
+            array[i] = (T) BlockVector3.at(x, b1, z);
             index++;
         }
         return array;
@@ -276,7 +275,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(@NotNull Collection<?> c) {
         boolean result = false;
         int size = size();
         int index = -1;
@@ -318,9 +317,8 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             int b3 = ((byte) (index >> 15)) & 0xFF;
             int b4 = ((byte) (index >> 23)) & 0xFF;
             int x = offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21);
-            int y = b1;
             int z = offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21);
-            visitor.run(x, y, z, index);
+            visitor.run(x, b1, z, index);
         }
     }
 

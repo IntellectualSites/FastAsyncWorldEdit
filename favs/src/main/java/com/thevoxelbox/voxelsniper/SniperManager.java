@@ -6,9 +6,6 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- *
- */
 public class SniperManager {
     private Map<UUID, Sniper> sniperInstances = Maps.newHashMap();
     private VoxelSniper plugin;

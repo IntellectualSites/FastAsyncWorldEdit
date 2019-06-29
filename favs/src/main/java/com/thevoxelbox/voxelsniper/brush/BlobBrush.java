@@ -7,11 +7,6 @@ import org.bukkit.ChatColor;
 
 import java.util.Random;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Blob_Brush
- *
- * @author Giltwist
- */
 public class BlobBrush extends PerformBrush {
     private static final int GROW_PERCENT_DEFAULT = 1000;
     private static final int GROW_PERCENT_MIN = 1;
@@ -20,9 +15,6 @@ public class BlobBrush extends PerformBrush {
     private Random randomGenerator = new Random();
     private int growPercent = GROW_PERCENT_DEFAULT; // chance block on recursion pass is made active
 
-    /**
-     *
-     */
     public BlobBrush() {
         this.setName("Blob");
     }
@@ -101,7 +93,7 @@ public class BlobBrush extends PerformBrush {
 
         final double rSquared = Math.pow(brushSize + 1, 2);
 
-        // Make the changes        
+        // Make the changes
         for (int x = brushSizeDoubled; x >= 0; x--) {
             final double xSquared = Math.pow(x - brushSize - 1, 2);
 
@@ -233,7 +225,7 @@ public class BlobBrush extends PerformBrush {
                     v.sendMessage(ChatColor.RED + "Growth percent must be an integer " + GROW_PERCENT_MIN + "-" + GROW_PERCENT_MAX + "!");
                 }
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

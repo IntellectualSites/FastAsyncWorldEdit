@@ -64,11 +64,13 @@ public enum Direction {
     ;
 
     private final Vector3 direction;
-    private final BlockVector3 blockVector;
-    private final int flags, left, right;
-    
+    private final int flags;
+    private final int left;
+    private final int right;
+    private final BlockVector3 blockPoint;
+
     private static HashMap<String, Direction> map = new HashMap<>();
-    
+
     static {
         for (Direction dir : Direction.values()) {
             map.put(dir.name(), dir);
@@ -77,17 +79,17 @@ public enum Direction {
     }
 
     Direction(Vector3 vector, int flags, int left, int right) {
+        this.blockPoint = BlockVector3.at(Math.signum(vector.getX()), Math.signum(vector.getY()), Math.signum(vector.getZ()));
         this.direction = vector.normalize();
-        this.blockVector = BlockVector3.at(Math.signum(vector.getX()), Math.signum(vector.getY()), Math.signum(vector.getZ()));
         this.flags = flags;
         this.left = left;
         this.right = right;
     }
-    
+
     public static Direction get(CharSequence sequence) {
         return map.get(sequence);
     }
-    
+
     public Direction getLeft() {
         return left != -1 ? values()[left] : null;
     }
@@ -109,15 +111,15 @@ public enum Direction {
     }
 
     public int getBlockX() {
-        return blockVector.getBlockX();
+        return blockPoint.getX();
     }
 
     public int getBlockY() {
-        return blockVector.getBlockY();
+        return blockPoint.getY();
     }
 
     public int getBlockZ() {
-        return blockVector.getBlockZ();
+        return blockPoint.getZ();
     }
 
     /**
@@ -177,7 +179,7 @@ public enum Direction {
      * @return the vector
      */
     public BlockVector3 toBlockVector() {
-        return direction.toBlockPoint();
+        return blockPoint;
     }
 
     /**
@@ -332,3 +334,4 @@ public enum Direction {
     }
 
 }
+

@@ -9,11 +9,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public enum Jars {
-    WE_B_6_1_7_2("https://addons.cursecdn.com/files/2431/372/worldedit-bukkit-6.1.7.2.jar",
-            "CRVJCWGJJ6UK40CTGHXQVK2/3C9BBTOS25FWI0ZHD4S=", 1726340),
-
-    VS_B_5_171_0("https://media.forgecdn.net/files/2488/589/VoxelSniper-5.172.0-SNAPSHOT.jar",
-            "4CTEDDEKCAN/M6R0DHS925++HBSJ/TUYAAKAR4CUWC4=", 3615020),
 
     MM_v1_4_0("https://github.com/InventivetalentDev/MapManager/releases/download/1.4.0-SNAPSHOT/MapManager_v1.4.0-SNAPSHOT.jar",
             "AEO5SKBUGN4YJRS8XGGNLBM2QRZPTI1KF0/1W1URTGA=", 163279),
@@ -45,7 +40,7 @@ public enum Jars {
     public byte[] download() throws IOException {
         byte[] jarBytes = new byte[this.filesize];
         URL url = new URL(this.url);
-        try (DataInputStream dis = new DataInputStream(url.openConnection().getInputStream());) {
+        try (DataInputStream dis = new DataInputStream(url.openConnection().getInputStream())) {
             dis.readFully(jarBytes);
             if (dis.read() != -1) { // assert that we've read everything
                 throw new IllegalStateException("downloaded jar is longer than expected");

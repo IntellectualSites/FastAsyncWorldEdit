@@ -8,9 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 
-/**
- * @author DivineRage
- */
 public class ScannerBrush extends Brush {
     private static final int DEPTH_MIN = 1;
     private static final int DEPTH_DEFAULT = 24;
@@ -19,9 +16,6 @@ public class ScannerBrush extends Brush {
     private int depth = DEPTH_DEFAULT;
     private Material checkFor = Material.AIR;
 
-    /**
-     *
-     */
     public ScannerBrush() {
         this.setName("Scanner");
     }
@@ -29,10 +23,8 @@ public class ScannerBrush extends Brush {
     private int clamp(final int value, final int min, final int max) {
         if (value < min) {
             return min;
-        } else if (value > max) {
-            return max;
         } else {
-            return value;
+            return Math.min(value, max);
         }
     }
 
@@ -152,7 +144,7 @@ public class ScannerBrush extends Brush {
                 this.depth = this.clamp(Integer.parseInt(par[i].substring(1)), DEPTH_MIN, DEPTH_MAX);
                 v.sendMessage(ChatColor.AQUA + "Scanner depth set to " + this.depth);
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

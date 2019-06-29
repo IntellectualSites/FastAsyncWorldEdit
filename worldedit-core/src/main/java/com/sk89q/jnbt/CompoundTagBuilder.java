@@ -34,7 +34,7 @@ public class CompoundTagBuilder {
     /**
      * Create a new instance.
      */
-    public CompoundTagBuilder() {
+    CompoundTagBuilder() {
         this.entries = new HashMap<>();
     }
 
@@ -43,7 +43,7 @@ public class CompoundTagBuilder {
      *
      * @param value the value
      */
-    public CompoundTagBuilder(Map<String, Tag> value) {
+    CompoundTagBuilder(Map<String, Tag> value) {
         checkNotNull(value);
         this.entries = value;
     }

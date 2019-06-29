@@ -27,14 +27,11 @@ import com.boydti.fawe.object.function.block.BiomeCopy;
 import com.boydti.fawe.object.function.block.CombinedBlockCopy;
 import com.boydti.fawe.object.function.block.SimpleBlockCopy;
 import com.boydti.fawe.util.MaskTraverser;
-import com.google.common.base.Predicate;
-import com.sk89q.worldedit.EditSession;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.Lists;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -42,28 +39,23 @@ import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskTestFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
-import com.sk89q.worldedit.function.block.ExtentBlockCopy;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
 import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
-import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Makes a copy of a portion of one extent to another extent or another point.
@@ -94,8 +86,8 @@ public class ForwardExtentCopy implements Operation {
      * Create a new copy using the region's lowest minimum point as the
      * "from" position.
      *
-     * @param source      the source extent
-     * @param region      the region to copy
+     * @param source the source extent
+     * @param region the region to copy
      * @param destination the destination extent
      * @param to the destination position
      * @see #ForwardExtentCopy(Extent, Region, BlockVector3, Extent, BlockVector3) the main constructor
@@ -107,11 +99,11 @@ public class ForwardExtentCopy implements Operation {
     /**
      * Create a new copy.
      *
-     * @param source      the source extent
-     * @param region      the region to copy
-     * @param from        the source position
+     * @param source the source extent
+     * @param region the region to copy
+     * @param from the source position
      * @param destination the destination extent
-     * @param to          the destination position
+     * @param to the destination position
      */
     public ForwardExtentCopy(Extent source, Region region, BlockVector3 from, Extent destination, BlockVector3 to) {
         checkNotNull(source);
@@ -159,10 +151,20 @@ public class ForwardExtentCopy implements Operation {
         return sourceMask;
     }
 
+    /**
+     * Set whether entities should be copied along with blocks.
+     *
+     * @param copyEntities true if copying
+     */
     public void setCopyingEntities(boolean copyEntities) {
         this.copyEntities = copyEntities;
     }
 
+    /**
+     * Return whether entities should be copied along with blocks.
+     *
+     * @return true if copying
+     */
     public boolean isCopyingEntities() {
         return copyEntities;
     }
@@ -299,7 +301,7 @@ public class ForwardExtentCopy implements Operation {
                 if (copyBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
                     copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
                 }
-                blockCopy = new BackwardsExtentBlockCopy(transExt, region, finalDest, from, transform, copy);
+                blockCopy = new BackwardsExtentBlockCopy(region, from, transform, copy);
             } else {
                 transExt = new PositionTransformExtent(finalDest, currentTransform);
                 transExt.setOrigin(from);
@@ -364,7 +366,7 @@ public class ForwardExtentCopy implements Operation {
                     .filter(e -> e.getType() != EntityTypes.PLAYER)
                     .collect(Collectors.toList());
         } else {
-            entities = new ArrayList<>();
+            entities = Collections.emptyList();
         }
 
 
@@ -373,8 +375,6 @@ public class ForwardExtentCopy implements Operation {
 
             if (!entities.isEmpty()) {
                 ExtentEntityCopy entityCopy = new ExtentEntityCopy(from.toVector3(), destination, to.toVector3(), currentTransform);
-//            if (copyingEntities) {
-//                ExtentEntityCopy entityCopy = new ExtentEntityCopy(from, destination, to, currentTransform);
                 entityCopy.setRemoving(removingEntities);
                 EntityVisitor entityVisitor = new EntityVisitor(entities.iterator(), entityCopy);
                 Operations.completeBlindly(entityVisitor);

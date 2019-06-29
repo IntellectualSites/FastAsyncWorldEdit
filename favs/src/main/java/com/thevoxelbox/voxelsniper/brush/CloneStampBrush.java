@@ -6,15 +6,11 @@ import org.bukkit.ChatColor;
 
 /**
  * The CloneStamp class is used to create a collection of blocks in a cylinder shape according to the selection the player has set.
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Clone_and_CopyPasta_Brushes
  *
  * @author Voxel
  */
 public class CloneStampBrush extends StampBrush {
-    /**
-     *
-     */
-    public CloneStampBrush() {
+public CloneStampBrush() {
         this.setName("Clone");
     }
 
@@ -24,7 +20,7 @@ public class CloneStampBrush extends StampBrush {
      * x y z -- initial center of the selection v.brushSize -- the radius of the cylinder v.voxelHeight -- the heigth of the cylinder c.cCen -- the offset on
      * the Y axis of the selection ( bottom of the cylinder ) as blockPositionY: Bottom_Y = targetBlock.y + v.cCen;
      *
-     * @param v the caller
+     * @param v Sniper Caller
      */
     private void clone(final SnipeData v) {
         final int brushSize = v.getBrushSize();
@@ -109,7 +105,7 @@ public class CloneStampBrush extends StampBrush {
     }
 
     @Override
-    public final void parameters(final String[] par, final com.thevoxelbox.voxelsniper.SnipeData v) {
+    public final void parameters(final String[] par, final SnipeData v) {
         final String parameter = par[1];
 
         if (parameter.equalsIgnoreCase("info")) {

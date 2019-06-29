@@ -61,7 +61,7 @@ public class OldChunk implements Chunk {
      */
     public OldChunk(World world, CompoundTag tag) throws DataException {
         rootTag = tag;
-        
+
         blocks = NBTUtils.getChildTag(rootTag.getValue(), "Blocks", ByteArrayTag.class).getValue();
         data = NBTUtils.getChildTag(rootTag.getValue(), "Data", ByteArrayTag.class).getValue();
         rootX = NBTUtils.getChildTag(rootTag.getValue(), "xPos", IntTag.class).getValue();
@@ -191,6 +191,7 @@ public class OldChunk implements Chunk {
                 return state.toBaseBlock(tileEntity);
             }
         }
+
         return state.toBaseBlock();
     }
 

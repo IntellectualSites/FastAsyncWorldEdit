@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.util.command.parametric;
 
-import com.boydti.fawe.command.SuggestInputParseException;
-import com.boydti.fawe.config.BBC;
 import com.google.common.primitives.Chars;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -28,7 +26,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.minecraft.util.commands.SuggestionContext;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.InvalidUsageException;
@@ -37,6 +34,7 @@ import com.sk89q.worldedit.util.command.Parameter;
 import com.sk89q.worldedit.util.command.SimpleDescription;
 import com.sk89q.worldedit.util.command.UnconsumedParameterException;
 import com.sk89q.worldedit.util.command.binding.Switch;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -66,13 +64,13 @@ public class ParametricCallable extends AParametricCallable {
     /**
      * Create a new instance.
      *
-     * @param builder    the parametric builder
-     * @param object     the object to invoke on
-     * @param method     the method to invoke
+     * @param builder the parametric builder
+     * @param object the object to invoke on
+     * @param method the method to invoke
      * @param definition the command definition annotation
      * @throws ParametricException thrown on an error
      */
-    public ParametricCallable(ParametricBuilder builder, Object object, Method method, Command definition) throws ParametricException {
+    ParametricCallable(ParametricBuilder builder, Object object, Method method, Command definition) throws ParametricException {
         this.builder = builder;
         this.object = object;
         this.method = method;
@@ -80,7 +78,6 @@ public class ParametricCallable extends AParametricCallable {
         Annotation[][] annotations = method.getParameterAnnotations();
         String[] names = builder.getParanamer().lookupParameterNames(method, false);
         Type[] types = method.getGenericParameterTypes();
-
         parameters = new ParameterData[types.length];
         List<Parameter> userParameters = new ArrayList<>();
 
@@ -112,7 +109,7 @@ public class ParametricCallable extends AParametricCallable {
                     if (value.length > 0) {
                         parameter.setDefaultValue(value);
                     }
-                    // Special annotation bindings
+                // Special annotation bindings
                 } else if (parameter.getBinding() == null) {
                     parameter.setBinding(builder.getBindings());
                     parameter.setClassifier(annotation);
@@ -147,10 +144,10 @@ public class ParametricCallable extends AParametricCallable {
                     if (parameter.getConsumedCount() < 0) {
                         throw new ParametricException(
                                 "Found an parameter using the binding " +
-                                        parameter.getBinding().getClass().getCanonicalName() +
-                                        "\nthat does not know how many arguments it consumes, but " +
-                                        "it follows an optional parameter\nMethod: " +
-                                        method.toGenericString());
+                                parameter.getBinding().getClass().getCanonicalName() +
+                                "\nthat does not know how many arguments it consumes, but " +
+                                "it follows an optional parameter\nMethod: " +
+                                method.toGenericString());
                     }
                 }
             }
@@ -208,7 +205,7 @@ public class ParametricCallable extends AParametricCallable {
         locals.putIfAbsent(CommandCallable.class, this);
 
         String calledCommand = parentCommands.length > 0 ? parentCommands[parentCommands.length - 1] : "_";
-        String[] split = (calledCommand + " " + stringArguments).split(" ", -1);
+        String[] split = CommandContext.split(calledCommand + " " + stringArguments);
         CommandContext context = new CommandContext(split, getValueFlags(), false, locals);
 
         // Provide help if -? is specified
@@ -271,14 +268,14 @@ public class ParametricCallable extends AParametricCallable {
             }
             return result;
         } catch (MissingParameterException e) {
-            throw new InvalidUsageException(BBC.getPrefix() + "Too few parameters!", this, true);
+            throw new InvalidUsageException("Too few parameters!", this);
         } catch (UnconsumedParameterException e) {
-            throw new InvalidUsageException(BBC.getPrefix() + "Too many parameters! Unused parameters: " + e.getUnconsumed(), this, true);
+            throw new InvalidUsageException("Too many parameters! Unused parameters: " + e.getUnconsumed(), this);
         } catch (ParameterException e) {
             assert parameter != null;
             String name = parameter.getName();
 
-            throw new InvalidUsageException("For parameter '" + name + "': " + e.getMessage(), this, true);
+            throw new InvalidUsageException("For parameter '" + name + "': " + e.getMessage(), this);
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof CommandException) {
                 throw (CommandException) e.getCause();
@@ -344,12 +341,12 @@ public class ParametricCallable extends AParametricCallable {
     /**
      * Generate a name for a parameter.
      *
-     * @param type       the type
+     * @param type the type
      * @param classifier the classifier
-     * @param index      the index
+     * @param index the index
      * @return a generated name
      */
-    public static String generateName(Type type, Annotation classifier, int index) {
+    private static String generateName(Type type, Annotation classifier, int index) {
         if (classifier != null) {
             return classifier.annotationType().getSimpleName().toLowerCase();
         } else {
@@ -360,6 +357,5 @@ public class ParametricCallable extends AParametricCallable {
             }
         }
     }
-
 
 }

@@ -1,7 +1,6 @@
 package com.boydti.fawe.object;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 
 public abstract class FaweCommand<T> {
@@ -27,26 +26,16 @@ public abstract class FaweCommand<T> {
                 execute(player, args);
                 return true;
             } else if (player == null) {
-                TaskManager.IMP.async(new Runnable() {
-                    @Override
-                    public void run() {
-                        execute(player, args);
-                    }
-                });
+                TaskManager.IMP.async(() -> execute(player, args));
             } else {
-                if (!player.runAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        execute(player, args);
-                    }
-                }, true, true)) {
+                if (!player.runAction(() -> execute(player, args), true, true)) {
                     BBC.WORLDEDIT_COMMAND_LIMIT.send(player);
                     return true;
                 }
             }
             return true;
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return false;
     }

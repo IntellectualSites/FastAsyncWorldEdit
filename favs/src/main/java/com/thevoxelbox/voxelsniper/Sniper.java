@@ -1,4 +1,4 @@
-/**
+/*
  This file is part of VoxelSniper, licensed under the MIT License (MIT).
 
  Copyright (c) The VoxelBox <http://thevoxelbox.com>
@@ -71,7 +71,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Sniper {
-    private VoxelSniper plugin;
     private final UUID player;
     private boolean enabled = true;
 //    private LinkedList<FaweChangeSet> undoList = new LinkedList<>();
@@ -80,7 +79,6 @@ public class Sniper {
     public Sniper(VoxelSniper plugin, Player player) {
         Preconditions.checkNotNull(plugin);
         Preconditions.checkNotNull(player);
-        this.plugin = plugin;
         this.player = player.getUniqueId();
         SniperTool sniperTool = new SniperTool(this);
         sniperTool.assignAction(SnipeAction.ARROW, Material.ARROW);
@@ -89,7 +87,7 @@ public class Sniper {
     }
 
     public String getCurrentToolId() {
-        return getToolId((getPlayer().getInventory().getItemInMainHand() != null) ? getPlayer().getInventory().getItemInMainHand().getType() : null);
+        return getToolId(getPlayer().getInventory().getItemInMainHand().getType());
     }
 
     public String getToolId(Material itemInHand) {
@@ -130,10 +128,10 @@ public class Sniper {
     /**
      * Sniper execution call.
      *
-     * @param action       Action player performed
-     * @param itemInHand   Item in hand of player
+     * @param action Action player performed
+     * @param itemInHand Item in hand of player
      * @param clickedBlock Block that the player targeted/interacted with
-     * @param clickedFace  Face of that targeted Block
+     * @param clickedFace Face of that targeted Block
      * @return true if command visibly processed, false otherwise.
      */
     public boolean snipe(final Action action, final Material itemInHand, final Block clickedBlock, final BlockFace clickedFace) {
@@ -397,14 +395,12 @@ public class Sniper {
                 } else {
                     changeQueue.flush();
                 }
-                if (changeSet != null) {
-                    if (Settings.IMP.HISTORY.COMBINE_STAGES) {
-                        changeSet.closeAsync();
-                    } else {
-                        changeSet.close();
-                    }
-                    session.remember(changeSet.toEditSession(fp));
+                if (Settings.IMP.HISTORY.COMBINE_STAGES) {
+                    changeSet.closeAsync();
+                } else {
+                    changeSet.close();
                 }
+                session.remember(changeSet.toEditSession(fp));
                 return true;
             }
             return false;
@@ -511,7 +507,7 @@ public class Sniper {
             count++;
         }
         if (count > 0) {
-            BBC.COMMAND_UNDO_SUCCESS.send(fp);
+            BBC.COMMAND_UNDO_SUCCESS.send(fp, count == 1 ? "" : " x" + count);
         } else {
             BBC.COMMAND_UNDO_ERROR.send(fp);
         }

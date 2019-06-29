@@ -28,10 +28,9 @@ import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.sk89q.worldedit.registry.state.PropertyKey;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -48,10 +47,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class LegacyMapper {
 
@@ -90,7 +86,6 @@ public class LegacyMapper {
         }
         String source = Resources.toString(url, Charset.defaultCharset());
         LegacyDataFile dataFile = gson.fromJson(source, new TypeToken<LegacyDataFile>() {}.getType());
-
         ParserContext parserContext = new ParserContext();
         parserContext.setPreferringWildcard(false);
         parserContext.setRestricted(false);
@@ -99,7 +94,6 @@ public class LegacyMapper {
         for (Map.Entry<String, String> blockEntry : dataFile.blocks.entrySet()) {
             try {
                 BlockStateHolder blockState = BlockState.get(null, blockEntry.getValue());
-//            	BlockState blockState = WorldEdit.getInstance().getBlockFactory().parseFromInput(blockEntry.getValue(), parserContext).toImmutableState();
                 BlockType type = blockState.getBlockType();
                 if (type.hasProperty(PropertyKey.WATERLOGGED)) {
                     blockState = blockState.with(PropertyKey.WATERLOGGED, false);
@@ -165,7 +159,11 @@ public class LegacyMapper {
     @Nullable
     public int[] getLegacyFromItem(ItemType itemType) {
         Integer combinedId = getLegacyCombined(itemType);
-        return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
+        if (combinedId == null) {
+            return null;
+        } else {
+            return new int[]{combinedId >> 4, combinedId & 0xF};
+        }
     }
 
     @Nullable
@@ -226,7 +224,7 @@ public class LegacyMapper {
         Integer combinedId = getLegacyCombined(blockState);
         return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
     }
-    
+
     public BaseBlock getBaseBlockFromPlotBlock(PlotBlock plotBlock) {
     	if(plotBlock instanceof StringPlotBlock) {
     		try {

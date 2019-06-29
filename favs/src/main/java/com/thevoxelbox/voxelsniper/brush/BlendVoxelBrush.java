@@ -6,13 +6,8 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Blend_Brushes
- */
 public class BlendVoxelBrush extends BlendBrushBase {
-    /**
-     *
-     */
+
     public BlendVoxelBrush() {
         this.setName("Blend Voxel");
     }
@@ -40,7 +35,7 @@ public class BlendVoxelBrush extends BlendBrushBase {
         for (int x = 0; x <= brushSizeDoubled; x++) {
             for (int y = 0; y <= brushSizeDoubled; y++) {
                 System.arraycopy(oldMaterials[x + 1][y + 1], 1, newMaterials[x][y], 0,
-                        brushSizeDoubled + 1);
+                                 brushSizeDoubled + 1);
             }
         }
 

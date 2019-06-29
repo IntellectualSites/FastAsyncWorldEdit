@@ -23,7 +23,7 @@ public class CachedMathMan {
     private static float[] ANGLES = new float[65536];
     static {
         for (int i = 0; i < 65536; ++i) {
-            ANGLES[i] = (float) Math.sin((double) i * 3.141592653589793D * 2.0D / 65536.0D);
+            ANGLES[i] = (float) Math.sin((double) i * Math.PI * 2.0D / 65536.0D);
         }
     }
 
@@ -51,7 +51,7 @@ public class CachedMathMan {
         return ANGLES[(int) (paramFloat * 10430.378F + 16384.0F) & 0xFFFF];
     }
 
-    protected static final float atan2(float y, float x) {
+    protected static float atan2(float y, float x) {
         float add, mul;
 
         if (x < 0.0f) {
@@ -65,7 +65,7 @@ public class CachedMathMan {
                 mul = -1.0f;
             }
 
-            add = -3.141592653f;
+            add = (float) -Math.PI;
         } else {
             if (y < 0.0f) {
                 y = -y;
@@ -77,7 +77,7 @@ public class CachedMathMan {
             add = 0.0f;
         }
 
-        float invDiv = 1.0f / (((x < y) ? y : x) * INV_ATAN2_DIM_MINUS_1);
+        float invDiv = 1.0f / ((Math.max(x, y)) * INV_ATAN2_DIM_MINUS_1);
 
         int xi = (int) (x * invDiv);
         int yi = (int) (y * invDiv);

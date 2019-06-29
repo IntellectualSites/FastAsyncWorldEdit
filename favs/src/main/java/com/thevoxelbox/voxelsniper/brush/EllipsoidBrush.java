@@ -6,18 +6,12 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Ellipsoid_Brush
- */
 public class EllipsoidBrush extends PerformBrush {
     private double xRad;
     private double yRad;
     private double zRad;
     private boolean istrue;
 
-    /**
-     *
-     */
     public EllipsoidBrush() {
         this.setName("Ellipsoid");
     }
@@ -78,7 +72,7 @@ public class EllipsoidBrush extends PerformBrush {
     }
 
     @Override
-    public final void parameters(final String[] par, final com.thevoxelbox.voxelsniper.SnipeData v) {
+    public final void parameters(final String[] par, final SnipeData v) {
         this.istrue = false;
         for (int i = 1; i < par.length; i++) {
             final String parameter = par[i];

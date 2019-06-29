@@ -45,7 +45,7 @@ public class SweepBrush implements Brush, ResettableTool {
             return;
         }
 
-        boolean newPos = this.position == null || !position.equals(this.position);
+        boolean newPos = !position.equals(this.position);
         this.position = position;
         FawePlayer player = editSession.getPlayer();
         if (newPos) {
@@ -98,7 +98,6 @@ public class SweepBrush implements Brush, ResettableTool {
                 MutableVector3 last = new MutableVector3(0, 0, 0);
                 for (double pos = 0D; pos <= 1D; pos += step) {
                     Vector3 gradient = interpol.get1stDerivative(pos);
-                    if (last == null) last = new MutableVector3(interpol.get1stDerivative(pos));
                     double dist = MathMan.sqrtApprox(last.distanceSq(gradient));
                     last.mutX(gradient.getX());
                     last.mutY(gradient.getY());

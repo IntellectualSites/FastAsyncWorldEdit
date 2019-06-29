@@ -45,7 +45,7 @@ public class DefaultFaweQueueMap implements IFaweQueueMap {
     };
 
     @Override
-    public Collection<FaweChunk> getFaweCunks() {
+    public Collection<FaweChunk> getFaweChunks() {
         synchronized (blocks) {
             return new HashSet<>(blocks.values());
         }

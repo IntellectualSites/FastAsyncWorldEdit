@@ -21,14 +21,11 @@ package com.sk89q.worldedit.blocks;
 
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Block-related utility methods.

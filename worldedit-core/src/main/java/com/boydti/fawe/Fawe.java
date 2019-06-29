@@ -166,21 +166,6 @@ public class Fawe {
         this.timer = new FaweTimer();
         Fawe.this.IMP.setupVault();
 
-        File jar = MainUtil.getJarFile();
-        // TODO FIXME remove extrablocks.json
-//        File extraBlocks = MainUtil.copyFile(jar, "extrablocks.json", null);
-//        if (extraBlocks != null && extraBlocks.exists()) {
-//            TaskManager.IMP.task(() -> {
-//                try {
-//                    BundledBlockData.getInstance().loadFromResource();
-//                    BundledBlockData.getInstance().add(extraBlocks.toURI().toURL(), true);
-//                } catch (Throwable ignore) {
-//                    ignore.printStackTrace();
-//                    Fawe.debug("Invalid format: extrablocks.json");
-//                }
-//            });
-//        }
-
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
@@ -206,11 +191,6 @@ public class Fawe {
         checkNotNull(chatManager);
         this.chatManager = chatManager;
     }
-
-    //    @Deprecated
-//    public boolean isJava8() {
-//        return isJava8;
-//    }
 
     public DefaultTransformParser getTransformParser() {
         return transformParser;
@@ -295,11 +275,10 @@ public class Fawe {
         Settings.IMP.PLATFORM = IMP.getPlatform().replace("\"", "");
         try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
-          //  java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
             String versionString = br.readLine();
             String commitString = br.readLine();
             String dateString = br.readLine();
-           // scanner.close();
+            br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
             Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-Breaking/" + version.build;
@@ -361,7 +340,7 @@ public class Fawe {
         try {
             String arch = System.getenv("PROCESSOR_ARCHITECTURE");
             String wow64Arch = System.getenv("PROCESSOR_ARCHITEW6432");
-            boolean x86OS = arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64") ? false : true;
+            boolean x86OS = !(arch.endsWith("64") || wow64Arch != null && wow64Arch.endsWith("64"));
             boolean x86JVM = System.getProperty("sun.arch.data.model").equals("32");
             if (x86OS != x86JVM) {
                 debug("====== UPGRADE TO 64-BIT JAVA ======");
@@ -403,7 +382,7 @@ public class Fawe {
             }
         } catch (Throwable e) {
             debug("====== MEMORY LISTENER ERROR ======");
-            MainUtil.handleError(e, false);
+            e.printStackTrace();
             debug("===================================");
             debug("FAWE needs access to the JVM memory system:");
             debug(" - Change your Java security settings");
@@ -422,7 +401,7 @@ public class Fawe {
     }
 
     public static boolean isMainThread() {
-        return INSTANCE != null ? INSTANCE.thread == Thread.currentThread() : true;
+        return INSTANCE == null || INSTANCE.thread == Thread.currentThread();
     }
 
     /**

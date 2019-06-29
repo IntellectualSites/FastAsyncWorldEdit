@@ -67,7 +67,7 @@ public class IntegerProperty extends AbstractProperty<Integer> {
     public Integer getValueFor(String string) {
         try {
             int val = Integer.parseInt(string);
-//            if (!getValues().contains(val)) {
+//            if (!getValues().contains(val)) { // This check is slow
 //                throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + getValues().toString());
 //            }
             return val;

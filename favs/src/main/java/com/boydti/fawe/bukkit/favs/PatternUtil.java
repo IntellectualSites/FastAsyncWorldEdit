@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.favs;
 
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -23,7 +22,7 @@ public class PatternUtil {
             snipeData.sendMessage(ChatColor.GOLD + "Voxel: " + ChatColor.RED + arg);
             return pattern;
         } catch (InputParseException e) {
-            fp.sendMessage(BBC.getPrefix() + e.getMessage());
+            fp.sendMessage(e.getMessage());
             return null;
         }
     }

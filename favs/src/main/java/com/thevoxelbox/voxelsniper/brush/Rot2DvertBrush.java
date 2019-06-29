@@ -8,40 +8,31 @@ import com.thevoxelbox.voxelsniper.util.BlockWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
-/**
- * @author Gavjenks, hack job from the other 2d rotation brush blockPositionY piotr
- */
 // The X Y and Z variable names in this file do NOT MAKE ANY SENSE. Do not attempt to actually figure out what on earth is going on here. Just go to the
 // original 2d horizontal brush if you wish to make anything similar to this, and start there. I didn't bother renaming everything.
 public class Rot2DvertBrush extends Brush {
     private int mode = 0;
     private int bSize;
-    private int brushSize;
     private BlockWrapper[][][] snap;
     private double se;
 
-    /**
-     *
-     */
     public Rot2DvertBrush() {
         this.setName("2D Rotation");
     }
 
     @SuppressWarnings("deprecation")
     private void getMatrix() {
-        this.brushSize = (this.bSize * 2) + 1;
+        int brushSize = (this.bSize * 2) + 1;
 
-        this.snap = new BlockWrapper[this.brushSize][this.brushSize][this.brushSize];
+        this.snap = new BlockWrapper[brushSize][brushSize][brushSize];
 
         int sx = this.getTargetBlock().getX() - this.bSize;
-        int sy = this.getTargetBlock().getY() - this.bSize;
-        int sz = this.getTargetBlock().getZ() - this.bSize;
 
         for (int x = 0; x < this.snap.length; x++) {
-            sz = this.getTargetBlock().getZ() - this.bSize;
+            int sz = this.getTargetBlock().getZ() - this.bSize;
 
             for (int z = 0; z < this.snap.length; z++) {
-                sy = this.getTargetBlock().getY() - this.bSize;
+                int sy = this.getTargetBlock().getY() - this.bSize;
 
                 for (int y = 0; y < this.snap.length; y++) {
                     final AsyncBlock block = this.clampY(sx, sy, sz); // why is this not sx + x, sy + y sz + z?
@@ -56,7 +47,7 @@ public class Rot2DvertBrush extends Brush {
         }
     }
 
-    private void rotate(final SnipeData v) {
+    private void rotate() {
         final double brushSizeSquared = Math.pow(this.bSize + 0.5, 2);
         final double cos = Math.cos(this.se);
         final double sin = Math.sin(this.se);
@@ -142,7 +133,7 @@ public class Rot2DvertBrush extends Brush {
 
         if (this.mode == 0) {
             this.getMatrix();
-            this.rotate(v);
+            this.rotate();
         } else {
             v.owner().getPlayer().sendMessage(ChatColor.RED + "Something went wrong.");
         }
@@ -154,7 +145,7 @@ public class Rot2DvertBrush extends Brush {
 
         if (this.mode == 0) {
             this.getMatrix();
-            this.rotate(v);
+            this.rotate();
         } else {
             v.owner().getPlayer().sendMessage(ChatColor.RED + "Something went wrong.");
         }

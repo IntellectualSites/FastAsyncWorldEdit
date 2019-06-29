@@ -11,16 +11,8 @@ import org.bukkit.util.Vector;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Dome_Brush
- *
- * @author Gavjenks
- * @author MikeMatrix
- */
 public class DomeBrush extends Brush {
-    /**
-     *
-     */
+
     public DomeBrush() {
         this.setName("Dome");
     }
@@ -34,8 +26,8 @@ public class DomeBrush extends Brush {
     }
 
     /**
-     * @param v
-     * @param targetBlock
+     * @param v Snipe Data
+     * @param targetBlock the targetBlock to set
      */
     @SuppressWarnings("deprecation")
     private void generateDome(final SnipeData v, final Block targetBlock) {

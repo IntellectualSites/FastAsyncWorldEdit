@@ -8,14 +8,11 @@ import org.bukkit.block.Block;
 
 /**
  * THIS BRUSH SHOULD NOT USE PERFORMERS.
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Shell_Brushes
  *
  * @author Voxel
  */
 public class ShellBallBrush extends Brush {
-    /**
-     *
-     */
+
     public ShellBallBrush() {
         this.setName("Shell Ball");
     }
@@ -43,7 +40,7 @@ public class ShellBallBrush extends Brush {
         for (int x = 0; x <= brushSizeDoubled; x++) {
             for (int y = 0; y <= brushSizeDoubled; y++) {
                 System.arraycopy(oldMaterials[x + 1][y + 1], 1, newMaterials[x][y], 0,
-                        brushSizeDoubled + 1);
+                                 brushSizeDoubled + 1);
             }
         }
 
@@ -103,7 +100,7 @@ public class ShellBallBrush extends Brush {
         }
         v.owner().storeUndo(undo);
 
-        // This is needed because most uses of this brush will not be sible to the sniper.
+        // This is needed because most uses of this brush will not be sible to the sible sniper.
         v.owner().getPlayer().sendMessage(ChatColor.AQUA + "Shell complete.");
     }
 

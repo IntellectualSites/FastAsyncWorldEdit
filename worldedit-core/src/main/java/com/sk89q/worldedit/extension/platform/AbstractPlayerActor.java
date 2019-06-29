@@ -326,7 +326,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             if (!getLocation().getExtent().getBlock(spot).getBlockType().getMaterial().isMovementBlocker()) {
                 getLocation().getExtent().setBlock(spot, BlockTypes.GLASS.getDefaultState());
             }
-        }catch (WorldEditException e) {
+        } catch (WorldEditException e) {
             e.printStackTrace();
         }
         setPosition(Vector3.at(x + 0.5, y, z + 0.5));
@@ -334,12 +334,12 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public Location getBlockIn() {
-        return getLocation().setPosition(getLocation().floor());
+        return getLocation().setPosition(getLocation().toVector().floor());
     }
 
     @Override
     public Location getBlockOn() {
-        return getLocation().setPosition(getLocation().setY(getLocation().getY() - 1).floor());
+        return getLocation().setPosition(getLocation().setY(getLocation().getY() - 1).toVector().floor());
     }
 
     @Override
@@ -414,7 +414,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         boolean inFree = false;
 
         while ((block = hitBlox.getNextBlock()) != null) {
-            boolean free = !world.getBlock(block.toBlockPoint()).getBlockType().getMaterial().isMovementBlocker();
+            boolean free = !world.getBlock(block.toVector().toBlockPoint()).getBlockType().getMaterial().isMovementBlocker();
 
             if (firstBlock) {
                 firstBlock = false;

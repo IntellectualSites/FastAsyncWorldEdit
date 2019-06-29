@@ -46,6 +46,7 @@ import javax.annotation.Nullable;
 
 /**
  * An abstract implementation of {@link World}.
+ * Added by FAWE.
  */
 public interface SimpleWorld extends World {
     @Override

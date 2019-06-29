@@ -1,10 +1,8 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -17,6 +15,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -37,11 +36,11 @@ public class RandomFullClipboardPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
-        ClipboardHolder holder = clipboards.get(PseudoRandom.random.random(clipboards.size()));
+        ClipboardHolder holder = clipboards.get(ThreadLocalRandom.current().nextInt(clipboards.size()));
         AffineTransform transform = new AffineTransform();
         if (randomRotate) {
-            transform = transform.rotateY(PseudoRandom.random.random(4) * 90);
-            holder.setTransform(new AffineTransform().rotateY(PseudoRandom.random.random(4) * 90));
+            transform = transform.rotateY(ThreadLocalRandom.current().nextInt(4) * 90);
+            holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
         }
         if (randomFlip) {
             transform = transform.scale(Vector3.at(1, 0, 0).multiply(-2).add(1, 1, 1));

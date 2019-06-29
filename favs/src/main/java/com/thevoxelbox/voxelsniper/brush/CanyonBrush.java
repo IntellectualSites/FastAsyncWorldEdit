@@ -11,27 +11,16 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_CANYONATOR
- *
- * @author Voxel
- */
+
 public class CanyonBrush extends Brush {
     private static final int SHIFT_LEVEL_MIN = 10;
     private static final int SHIFT_LEVEL_MAX = 60;
     private int yLevel = 10;
 
-    /**
-     *
-     */
     public CanyonBrush() {
         this.setName("Canyon");
     }
 
-    /**
-     * @param chunk
-     * @param undo
-     */
     @SuppressWarnings("deprecation")
     protected final void canyon(final AsyncChunk chunk, final Undo undo) {
         for (int x = 0; x < CHUNK_SIZE; x++) {

@@ -3,11 +3,13 @@ package com.boydti.fawe.object.extent;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.jnbt.*;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.DoubleTag;
+import com.sk89q.jnbt.FloatTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -17,23 +19,26 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFaweQueue {
 
     private final World world;
     private FaweQueue queue;
-    private final int maxY;
 
     public FastWorldEditExtent(final World world, FaweQueue queue) {
         super(queue);
         this.world = world;
         this.queue = queue;
-        this.maxY = world.getMaxY();
     }
 
     public FaweQueue getQueue() {
@@ -112,7 +117,7 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
-    
+
 
 
     @Override
@@ -129,10 +134,9 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
     public BlockState getLazyBlock(int x, int y, int z) {
         int combinedId4Data = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combinedId4Data);
-        BlockState state = type.withStateId(combinedId4Data);
-        return state;
+        return type.withStateId(combinedId4Data);
     }
-    
+
     @Override
     public BaseBlock getFullBlock(BlockVector3 pos) {
         int combinedId4Data = queue.getCombinedId4Data(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), 0);

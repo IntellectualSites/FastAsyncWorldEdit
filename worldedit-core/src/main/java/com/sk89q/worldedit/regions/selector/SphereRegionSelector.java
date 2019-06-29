@@ -98,5 +98,4 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
         return "sphere";
     }
 
-
 }

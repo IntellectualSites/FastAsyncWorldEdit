@@ -10,7 +10,7 @@ import java.util.List;
 public class ScrollClipboard extends ScrollAction {
     private final List<ClipboardHolder> clipboards;
     private final LocalSession session;
-    int index = 0;
+    private int index = 0;
 
     public ScrollClipboard(BrushTool tool, LocalSession session, List<ClipboardHolder> clipboards) {
         super(tool);

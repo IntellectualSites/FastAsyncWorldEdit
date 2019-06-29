@@ -18,7 +18,6 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private transient MutableBlockVector3 cur;
     private transient MutableBlockVector3[] buffer;
     private transient MutableBlockVector3[] allowed;
-    private transient MutableBlockVector3 next;
 
     public SurfaceRandomOffsetPattern(Pattern pattern, int distance) {
         this.pattern = pattern;
@@ -44,6 +43,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         cur.setComponents(pos);
         for (int move = 0; move < moves; move++) {
             int index = 0;
+            MutableBlockVector3 next;
             for (int i = 0; i < allowed.length; i++) {
                 next = buffer[i];
                 BlockVector3 dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];

@@ -6,13 +6,8 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Blend_Brushes
- */
 public class BlendDiscBrush extends BlendBrushBase {
-    /**
-     *
-     */
+
     public BlendDiscBrush() {
         this.setName("Blend Disc");
     }

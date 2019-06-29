@@ -7,11 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Three-Point_Circle_Brush
- *
- * @author Giltwist
- */
 public class ThreePointCircleBrush extends PerformBrush {
     private Vector coordsOne;
     private Vector coordsTwo;
@@ -159,12 +154,12 @@ public class ThreePointCircleBrush extends PerformBrush {
     public final void parameters(final String[] par, final SnipeData v) {
         if (par[1].equalsIgnoreCase("info")) {
             v.sendMessage(ChatColor.YELLOW + "3-Point Circle Brush instructions: Select three corners with the arrow brush, then generate the Circle with the powder brush.");
-            String toleranceOptions = "";
+            StringBuilder toleranceOptions = new StringBuilder();
             for (final Tolerance tolerance : Tolerance.values()) {
-                if (!toleranceOptions.isEmpty()) {
-                    toleranceOptions += "|";
+                if (toleranceOptions.length() > 0) {
+                    toleranceOptions.append("|");
                 }
-                toleranceOptions += tolerance.name().toLowerCase();
+                toleranceOptions.append(tolerance.name().toLowerCase());
             }
             v.sendMessage(ChatColor.GOLD + "/b tpc " + toleranceOptions + " -- Toggle the calculations to emphasize accuracy or smoothness");
             return;
@@ -193,7 +188,9 @@ public class ThreePointCircleBrush extends PerformBrush {
      * @author MikeMatrix
      */
     private enum Tolerance {
-        DEFAULT(1000), ACCURATE(10), SMOOTH(2000);
+        DEFAULT(1000),
+        ACCURATE(10),
+        SMOOTH(2000);
         private int value;
 
         Tolerance(final int value) {

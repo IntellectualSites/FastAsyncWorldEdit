@@ -2,9 +2,11 @@ package com.boydti.fawe.bukkit.regions;
 
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.regions.FaweMask;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.*;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -53,7 +55,7 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public BukkitMask getMask(final FawePlayer<Player> fp) {
+    public FaweMask getMask(final FawePlayer<Player> fp) {
         final Player player = fp.parent;
         final Location location = player.getLocation();
         try {
@@ -71,12 +73,7 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
                         final Chunk chunk = location.getChunk();
                         final Location pos1 = new Location(location.getWorld(), chunk.getX() * 16, 0, chunk.getZ() * 16);
                         final Location pos2 = new Location(location.getWorld(), (chunk.getX() * 16) + 15, 156, (chunk.getZ() * 16) + 15);
-                        return new BukkitMask(pos1, pos2) {
-                            @Override
-                            public String getName() {
-                                return "PLOT:" + location.getChunk().getX() + "," + location.getChunk().getZ();
-                            }
-
+                        return new FaweMask(BukkitAdapter.adapt(pos1).toBlockPoint(), BukkitAdapter.adapt(pos2).toBlockPoint()) {
                             @Override
                             public boolean isValid(FawePlayer player, MaskType type) {
                                 return isAllowed((Player) player.parent, myplot);

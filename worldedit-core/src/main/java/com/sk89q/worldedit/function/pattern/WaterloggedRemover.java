@@ -20,27 +20,59 @@
 package com.sk89q.worldedit.function.pattern;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import java.lang.ref.SoftReference;
+import java.util.Map;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 /**
  * Removes the waterlogged state from blocks if possible. If not possible, returns air.
  */
 public class WaterloggedRemover extends AbstractExtentPattern {
 
+    private static SoftReference<BlockState[]> cache = new SoftReference<>(null);
+
+    private synchronized BlockState[] getRemap() {
+         BlockState[] remap = this.cache.get();
+         if (remap != null) return remap;
+         this.cache = new SoftReference<>(remap = new BlockState[BlockTypes.states.length]);
+
+         // init
+        for (int i = 0; i < remap.length; i++) {
+            BlockState state = remap[i];
+            BlockType type = state.getBlockType();
+            if (!type.hasProperty(PropertyKey.WATERLOGGED)) {
+                continue;
+            }
+            if (state.getState(PropertyKey.WATERLOGGED) == Boolean.TRUE) {
+                remap[i] = state.with(PropertyKey.WATERLOGGED, false);
+            }
+        }
+        return remap;
+    }
+
+    private final BlockState[] remap;
+
     public WaterloggedRemover(Extent extent) {
         super(extent);
+        this.remap = getRemap();
     }
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
         BaseBlock block = getExtent().getFullBlock(position);
-        @SuppressWarnings("unchecked")
-        Property<Object> prop = (Property<Object>) block.getBlockType().getPropertyMap().getOrDefault("waterlogged", null);
-        if (prop != null) {
-            return block.with(prop, false);
+        BlockState newState = remap[block.getOrdinal()];
+        if (newState != null) {
+            return newState.toBaseBlock(block.getNbtData());
         }
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }

@@ -6,9 +6,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 
-/**
- *
- */
 public class UndoDelegate implements BlockChangeDelegate {
     private final World targetWorld;
     private Undo currentUndo;

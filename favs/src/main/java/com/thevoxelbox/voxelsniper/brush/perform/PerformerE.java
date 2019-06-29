@@ -12,9 +12,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author Voxel
- */
+
 
 /* The m/i/c system of naming performers: <placement-option>[replacement-option][extras]
  *

@@ -27,10 +27,10 @@ import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
+
     private final Vector3 unit;
     private final Vector3 zero2;
     private Vector3 current = new MutableVector3(Vector3.ZERO);
-    private EditSession editSession;
     private Extent extent;
 
     public WorldEditExpressionEnvironment(EditSession editSession, Vector3 unit, Vector3 zero) {
@@ -64,7 +64,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     @Override
     public int getBlockTypeAbs(double x, double y, double z) {
-        return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
+        return extent.getBlock(BlockVector3.at(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     @Override
     public int getBlockTypeRel(double x, double y, double z) {
-        return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() >> 4;
+        return extent.getBlock(toWorldRel(x, y, z).toBlockPoint()).getBlockType().getLegacyCombinedId() >> 4;
     }
 
     @Override
@@ -89,6 +89,5 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     public void setCurrentBlock(Vector3 current) {
         this.current = current;
     }
-
 
 }

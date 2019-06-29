@@ -36,13 +36,12 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 public class BukkitServerInterface implements MultiUserPlatform {
     public Server server;
@@ -100,7 +99,7 @@ public class BukkitServerInterface implements MultiUserPlatform {
             return player;
         } else {
             org.bukkit.entity.Player bukkitPlayer = server.getPlayerExact(player.getName());
-            return bukkitPlayer != null ? plugin.wrapPlayer(bukkitPlayer) : null;
+            return bukkitPlayer != null ? WorldEditPlugin.getInstance().wrapPlayer(bukkitPlayer) : null;
         }
     }
 
@@ -119,7 +118,7 @@ public class BukkitServerInterface implements MultiUserPlatform {
     public void registerCommands(Dispatcher dispatcher) {
         List<CommandInfo> toRegister = new ArrayList<>();
         BukkitCommandInspector inspector = new BukkitCommandInspector(plugin, dispatcher);
-        
+
         for (CommandMapping command : dispatcher.getCommands()) {
             Description description = command.getDescription();
             List<String> permissions = description.getPermissions();
@@ -177,7 +176,7 @@ public class BukkitServerInterface implements MultiUserPlatform {
     public Collection<Actor> getConnectedUsers() {
         List<Actor> users = new ArrayList<>();
         for (org.bukkit.entity.Player player : Bukkit.getServer().getOnlinePlayers()) {
-            users.add(plugin.wrapPlayer(player));
+            users.add(WorldEditPlugin.getInstance().wrapPlayer(player));
         }
         return users;
     }

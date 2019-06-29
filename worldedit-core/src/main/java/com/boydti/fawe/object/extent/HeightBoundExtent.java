@@ -6,6 +6,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 public class HeightBoundExtent extends FaweRegionExtent {
 
@@ -35,6 +36,6 @@ public class HeightBoundExtent extends FaweRegionExtent {
 
     @Override
     public Collection<Region> getRegions() {
-        return Arrays.asList(new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, min, max, Integer.MIN_VALUE, Integer.MAX_VALUE));
+        return Collections.singletonList(new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, min, max, Integer.MIN_VALUE, Integer.MAX_VALUE));
     }
 }

@@ -124,7 +124,6 @@ public class ContextArgumentStack implements ArgumentStack {
      *
      * <p>The marked position initially starts at 0.</p>
      */
-    @Override
     public void mark() {
         markedIndex = index;
     }
@@ -137,7 +136,6 @@ public class ContextArgumentStack implements ArgumentStack {
      *
      * @return the consumed arguments
      */
-    @Override
     public String reset() {
         String value = (index - 1 > markedIndex) ? context.getString(markedIndex, index - 1) : "";
         index = markedIndex;
@@ -176,7 +174,5 @@ public class ContextArgumentStack implements ArgumentStack {
     public CommandContext getContext() {
         return context;
     }
-
-
 
 }

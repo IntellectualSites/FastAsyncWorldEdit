@@ -117,7 +117,7 @@ public class HistoryCommands extends MethodCommands {
                                             rollback.setTime(historyFile.lastModified());
                                             RollbackDatabase db = DBHandler.IMP.getDatabase(world);
                                             db.logEdit(rollback);
-                                            player.print(BBC.getPrefix() + "Logging: " + historyFile);
+                                            player.print("Logging: " + historyFile);
                                         }
                                     }
                                 } catch (IllegalArgumentException e) {
@@ -127,7 +127,7 @@ public class HistoryCommands extends MethodCommands {
                             }
                         }
                     }
-                    player.print(BBC.getPrefix() + "Done import!");
+                    player.print("Done import!");
                     return;
                 }
                 String toParse = user.substring(1);
@@ -142,7 +142,7 @@ public class HistoryCommands extends MethodCommands {
                 if (file.getBDFile().exists()) {
                     if (restore) file.redo(FawePlayer.wrap(player));
                     else file.undo(FawePlayer.wrap(player));
-                    BBC.ROLLBACK_ELEMENT.send(player, Fawe.imp().getWorldName(world) + "/" + user + "-" + index);
+                    BBC.ROLLBACK_ELEMENT.send(player, world.getName() + "/" + user + "-" + index);
                 } else {
                     BBC.TOOL_INSPECT_INFO_FOOTER.send(player, 0);
                 }
@@ -193,15 +193,10 @@ public class HistoryCommands extends MethodCommands {
             @Override
             public void run(DiskStorageHistory edit) {
                 edit.undo(fp, allowedRegions);
-                BBC.ROLLBACK_ELEMENT.send(player, Fawe.imp().getWorldName(edit.getWorld()) + "/" + user + "-" + edit.getIndex());
+                BBC.ROLLBACK_ELEMENT.send(player, edit.getWorld().getName() + "/" + user + "-" + edit.getIndex());
                 count.incrementAndGet();
             }
-        }, new Runnable() {
-            @Override
-            public void run() {
-                BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count);
-            }
-        }, true, restore);
+        }, () -> BBC.TOOL_INSPECT_INFO_FOOTER.send(player, count), true, restore);
     }
 
     @Command(

@@ -85,6 +85,7 @@ public class GroundFunction implements LayerFunction {
         if (depth == 0) {
             if (function.apply(position)) {
                 affected++;
+                return true;
             }
         }
 

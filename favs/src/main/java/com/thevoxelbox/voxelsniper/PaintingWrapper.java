@@ -23,9 +23,9 @@ public final class PaintingWrapper {
     /**
      * The paint method used to scroll or set a painting to a specific type.
      *
-     * @param p      The player executing the method
-     * @param auto   Scroll automatically? If false will use 'choice' to try and set the painting
-     * @param back   Scroll in reverse?
+     * @param p The player executing the method
+     * @param auto Scroll automatically? If false will use 'choice' to try and set the painting
+     * @param back Scroll in reverse?
      * @param choice Chosen index to set the painting to
      */
     @SuppressWarnings("deprecation")

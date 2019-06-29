@@ -25,7 +25,11 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
+
+import java.util.Vector;
 
 public class GravityBrush implements Brush {
 
@@ -37,10 +41,6 @@ public class GravityBrush implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
-        Mask mask = editSession.getMask();
-        if (mask == Masks.alwaysTrue() || mask == Masks.alwaysTrue2D()) {
-            mask = null;
-        }
         int size = (int) sizeDouble;
         int endY = position.getBlockY() + size;
         int startPerformY = Math.max(0, position.getBlockY() - size);
@@ -52,7 +52,7 @@ public class GravityBrush implements Brush {
                     BlockStateHolder block = editSession.getLazyBlock(x, y, z);
                     if (!block.getBlockType().getMaterial().isAir()) {
                         if (y != freeSpot) {
-                            editSession.setBlock(x, y, z, EditSession.nullBlock);
+                            editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
                             editSession.setBlock(x, freeSpot, z, block);
                         }
                         freeSpot = y + 1;
@@ -61,7 +61,5 @@ public class GravityBrush implements Brush {
             }
         }
     }
-
-
 
 }

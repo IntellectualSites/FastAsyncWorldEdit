@@ -2,7 +2,6 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.exception.FaweException;
@@ -14,9 +13,10 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
+
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class WEManager {
 
@@ -33,7 +33,7 @@ public class WEManager {
                 field.set(parent, new NullExtent((Extent) field.get(parent), reason));
             }
         } catch (final Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         throw new FaweException(reason);
     }
@@ -89,8 +89,8 @@ public class WEManager {
         if (!Settings.IMP.REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
-        FaweLocation loc = player.getLocation();
-        String world = loc.world;
+        Location loc = player.getLocation();
+        String world = player.getWorld().getName();
         if (!world.equals(player.getMeta("lastMaskWorld"))) {
             player.deleteMeta("lastMaskWorld");
             player.deleteMeta("lastMask");
@@ -112,7 +112,7 @@ public class WEManager {
                         FaweMask mask = iter.next();
                         if (mask.isValid(player, type)) {
                             Region region = mask.getRegion();
-                            if (region.contains(loc.x, loc.y, loc.z)) {
+                            if (region.contains(loc.toBlockPoint())) {
                                 regions.add(region);
                             } else {
                                 removed = true;
@@ -144,12 +144,7 @@ public class WEManager {
                 }
             }
         }
-        if (!tmpMasks.isEmpty()) {
-            masks = tmpMasks;
-            regions = masks.stream().map(FaweMask::getRegion).collect(Collectors.toSet());
-        } else {
-            regions.addAll(backupRegions);
-        }
+        regions.addAll(backupRegions);
         if (!masks.isEmpty()) {
             player.setMeta("lastMask", masks);
         } else {
@@ -194,7 +189,7 @@ public class WEManager {
                     }), 2);
                 });
             } catch (final Exception e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }, false, false);
     }

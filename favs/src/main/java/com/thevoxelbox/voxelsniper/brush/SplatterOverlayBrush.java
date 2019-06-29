@@ -10,11 +10,6 @@ import org.bukkit.ChatColor;
 
 import java.util.Random;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Splatter_Overlay_Brush
- *
- * @author Gavjenks Splatterized blockPositionY Giltwist
- */
 public class SplatterOverlayBrush extends PerformBrush {
     private static final int GROW_PERCENT_MIN = 1;
     private static final int GROW_PERCENT_DEFAULT = 1000;
@@ -34,9 +29,6 @@ public class SplatterOverlayBrush extends PerformBrush {
     private int depth = 3;
     private boolean allBlocks = false;
 
-    /**
-     *
-     */
     public SplatterOverlayBrush() {
         this.setName("Splatter Overlay");
     }
@@ -88,8 +80,9 @@ public class SplatterOverlayBrush extends PerformBrush {
             }
             // integrate tempsplat back into splat at end of iteration
             for (int x = 2 * v.getBrushSize(); x >= 0; x--) {
-                if (2 * v.getBrushSize() + 1 >= 0)
+                if (2 * v.getBrushSize() + 1 >= 0) {
                     System.arraycopy(tempSplat[x], 0, splat[x], 0, 2 * v.getBrushSize() + 1);
+                }
             }
         }
         this.growPercent = gref;
@@ -124,9 +117,6 @@ public class SplatterOverlayBrush extends PerformBrush {
                                                 memory[x + v.getBrushSize()][z + v.getBrushSize()] = 1;
                                             }
                                         }
-                                        continue;
-                                    } else {
-                                        continue;
                                     }
                                 } else {
                                     final int depth = randomizeHeight ? generator.nextInt(this.depth) : this.depth;
@@ -197,8 +187,9 @@ public class SplatterOverlayBrush extends PerformBrush {
             }
             // integrate tempsplat back into splat at end of iteration
             for (int x = 2 * v.getBrushSize(); x >= 0; x--) {
-                if (2 * v.getBrushSize() + 1 >= 0)
+                if (2 * v.getBrushSize() + 1 >= 0) {
                     System.arraycopy(tempsplat[x], 0, splat[x], 0, 2 * v.getBrushSize() + 1);
+                }
             }
         }
         this.growPercent = gref;
@@ -225,9 +216,6 @@ public class SplatterOverlayBrush extends PerformBrush {
                                                 // in parameters
                                                 memory[x + v.getBrushSize()][z + v.getBrushSize()] = 1; // stop it from checking any other blocks in this vertical 1x1 column.
                                             }
-                                            continue;
-                                        } else {
-                                            continue;
                                         }
                                     } else {
                                         final int depth = randomizeHeight ? generator.nextInt(this.depth) : this.depth;
@@ -338,10 +326,10 @@ public class SplatterOverlayBrush extends PerformBrush {
                         v.sendMessage(ChatColor.RED + "Recursions must be an integer 1-10!");
                     }
                 } else {
-                    v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                    v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
                 }
             } catch (Exception exception) {
-                v.sendMessage(String.format("An error occured while processing parameter %s.", parameter));
+                v.sendMessage(String.format("An error occurred while processing parameter %s.", parameter));
             }
         }
     }

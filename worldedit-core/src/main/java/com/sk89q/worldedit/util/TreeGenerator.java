@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.util;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -30,6 +31,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -64,8 +66,8 @@ public class TreeGenerator {
             }
         },
         JUNGLE("Jungle tree", "jungle"),
-        SMALL_JUNGLE("Small jungle tree", "shortjungle", "smalljungle"),
-        SHORT_JUNGLE("Short jungle tree") {
+        SMALL_JUNGLE("Small jungle tree", "smalljungle"),
+        SHORT_JUNGLE("Short jungle tree", "shortjungle") {
             @Override
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
                 return SMALL_JUNGLE.generate(editSession, pos);
@@ -113,22 +115,22 @@ public class TreeGenerator {
         private static final Set<String> primaryAliases = Sets.newHashSet();
 
         private final String name;
-        private final String[] lookupKeys;
+        public final ImmutableList<String> lookupKeys;
 
         static {
             for (TreeType type : EnumSet.allOf(TreeType.class)) {
                 for (String key : type.lookupKeys) {
                     lookup.put(key, type);
                 }
-                if (type.lookupKeys.length > 0) {
-                    primaryAliases.add(type.lookupKeys[0]);
+                if (type.lookupKeys.size() > 0) {
+                    primaryAliases.add(type.lookupKeys.get(0));
                 }
             }
         }
 
         TreeType(String name, String... lookupKeys) {
             this.name = name;
-            this.lookupKeys = lookupKeys;
+            this.lookupKeys = ImmutableList.copyOf(lookupKeys);
         }
 
         public static Set<String> getAliases() {
@@ -160,7 +162,7 @@ public class TreeGenerator {
          */
         @Nullable
         public static TreeType lookup(String name) {
-            return lookup.get(name.toLowerCase());
+            return lookup.get(name.toLowerCase(Locale.ROOT));
         }
     }
 
@@ -179,8 +181,8 @@ public class TreeGenerator {
         int trunkHeight = (int) Math.floor(Math.random() * 2) + 3;
         int height = (int) Math.floor(Math.random() * 5) + 8;
 
-        BlockStateHolder logBlock = BlockTypes.OAK_LOG.getDefaultState();
-        BlockStateHolder leavesBlock = BlockTypes.OAK_LEAVES.getDefaultState();
+        BlockState logBlock = BlockTypes.OAK_LOG.getDefaultState();
+        BlockState leavesBlock = BlockTypes.OAK_LEAVES.getDefaultState();
 
         // Create trunk
         for (int i = 0; i < trunkHeight; ++i) {

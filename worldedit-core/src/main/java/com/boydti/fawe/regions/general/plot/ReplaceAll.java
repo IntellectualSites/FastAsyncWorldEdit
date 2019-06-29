@@ -1,3 +1,4 @@
+/*
 package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.object.FawePlayer;
@@ -45,37 +46,30 @@ public class ReplaceAll extends Command {
             plot.addRunning();
             FawePlayer<Object> fp = FawePlayer.wrap(player.getName());
             Captions.TASK_START.send(player);
-            TaskManager.IMP.async(new Runnable() {
-                @Override
-                public void run() {
-                    fp.runAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            String worldName = plot.getWorldName();
-                            TaskManager.IMP.sync(new RunnableVal<Object>() {
-                                @Override
-                                public void run(Object value) {
-                                    SetupUtils.manager.unload(worldName, true);
-                                }
-                            });
-                            FakePlayer actor = FakePlayer.getConsole();
-                            String cmd = "/replaceallpattern " + worldName + " " + StringMan.join(args, " ");
-                            CommandEvent event = new CommandEvent(actor, cmd);
-                            CommandManager.getInstance().handleCommandOnCurrentThread(event);
-                            TaskManager.IMP.sync(new RunnableVal<Object>() {
-                                @Override
-                                public void run(Object value) {
-                                    plot.teleportPlayer(player);
-                                }
-                            });
-                            plot.removeRunning();
-                        }
-                    }, true, false);
-                }
-            });
+            TaskManager.IMP.async(() -> fp.runAction(() -> {
+                String worldName = plot.getWorldName();
+                TaskManager.IMP.sync(new RunnableVal<Object>() {
+                    @Override
+                    public void run(Object value) {
+                        SetupUtils.manager.unload(worldName, true);
+                    }
+                });
+                FakePlayer actor = FakePlayer.getConsole();
+                String cmd = "/replaceallpattern " + worldName + " " + StringMan.join(args, " ");
+                CommandEvent event = new CommandEvent(actor, cmd);
+                CommandManager.getInstance().handleCommandOnCurrentThread(event);
+                TaskManager.IMP.sync(new RunnableVal<Object>() {
+                    @Override
+                    public void run(Object value) {
+                        plot.teleportPlayer(player);
+                    }
+                });
+                plot.removeRunning();
+            }, true, false));
         } else {
             player.sendMessage("Must have the `worlds` component enabled in the PlotSquared config.yml");
             return;
         }
     }
 }
+*/

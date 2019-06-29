@@ -8,12 +8,6 @@ import com.thevoxelbox.voxelsniper.Undo;
 
 import java.util.Random;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Random-Erode_Brush
- *
- * @author Piotr
- * @author Giltwist (Randomized blockPositionY)
- */
 public class RandomErodeBrush extends Brush {
     private final double trueCircle = 0.5;
     private BlockWrapper[][][] snap;
@@ -21,14 +15,10 @@ public class RandomErodeBrush extends Brush {
     private int bsize;
     private int erodeFace;
     private int fillFace;
-    private int brushSize;
     private int erodeRecursion = 1;
     private int fillRecursion = 1;
     private Random generator = new Random();
 
-    /**
-     *
-     */
     public RandomErodeBrush() {
         this.setName("RandomErode");
     }
@@ -60,7 +50,6 @@ public class RandomErodeBrush extends Brush {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private boolean fill(final int x, final int y, final int z) {
         if (this.snap[x][y][z].isSolid()) {
             return false;
@@ -95,19 +84,17 @@ public class RandomErodeBrush extends Brush {
     }
 
     private void getMatrix() {
-        this.brushSize = ((this.bsize + 1) * 2) + 1;
+        int brushSize = ((this.bsize + 1) * 2) + 1;
 
         if (this.snap.length == 0) {
-            this.snap = new BlockWrapper[this.brushSize][this.brushSize][this.brushSize];
+            this.snap = new BlockWrapper[brushSize][brushSize][brushSize];
 
             int sx = this.getTargetBlock().getX() - (this.bsize + 1);
-            int sy = this.getTargetBlock().getY() - (this.bsize + 1);
-            int sz = this.getTargetBlock().getZ() - (this.bsize + 1);
 
             for (int x = 0; x < this.snap.length; x++) {
-                sz = this.getTargetBlock().getZ() - (this.bsize + 1);
+                int sz = this.getTargetBlock().getZ() - (this.bsize + 1);
                 for (int z = 0; z < this.snap.length; z++) {
-                    sy = this.getTargetBlock().getY() - (this.bsize + 1);
+                    int sy = this.getTargetBlock().getY() - (this.bsize + 1);
                     for (int y = 0; y < this.snap.length; y++) {
                         this.snap[x][y][z] = new BlockWrapper(this.clampY(sx, sy, sz));
                         sy++;
@@ -118,16 +105,14 @@ public class RandomErodeBrush extends Brush {
             }
             this.firstSnap = this.snap.clone();
         } else {
-            this.snap = new BlockWrapper[this.brushSize][this.brushSize][this.brushSize];
+            this.snap = new BlockWrapper[brushSize][brushSize][brushSize];
 
             int sx = this.getTargetBlock().getX() - (this.bsize + 1);
-            int sy = this.getTargetBlock().getY() - (this.bsize + 1);
-            int sz = this.getTargetBlock().getZ() - (this.bsize + 1);
 
             for (int x = 0; x < this.snap.length; x++) {
-                sz = this.getTargetBlock().getZ() - (this.bsize + 1);
+                int sz = this.getTargetBlock().getZ() - (this.bsize + 1);
                 for (int z = 0; z < this.snap.length; z++) {
-                    sy = this.getTargetBlock().getY() - (this.bsize + 1);
+                    int sy = this.getTargetBlock().getY() - (this.bsize + 1);
                     for (int y = 0; y < this.snap.length; y++) {
                         this.snap[x][y][z] = new BlockWrapper(this.clampY(sx, sy, sz));
                         sy++;
@@ -317,29 +302,18 @@ public class RandomErodeBrush extends Brush {
         return "voxelsniper.brush.randomerode";
     }
 
-    /**
-     * @author unknown
-     */
     private class BlockWrapper {
         private boolean solid;
         private AsyncBlock nativeBlock;
         private int id;
         private int i;
 
-        /**
-         * @param bl
-         */
-        @SuppressWarnings("deprecation")
         public BlockWrapper(final AsyncBlock bl) {
             this.setNativeBlock(bl);
             this.setI(bl.getTypeId());
             switch (bl.getType()) {
                 case AIR:
-                    this.setSolid(false);
-                    break;
                 case WATER:
-                    this.setSolid(false);
-                    break;
                 case LAVA:
                     this.setSolid(false);
                     break;

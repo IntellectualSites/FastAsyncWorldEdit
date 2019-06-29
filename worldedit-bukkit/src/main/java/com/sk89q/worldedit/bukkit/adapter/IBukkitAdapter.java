@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public interface IBukkitAdapter {
+
     /**
      * Checks equality between a WorldEdit BlockType and a Bukkit Material
      *
@@ -101,7 +102,7 @@ public interface IBukkitAdapter {
     default Location adapt(org.bukkit.Location location) {
         checkNotNull(location);
         Vector3 position = asVector(location);
-        return new com.sk89q.worldedit.util.Location(
+        return new Location(
                 adapt(location.getWorld()),
                 position,
                 location.getYaw(),
@@ -138,7 +139,7 @@ public interface IBukkitAdapter {
                 world,
                 position.getX(), position.getY(), position.getZ());
     }
-    
+
     default org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position){
     	return adapt(world, position.toVector3());
     }
@@ -170,7 +171,7 @@ public interface IBukkitAdapter {
         checkNotNull(location);
         return Vector3.at(location.getX(), location.getY(), location.getZ());
     }
-    
+
     /**
      * Create a WorldEdit BlockVector from a Bukkit location.
      *

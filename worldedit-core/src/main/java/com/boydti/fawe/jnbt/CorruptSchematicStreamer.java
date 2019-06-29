@@ -293,8 +293,7 @@ public class CorruptSchematicStreamer {
         int vx = 0, vy = 0, vz = 0;
         for (int x = 0; x < factors.size(); x++) {
             int xValue = factors.get(x);
-            for (int y = 0; y < factors.size(); y++) {
-                int yValue = factors.get(y);
+            for (int yValue : factors) {
                 long area = xValue * yValue;
                 if (volume % area == 0) {
                     int z = (int) (volume / area);

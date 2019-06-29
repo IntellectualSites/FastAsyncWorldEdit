@@ -6,24 +6,14 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Drain_Brush
- *
- * @author Gavjenks
- * @author psanker
- */
 public class DrainBrush extends Brush {
     private double trueCircle = 0;
     private boolean disc = false;
 
-    /**
-     *
-     */
     public DrainBrush() {
         this.setName("Drain");
     }
 
-    @SuppressWarnings("deprecation")
     private void drain(final SnipeData v) {
         final int brushSize = v.getBrushSize();
         final double brushSizeSquared = Math.pow(brushSize + this.trueCircle, 2);
@@ -123,7 +113,7 @@ public class DrainBrush extends Brush {
                     v.sendMessage(ChatColor.AQUA + "Disc drain mode ON");
                 }
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

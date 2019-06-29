@@ -6,9 +6,6 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
-/**
- * @author MikeMatrix
- */
 public class CheckerVoxelDiscBrush extends PerformBrush {
     private boolean useWorldCoordinates = true;
 
@@ -19,10 +16,6 @@ public class CheckerVoxelDiscBrush extends PerformBrush {
         this.setName("Checker Voxel Disc");
     }
 
-    /**
-     * @param v
-     * @param target
-     */
     private void applyBrush(final SnipeData v, final Block target) {
         for (int x = v.getBrushSize(); x >= -v.getBrushSize(); x--) {
             for (int y = v.getBrushSize(); y >= -v.getBrushSize(); y--) {
@@ -69,7 +62,7 @@ public class CheckerVoxelDiscBrush extends PerformBrush {
                 this.useWorldCoordinates = false;
                 v.sendMessage(ChatColor.AQUA + "Disabled using World Coordinates.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
                 break;
             }
         }

@@ -19,14 +19,23 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Function;
 
 import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Combines several masks and requires that all masks return true
@@ -95,7 +104,8 @@ public class MaskIntersection extends AbstractMask {
         Set<Mask> optimized = new HashSet<>();
         Set<Map.Entry<Mask, Mask>> failedCombines = new HashSet<>();
         // Combine the masks
-        while (combine(pairingFunction(), failedCombines));
+        while (combine(pairingFunction(), failedCombines)) {
+        }
         // Optimize / combine
         do optimizeMasks(optimized);
         while (combine(pairingFunction(), failedCombines));
@@ -113,7 +123,7 @@ public class MaskIntersection extends AbstractMask {
             outer:
             for (Mask mask : masks) {
                 for (Mask other : masks) {
-                    AbstractMap.SimpleEntry pair = new AbstractMap.SimpleEntry(mask, other);
+                    AbstractMap.SimpleEntry<Mask, Mask> pair = new AbstractMap.SimpleEntry<>(mask, other);
                     if (failedCombines.contains(pair)) continue;
                     Mask combined = pairing.apply(pair);
                     if (combined != null) {
@@ -177,6 +187,7 @@ public class MaskIntersection extends AbstractMask {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -194,4 +205,5 @@ public class MaskIntersection extends AbstractMask {
         }
         return new MaskIntersection2D(mask2dList);
     }
+
 }

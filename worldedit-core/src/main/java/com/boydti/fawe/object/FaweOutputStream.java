@@ -47,8 +47,8 @@ public class FaweOutputStream extends DataOutputStream {
     public void write(long[] data) throws IOException {
         this.writeVarInt(data.length);
 
-        for(int j = 0; j < data.length; ++j) {
-            this.writeLong(data[j]);
+        for (long datum : data) {
+            this.writeLong(datum);
         }
     }
 

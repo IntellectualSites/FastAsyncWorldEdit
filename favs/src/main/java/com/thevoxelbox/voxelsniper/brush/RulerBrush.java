@@ -6,11 +6,6 @@ import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 import org.bukkit.util.Vector;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Ruler_Brush
- *
- * @author Gavjenks
- */
 public class RulerBrush extends Brush {
     private boolean first = true;
     private Vector coords = new Vector(0, 0, 0);
@@ -19,9 +14,6 @@ public class RulerBrush extends Brush {
     private int yOff = 0;
     private int zOff = 0;
 
-    /**
-     *
-     */
     public RulerBrush() {
         this.setName("Ruler");
     }
@@ -93,7 +85,7 @@ public class RulerBrush extends Brush {
                 this.xOff = 0;
                 v.sendMessage(ChatColor.BLUE + "Ruler mode.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

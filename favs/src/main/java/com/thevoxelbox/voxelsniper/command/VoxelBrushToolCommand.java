@@ -31,11 +31,7 @@ public class VoxelBrushToolCommand extends VoxelCommand {
                 }
 
                 if (args.length == 3 && args[2] != null && !args[2].isEmpty()) {
-                    Material itemInHand = (player.getItemInHand() != null) ? player.getItemInHand().getType() : null;
-                    if (itemInHand == null) {
-                        player.sendMessage("/btool assign <arrow|powder> <toolid>");
-                        return true;
-                    }
+                    Material itemInHand = player.getItemInHand().getType();
                     if (sniper.setTool(args[2], action, itemInHand)) {
                         player.sendMessage(itemInHand.name() + " has been assigned to '" + args[2] + "' as action " + action.name() + ".");
                     } else {
@@ -48,11 +44,7 @@ public class VoxelBrushToolCommand extends VoxelCommand {
                     sniper.removeTool(args[1]);
                     return true;
                 } else {
-                    Material itemInHand = (player.getItemInHand() != null) ? player.getItemInHand().getType() : null;
-                    if (itemInHand == null) {
-                        player.sendMessage("Can't unassign empty hands.");
-                        return true;
-                    }
+                    Material itemInHand = player.getItemInHand().getType();
                     if (sniper.getCurrentToolId() == null) {
                         player.sendMessage("Can't unassign default tool.");
                         return true;

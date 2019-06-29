@@ -20,19 +20,14 @@
 package com.sk89q.worldedit.registry.state;
 
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.internal.expression.runtime.Function;
-import com.sk89q.worldedit.math.MathUtils;
+
+import static com.google.common.base.Preconditions.checkState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkState;
-
-public class AbstractProperty<T> implements Property<T> {
+public abstract class AbstractProperty<T> implements Property<T> {
 
     private final PropertyKey key;
     private String name;
@@ -78,9 +73,7 @@ public class AbstractProperty<T> implements Property<T> {
     }
 
     //todo remove the following to allow for upstream compatibility.
-    public <C extends AbstractProperty<T>> C withOffset(int bitOffset) {
-        return (C) new AbstractProperty<>(name, values, bitOffset);
-    }
+    public abstract <C extends AbstractProperty<T>> C withOffset(int bitOffset);
 
     @Deprecated
     public int modify(int state, T value) {

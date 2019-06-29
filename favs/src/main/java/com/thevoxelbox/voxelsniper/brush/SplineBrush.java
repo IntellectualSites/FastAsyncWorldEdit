@@ -43,7 +43,7 @@ public class SplineBrush extends PerformBrush {
 
         this.ctrlPts.add(targetBlock);
         v.sendMessage(ChatColor.GRAY + "Added block " + ChatColor.RED + "(" + targetBlock.getX() + ", " + targetBlock.getY() + ", " + targetBlock.getZ() + ") " + ChatColor.GRAY
-                + "to control point selection");
+                              + "to control point selection");
     }
 
     public final void removeFromSet(final SnipeData v, final boolean ep, Block targetBlock) {
@@ -55,7 +55,7 @@ public class SplineBrush extends PerformBrush {
 
             this.endPts.add(targetBlock);
             v.sendMessage(ChatColor.GRAY + "Removed block " + ChatColor.RED + "(" + targetBlock.getX() + ", " + targetBlock.getY() + ", " + targetBlock.getZ() + ") " + ChatColor.GRAY
-                    + "from endpoint selection");
+                                  + "from endpoint selection");
             return;
         }
 
@@ -66,7 +66,7 @@ public class SplineBrush extends PerformBrush {
 
         this.ctrlPts.remove(targetBlock);
         v.sendMessage(ChatColor.GRAY + "Removed block " + ChatColor.RED + "(" + targetBlock.getX() + ", " + targetBlock.getY() + ", " + targetBlock.getZ() + ") " + ChatColor.GRAY
-                + "from control point selection");
+                              + "from control point selection");
     }
 
     public final boolean spline(final Point start, final Point end, final Point c1, final Point c2, final SnipeData v) {
@@ -146,7 +146,7 @@ public class SplineBrush extends PerformBrush {
     }
 
     @Override
-    public final void parameters(final String[] par, final com.thevoxelbox.voxelsniper.SnipeData v) {
+    public final void parameters(final String[] par, final SnipeData v) {
         for (int i = 1; i < par.length; i++) {
             if (par[i].equalsIgnoreCase("info")) {
                 v.sendMessage(ChatColor.GOLD + "Spline brush parameters");
@@ -181,7 +181,7 @@ public class SplineBrush extends PerformBrush {
                     this.render(v);
                 }
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

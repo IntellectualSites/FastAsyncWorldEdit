@@ -73,6 +73,7 @@ public class ScriptingCommands {
             min = 1,
             max = 1
     )
+    @CommandPermissions("fawe.setupdispatcher")
     public void setupdispatcher(Player player, LocalSession session, final CommandContext args) throws WorldEditException {
         CommandManager.getInstance().setupDispatcher();
     }
@@ -87,7 +88,7 @@ public class ScriptingCommands {
         String ext = filename.substring(index + 1, filename.length());
 
         if (!ext.equalsIgnoreCase("js")) {
-            actor.printError(BBC.getPrefix() + "Only .js scripts are currently supported");
+            actor.printError("Only .js scripts are currently supported");
             return null;
         }
 
@@ -100,7 +101,7 @@ public class ScriptingCommands {
                 file = WorldEdit.class.getResourceAsStream("craftscripts/" + filename);
 
                 if (file == null) {
-                    actor.printError(BBC.getPrefix() + "Script does not exist: " + filename);
+                    actor.printError("Script does not exist: " + filename);
                     return null;
                 }
             } else {
@@ -113,7 +114,7 @@ public class ScriptingCommands {
             in.close();
             script = new String(data, 0, data.length, "utf-8");
         } catch (IOException e) {
-            actor.printError(BBC.getPrefix() + "Script read error: " + e.getMessage());
+            actor.printError("Script read error: " + e.getMessage());
             return null;
         }
 
@@ -154,14 +155,14 @@ public class ScriptingCommands {
             result = engine.evaluate(script, filename, vars);
         } catch (ScriptException e) {
             e.printStackTrace();
-            actor.printError(BBC.getPrefix() + "Failed to execute:");
+            actor.printError("Failed to execute:");
             actor.printRaw(e.getMessage());
         } catch (NumberFormatException e) {
             throw e;
         } catch (WorldEditException e) {
             throw e;
         } catch (Throwable e) {
-            actor.printError(BBC.getPrefix() + "Failed to execute (see console):");
+            actor.printError("Failed to execute (see console):");
             actor.printRaw(e.getClass().getCanonicalName());
             e.printStackTrace();
         }
@@ -203,7 +204,7 @@ public class ScriptingCommands {
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
     public void executeLast(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-        
+
         String lastScript = session.getLastScript();
 
         if (!player.hasPermission("worldedit.scripting.execute." + lastScript)) {

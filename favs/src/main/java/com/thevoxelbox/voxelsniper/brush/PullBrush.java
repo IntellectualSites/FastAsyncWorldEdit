@@ -8,9 +8,7 @@ import org.bukkit.ChatColor;
 
 import java.util.HashSet;
 
-/**
- * @author Piotr
- */
+
 public class PullBrush extends Brush {
     private final HashSet<BlockWrapper> surface = new HashSet<>();
     private int vh;
@@ -244,9 +242,7 @@ public class PullBrush extends Brush {
         return "voxelsniper.brush.pull";
     }
 
-    /**
-     * @author Piotr
-     */
+
     private final class BlockWrapper {
 
         private final int id;

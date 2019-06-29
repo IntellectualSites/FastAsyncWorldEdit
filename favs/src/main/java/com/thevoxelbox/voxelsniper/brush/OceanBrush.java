@@ -9,11 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_OCEANATOR_5000
- *
- * @author Voxel
- */
+
 public class OceanBrush extends Brush {
     private static final int WATER_LEVEL_DEFAULT = 62; // y=63 -- we are using array indices here
     private static final int WATER_LEVEL_MIN = 12;
@@ -22,9 +18,6 @@ public class OceanBrush extends Brush {
     private int waterLevel = WATER_LEVEL_DEFAULT;
     private boolean coverFloor = false;
 
-    /**
-     *
-     */
     public OceanBrush() {
         this.setName("OCEANATOR 5000(tm)");
     }
@@ -39,10 +32,6 @@ public class OceanBrush extends Brush {
         return 0;
     }
 
-    /**
-     * @param v
-     * @param undo
-     */
     protected final void oceanator(final SnipeData v, final Undo undo) {
         final AsyncWorld world = this.getWorld();
 
@@ -55,7 +44,7 @@ public class OceanBrush extends Brush {
             for (int z = minZ; z <= maxZ; z++) {
                 final int currentHeight = getHeight(x, z);
                 final int wLevelDiff = currentHeight - (this.waterLevel - 1);
-                final int newSeaFloorLevel = ((this.waterLevel - wLevelDiff) >= LOW_CUT_LEVEL) ? this.waterLevel - wLevelDiff : LOW_CUT_LEVEL;
+                final int newSeaFloorLevel = Math.max((this.waterLevel - wLevelDiff), LOW_CUT_LEVEL);
 
                 final int highestY = this.getWorld().getHighestBlockYAt(x, z);
 

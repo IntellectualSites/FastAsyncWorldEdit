@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.pattern;
 
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
@@ -9,7 +8,7 @@ import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.IOException;
 
@@ -59,7 +58,7 @@ public class ExpressionPattern extends AbstractPattern {
             return BlockState.getFromInternalId((int) combined).toBaseBlock();
         } catch (EvaluationException e) {
             e.printStackTrace();
-            return EditSession.nullBlock.toBaseBlock();
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
         } catch (Throwable e) {
             e.printStackTrace();
             throw e;

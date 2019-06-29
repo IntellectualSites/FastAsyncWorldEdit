@@ -1,14 +1,13 @@
 package com.boydti.fawe.object;
 
 import com.boydti.fawe.object.visitor.FaweChunkVisitor;
-import com.boydti.fawe.util.MainUtil;
+
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -121,7 +120,7 @@ public abstract class FaweChunk<T> implements Callable<FaweChunk> {
                 return BaseBlock.getFromInternalId(combined, tile).toImmutableState();
             }
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
         return BlockState.getFromInternalId(combined);
     }

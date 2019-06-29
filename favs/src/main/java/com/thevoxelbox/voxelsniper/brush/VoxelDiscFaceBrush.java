@@ -6,15 +6,9 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Voxel_Disc_Face_Brush
- *
- * @author Voxel
- */
+
 public class VoxelDiscFaceBrush extends PerformBrush {
-    /**
-     *
-     */
+
     public VoxelDiscFaceBrush() {
         this.setName("Voxel Disc Face");
     }

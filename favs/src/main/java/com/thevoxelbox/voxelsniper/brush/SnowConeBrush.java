@@ -12,11 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Snow_cone_brush
- *
- * @author Voxel
- */
+
 public class SnowConeBrush extends Brush {
     @SuppressWarnings("deprecation")
     private void addSnow(final SnipeData v, Block targetBlock) {
@@ -129,11 +125,11 @@ public class SnowConeBrush extends Brush {
         } else {
             Block blockAbove = getTargetBlock().getRelative(BlockFace.UP);
             if (blockAbove != null && BukkitAdapter.adapt(blockAbove.getType()).getMaterial()
-                    .isAir()) {
+                                                   .isAir()) {
                 addSnow(v, blockAbove);
             } else {
                 v.owner().getPlayer()
-                        .sendMessage(ChatColor.RED + "Error: Center block neither snow nor air.");
+                 .sendMessage(ChatColor.RED + "Error: Center block neither snow nor air.");
             }
         }
     }

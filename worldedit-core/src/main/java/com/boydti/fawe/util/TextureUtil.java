@@ -1,25 +1,19 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.pattern.PatternExtent;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-
-import com.sk89q.worldedit.util.command.binding.Text;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.world.registry.BundledBlockData;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
@@ -27,12 +21,23 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -107,60 +112,60 @@ public class TextureUtil implements TextureHolder {
     private BiomeColor[] biomes = new BiomeColor[] {
         //    ID    Name             Temperature, rainfall, grass, foliage colors
         //    - note: the colors here are just placeholders, they are computed in the program
-        new BiomeColor(0, "Ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
         // default values of temp and rain
-        new BiomeColor(1, "Plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(2, "Desert", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(3, "Extreme Hills", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(4, "Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(5, "Taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(6, "Swampland", 0.8f, 0.9f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(7, "River", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(1, "plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(2, "desert", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(3, "mountains", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(4, "forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(5, "taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(6, "swamp", 0.8f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(7, "river", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
         // default values of temp and rain
-        new BiomeColor(8, "Nether", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(9, "End", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(8, "nether", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(9, "the_end", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
         // default values of temp and rain
-        new BiomeColor(10, "Frozen Ocean", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(11, "Frozen River", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(12, "Ice Plains", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(13, "Ice Mountains", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(14, "Mushroom Island", 0.9f, 1.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(15, "Mushroom Island Shore", 0.9f, 1.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(16, "Beach", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(17, "Desert Hills", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(18, "Forest Hills", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(19, "Taiga Hills", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(20, "Extreme Hills Edge", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(21, "Jungle", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(22, "Jungle Hills", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(23, "Jungle Edge", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(24, "Deep Ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(25, "Stone Beach", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(26, "Cold Beach", 0.05f, 0.3f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(27, "Birch Forest", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(28, "Birch Forest Hills", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(29, "Roofed Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(30, "Cold Taiga", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(31, "Cold Taiga Hills", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(32, "Mega Taiga", 0.3f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(33, "Mega Taiga Hills", 0.3f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(34, "Extreme Hills+", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(35, "Savanna", 1.2f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(36, "Savanna Plateau", 1.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(37, "Mesa", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(38, "Mesa Plateau F", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(39, "Mesa Plateau", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(40, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(41, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(42, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(43, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(44, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(45, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(46, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(47, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(48, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(49, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(50, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(10, "frozen_ocean", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(11, "frozen_river", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(12, "snowy_tundra", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(13, "snowy_mountains", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(14, "mushroom_fields", 0.9f, 1.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(15, "mushroom_field_shore", 0.9f, 1.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(16, "beach", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(17, "desert_hills", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(18, "wooded_hills", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(19, "taiga_hills", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(20, "mountain_edge", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(21, "jungle", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(22, "jungle_hills", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(23, "jungle_edge", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(24, "deep_ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(25, "stone_shore", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(26, "snowy_beach", 0.05f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(27, "birch_forest", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(28, "birch_forest_hills", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(29, "dark_forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(30, "snowy_taiga", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(31, "snowy_taiga_hills", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(32, "giant_tree_taiga", 0.3f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(33, "giant_tree_taiga_hills", 0.3f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(34, "wooded_mountains", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(35, "savanna", 1.2f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(36, "savanna_plateau", 1.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(37, "badlands", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(38, "wooded_badlands_plateau", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(39, "badlands_plateau", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(40, "small_end_islands", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(41, "end_midlands", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(42, "end_highlands", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(43, "end_barrens", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(44, "warm_ocean", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(45, "lukewarm_ocean", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(46, "cold_ocean", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(47, "deep_warm_ocean", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(48, "deep_lukewarm_ocean", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(49, "deep_cold_ocean", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(50, "deep_frozen_ocean", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(51, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(52, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(53, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
@@ -237,21 +242,21 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(124, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(125, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(126, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(127, "The Void", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(127, "the_void", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
         // default values of temp and rain; also, no height differences
         new BiomeColor(128, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(129, "Sunflower Plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(130, "Desert M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(131, "Extreme Hills M", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(132, "Flower Forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(133, "Taiga M", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(134, "Swampland M", 0.8f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(129, "sunflower_plains", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(130, "desert_lakes", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(131, "gravelly_mountains", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(132, "flower_forest", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(133, "taiga_mountains", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(134, "swamp_hills", 0.8f, 0.9f, 0x92BD59, 0x77AB2F),
         new BiomeColor(135, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(136, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(137, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(138, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(139, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(140, "Ice Plains Spikes", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(140, "ice_spikes", 0.0f, 0.5f, 0x92BD59, 0x77AB2F),
         new BiomeColor(141, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(142, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(143, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
@@ -260,28 +265,28 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(146, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(147, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(148, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(149, "Jungle M", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(149, "modified_jungle", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
         new BiomeColor(150, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(151, "JungleEdge M", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(151, "modified_jungle_edge", 0.95f, 0.8f, 0x92BD59, 0x77AB2F),
         new BiomeColor(152, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(153, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(154, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(155, "Birch Forest M", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(156, "Birch Forest Hills M", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(157, "Roofed Forest M", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(158, "Cold Taiga M", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(159, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(160, "Mega Spruce Taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(155, "tall_birch_forest", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(156, "tall_birch_hills", 0.6f, 0.6f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(157, "dark_forest_hills", 0.7f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(158, "snowy_taiga_mountains", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(159, "Unknown", -0.5f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(160, "giant_spruce_taiga", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
         // special exception, temperature not 0.3
-        new BiomeColor(161, "Mega Spruce Taiga Hills", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(162, "Extreme Hills+ M", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(163, "Savanna M", 1.1f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(164, "Savanna Plateau M", 1.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(165, "Mesa (Bryce)", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(166, "Mesa Plateau F M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(167, "Mesa Plateau M", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(168, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(169, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(161, "giant_spruce_taiga_hills", 0.25f, 0.8f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(162, "modified_gravelly_mountains", 0.2f, 0.3f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(163, "shattered_savanna", 1.1f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(164, "shattered_savanna_plateau", 1.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(165, "eroded_badlands", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(166, "modified_wooded_badlands_plateau", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(167, "modified_badlands_plateau", 2.0f, 0.0f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(168, "bamboo_jungle", 0.95f, 0.9f, 0x92BD59, 0x77AB2F),
+        new BiomeColor(169, "bamboo_jungle_hills", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(170, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(171, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(172, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
@@ -597,23 +602,21 @@ public class TextureUtil implements TextureHolder {
                     // Get all the groups in the current jar
                     // The vanilla textures are in `assets/minecraft`
                     // A jar may contain textures for multiple mods
+                    Enumeration<? extends ZipEntry> entries = zipFile.entries();
                     Set<String> mods = new HashSet<>();
-                    {
-                        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-                        while (entries.hasMoreElements()) {
-                            ZipEntry entry = entries.nextElement();
-                            String name = entry.getName();
-                            Path path = Paths.get(name);
-                            if (path.startsWith("assets" + File.separator)) {
-                                String[] split =
-                                    path.toString().split(Pattern.quote(File.separator));
-                                if (split.length > 1) {
-                                    String modId = split[1];
-                                    mods.add(modId);
-                                }
+                    while (entries.hasMoreElements()) {
+                        ZipEntry entry = entries.nextElement();
+                        String name = entry.getName();
+                        Path path = Paths.get(name);
+                        if (path.startsWith("assets" + File.separator)) {
+                            String[] split =
+                                path.toString().split(Pattern.quote(File.separator));
+                            if (split.length > 1) {
+                                String modId = split[1];
+                                mods.add(modId);
                             }
-                            continue;
                         }
+                        continue;
                     }
                     String modelsDir = "assets/%1$s/models/block/%2$s.json";
                     String texturesDir = "assets/%1$s/textures/%2$s.png";
@@ -632,153 +635,148 @@ public class TextureUtil implements TextureHolder {
                         String nameSpace = split.length == 1 ? "minecraft" : split[0];
 
                         Map<String, String> texturesMap = new ConcurrentHashMap<>();
-                        { // Read models
-                            String modelFileName = String.format(modelsDir, nameSpace, name);
-                            ZipEntry entry = getEntry(zipFile, modelFileName);
-                            if (entry == null) {
-                                System.out.println("Cannot find " + modelFileName + " in " + file);
+                        // Read models
+                        String modelFileName = String.format(modelsDir, nameSpace, name);
+                        ZipEntry entry = getEntry(zipFile, modelFileName);
+                        if (entry == null) {
+                            System.out.println("Cannot find " + modelFileName + " in " + file);
+                            continue;
+                        }
+
+                        String textureFileName;
+                        try (InputStream is = zipFile.getInputStream(entry)) {
+                            JsonReader reader = new JsonReader(
+                                new InputStreamReader(is, StandardCharsets.UTF_8));
+                            Map<String, Object> root = gson.fromJson(reader, typeToken);
+                            Map<String, Object> textures = (Map) root.get("textures");
+
+                            if (textures == null) {
                                 continue;
                             }
-
-                            String textureFileName;
-                            try (InputStream is = zipFile.getInputStream(entry)) {
-                                JsonReader reader = new JsonReader(
-                                    new InputStreamReader(is, StandardCharsets.UTF_8));
-                                Map<String, Object> root = gson.fromJson(reader, typeToken);
-                                Map<String, Object> textures = (Map) root.get("textures");
-
-                                if (textures == null) {
-                                    continue;
-                                }
-                                Set<String> models = new HashSet<>();
-                                // Get models
-                                for (Map.Entry<String, Object> stringObjectEntry : textures
-                                    .entrySet()) {
-                                    Object value = stringObjectEntry.getValue();
-                                    if (value instanceof String) {
+                            Set<String> models = new HashSet<>();
+                            // Get models
+                            for (Map.Entry<String, Object> stringObjectEntry : textures
+                                .entrySet()) {
+                                Object value = stringObjectEntry.getValue();
+                                if (value instanceof String) {
+                                    models.add((String) value);
+                                } else if (value instanceof Map) {
+                                    value = ((Map) value).get("model");
+                                    if (value != null) {
                                         models.add((String) value);
-                                    } else if (value instanceof Map) {
-                                        value = ((Map) value).get("model");
-                                        if (value != null) {
-                                            models.add((String) value);
-                                        }
                                     }
                                 }
-                                if (models.size() != 1) {
-                                    continue;
-                                }
-
-                                textureFileName =
-                                    String.format(texturesDir, nameSpace, models.iterator().next());
                             }
-
-                            BufferedImage image = readImage(zipFile, textureFileName);
-                            if (image == null) {
-                                System.out.println("Cannot find " + textureFileName);
+                            if (models.size() != 1) {
                                 continue;
                             }
-                            int color = ImageUtil.getColor(image);
-                            long distance = getDistance(image, color);
-                            distanceMap.put(combined, (Long) distance);
-                            colorMap.put(combined, (Integer) color);
+
+                            textureFileName =
+                                String.format(texturesDir, nameSpace, models.iterator().next());
+                        }
+
+                        BufferedImage image = readImage(zipFile, textureFileName);
+                        if (image == null) {
+                            System.out.println("Cannot find " + textureFileName);
+                            continue;
+                        }
+                        int color = ImageUtil.getColor(image);
+                        long distance = getDistance(image, color);
+                        distanceMap.put(combined, (Long) distance);
+                        colorMap.put(combined, (Integer) color);
+                    }
+                    Integer grass = null;
+                    {
+                        String grassFileName =
+                            String.format(texturesDir, "minecraft", "grass_block_top");
+                        BufferedImage image = readImage(zipFile, grassFileName);
+                        if (image != null) {
+                            grass = ImageUtil.getColor(image);
                         }
                     }
-                    {
-                        Integer grass = null;
-                        {
-                            String grassFileName =
-                                String.format(texturesDir, "minecraft", "grass_block_top");
-                            BufferedImage image = readImage(zipFile, grassFileName);
-                            if (image != null) {
-                                grass = ImageUtil.getColor(image);
-                            }
-                        }
-                        if (grass != null) {
-                            // assets\minecraft\textures\colormap
-                            ZipEntry grassEntry = getEntry(zipFile,
-                                "assets/minecraft/textures/colormap/grass_block.png");
-                            if (grassEntry != null) {
-                                try (InputStream is = zipFile.getInputStream(grassEntry)) {
-                                    BufferedImage image = ImageIO.read(is);
-                                    // Update biome colors
-                                    for (BiomeColor biome : biomes) {
-                                        float adjTemp =
-                                            MathMan.clamp(biome.temperature, 0.0f, 1.0f);
-                                        float adjRainfall =
-                                            MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
-                                        int x = (int) (255 - adjTemp * 255);
-                                        int z = (int) (255 - adjRainfall * 255);
-                                        biome.grass = image.getRGB(x, z);
-                                    }
-                                }
-                                // swampland: perlin - avoid
-                                biomes[6].grass = 0;
-                                biomes[134].grass = 0;
-                                // roofed forest: averaged w/ 0x28340A
-                                biomes[29].grass =
-                                    multiplyColor(biomes[29].grass, 0x28340A + (255 << 24));
-                                biomes[157].grass =
-                                    multiplyColor(biomes[157].grass, 0x28340A + (255 << 24));
-                                // mesa : 0x90814D
-                                biomes[37].grass = 0x90814D + (255 << 24);
-                                biomes[38].grass = 0x90814D + (255 << 24);
-                                biomes[39].grass = 0x90814D + (255 << 24);
-                                biomes[165].grass = 0x90814D + (255 << 24);
-                                biomes[166].grass = 0x90814D + (255 << 24);
-                                biomes[167].grass = 0x90814D + (255 << 24);
-                                List<BiomeColor> valid = new ArrayList<>();
+                    if (grass != null) {
+                        // assets\minecraft\textures\colormap
+                        ZipEntry grassEntry = getEntry(zipFile,
+                            "assets/minecraft/textures/colormap/grass_block.png");
+                        if (grassEntry != null) {
+                            try (InputStream is = zipFile.getInputStream(grassEntry)) {
+                                BufferedImage image = ImageIO.read(is);
+                                // Update biome colors
                                 for (BiomeColor biome : biomes) {
-                                    //                                biome.grass = multiplyColor(biome.grass, grass);
-                                    if (biome.grass != 0 && !biome.name
-                                        .equalsIgnoreCase("Unknown Biome")) {
-                                        valid.add(biome);
-                                    }
-                                    biome.grassCombined = multiplyColor(grass, biome.grass);
+                                    float adjTemp =
+                                        MathMan.clamp(biome.temperature, 0.0f, 1.0f);
+                                    float adjRainfall =
+                                        MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
+                                    int x = (int) (255 - adjTemp * 255);
+                                    int z = (int) (255 - adjRainfall * 255);
+                                    biome.grass = image.getRGB(x, z);
                                 }
-                                this.validBiomes = valid.toArray(new BiomeColor[valid.size()]);
+                            }
+                            // swampland: perlin - avoid
+                            biomes[6].grass = 0;
+                            biomes[134].grass = 0;
+                            // roofed forest: averaged w/ 0x28340A
+                            biomes[29].grass =
+                                multiplyColor(biomes[29].grass, 0x28340A + (255 << 24));
+                            biomes[157].grass =
+                                multiplyColor(biomes[157].grass, 0x28340A + (255 << 24));
+                            // mesa : 0x90814D
+                            biomes[37].grass = 0x90814D + (255 << 24);
+                            biomes[38].grass = 0x90814D + (255 << 24);
+                            biomes[39].grass = 0x90814D + (255 << 24);
+                            biomes[165].grass = 0x90814D + (255 << 24);
+                            biomes[166].grass = 0x90814D + (255 << 24);
+                            biomes[167].grass = 0x90814D + (255 << 24);
+                            List<BiomeColor> valid = new ArrayList<>();
+                            for (BiomeColor biome : biomes) {
+                                //                                biome.grass = multiplyColor(biome.grass, grass);
+                                if (biome.grass != 0 && !biome.name
+                                    .equalsIgnoreCase("Unknown Biome")) {
+                                    valid.add(biome);
+                                }
+                                biome.grassCombined = multiplyColor(grass, biome.grass);
+                            }
+                            this.validBiomes = valid.toArray(new BiomeColor[0]);
 
-                                {
-                                    ArrayList<BiomeColor> uniqueColors = new ArrayList<>();
-                                    Set<Integer> uniqueBiomesColors = new IntArraySet();
-                                    for (BiomeColor color : validBiomes) {
-                                        if (uniqueBiomesColors.add(color.grass)) {
-                                            uniqueColors.add(color);
+                            ArrayList<BiomeColor> uniqueColors = new ArrayList<>();
+                            Set<Integer> uniqueBiomesColors = new IntArraySet();
+                            for (BiomeColor color : validBiomes) {
+                                if (uniqueBiomesColors.add(color.grass)) {
+                                    uniqueColors.add(color);
+                                }
+                            }
+                            int count = 0;
+                            int count2 = 0;
+                            uniqueBiomesColors.clear();
+
+                            LongArrayList layerIds = new LongArrayList();
+                            LongArrayList layerColors = new LongArrayList();
+                            for (int i = 0; i < uniqueColors.size(); i++) {
+                                for (int j = i; j < uniqueColors.size(); j++) {
+                                    for (int k = j; k < uniqueColors.size(); k++) {
+                                        BiomeColor c1 = uniqueColors.get(i);
+                                        BiomeColor c2 = uniqueColors.get(j);
+                                        BiomeColor c3 = uniqueColors.get(k);
+                                        int average =
+                                            averageColor(c1.grass, c2.grass, c3.grass);
+                                        if (uniqueBiomesColors.add(average)) {
+                                            count++;
+                                            layerColors.add((long) average);
+                                            layerIds.add(
+                                                (long) ((c1.id) + (c2.id << 8) + (c3.id
+                                                    << 16)));
                                         }
                                     }
-                                    int count = 0;
-                                    int count2 = 0;
-                                    uniqueBiomesColors.clear();
-
-                                    LongArrayList layerIds = new LongArrayList();
-                                    LongArrayList layerColors = new LongArrayList();
-                                    for (int i = 0; i < uniqueColors.size(); i++) {
-                                        for (int j = i; j < uniqueColors.size(); j++) {
-                                            for (int k = j; k < uniqueColors.size(); k++) {
-                                                BiomeColor c1 = uniqueColors.get(i);
-                                                BiomeColor c2 = uniqueColors.get(j);
-                                                BiomeColor c3 = uniqueColors.get(k);
-                                                int average =
-                                                    averageColor(c1.grass, c2.grass, c3.grass);
-                                                if (uniqueBiomesColors.add(average)) {
-                                                    count++;
-                                                    layerColors.add((long) average);
-                                                    layerIds.add(
-                                                        (long) ((c1.id) + (c2.id << 8) + (c3.id
-                                                            << 16)));
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    validMixBiomeColors = new int[layerColors.size()];
-                                    for (int i = 0; i < layerColors.size(); i++) {
-                                        validMixBiomeColors[i] = (int) layerColors.getLong(i);
-                                    }
-                                    validMixBiomeIds = layerIds.toLongArray();
                                 }
                             }
 
+                            validMixBiomeColors = new int[layerColors.size()];
+                            for (int i = 0; i < layerColors.size(); i++) {
+                                validMixBiomeColors[i] = (int) layerColors.getLong(i);
+                            }
+                            validMixBiomeIds = layerIds.toLongArray();
                         }
+
                     }
                     //                 Close the file
                     zipFile.close();

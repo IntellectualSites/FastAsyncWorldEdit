@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.internal.command;
 
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.MathMan;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -37,14 +37,12 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Direction;
-import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.command.parametric.ArgumentStack;
 import com.sk89q.worldedit.util.command.parametric.BindingBehavior;
-import com.sk89q.worldedit.util.command.parametric.BindingHelper;
 import com.sk89q.worldedit.util.command.parametric.BindingMatch;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
@@ -89,7 +87,7 @@ public class WorldEditBinding {
     public Object getSelection(ArgumentStack context) throws IncompleteRegionException, ParameterException {
         Player sender = getPlayer(context);
         LocalSession session = worldEdit.getSessionManager().get(sender);
-        return session.getSelection(FawePlayer.wrap(sender).getWorldForEditing());
+        return session.getSelection(sender.getWorld());
     }
 
     /**
@@ -100,7 +98,7 @@ public class WorldEditBinding {
      * @throws ParameterException on other error
      */
     @BindingMatch(type = EditSession.class,
-            behavior = BindingBehavior.PROVIDES)
+                  behavior = BindingBehavior.PROVIDES)
     public EditSession getEditSession(ArgumentStack context) throws ParameterException {
         Player sender = getPlayer(context);
         LocalSession session = worldEdit.getSessionManager().get(sender);
@@ -119,7 +117,7 @@ public class WorldEditBinding {
      * @throws ParameterException on error
      */
     @BindingMatch(type = LocalSession.class,
-            behavior = BindingBehavior.PROVIDES)
+                  behavior = BindingBehavior.PROVIDES)
     public LocalSession getLocalSession(ArgumentStack context) throws ParameterException {
         Player sender = getPlayer(context);
         return worldEdit.getSessionManager().get(sender);
@@ -151,7 +149,7 @@ public class WorldEditBinding {
      * @throws ParameterException on error
      */
     @BindingMatch(type = Player.class,
-            behavior = BindingBehavior.PROVIDES)
+                  behavior = BindingBehavior.PROVIDES)
     public Player getPlayer(ArgumentStack context) throws ParameterException {
         Actor sender = context.getContext().getLocals().get(Actor.class);
         if (sender == null) {
@@ -167,7 +165,7 @@ public class WorldEditBinding {
      * Gets an {@link BaseBlock} from a {@link ArgumentStack}.
      *
      * @param context the context
-     * @return a block state
+     * @return a pattern
      * @throws ParameterException on error
      * @throws WorldEditException on error
      */
@@ -201,8 +199,8 @@ public class WorldEditBinding {
     }
 
     @BindingMatch(type = {BaseBlock.class, BlockState.class, BlockStateHolder.class},
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1)
     public BaseBlock getBaseBlock(ArgumentStack context) throws ParameterException, WorldEditException {
         return getBlockState(context).toBaseBlock();
     }
@@ -245,8 +243,8 @@ public class WorldEditBinding {
      * @throws WorldEditException on error
      */
     @BindingMatch(type = Pattern.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1)
     public Pattern getPattern(ArgumentStack context) throws ParameterException, WorldEditException {
         Actor actor = context.getContext().getLocals().get(Actor.class);
         ParserContext parserContext = new ParserContext();
@@ -274,8 +272,8 @@ public class WorldEditBinding {
      * @throws WorldEditException on error
      */
     @BindingMatch(type = Mask.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1)
     public Mask getMask(ArgumentStack context) throws ParameterException, WorldEditException {
         Actor actor = context.getContext().getLocals().get(Actor.class);
         ParserContext parserContext = new ParserContext();
@@ -307,7 +305,7 @@ public class WorldEditBinding {
                   type = BlockVector3.class,
                   behavior = BindingBehavior.CONSUMES,
                   consumedCount = 1)
-    public BlockVector3 getDirection(ArgumentStack context, Direction direction) 
+    public BlockVector3 getDirection(ArgumentStack context, Direction direction)
             throws ParameterException, UnknownDirectionException {
         Player sender = getPlayer(context);
         if (direction.includeDiagonals()) {
@@ -377,7 +375,5 @@ public class WorldEditBinding {
                             "biome that should be 'default', so the command should not be taking a default biome");
         }
     }
-
-
 
 }

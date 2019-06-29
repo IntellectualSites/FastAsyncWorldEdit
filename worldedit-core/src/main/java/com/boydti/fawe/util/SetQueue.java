@@ -5,6 +5,7 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.world.World;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -273,7 +274,7 @@ public class SetQueue {
         } catch (Throwable e) {
             pool.awaitQuiescence(Settings.IMP.QUEUE.DISCARD_AFTER_MS, TimeUnit.MILLISECONDS);
             completer = new ExecutorCompletionService(pool);
-            MainUtil.handleError(e);
+            e.printStackTrace();
         } finally {
             queue.endSet(Settings.IMP.QUEUE.PARALLEL_THREADS > 1);
             queue.setStage(QueueStage.NONE);

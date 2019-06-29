@@ -31,39 +31,39 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BindingMatch {
-    
+
     /**
      * The classifier.
-     * 
+     *
      * @return the classifier, or {@link Annotation} if not set
      */
     Class<? extends Annotation> classifier() default Annotation.class;
-    
+
     /**
      * The type.
-     * 
+     *
      * @return the type, or {@link Class} if not set
      */
     Class<?>[] type() default Class.class;
 
     /**
      * The binding behavior.
-     * 
+     *
      * @return the behavior
      */
     BindingBehavior behavior();
-    
+
     /**
      * Get the number of arguments that this binding consumes.
-     * 
+     *
      * @return -1 if unknown or irrelevant
      */
     int consumedCount() default -1;
-    
+
     /**
      * Set whether an array of modifier annotations is provided in the list of
      * arguments.
-     * 
+     *
      * @return true to provide modifiers
      */
     boolean provideModifiers() default false;

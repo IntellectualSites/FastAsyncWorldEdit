@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.sk89q.worldedit.function.pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -27,6 +28,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 /**
  * A pattern that returns the same {@link BaseBlock} each time.
  */
+@Deprecated
 public class BlockPattern extends AbstractPattern {
 
     private BaseBlock block;
@@ -36,6 +38,7 @@ public class BlockPattern extends AbstractPattern {
      *
      * @param block the block
      */
+    @Deprecated
     public BlockPattern(BlockStateHolder<?> block) {
         setBlock(block);
     }

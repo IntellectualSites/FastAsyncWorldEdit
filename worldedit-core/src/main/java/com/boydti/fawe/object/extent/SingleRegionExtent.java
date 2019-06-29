@@ -5,6 +5,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 public class SingleRegionExtent extends FaweRegionExtent {
 
@@ -32,6 +33,6 @@ public class SingleRegionExtent extends FaweRegionExtent {
 
     @Override
     public Collection<Region> getRegions() {
-        return Arrays.asList(region);
+        return Collections.singletonList(region);
     }
 }

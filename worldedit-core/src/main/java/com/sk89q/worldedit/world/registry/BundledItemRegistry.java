@@ -22,8 +22,6 @@ package com.sk89q.worldedit.world.registry;
 import com.sk89q.worldedit.world.item.ItemType;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * A item registry that uses {@link BundledItemRegistry} to serve information
@@ -45,10 +43,5 @@ public class BundledItemRegistry implements ItemRegistry {
             return localized;
         }
         return null;
-    }
-
-    @Override
-    public Collection<String> registerItems() {
-        return Collections.emptyList();
     }
 }

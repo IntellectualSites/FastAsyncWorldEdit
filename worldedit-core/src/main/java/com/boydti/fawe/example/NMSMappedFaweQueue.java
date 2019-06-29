@@ -1,16 +1,9 @@
 package com.boydti.fawe.example;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public abstract class NMSMappedFaweQueue<WORLD, CHUNK, CHUNKSECTION, SECTION> extends MappedFaweQueue<WORLD, CHUNK, CHUNKSECTION, SECTION> {
 
@@ -104,7 +97,7 @@ public abstract class NMSMappedFaweQueue<WORLD, CHUNK, CHUNKSECTION, SECTION> ex
         try {
             refreshChunk(fc);
         } catch (Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 

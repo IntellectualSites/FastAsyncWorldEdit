@@ -7,17 +7,9 @@ import com.thevoxelbox.voxelsniper.Undo;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Clean_Snow_Brush
- *
- * @author psanker
- */
 public class CleanSnowBrush extends Brush {
     private double trueCircle = 0;
 
-    /**
-     *
-     */
     public CleanSnowBrush() {
         this.setName("Clean Snow");
     }
@@ -80,7 +72,7 @@ public class CleanSnowBrush extends Brush {
                 this.trueCircle = 0;
                 v.sendMessage(ChatColor.AQUA + "True circle mode OFF.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

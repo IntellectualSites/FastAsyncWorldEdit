@@ -7,17 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Extrude_Brush
- *
- * @author psanker
- */
 public class ExtrudeBrush extends Brush {
     private double trueCircle;
 
-    /**
-     *
-     */
     public ExtrudeBrush() {
         this.setName("Extrude");
     }
@@ -153,7 +145,7 @@ public class ExtrudeBrush extends Brush {
     }
 
     @Override
-    public final void parameters(final String[] par, final com.thevoxelbox.voxelsniper.SnipeData v) {
+    public final void parameters(final String[] par, final SnipeData v) {
         for (int i = 1; i < par.length; i++) {
             final String parameter = par[i];
 

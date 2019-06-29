@@ -24,7 +24,6 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.pattern.PatternTraverser;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.boydti.fawe.wrappers.WorldWrapper;
@@ -57,6 +56,7 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -139,9 +139,9 @@ public class PlatformManager {
 
             // Check whether this platform was chosen to be the preferred one
             // for any capability and be sure to remove it
-            Iterator<Map.Entry<Capability, Platform>> it = preferences.entrySet().iterator();
+            Iterator<Entry<Capability, Platform>> it = preferences.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Capability, Platform> entry = it.next();
+                Entry<Capability, Platform> entry = it.next();
                 if (entry.getValue().equals(platform)) {
                     entry.getKey().unload(this, entry.getValue());
                     it.remove();
@@ -347,6 +347,7 @@ public class PlatformManager {
                         event.setCancelled(true);
                         return;
                     }
+
                     if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
                         final BlockTool superPickaxe = session.getSuperPickaxe();
                         if (superPickaxe != null && superPickaxe.canUse(player)) {
@@ -357,8 +358,8 @@ public class PlatformManager {
                             return;
                         }
                     }
-                    final Tool tool = session.getTool(player);
-                    if (tool != null && tool instanceof DoubleActionBlockTool) {
+                    Tool tool = session.getTool(player);
+                    if (tool instanceof DoubleActionBlockTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
                             final Player maskedPlayerWrapper = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap((Player) actor), ((Player) actor).getLocation());
@@ -372,6 +373,7 @@ public class PlatformManager {
                             return;
                         }
                     }
+
                 } else if (event.getType() == Interaction.OPEN) {
                     if (session.isToolControlEnabled() && player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().wandItem)) {
                         if (!actor.hasPermission("worldedit.selection.pos")) {
@@ -392,12 +394,13 @@ public class PlatformManager {
                                 }
                             }, false, true);
                         }
+
                         event.setCancelled(true);
                         return;
                     }
 
-                    final Tool tool = session.getTool(player);
-                    if (tool != null && tool instanceof BlockTool) {
+                    Tool tool = session.getTool(player);
+                    if (tool instanceof BlockTool) {
                         if (tool.canUse(player)) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);
                             if (fp.checkAction()) {
@@ -430,7 +433,7 @@ public class PlatformManager {
         } else {
             actor.printError("Please report this error: [See console]");
             actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -439,8 +442,8 @@ public class PlatformManager {
         // Create a proxy actor with a potentially different world for
         // making changes to the world
         Player actor = createProxyActor(event.getPlayer());
-        final Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap(actor), actor.getLocation(), true);
-        final LocalSession session = worldEdit.getSessionManager().get(player);
+        Player player = new LocationMaskedPlayerWrapper(PlayerWrapper.wrap(actor), actor.getLocation(), true);
+        LocalSession session = worldEdit.getSessionManager().get(player);
 
         VirtualWorld virtual = session.getVirtualWorld();
         if (virtual != null) {
@@ -451,7 +454,7 @@ public class PlatformManager {
         try {
             switch (event.getInputType()) {
                 case PRIMARY: {
-                    if (getConfiguration().navigationWandMaxDistance > 0 && player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
+                    if ((getConfiguration().navigationWandMaxDistance > 0) && player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
                         if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
                             return;
                         }
@@ -476,6 +479,7 @@ public class PlatformManager {
                             return;
                         }
                     }
+
                     break;
                 }
 
@@ -511,15 +515,14 @@ public class PlatformManager {
             if (faweException != null) {
                 BBC.WORLDEDIT_CANCEL_REASON.send(player, faweException.getMessage());
             } else {
-                player.printError(BBC.getPrefix() + "Please report this error: [See console]");
+                player.printError("Please report this error: [See console]");
                 player.printRaw(e.getClass().getName() + ": " + e.getMessage());
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         } finally {
             Request.reset();
         }
     }
-
 
 
 }

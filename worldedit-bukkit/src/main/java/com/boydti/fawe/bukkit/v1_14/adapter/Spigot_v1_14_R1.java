@@ -89,6 +89,8 @@ import net.minecraft.server.v1_14_R1.NBTTagLong;
 import net.minecraft.server.v1_14_R1.NBTTagLongArray;
 import net.minecraft.server.v1_14_R1.NBTTagShort;
 import net.minecraft.server.v1_14_R1.NBTTagString;
+import net.minecraft.server.v1_14_R1.PacketPlayOutEntityStatus;
+import net.minecraft.server.v1_14_R1.PacketPlayOutTileEntityData;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.World;
@@ -101,6 +103,7 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.slf4j.Logger;
@@ -590,8 +593,11 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
 
 	@Override
 	public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
-		// TODO Auto-generated method stub
-		
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutTileEntityData(
+                new BlockPosition(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()),
+                7,
+                (NBTTagCompound) fromNative(nbtData)
+        ));
 	}
 
 	@Override
@@ -606,7 +612,8 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
 
 	@Override
 	public void sendFakeOP(Player player) {
-		// TODO Auto-generated method stub
-		
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityStatus(
+                ((CraftPlayer) player).getHandle(), (byte) 28
+        ));
 	}
 }

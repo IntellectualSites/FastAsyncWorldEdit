@@ -6,11 +6,10 @@ package com.thevoxelbox.voxelsniper.brush.perform;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.thevoxelbox.voxelsniper.Message;
+import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.util.VoxelList;
 
-/**
- * @author Voxel
- */
+
 public class pIncludeInk extends vPerformer {
 
     private VoxelList includeList;
@@ -28,7 +27,7 @@ public class pIncludeInk extends vPerformer {
     }
 
     @Override
-    public void init(com.thevoxelbox.voxelsniper.SnipeData v) {
+    public void init(SnipeData v) {
         w = v.getWorld();
         data = v.getPropertyId();
         includeList = v.getVoxelList();

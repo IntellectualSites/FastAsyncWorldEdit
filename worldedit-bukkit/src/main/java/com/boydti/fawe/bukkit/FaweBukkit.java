@@ -61,7 +61,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 public class FaweBukkit implements IFawe, Listener {
@@ -73,9 +72,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     private boolean listeningImages;
     private BukkitImageListener imageListener;
-    private CFIPacketListener packetListener;
-
-    private boolean listeningCui;
+    //private CFIPacketListener packetListener;
 
     public VaultUtil getVault() {
         return this.vault;
@@ -106,11 +103,11 @@ public class FaweBukkit implements IFawe, Listener {
             }
             try {
                 Fawe.get().setChatManager(new BukkitChatManager());
-            } catch (Throwable ignore) {
-                ignore.printStackTrace();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
             }
         } catch (final Throwable e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             Bukkit.getServer().shutdown();
         }
 
@@ -131,29 +128,34 @@ public class FaweBukkit implements IFawe, Listener {
             }
 
             try {
-            Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
+                Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
                 Bukkit.getPluginManager().registerEvents(new AsyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
             } catch (Throwable ignore) {
-                ignore.printStackTrace();
+                debug("====== USE PAPER ======");
+                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
+                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
+                debug(" - This is only a recommendation");
+                debug(" - Allows the use of Async Tab Completetion as provided by Paper");
+                debug("==============================");
                 Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
             }
         });
     }
 
-    @Override
-    public void registerPacketListener() {
-        PluginManager manager = Bukkit.getPluginManager();
-        if (packetListener == null && manager.getPlugin("ProtocolLib") != null) {
-            packetListener = new CFIPacketListener(plugin);
-        }
-    }
+//    @Override // Please don't delete this again, it's WIP
+//    public void registerPacketListener() {
+//        PluginManager manager = Bukkit.getPluginManager();
+//        if (packetListener == null && manager.getPlugin("ProtocolLib") != null) {
+//            packetListener = new CFIPacketListener(plugin);
+//        }
+//    }
 
     @Override
     public synchronized ImageViewer getImageViewer(FawePlayer fp) {
         if (listeningImages && imageListener == null) return null;
         try {
             listeningImages = true;
-            registerPacketListener();
+            //registerPacketListener();
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
@@ -197,13 +199,9 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public void debug(final String s) {
+    public void debug(final String message) {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
-        if (console != null) {
-            console.sendMessage(BBC.color(s));
-        } else {
-            Bukkit.getLogger().info(BBC.color(s));
-        }
+        console.sendMessage(BBC.color(message));
     }
 
     @Override
@@ -239,7 +237,7 @@ public class FaweBukkit implements IFawe, Listener {
             Player player = (Player) obj;
             FawePlayer existing = Fawe.get().getCachedPlayer(player.getName());
             return existing != null ? existing : new BukkitPlayer(player);
-        } else if (obj != null && obj.getClass().getName().contains("EntityPlayer")) {
+        } else if (obj.getClass().getName().contains("EntityPlayer")) {
             try {
                 Method method = obj.getClass().getDeclaredMethod("getBukkitEntity");
                 return wrap(method.invoke(obj));
@@ -280,14 +278,13 @@ public class FaweBukkit implements IFawe, Listener {
         try {
             this.vault = new VaultUtil();
         } catch (final Throwable e) {
-            this.debug(BBC.getPrefix() + "&dVault is used for persistent `/wea` toggles.");
+            this.debug("&dVault is used for persistent `/wea` toggles.");
         }
     }
 
     @Override
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
-        List<String> pl = new ArrayList<>();
         msg.append("server.version: " + Bukkit.getVersion() + "\n");
         msg.append("Plugins: \n");
         for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
@@ -323,7 +320,7 @@ public class FaweBukkit implements IFawe, Listener {
         }
         try {
             return getQueue(world);
-        } catch (Throwable ignore) {
+        } catch (Throwable throwable) {
             // Disable incompatible settings
             Settings.IMP.QUEUE.PARALLEL_THREADS = 1; // BukkitAPI placer is too slow to parallel thread at the chunk level
             Settings.IMP.HISTORY.COMBINE_STAGES = false; // Performing a chunk copy (if possible) wouldn't be faster using the BukkitAPI
@@ -338,7 +335,7 @@ public class FaweBukkit implements IFawe, Listener {
                 debug("Download the version of FAWE for your platform");
                 debug(" - http://ci.athion.net/job/FastAsyncWorldEdit/lastSuccessfulBuild/artifact/target");
                 debug("=======================================");
-                ignore.printStackTrace();
+                throwable.printStackTrace();
                 debug("=======================================");
                 TaskManager.IMP.laterAsync(
                     () -> MainUtil.sendAdmin("&cNo NMS placer found, see console!"), 1);
@@ -371,11 +368,11 @@ public class FaweBukkit implements IFawe, Listener {
                 } catch (Throwable ignore) {
                 }
             }
-            Throwable error = null;
+            Throwable error;
             try {
                 return getQueue(world);
-            } catch (Throwable ignore) {
-                error = ignore;
+            } catch (Throwable throwable) {
+                error = throwable;
             }
             // Disable incompatible settings
             Settings.IMP.QUEUE.PARALLEL_THREADS = 1; // BukkitAPI placer is too slow to parallel thread at the chunk level
@@ -422,7 +419,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new WorldguardFlag(worldguardPlugin, this));
                 Fawe.debug("Plugin 'WorldGuard' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         final Plugin townyPlugin = Bukkit.getServer().getPluginManager().getPlugin("Towny");
@@ -431,13 +428,13 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new TownyFeature(townyPlugin, this));
                 Fawe.debug("Plugin 'Towny' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         final Plugin factionsPlugin = Bukkit.getServer().getPluginManager().getPlugin("Factions");
         if ((factionsPlugin != null) && factionsPlugin.isEnabled()) {
             try {
-                managers.add(new FactionsFeature(factionsPlugin, this));
+                managers.add(new FactionsFeature(factionsPlugin));
                 Fawe.debug("Plugin 'Factions' found. Using it now.");
             } catch (final Throwable e) {
                 try {
@@ -445,10 +442,10 @@ public class FaweBukkit implements IFawe, Listener {
                     Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
                 } catch (Throwable e2) {
                     try {
-                        managers.add(new FactionsOneFeature(factionsPlugin, this));
+                        managers.add(new FactionsOneFeature(factionsPlugin));
                         Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
                     } catch (Throwable e3) {
-                        MainUtil.handleError(e);
+                        e.printStackTrace();
                     }
 
                 }
@@ -460,16 +457,16 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new ResidenceFeature(residencePlugin, this));
                 Fawe.debug("Plugin 'Residence' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         final Plugin griefpreventionPlugin = Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention");
         if ((griefpreventionPlugin != null) && griefpreventionPlugin.isEnabled()) {
             try {
-                managers.add(new GriefPreventionFeature(griefpreventionPlugin, this));
+                managers.add(new GriefPreventionFeature(griefpreventionPlugin));
                 Fawe.debug("Plugin 'GriefPrevention' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         final Plugin preciousstonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("PreciousStones");
@@ -478,7 +475,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new PreciousStonesFeature(preciousstonesPlugin, this));
                 Fawe.debug("Plugin 'PreciousStones' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
 
@@ -486,10 +483,10 @@ public class FaweBukkit implements IFawe, Listener {
         final Plugin aSkyBlock = Bukkit.getServer().getPluginManager().getPlugin("ASkyBlock");
         if ((aSkyBlock != null) && aSkyBlock.isEnabled()) {
             try {
-                managers.add(new ASkyBlockHook(aSkyBlock, this));
+                managers.add(new ASkyBlockHook(aSkyBlock));
                 Fawe.debug("Plugin 'ASkyBlock' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
         if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
@@ -497,7 +494,7 @@ public class FaweBukkit implements IFawe, Listener {
                 managers.add(new FreeBuildRegion());
                 Fawe.debug("Plugin '<internal.freebuild>' found. Using it now.");
             } catch (final Throwable e) {
-                MainUtil.handleError(e);
+                e.printStackTrace();
             }
         }
 
@@ -571,7 +568,7 @@ public class FaweBukkit implements IFawe, Listener {
                     BukkitQueue_0.checkVersion(v.name());
                     this.version = tmp = v;
                     break;
-                } catch (IllegalStateException e) {}
+                } catch (IllegalStateException ignored) {}
             }
         }
         return tmp;

@@ -1,7 +1,28 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.extent.transform;
 
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.ReflectionUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
@@ -18,6 +39,7 @@ import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
+import static com.sk89q.worldedit.util.Direction.*;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -32,8 +54,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.sk89q.worldedit.util.Direction.*;
-
+/**
+ * Transforms blocks themselves (but not their position) according to a
+ * given transform.
+ */
 public class BlockTransformExtent extends ResettableExtent {
     private Transform transform;
     private Transform transformInverse;
@@ -46,8 +70,14 @@ public class BlockTransformExtent extends ResettableExtent {
         this(parent, new AffineTransform());
     }
 
-    public BlockTransformExtent(Extent parent, Transform transform) {
-        super(parent);
+    /**
+     * Create a new instance.
+     *
+     * @param extent the extent
+     */
+    public BlockTransformExtent(Extent extent, Transform transform) {
+        super(extent);
+        checkNotNull(transform);
         this.transform = transform;
         this.transformInverse = this.transform.inverse();
         cache();
@@ -134,7 +164,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                     continue;
                                 default:
                                     System.out.println("Unknown direction " + value);
-                                    result.add(0l);
+                                    result.add(0L);
                             }
                         }
                         return adapt(result.toArray(new Long[0]));
@@ -174,7 +204,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                     break;
                                 default:
                                     System.out.println("Unknown direction " + value);
-                                    directions.add(0l);
+                                    directions.add(0L);
                             }
                         }
                         return adapt(directions.toArray(new Long[0]));
@@ -245,7 +275,7 @@ public class BlockTransformExtent extends ResettableExtent {
             }
             if (newIndex != null) return newIndex;
         }
-        return newIndex != null ? newIndex : null;
+        return newIndex;
     }
 
     private static boolean isDirectional(Property property) {
@@ -268,7 +298,7 @@ public class BlockTransformExtent extends ResettableExtent {
         }
     }
 
-    private static final BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundTag tag, Transform transform) {
+    private static BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundTag tag, Transform transform) {
         if (tag != null) {
             if (tag.containsKey("Rot")) {
                 int rot = tag.asInt("Rot");
@@ -321,7 +351,7 @@ public class BlockTransformExtent extends ResettableExtent {
             newMaskedId = tmp.getInternalId();
         }
 
-        for (AbstractProperty property : (Collection<AbstractProperty>) (Collection) type.getProperties()) {
+        for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
             if (isDirectional(property)) {
                 long[] directions = getDirections(property);
                 if (directions != null) {
@@ -335,30 +365,11 @@ public class BlockTransformExtent extends ResettableExtent {
         return newMaskedId;
     }
 
-    /**
-     * @deprecated Slow - does not cache results
-     * @param block
-     * @param transform
-     * @param <B>
-     * @return
-     */
-    @Deprecated
-    public static <B extends BlockStateHolder<B>> B transform(B block, Transform transform) {
-        BlockState state = block.toImmutableState();
-
-        int transformedId = transformState(state, transform);
-        BlockState transformed = BlockState.getFromInternalId(transformedId);
-        if (block.hasNbtData()) {
-            return (B) transformBaseBlockNBT(transformed, block.getNbtData(), transform);
-        }
-        return (B) (block instanceof BaseBlock ? transformed.toBaseBlock() : transformed);
-    }
 
     private void cache() {
         BLOCK_ROTATION_BITMASK = new int[BlockTypes.size()];
         BLOCK_TRANSFORM = new int[BlockTypes.size()][];
         BLOCK_TRANSFORM_INVERSE = new int[BlockTypes.size()][];
-        outer:
         for (int i = 0; i < BLOCK_TRANSFORM.length; i++) {
             BLOCK_TRANSFORM[i] = ALL;
             BLOCK_TRANSFORM_INVERSE[i] = ALL;
@@ -382,8 +393,28 @@ public class BlockTransformExtent extends ResettableExtent {
         return super.setExtent(extent);
     }
 
+    /**
+     * Get the transform.
+     *
+     * @return the transform
+     */
     public Transform getTransform() {
         return transform;
+    }
+
+    @Override
+    public BlockState getBlock(BlockVector3 position) {
+        return transform(super.getBlock(position));
+    }
+
+    @Override
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return transform(super.getFullBlock(position));
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
+        return super.setBlock(location, transformInverse(block));
     }
 
     public void setTransform(Transform affine) {
@@ -392,7 +423,28 @@ public class BlockTransformExtent extends ResettableExtent {
         cache();
     }
 
-    private final BlockState transform(BlockState state, int[][] transformArray, Transform transform) {
+    /**
+     * Transform the given block using the given transform.
+     *
+     * <p>The provided block is <em>not</em> modified.</p>
+     *
+     * @param block the block
+     * @param transform the transform
+     * @return the same block
+     */
+    public static <B extends BlockStateHolder<B>> B transform(B block, Transform transform) {
+        // performance critical
+        BlockState state = block.toImmutableState();
+
+        int transformedId = transformState(state, transform);
+        BlockState transformed = BlockState.getFromInternalId(transformedId);
+        if (block.hasNbtData()) {
+            return (B) transformBaseBlockNBT(transformed, block.getNbtData(), transform);
+        }
+        return (B) (block instanceof BaseBlock ? transformed.toBaseBlock() : transformed);
+    }
+
+    private BlockState transform(BlockState state, int[][] transformArray, Transform transform) {
         int typeId = state.getInternalBlockTypeId();
         int[] arr = transformArray[typeId];
         if (arr == ALL) {
@@ -425,7 +477,7 @@ public class BlockTransformExtent extends ResettableExtent {
         return transformed.toBaseBlock();
     }
 
-    public final BlockStateHolder transformInverse(BlockStateHolder block) {
+    protected final BlockStateHolder transformInverse(BlockStateHolder block) {
         BlockState transformed = transformInverse(block.toImmutableState());
         if (block.hasNbtData()) {
             return transformBaseBlockNBT(transformed, block.getNbtData(), transformInverse);
@@ -437,7 +489,7 @@ public class BlockTransformExtent extends ResettableExtent {
         return transform(block, BLOCK_TRANSFORM, transform);
     }
 
-    public final BlockState transformInverse(BlockState block) {
+    private BlockState transformInverse(BlockState block) {
         return transform(block, BLOCK_TRANSFORM_INVERSE, transformInverse);
     }
 
@@ -447,18 +499,8 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return transform(super.getFullBlock(position));
-    }
-
-    @Override
     public BlockState getLazyBlock(BlockVector3 position) {
         return transform(super.getLazyBlock(position));
-    }
-
-    @Override
-    public BlockState getBlock(BlockVector3 position) {
-        return transform(super.getBlock(position));
     }
 
     @Override
@@ -471,11 +513,6 @@ public class BlockTransformExtent extends ResettableExtent {
         return super.setBlock(x, y, z, transformInverse(block));
     }
 
-
-    @Override
-    public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
-        return super.setBlock(location, transformInverse(block));
-    }
 
 
 }

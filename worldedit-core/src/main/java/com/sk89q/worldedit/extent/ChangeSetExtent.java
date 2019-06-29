@@ -19,9 +19,6 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockState;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.WorldEditException;
@@ -43,8 +40,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores changes to a {@link ChangeSet}.

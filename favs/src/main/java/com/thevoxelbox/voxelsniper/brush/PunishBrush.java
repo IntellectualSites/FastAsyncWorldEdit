@@ -19,13 +19,6 @@ import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.Random;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Punish_Brush
- *
- * @author Monofraps
- * @author Deamon
- * @author MikeMatrix
- */
 public class PunishBrush extends PerformBrush {
     private static final int MAXIMAL_RANDOM_TELEPORTATION_RANGE = 400;
     private static final int TICKS_PER_SECOND = 20;
@@ -213,7 +206,7 @@ public class PunishBrush extends PerformBrush {
                         }
                     } catch (final Exception exception) {
                         exception.printStackTrace();
-                        v.sendMessage("An error occured.");
+                        v.sendMessage("An error occurred.");
                         return;
                     }
                 } else if (v.getBrushSize() == PunishBrush.INFINIPUNISH_SIZE) {
@@ -315,9 +308,6 @@ public class PunishBrush extends PerformBrush {
         return "voxelsniper.brush.punish";
     }
 
-    /**
-     * @author Monofraps
-     */
     private enum Punishment {
         // Monofraps
         FIRE, LIGHTNING, BLINDNESS, DRUNK, KILL, RANDOMTP, ALL_POTION,

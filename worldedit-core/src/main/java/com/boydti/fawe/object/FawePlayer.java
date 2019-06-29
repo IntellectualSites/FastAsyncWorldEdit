@@ -10,33 +10,54 @@ import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
-import com.boydti.fawe.util.*;
-import com.boydti.fawe.wrappers.FakePlayer;
+import com.boydti.fawe.util.EditSessionBuilder;
+import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.SetQueue;
+import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.worldedit.*;
-
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
-import com.sk89q.worldedit.extension.platform.*;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformManager;
+import com.sk89q.worldedit.extension.platform.PlayerProxy;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.regions.*;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CylinderRegion;
+import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionOperationException;
+import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.ConvexPolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.CylinderRegionSelector;
+import com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -63,14 +84,8 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @return
      */
     public static <V> FawePlayer<V> wrap(Object obj) {
-        if (obj == null || (obj instanceof String && obj.equals("*"))) {
-            return FakePlayer.getConsole().toFawePlayer();
-        }
         if (obj instanceof FawePlayer) {
             return (FawePlayer<V>) obj;
-        }
-        if (obj instanceof FakePlayer) {
-            return ((FakePlayer) obj).toFawePlayer();
         }
         if (obj instanceof Player) {
             Player actor = LocationMaskedPlayerWrapper.unwrap((Player) obj);
@@ -95,18 +110,8 @@ public abstract class FawePlayer<T> extends Metadatable {
             if (existing != null) {
                 return existing;
             }
-            FakePlayer fake = new FakePlayer(actor.getName(), actor.getUniqueId(), actor);
-            return fake.toFawePlayer();
-        }
-        if (obj != null && obj.getClass().getName().contains("CraftPlayer") && !Fawe.imp().getPlatform().equals("bukkit")) {
-            try {
-                Method methodGetHandle = obj.getClass().getDeclaredMethod("getHandle");
-                obj = methodGetHandle.invoke(obj);
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return null;
             }
-        }
+        obj.getClass().getName();
         return Fawe.imp().wrap(obj);
     }
 
@@ -206,7 +211,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             if (region != null) {
             	BlockVector3 min = region.getMinimumPoint();
             	BlockVector3 max = region.getMaximumPoint();
-                long area = (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1));
+                long area = (max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1);
                 if (area > 2 << 18) {
                     setConfirmTask(task, context, command);
                     BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
@@ -220,7 +225,7 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     public synchronized boolean confirm() {
         Runnable confirm = deleteMeta("cmdConfirm");
-        if (!(confirm instanceof Runnable)) {
+        if (confirm == null) {
             return false;
         }
         queueAction(() -> {
@@ -281,7 +286,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             e = e.getCause();
         }
         if (e instanceof WorldEditException) {
-            sendMessage(BBC.getPrefix() + e.getLocalizedMessage());
+            sendMessage(e.getLocalizedMessage());
         } else {
             FaweException fe = FaweException.get(e);
             if (fe != null) {
@@ -341,7 +346,7 @@ public abstract class FawePlayer<T> extends Metadatable {
                     if (session.getClipboard() != null) {
                         return;
                     }
-                } catch (EmptyClipboardException e) {
+                } catch (EmptyClipboardException ignored) {
                 }
                 if (player != null) {
                     Clipboard clip = doc.toClipboard();
@@ -351,7 +356,7 @@ public abstract class FawePlayer<T> extends Metadatable {
             }
         } catch (Exception event) {
             Fawe.debug("====== INVALID CLIPBOARD ======");
-            MainUtil.handleError(event, false);
+            event.printStackTrace();
             Fawe.debug("===============---=============");
             Fawe.debug("This shouldn't result in any failure");
             Fawe.debug("File: " + file.getName() + " (len:" + file.length() + ")");
@@ -365,7 +370,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @return
      */
     public World getWorld() {
-        return FaweAPI.getWorld(getLocation().world);
+        return getPlayer().getWorld();
     }
 
     public FaweQueue getFaweQueue(boolean autoQueue) {
@@ -468,6 +473,13 @@ public abstract class FawePlayer<T> extends Metadatable {
     public abstract void sendMessage(final String message);
 
     /**
+     * Print a WorldEdit error.
+     *
+     * @param msg The error message text
+     */
+    public abstract void printError(String msg);
+
+    /**
      * Have the player execute a command
      *
      * @param substring
@@ -479,7 +491,9 @@ public abstract class FawePlayer<T> extends Metadatable {
      *
      * @return
      */
-    public abstract FaweLocation getLocation();
+    public Location getLocation() {
+        return getPlayer().getLocation();
+    }
 
     /**
      * Get the WorldEdit player object
@@ -516,7 +530,8 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @return
      */
     public LocalSession getSession() {
-        return (this.session != null || this.getPlayer() == null || Fawe.get() == null) ? this.session : (session = Fawe.get().getWorldEdit().getSessionManager().get(this.getPlayer()));
+        if (this.session != null || this.getPlayer() == null || Fawe.get() == null) return this.session;
+        else return session = Fawe.get().getWorldEdit().getSessionManager().get(this.getPlayer());
     }
 
     /**
@@ -550,19 +565,14 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     public void setSelection(Region region) {
         RegionSelector selector;
-        switch (region.getClass().getName()) {
-            case "ConvexPolyhedralRegion":
-                selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
-                break;
-            case "CylinderRegion":
-                selector = new CylinderRegionSelector((CylinderRegion) region);
-                break;
-            case "Polygonal2DRegion":
-                selector = new com.sk89q.worldedit.regions.selector.Polygonal2DRegionSelector((Polygonal2DRegion) region);
-                break;
-            default:
-                selector = new CuboidRegionSelector(null, region.getMinimumPoint(), region.getMaximumPoint());
-                break;
+        if (region instanceof ConvexPolyhedralRegion) {
+            selector = new ConvexPolyhedralRegionSelector((ConvexPolyhedralRegion) region);
+        } else if (region instanceof CylinderRegion) {
+            selector = new CylinderRegionSelector((CylinderRegion) region);
+        } else if (region instanceof Polygonal2DRegion) {
+            selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
+        } else {
+            selector = new CuboidRegionSelector(null, region.getMinimumPoint(), region.getMaximumPoint());
         }
         selector.setWorld(region.getWorld());
 

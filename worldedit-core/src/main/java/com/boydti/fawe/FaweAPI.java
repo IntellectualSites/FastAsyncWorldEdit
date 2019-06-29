@@ -4,10 +4,8 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.example.NMSRelighter;
-import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.schematic.Schematic;
@@ -37,8 +35,11 @@ import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.World;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -67,7 +68,7 @@ public class FaweAPI {
      *
      * @param world
      * @return A new EditSessionBuilder
-     * @see com.boydti.fawe.util.EditSessionBuilder
+     * @see EditSessionBuilder
      */
     public static EditSessionBuilder getEditSessionBuilder(World world) {
         return new EditSessionBuilder(world);
@@ -182,7 +183,7 @@ public class FaweAPI {
      * @param world     The name of the world
      * @param autoqueue If it should start dispatching before you enqueue it.
      * @return
-     * @see com.boydti.fawe.object.FaweQueue#enqueue()
+     * @see FaweQueue#enqueue()
      */
     public static FaweQueue createQueue(World world, boolean autoqueue) {
         return SetQueue.IMP.getNewQueue(world, true, autoqueue);
@@ -191,11 +192,6 @@ public class FaweAPI {
     public static World getWorld(String worldName) {
         Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
         List<? extends World> worlds = platform.getWorlds();
-        for (World current : worlds) {
-            if (Fawe.imp().getWorldName(current).equals(worldName)) {
-                return WorldWrapper.wrap(current);
-            }
-        }
         for (World current : worlds) {
             if (current.getName().equals(worldName)) {
                 return WorldWrapper.wrap(current);
@@ -220,8 +216,8 @@ public class FaweAPI {
      *
      * @param file
      * @return
-     * @see com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat
-     * @see com.boydti.fawe.object.schematic.Schematic
+     * @see ClipboardFormat
+     * @see Schematic
      */
     public static Schematic load(File file) throws IOException {
         return ClipboardFormats.findByFile(file).load(file);
@@ -246,15 +242,6 @@ public class FaweAPI {
     }
 
     /**
-     * Use ThreadLocalRandom instead
-     *
-     */
-    @Deprecated
-    public static PseudoRandom getFastRandom() {
-        throw new UnsupportedOperationException("Please Use ThreadLocalRandom instead.");
-    }
-
-    /**
      * Get a player's allowed WorldEdit region
      *
      * @param player
@@ -271,7 +258,7 @@ public class FaweAPI {
      *
      * @param extent
      * @param reason
-     * @see com.sk89q.worldedit.EditSession#getRegionExtent() To get the FaweExtent for an EditSession
+     * @see EditSession#getRegionExtent() To get the FaweExtent for an EditSession
      */
     public static void cancelEdit(Extent extent, BBC reason) {
         try {
@@ -332,8 +319,13 @@ public class FaweAPI {
      *                 Reading only part of the file will result in unreliable bounds info for large edits
      * @return
      */
-    public static List<DiskStorageHistory> getBDFiles(FaweLocation origin, UUID user, int radius, long timediff, boolean shallow) {
-        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + origin.world);
+    public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
+        Extent extent = origin.getExtent();
+        if (!(extent instanceof World)) {
+            throw new IllegalArgumentException("Origin is not a valid world");
+        }
+        World world = (World) extent;
+        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + Fawe.imp().getWorldName(world));
         if (!history.exists()) {
             return new ArrayList<>();
         }
@@ -364,7 +356,6 @@ public class FaweAPI {
                 }
             }
         }
-        World world = origin.getWorld();
         files.sort((a, b) -> {
             String aName = a.getName();
             String bName = b.getName();
@@ -373,7 +364,7 @@ public class FaweAPI {
             long value = aI - bI;
             return value == 0 ? 0 : value < 0 ? -1 : 1;
         });
-        RegionWrapper bounds = new RegionWrapper(origin.x - radius, origin.x + radius, origin.z - radius, origin.z + radius);
+        RegionWrapper bounds = new RegionWrapper(origin.getBlockX() - radius, origin.getBlockX() + radius, origin.getBlockZ() - radius, origin.getBlockZ() + radius);
         RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
         HashSet<RegionWrapper> regionSet = Sets.<RegionWrapper>newHashSet(bounds);
         ArrayList<DiskStorageHistory> result = new ArrayList<>();
@@ -410,7 +401,7 @@ public class FaweAPI {
      * @param uuid
      * @param index
      * @return
-     * @see com.boydti.fawe.object.changeset.DiskStorageHistory#toEditSession(com.boydti.fawe.object.FawePlayer)
+     * @see DiskStorageHistory#toEditSession(FawePlayer)
      */
     public static DiskStorageHistory getChangeSetFromDisk(World world, UUID uuid, int index) {
         return new DiskStorageHistory(world, uuid, index);
@@ -525,27 +516,6 @@ public class FaweAPI {
      */
     public static BBC[] getTranslations() {
         return BBC.values();
-    }
-
-    /**
-     * @see #getEditSessionBuilder(com.sk89q.worldedit.world.World)
-     * @deprecated
-     */
-    @Deprecated
-    public static EditSession getNewEditSession(@Nonnull FawePlayer player) {
-        if (player == null) {
-            throw new IllegalArgumentException("Player may not be null");
-        }
-        return player.getNewEditSession();
-    }
-
-    /**
-     * @see #getEditSessionBuilder(com.sk89q.worldedit.world.World)
-     * @deprecated
-     */
-    @Deprecated
-    public static EditSession getNewEditSession(World world) {
-        return WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
     }
 
 }

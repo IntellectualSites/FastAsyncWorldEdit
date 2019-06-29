@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.listener;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FawePlayer;
@@ -15,30 +14,25 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.injector.netty.WirePacket;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.WrappedBlockData;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -70,7 +64,7 @@ public class CFIPacketListener implements Listener {
                     Player plr = event.getPlayer();
                     BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
                     if (!sendBlockChange(plr, gen, pt, Interaction.HIT)) {
-                        gen.setBlock(pt, EditSession.nullBlock);
+                        gen.setBlock(pt, BlockTypes.AIR.getDefaultState());
                     }
                 } catch (WorldEditException e) {
                     e.printStackTrace();
@@ -89,7 +83,7 @@ public class CFIPacketListener implements Listener {
                     EnumWrappers.Hand enumHand = hands.isEmpty() ? EnumWrappers.Hand.MAIN_HAND : hands.get(0);
                     PlayerInventory inv = plr.getInventory();
                     ItemStack hand = enumHand == EnumWrappers.Hand.MAIN_HAND ? inv.getItemInMainHand() : inv.getItemInOffHand();
-                    if (hand != null && hand.getType().isBlock()) {
+                    if (hand.getType().isBlock()) {
                         Material type = hand.getType();
                         switch (type) {
                             case AIR:
@@ -287,8 +281,7 @@ public class CFIPacketListener implements Listener {
         BlockPosition loc = position.readSafely(0);
         if (loc == null) return null;
         BlockVector3 origin = generator.getOrigin().toBlockPoint();
-        BlockVector3 pt = BlockVector3.at(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
-        return pt;
+        return BlockVector3.at(loc.getX() - origin.getBlockX(), loc.getY() - origin.getBlockY(), loc.getZ() - origin.getBlockZ());
     }
 
     private void handleBlockEvent(PacketEvent event, boolean relative, RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> task) {

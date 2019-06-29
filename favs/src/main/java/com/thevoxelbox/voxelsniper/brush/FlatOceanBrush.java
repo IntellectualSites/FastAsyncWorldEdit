@@ -6,23 +6,16 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
-/**
- * @author GavJenks
- */
 public class FlatOceanBrush extends Brush {
     private static final int DEFAULT_WATER_LEVEL = 29;
     private static final int DEFAULT_FLOOR_LEVEL = 8;
     private int waterLevel = DEFAULT_WATER_LEVEL;
     private int floorLevel = DEFAULT_FLOOR_LEVEL;
 
-    /**
-     *
-     */
     public FlatOceanBrush() {
         this.setName("FlatOcean");
     }
 
-    @SuppressWarnings("deprecation")
     private void flatOcean(final AsyncChunk chunk) {
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int z = 0; z < CHUNK_SIZE; z++) {

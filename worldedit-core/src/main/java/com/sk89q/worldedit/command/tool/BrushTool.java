@@ -1,3 +1,22 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.command.tool;
 
 import com.boydti.fawe.Fawe;
@@ -16,15 +35,21 @@ import com.boydti.fawe.object.brush.visualization.VisualMode;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.object.mask.MaskedTargetBlock;
 import com.boydti.fawe.object.pattern.PatternTraverser;
-import com.boydti.fawe.util.*;
+import com.boydti.fawe.util.BrushCache;
+import com.boydti.fawe.util.EditSessionBuilder;
+import com.boydti.fawe.util.MaskTraverser;
+import com.boydti.fawe.util.StringMan;
+import com.boydti.fawe.util.TaskManager;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.*;
-
-import com.sk89q.worldedit.internal.expression.Expression;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
@@ -36,10 +61,14 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockType;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -47,11 +76,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.Nullable;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
+/**
+ * Builds a shape at the place being looked at.
+ */
 public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool, ResettableTool, Serializable {
 //    TODO:
     // Serialize methods
@@ -79,7 +107,13 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     private transient BaseItem holder;
 
+    /**
+     * Construct the tool.
+     *
+     * @param permission the permission to check before use is allowed
+     */
     public BrushTool(String permission) {
+        checkNotNull(permission);
         getContext().addPermission(permission);
     }
 
@@ -285,10 +319,9 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     /**
      * Set the brush.
      *
-     * @param brush      tbe brush
+     * @param brush tbe brush
      * @param permission the permission
      */
-    @Deprecated
     public void setBrush(Brush brush, String permission) {
         setBrush(brush, permission, null);
         update();
@@ -382,13 +415,12 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         switch (targetMode) {
             case TARGET_BLOCK_RANGE:
                 return offset(trace(editSession, player, getRange(), true), loc).toBlockPoint();
-            case FOWARD_POINT_PITCH: {
+            case FORWARD_POINT_PITCH: {
                 int d = 0;
                 float pitch = loc.getPitch();
                 pitch = 23 - (pitch / 4);
                 d += (int) (Math.sin(Math.toRadians(pitch)) * 50);
                 final Vector3 vector = loc.getDirection().withY(0).normalize().multiply(d).add(loc.getX(), loc.getY(), loc.getZ());
-//                vector = vector.add(loc.getX(), loc.getY(), loc.getZ());
                 return offset(vector, loc).toBlockPoint();
             }
             case TARGET_POINT_HEIGHT: {

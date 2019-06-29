@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public interface IFaweQueueMap {
 
-    Collection<FaweChunk> getFaweCunks();
+    Collection<FaweChunk> getFaweChunks();
 
     void forEachChunk(RunnableVal<FaweChunk> onEach);
 

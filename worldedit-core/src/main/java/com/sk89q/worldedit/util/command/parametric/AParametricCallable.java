@@ -40,7 +40,7 @@ public abstract class AParametricCallable implements CommandCallable {
      * @param existing  the existing scoped context
      * @return the context to use
      */
-    public static ArgumentStack getScopedContext(Parameter parameter, ArgumentStack existing) {
+    static ArgumentStack getScopedContext(Parameter parameter, ArgumentStack existing) {
         if (parameter.getFlag() != null) {
             CommandContext context = existing.getContext();
 
@@ -213,7 +213,6 @@ public abstract class AParametricCallable implements CommandCallable {
 
         CommandContext context = new CommandContext(split, getValueFlags(), !arguments.endsWith(" "), locals);
         ContextArgumentStack scoped = new ContextArgumentStack(context);
-        SuggestionContext suggestable = context.getSuggestionContext();
 
         List<String> suggestions = new ArrayList<>(2);
         ParameterData parameter = null;

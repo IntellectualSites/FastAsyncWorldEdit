@@ -905,7 +905,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
             tile.save(tag); // readTagIntoEntity
             return (CompoundTag) toNative(tag);
         } catch (Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
             return null;
         }
     }

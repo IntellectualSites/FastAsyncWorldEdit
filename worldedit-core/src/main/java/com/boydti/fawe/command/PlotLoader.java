@@ -50,7 +50,7 @@ public class PlotLoader {
             SinglePlotArea area = sManager.getArea();
             PlotPlayer player = PlotPlayer.wrap(fp.parent);
 
-            fp.sendMessage(BBC.getPrefix() + "Claiming world");
+            fp.sendMessage("Claiming world");
             Plot plot = TaskManager.IMP.sync(new RunnableVal<Plot>() {
                 @Override
                 public void run(Plot o) {
@@ -65,12 +65,9 @@ public class PlotLoader {
                         area.setMeta("lastPlot", new PlotId(0, 0));
                     }
                     PlotId lastId = (PlotId) area.getMeta("lastPlot");
-                    while (true) {
+                    do {
                         lastId = Auto.getNextPlotId(lastId, 1);
-                        if (area.canClaim(player, lastId, lastId)) {
-                            break;
-                        }
-                    }
+                    } while (!area.canClaim(player, lastId, lastId));
                     area.setMeta("lastPlot", lastId);
                     this.value = area.getPlot(lastId);
                     this.value.setOwner(player.getUUID());

@@ -10,11 +10,7 @@ import org.bukkit.block.Block;
 import java.util.EnumSet;
 import java.util.Set;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Eraser_Brush
- *
- * @author Voxel
- */
+
 public class EraserBrush extends Brush {
 
     private static final Set<Material> EXCLUSIVE_MATERIALS = EnumSet.of(
@@ -22,9 +18,6 @@ public class EraserBrush extends Brush {
     private static final Set<Material> EXCLUSIVE_LIQUIDS = EnumSet.of(
             Material.WATER, Material.WATER, Material.LAVA, Material.LAVA);
 
-    /**
-     *
-     */
     public EraserBrush() {
         this.setName("Eraser");
     }

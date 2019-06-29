@@ -3,9 +3,6 @@ package com.thevoxelbox.voxelsniper;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.ChatColor;
 
-/**
- *
- */
 public class Message {
     private static final int BRUSH_SIZE_WARNING_THRESHOLD = 20;
     private final SnipeData snipeData;

@@ -109,15 +109,15 @@ public class WorldEditListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandSendEvent event) {
-        CommandLocals locals = new CommandLocals();
-        locals.put(Actor.class, plugin.wrapCommandSender(event.getPlayer()));
         Dispatcher dispatcher = plugin.getWorldEdit().getPlatformManager().getCommandManager().getDispatcher();
         if (dispatcher != null) {
-            Set<String> toRemove = dispatcher.getCommands().stream()
-                    .filter(commandMapping -> !commandMapping.getCallable().testPermission(locals))
-                    .map(CommandMapping::getPrimaryAlias)
-                    .collect(Collectors.toSet());
-            event.getCommands().removeIf(toRemove::contains);
+        CommandLocals locals = new CommandLocals();
+        locals.put(Actor.class, plugin.wrapCommandSender(event.getPlayer()));
+        Set<String> toRemove = plugin.getWorldEdit().getPlatformManager().getCommandManager().getDispatcher().getCommands().stream()
+                .filter(commandMapping -> !commandMapping.getCallable().testPermission(locals))
+                .map(CommandMapping::getPrimaryAlias)
+                .collect(Collectors.toSet());
+        event.getCommands().removeIf(toRemove::contains);
         }
     }
 

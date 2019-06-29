@@ -12,20 +12,11 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.List;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#The_Jockey_Brush
- *
- * @author Voxel
- * @author Monofraps
- */
 public class JockeyBrush extends Brush {
     private static final int ENTITY_STACK_LIMIT = 50;
     private JockeyType jockeyType = JockeyType.NORMAL_ALL_ENTITIES;
     private Entity jockeyedEntity = null;
 
-    /**
-     *
-     */
     public JockeyBrush() {
         this.setName("Jockey");
     }
@@ -139,16 +130,15 @@ public class JockeyBrush extends Brush {
     public final void info(final Message vm) {
         vm.brushName(this.getName());
         vm.custom("Current jockey mode: " + ChatColor.GREEN + jockeyType.toString());
-        vm.custom(ChatColor.GREEN + "Help: " + ChatColor.AQUA + "http://www.voxelwiki.com/minecraft/Voxelsniper#The_Jockey_Brush");
     }
 
     @Override
     public final void parameters(final String[] par, final SnipeData v) {
-        boolean inverse = false;
-        boolean playerOnly = false;
-        boolean stack = false;
 
         try {
+            boolean inverse = false;
+            boolean playerOnly = false;
+            boolean stack = false;
             for (String parameter : par) {
                 if (parameter.startsWith("-i:")) {
                     inverse = parameter.endsWith("y");

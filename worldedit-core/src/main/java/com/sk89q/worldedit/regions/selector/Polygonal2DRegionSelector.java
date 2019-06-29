@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.regions.selector;
 
 import com.boydti.fawe.config.BBC;
-import static com.google.common.base.Preconditions.checkNotNull;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -36,13 +36,11 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
+
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Creates a {@code Polygonal2DRegion} from a user's selections.
@@ -114,7 +112,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
      */
     public Polygonal2DRegionSelector(@Nullable World world, List<BlockVector2> points, int minY, int maxY) {
         checkNotNull(points);
-        
+
         final BlockVector2 pos2D = points.get(0);
         pos1 = BlockVector3.at(pos2D.getX(), minY, pos2D.getZ());
         region = new Polygonal2DRegion(world, points, minY, maxY);

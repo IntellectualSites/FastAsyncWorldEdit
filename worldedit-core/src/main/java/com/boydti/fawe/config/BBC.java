@@ -4,13 +4,13 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.PseudoRandom;
 import com.boydti.fawe.object.RunnableVal3;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.chat.Message;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sk89q.worldedit.extension.platform.Actor;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -379,51 +379,25 @@ public enum BBC {
     /**
      * Translated
      */
-    private String s;
+    private String translatedMessage;
     /**
      * Default
      */
-    private String d;
+    private String defaultMessage;
     /**
      * What locale category should this translation fall under
      */
-    private String cat;
-    /**
-     * Should the string be prefixed?
-     */
-    private boolean prefix;
-
-    /**
-     * Constructor for custom strings.
-     */
-    BBC() {
-        /*
-         * use setCustomString();
-         */
-    }
+    private String category;
 
     /**
      * Constructor
      *
-     * @param d      default
-     * @param prefix use prefix
+     * @param defaultMessage default
      */
-    BBC(final String d, final boolean prefix, final String cat) {
-        this.d = d;
-        if (this.s == null) {
-            this.s = d;
-        }
-        this.prefix = prefix;
-        this.cat = cat.toLowerCase();
-    }
-
-    /**
-     * Constructor
-     *
-     * @param d default
-     */
-    BBC(final String d, final String cat) {
-        this(d, true, cat.toLowerCase());
+    BBC(final String defaultMessage, final String category) {
+        this.defaultMessage = defaultMessage;
+        this.translatedMessage = defaultMessage;
+        this.category = category.toLowerCase();
     }
 
     public String f(final Object... args) {
@@ -431,7 +405,7 @@ public enum BBC {
     }
 
     public String format(final Object... args) {
-        String m = this.s;
+        String m = this.translatedMessage;
         for (int i = args.length - 1; i >= 0; i--) {
             if (args[i] == null) {
                 continue;
@@ -458,7 +432,7 @@ public enum BBC {
             final HashSet<String> toRemove = new HashSet<>();
             for (final BBC c : all) {
                 allNames.add(c.name());
-                allCats.add(c.cat.toLowerCase());
+                allCats.add(c.category.toLowerCase());
             }
             final HashSet<BBC> captions = new HashSet<>();
             boolean changed = false;
@@ -471,13 +445,13 @@ public enum BBC {
                 final String node = split[split.length - 1].toUpperCase();
                 final BBC caption = allNames.contains(node) ? valueOf(node) : null;
                 if (caption != null) {
-                    if (!split[0].equalsIgnoreCase(caption.cat)) {
+                    if (!split[0].equalsIgnoreCase(caption.category)) {
                         changed = true;
                         yml.set(key, null);
-                        yml.set(caption.cat + "." + caption.name().toLowerCase(), value);
+                        yml.set(caption.category + "." + caption.name().toLowerCase(), value);
                     }
                     captions.add(caption);
-                    caption.s = (String) value;
+                    caption.translatedMessage = (String) value;
                 } else {
                     toRemove.add(key);
                 }
@@ -489,15 +463,15 @@ public enum BBC {
             for (final BBC caption : all) {
                 if (!captions.contains(caption)) {
                     changed = true;
-                    yml.set(caption.cat + "." + caption.name().toLowerCase(), caption.d);
+                    yml.set(caption.category + "." + caption.name().toLowerCase(), caption.defaultMessage);
                 }
-                caption.s = StringMan.replaceFromMap(caption.s, replacements);
+                caption.translatedMessage = StringMan.replaceFromMap(caption.translatedMessage, replacements);
             }
             if (changed) {
                 yml.save(file);
             }
         } catch (final Exception e) {
-            MainUtil.handleError(e);
+            e.printStackTrace();
         }
     }
 
@@ -524,7 +498,7 @@ public enum BBC {
     }
 
     public String s() {
-        return this.s;
+        return this.translatedMessage;
     }
 
     public Message m(Object... args) {
@@ -532,15 +506,11 @@ public enum BBC {
     }
 
     public String original() {
-        return d;
+        return defaultMessage;
     }
 
-    public boolean usePrefix() {
-        return this.prefix;
-    }
-
-    public String getCat() {
-        return this.cat;
+    public String getCategory() {
+        return this.category;
     }
 
     public BBC or(BBC... others) {
@@ -559,11 +529,7 @@ public enum BBC {
                 Method method = actor.getClass().getMethod("print", String.class);
                 method.setAccessible(true);
                 method.invoke(actor, (PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -581,6 +547,16 @@ public enum BBC {
             Fawe.debug(this.format(args));
         } else {
             player.sendMessage((PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
+        }
+    }
+    public void send(final Actor player, final Object... args) {
+        if (isEmpty()) {
+            return;
+        }
+        if (player == null) {
+            Fawe.debug(this.format(args));
+        } else {
+            player.print(this.format(args));
         }
     }
 
@@ -700,7 +676,7 @@ public enum BBC {
                     }
                     for (Map.Entry<String, Object> entry2 : obj.entrySet()) {
                         if (StringMan.isEqualIgnoreCaseToAny(entry2.getKey(), "bold", "italic", "underlined", "strikethrough", "obfuscated")) {
-                            boolean newValue = Boolean.valueOf((String) entry2.getValue());
+                            boolean newValue = Boolean.parseBoolean((String) entry2.getValue());
                             if (properties.put(entry2.getKey(), newValue) != newValue) {
                                 if (newValue) {
                                     char code = BBC.getCode(entry2.getKey().toUpperCase());

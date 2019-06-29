@@ -1,9 +1,25 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.extent.inventory;
 
 import com.boydti.fawe.object.exception.FaweException;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -33,7 +49,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
     /**
      * Create a new instance.
      *
-     * @param extent   the extent
+     * @param extent the extent
      * @param blockBag the block bag
      */
     public BlockBagExtent(Extent extent, @Nonnull BlockBag blockBag) {
@@ -52,9 +68,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
      *
      * @return a block bag, which may be null if none is used
      */
-    public
-    @Nullable
-    BlockBag getBlockBag() {
+    public @Nullable BlockBag getBlockBag() {
         return blockBag;
     }
 
@@ -86,40 +100,37 @@ public class BlockBagExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 pos, B block) throws WorldEditException {
-        return setBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), block);
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
+        return setBlock(position.getX(), position.getY(), position.getZ(), block);
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        if(blockBag != null) {
-            BlockStateHolder lazyBlock = getExtent().getLazyBlock(x, y, z);
-            BlockType fromType = lazyBlock.getBlockType();
-        	if(!block.getBlockType().equals(fromType)) {
-				BlockType type = block.getBlockType();
-		        if (!type.getMaterial().isAir()) {
-		            try {
-		                blockBag.fetchPlacedBlock(block.toImmutableState());
-		            } catch (UnplaceableBlockException e) {
-		                throw new FaweException.FaweBlockBagException();
-		            } catch (BlockBagException e) {
-		                missingBlocks[type.getInternalId()]++;
-		                throw new FaweException.FaweBlockBagException();
-		            }
-		        }
-		        if (mine) {
-	
-		            if (!fromType.getMaterial().isAir()) {
-		                try {
-		                    blockBag.storeDroppedBlock(fromType.getDefaultState());
-		                } catch (BlockBagException ignored) {
-		                }
-		            }
-		        }
-        	}
+        if (blockBag != null) {
+            BlockState existing = getLazyBlock(x, y, z);
+
+            if (!block.getBlockType().equals(existing.getBlockType())) {
+                if (!block.getBlockType().getMaterial().isAir()) {
+                    try {
+                        blockBag.fetchPlacedBlock(block.toImmutableState());
+                    } catch (UnplaceableBlockException e) {
+                        throw new FaweException.FaweBlockBagException();
+                    } catch (BlockBagException e) {
+                        missingBlocks[block.getBlockType().getInternalId()]++;
+                        throw new FaweException.FaweBlockBagException();
+                    }
+                }
+                if (mine) {
+                    if (!existing.getBlockType().getMaterial().isAir()) {
+                        try {
+                            blockBag.storeDroppedBlock(existing);
+                        } catch (BlockBagException ignored) {
+                        }
+                    }
+                }
+            }
         }
-        return getExtent().setBlock(x, y, z, block);
+
+        return super.setBlock(x, y, z, block);
     }
-
-
 }

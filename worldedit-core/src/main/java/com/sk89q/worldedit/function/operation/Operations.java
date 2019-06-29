@@ -27,20 +27,20 @@ import com.sk89q.worldedit.WorldEditException;
  */
 public final class Operations {
 
+    private static final RunContext context = new RunContext();
+
     private Operations() {
     }
-
-    private static RunContext context = new RunContext();
 
     /**
      * Complete a given operation synchronously until it completes.
      *
-     * @param operation operation to execute
+     * @param op operation to execute
      * @throws WorldEditException WorldEdit exception
      */
-    public static void complete(Operation operation) throws WorldEditException {
-        while (operation != null) {
-            operation = operation.resume(context);
+    public static void complete(Operation op) throws WorldEditException {
+        while (op != null) {
+            op = op.resume(context);
         }
     }
 
@@ -48,11 +48,19 @@ public final class Operations {
      * Complete a given operation synchronously until it completes. Catch all
      * errors that is not {@link MaxChangedBlocksException} for legacy reasons.
      *
-     * @param operation operation to execute
+     * @param op operation to execute
      * @throws MaxChangedBlocksException thrown when too many blocks have been changed
      */
-    public static void completeLegacy(Operation operation) throws MaxChangedBlocksException {
-        completeBlindly(operation);
+    public static void completeLegacy(Operation op) throws MaxChangedBlocksException {
+        while (op != null) {
+            try {
+                op = op.resume(context);
+            } catch (MaxChangedBlocksException e) {
+                throw e;
+            } catch (WorldEditException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
@@ -60,25 +68,16 @@ public final class Operations {
      * {@link com.sk89q.worldedit.WorldEditException} exceptions as
      * {@link java.lang.RuntimeException}s.
      *
-     * @param operation operation to execute
+     * @param op operation to execute
      */
-    public static void completeBlindly(Operation operation) {
-        try {
-            while (operation != null) {
-                operation = operation.resume(context);
+    public static void completeBlindly(Operation op) {
+        while (op != null) {
+            try {
+                op = op.resume(context);
+            } catch (WorldEditException e) {
+                throw new RuntimeException(e);
             }
-        } catch (WorldEditException e) {
-            throw new RuntimeException(e);
         }
     }
-
-    public static void completeSmart(final Operation op, final Runnable whenDone, final boolean threadsafe) {
-        completeBlindly(op);
-        if (whenDone != null) {
-            whenDone.run();
-        }
-        return;
-    }
-
 
 }

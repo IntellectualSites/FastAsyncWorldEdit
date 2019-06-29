@@ -243,8 +243,8 @@ public class BlockMaskBuilder {
     private boolean optimizedStates = true;
 
     public boolean isEmpty() {
-        for (int i = 0; i < bitSets.length; i++) {
-            if (bitSets[i] != null) return false;
+        for (long[] bitSet : bitSets) {
+            if (bitSet != null) return false;
         }
         return true;
     }
@@ -255,10 +255,6 @@ public class BlockMaskBuilder {
 
     protected BlockMaskBuilder(long[][] bitSets) {
         this.bitSets = bitSets;
-    }
-
-    public BlockMaskBuilder parse(String input) {
-        return this;
     }
 
     public BlockMaskBuilder addAll() {

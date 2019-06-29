@@ -50,13 +50,11 @@ public final class BrushCache {
                 tool.setHolder(item);
                 brushCache.put(key, tool);
                 return tool;
-            } catch (Throwable ignore) {
-                ignore.printStackTrace();
+            } catch (Exception throwable) {
+                throwable.printStackTrace();
                 Fawe.debug("Invalid brush for " + player + " holding " + item.getType() + ": " + json.getValue());
-                if (item != null) {
-                    item.setNbtData(null);
-                    brushCache.remove(key);
-                }
+                item.setNbtData(null);
+                brushCache.remove(key);
             } finally {
                 RECURSION.remove();
             }
@@ -91,7 +89,7 @@ public final class BrushCache {
             String json = tool.toString(gson);
             map.put("weBrushJson", new StringTag(json));
             if (display == null) {
-                map.put("display", new CompoundTag(displayMap = new HashMap()));
+                map.put("display", new CompoundTag(displayMap = new HashMap<>()));
             } else {
                 displayMap = ReflectionUtils.getMap(display.getValue());
             }

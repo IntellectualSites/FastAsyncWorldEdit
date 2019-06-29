@@ -3,13 +3,8 @@ package com.thevoxelbox.voxelsniper.brush;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 
-/**
- * @author Gavjenks
- */
 public class LightningBrush extends Brush {
-    /**
-     *
-     */
+
     public LightningBrush() {
         this.setName("Lightning");
     }

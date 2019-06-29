@@ -23,7 +23,7 @@ public final class IncendoPaster {
     /**
      * Upload service URL
      */
-    public static final String UPLOAD_PATH = "https://incendo.org/paste/upload";
+    public static final String UPLOAD_PATH = "https://athion.net/ISPaster/paste/upload";
     /**
      * Valid paste applications
      */
@@ -238,7 +238,7 @@ public final class IncendoPaster {
 
         if (jsonObject.has("created")) {
             final String pasteId = jsonObject.get("paste_id").getAsString();
-            return String.format("https://incendo.org/paste/view/%s", pasteId);
+            return String.format("https://athion.net/ISPaster/paste/view/%s", pasteId);
         } else {
             throw new IOException(String.format("Failed to upload files: %s",
                 jsonObject.get("response").getAsString()));

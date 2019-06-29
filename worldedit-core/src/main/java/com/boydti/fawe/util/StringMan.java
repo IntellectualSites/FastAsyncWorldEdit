@@ -127,7 +127,7 @@ public class StringMan {
             int start = sb.indexOf(key, 0);
             while (start > -1) {
                 final int end = start + key.length();
-                final int nextSearchStart = start + 0;
+                final int nextSearchStart = start;
                 sb.delete(start, end);
                 size -= end - start;
                 start = sb.indexOf(key, nextSearchStart);
@@ -209,10 +209,10 @@ public class StringMan {
             }
             return "{ " + result + " }";
         } else if (obj instanceof Collection<?>) {
-            String result = "";
+            StringBuilder result = new StringBuilder();
             String prefix = "";
             for (final Object element : (Collection<?>) obj) {
-                result += prefix + getString(element);
+                result.append(prefix).append(getString(element));
                 prefix = ",";
             }
             return "( " + result + " )";
@@ -299,13 +299,7 @@ public class StringMan {
 
     public static String joinOrdered(final Collection<?> collection, final String delimiter) {
         final Object[] array = collection.toArray();
-        Arrays.sort(array, new Comparator<Object>() {
-            @Override
-            public int compare(final Object a, final Object b) {
-                return a.hashCode() - b.hashCode();
-            }
-
-        });
+        Arrays.sort(array, Comparator.comparingInt(Object::hashCode));
         return join(array, delimiter);
     }
 
@@ -327,12 +321,7 @@ public class StringMan {
     }
 
     public static Comparator<String> blockStateComparator(String input) {
-        return new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return blockStateStringDistance(input, o1) - blockStateStringDistance(input, o2);
-            }
-        };
+        return Comparator.comparingInt(o -> blockStateStringDistance(input, o));
     }
 
     public static boolean blockStateMatches(String input, String item) {
@@ -392,9 +381,9 @@ public class StringMan {
             n = m;
             m = t.length();
         }
-        int p[] = new int[n + 1];
-        int d[] = new int[n + 1];
-        int _d[];
+        int[] p = new int[n + 1];
+        int[] d = new int[n + 1];
+        int[] _d;
         int i;
         int j;
         char t_j;

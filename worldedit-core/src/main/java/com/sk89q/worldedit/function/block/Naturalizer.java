@@ -19,20 +19,15 @@
 
 package com.sk89q.worldedit.function.block;
 
-import com.google.common.collect.Sets;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.function.mask.BlockTypeMask;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Makes a layer of grass on top, three layers of dirt below, and smooth stone
@@ -70,21 +65,27 @@ public class Naturalizer implements LayerFunction {
         return mask.test(position);
     }
 
+    private BlockState getTargetBlock(int depth) {
+        switch (depth) {
+            case 0:
+                return BlockTypes.GRASS_BLOCK.getDefaultState();
+            case 1:
+            case 2:
+            case 3:
+                return BlockTypes.DIRT.getDefaultState();
+            default:
+                return BlockTypes.STONE.getDefaultState();
+        }
+    }
+
+    private boolean naturalize(BlockVector3 position, int depth) throws WorldEditException {
+        return editSession.setBlock(position, getTargetBlock(depth));
+    }
     @Override
     public boolean apply(BlockVector3 position, int depth) throws WorldEditException {
         if (mask.test(position)) {
-            affected++;
-            switch (depth) {
-                case 0:
-                    editSession.setBlock(position, BlockTypes.GRASS_BLOCK);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                    editSession.setBlock(position, BlockTypes.DIRT);
-                    break;
-                default:
-                    editSession.setBlock(position, BlockTypes.STONE);
+            if (naturalize(position, depth)) {
+                ++affected;
             }
         }
 

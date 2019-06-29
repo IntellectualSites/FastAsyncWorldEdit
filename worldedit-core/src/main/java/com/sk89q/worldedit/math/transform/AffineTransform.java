@@ -1,17 +1,34 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.worldedit.math.transform;
+
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MathUtils;
+import com.sk89q.worldedit.math.Vector3;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MathUtils;
-import com.sk89q.worldedit.math.MutableVector3;
-import com.sk89q.worldedit.math.Vector3;
-
 /**
  * An affine transform.
- * <p>
+ *
  * <p>This class is from the
  * <a href="http://geom-java.sourceforge.net/index.html">JavaGeom project</a>,
  * which is licensed under LGPL v2.1.</p>
@@ -153,7 +170,7 @@ public class AffineTransform implements Transform, Serializable {
      *
      * @return the determinant of the transform.
      */
-    public double determinant() {
+    private double determinant() {
         return m00 * (m11 * m22 - m12 * m21) - m01 * (m10 * m22 - m20 * m12)
                 + m02 * (m10 * m21 - m20 * m11);
     }
@@ -165,19 +182,19 @@ public class AffineTransform implements Transform, Serializable {
     public AffineTransform inverse() {
         if (inverse != null) return inverse;
         double det = this.determinant();
-        return inverse = new AffineTransform(
+        return new AffineTransform(
                 (m11 * m22 - m21 * m12) / det,
-                (m02 * m21 - m22 * m01) / det,
+                (m21 * m02 - m01 * m22) / det,
                 (m01 * m12 - m11 * m02) / det,
                 (m01 * (m22 * m13 - m12 * m23) + m02 * (m11 * m23 - m21 * m13)
                         - m03 * (m11 * m22 - m21 * m12)) / det,
-                (m12 * m20 - m22 * m10) / det,
+                (m20 * m12 - m10 * m22) / det,
                 (m00 * m22 - m20 * m02) / det,
-                (m02 * m10 - m12 * m00) / det,
+                (m10 * m02 - m00 * m12) / det,
                 (m00 * (m12 * m23 - m22 * m13) - m02 * (m10 * m23 - m20 * m13)
                         + m03 * (m10 * m22 - m20 * m12)) / det,
                 (m10 * m21 - m20 * m11) / det,
-                (m01 * m20 - m21 * m00) / det,
+                (m20 * m01 - m00 * m21) / det,
                 (m00 * m11 - m10 * m01) / det,
                 (m00 * (m21 * m13 - m11 * m23) + m01 * (m10 * m23 - m20 * m13)
                         - m03 * (m10 * m21 - m20 * m11)) / det);
@@ -329,10 +346,6 @@ public class AffineTransform implements Transform, Serializable {
     @Override
     public String toString() {
         return String.format("Affine[%g %g %g %g, %g %g %g %g, %g %g %g %g]}", m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23);
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
     }
 
 

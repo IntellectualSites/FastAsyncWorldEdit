@@ -81,7 +81,7 @@ public class SnapshotCommands {
 
                 BBC.SNAPSHOT_LIST_HEADER.send(player, player.getWorld().getName());
                 for (byte i = 0; i < Math.min(num, snapshots.size()); i++) {
-                    player.print(BBC.getPrefix() + (i + 1) + ". " + snapshots.get(i).getName());
+                    player.print((i + 1) + ". " + snapshots.get(i).getName());
                 }
 
                 BBC.SNAPSHOT_LIST_FOOTER.send(player);
@@ -92,10 +92,9 @@ public class SnapshotCommands {
                 File dir = config.snapshotRepo.getDirectory();
 
                 try {
-                    WorldEdit.logger.info(BBC.getPrefix() + "WorldEdit found no snapshots: looked in: "
-                            + dir.getCanonicalPath());
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in: " + dir.getCanonicalPath());
                 } catch (IOException e) {
-                    WorldEdit.logger.info(BBC.getPrefix() + "WorldEdit found no snapshots: looked in "
+                    WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
                             + "(NON-RESOLVABLE PATH - does it exist?): "
                             + dir.getPath());
                 }
@@ -168,7 +167,7 @@ public class SnapshotCommands {
         try {
             index = Integer.parseInt(args.getString(0));
         } catch (NumberFormatException e) {
-            player.printError(BBC.getPrefix() + "Invalid index, " + args.getString(0) + " is not a valid integer.");
+            player.printError("Invalid index, " + args.getString(0) + " is not a valid integer.");
             return;
         }
 
@@ -180,7 +179,7 @@ public class SnapshotCommands {
         try {
             List<Snapshot> snapshots = config.snapshotRepo.getSnapshots(true, player.getWorld().getName());
             if (snapshots.size() < index) {
-                player.printError(BBC.getPrefix() + "Invalid index, must be between 1 and " + snapshots.size() + ".");
+                player.printError("Invalid index, must be between 1 and " + snapshots.size() + ".");
                 return;
             }
             Snapshot snapshot = snapshots.get(index - 1);
@@ -222,7 +221,7 @@ public class SnapshotCommands {
 
                 if (snapshot == null) {
                     dateFormat.setTimeZone(session.getTimeZone());
-                    player.printError(BBC.getPrefix() + "Couldn't find a snapshot before "
+                    player.printError("Couldn't find a snapshot before "
                             + dateFormat.format(date.getTime()) + ".");
                 } else {
                     session.setSnapshot(snapshot);
@@ -260,7 +259,7 @@ public class SnapshotCommands {
                 Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, player.getWorld().getName());
                 if (snapshot == null) {
                     dateFormat.setTimeZone(session.getTimeZone());
-                    player.printError(BBC.getPrefix() + "Couldn't find a snapshot after "
+                    player.printError("Couldn't find a snapshot after "
                             + dateFormat.format(date.getTime()) + ".");
                 } else {
                     session.setSnapshot(snapshot);

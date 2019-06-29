@@ -14,7 +14,6 @@ import java.util.concurrent.ForkJoinPool;
 public class MCAFilter<T> extends IterableThreadLocal<T> {
 
     public void withPool(ForkJoinPool pool, MCAQueue queue) {
-        return;
     }
 
     /**

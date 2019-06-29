@@ -6,18 +6,11 @@ import com.thevoxelbox.voxelsniper.SnipeData;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 
-/**
- * http://www.voxelwiki.com/minecraft/Voxelsniper#Ring_Brush
- *
- * @author Voxel
- */
+
 public class RingBrush extends PerformBrush {
     private double trueCircle = 0;
     private double innerSize = 0;
 
-    /**
-     *
-     */
     public RingBrush() {
         this.setName("Ring");
     }
@@ -83,7 +76,7 @@ public class RingBrush extends PerformBrush {
                     v.sendMessage(ChatColor.RED + "The parameters included are invalid.");
                 }
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }

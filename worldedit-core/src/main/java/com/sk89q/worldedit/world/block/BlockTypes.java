@@ -19,41 +19,31 @@
 
 package com.sk89q.worldedit.world.block;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.StringMan;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
-import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import it.unimi.dsi.fastutil.ints.IntCollections;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.IntPredicate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -923,31 +913,31 @@ public final class BlockTypes {
         return $NAMESPACES;
     }
 
-    public static final @Nullable BlockType get(final String id) {
+    public static @Nullable BlockType get(final String id) {
         return $REGISTRY.get(id);
     }
 
-    public static final @Nullable BlockType get(final CharSequence id) {
+    public static @Nullable BlockType get(final CharSequence id) {
         return $REGISTRY.get(id);
     }
 
     @Deprecated
-    public static final BlockType get(final int ordinal) {
+    public static BlockType get(final int ordinal) {
         return values[ordinal];
     }
 
     @Deprecated
-    public static final BlockType getFromStateId(final int internalStateId) {
+    public static BlockType getFromStateId(final int internalStateId) {
         return values[internalStateId & BIT_MASK];
     }
 
     @Deprecated
-    public static final BlockType getFromStateOrdinal(final int internalStateOrdinal) {
+    public static BlockType getFromStateOrdinal(final int internalStateOrdinal) {
         return states[internalStateOrdinal].getBlockType();
     }
 
     public static int size() {
         return values.length;
     }
-    
+
 }

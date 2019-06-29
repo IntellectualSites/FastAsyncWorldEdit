@@ -20,13 +20,15 @@
 package com.sk89q.worldedit.util.command;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.util.StringMan;
+
 import com.google.common.base.Joiner;
+import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -117,7 +119,7 @@ public class SimpleDispatcher implements Dispatcher {
             throw new CommandPermissionsException();
         }
 
-        String[] split = arguments.split(" ", -1);
+        String[] split = CommandContext.split(arguments);
         Set<String> aliases = getPrimaryAliases();
 
         if (aliases.isEmpty()) {
@@ -142,12 +144,12 @@ public class SimpleDispatcher implements Dispatcher {
 
         }
 
-        throw new InvalidUsageException(BBC.getPrefix() + "Please choose a sub-command.", this, true);
+        throw new InvalidUsageException("Please choose a sub-command.", this, true);
     }
 
     @Override
     public List<String> getSuggestions(String arguments, CommandLocals locals) throws CommandException {
-        String[] split = arguments.split(" ", -1);
+        String[] split = CommandContext.split(arguments);
 
         if (split.length <= 1) {
             String prefix = split.length > 0 ? split[0] : "";
@@ -189,4 +191,5 @@ public class SimpleDispatcher implements Dispatcher {
         // Checking every perm in the class here was unnecessarily stupid
         return true;
     }
+
 }

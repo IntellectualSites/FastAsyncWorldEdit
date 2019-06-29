@@ -1,19 +1,15 @@
 package com.boydti.fawe.bukkit.wrapper;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.wrapper.state.AsyncSign;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.TaskManager;
+import com.destroystokyo.paper.block.BlockSoundGroup;
 import com.sk89q.worldedit.WorldEditException;
-import java.util.Collection;
-import java.util.List;
-
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +24,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.List;
 
 public class AsyncBlock implements Block {
 
@@ -70,27 +70,27 @@ public class AsyncBlock implements Block {
         return BlockTypes.getFromStateId(id).getInternalId();
     }
 
-    @Override
+    @NotNull @Override
     public AsyncBlock getRelative(int modX, int modY, int modZ) {
         return new AsyncBlock(world, queue, x + modX, y + modY, z + modZ);
     }
 
-    @Override
+    @NotNull @Override
     public AsyncBlock getRelative(BlockFace face) {
         return this.getRelative(face.getModX(), face.getModY(), face.getModZ());
     }
 
-    @Override
+    @NotNull @Override
     public AsyncBlock getRelative(BlockFace face, int distance) {
         return this.getRelative(face.getModX() * distance, face.getModY() * distance, face.getModZ() * distance);
     }
 
-    @Override
+    @NotNull @Override
     public Material getType() {
         return getBlockData().getMaterial();
     }
 
-    @Override
+    @NotNull @Override
     public BlockData getBlockData() {
         return BukkitAdapter.getBlockData(queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()));
     }
@@ -135,7 +135,7 @@ public class AsyncBlock implements Block {
         return (byte) queue.getEmmittedLight(x, y, z);
     }
 
-    @Override
+    @NotNull @Override
     public AsyncWorld getWorld() {
         return world;
     }
@@ -155,7 +155,7 @@ public class AsyncBlock implements Block {
         return z;
     }
 
-    @Override
+    @NotNull @Override
     public Location getLocation() {
         return new Location(world, x, y, z);
     }
@@ -164,20 +164,20 @@ public class AsyncBlock implements Block {
     public Location getLocation(Location loc) {
         if(loc != null) {
             loc.setWorld(this.getWorld());
-            loc.setX((double)this.x);
-            loc.setY((double)this.y);
-            loc.setZ((double)this.z);
+            loc.setX(this.x);
+            loc.setY(this.y);
+            loc.setZ(this.z);
         }
         return loc;
     }
 
-    @Override
+    @NotNull @Override
     public AsyncChunk getChunk() {
         return world.getChunkAt(x >> 4, z >> 4);
     }
 
     @Override
-    public void setBlockData(BlockData blockData) {
+    public void setBlockData(@NotNull BlockData blockData) {
         try {
             queue.setBlock(x, y, z, BukkitAdapter.adapt(blockData));
         } catch (WorldEditException e) {
@@ -186,12 +186,12 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public void setBlockData(BlockData blockData, boolean b) {
+    public void setBlockData(@NotNull BlockData blockData, boolean b) {
         setBlockData(blockData);
     }
 
     @Override
-    public void setType(Material type) {
+    public void setType(@NotNull Material type) {
         try {
             queue.setBlock(x, y, z, BukkitAdapter.adapt(type).getDefaultState());
         } catch (WorldEditException e) {
@@ -200,12 +200,12 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public void setType(Material type, boolean applyPhysics) {
+    public void setType(@NotNull Material type, boolean applyPhysics) {
         setType(type);
     }
 
     @Override
-    public BlockFace getFace(Block block) {
+    public BlockFace getFace(@NotNull Block block) {
         BlockFace[] directions = BlockFace.values();
         for (BlockFace face : directions) {
             if (this.getX() + face.getModX() == block.getX()
@@ -217,7 +217,7 @@ public class AsyncBlock implements Block {
         return null;
     }
 
-    @Override
+    @NotNull @Override
     public AsyncBlockState getState() {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combined);
@@ -231,12 +231,18 @@ public class AsyncBlock implements Block {
     }
 
     @Override
+    @NotNull
+    public AsyncBlockState getState(boolean useSnapshot) {
+        return getState();
+    }
+
+    @NotNull @Override
     public Biome getBiome() {
         return world.getAdapter().adapt(queue.getBiomeType(x, z));
     }
 
     @Override
-    public void setBiome(Biome bio) {
+    public void setBiome(@NotNull Biome bio) {
         BiomeType biome = world.getAdapter().adapt(bio);
         queue.setBiome(x, z, biome);
     }
@@ -252,17 +258,17 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public boolean isBlockFacePowered(BlockFace face) {
+    public boolean isBlockFacePowered(@NotNull BlockFace face) {
         return false;
     }
 
     @Override
-    public boolean isBlockFaceIndirectlyPowered(BlockFace face) {
+    public boolean isBlockFaceIndirectlyPowered(@NotNull BlockFace face) {
         return false;
     }
 
     @Override
-    public int getBlockPower(BlockFace face) {
+    public int getBlockPower(@NotNull BlockFace face) {
         return 0;
     }
 
@@ -316,37 +322,37 @@ public class AsyncBlock implements Block {
     }
 
     @Override
-    public boolean breakNaturally(ItemStack tool) {
+    public boolean breakNaturally(@NotNull ItemStack tool) {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().breakNaturally(tool));
     }
 
-    @Override
+    @NotNull @Override
     public Collection<ItemStack> getDrops() {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops());
     }
 
-    @Override
-    public Collection<ItemStack> getDrops(ItemStack tool) {
+    @NotNull @Override
+    public Collection<ItemStack> getDrops(@NotNull ItemStack tool) {
         return TaskManager.IMP.sync(() -> getUnsafeBlock().getDrops(tool));
     }
 
     @Override
-    public void setMetadata(String metadataKey, MetadataValue newMetadataValue) {
+    public void setMetadata(@NotNull String metadataKey, @NotNull MetadataValue newMetadataValue) {
         this.getUnsafeBlock().setMetadata(metadataKey, newMetadataValue);
     }
 
-    @Override
-    public List<MetadataValue> getMetadata(String metadataKey) {
+    @NotNull @Override
+    public List<MetadataValue> getMetadata(@NotNull String metadataKey) {
         return this.getUnsafeBlock().getMetadata(metadataKey);
     }
 
     @Override
-    public boolean hasMetadata(String metadataKey) {
+    public boolean hasMetadata(@NotNull String metadataKey) {
         return this.getUnsafeBlock().hasMetadata(metadataKey);
     }
 
     @Override
-    public void removeMetadata(String metadataKey, Plugin owningPlugin) {
+    public void removeMetadata(@NotNull String metadataKey, @NotNull Plugin owningPlugin) {
         this.getUnsafeBlock().removeMetadata(metadataKey, owningPlugin);
     }
 
@@ -356,12 +362,17 @@ public class AsyncBlock implements Block {
 	}
 
 	@Override
-	public RayTraceResult rayTrace(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3) {
+	public RayTraceResult rayTrace(@NotNull Location arg0, @NotNull Vector arg1, double arg2, @NotNull FluidCollisionMode arg3) {
 		return this.getUnsafeBlock().rayTrace(arg0, arg1, arg2, arg3);
 	}
 
-	@Override
+	@NotNull @Override
 	public BoundingBox getBoundingBox() {
 		return this.getUnsafeBlock().getBoundingBox();
 	}
+
+    @Override
+    public @NotNull BlockSoundGroup getSoundGroup() {
+        return TaskManager.IMP.sync(() -> getUnsafeBlock().getSoundGroup());
+    }
 }

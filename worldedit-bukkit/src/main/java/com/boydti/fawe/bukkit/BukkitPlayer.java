@@ -2,19 +2,14 @@ package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FaweLocation;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.wrappers.PlayerWrapper;
-import java.lang.reflect.Method;
-import java.util.UUID;
-
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public class BukkitPlayer extends FawePlayer<Player> {
 
@@ -66,21 +61,11 @@ public class BukkitPlayer extends FawePlayer<Player> {
 
     @Override
     public void resetTitle() {
-        sendTitle("","");
+        parent.resetTitle();
     }
 
     public void sendTitle(String title, String sub) {
-        try {
-            Method methodSendTitle = Player.class.getDeclaredMethod("sendTitle", String.class, String.class, int.class, int.class, int.class);
-            methodSendTitle.invoke(parent, ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
-            return;
-        } catch (Throwable ignore) {
-            try {
-                Method methodSendTitle = Player.class.getDeclaredMethod("sendTitle", String.class, String.class);
-                methodSendTitle.invoke(parent, ChatColor.GOLD + title, ChatColor.GOLD + sub);
-                return;
-            } catch (Throwable ignore2) {}
-        }
+        parent.sendTitle(ChatColor.GOLD + title, ChatColor.GOLD + sub, 0, 70, 20);
         if (console == null) {
             console = Bukkit.getConsoleSender();
             Bukkit.getServer().dispatchCommand(console, "gamerule sendCommandFeedback false");
@@ -95,15 +80,13 @@ public class BukkitPlayer extends FawePlayer<Player> {
         this.parent.sendMessage(BBC.color(message));
     }
 
-    @Override
-    public void executeCommand(final String cmd) {
-        Bukkit.getServer().dispatchCommand(this.parent, cmd);
+    @Override public void printError(String msg) {
+        this.sendMessage(msg);
     }
 
     @Override
-    public FaweLocation getLocation() {
-        final Location loc = this.parent.getLocation();
-        return new FaweLocation(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+    public void executeCommand(final String cmd) {
+        Bukkit.getServer().dispatchCommand(this.parent, cmd);
     }
 
     @Override

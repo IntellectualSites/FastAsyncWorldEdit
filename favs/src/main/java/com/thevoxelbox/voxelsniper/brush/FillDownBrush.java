@@ -8,17 +8,12 @@ import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 
-/**
- * @author Voxel
- */
+
 public class FillDownBrush extends PerformBrush {
     private double trueCircle = 0;
     private boolean fillLiquid = true;
     private boolean fromExisting = false;
 
-    /**
-     *
-     */
     public FillDownBrush() {
         this.setName("Fill Down");
     }
@@ -45,7 +40,9 @@ public class FillDownBrush extends PerformBrush {
                                 break;
                             }
                         }
-                        if (!found) continue;
+                        if (!found) {
+                            continue;
+                        }
                         y--;
                     }
                     for (; y >= -targetBlock.getY(); --y) {
@@ -110,7 +107,7 @@ public class FillDownBrush extends PerformBrush {
                 this.fromExisting = !this.fromExisting;
                 v.sendMessage(ChatColor.AQUA + "Now filling down from " + ((this.fromExisting) ? "existing" : "all") + " blocks.");
             } else {
-                v.sendMessage(ChatColor.RED + "Invalid brush parameters! use the info parameter to display parameter info.");
+                v.sendMessage(ChatColor.RED + "Invalid brush parameters! Use the info parameter to display parameter info.");
             }
         }
     }
