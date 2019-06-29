@@ -40,17 +40,17 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.*;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import net.minecraft.server.v1_13_R2.*;
+import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
-import org.bukkit.craftbukkit.v1_13_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
+public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -82,7 +82,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
 
-    public Spigot_v1_13_R2() throws NoSuchFieldException, NoSuchMethodException {
+    public Spigot_v1_14_R1() throws NoSuchFieldException, NoSuchMethodException {
         // The list of tags on an NBTTagList
         nbtListTagListField = NBTTagList.class.getDeclaredField("list");
         nbtListTagListField.setAccessible(true);

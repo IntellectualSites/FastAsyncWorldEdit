@@ -84,10 +84,10 @@ public interface InputExtent {
      * @return the biome at the location
      */
     default BiomeType getBiome(BlockVector2 position) {
-        return getBiome(position.getX(), position.getZ());
+        return getBiomeType(position.getX(), position.getZ());
     }
 
-    default BiomeType getBiome(int x, int z) {
+    default BiomeType getBiomeType(int x, int z) {
         return getBiome(MutableBlockVector2.get(x, z));
     }
 }

@@ -20,23 +20,23 @@ import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.jpountz.util.UnsafeUtils;
-import net.minecraft.server.v1_13_R2.Block;
-import net.minecraft.server.v1_13_R2.Chunk;
-import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_13_R2.ChunkProviderServer;
-import net.minecraft.server.v1_13_R2.ChunkSection;
-import net.minecraft.server.v1_13_R2.DataBits;
-import net.minecraft.server.v1_13_R2.DataPalette;
-import net.minecraft.server.v1_13_R2.DataPaletteBlock;
-import net.minecraft.server.v1_13_R2.DataPaletteLinear;
-import net.minecraft.server.v1_13_R2.GameProfileSerializer;
-import net.minecraft.server.v1_13_R2.IBlockData;
-import net.minecraft.server.v1_13_R2.PlayerChunk;
-import net.minecraft.server.v1_13_R2.PlayerChunkMap;
-import net.minecraft.server.v1_13_R2.WorldServer;
+import net.minecraft.server.v1_14_R1.Block;
+import net.minecraft.server.v1_14_R1.Chunk;
+import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_14_R1.ChunkProviderServer;
+import net.minecraft.server.v1_14_R1.ChunkSection;
+import net.minecraft.server.v1_14_R1.DataBits;
+import net.minecraft.server.v1_14_R1.DataPalette;
+import net.minecraft.server.v1_14_R1.DataPaletteBlock;
+import net.minecraft.server.v1_14_R1.DataPaletteLinear;
+import net.minecraft.server.v1_14_R1.GameProfileSerializer;
+import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.PlayerChunk;
+import net.minecraft.server.v1_14_R1.PlayerChunkMap;
+import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
-import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -202,7 +202,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         return ensureLoaded(nmsWorld, X, Z);
     }
 
-    public static Chunk ensureLoaded(net.minecraft.server.v1_13_R2.World nmsWorld, int X, int Z) {
+    public static Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
         ChunkProviderServer provider = (ChunkProviderServer) nmsWorld.getChunkProvider();
         Chunk nmsChunk = provider.chunks.get(ChunkCoordIntPair.a(X, Z));
         if (nmsChunk != null) {

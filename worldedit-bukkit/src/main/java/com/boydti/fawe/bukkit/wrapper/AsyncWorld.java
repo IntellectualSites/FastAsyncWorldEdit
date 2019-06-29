@@ -29,6 +29,7 @@ import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -426,17 +427,11 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public boolean unloadChunk(int x, int z, boolean save) {
-        return unloadChunk(x, z, save, false);
-    }
-
-    @Deprecated
-    @Override
-    public boolean unloadChunk(final int x, final int z, final boolean save, final boolean safe) {
         if (isChunkLoaded(x, z)) {
             return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
                 @Override
                 public void run(Boolean value) {
-                    this.value = parent.unloadChunk(x, z, save, safe);
+                    this.value = parent.unloadChunk(x, z, save);
                 }
             });
         }
@@ -445,12 +440,15 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 
     @Override
     public boolean unloadChunkRequest(int x, int z) {
-        return unloadChunk(x, z);
-    }
-
-    @Override
-    public boolean unloadChunkRequest(int x, int z, boolean safe) {
-        return unloadChunk(x, z, safe);
+        if (isChunkLoaded(x, z)) {
+            return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
+                @Override
+                public void run(Boolean value) {
+                    this.value = parent.unloadChunkRequest(x, z);
+                }
+            });
+        }
+        return true;
     }
 
     @Override
@@ -501,8 +499,8 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     }
 
     @Override
-    public <T extends Arrow> T spawnArrow(Location location, Vector vector, float v, float v1, Class<T> aClass) {
-        return parent.spawnArrow(location, vector, v, v1, aClass);
+    public <T extends AbstractArrow> T spawnArrow(Location location, Vector direction, float speed, float spread, Class<T> clazz) {
+        return parent.spawnArrow(location, direction, speed, spread, clazz);
     }
 
     @Override

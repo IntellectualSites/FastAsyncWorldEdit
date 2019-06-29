@@ -614,13 +614,13 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     public enum Version {
-        v1_13_R2,
+        v1_14_R1,
         NONE,
     }
 
     private FaweQueue getQueue(World world) {
         switch (getVersion()) {
-            case v1_13_R2:
+            case v1_14_R1:
                 return new BukkitQueue_1_13(world);
             default:
             case NONE:
@@ -630,7 +630,7 @@ public class FaweBukkit implements IFawe, Listener {
 
     private FaweQueue getQueue(String world) {
         switch (getVersion()) {
-            case v1_13_R2:
+            case v1_14_R1:
                 return new BukkitQueue_1_13(world);
             default:
             case NONE:

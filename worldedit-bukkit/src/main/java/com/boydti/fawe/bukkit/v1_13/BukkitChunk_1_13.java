@@ -2,7 +2,7 @@ package com.boydti.fawe.bukkit.v1_13;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.BlockMaterial_1_13;
-import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
+import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_14_R1;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.IntFaweChunk;
@@ -23,32 +23,32 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import net.minecraft.server.v1_13_R2.BiomeBase;
-import net.minecraft.server.v1_13_R2.Block;
-import net.minecraft.server.v1_13_R2.BlockPosition;
-import net.minecraft.server.v1_13_R2.Blocks;
-import net.minecraft.server.v1_13_R2.ChunkSection;
-import net.minecraft.server.v1_13_R2.DataBits;
-import net.minecraft.server.v1_13_R2.DataPalette;
-import net.minecraft.server.v1_13_R2.DataPaletteBlock;
-import net.minecraft.server.v1_13_R2.DataPaletteHash;
-import net.minecraft.server.v1_13_R2.DataPaletteLinear;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityPlayer;
-import net.minecraft.server.v1_13_R2.EntityTypes;
-import net.minecraft.server.v1_13_R2.GameProfileSerializer;
-import net.minecraft.server.v1_13_R2.IBlockData;
-import net.minecraft.server.v1_13_R2.MinecraftKey;
-import net.minecraft.server.v1_13_R2.NBTTagCompound;
-import net.minecraft.server.v1_13_R2.NBTTagInt;
-import net.minecraft.server.v1_13_R2.NibbleArray;
-import net.minecraft.server.v1_13_R2.RegistryID;
-import net.minecraft.server.v1_13_R2.TileEntity;
+import net.minecraft.server.v1_14_R1.BiomeBase;
+import net.minecraft.server.v1_14_R1.Block;
+import net.minecraft.server.v1_14_R1.BlockPosition;
+import net.minecraft.server.v1_14_R1.Blocks;
+import net.minecraft.server.v1_14_R1.ChunkSection;
+import net.minecraft.server.v1_14_R1.DataBits;
+import net.minecraft.server.v1_14_R1.DataPalette;
+import net.minecraft.server.v1_14_R1.DataPaletteBlock;
+import net.minecraft.server.v1_14_R1.DataPaletteHash;
+import net.minecraft.server.v1_14_R1.DataPaletteLinear;
+import net.minecraft.server.v1_14_R1.Entity;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.EntityTypes;
+import net.minecraft.server.v1_14_R1.GameProfileSerializer;
+import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.MinecraftKey;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import net.minecraft.server.v1_14_R1.NBTTagInt;
+import net.minecraft.server.v1_14_R1.NibbleArray;
+import net.minecraft.server.v1_14_R1.RegistryID;
+import net.minecraft.server.v1_14_R1.TileEntity;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
-import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.InvocationTargetException;
@@ -134,7 +134,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                             if (ibd == null) {
                                 ibd = defaultBlock;
                             }
-                            final int ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToInt(ibd);
+                            final int ordinal = ((Spigot_v1_14_R1) getAdapter()).adaptToInt(ibd);
                             idsArray[i] = BlockTypes.states[ordinal].getInternalId();
                         }
                     } catch (final IllegalAccessException e) {
@@ -328,7 +328,7 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
 
     @Override
     public FaweChunk call() {
-        final Spigot_v1_13_R2 adapter = (Spigot_v1_13_R2) BukkitQueue_0.getAdapter();
+        final Spigot_v1_14_R1 adapter = (Spigot_v1_14_R1) BukkitQueue_0.getAdapter();
         try {
             final BukkitChunk_1_13 copy = getParent().getChangeTask() != null ? new BukkitChunk_1_13(getParent(), getX(), getZ()) : null;
             final Chunk chunk = this.getChunk();
@@ -337,11 +337,11 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
             final int bx = this.getX() << 4;
             final int bz = this.getZ() << 4;
             final boolean flag = world.getEnvironment() == World.Environment.NORMAL;
-            final net.minecraft.server.v1_13_R2.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
+            final net.minecraft.server.v1_14_R1.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
             nmsChunk.f(true); // Set Modified
             nmsChunk.mustSave = true;
             nmsChunk.markDirty();
-            final net.minecraft.server.v1_13_R2.World nmsWorld = nmsChunk.world;
+            final net.minecraft.server.v1_14_R1.World nmsWorld = nmsChunk.world;
             final ChunkSection[] sections = nmsChunk.getSections();
             final List<Entity>[] entities = nmsChunk.getEntitySlices();
             final Map<BlockPosition, TileEntity> tiles = nmsChunk.getTileEntities();

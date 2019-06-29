@@ -2,24 +2,24 @@ package com.boydti.fawe.bukkit.beta;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
-import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
+import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_14_R1;
 import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
 import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import net.minecraft.server.v1_13_R2.Chunk;
-import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_13_R2.ChunkProviderServer;
-import net.minecraft.server.v1_13_R2.ChunkSection;
-import net.minecraft.server.v1_13_R2.DataBits;
-import net.minecraft.server.v1_13_R2.DataPalette;
-import net.minecraft.server.v1_13_R2.DataPaletteBlock;
-import net.minecraft.server.v1_13_R2.DataPaletteHash;
-import net.minecraft.server.v1_13_R2.DataPaletteLinear;
-import net.minecraft.server.v1_13_R2.IBlockData;
-import net.minecraft.server.v1_13_R2.World;
+import net.minecraft.server.v1_14_R1.Chunk;
+import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_14_R1.ChunkProviderServer;
+import net.minecraft.server.v1_14_R1.ChunkSection;
+import net.minecraft.server.v1_14_R1.DataBits;
+import net.minecraft.server.v1_14_R1.DataPalette;
+import net.minecraft.server.v1_14_R1.DataPaletteBlock;
+import net.minecraft.server.v1_14_R1.DataPaletteHash;
+import net.minecraft.server.v1_14_R1.DataPaletteLinear;
+import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.World;
 
 import java.util.Arrays;
 
@@ -98,7 +98,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
                                 if (ibd == null) {
                                     ordinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
                                 } else {
-                                    ordinal = ((Spigot_v1_13_R2) getAdapter()).adaptToChar(ibd);
+                                    ordinal = ((Spigot_v1_14_R1) getAdapter()).adaptToChar(ibd);
                                 }
                                 paletteToBlockChars[paletteVal] = ordinal;
                             }
@@ -147,7 +147,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
         if (ibd == null) {
             return BlockTypes.AIR.getDefaultState().getOrdinalChar();
         } else {
-            return ((Spigot_v1_13_R2) getAdapter()).adaptToChar(ibd);
+            return ((Spigot_v1_14_R1) getAdapter()).adaptToChar(ibd);
         }
     }
 

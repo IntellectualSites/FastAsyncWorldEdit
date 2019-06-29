@@ -17,19 +17,19 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import net.minecraft.server.v1_13_R2.BiomeBase;
-import net.minecraft.server.v1_13_R2.BlockPosition;
-import net.minecraft.server.v1_13_R2.Chunk;
-import net.minecraft.server.v1_13_R2.ChunkSection;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityTypes;
-import net.minecraft.server.v1_13_R2.MinecraftKey;
-import net.minecraft.server.v1_13_R2.NBTTagCompound;
-import net.minecraft.server.v1_13_R2.NBTTagInt;
-import net.minecraft.server.v1_13_R2.TileEntity;
+import net.minecraft.server.v1_14_R1.BiomeBase;
+import net.minecraft.server.v1_14_R1.BlockPosition;
+import net.minecraft.server.v1_14_R1.Chunk;
+import net.minecraft.server.v1_14_R1.ChunkSection;
+import net.minecraft.server.v1_14_R1.Entity;
+import net.minecraft.server.v1_14_R1.EntityTypes;
+import net.minecraft.server.v1_14_R1.MinecraftKey;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import net.minecraft.server.v1_14_R1.NBTTagInt;
+import net.minecraft.server.v1_14_R1.TileEntity;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.Collection;
@@ -185,7 +185,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
 
                 Runnable[] syncTasks = null;
 
-                net.minecraft.server.v1_13_R2.World nmsWorld = nmsChunk.getWorld();
+                net.minecraft.server.v1_14_R1.World nmsWorld = nmsChunk.getWorld();
                 int bx = X << 4;
                 int bz = Z << 4;
 
