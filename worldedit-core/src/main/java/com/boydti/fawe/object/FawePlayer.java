@@ -1,7 +1,6 @@
 package com.boydti.fawe.object;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
@@ -249,16 +248,6 @@ public abstract class FawePlayer<T> extends Metadatable {
         }
     }
 
-    public boolean toggle(String perm) {
-        if (this.hasPermission(perm)) {
-            this.setPermission(perm, false);
-            return false;
-        } else {
-            this.setPermission(perm, true);
-            return true;
-        }
-    }
-
     /**
      * Queue an action to run async
      * @param run
@@ -456,14 +445,6 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @return
      */
     public abstract boolean hasPermission(final String perm);
-
-    /**
-     * Set a permission (requires Vault)
-     *
-     * @param perm
-     * @param flag
-     */
-    public abstract void setPermission(final String perm, final boolean flag);
 
     /**
      * Send a message to the player

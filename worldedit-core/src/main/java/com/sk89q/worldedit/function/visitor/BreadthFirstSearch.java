@@ -318,4 +318,5 @@ public abstract class BreadthFirstSearch implements Operation {
         visited.clear();
         affected = 0;
     }
+
 }

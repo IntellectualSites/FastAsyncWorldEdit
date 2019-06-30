@@ -28,12 +28,16 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.boydti.fawe.util.MathMan;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.Logging;
-
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.ORIENTATION_REGION;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -58,7 +62,14 @@ import com.sk89q.worldedit.math.convolution.GaussianKernel;
 import com.sk89q.worldedit.math.convolution.HeightMap;
 import com.sk89q.worldedit.math.convolution.HeightMapFilter;
 import com.sk89q.worldedit.math.noise.RandomNoise;
-import com.sk89q.worldedit.regions.*;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionOperationException;
+import com.sk89q.worldedit.regions.Regions;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.command.binding.Range;
@@ -75,15 +86,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.ORIENTATION_REGION;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 /**
  * Commands that operate on regions.
@@ -486,11 +488,10 @@ public class RegionCommands extends MethodCommands {
     )
     @CommandPermissions("fawe.admin")
     public void wea(Player player) throws WorldEditException {
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
-        if (fp.toggle("fawe.bypass")) {
-            BBC.WORLDEDIT_BYPASSED.send(fp);
+        if (player.togglePermission("fawe.bypass")) {
+            BBC.WORLDEDIT_BYPASSED.send(player);
         } else {
-            BBC.WORLDEDIT_RESTRICTED.send(fp);
+            BBC.WORLDEDIT_RESTRICTED.send(player);
         }
     }
 
@@ -500,8 +501,7 @@ public class RegionCommands extends MethodCommands {
             help = "Select your current allowed region"
     )
     @CommandPermissions("fawe.worldeditregion")
-    public void wer(Player player) throws WorldEditException {
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
+    public void wer(FawePlayer fp) throws WorldEditException {
         final Region region = fp.getLargestRegion();
         if (region == null) {
             BBC.NO_REGION.send(fp);

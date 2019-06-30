@@ -48,4 +48,13 @@ public interface Subject {
      */
     boolean hasPermission(String permission);
 
+    /**
+     * Add and remove permissions from a subject to show and hide certain messages.
+     *
+     * @param permission the permission
+     * @return false if the permission was removed, true if this subject has permission
+     */
+    boolean togglePermission(String permission);
+
+    void setPermission(String permission, boolean value);
 }

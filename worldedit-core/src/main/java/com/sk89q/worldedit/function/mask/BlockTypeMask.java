@@ -20,14 +20,12 @@
 package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -113,9 +111,6 @@ public class BlockTypeMask extends AbstractExtentMask {
     public boolean test(BlockVector3 vector) {
         return types[getExtent().getBlockType(vector).getInternalId()];
     }
-//    public boolean test(BlockVector3 vector) {
-//        return blocks.contains(getExtent().getBlock(vector).getBlockType());
-//    }
 
     @Nullable
     @Override

@@ -4,30 +4,36 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.util.*;
+import com.boydti.fawe.util.CachedTextureUtil;
+import com.boydti.fawe.util.CleanTextureUtil;
+import com.boydti.fawe.util.MathMan;
+import com.boydti.fawe.util.RandomTextureUtil;
+import com.boydti.fawe.util.TextureUtil;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Sets;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.extension.input.DisallowedUsageException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * General WorldEdit commands.
@@ -54,7 +60,7 @@ public class OptionsCommands {
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
         FawePlayer<Object> fp = FawePlayer.wrap(player);
-        if (fp.toggle("fawe.tips")) {
+        if (player.togglePermission("fawe.tips")) {
             BBC.WORLDEDIT_TOGGLE_TIPS_ON.send(player);
         } else {
             BBC.WORLDEDIT_TOGGLE_TIPS_OFF.send(player);

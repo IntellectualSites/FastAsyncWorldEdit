@@ -29,14 +29,6 @@ import javax.annotation.Nullable;
 
 public class SolidBlockMask extends BlockTypeMask {
 
-    public static boolean[] getTypes() {
-        boolean[] types = new boolean[BlockTypes.size()];
-        for (BlockType type : BlockTypes.values) {
-            types[type.getInternalId()] = type.getMaterial().isSolid();
-        }
-        return types;
-    }
-
     public SolidBlockMask(Extent extent) {
         super(extent, getTypes());
     }
@@ -46,6 +38,14 @@ public class SolidBlockMask extends BlockTypeMask {
         Extent extent = getExtent();
         BlockState block = extent.getBlock(vector);
         return block.getBlockType().getMaterial().isMovementBlocker();
+    }
+
+    public static boolean[] getTypes() {
+        boolean[] types = new boolean[BlockTypes.size()];
+        for (BlockType type : BlockTypes.values) {
+            types[type.getInternalId()] = type.getMaterial().isSolid();
+        }
+        return types;
     }
 
     @Nullable

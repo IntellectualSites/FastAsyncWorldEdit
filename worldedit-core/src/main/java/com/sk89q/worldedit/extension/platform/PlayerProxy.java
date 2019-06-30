@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.extension.platform;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -37,9 +36,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 
-import java.util.UUID;
-
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class PlayerProxy extends AbstractPlayerActor {
 
@@ -153,6 +151,14 @@ public class PlayerProxy extends AbstractPlayerActor {
     @Override
     public boolean hasPermission(String perm) {
         return permActor.hasPermission(perm);
+    }
+
+    @Override public boolean togglePermission(String permission) {
+        return permActor.hasPermission(permission);
+    }
+
+    @Override public void setPermission(String permission, boolean value) {
+        permActor.setPermission(permission, value);
     }
 
     @Override
