@@ -40,4 +40,5 @@ class BukkitBiomeRegistry implements BiomeRegistry {
         final Biome bukkitBiome = BukkitAdapter.adapt(biome);
         return bukkitBiome == null ? null : bukkitBiome::name;
     }
+
 }

@@ -38,30 +38,31 @@ println """
 *******************************************
 """
 
-group = 'com.boydti.fawe'
+allprojects {
+    group = 'com.boydti.fawe'
 
-def rootVersion = "1.13"
-def revision = ""
-def buildNumber = ""
-def date = ""
-ext {
-    git = Grgit.open(dir: '.git')
-    date = git.head().getDate().format("yy.MM.dd")
-    revision = "-${git.head().abbreviatedId}"
-    parents = git.head().parentIds;
-    if (project.hasProperty('buildnumber')) {
-        buildNumber = "$buildnumber"
-    } else {
-        index = -2109;  // Offset to match CI
-        for (; parents != null && !parents.isEmpty(); index++) {
-            parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
+    def rootVersion = "1.13"
+    def revision = ""
+    def buildNumber = ""
+    def date = ""
+    ext {
+        git = Grgit.open(dir: '.git')
+        date = git.head().getDate().format("yy.MM.dd")
+        revision = "-${git.head().abbreviatedId}"
+        parents = git.head().parentIds;
+        if (project.hasProperty('buildnumber')) {
+            buildNumber = "$buildnumber"
+        } else {
+            index = -2109;  // Offset to match CI
+            for (; parents != null && !parents.isEmpty(); index++) {
+                parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
+            }
+            buildNumber = "${index}"
         }
-        buildNumber = "${index}"
     }
+
+    version = String.format("%s.%s", rootVersion, buildNumber)
 }
-
-version = String.format("%s.%s", rootVersion, buildNumber)
-
 description = rootProject.name
 
 subprojects {
@@ -97,6 +98,7 @@ configure(['worldedit-core', 'worldedit-bukkit', 'favs'].collect { project("$it"
     apply plugin: 'maven'
 //    apply plugin: 'checkstyle'
     apply plugin: 'com.github.johnrengelman.shadow'
+//    apply plugin: 'com.jfrog.artifactory'
 //    Enable this requires putting license header files in many, many FAWE files
 //    apply plugin: 'net.minecrell.licenser'
 
@@ -117,7 +119,7 @@ configure(['worldedit-core', 'worldedit-bukkit', 'favs'].collect { project("$it"
         }
     }
 
-    if (!(name.equals('worldedit-forge') || name.equals('worldedit-sponge'))) {
+    if (name == "worldedit-core" || name == "worldedit-bukkit") {
         task sourcesJar(type: Jar, dependsOn: classes) {
             classifier = 'sources'
             from sourceSets.main.allSource
@@ -131,6 +133,11 @@ configure(['worldedit-core', 'worldedit-bukkit', 'favs'].collect { project("$it"
 
 //    build.dependsOn(checkstyleMain)
 //    build.dependsOn(checkstyleTest)
+//    build.dependsOn(javadocJar)
+//
+//    artifactoryPublish {
+//        publishConfigs('archives')
+//    }
 
     dependencies {
         compileOnly 'org.jetbrains:annotations:17.0.0'
@@ -175,6 +182,5 @@ configure(['worldedit-core', 'worldedit-bukkit', 'favs'].collect { project("$it"
             }
         }
     }
-
 
 }

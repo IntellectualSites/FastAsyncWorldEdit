@@ -4,7 +4,6 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.MathMan;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
@@ -15,9 +14,6 @@ import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -224,8 +220,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
             buffer = new byte[8192];
         }
         FastByteArrayOutputStream buffered = new FastByteArrayOutputStream(buffer);
-        DataOutputStream dataOut = new DataOutputStream(buffered);
-        try (NBTOutputStream nbtOut = new NBTOutputStream((DataOutput) dataOut)) {
+        try (NBTOutputStream nbtOut = new NBTOutputStream(buffered)) {
             write(nbtOut);
         }
         return buffered.toByteArray();

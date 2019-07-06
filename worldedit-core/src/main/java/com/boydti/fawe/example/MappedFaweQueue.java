@@ -250,23 +250,28 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
         }
     }
 
+    @Override
     public Settings getSettings() {
         return settings;
     }
 
+    @Override
     public void setSettings(Settings settings) {
         this.settings = settings == null ? Settings.IMP : settings;
     }
 
+    @Override
     public void setWorld(String world) {
         this.world = world;
         this.weWorld = null;
     }
 
+    @Override
     public World getWEWorld() {
         return weWorld != null ? weWorld : (weWorld = FaweAPI.getWorld(world));
     }
 
+    @Override
     public String getWorldName() {
         return world;
     }
@@ -288,52 +293,59 @@ public abstract class MappedFaweQueue<WORLD, CHUNK, CHUNKSECTIONS, SECTION> impl
 
     @Override
     public boolean supports(Capability capability) {
-        if (capability == Capability.CHANGE_TASKS) {
-            return true;
-        }
-        return false;
+        return capability == Capability.CHANGE_TASKS;
     }
 
     public void setSessions(ConcurrentLinkedDeque<EditSession> sessions) {
         this.sessions = sessions;
     }
 
+    @Override
     public long getModified() {
         return modified;
     }
 
+    @Override
     public void setModified(long modified) {
         this.modified = modified;
     }
 
+    @Override
     public RunnableVal2<ProgressType, Integer> getProgressTask() {
         return progressTask;
     }
 
+    @Override
     public void setProgressTask(RunnableVal2<ProgressType, Integer> progressTask) {
         this.progressTask = progressTask;
     }
 
+    @Override
     public void setChangeTask(RunnableVal2<FaweChunk, FaweChunk> changeTask) {
         this.changeTask = changeTask;
     }
 
+    @Override
     public RunnableVal2<FaweChunk, FaweChunk> getChangeTask() {
         return changeTask;
     }
 
+    @Override
     public SetQueue.QueueStage getStage() {
         return stage;
     }
 
+    @Override
     public void setStage(SetQueue.QueueStage stage) {
         this.stage = stage;
     }
 
+    @Override
     public void addNotifyTask(Runnable runnable) {
         this.tasks.add(runnable);
     }
 
+    @Override
     public void addTask(Runnable whenFree) {
         tasks.add(whenFree);
     }

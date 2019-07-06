@@ -26,10 +26,6 @@ import com.boydti.fawe.object.random.TrueRandom;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
-
-import com.google.common.collect.Lists;
-import com.sk89q.worldedit.EmptyClipboardException;
-import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.PatternCommands;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -41,12 +37,10 @@ import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.command.ActorAuthorizer;
 import com.sk89q.worldedit.internal.command.WorldEditBinding;
 import com.sk89q.worldedit.internal.expression.Expression;
-import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.util.command.SimpleDispatcher;
 import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -115,16 +109,16 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
 
 
                     if (charMask) {
-                        switch (char0) {
-                            case '$': {
-                                String value = command.substring(1) + ((entry.getValue().isEmpty()) ? "" : "[" + StringMan.join(entry.getValue(), "][") + "]");
-                                if (value.contains(":")) {
-                                    if (value.charAt(0) == ':') value.replaceFirst(":", "");
-                                    value = value.replaceAll(":", "][");
+                        if (char0 == '$') {
+                            String value = command.substring(1) + ((entry.getValue().isEmpty()) ? ""
+                                : "[" + StringMan.join(entry.getValue(), "][") + "]");
+                            if (value.contains(":")) {
+                                if (value.charAt(0) == ':') {
+                                    value.replaceFirst(":", "");
                                 }
-                                pattern = parseFromInput(char0 + "[" + value + "]", context);
-                                break;
+                                value = value.replaceAll(":", "][");
                             }
+                            pattern = parseFromInput(char0 + "[" + value + "]", context);
                         }
                     }
                     if (pattern == null) {
@@ -194,14 +188,14 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
         }
         if (patterns.isEmpty()) {
             return null;
-        } else if (patterns.size() == 1) {
+        }
+        if (patterns.size() == 1) {
             return patterns.get(0);
-        } else {
-            RandomPattern random = new RandomPattern(new TrueRandom());
-            for (int i = 0; i < patterns.size(); i++) {
-                random.add(patterns.get(i), chances.get(i));
-            }
-            return random;
-            }
+        }
+        RandomPattern random = new RandomPattern(new TrueRandom());
+        for (int i = 0; i < patterns.size(); i++) {
+            random.add(patterns.get(i), chances.get(i));
+        }
+        return random;
     }
 }

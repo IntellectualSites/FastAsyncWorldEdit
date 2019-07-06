@@ -4,16 +4,14 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
-
 import java.awt.Color;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 public class SaturatePattern extends AbstractPattern {
     private transient TextureHolder holder;
@@ -29,7 +27,7 @@ public class SaturatePattern extends AbstractPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        BlockType block = extent.getBlockType(position);
+        BlockType block = extent.getBlock(position).getBlockType();
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(block);
         int newColor = util.multiplyColor(currentColor, color);
@@ -38,7 +36,7 @@ public class SaturatePattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
-        BlockType block = extent.getBlockType(getPosition);
+        BlockType block = extent.getBlock(getPosition).getBlockType();
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(block);
         if (currentColor == 0) return false;
@@ -48,7 +46,7 @@ public class SaturatePattern extends AbstractPattern {
         return extent.setBlock(setPosition, newBlock.getDefaultState());
     }
 
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
         holder = Fawe.get().getCachedTextureUtil(true, 0, 100);
     }

@@ -1,16 +1,14 @@
 package com.boydti.fawe.jnbt;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.exception.FaweException;
+
 import com.sk89q.jnbt.NBTInputStream;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class NBTStreamer {
     private final NBTInputStream is;
@@ -27,7 +25,7 @@ public class NBTStreamer {
      * @throws IOException
      */
     public void readFully() throws IOException {
-        is.readNamedTagLazy(node -> readers.get(node));
+        is.readNamedTagLazy(readers::get);
         is.close();
     }
 

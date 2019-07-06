@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.extent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.jnbt.anvil.generator.GenBase;
 import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.object.extent.LightingExtent;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -40,15 +40,15 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
+import java.util.List;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
 public class AbstractDelegateExtent implements LightingExtent {
+
     private transient final Extent extent;
     protected MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
@@ -74,12 +74,8 @@ public class AbstractDelegateExtent implements LightingExtent {
         return extent.getMaxY();
     }
 
+
     @Override
-    public BlockType getBlockType(BlockVector3 position) {
-        return extent.getBlockType(position);
-    }
-
-
     public int getBlockLight(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getBlockLight(x, y, z);
@@ -87,6 +83,7 @@ public class AbstractDelegateExtent implements LightingExtent {
         return getBrightness(x, y, z);
     }
 
+    @Override
     public int getOpacity(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getOpacity(x, y, z);
@@ -102,6 +99,7 @@ public class AbstractDelegateExtent implements LightingExtent {
         return 0;
     }
 
+    @Override
     public int getBrightness(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getBrightness(x, y, z);
@@ -133,6 +131,7 @@ public class AbstractDelegateExtent implements LightingExtent {
         return setBlock(mutable.setComponents(x, y, z), block);
     }
 
+    @Override
     public BlockState getBlock(BlockVector3 position) {
         return extent.getBlock(position);
     }
@@ -227,6 +226,7 @@ public class AbstractDelegateExtent implements LightingExtent {
         return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
     }
 
+    @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
         return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
     }

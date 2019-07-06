@@ -25,8 +25,6 @@ import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.util.report.Unreported;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 import org.slf4j.Logger;
@@ -104,7 +102,6 @@ public class PropertiesConfiguration extends LocalConfiguration {
         }
         superPickaxeDrop = getBool("super-pickaxe-drop-items", superPickaxeDrop);
         superPickaxeManyDrop = getBool("super-pickaxe-many-drop-items", superPickaxeManyDrop);
-        noDoubleSlash = getBool("no-double-slash", noDoubleSlash);
         useInventory = getBool("use-inventory", useInventory);
         useInventoryOverride = getBool("use-inventory-override", useInventoryOverride);
         useInventoryCreativeOverride = getBool("use-inventory-creative-override", useInventoryCreativeOverride);

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.util;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extent.Extent;
@@ -47,7 +48,7 @@ public class Location extends Vector3 {
      * @param extent the extent
      */
     public Location(Extent extent) {
-        this(extent, Vector3.ZERO, Vector3.ZERO);
+        this(extent, Vector3.ZERO, 0f, 90f);
     }
 
     /**
@@ -60,7 +61,7 @@ public class Location extends Vector3 {
      * @param z the Z coordinate
      */
     public Location(Extent extent, double x, double y, double z) {
-        this(extent, Vector3.at(x, y, z), Vector3.ZERO);
+        this(extent, Vector3.at(x, y, z), 0f, 90f);
     }
 
     /**
@@ -71,7 +72,7 @@ public class Location extends Vector3 {
      * @param position the position vector
      */
     public Location(Extent extent, Vector3 position) {
-        this(extent, position, Vector3.ZERO);
+        this(extent, position, 0f, 90f);
     }
 
     /**
@@ -124,7 +125,6 @@ public class Location extends Vector3 {
      * @param yaw the yaw, in degrees
      * @param pitch the pitch, in degrees
      */
-
     public Location(Extent extent, Vector3 position, float yaw, float pitch) {
         super(position);
         checkNotNull(extent);
@@ -292,6 +292,18 @@ public class Location extends Vector3 {
         return new Location(extent, position, yaw, pitch);
     }
 
+    @Override public Location clampY(int min, int max) {
+        checkArgument(min <= max, "minimum cannot be greater than maximum");
+        if (y < min) {
+            return new Location(extent, x, min, z);
+        }
+        if (y > max) {
+            return new Location(extent, x, max, z);
+        }
+        return this;
+
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -309,8 +321,4 @@ public class Location extends Vector3 {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 }

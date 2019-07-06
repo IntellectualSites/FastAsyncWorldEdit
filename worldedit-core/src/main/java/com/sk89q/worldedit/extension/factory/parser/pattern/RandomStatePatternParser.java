@@ -22,14 +22,29 @@ package com.sk89q.worldedit.extension.factory.parser.pattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.pattern.RandomStatePattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.FuzzyBlockState;
+
+import java.util.stream.Stream;
 
 public class RandomStatePatternParser extends InputParser<Pattern> {
     public RandomStatePatternParser(WorldEdit worldEdit) {
         super(worldEdit);
+    }
+
+    @Override
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of("*");
+        }
+        if (!input.startsWith("*")) {
+            return Stream.empty();
+        }
+
+        return worldEdit.getBlockFactory().getSuggestions(input.substring(1)).stream().map(s -> "*" + s);
     }
 
     @Override
@@ -44,7 +59,9 @@ public class RandomStatePatternParser extends InputParser<Pattern> {
         context.setPreferringWildcard(wasFuzzy);
         if (block.getStates().size() == block.getBlockType().getPropertyMap().size()) {
             // they requested random with *, but didn't leave any states empty - simplify
-            return (block);
+            return block;
+        } else if (block.toImmutableState() instanceof FuzzyBlockState) {
+            return new RandomStatePattern((FuzzyBlockState) block.toImmutableState());
         } else {
             return null; // only should happen if parseLogic changes
         }

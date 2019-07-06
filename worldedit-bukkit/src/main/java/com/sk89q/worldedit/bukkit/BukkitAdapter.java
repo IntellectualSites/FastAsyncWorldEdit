@@ -21,31 +21,25 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
 import com.sk89q.worldedit.NotABlockException;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.SimpleBukkitAdapter;
 import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.item.ItemType;
-
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
@@ -72,6 +66,12 @@ public enum BukkitAdapter {
 
     private static final IBukkitAdapter getAdapter() {
         return INSTANCE.adapter;
+    }
+
+    private static final ParserContext TO_BLOCK_CONTEXT = new ParserContext();
+
+    static {
+        TO_BLOCK_CONTEXT.setRestricted(false);
     }
 
     /**
@@ -113,6 +113,26 @@ public enum BukkitAdapter {
     }
 
     /**
+     * Create a WorldEdit Player from a Bukkit Player.
+     *
+     * @param player The Bukkit player
+     * @return The WorldEdit player
+     */
+    public static BukkitPlayer adapt(Player player) {
+        return getAdapter().adapt(player);
+    }
+
+    /**
+     * Create a Bukkit Player from a WorldEdit Player.
+     *
+     * @param player The WorldEdit player
+     * @return The Bukkit player
+     */
+    public static Player adapt(com.sk89q.worldedit.entity.Player player) {
+        return getAdapter().adapt(player);
+    }
+
+    /**
      * Create a WorldEdit location from a Bukkit location.
      *
      * @param location the Bukkit location
@@ -134,10 +154,24 @@ public enum BukkitAdapter {
         return getAdapter().adapt(location);
     }
 
+    /**
+     * Create a Bukkit location from a WorldEdit position with a Bukkit world.
+     *
+     * @param world the Bukkit world
+     * @param position the WorldEdit position
+     * @return a Bukkit location
+     */
     public static org.bukkit.Location adapt(org.bukkit.World world, Vector3 position) {
         return getAdapter().adapt(world, position);
     }
 
+    /**
+     * Create a Bukkit location from a WorldEdit position with a Bukkit world.
+     *
+     * @param world the Bukkit world
+     * @param position the WorldEdit position
+     * @return a Bukkit location
+     */
     public static org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position) {
         checkNotNull(world);
         checkNotNull(position);
@@ -157,19 +191,26 @@ public enum BukkitAdapter {
         return getAdapter().adapt(world, location);
     }
 
-    public static Vector3 asVector(org.bukkit.Location location) {
-        return getAdapter().asVector(location);
-    }
-
     /**
      * Create a WorldEdit Vector from a Bukkit location.
      *
      * @param location The Bukkit location
      * @return a WorldEdit vector
      */
+    public static Vector3 asVector(org.bukkit.Location location) {
+        checkNotNull(location);
+        return Vector3.at(location.getX(), location.getY(), location.getZ());
+    }
+
+    /**
+     * Create a WorldEdit BlockVector from a Bukkit location.
+     *
+     * @param location The Bukkit location
+     * @return a WorldEdit vector
+     */
     public static BlockVector3 asBlockVector(org.bukkit.Location location) {
         checkNotNull(location);
-        return getAdapter().asBlockVector(location);
+        return BlockVector3.at(location.getX(), location.getY(), location.getZ());
     }
 
     /**
@@ -328,13 +369,5 @@ public enum BukkitAdapter {
     public static ItemStack adapt(BaseItemStack item) {
         checkNotNull(item);
         return getAdapter().adapt(item);
-    }
-
-    public static BukkitPlayer adapt(Player player) {
-        return getAdapter().adapt(player);
-    }
-
-    public static Player adapt(com.sk89q.worldedit.entity.Player player) {
-        return getAdapter().adapt(player);
     }
 }

@@ -19,11 +19,10 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.object.collection.FastBitSet;
-import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.StringMan;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.boydti.fawe.object.collection.FastBitSet;
+import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -34,13 +33,12 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * A mask that checks whether blocks at the given positions are matched by
@@ -65,7 +63,6 @@ public class BlockMask extends AbstractExtentMask {
      */
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
         super(extent);
-        MainUtil.warnDeprecated(BlockMaskBuilder.class);
         checkNotNull(blocks);
         this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
     }
@@ -78,7 +75,6 @@ public class BlockMask extends AbstractExtentMask {
      */
     public BlockMask(Extent extent, BaseBlock... block) {
         super(extent);
-        MainUtil.warnDeprecated(BlockMaskBuilder.class);
         checkNotNull(block);
         this.bitSets = new BlockMaskBuilder().addBlocks(block).optimize().getBits();
     }

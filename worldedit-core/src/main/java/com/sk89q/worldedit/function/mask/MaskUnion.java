@@ -25,6 +25,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import java.util.Map;
 import javax.annotation.Nullable;
 
@@ -60,7 +61,9 @@ public class MaskUnion extends MaskIntersection {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        for (Mask mask : getMasksArray()) {
+        Mask[] masks = getMasksArray();
+
+        for (Mask mask : masks) {
             if (mask.test(vector)) {
                 return true;
             }

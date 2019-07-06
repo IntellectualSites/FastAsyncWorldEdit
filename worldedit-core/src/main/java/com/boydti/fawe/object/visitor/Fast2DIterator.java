@@ -27,12 +27,12 @@ public class Fast2DIterator implements Iterable<BlockVector2> {
     }
 
     public Fast2DIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable HasFaweQueue editSession) {
-        this(iter, (FaweQueue) (editSession != null ? editSession.getQueue() : null));
+        this(iter, editSession != null ? editSession.getQueue() : null);
     }
 
     public Fast2DIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable FaweQueue faweQueue) {
         this.iterable = iter;
-        this.queue = faweQueue != null && faweQueue instanceof MappedFaweQueue ? (MappedFaweQueue) faweQueue : null;
+        this.queue = faweQueue instanceof MappedFaweQueue ? (MappedFaweQueue) faweQueue : null;
     }
 
     public Iterable<? extends BlockVector2> getIterable() {

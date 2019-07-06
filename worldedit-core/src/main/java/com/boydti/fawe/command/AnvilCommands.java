@@ -1,11 +1,24 @@
 package com.boydti.fawe.command;
 
-import com.boydti.fawe.Fawe;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.jnbt.anvil.*;
-import com.boydti.fawe.jnbt.anvil.filters.*;
+import com.boydti.fawe.jnbt.anvil.MCAClipboard;
+import com.boydti.fawe.jnbt.anvil.MCAFile;
+import com.boydti.fawe.jnbt.anvil.MCAFilter;
+import com.boydti.fawe.jnbt.anvil.MCAFilterCounter;
+import com.boydti.fawe.jnbt.anvil.MCAQueue;
+import com.boydti.fawe.jnbt.anvil.filters.DebugFixP2Roads;
+import com.boydti.fawe.jnbt.anvil.filters.DeleteBiomeFilterSimple;
+import com.boydti.fawe.jnbt.anvil.filters.DeleteOldFilter;
+import com.boydti.fawe.jnbt.anvil.filters.DeleteUnclaimedFilter;
+import com.boydti.fawe.jnbt.anvil.filters.DeleteUninhabitedFilter;
+import com.boydti.fawe.jnbt.anvil.filters.PlotTrimFilter;
+import com.boydti.fawe.jnbt.anvil.filters.RemapFilter;
+import com.boydti.fawe.jnbt.anvil.filters.RemoveLayerFilter;
+import com.boydti.fawe.jnbt.anvil.filters.SetPatternFilter;
+import com.boydti.fawe.jnbt.anvil.filters.TrimAirFilter;
 import com.boydti.fawe.jnbt.anvil.history.IAnvilHistory;
 import com.boydti.fawe.jnbt.anvil.history.NullAnvilHistory;
 import com.boydti.fawe.object.FawePlayer;
@@ -14,17 +27,16 @@ import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal4;
 import com.boydti.fawe.object.changeset.AnvilHistory;
 import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
-import com.boydti.fawe.object.mask.FaweBlockMatcher;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.SetQueue;
-import com.boydti.fawe.util.StringMan;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -33,14 +45,9 @@ import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.*;
 import java.util.function.Consumer;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Command(aliases = {"/anvil"}, desc = "Manipulate billions of blocks: [More Info](https://github.com/boy0001/FastAsyncWorldedit/wiki/Anvil-API)")
 public class AnvilCommands {
@@ -139,9 +146,7 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with another",
             help = "Replace all blocks in the selection with another\n" +
                     "The -d flag disabled wildcard data matching\n",
-            flags = "df",
-            min = 2,
-            max = 4
+            flags = "df"
     )
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAll(Player player, String folder, @Optional String from, String to, @Switch('d') boolean useData) throws WorldEditException {
@@ -164,9 +169,7 @@ public class AnvilCommands {
             aliases = {"remapall"},
             usage = "<folder>",
             help = "Remap the world between MCPE/PC values",
-            desc = "Remap the world between MCPE/PC values",
-            min = 1,
-            max = 1
+            desc = "Remap the world between MCPE/PC values"
     )
     @CommandPermissions("worldedit.anvil.remapall")
     public void remapall(Player player, String folder) throws WorldEditException {
@@ -188,9 +191,7 @@ public class AnvilCommands {
             help = "Delete all chunks which haven't been occupied for `age-ticks` (20t = 1s) and \n" +
                     "Have not been accessed since `file-duration` (ms) after creation and\n" +
                     "Have not been used in the past `chunk-inactivity` (ms)" +
-                    "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`",
-            min = 2,
-            max = 3
+                    "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteallunvisited")
     public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Optional("60000") int fileDurationMillis) throws WorldEditException {
@@ -220,7 +221,7 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"deleteunclaimed"},
+            name = "deleteunclaimed",
             usage = "<age-ticks> [file-age=60000]",
             desc = "(Supports: WG, P2, GP) Delete all chunks which haven't been occupied AND claimed",
             help = "(Supports: WG, P2, GP) Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n" +
@@ -245,9 +246,7 @@ public class AnvilCommands {
             help = "Delete regions which haven't been accessed in a certain amount of time\n" +
                     "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n" +
                     "(months are not a unit of time)\n" +
-                    "E.g. 8h5m12s\n",
-            min = 2,
-            max = 3
+                    "E.g. 8h5m12s\n"
     )
     @CommandPermissions("worldedit.anvil.deletealloldregions")
     public void deleteAllOldRegions(Player player, String folder, String time) throws WorldEditException {
@@ -258,7 +257,7 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"trimallplots", },
+            name = "trimallplots",
             desc = "Trim chunks in a Plot World",
             help = "Trim chunks in a Plot World\n" +
                     "Unclaimed chunks will be deleted\n" +
@@ -278,7 +277,7 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"deletebiomechunks", },
+            name = "deletebiomechunks",
             desc = "Delete chunks matching a specific biome"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
@@ -289,7 +288,7 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"trimallair", },
+            name = "trimallair",
             desc = "Trim all air in the world"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
@@ -300,7 +299,7 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"debugfixroads", },
+            name = "debugfixroads",
             desc = "debug - do not use"
     )
     @CommandPermissions("worldedit.anvil.debugfixroads")
@@ -314,9 +313,7 @@ public class AnvilCommands {
             aliases = {"replaceallpattern", "reap", "repallpat"},
             usage = "<folder> [from-block] <to-pattern>",
             desc = "Replace all blocks in the selection with another",
-            flags = "dm",
-            min = 2,
-            max = 4
+            flags = "dm"
     )
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAllPattern(Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
@@ -346,9 +343,7 @@ public class AnvilCommands {
             aliases = {"countall"},
             usage = "<folder> [hasSky] <id>",
             desc = "Count all blocks in a world",
-            flags = "d",
-            min = 2,
-            max = 3
+            flags = "d"
     )
     @CommandPermissions("worldedit.anvil.countall")
     public void countAll(Player player, EditSession editSession, String folder, String arg, @Switch('d') boolean useData) throws WorldEditException {

@@ -38,6 +38,7 @@ import javax.annotation.Nullable;
 
 public interface IDelegateFaweQueue extends FaweQueue {
 
+    @Override
     FaweQueue getQueue();
 
     @Override

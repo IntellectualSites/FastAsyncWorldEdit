@@ -21,7 +21,6 @@ package com.sk89q.worldedit.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.collect.ComparisonChain;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 import java.util.Comparator;
@@ -45,19 +44,29 @@ public class BlockVector3 {
     }
 
     public static BlockVector3 at(int x, int y, int z) {
+        // switch for efficiency on typical cases
+        // in MC y is rarely 0/1 on selections
+        switch (y) {
+            case 0:
+                if (x == 0 && z == 0) {
+                    return ZERO;
+                }
+                break;
+            case 1:
+                if (x == 1 && z == 1) {
+                    return ONE;
+                }
+                break;
+        }
         return new BlockVector3(x, y, z);
     }
 
     // thread-safe initialization idiom
     private static final class YzxOrderComparator {
-        private static final Comparator<BlockVector3> YZX_ORDER = (a, b) -> {
-            //noinspection SuspiciousNameCombination
-            return ComparisonChain.start()
-                    .compare(a.y, b.y)
-                    .compare(a.z, b.z)
-                    .compare(a.x, b.x)
-                    .result();
-        };
+        private static final Comparator<BlockVector3> YZX_ORDER =
+            Comparator.comparingInt(BlockVector3::getY)
+                .thenComparingInt(BlockVector3::getZ)
+                .thenComparingInt(BlockVector3::getX);
     }
 
     /**
@@ -367,6 +376,50 @@ public class BlockVector3 {
      */
     public BlockVector3 divide(int n) {
         return divide(n, n, n);
+    }
+
+    /**
+     * Shift all components right.
+     *
+     * @param x the value to shift x by
+     * @param y the value to shift y by
+     * @param z the value to shift z by
+     * @return a new vector
+     */
+    public BlockVector3 shr(int x, int y, int z) {
+        return at(this.x >> x, this.y >> y, this.z >> z);
+    }
+
+    /**
+     * Shift all components right by {@code n}.
+     *
+     * @param n the value to shift by
+     * @return a new vector
+     */
+    public BlockVector3 shr(int n) {
+        return shr(n, n, n);
+    }
+
+    /**
+     * Shift all components left.
+     *
+     * @param x the value to shift x by
+     * @param y the value to shift y by
+     * @param z the value to shift z by
+     * @return a new vector
+     */
+    public BlockVector3 shl(int x, int y, int z) {
+        return at(this.x << x, this.y << y, this.z << z);
+    }
+
+    /**
+     * Shift all components left by {@code n}.
+     *
+     * @param n the value to shift by
+     * @return a new vector
+     */
+    public BlockVector3 shl(int n) {
+        return shl(n, n, n);
     }
 
     /**

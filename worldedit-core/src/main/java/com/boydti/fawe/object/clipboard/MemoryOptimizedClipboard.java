@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.clipboard;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.IntegerTrio;
@@ -9,10 +8,8 @@ import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -122,7 +119,7 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
         if (!hasBiomes()) {
             return null;
         }
-        return BiomeTypes.get(biomes[index]);
+        return BiomeTypes.register(biomes[index]);
     }
 
     @Override

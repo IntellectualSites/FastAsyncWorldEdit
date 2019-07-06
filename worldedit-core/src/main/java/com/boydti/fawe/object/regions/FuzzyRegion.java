@@ -88,6 +88,7 @@ public class FuzzyRegion extends AbstractRegion {
         setMinMax(x, y, z);
     }
 
+    @Override
     public boolean contains(int x, int y, int z) {
         return set.contains(x, y, z);
     }

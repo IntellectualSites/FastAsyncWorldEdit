@@ -21,7 +21,7 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.CFICommands;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.command.BiomeCommands;

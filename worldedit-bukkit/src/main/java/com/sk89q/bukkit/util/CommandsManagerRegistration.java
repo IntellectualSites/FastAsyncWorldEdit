@@ -19,7 +19,7 @@
 
 package com.sk89q.bukkit.util;
 
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandsManager;
 import org.bukkit.command.CommandExecutor;
@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public class CommandsManagerRegistration extends CommandRegistration {
 
     protected CommandsManager<?> commands;

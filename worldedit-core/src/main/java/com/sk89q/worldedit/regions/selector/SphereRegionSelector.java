@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -88,7 +87,11 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        BBC.SELECTOR_RADIUS.send(player, region.getRadius().getX(), region.getArea());
+        if (isDefined()) {
+            player.print("Radius set to " + region.getRadius().getX() + " (" + region.getArea() + ").");
+        } else {
+            player.print("Radius set to " + region.getRadius().getX() + ".");
+        }
 
         session.describeCUI(player);
     }

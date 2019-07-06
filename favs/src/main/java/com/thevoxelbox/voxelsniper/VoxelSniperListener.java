@@ -3,7 +3,7 @@ package com.thevoxelbox.voxelsniper;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.util.command.parametric.ExceptionConverter;
 import com.thevoxelbox.voxelsniper.api.command.VoxelCommand;
 import com.thevoxelbox.voxelsniper.command.*;
@@ -71,7 +71,7 @@ public class VoxelSniperListener implements Listener {
 
         FawePlayer fp = FawePlayer.wrap(player);
         if (!fp.runAction(() -> {
-            ExceptionConverter exceptionConverter = CommandManager.getInstance().getExceptionConverter();
+            ExceptionConverter exceptionConverter = PlatformCommandManager.getInstance().getExceptionConverter();
             try {
                 try {
                     found.onCommand(player, split);

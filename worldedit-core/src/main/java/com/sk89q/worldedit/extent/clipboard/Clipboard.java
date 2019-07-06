@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.clipboard;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 

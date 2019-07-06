@@ -371,6 +371,6 @@ public interface IBukkitAdapter {
     }
 
     default BiomeType adapt(Biome biome) {
-        return BiomeTypes.get(biome.name().toLowerCase());
+        return BiomeTypes.register(biome.name().toLowerCase());
     }
 }

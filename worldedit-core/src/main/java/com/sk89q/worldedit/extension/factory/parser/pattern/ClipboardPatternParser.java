@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
-import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -32,7 +31,8 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
-import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
 
 public class ClipboardPatternParser extends InputParser<Pattern> {
 
@@ -41,8 +41,28 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
     }
 
     @Override
-    public List<String> getSuggestions() {
-        return Lists.newArrayList("#clipboard", "#copy");
+    public Stream<String> getSuggestions(String input) {
+        if (input.isEmpty()) {
+            return Stream.of("#clipboard");
+        }
+        String[] offsetParts = input.split("@", 2);
+        String firstLower = offsetParts[0].toLowerCase(Locale.ROOT);
+        final boolean isClip = "#clipboard".startsWith(firstLower);
+        final boolean isCopy = "#copy".startsWith(firstLower);
+        if (isClip || isCopy) {
+            if (offsetParts.length == 2) {
+                String coords = offsetParts[1];
+                if (coords.isEmpty()) {
+                    return Stream.of(input + "[x,y,z]");
+                }
+            } else {
+                if (isClip) {
+                    return Stream.of("#clipboard", "#clipboard@[x,y,z]");
+                }
+                return Stream.of("#copy", "#copy@[x,y,z]");
+            }
+        }
+        return Stream.empty();
     }
 
     @Override
@@ -83,4 +103,5 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
             throw new InputParseException("No session is available, so no clipboard is available");
         }
     }
+
 }

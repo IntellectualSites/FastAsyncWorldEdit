@@ -1,5 +1,7 @@
 package com.boydti.fawe.util;
 
+import static java.lang.System.arraycopy;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
@@ -12,7 +14,6 @@ import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
 import com.boydti.fawe.object.changeset.FaweStreamChangeSet;
 import com.boydti.fawe.object.io.AbstractDelegateOutputStream;
-
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.sk89q.jnbt.CompoundTag;
@@ -27,20 +28,19 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.Location;
-import static java.lang.System.arraycopy;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
-import net.jpountz.lz4.LZ4Compressor;
-import net.jpountz.lz4.LZ4Factory;
-import net.jpountz.lz4.LZ4FastDecompressor;
-import net.jpountz.lz4.LZ4InputStream;
-import net.jpountz.lz4.LZ4Utils;
-
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -77,6 +77,15 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
+import net.jpountz.lz4.LZ4InputStream;
+import net.jpountz.lz4.LZ4Utils;
 
 public class MainUtil {
     /*
@@ -850,35 +859,6 @@ public class MainUtil {
             pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static void warnDeprecated(Class... alternatives) {
-        StackTraceElement[] stacktrace = new RuntimeException().getStackTrace();
-        if (stacktrace.length > 1) {
-            for (int i = 1; i < stacktrace.length; i++) {
-                StackTraceElement stack = stacktrace[i];
-                String s = stack.toString();
-                if (s.startsWith("com.sk89q")) {
-                    continue;
-                }
-                try {
-                    StackTraceElement creatorElement = stacktrace[1];
-                    String className = creatorElement.getClassName();
-                    Class clazz = Class.forName(className);
-                    String creator = clazz.getSimpleName();
-                    String packageName = clazz.getPackage().getName();
-
-                    StackTraceElement deprecatedElement = stack;
-                    String myName = Class.forName(deprecatedElement.getClassName()).getSimpleName();
-                    Fawe.debug("@" + creator + " used by " + myName + "." + deprecatedElement.getMethodName() + "():" + deprecatedElement.getLineNumber() + " is deprecated.");
-                    Fawe.debug(" - Alternatives: " + StringMan.getString(alternatives));
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                } finally {
-                    break;
-                }
-            }
         }
     }
 

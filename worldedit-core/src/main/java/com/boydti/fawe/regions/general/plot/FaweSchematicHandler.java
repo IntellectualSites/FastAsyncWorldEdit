@@ -8,7 +8,6 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
-
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
@@ -27,7 +26,6 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
-
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.File;

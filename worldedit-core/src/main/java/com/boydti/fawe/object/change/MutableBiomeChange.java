@@ -4,7 +4,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.math.MutableBlockVector2;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 
 public class MutableBiomeChange implements Change {
@@ -26,11 +25,11 @@ public class MutableBiomeChange implements Change {
 
     @Override
     public void undo(UndoContext context) throws WorldEditException {
-        context.getExtent().setBiome(mutable, BiomeTypes.get(from));
+        context.getExtent().setBiome(mutable, BiomeTypes.register(from));
     }
 
     @Override
     public void redo(UndoContext context) throws WorldEditException {
-        context.getExtent().setBiome(mutable, BiomeTypes.get(to));
+        context.getExtent().setBiome(mutable, BiomeTypes.register(to));
     }
 }

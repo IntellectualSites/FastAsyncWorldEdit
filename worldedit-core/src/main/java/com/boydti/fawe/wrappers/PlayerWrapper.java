@@ -23,6 +23,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -118,6 +119,10 @@ public class PlayerWrapper extends AbstractPlayerActor {
     @Override
     public void printError(String msg) {
         parent.printError(msg);
+    }
+
+    @Override public void print(Component component) {
+        parent.print(component);
     }
 
     @Override

@@ -65,10 +65,10 @@ class BukkitRegistries extends BundledRegistries {
     public BlockCategoryRegistry getBlockCategoryRegistry() {
         return blockCategoryRegistry;
     }
-    
+
     @Override
     public ItemCategoryRegistry getItemCategoryRegistry() {
-    	return itemCategoryRegistry;
+        return itemCategoryRegistry;
     }
 
     @Override

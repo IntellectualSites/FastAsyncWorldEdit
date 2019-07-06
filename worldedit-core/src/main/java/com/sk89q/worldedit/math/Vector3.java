@@ -25,7 +25,6 @@ import com.boydti.fawe.util.MathMan;
 import com.google.common.collect.ComparisonChain;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
-import javax.annotation.Nullable;
 import java.util.Comparator;
 
 /**
@@ -40,6 +39,21 @@ public class Vector3 {
     public static final Vector3 ONE = new Vector3(1, 1, 1);
 
     public static Vector3 at(double x, double y, double z) {
+        // switch for efficiency on typical cases
+        // in MC y is rarely 0/1 on selections
+        int yTrunc = (int) y;
+        switch (yTrunc) {
+            case 0:
+                if (x == 0 && y == 0 && z == 0) {
+                    return ZERO;
+                }
+                break;
+            case 1:
+                if (x == 1 && y == 1 && z == 1) {
+                    return ONE;
+                }
+                break;
+        }
         return new Vector3(x, y, z);
     }
 
@@ -56,7 +70,7 @@ public class Vector3 {
 
     /**
      * Returns a comparator that sorts vectors first by Y, then Z, then X.
-     * 
+     *
      * <p>
      * Useful for sorting by chunk block storage order.
      */
@@ -632,14 +646,14 @@ public class Vector3 {
 
     @Override
     public int hashCode() {
-        return (((int) x) ^ (((int) z) << 12)) ^ (((int) y) << 24);
+        return (int) x ^ (int) z << 12 ^ (int) y << 24;
     }
 
     @Override
     public String toString() {
-        String x = (getX() == getBlockX() ? "" + getBlockX() : "" + getX());
-        String y = (getY() == getBlockY() ? "" + getBlockY() : "" + getY());
-        String z = (getZ() == getBlockZ() ? "" + getBlockZ() : "" + getZ());
+        String x = "" + getX();
+        String y = "" + getY();
+        String z = "" + getZ();
         return "(" + x + ", " + y + ", " + z + ")";
     }
 

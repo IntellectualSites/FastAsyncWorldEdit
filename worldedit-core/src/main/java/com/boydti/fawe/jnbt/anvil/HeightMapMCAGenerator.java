@@ -1,11 +1,7 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.example.SimpleIntFaweChunk;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCADrawer;
-import com.boydti.fawe.jnbt.anvil.MCAChunk;
-import com.boydti.fawe.jnbt.anvil.MCAWriter;
 import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.change.StreamChange;
@@ -930,7 +926,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) index = Math.floorMod(index, getArea());
-        return BiomeTypes.get(biomes.getByte(index));
+        return BiomeTypes.register(biomes.getByte(index));
     }
 
     @Override

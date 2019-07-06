@@ -19,6 +19,12 @@
 
 package com.sk89q.worldedit;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
@@ -26,7 +32,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.jnbt.anvil.MCAQueue;
 import com.boydti.fawe.jnbt.anvil.MCAWorld;
-import com.boydti.fawe.logging.LoggingChangeSet;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
@@ -44,7 +49,17 @@ import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.*;
+import com.boydti.fawe.object.extent.FastWorldEditExtent;
+import com.boydti.fawe.object.extent.FaweRegionExtent;
+import com.boydti.fawe.object.extent.HeightBoundExtent;
+import com.boydti.fawe.object.extent.MultiRegionExtent;
+import com.boydti.fawe.object.extent.NullExtent;
+import com.boydti.fawe.object.extent.ProcessedWEExtent;
+import com.boydti.fawe.object.extent.ResettableExtent;
+import com.boydti.fawe.object.extent.SingleRegionExtent;
+import com.boydti.fawe.object.extent.SlowExtent;
+import com.boydti.fawe.object.extent.SourceMaskExtent;
+import com.boydti.fawe.object.extent.StripNBTExtent;
 import com.boydti.fawe.object.function.SurfaceRegionFunction;
 import com.boydti.fawe.object.mask.ResettableMask;
 import com.boydti.fawe.object.pattern.ExistingPattern;
@@ -58,9 +73,6 @@ import com.boydti.fawe.util.Perm;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Supplier;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -81,7 +93,16 @@ import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
-import com.sk89q.worldedit.function.mask.*;
+import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
+import com.sk89q.worldedit.function.mask.BoundedHeightMask;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.MaskUnion;
+import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.NoiseFilter2D;
+import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -122,15 +143,13 @@ import com.sk89q.worldedit.regions.EllipsoidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 import com.sk89q.worldedit.regions.shape.ArbitraryBiomeShape;
 import com.sk89q.worldedit.regions.shape.ArbitraryShape;
 import com.sk89q.worldedit.regions.shape.RegionShape;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.SimpleWorld;
@@ -144,11 +163,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -156,6 +171,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -229,20 +249,17 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public static final UUID CONSOLE = UUID.fromString("1-1-3-3-7");
 
     @Deprecated
-    public EditSession(@Nonnull World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
+    public EditSession(@Nonnull World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @NotNull EventBus bus, @Nullable EditSessionEvent event) {
         this(null, world, queue, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, bus, event);
     }
 
-    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
+    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @NotNull EventBus bus, @Nullable EditSessionEvent event) {
         super(world);
         this.worldName = worldName == null ? world == null ? queue == null ? "" : queue.getWorldName() : world.getName() : worldName;
         if (world == null && this.worldName != null) world = FaweAPI.getWorld(this.worldName);
 
         this.world = world;
 
-        if (bus == null) {
-            bus = WorldEdit.getInstance().getEventBus();
-        }
         if (event == null) {
             event = new EditSessionEvent(world, player == null ? null : (player.getPlayer()), -1, null);
         }
@@ -344,13 +361,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             if (this.limit.SPEED_REDUCTION > 0) {
                 this.bypassHistory = new SlowExtent(this.bypassHistory, this.limit.SPEED_REDUCTION);
             }
-            if (changeSet instanceof NullChangeSet && Fawe.imp().getBlocksHubApi() != null && player != null) {
-                changeSet = LoggingChangeSet.wrap(player, changeSet);
-            }
             if (!(changeSet instanceof NullChangeSet)) {
-                if (!(changeSet instanceof LoggingChangeSet) && player != null && Fawe.imp().getBlocksHubApi() != null) {
-                    changeSet = LoggingChangeSet.wrap(player, changeSet);
-                }
                 if (this.blockBag != null) {
                     changeSet = new BlockBagChangeSet(changeSet, blockBag, limit.INVENTORY_MODE == 1);
                 }
@@ -416,7 +427,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     public void resetLimit() {
         this.limit.set(this.originalLimit);
-        ExtentTraverser<ProcessedWEExtent> find = new ExtentTraverser(extent).find(ProcessedWEExtent.class);
+        ExtentTraverser<ProcessedWEExtent> find = new ExtentTraverser<>(extent).find(ProcessedWEExtent.class);
         if (find != null && find.get() != null) {
             find.get().setLimit(this.limit);
         }
@@ -455,7 +466,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return FaweRegionExtent (may be null)
      */
     public FaweRegionExtent getRegionExtent() {
-        ExtentTraverser<FaweRegionExtent> traverser = new ExtentTraverser(this.extent).find(FaweRegionExtent.class);
+        ExtentTraverser<FaweRegionExtent> traverser = new ExtentTraverser<>(this.extent).find(FaweRegionExtent.class);
         return traverser == null ? null : traverser.get();
     }
 
@@ -467,6 +478,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return bypassHistory;
     }
 
+    @Override
     public Extent getExtent() {
         return extent;
     }
@@ -533,26 +545,16 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     /**
-     * Send a debug message to the Actor responsible for this EditSession (or Console)
-     *
-     * @param message
-     * @param args
-     */
-    public void debug(BBC message, Object... args) {
-        message.send(player, args);
-    }
-
-    /**
      * Get the FaweQueue this EditSession uses to queue the changes<br>
      * - Note: All implementation queues for FAWE are instances of NMSMappedFaweQueue
      *
      * @return
      */
+    @Override
     public FaweQueue getQueue() {
         return queue;
     }
 
-    @Deprecated
     private AbstractDelegateExtent wrapExtent(Extent extent, EventBus eventBus, EditSessionEvent event, Stage stage) {
         event = event.clone(stage);
         event.setExtent(extent);
@@ -739,7 +741,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return mask, may be null
      */
     public Mask getMask() {
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser(this.extent).find(MaskingExtent.class);
+        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(MaskingExtent.class);
         return maskingExtent != null ? maskingExtent.get().getMask() : null;
     }
 
@@ -749,18 +751,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return mask, may be null
      */
     public Mask getSourceMask() {
-        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser(this.extent).find(SourceMaskExtent.class);
+        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(SourceMaskExtent.class);
         return maskingExtent != null ? maskingExtent.get().getMask() : null;
     }
 
     public void addTransform(ResettableExtent transform) {
         wrapped = true;
         if (transform == null) {
-            ExtentTraverser<AbstractDelegateExtent> traverser = new ExtentTraverser(this.extent).find(ResettableExtent.class);
+            ExtentTraverser traverser = new ExtentTraverser(this.extent).find(ResettableExtent.class);
             AbstractDelegateExtent next = extent;
             while (traverser != null && traverser.get() instanceof ResettableExtent) {
                 traverser = traverser.next();
-                next = traverser.get();
+                next = (AbstractDelegateExtent) traverser.get();
             }
             this.extent = next;
             return;
@@ -770,7 +772,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public @Nullable ResettableExtent getTransform() {
-        ExtentTraverser<AbstractDelegateExtent> traverser = new ExtentTraverser(this.extent).find(ResettableExtent.class);
+        ExtentTraverser traverser = new ExtentTraverser(this.extent).find(ResettableExtent.class);
         if (traverser != null) {
             return (ResettableExtent) traverser.get();
         }
@@ -788,7 +790,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         } else {
             new MaskTraverser(mask).reset(this);
         }
-        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser(this.extent).find(SourceMaskExtent.class);
+        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(SourceMaskExtent.class);
         if (maskingExtent != null && maskingExtent.get() != null) {
             Mask oldMask = maskingExtent.get().getMask();
             if (oldMask instanceof ResettableMask) {
@@ -845,7 +847,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return the survival simulation extent
      */
     public SurvivalModeExtent getSurvivalExtent() {
-        ExtentTraverser<SurvivalModeExtent> survivalExtent = new ExtentTraverser(this.extent).find(SurvivalModeExtent.class);
+        ExtentTraverser<SurvivalModeExtent> survivalExtent = new ExtentTraverser<>(this.extent).find(SurvivalModeExtent.class);
         if (survivalExtent != null) {
             return survivalExtent.get();
         } else {
@@ -878,7 +880,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (history == null) {
             return;
         }
-        ExtentTraverser traverseHistory = new ExtentTraverser(this.extent).find(HistoryExtent.class);
+        ExtentTraverser<HistoryExtent> traverseHistory = new ExtentTraverser<>(this.extent).find(HistoryExtent.class);
         if (disableHistory) {
             if (traverseHistory != null && traverseHistory.exists()) {
                 ExtentTraverser beforeHistory = traverseHistory.previous();
@@ -890,7 +892,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 }
             }
         } else if (traverseHistory == null || !traverseHistory.exists()) {
-            ExtentTraverser traverseBypass = new ExtentTraverser(this.extent).find(bypassHistory);
+            ExtentTraverser traverseBypass = new ExtentTraverser<>(this.extent).find(bypassHistory);
             if (traverseBypass != null) {
                 ExtentTraverser beforeHistory = traverseBypass.previous();
                 beforeHistory.setNext(history);
@@ -939,19 +941,19 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      *
      * @return a map of missing blocks
      */
-    public Map<com.sk89q.worldedit.world.block.BlockType, Integer> popMissingBlocks() {
+    public Map<BlockType, Integer> popMissingBlocks() {
         BlockBag bag = getBlockBag();
         if (bag != null) {
             bag.flushChanges();
 
-            Map<com.sk89q.worldedit.world.block.BlockType, Integer> missingBlocks;
+            Map<BlockType, Integer> missingBlocks;
             ChangeSet changeSet = getChangeSet();
 
 
             if (changeSet instanceof BlockBagChangeSet) {
                 missingBlocks = ((BlockBagChangeSet) changeSet).popMissing();
             } else {
-                ExtentTraverser<BlockBagExtent> find = new ExtentTraverser(extent).find(BlockBagExtent.class);
+                ExtentTraverser<BlockBagExtent> find = new ExtentTraverser<>(extent).find(BlockBagExtent.class);
                 if (find != null && find.get() != null) {
                     missingBlocks = find.get().popMissing();
                 } else {
@@ -1065,6 +1067,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
+    @Override
     public BlockState getLazyBlock(int x, int y, int z) {
         return extent.getLazyBlock(x, y, z);
     }
@@ -1084,18 +1087,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     /**
-     * Get a block type at the given position.
-     *
-     * @param position the position
-     * @return the block type
-     * @deprecated Use {@link #getLazyBlock(BlockVector3)} or {@link #getBlock(BlockVector3)}
-     */
-    @Deprecated
-    public BlockType getBlockType(final BlockVector3 position) {
-        return getBlockType(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-    }
-
-    /**
      * Returns the highest solid 'terrain' block.
      *
      * @param x the X coordinate
@@ -1104,6 +1095,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param maxY maximal height
      * @return height of highest block found or 'minY'
      */
+    @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
         for (int y = maxY; y >= minY; --y) {
             if (getBlock(x, y, z).getBlockType().getMaterial().isMovementBlocker()) {
@@ -1123,6 +1115,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param filter a mask of blocks to consider, or null to consider any solid (movement-blocking) block
      * @return height of highest block found or 'minY'
      */
+    @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
         for (int y = maxY; y >= minY; --y) {
             if (filter.test(mutablebv.setComponents(x, y, z))) {
@@ -1209,6 +1202,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
 
+    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         this.changes++;
         try {
@@ -1301,7 +1295,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     @Override
     @Nullable
-    public Entity createEntity(com.sk89q.worldedit.util.Location location, final BaseEntity entity) {
+    public Entity createEntity(Location location, final BaseEntity entity) {
         return this.extent.createEntity(location, entity);
     }
 
@@ -1472,12 +1466,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
         if (searchIDs.size() == 1) {
             final BlockType id = searchIDs.iterator().next();
-            RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-                @Override
-                public boolean apply(BlockVector3 position) throws WorldEditException {
-                    return getBlockType(position) == id;
-                }
-            }, this);
+            RegionVisitor visitor = new RegionVisitor(region, position -> getBlock(position).getBlockType() == id, this);
             Operations.completeBlindly(visitor);
             return visitor.getAffected();
         }
@@ -1489,23 +1478,14 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public int countBlock(final Region region, final boolean[] ids) {
-        RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 position) throws WorldEditException {
-                return ids[getBlockType(position).getInternalId()];
-            }
-        }, this);
+        RegionVisitor visitor = new RegionVisitor(region,
+            position -> ids[getBlock(position).getInternalId()], this);
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
 
     public int countBlock(final Region region, final Mask mask) {
-        RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 position) throws WorldEditException {
-                return mask.test(position);
-            }
-        }, this);
+        RegionVisitor visitor = new RegionVisitor(region, mask::test, this);
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
@@ -1519,12 +1499,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
         Mask mask = new BlockMaskBuilder().addBlocks(searchBlocks).build(extent);
-        RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 position) throws WorldEditException {
-                return mask.test(position);
-            }
-        }, this);
+        RegionVisitor visitor = new RegionVisitor(region, mask::test, this);
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
@@ -1534,30 +1509,27 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final int startPerformY = region.getMinimumPoint().getBlockY();
         final int startCheckY = fullHeight ? 0 : startPerformY;
         final int endY = region.getMaximumPoint().getBlockY();
-        RegionVisitor visitor = new RegionVisitor(flat, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 pos) throws WorldEditException {
-                int x = pos.getBlockX();
-                int z = pos.getBlockZ();
-                int freeSpot = startCheckY;
-                for (int y = startCheckY; y <= endY; y++) {
-                    if (y < startPerformY) {
-                        if (!getBlockType(x, y, z).getMaterial().isAir()) {
-                            freeSpot = y + 1;
-                        }
-                        continue;
+        RegionVisitor visitor = new RegionVisitor(flat, pos -> {
+            int x = pos.getBlockX();
+            int z = pos.getBlockZ();
+            int freeSpot = startCheckY;
+            for (int y = startCheckY; y <= endY; y++) {
+                if (y < startPerformY) {
+                    if (!getBlockType(x, y, z).getMaterial().isAir()) {
+                        freeSpot = y + 1;
                     }
-                    BlockType block = getBlockType(x, y, z);
-                    if (!block.getMaterial().isAir()) {
-                        if (freeSpot != y) {
-                            setBlock(x, freeSpot, z, block);
-                            setBlock(x, y, z, replace);
-                        }
-                        freeSpot++;
-                    }
+                    continue;
                 }
-                return true;
+                BlockType block = getBlockType(x, y, z);
+                if (!block.getMaterial().isAir()) {
+                    if (freeSpot != y) {
+                        setBlock(x, freeSpot, z, block);
+                        setBlock(x, y, z, replace);
+                    }
+                    freeSpot++;
+                }
             }
+            return true;
         }, this);
         Operations.completeBlindly(visitor);
         return this.changes;
@@ -1574,7 +1546,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int fillDirection(final BlockVector3 origin, final Pattern pattern, final double radius, final int depth, BlockVector3 direction) {
+    public int fillDirection(final BlockVector3 origin, final Pattern pattern, final double radius, final int depth, BlockVector3 direction) throws MaxChangedBlocksException {
         checkNotNull(origin);
         checkNotNull(pattern);
         checkArgument(radius >= 0, "radius >= 0");
@@ -1727,12 +1699,11 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         FaweRegionExtent regionExtent = getRegionExtent();
         if (!(region instanceof CuboidRegion)) return false;
         if (regionExtent != null) {
-            if (!(region instanceof CuboidRegion)) return false;
             BlockVector3 pos1 = region.getMinimumPoint();
             BlockVector3 pos2 = region.getMaximumPoint();
             boolean contains = false;
             for (Region current : regionExtent.getRegions()) {
-                if (current.contains((int) pos1.getX(), pos1.getBlockY(), pos1.getBlockZ()) && current.contains(pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ())) {
+                if (current.contains(pos1.getX(), pos1.getBlockY(), pos1.getBlockZ()) && current.contains(pos2.getBlockX(), pos2.getBlockY(), pos2.getBlockZ())) {
                     contains = true;
                     break;
                 }
@@ -1745,8 +1716,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             return false;
         if (getChangeTask() != getChangeSet()) return false;
         if (!Masks.isNull(getMask()) || !Masks.isNull(getSourceMask())) return false;
-        if (getBlockBag() != null) return false;
-        return true;
+        return getBlockBag() == null;
     }
 
     public boolean hasExtraExtents() {
@@ -1772,7 +1742,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 getWorld(), // Causes clamping of Y range
                 position.add(adjustment.multiply(-1)),
                 position.add(adjustment));
-        Pattern pattern = (BlockTypes.AIR.getDefaultState());
+        Pattern pattern = BlockTypes.AIR.getDefaultState();
         return replaceBlocks(region, mask, pattern);
     }
 
@@ -1787,7 +1757,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(block);
-        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
 
         if (canBypassAll(region, false, true) && !hasNbt) {
             return changes = queue.setBlocks((CuboidRegion) region, block.getInternalId());
@@ -1845,7 +1815,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
-        return replaceBlocks(region, filter, (replacement));
+        return replaceBlocks(region, filter, replacement);
     }
 
     /**
@@ -1917,7 +1887,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int makeCuboidFaces(Region region, B block) throws MaxChangedBlocksException {
-        return makeCuboidFaces(region, (block));
+        return makeCuboidFaces(region, block);
     }
 
     /**
@@ -1969,7 +1939,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int makeCuboidWalls(Region region, B block) throws MaxChangedBlocksException {
-        return makeCuboidWalls(region, (block));
+        return makeCuboidWalls(region, block);
     }
 
     /**
@@ -2094,7 +2064,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         BlockVector3 to = region.getMinimumPoint();
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
         copy.setCopyingEntities(copyEntities);
-        copy.setCopyBiomes(copyBiomes);
+        copy.setCopyingBiomes(copyBiomes);
         copy.setRepetitions(count);
         copy.setTransform(new AffineTransform().translate(dir.multiply(size)));
         Mask sourceMask = getSourceMask();
@@ -2140,8 +2110,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
 
         if (replacement == null) replacement = BlockTypes.AIR.getDefaultState();
-        final BlockReplace remove = replacement instanceof ExistingPattern ? null : new BlockReplace(this, replacement);
-        copy.setCopyBiomes(copyBiomes);
+        BlockReplace remove = replacement instanceof ExistingPattern ? null : new BlockReplace(this, replacement);
+        copy.setCopyingBiomes(copyBiomes);
         copy.setCopyingEntities(copyEntities);
         copy.setSourceFunction(remove); // Remove
         copy.setRemovingEntities(true);
@@ -2170,7 +2140,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int moveCuboidRegion(Region region, BlockVector3 dir, int distance, boolean copyAir, Pattern replacement) {
+    public int moveCuboidRegion(Region region, BlockVector3 dir, int distance, boolean copyAir, Pattern replacement) throws MaxChangedBlocksException {
         return moveRegion(region, dir, distance, copyAir, true, false, replacement);
     }
 
@@ -2214,7 +2184,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (waterlogged) {
             replace = new BlockReplace(this, new WaterloggedRemover(this));
         } else {
-            replace = new BlockReplace(this, (BlockTypes.AIR.getDefaultState()));
+            replace = new BlockReplace(this, BlockTypes.AIR.getDefaultState());
         }
         RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
 
@@ -2256,7 +2226,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 blockMask
         );
 
-        BlockReplace replace = new BlockReplace(this, (fluid.getDefaultState()));
+        BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
 
         // Around the origin in a 3x3 block
@@ -2298,15 +2268,15 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks changed
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int makeCylinder(BlockVector3 pos, Pattern block, double radiusX, double radiusZ, int height, boolean filled) throws MaxChangedBlocksException{
+    public int makeCylinder(BlockVector3 pos, Pattern block, double radiusX, double radiusZ, int height, boolean filled) throws MaxChangedBlocksException {
         return makeCylinder(pos, block, radiusX, radiusZ, height, 0, filled);
     }
 
-    public int makeHollowCylinder(BlockVector3 pos, final Pattern block, double radiusX, double radiusZ, int height, double thickness) {
+    public int makeHollowCylinder(BlockVector3 pos, final Pattern block, double radiusX, double radiusZ, int height, double thickness) throws MaxChangedBlocksException {
         return makeCylinder(pos, block, radiusX, radiusZ, height, thickness, false);
     }
 
-    private int makeCylinder(BlockVector3 pos, final Pattern block, double radiusX, double radiusZ, int height, double thickness, final boolean filled) {
+    private int makeCylinder(BlockVector3 pos, Pattern block, double radiusX, double radiusZ, int height, double thickness, boolean filled) throws MaxChangedBlocksException {
         int affected = 0;
 
         radiusX += 0.5;
@@ -2322,12 +2292,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
         if (posv.getBlockY() < 0) {
             posv.mutY(0);
-        } else if (((posv.getBlockY() + height) - 1) > maxY) {
-            height = (maxY - posv.getBlockY()) + 1;
+        } else if (posv.getBlockY() + height - 1 > maxY) {
+            height = maxY - posv.getBlockY() + 1;
         }
 
-        final double invRadiusX = 1 / (radiusX);
-        final double invRadiusZ = 1 / (radiusZ);
+        final double invRadiusX = 1 / radiusX;
+        final double invRadiusZ = 1 / radiusZ;
 
         int px = posv.getBlockX();
         int py = posv.getBlockY();
@@ -2336,7 +2306,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
-        double dx, dxz, dz;
+        double distanceSq;
         double nextXn = 0;
 
         if (thickness != 0) {
@@ -2350,15 +2320,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 nextMinXn = (x + 1) * minInvRadiusX;
                 double nextZn = 0;
                 double nextMinZn = 0;
-                dx = xn * xn;
                 forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                     final double zn = nextZn;
                     double dz2 = nextMinZn * nextMinZn;
                     nextZn = (z + 1) * invRadiusZ;
                     nextMinZn = (z + 1) * minInvRadiusZ;
-                    dz = zn * zn;
-                    dxz = dx + dz;
-                    if (dxz > 1) {
+                    distanceSq = lengthSq(xn, zn);
+                    if (distanceSq > 1) {
                         if (z == 0) {
                             break forX;
                         }
@@ -2381,14 +2349,14 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             forX: for (int x = 0; x <= ceilRadiusX; ++x) {
                 final double xn = nextXn;
                 nextXn = (x + 1) * invRadiusX;
+                double dx = xn * xn;
                 double nextZn = 0;
-                dx = xn * xn;
                 forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                     final double zn = nextZn;
                     nextZn = (z + 1) * invRadiusZ;
-                    dz = zn * zn;
-                    dxz = dx + dz;
-                    if (dxz > 1) {
+                    double dz = zn * zn;
+                    distanceSq = lengthSq(xn,zn);
+                    if (distanceSq > 1) {
                         if (z == 0) {
                             break forX;
                         }
@@ -2414,7 +2382,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return this.changes;
     }
 
-    public int makeCircle(BlockVector3 pos, final Pattern block, double radiusX, double radiusY, double radiusZ, boolean filled, Vector3 normal) {
+    public int makeCircle(BlockVector3 pos, final Pattern block, double radiusX, double radiusY, double radiusZ, boolean filled, Vector3 normal) throws MaxChangedBlocksException {
         radiusX += 0.5;
         radiusY += 0.5;
         radiusZ += 0.5;
@@ -2549,20 +2517,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         double nextXn = invRadiusX;
         forX: for (int x = 0; x <= ceilRadiusX; ++x) {
             final double xn = nextXn;
-            double dx = xn * xn;
             nextXn = (x + 1) * invRadiusX;
             double nextZn = invRadiusZ;
+            double dx = xn * xn;
             forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                 final double zn = nextZn;
                 double dz = zn * zn;
-                double dxz = dx + dz;
                 nextZn = (z + 1) * invRadiusZ;
                 double nextYn = invRadiusY;
 
                 forY: for (int y = 0; y <= ceilRadiusY; ++y) {
                     final double yn = nextYn;
-                    double dy = yn * yn;
-                    double dxyz = dxz + dy;
+                    double dxyz = lengthSq(zn, yn, zn);
                     nextYn = (y + 1) * invRadiusY;
 
                     if (dxyz > 1) {
@@ -2576,7 +2542,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     if (!filled) {
-                        if (nextXn * nextXn + dy + dz <= 1 && nextYn * nextYn + dx + dz <= 1 && nextZn * nextZn + dx + dy <= 1) {
+                        double dy = yn * yn;
+                        if (lengthSq(nextXn, yn, zn) <= 1 && lengthSq(xn, nextYn, zn) <= 1 && lengthSq(xn, yn, nextZn) <= 1) {
                             continue;
                         }
                     }
@@ -2763,11 +2730,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int green(BlockVector3 position, double radius, final boolean onlyNormalDirt)
+    public int green(BlockVector3 position, double radius, boolean onlyNormalDirt)
             throws MaxChangedBlocksException {
+        int affected = 0;
         final double radiusSq = radius * radius;
 
         final int ox = position.getBlockX();
+        final int oy = position.getBlockY();
         final int oz = position.getBlockZ();
 
         final BlockState grass = BlockTypes.GRASS_BLOCK.getDefaultState();
@@ -2776,27 +2745,25 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         for (int x = ox - ceilRadius; x <= ox + ceilRadius; ++x) {
             int dx = x - ox;
             int dx2 = dx * dx;
-            for (int z = oz - ceilRadius; z <= (oz + ceilRadius); ++z) {
+            for (int z = oz - ceilRadius; z <= oz + ceilRadius; ++z) {
                 int dz = z - oz;
                 int dz2 = dz * dz;
                 if (dx2 + dz2 > radiusSq) {
                     continue;
                 }
-                loop:
+
                 for (int y = maxY; y >= 1; --y) {
-                    BlockType block = getBlockType(x, y, z);
-                    switch (block.getInternalId()) {
-                        case BlockID.COARSE_DIRT:
-                            if (onlyNormalDirt) break loop;
-                        case BlockID.DIRT:
-                            this.setBlock(x, y, z, BlockTypes.GRASS_BLOCK.getDefaultState());
-                            break loop;
-                        case BlockID.WATER:
-                        case BlockID.LAVA:
-                        default:
-                            if (block.getMaterial().isMovementBlocker()) {
-                                break loop;
-                            }
+                    final BlockState block = getBlock(x, y, z);
+
+                    if (block.getBlockType() == BlockTypes.DIRT ||
+                            (!onlyNormalDirt && block.getBlockType() == BlockTypes.COARSE_DIRT)) {
+                        this.setBlock(x, y, z, grass);
+
+                        break;
+                    } else if (block.getBlockType() == BlockTypes.WATER || block.getBlockType() == BlockTypes.LAVA) {
+                        break;
+                    } else if (block.getBlockType().getMaterial().isMovementBlocker()) {
+                        break;
                     }
                 }
             }
@@ -2813,11 +2780,11 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return number of patches created
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int makePumpkinPatches(final BlockVector3 position, final int apothem) {
+    public int makePumpkinPatches(BlockVector3 position, int apothem) throws MaxChangedBlocksException {
         return makePumpkinPatches(position, apothem, 0.02);
     }
 
-    public int makePumpkinPatches(final BlockVector3 position, final int apothem, double density) {
+    public int makePumpkinPatches(BlockVector3 position, int apothem, double density) throws MaxChangedBlocksException {
         // We want to generate pumpkins
         GardenPatchGenerator generator = new GardenPatchGenerator(this);
         generator.setPlant(GardenPatchGenerator.getPumpkinPattern());
@@ -2846,7 +2813,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int makeForest(BlockVector3 basePosition, int size, double density, TreeGenerator.TreeType treeType) throws MaxChangedBlocksException {
-        try {
             for (int x = basePosition.getBlockX() - size; x <= (basePosition.getBlockX() + size); ++x) {
                 for (int z = basePosition.getBlockZ() - size; z <= (basePosition.getBlockZ() + size); ++z) {
                     // Don't want to be in the ground
@@ -2873,7 +2839,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
                 }
             }
-        } catch (MaxChangedBlocksException ignore) {}
         return this.changes;
     }
 
@@ -2928,7 +2893,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             }
         } else {
             for (final BlockVector3 pt : region) {
-                BlockType type = getBlockType(pt);
+                BlockType type = getBlock(pt).getBlockType();
                 counter[type.getInternalId()]++;
             }
         }
@@ -3100,6 +3065,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final RValue x = expression.getVariable("x", false).optimize();
         final RValue y = expression.getVariable("y", false).optimize();
         final RValue z = expression.getVariable("z", false).optimize();
+
         final WorldEditExpressionEnvironment environment = new WorldEditExpressionEnvironment(this, unit, zero);
         expression.setEnvironment(environment);
         final Vector3 zero2 = zero.add(0.5, 0.5, 0.5);
@@ -3142,7 +3108,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public int hollowOutRegion(Region region, int thickness, Pattern pattern) throws MaxChangedBlocksException {
-    	try {
         final Set<BlockVector3> outside = new LocalBlockVectorSet();
 
         final BlockVector3 min = region.getMinimumPoint();
@@ -3201,12 +3166,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
                 }
                 this.changes++;
+            try {
                 pattern.apply(this.extent, position, position);
+            } catch (WorldEditException e) {
+                e.printStackTrace();
             }
-        } catch (WorldEditException e) {
-            throw new RuntimeException(e);
         }
-
         return changes;
     }
 
@@ -3276,12 +3241,12 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
         Set<BlockVector3> newVset;
         if (flat) {
-            newVset = this.getStretched(vset, radius);
+            newVset = getStretched(vset, radius);
             if (!filled) {
                 newVset = this.getOutline(newVset);
             }
         } else {
-            newVset = this.getBallooned(vset, radius);
+            newVset = getBallooned(vset, radius);
             if (!filled) {
                 newVset = this.getHollowed(newVset);
             }
@@ -3324,16 +3289,20 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         interpol.setNodes(nodes);
         double splinelength = interpol.arcLength(0, 1);
         for (double loop = 0; loop <= 1; loop += 1D / splinelength / quality) {
-            final BlockVector3 tipv = interpol.getPosition(loop).toBlockPoint();
+            BlockVector3 tipv = interpol.getPosition(loop).toBlockPoint();
             if (radius == 0) {
-                pattern.apply(this, tipv, tipv);
+                try {
+                    pattern.apply(this, tipv, tipv);
+                } catch (WorldEditException e) {
+                    e.printStackTrace();
+                }
             } else {
                 vset.add(tipv);
             }
         }
         Set<BlockVector3> newVset;
         if (radius != 0) {
-            newVset = this.getBallooned(vset, radius);
+            newVset = getBallooned(vset, radius);
             if (!filled) {
                 newVset = this.getHollowed(newVset);
             }
@@ -3342,7 +3311,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return changes;
     }
 
-    private Set<BlockVector3> getBallooned(Set<BlockVector3> vset, double radius) {
+    private static Set<BlockVector3> getBallooned(Set<BlockVector3> vset, double radius) {
         if (radius < 1) {
             return vset;
         }
@@ -3352,9 +3321,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         for (BlockVector3 v : vset) {
             int tipx = v.getBlockX(), tipy = v.getBlockY(), tipz = v.getBlockZ();
 
-            for (int loopx = tipx - ceilrad; loopx <= (tipx + ceilrad); loopx++) {
-                for (int loopy = tipy - ceilrad; loopy <= (tipy + ceilrad); loopy++) {
-                    for (int loopz = tipz - ceilrad; loopz <= (tipz + ceilrad); loopz++) {
+            for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
+                for (int loopy = tipy - ceilrad; loopy <= tipy + ceilrad; loopy++) {
+                    for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
                         if (MathMan.hypot(loopx - tipx, loopy - tipy, loopz - tipz) <= radius) {
                             returnset.add(loopx, loopy, loopz);
                         }
@@ -3365,7 +3334,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return returnset;
     }
 
-    public Set<BlockVector3> getStretched(final Set<BlockVector3> vset, final double radius) {
+    public static Set<BlockVector3> getStretched(Set<BlockVector3> vset, double radius) {
         if (radius < 1) {
             return vset;
         }
@@ -3373,8 +3342,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final int ceilrad = (int) Math.ceil(radius);
         for (final BlockVector3 v : vset) {
             final int tipx = v.getBlockX(), tipy = v.getBlockY(), tipz = v.getBlockZ();
-            for (int loopx = tipx - ceilrad; loopx <= (tipx + ceilrad); loopx++) {
-                for (int loopz = tipz - ceilrad; loopz <= (tipz + ceilrad); loopz++) {
+            for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
+                for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
                     if (MathMan.hypot(loopx - tipx, 0, loopz - tipz) <= radius) {
                         returnset.add(loopx, v.getBlockY(), loopz);
                     }
@@ -3384,7 +3353,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return returnset;
     }
 
-    public Set<BlockVector3> getOutline(final Set<BlockVector3> vset) {
+    public Set<BlockVector3> getOutline(Set<BlockVector3> vset) {
         final LocalBlockVectorSet returnset = new LocalBlockVectorSet();
         final LocalBlockVectorSet newset = new LocalBlockVectorSet();
         newset.addAll(vset);
@@ -3400,7 +3369,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return returnset;
     }
 
-    public Set<BlockVector3> getHollowed(final Set<BlockVector3> vset) {
+    public Set<BlockVector3> getHollowed(Set<BlockVector3> vset) {
         final Set<BlockVector3> returnset = new LocalBlockVectorSet();
         final LocalBlockVectorSet newset = new LocalBlockVectorSet();
         newset.addAll(vset);
@@ -3421,6 +3390,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     private void recurseHollow(Region region, BlockVector3 origin, Set<BlockVector3> outside) {
         final LocalBlockVectorSet queue = new LocalBlockVectorSet();
         queue.add(origin);
+
         while (!queue.isEmpty()) {
         	final BlockVector3 current = queue.getIndex(0);
         	queue.remove(current);
@@ -3516,6 +3486,10 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     @Override
     public String getName() {
         return worldName;
+    }
+
+    @Override public @org.jetbrains.annotations.Nullable Path getStoragePath() {
+        return null;
     }
 
     @Override
@@ -3665,12 +3639,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
         return false;
     }
-
-//    public void dropItem(BlockVector3 position, BaseItemStack item) {
-//        if (getWorld() != null) {
-//            getWorld().dropItem(position, item);
-//        }
-//    }
 
     @Override
     public void simulateBlockMine(BlockVector3 position) {

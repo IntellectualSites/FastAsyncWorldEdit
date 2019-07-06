@@ -3,8 +3,9 @@ package com.boydti.fawe.util.chat;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
-import com.sk89q.worldedit.WorldEdit;
+
 import com.sk89q.worldedit.extension.platform.Actor;
+
 import java.util.Objects;
 
 public class Message {
@@ -75,7 +76,7 @@ public class Message {
     }
 
     public Message command(String command) {
-        Fawe.get().getChatManager().command(this, (WorldEdit.getInstance().getConfiguration().noDoubleSlash ? "" : "/") + command);
+        Fawe.get().getChatManager().command(this, ("/") + command);
         return this;
     }
 

@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extension.factory.parser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -33,11 +34,17 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Locale;
+import java.util.stream.Stream;
 
 public class DefaultItemParser extends InputParser<BaseItem> {
 
     public DefaultItemParser(WorldEdit worldEdit) {
         super(worldEdit);
+    }
+
+    @Override
+    public Stream<String> getSuggestions(String input) {
+        return SuggestionHelper.getNamespacedRegistrySuggestions(ItemType.REGISTRY, input);
     }
 
     @Override
@@ -62,6 +69,12 @@ public class DefaultItemParser extends InputParser<BaseItem> {
             }
         }
 
+        if ("hand".equalsIgnoreCase(input)) {
+            return getItemInHand(context.requireActor(), HandSide.MAIN_HAND);
+        } else if ("offhand".equalsIgnoreCase(input)) {
+            return getItemInHand(context.requireActor(), HandSide.OFF_HAND);
+        }
+
         if (item == null) {
             ItemType type = ItemTypes.get(input.toLowerCase(Locale.ROOT));
             if (type != null) {
@@ -83,4 +96,5 @@ public class DefaultItemParser extends InputParser<BaseItem> {
             throw new InputParseException("The user is not a player!");
         }
     }
+
 }

@@ -4,21 +4,27 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
-import com.boydti.fawe.object.*;
+import com.boydti.fawe.object.FaweLimit;
+import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.NullChangeSet;
+import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
-import java.util.UUID;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.UUID;
 
 public class EditSessionBuilder {
     private World world;
@@ -102,8 +108,8 @@ public class EditSessionBuilder {
     }
 
     /**
-     * @param disk        If it should be stored on disk
-     * @param uuid        The uuid to store it under (if on disk)
+     * @param disk If it should be stored on disk
+     * @param uuid The uuid to store it under (if on disk)
      * @param compression Compression level (0-9)
      * @return
      */
@@ -180,17 +186,15 @@ public class EditSessionBuilder {
         return this;
     }
 
-    public EditSessionBuilder eventBus(@Nullable EventBus eventBus) {
-        this.eventBus = eventBus;
-        return this;
-    }
-
     public EditSessionBuilder event(@Nullable EditSessionEvent event) {
         this.event = event;
         return this;
     }
 
     public EditSession build() {
-            return new EditSession(worldName, world, queue, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, eventBus, event);
+        if (eventBus == null) {
+            eventBus = WorldEdit.getInstance().getEventBus();
+        }
+        return new EditSession(worldName, world, queue, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, eventBus, event);
     }
 }

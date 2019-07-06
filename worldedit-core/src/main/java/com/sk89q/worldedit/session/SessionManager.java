@@ -27,6 +27,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.tool.InvalidToolBindException;
+import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
 import com.sk89q.worldedit.session.request.Request;
@@ -36,6 +38,8 @@ import com.sk89q.worldedit.session.storage.VoidStore;
 import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.gamemode.GameModes;
+import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +67,8 @@ public class SessionManager {
     private static final int FLUSH_PERIOD = 1000 * 60;
     private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5));
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
+    private static boolean warnedInvalidTool;
+
     private final Timer timer = new Timer();
     private final WorldEdit worldEdit;
     private final Map<UUID, SessionHolder> sessions = new HashMap<>();
@@ -187,6 +193,19 @@ public class SessionManager {
         return false;
     }
 
+    private void setDefaultWand(String sessionItem, String configItem, LocalSession session, Tool wand) throws InvalidToolBindException {
+        ItemType wandItem = null;
+        if (sessionItem != null) {
+            wandItem = ItemTypes.get(sessionItem);
+        }
+        if (wandItem == null) {
+            wandItem = ItemTypes.get(configItem);
+        }
+        if (wandItem != null) {
+            session.setTool(wandItem, wand);
+        }
+    }
+
     /**
      * Save a map of sessions to disk.
      *
@@ -242,7 +261,7 @@ public class SessionManager {
      * @return the key object
      */
     protected UUID getKey(SessionKey key) {
-            return key.getUniqueId();
+        return key.getUniqueId();
     }
 
     /**

@@ -23,14 +23,16 @@ package com.sk89q.worldedit.world.snapshot;
 
 import com.sk89q.worldedit.world.storage.MissingWorldException;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.Nullable;
+import java.util.Locale;
 
 /**
  * A repository contains zero or more snapshots.
@@ -115,12 +117,12 @@ public class SnapshotRepository {
      * @return a snapshot or null
      */
     @Nullable
-    public Snapshot getSnapshotAfter(Calendar date, String world) throws MissingWorldException {
+    public Snapshot getSnapshotAfter(ZonedDateTime date, String world) throws MissingWorldException {
         List<Snapshot> snapshots = getSnapshots(true, world);
         Snapshot last = null;
 
         for (Snapshot snapshot : snapshots) {
-            if (snapshot.getDate() != null && snapshot.getDate().before(date)) {
+            if (snapshot.getDate() != null && snapshot.getDate().compareTo(date) < 0) {
                 return last;
             }
 
@@ -137,12 +139,12 @@ public class SnapshotRepository {
      * @return a snapshot or null
      */
     @Nullable
-    public Snapshot getSnapshotBefore(Calendar date, String world) throws MissingWorldException {
+    public Snapshot getSnapshotBefore(ZonedDateTime date, String world) throws MissingWorldException {
         List<Snapshot> snapshots = getSnapshots(false, world);
         Snapshot last = null;
 
         for (Snapshot snapshot : snapshots) {
-            if (snapshot.getDate().after(date)) {
+            if (snapshot.getDate().compareTo(date) > 0) {
                 return last;
             }
 
@@ -161,7 +163,7 @@ public class SnapshotRepository {
         for (SnapshotDateParser parser : dateParsers) {
             Calendar date = parser.detectDate(snapshot.getFile());
             if (date != null) {
-                snapshot.setDate(date);
+                snapshot.setDate(date.toInstant().atZone(ZoneOffset.UTC));
                 return;
             }
         }
@@ -207,11 +209,17 @@ public class SnapshotRepository {
             return false;
         }
 
-        return (file.isDirectory() && (new File(file, "level.dat")).exists())
-                || (file.isFile() && (file.getName().toLowerCase().endsWith(".zip")
-                || file.getName().toLowerCase().endsWith(".tar.bz2")
-                || file.getName().toLowerCase().endsWith(".tar.gz")
-                || file.getName().toLowerCase().endsWith(".tar")));
+        if (file.isDirectory() && new File(file, "level.dat").exists()) {
+            return true;
+        }
+        if (file.isFile()) {
+            String lowerCaseFileName = file.getName().toLowerCase(Locale.ROOT);
+            return lowerCaseFileName.endsWith(".zip")
+                || lowerCaseFileName.endsWith(".tar.bz2")
+                || lowerCaseFileName.endsWith(".tar.gz")
+                || lowerCaseFileName.endsWith(".tar");
+        }
+        return false;
     }
 
     /**

@@ -25,7 +25,7 @@ import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -152,7 +152,7 @@ public class FaweAPI {
      * @param aliases The aliases to give the command (or none)
      */
     public static void registerCommands(Object clazz, String... aliases) {
-        CommandManager.getInstance().registerCommands(clazz, aliases);
+        PlatformCommandManager.getInstance().registerCommands(clazz, aliases);
     }
 
     /**

@@ -37,8 +37,6 @@ dependencies {
     compile 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
     compile 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
     compile 'com.wasteofplastic:askyblock:3.0.8.2'
-    compileOnly 'com.sk89q.worldguard:worldguard-core:7.0.0-20190215.210421-39'
-    compileOnly 'com.sk89q.worldguard:worldguard-legacy:7.0.0-20190215.210421-39'
 }
 
 processResources {
@@ -49,6 +47,10 @@ processResources {
         )
         include 'plugin.yml'
     }
+//    from (zipTree('src/main/resources/worldedit-adapters.jar').matching {
+//        exclude 'META-INF/'
+//    })
+//    exclude '**/worldedit-adapters.jar'
 }
 
 jar.archiveName="fawe-bukkit-${project.parent.version}.jar"

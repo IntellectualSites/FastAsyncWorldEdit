@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -38,6 +39,14 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
+import java.lang.ref.WeakReference;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
 import org.bukkit.Effect;
 import org.bukkit.TreeType;
 import org.bukkit.World;
@@ -47,15 +56,8 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.slf4j.Logger;
-
-import javax.annotation.Nullable;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class BukkitWorld extends AbstractWorld {
 
@@ -155,6 +157,11 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
+    public Path getStoragePath() {
+        return getWorld().getWorldFolder().toPath();
+    }
+
+    @Override
     public int getBlockLightLevel(BlockVector3 pt) {
         return getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).getLightLevel();
     }
@@ -239,11 +246,11 @@ public class BukkitWorld extends AbstractWorld {
             return false;
         }
         BlockState state = block.getState();
-        if (!(state instanceof org.bukkit.inventory.InventoryHolder)) {
+        if (!(state instanceof InventoryHolder)) {
             return false;
         }
 
-        org.bukkit.inventory.InventoryHolder chest = (org.bukkit.inventory.InventoryHolder) state;
+        InventoryHolder chest = (InventoryHolder) state;
         Inventory inven = chest.getInventory();
         if (chest instanceof Chest) {
             inven = getBlockInventory((Chest) chest);
@@ -311,10 +318,13 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        if (worldRef.get() == null) {
+            return false;
+        } else if (other == null) {
             return false;
         } else if ((other instanceof BukkitWorld)) {
-            return ((BukkitWorld) other).getWorld().equals(getWorld());
+            World otherWorld = ((BukkitWorld) other).worldRef.get();
+            return otherWorld != null && otherWorld.equals(getWorld());
         } else if (other instanceof com.sk89q.worldedit.world.World) {
             return ((com.sk89q.worldedit.world.World) other).getName().equals(getName());
         } else {

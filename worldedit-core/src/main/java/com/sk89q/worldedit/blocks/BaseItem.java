@@ -19,15 +19,12 @@
 
 package com.sk89q.worldedit.blocks;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.item.ItemType;
-import com.sk89q.worldedit.world.item.ItemTypes;
 
 import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents an item, without an amount value. See {@link BaseItemStack}

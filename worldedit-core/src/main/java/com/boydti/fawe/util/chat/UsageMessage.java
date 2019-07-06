@@ -6,7 +6,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.minecraft.util.commands.Link;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.CommandMapping;
 import com.sk89q.worldedit.util.command.Description;
@@ -57,7 +57,7 @@ public class UsageMessage extends Message {
         String prefix = !commandString.isEmpty() ? commandString + " " : "";
 
         List<CommandMapping> list = new ArrayList<>(dispatcher.getCommands());
-        list.sort(new PrimaryAliasComparator(CommandManager.COMMAND_CLEAN_PATTERN));
+        list.sort(new PrimaryAliasComparator(PlatformCommandManager.COMMAND_CLEAN_PATTERN));
 
         for (CommandMapping mapping : list) {
             boolean perm = locals == null || mapping.getCallable().testPermission(locals);

@@ -11,30 +11,27 @@ import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.minecraft.util.commands.Command;
+
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -163,16 +160,14 @@ public class BrushOptionsCommands extends MethodCommands {
             max = 0
     )
     public void none(Player player, LocalSession session, CommandContext args) throws WorldEditException {
-        session.setTool(null, player);
+        session.setTool(player, null);
         BBC.TOOL_NONE.send(player);
     }
 
     @Command(
             aliases = {"/", ","},
             usage = "[on|off]",
-            desc = "Toggle the super pickaxe function",
-            min = 0,
-            max = 1
+            desc = "Toggle the super pickaxe function"
     )
     @CommandPermissions("worldedit.superpickaxe")
     public void togglePickaxe(Player player, LocalSession session, CommandContext args) throws WorldEditException {
@@ -210,8 +205,8 @@ public class BrushOptionsCommands extends MethodCommands {
         session.setTool(item, null, player);
         String cmd = "brush " + args.getJoinedStrings(0);
         CommandEvent event = new CommandEvent(player, cmd);
-        CommandManager.getInstance().handleCommandOnCurrentThread(event);
-        BrushTool newTool = session.getBrushTool(item, player, false);
+        PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
+        BrushTool newTool = session.getBrushTool(item.getType(), player, false);
         if (newTool != null && tool != null) {
             newTool.setSecondary(tool.getSecondary());
         }
@@ -231,8 +226,8 @@ public class BrushOptionsCommands extends MethodCommands {
         session.setTool(item, null, player);
         String cmd = "brush " + args.getJoinedStrings(0);
         CommandEvent event = new CommandEvent(player, cmd);
-        CommandManager.getInstance().handleCommandOnCurrentThread(event);
-        BrushTool newTool = session.getBrushTool(item, player, false);
+        PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
+        BrushTool newTool = session.getBrushTool(item.getType(), player, false);
         if (newTool != null && tool != null) {
             newTool.setPrimary(tool.getPrimary());
         }

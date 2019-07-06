@@ -20,7 +20,9 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import java.util.stream.IntStream;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -72,10 +74,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.enginehub.piston.annotation.CommandContainer;
 
 import static com.boydti.fawe.util.image.ImageUtil.load;
 
-@Command(aliases = {"/cfi"}, desc = "Create a world from images: [More Info](https://git.io/v5iDy)")
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class CFICommands extends MethodCommands {
 
     private final Dispatcher dispathcer;
@@ -99,17 +102,14 @@ public class CFICommands extends MethodCommands {
 
     @Command(
             aliases = {"heightmap"},
-            usage = "<url>",
             desc = "Start CFI with a height map as a base"
     )
     @CommandPermissions("worldedit.anvil.cfi")
     public void heightmap(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional("1") double yscale) throws ParameterException {
         if (yscale != 0) {
             int[] raw = ((DataBufferInt) image.load().getRaster().getDataBuffer()).getData();
-            int[] table = new int[256];
-            for (int i = 0; i < table.length; i++) {
-                table[i] = Math.min(255, (int) (i * yscale));
-            }
+            int[] table = IntStream.range(0, 256).map(i -> Math.min(255, (int) (i * yscale)))
+                .toArray();
             for (int i = 0; i < raw.length; i++) {
                 int color = raw[i];
                 int red = table[(color >> 16) & 0xFF];
@@ -123,8 +123,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"empty"},
-            usage = "<width> <length>",
+            name = "empty",
             desc = "Start CFI with an empty map as a base"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -135,8 +134,7 @@ public class CFICommands extends MethodCommands {
 
     private String generateName() {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH.mm.ss");
-        String data = df.format(new Date());
-        return data;
+        return df.format(new Date());
     }
 
     private void setup(HeightMapMCAGenerator generator, FawePlayer fp) {
@@ -149,8 +147,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"brush"},
-            usage = "",
+            name = "brush",
             desc = "Info about using brushes with CFI"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -166,23 +163,23 @@ public class CFICommands extends MethodCommands {
         } else {
             msg = msg("This is not supported with your platform/version").newline();
         }
-        msg.text("&8< &7[&aBack&7]").cmdTip(alias()).send(fp);
+        msg.text("< [Back]").cmdTip(alias()).send(fp);
     }
 
     @Command(
-            aliases = {"cancel", "exit"},
-            usage = "",
+            name = "cancel",
+            aliases = {"exit"},
             desc = "Cancel creation"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void cancel(FawePlayer fp) throws ParameterException, IOException {
+    public void cancel(FawePlayer fp) {
         getSettings(fp).remove();
         fp.sendMessage("Cancelled!");
     }
 
     @Command(
-            aliases = {"done", "create"},
-            usage = "",
+            name = "done",
+            aliases = "create",
             desc = "Create the world"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -240,8 +237,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"column", "setcolumn"},
-            usage = "<pattern> [url|mask]",
+            name = "column",
             desc = "Set the floor and main block"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -256,8 +252,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"floor", "setfloor"},
-            usage = "<pattern> [url|mask]",
+            name = "floor",
             desc = "Set the floor (default: grass)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -276,8 +271,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"main", "setmain"},
-            usage = "<pattern> [url|mask]",
+            name = "main",
             desc = "Set the main block (default: stone)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -296,10 +290,10 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
+            name = "overlay",
             aliases = {"overlay", "setoverlay"},
-            usage = "<pattern> [url|mask]",
             desc = "Set the overlay block",
-            help = "Change the block directly above the floor (default: air)\n" +
+            descFooter = "Change the block directly above the floor (default: air)\n" +
                     "e.g. Tallgrass"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -314,9 +308,8 @@ public class CFICommands extends MethodCommands {
 
     @Command(
             aliases = {"smooth"},
-            usage = "<radius> <iterations> [image|mask]",
             desc = "Smooth the terrain",
-            help = "Smooth terrain within an image-mask, or worldedit mask\n" +
+            descFooter = "Smooth terrain within an image-mask, or worldedit mask\n" +
                     " - You can use !0 as the mask to smooth everything\n" +
                     " - This supports smoothing snow layers (set the floor to 78:7)\n" +
                     " - A good value for radius and iterations would be 1 8."
@@ -335,8 +328,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"snow"},
-            usage = "[image|mask]",
+            name = "snow",
             desc = "Create some snow"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -351,10 +343,9 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"biomepriority", "palettebiomepriority", "setpalettebiomepriority"},
-            usage = "[percent=50]",
+            name = "biomepriority",
             desc = "Set the biome priority",
-            help = "Increase or decrease biome priority when using blockBiomeColor.\n" +
+            descFooter = "Increase or decrease biome priority when using blockBiomeColor.\n" +
                     "A value of 50 is the default\n" +
                     "Above 50 will prefer to color with biomes\n" +
                     "Below 50 will prefer to color with blocks"
@@ -366,10 +357,9 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"paletteblocks", "colorpaletterblocks", "setcolorpaletteblocks"},
-            usage = "<blocks|#clipboard|*>",
+            name = "paletteblocks",
             desc = "Set the blocks used for coloring",
-            help = "Allow only specific blocks to be used for coloring\n" +
+            descFooter = "Allow only specific blocks to be used for coloring\n" +
                     "`blocks` is a list of blocks e.g. stone,bedrock,wool\n" +
                     "`#clipboard` will only use the blocks present in your clipboard."
     )
@@ -377,15 +367,15 @@ public class CFICommands extends MethodCommands {
     public void paletteblocks(FawePlayer fp, Player player, LocalSession session, @Optional String arg) throws ParameterException, EmptyClipboardException, InputParseException, FileNotFoundException {
         if (arg == null) {
             msg("What blocks do you want to color with?").newline()
-            .text("&7[&aAll&7]").cmdTip(alias() + " PaletteBlocks *").text(" - All available blocks")
+            .text("[All]").cmdTip(alias() + " PaletteBlocks *").text(" - All available blocks")
             .newline()
-            .text("&7[&aClipboard&7]").cmdTip(alias() + " PaletteBlocks #clipboard").text(" - The blocks in your clipboard")
+            .text("[Clipboard]").cmdTip(alias() + " PaletteBlocks #clipboard").text(" - The blocks in your clipboard")
             .newline()
-            .text("&7[&aList&7]").suggestTip(alias() + " PaletteBlocks stone,gravel").text(" - A comma separated list of blocks")
+            .text("[List]").suggestTip(alias() + " PaletteBlocks stone,gravel").text(" - A comma separated list of blocks")
             .newline()
-            .text("&7[&aComplexity&7]").cmdTip(alias() + " Complexity").text(" - Block textures within a complexity range")
+            .text("[Complexity]").cmdTip(alias() + " Complexity").text(" - Block textures within a complexity range")
             .newline()
-            .text("&8< &7[&aBack&7]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "coloring"))
+            .text("< [Back]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "coloring"))
             .send(fp);
             return;
         }
@@ -444,10 +434,9 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"randomization", "paletterandomization"},
-            usage = "<true|false>",
+            name = "randomization",
             desc = "Set whether randomization is enabled",
-            help = "This is enabled by default, randomization will add some random variation in the blocks used to closer match the provided image.\n" +
+            descFooter = "This is enabled by default, randomization will add some random variation in the blocks used to closer match the provided image.\n" +
                     "If disabled, the closest block to the color will always be used.\n" +
                     "Randomization will allow mixing biomes when coloring with biomes"
     )
@@ -458,10 +447,9 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"complexity", "palettecomplexity"},
-            usage = "<minPercent> <maxPercent>",
+            name = "complexity",
             desc = "Set the complexity for coloring",
-            help = "Set the complexity for coloring\n" +
+            descFooter = "Set the complexity for coloring\n" +
                     "Filter out blocks to use based on their complexity, which is a measurement of how much color variation there is in the texture for that block.\n" +
                     "Glazed terracotta is complex, and not very pleasant for terrain, whereas stone and wool are simpler textures.\n" +
                     "Using 0 73 for the min/max would use the simplest 73% of blocks for coloring, and is a reasonable value."
@@ -475,10 +463,9 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"schem", "schematic", "schems", "schematics", "addschems"},
-            usage = "[url] <mask> <file|folder|url> <rarity> <distance> <rotate=true>",
+            name = "schem",
             desc = "Populate schematics",
-            help = "Populate a schematic on the terrain\n" +
+            descFooter = "Populate a schematic on the terrain\n" +
                     " - Change the mask (e.g. angle mask) to only place the schematic in specific locations.\n" +
                     " - The rarity is a value between 0 and 100.\n" +
                     " - The distance is the spacing between each schematic"
@@ -502,10 +489,9 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"biome", "setbiome"},
-            usage = "<biome> [image|mask]",
+            name = "biome",
             desc = "Set the biome",
-            help = "Set the biome in specific parts of the map.\n" +
+            descFooter = "Set the biome in specific parts of the map.\n" +
                     " - If an image is used, the biome will have a chance to be set based on how white the pixel is (white #FFF = 100% chance)" +
                     " - The whiteOnly parameter determines if only white values on the image are set" +
                     " - If a mask is used, the biome will be set anywhere the mask applies"
@@ -522,7 +508,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"caves", "addcaves"},
+            name = "caves",
             desc = "Generate vanilla caves"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -533,10 +519,9 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"ore", "addore"},
-            usage = "<mask=stone> <pattern> <size> <frequency> <rarity> <minY> <maxY>",
+            name = "ore",
             desc = "Add an ore",
-            help = "Use a specific pattern and settings to generate ore"
+            descFooter = "Use a specific pattern and settings to generate ore"
     )
     @CommandPermissions("worldedit.anvil.cfi")
     public void ore(FawePlayer fp, Mask mask, Pattern pattern, int size, int frequency, int rariry, int minY, int maxY) throws ParameterException, WorldEditException {
@@ -546,8 +531,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"ores", "addores"},
-            usage = "<mask=stone>",
+            name = "ores",
             desc = "Generate the vanilla ores"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -558,10 +542,9 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"height", "setheight"},
-            usage = "<height|image>",
+            name = "height",
             desc = "Set the height",
-            help = "Set the terrain height either based on an image heightmap, or a numeric value."
+            descFooter = "Set the terrain height either based on an image heightmap, or a numeric value."
     )
     @CommandPermissions("worldedit.anvil.cfi")
     public void height(FawePlayer fp, String arg) throws ParameterException, WorldEditException {
@@ -576,10 +559,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"water", "waterid"},
-            usage = "<block>",
-            desc = "Change the block used for water\n" +
-                    "e.g. Lava"
+            name = "water",
+            desc = "Change the block used for water\ne.g. Lava"
     )
     @CommandPermissions("worldedit.anvil.cfi")
     public void waterId(FawePlayer fp, BlockStateHolder block) throws ParameterException, WorldEditException {
@@ -592,9 +573,7 @@ public class CFICommands extends MethodCommands {
 
     @Command(
             aliases = {"baseid", "bedrockid"},
-            usage = "<block>",
-            desc = "Change the block used for the base\n" +
-                    "e.g. Bedrock"
+            desc = "Change the block used for the base\ne.g. Bedrock"
     )
     @CommandPermissions("worldedit.anvil.cfi")
     public void baseId(FawePlayer fp, BlockStateHolder block) throws ParameterException, WorldEditException {
@@ -607,7 +586,6 @@ public class CFICommands extends MethodCommands {
 
     @Command(
             aliases = {"worldthickness", "width", "thickness"},
-            usage = "<height>",
             desc = "Set the thickness of the generated world\n" +
                     " - A value of 0 is the default and will not modify the height"
     )
@@ -620,7 +598,6 @@ public class CFICommands extends MethodCommands {
 
     @Command(
             aliases = {"floorthickness", "floorheight", "floorwidth"},
-            usage = "<height>",
             desc = "Set the thickness of the top layer\n" +
                     " - A value of 0 is the default and will only set the top block"
     )
@@ -659,7 +636,6 @@ public class CFICommands extends MethodCommands {
 
     @Command(
             aliases = {"waterheight", "sealevel", "setwaterheight"},
-            usage = "<height>",
             desc = "Set the level water is generated at\n" +
                     "Set the level water is generated at\n" +
                     " - By default water is disabled (with a value of 0)"
@@ -785,14 +761,14 @@ public class CFICommands extends MethodCommands {
 
         int biomePriority = gen.getBiomePriority();
 
-        Message msg = msg("&8>>&7 Current Settings &8<<&7").newline()
-        .text("&7Randomization ").text("&7[&a" + (Boolean.toString(rand).toUpperCase()) + "&7]").cmdTip(alias() + " randomization " + (!rand))
+        Message msg = msg(">> Current Settings <<").newline()
+        .text("Randomization ").text("[" + (Boolean.toString(rand).toUpperCase()) + "]").cmdTip(alias() + " randomization " + (!rand))
         .newline()
-        .text("&7Mask ").text("&7[&a" + mask + "&7]").cmdTip(alias() + " mask")
+        .text("Mask ").text("[" + mask + "]").cmdTip(alias() + " mask")
         .newline()
-        .text("&7Blocks ").text("&7[&a" + blocks + "&7]").tooltip(blockList).command(alias() + " paletteBlocks")
+        .text("Blocks ").text("[" + blocks + "]").tooltip(blockList).command(alias() + " paletteBlocks")
         .newline()
-        .text("&7BiomePriority ").text("&7[&a" + biomePriority + "&7]").cmdTip(alias() + " biomepriority")
+        .text("BiomePriority ").text("[" + biomePriority + "]").cmdTip(alias() + " biomepriority")
         .newline();
 
         if (settings.image != null) {
@@ -802,19 +778,19 @@ public class CFICommands extends MethodCommands {
             if (settings.mask != null) colorArgs.append(" " + settings.maskArg);
             if (!settings.whiteOnly) colorArgs.append(" -w");
 
-            msg.text("&7Image: ")
-            .text("&7[&a" + settings.imageArg + "&7]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "image"))
+            msg.text("Image: ")
+            .text("[" + settings.imageArg + "]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "image"))
             .newline().newline()
-            .text("&cLet's Color&7: ")
+            .text("&cLet's Color: ")
             .cmdOptions(alias() + " ", colorArgs.toString(), "Biomes", "Blocks", "BlockAndBiome", "Glass")
             .newline();
         } else {
             msg.newline().text("You can color a world using an image like ")
-            .text("&7[&aThis&7]").linkTip("http://i.imgur.com/vJYinIU.jpg").newline()
+            .text("[This]").linkTip("http://i.imgur.com/vJYinIU.jpg").newline()
             .text("&cYou MUST provide an image: ")
-            .text("&7[&aNone&7]").cmdTip(alias() + " " + Commands.getAlias(Command.class, "image")).newline();
+            .text("[None]").cmdTip(alias() + " " + Commands.getAlias(Command.class, "image")).newline();
         }
-        msg.text("&8< &7[&aBack&7]").cmdTip(alias()).send(fp);
+        msg.text("< [Back]").cmdTip(alias()).send(fp);
     }
 
     @Command(
@@ -835,12 +811,12 @@ public class CFICommands extends MethodCommands {
 
         StringBuilder cmd = new StringBuilder(alias() + " mask ");
 
-        msg("&8>>&7 Current Settings &8<<&7").newline()
-                .text("&7Image Mask ").text("&7[&a" + settings.imageMaskArg + "&7]").suggestTip(cmd + "http://")
+        msg(">> Current Settings <<").newline()
+                .text("Image Mask ").text("[" + settings.imageMaskArg + "]").suggestTip(cmd + "http://")
                 .newline()
-                .text("&7WorldEdit Mask ").text("&7[&a" + settings.maskArg + "&7]").suggestTip(cmd + "<mask>")
+                .text("WorldEdit Mask ").text("[" + settings.maskArg + "]").suggestTip(cmd + "<mask>")
                 .newline()
-                .text("&8< &7[&aBack&7]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
+                .text("< [Back]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
     }
 
     @Command(
@@ -861,10 +837,10 @@ public class CFICommands extends MethodCommands {
         if (pattern != null) {
             dispathcer.call(settings.getCategory(), context.getLocals(), new String[0]);
         } else {
-            msg("&8>>&7 Current Settings &8<<&7").newline()
-                    .text("&7Pattern ").text("&7[&aClick Here&7]").suggestTip(cmd + " stone")
+            msg(">> Current Settings <<").newline()
+                    .text("Pattern ").text("[Click Here]").suggestTip(cmd + " stone")
                     .newline()
-                    .text("&8< &7[&aBack&7]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
+                    .text("< [Back]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
         }
     }
 
@@ -902,9 +878,9 @@ public class CFICommands extends MethodCommands {
         StringBuilder cmd = new StringBuilder(alias() + " image ");
         if (image == null) {
             msg("Please provide an image:").newline()
-            .text("From a URL: ").text("&7[&aClick Here&7]").suggestTip(cmd + "http://")
+            .text("From a URL: ").text("[Click Here]").suggestTip(cmd + "http://")
             .newline()
-            .text("From a file: ").text("&7[&aClick Here&7]").suggestTip(cmd + "file://")
+            .text("From a file: ").text("[Click Here]").suggestTip(cmd + "file://")
             .send(fp);
         } else {
             if (settings.hasGenerator()) {
@@ -931,7 +907,7 @@ public class CFICommands extends MethodCommands {
         msg("What would you like to populate?").newline()
         .text("(You will need to type these commands)").newline()
         .cmdOptions(alias() + " ", "", "Ores", "Ore", "Caves", "Schematics", "Smooth")
-        .newline().text("&8< &7[&aBack&7]").cmdTip(alias())
+        .newline().text("< [Back]").cmdTip(alias())
         .send(fp);
     }
 
@@ -966,49 +942,49 @@ public class CFICommands extends MethodCommands {
         String waterHeight = Commands.getAlias(CFICommands.class, "waterheight");
         String snow = Commands.getAlias(CFICommands.class, "snow");
 
-        Message msg = msg("&8>>&7 Current Settings &8<<&7").newline()
-        .text("&7Mask ").text("&7[&a" + mask + "&7]").cmdTip(alias() + " mask")
+        Message msg = msg(">> Current Settings <<").newline()
+        .text("Mask ").text("[" + mask + "]").cmdTip(alias() + " mask")
         .newline()
-        .text("&7Pattern ").text("&7[&a" + pattern + "&7]").cmdTip(alias() + " pattern")
+        .text("Pattern ").text("[" + pattern + "]").cmdTip(alias() + " pattern")
         .newline()
         .newline()
-        .text("&8>>&7 Components &8<<&7")
+        .text(">> Components <<")
         .newline()
-        .text("&7[&aHeight&7]").suggestTip(alias() + " " + alias("height") + " 120").text(" - Terrain height for whole map")
+        .text("[Height]").suggestTip(alias() + " " + alias("height") + " 120").text(" - Terrain height for whole map")
         .newline()
-        .text("&7[&aWaterHeight&7]").suggestTip(alias() + " " + alias("waterheight") + " 60").text(" - Sea level for whole map")
+        .text("[WaterHeight]").suggestTip(alias() + " " + alias("waterheight") + " 60").text(" - Sea level for whole map")
         .newline()
-        .text("&7[&aFloorThickness&7]").suggestTip(alias() + " " + alias("floorthickness") + " 60").text(" - Floor thickness of entire map")
+        .text("[FloorThickness]").suggestTip(alias() + " " + alias("floorthickness") + " 60").text(" - Floor thickness of entire map")
         .newline()
-        .text("&7[&aWorldThickness&7]").suggestTip(alias() + " " + alias("worldthickness") + " 60").text(" - World thickness of entire map")
+        .text("[WorldThickness]").suggestTip(alias() + " " + alias("worldthickness") + " 60").text(" - World thickness of entire map")
         .newline()
-        .text("&7[&aSnow&7]").suggestTip(alias() + " " + alias("snow") + maskArgs).text(" - Set snow in the masked areas")
+        .text("[Snow]").suggestTip(alias() + " " + alias("snow") + maskArgs).text(" - Set snow in the masked areas")
         .newline();
 
         if (pattern != null) {
             String disabled = "You must specify a pattern";
             msg
-            .text("&7[&cWaterId&7]").tooltip(disabled).newline()
-            .text("&7[&cBedrockId&7]").tooltip(disabled).newline()
-            .text("&7[&cFloor&7]").tooltip(disabled).newline()
-            .text("&7[&cMain&7]").tooltip(disabled).newline()
-            .text("&7[&cColumn&7]").tooltip(disabled).newline()
-            .text("&7[&cOverlay&7]").tooltip(disabled).newline();
+            .text("[&cWaterId]").tooltip(disabled).newline()
+            .text("[&cBedrockId]").tooltip(disabled).newline()
+            .text("[&cFloor]").tooltip(disabled).newline()
+            .text("[&cMain]").tooltip(disabled).newline()
+            .text("[&cColumn]").tooltip(disabled).newline()
+            .text("[&cOverlay]").tooltip(disabled).newline();
         } else {
             StringBuilder compArgs = new StringBuilder();
             compArgs.append(" " + settings.patternArg + maskArgs);
 
             msg
-            .text("&7[&aWaterId&7]").cmdTip(alias() + " waterId " + pattern).text(" - Water id for whole map").newline()
-            .text("&7[&aBedrockId&7]").cmdTip(alias() + " baseId " + pattern).text(" - Bedrock id for whole map").newline()
-            .text("&7[&aFloor&7]").cmdTip(alias() + " floor" + compArgs).text(" - Set the floor in the masked areas").newline()
-            .text("&7[&aMain&7]").cmdTip(alias() + " main" + compArgs).text(" - Set the main block in the masked areas").newline()
-            .text("&7[&aColumn&7]").cmdTip(alias() + " column" + compArgs).text(" - Set the columns in the masked areas").newline()
-            .text("&7[&aOverlay&7]").cmdTip(alias() + " overlay" + compArgs).text(" - Set the overlay in the masked areas").newline();
+            .text("[WaterId]").cmdTip(alias() + " waterId " + pattern).text(" - Water id for whole map").newline()
+            .text("[BedrockId]").cmdTip(alias() + " baseId " + pattern).text(" - Bedrock id for whole map").newline()
+            .text("[Floor]").cmdTip(alias() + " floor" + compArgs).text(" - Set the floor in the masked areas").newline()
+            .text("[Main]").cmdTip(alias() + " main" + compArgs).text(" - Set the main block in the masked areas").newline()
+            .text("[Column]").cmdTip(alias() + " column" + compArgs).text(" - Set the columns in the masked areas").newline()
+            .text("[Overlay]").cmdTip(alias() + " overlay" + compArgs).text(" - Set the overlay in the masked areas").newline();
         }
 
         msg.newline()
-        .text("&8< &7[&aBack&7]").cmdTip(alias())
+        .text("< [Back]").cmdTip(alias())
         .send(fp);
     }
 
@@ -1160,9 +1136,9 @@ public class CFICommands extends MethodCommands {
     protected void mainMenu(FawePlayer fp) {
         msg("What do you want to do now?").newline()
                 .cmdOptions(alias() + " ", "", "Coloring", "Component", "Populate", "Brush")
-                .newline().text("&3<> &7[&aView&7]").command(alias() + " " + Commands.getAlias(CFICommands.class, "download")).tooltip("View full resolution image")
-                .newline().text("&4>< &7[&aCancel&7]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "cancel"))
-                .newline().text("&2>> &7[&aDone&7]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "done"))
+                .newline().text("<> [View]").command(alias() + " " + Commands.getAlias(CFICommands.class, "download")).tooltip("View full resolution image")
+                .newline().text(">< [Cancel]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "cancel"))
+                .newline().text("&2>> [Done]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "done"))
                 .send(fp);
     }
 }

@@ -21,10 +21,10 @@ package com.sk89q.worldedit.session.request;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
+
 import javax.annotation.Nullable;
 
 /**
@@ -49,9 +49,7 @@ public final class Request {
      *
      * @return the world, which may be null
      */
-    public
-    @Nullable
-    World getWorld() {
+    public @Nullable World getWorld() {
         return world;
     }
 
@@ -68,9 +66,7 @@ public final class Request {
         this.extent = extent;
     }
 
-    public
-    @Nullable
-    Extent getExtent() {
+    public @Nullable Extent getExtent() {
         if (extent != null) return extent;
         if (editSession != null) return editSession;
         if (world != null) return world;
@@ -91,9 +87,7 @@ public final class Request {
      *
      * @return the session, which may be null
      */
-    public
-    @Nullable
-    LocalSession getSession() {
+    public @Nullable LocalSession getSession() {
         return session;
     }
 
@@ -111,9 +105,7 @@ public final class Request {
      *
      * @return the edit session, which may be null
      */
-    public
-    @Nullable
-    EditSession getEditSession() {
+    public @Nullable EditSession getEditSession() {
         return editSession;
     }
 

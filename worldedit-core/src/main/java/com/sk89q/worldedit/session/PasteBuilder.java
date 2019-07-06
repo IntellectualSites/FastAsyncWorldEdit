@@ -19,17 +19,16 @@
 
 package com.sk89q.worldedit.session;
 
-import com.boydti.fawe.util.MaskTraverser;
-
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.worldedit.EditSession;
+
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -44,11 +43,12 @@ public class PasteBuilder {
     private final Transform transform;
     private final Extent targetExtent;
 
+    private Mask sourceMask = Masks.alwaysTrue();
+
     private BlockVector3 to = BlockVector3.ZERO;
     private boolean ignoreAirBlocks;
-    private boolean ignoreBiomes;
-    private boolean ignoreEntities;
-    private RegionFunction canApply;
+    private boolean copyEntities = true; // default because it used to be this way
+    private boolean copyBiomes;
 
     /**
      * Create a new instance.
@@ -76,6 +76,23 @@ public class PasteBuilder {
     }
 
     /**
+     * Set a custom mask of blocks to ignore from the source.
+     * This provides a more flexible alternative to {@link #ignoreAirBlocks(boolean)}, for example
+     * one might want to ignore structure void if copying a Minecraft Structure, etc.
+     *
+     * @param sourceMask
+     * @return this builder instance
+     */
+    public PasteBuilder maskSource(Mask sourceMask) {
+        if (sourceMask == null) {
+            this.sourceMask = Masks.alwaysTrue();
+            return this;
+        }
+        this.sourceMask = sourceMask;
+        return this;
+    }
+
+    /**
      * Set whether air blocks in the source are skipped over when pasting.
      *
      * @return this builder instance
@@ -85,18 +102,29 @@ public class PasteBuilder {
         return this;
     }
 
-    public PasteBuilder ignoreBiomes(boolean ignoreBiomes) {
-        this.ignoreBiomes = ignoreBiomes;
+    /**
+     * Set whether the copy should include source entities.
+     * Note that this is true by default for legacy reasons.
+     *
+     * @param copyEntities
+     * @return this builder instance
+     */
+    public PasteBuilder copyEntities(boolean copyEntities) {
+        this.copyEntities = copyEntities;
         return this;
     }
 
-    public PasteBuilder ignoreEntities(boolean ignoreEntities) {
-        this.ignoreEntities = ignoreEntities;
+    /**
+     * Set whether the copy should include source biomes (if available).
+     *
+     * @param copyBiomes
+     * @return this builder instance
+     */
+    public PasteBuilder copyBiomes(boolean copyBiomes) {
+        this.copyBiomes = copyBiomes;
         return this;
     }
-
     public PasteBuilder filter(RegionFunction function) {
-        this.canApply = function;
         return this;
     }
 
@@ -106,28 +134,17 @@ public class PasteBuilder {
      * @return the operation
      */
     public Operation build() {
-        Extent extent = clipboard;
-        if (!transform.isIdentity()) {
-            extent = new BlockTransformExtent(extent, transform);
-        }
+        BlockTransformExtent extent = new BlockTransformExtent(clipboard, transform);
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), targetExtent, to);
         copy.setTransform(transform);
-        copy.setCopyingEntities(!ignoreEntities);
-        copy.setCopyBiomes((!ignoreBiomes) && (!(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP.hasBiomes()));
-        if (this.canApply != null) {
-            copy.setFilterFunction(this.canApply);
-        }
-        if (targetExtent instanceof EditSession) {
-            Mask sourceMask = ((EditSession) targetExtent).getSourceMask();
-            if (sourceMask != null) {
-                new MaskTraverser(sourceMask).reset(extent);
-                copy.setSourceMask(sourceMask);
-                ((EditSession) targetExtent).setSourceMask(null);
-            }
-        }
         if (ignoreAirBlocks) {
-            copy.setSourceMask(new ExistingBlockMask(clipboard));
+            copy.setSourceMask(sourceMask == Masks.alwaysTrue() ? new ExistingBlockMask(clipboard)
+                    : new MaskIntersection(sourceMask, new ExistingBlockMask(clipboard)));
+        } else {
+            copy.setSourceMask(sourceMask);
         }
+        copy.setCopyingEntities(copyEntities);
+        copy.setCopyingBiomes(copyBiomes && clipboard.hasBiomes());
         return copy;
     }
 

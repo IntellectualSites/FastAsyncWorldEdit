@@ -22,6 +22,7 @@ package com.sk89q.worldedit.math.convolution;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -252,12 +253,12 @@ public class HeightMap {
      * @return number of blocks affected
      * @throws MaxChangedBlocksException
      */
+
     public int apply(int[] data) throws MaxChangedBlocksException {
         checkNotNull(data);
 
         BlockVector3 minY = region.getMinimumPoint();
         int originX = minY.getBlockX();
-        int originY = minY.getBlockY();
         int originZ = minY.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();

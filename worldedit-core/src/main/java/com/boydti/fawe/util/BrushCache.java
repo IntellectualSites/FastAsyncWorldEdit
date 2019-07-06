@@ -25,7 +25,7 @@ public final class BrushCache {
         return item.hasNbtData() ? item.getNbtData() : null;
     }
 
-    private static final Object getKey(BaseItem item) {
+    private static Object getKey(BaseItem item) {
         return item.getNativeItem();
     }
 

@@ -24,6 +24,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -44,7 +45,7 @@ import java.util.Objects;
  * snapshot of blocks correctly, so, for example, the NBT data for a block
  * may be missing.</p>
  */
-public class BaseBlock implements BlockStateHolder<BaseBlock> {
+public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     private BlockState blockState;
     @Nullable protected CompoundTag nbtData;
@@ -236,22 +237,6 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
         return this;
     }
 
-    @Override
-    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
-        if (compoundTag == null) {
-            return this.blockState.toBaseBlock();
-        } else if (compoundTag == this.nbtData) {
-            return this;
-        } else {
-            return new BaseBlock(this.blockState, compoundTag);
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return getOrdinal();
-    }
-
 	@Override
 	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
 		return extent.setBlock(set, this);
@@ -277,18 +262,38 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 		return toImmutableState().with(property, value).toBaseBlock(getNbtData());
 	}
 
-	@Override
-	public <V> V getState(PropertyKey property) {
-		return toImmutableState().getState(property);
-	}
+    @Override
+    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+        if (compoundTag == null) {
+            return this.blockState.toBaseBlock();
+        } else if (compoundTag == this.nbtData) {
+            return this;
+        } else {
+            return new BaseBlock(this.blockState, compoundTag);
+        }
+    }
+
+    @Override
+    public <V> V getState(PropertyKey property) {
+        return toImmutableState().getState(property);
+    }
+
+    @Override
+    public int hashCode() {
+        int ret = toImmutableState().hashCode() << 3;
+        if (hasNbtData()) {
+            ret += getNbtData().hashCode();
+        }
+        return ret;
+    }
 
     @Override
     public String toString() {
-        if (getNbtData() != null) {
-            return getAsString() + " {" + String.valueOf(getNbtData()) + "}";
-        } else {
-            return getAsString();
-        }
+//        if (getNbtData() != null) { // TODO Maybe make some JSON serialiser to make this not awful.
+//            return blockState.getAsString() + " {" + String.valueOf(getNbtData()) + "}";
+//        } else {
+            return blockState.getAsString();
+//        }
     }
 
 }

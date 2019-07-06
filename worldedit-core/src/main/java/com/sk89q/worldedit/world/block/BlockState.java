@@ -66,7 +66,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
      * @deprecated magic number
      * @return BlockState
      */
-	
+
     @Deprecated
     public static BlockState getFromInternalId(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
@@ -208,7 +208,6 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         return getBlockType().withPropertyId(propertyId);
     }
 
-
     @Override
     public BlockType getBlockType() {
         return this.blockType;
@@ -251,6 +250,16 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
 
     @Override
+    public <V> V getState(final Property<V> property) {
+        try {
+            AbstractProperty ap = (AbstractProperty) property;
+            return (V) ap.getValue(this.getInternalId());
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Property not found: " + property);
+        }
+    }
+
+    @Override
     public <V> BlockState with(final PropertyKey property, final V value) {
         try {
             BlockType type = getBlockType();
@@ -262,7 +271,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
 
     @Override
-    public final Map<Property<?>, Object> getStates() {
+    public Map<Property<?>, Object> getStates() {
         BlockType type = this.getBlockType();
         // Lazily initialize the map
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
@@ -270,13 +279,19 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
 
     @Override
-    public final <V> V getState(final Property<V> property) {
-        try {
-            AbstractProperty ap = (AbstractProperty) property;
-            return (V) ap.getValue(this.getInternalId());
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Property not found: " + property);
+    public boolean equalsFuzzy(BlockStateHolder<?> o) {
+        if (null == o) {
+            return false;
         }
+        if (this == o) {
+            // Added a reference equality check for speediness
+            return true;
+        }
+
+        if (o.getClass() == BlockState.class) {
+            return o.getOrdinal() == this.getOrdinal();
+        }
+        return o.equalsFuzzy(this);
     }
 
     @Override
@@ -291,7 +306,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
     @Deprecated
     @Override
-    public final <V> V getState(final PropertyKey key) {
+    public <V> V getState(PropertyKey key) {
         return getState(getBlockType().getProperty(key));
     }
 
@@ -301,14 +316,6 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
             return toBaseBlock();
         }
         return new BaseBlock(this, compoundTag);
-    }
-
-    @Override
-    public boolean equalsFuzzy(BlockStateHolder<?> o) {
-        if (o.getClass() == BlockState.class) {
-            return o.getOrdinal() == this.getOrdinal();
-        }
-        return o.equalsFuzzy(this);
     }
 
 	@Override

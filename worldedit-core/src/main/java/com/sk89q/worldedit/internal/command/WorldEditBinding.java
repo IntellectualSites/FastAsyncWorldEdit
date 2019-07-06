@@ -357,7 +357,7 @@ public class WorldEditBinding {
         String input = context.next();
         if (input != null) {
 
-            if (MathMan.isInteger(input)) return BiomeTypes.get(Integer.parseInt(input));
+            if (MathMan.isInteger(input)) return BiomeTypes.register(Integer.parseInt(input));
 
             BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                     .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();

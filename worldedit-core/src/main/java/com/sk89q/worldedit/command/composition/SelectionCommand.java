@@ -165,7 +165,7 @@ public class SelectionCommand extends SimpleCommand<Operation> {
 
                 return operation;
             } catch (IncompleteRegionException e) {
-                WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter().convert(e);
+                WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getExceptionConverter().convert(e);
                 return null;
             }
         } else {

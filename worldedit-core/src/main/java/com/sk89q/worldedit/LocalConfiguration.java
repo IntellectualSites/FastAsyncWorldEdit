@@ -20,13 +20,13 @@
 package com.sk89q.worldedit;
 
 import com.google.common.collect.Lists;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 
@@ -59,11 +59,10 @@ public abstract class LocalConfiguration {
     public boolean logCommands = false;
     public String logFile = "";
     public String logFormat = LogFormat.DEFAULT_FORMAT;
-    public boolean registerHelp = true; // what is the point of this, it's not even used
+    public boolean registerHelp = true; // unused
     public String wandItem = "minecraft:wooden_axe";
     public boolean superPickaxeDrop = true;
     public boolean superPickaxeManyDrop = true;
-    public boolean noDoubleSlash = false;
     public boolean useInventory = false;
     public boolean useInventoryOverride = false;
     public boolean useInventoryCreativeOverride = false;
@@ -76,7 +75,7 @@ public abstract class LocalConfiguration {
     public Set<String> allowedDataCycleBlocks = new HashSet<>();
     public String saveDir = "schematics";
     public String scriptsDir = "craftscripts";
-    public boolean showHelpInfo = true;
+    public boolean showHelpInfo = true; // unused
     public int butcherDefaultRadius = -1;
     public int butcherMaxRadius = -1;
     public boolean allowSymlinks = false;
@@ -158,7 +157,11 @@ public abstract class LocalConfiguration {
         if (disallowedBlocksMask == null) {
             BlockMaskBuilder builder = new BlockMaskBuilder();
             for (String blockRegex : disallowedBlocks) {
-                builder.addRegex(blockRegex);
+                try {
+                    builder.addRegex(blockRegex);
+                } catch (InputParseException e) {
+                    e.printStackTrace();
+                }
             }
             disallowedBlocksMask = builder.build(new NullExtent());
         }

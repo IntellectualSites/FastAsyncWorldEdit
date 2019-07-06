@@ -29,7 +29,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.helper.MCDirections;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -40,12 +39,12 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import static com.sk89q.worldedit.util.Direction.*;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -59,7 +58,9 @@ import java.util.Map;
  * given transform.
  */
 public class BlockTransformExtent extends ResettableExtent {
+
     private Transform transform;
+
     private Transform transformInverse;
     private int[] BLOCK_ROTATION_BITMASK;
     private int[][] BLOCK_TRANSFORM;
@@ -93,19 +94,11 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long[] adapt(Direction... dirs) {
-        long[] arr = new long[dirs.length];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = 1L << dirs[i].ordinal();
-        }
-        return arr;
+        return Arrays.stream(dirs).mapToLong(dir -> 1L << dir.ordinal()).toArray();
     }
 
     private static long[] adapt(Long... dirs) {
-        long[] arr = new long[dirs.length];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = dirs[i];
-        }
-        return arr;
+        return Arrays.stream(dirs).mapToLong(dir -> dir).toArray();
     }
 
     private static long[] getDirections(AbstractProperty property) {
@@ -388,11 +381,6 @@ public class BlockTransformExtent extends ResettableExtent {
         }
     }
 
-    @Override
-    public ResettableExtent setExtent(Extent extent) {
-        return super.setExtent(extent);
-    }
-
     /**
      * Get the transform.
      *
@@ -402,19 +390,30 @@ public class BlockTransformExtent extends ResettableExtent {
         return transform;
     }
 
+    /**
+     * Transform a block without making a copy.
+     *
+     * @param block the block
+     * @param reverse true to transform in the opposite direction
+     * @return the same block
+     */
+    private <T extends BlockStateHolder<T>> T transformBlock(T block, boolean reverse) {
+        return transform(block, reverse ? transform.inverse() : transform);
+    }
+
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transform(super.getBlock(position));
+        return transformBlock(super.getBlock(position), false);
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return transform(super.getFullBlock(position));
+        return transformBlock(super.getFullBlock(position), false);
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return super.setBlock(location, transformInverse(block));
+        return super.setBlock(location, transformBlock(block, true));
     }
 
     public void setTransform(Transform affine) {
@@ -432,7 +431,7 @@ public class BlockTransformExtent extends ResettableExtent {
      * @param transform the transform
      * @return the same block
      */
-    public static <B extends BlockStateHolder<B>> B transform(B block, Transform transform) {
+    public static <B extends BlockStateHolder<B>> B transform(@NotNull B block, @NotNull Transform transform) {
         // performance critical
         BlockState state = block.toImmutableState();
 
@@ -504,15 +503,40 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return super.getBiome(position);
-    }
-
-    @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
         return super.setBlock(x, y, z, transformInverse(block));
     }
 
+    /**
+     * Get the new value with the transformed direction.
+     *
+     * @param allowedStates the allowed states
+     * @param transform the transform
+     * @param oldDirection the old direction to transform
+     * @return a new state or null if none could be found
+     */
+    @Nullable
+    private static Vector3 getNewStateValue(List<Direction> allowedStates, Transform transform, Vector3 oldDirection) {
+        Vector3 newDirection = transform.apply(oldDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
+        Vector3 newValue = null;
+        double closest = -2;
+        boolean found = false;
+
+        for (Direction v : allowedStates) {
+            double dot = v.toVector().normalize().dot(newDirection);
+            if (dot >= closest) {
+                closest = dot;
+                newValue = v.toVector();
+                found = true;
+            }
+        }
+
+        if (found) {
+            return newValue;
+        } else {
+            return null;
+        }
+    }
 
 
 }

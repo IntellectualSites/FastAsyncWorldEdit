@@ -87,8 +87,9 @@ public class SchemSync implements Runnable {
                                                 UtilityCommands.allFiles(dir.listFiles(), true, new Consumer<File>() {
                                                     @Override
                                                     public void accept(File file) {
-                                                        String path = dir.toURI().relativize(file.toURI()).getPath();
                                                         try {
+                                                            String path = dir.toURI()
+                                                                .relativize(file.toURI()).getPath();
                                                             out.writeUTF(path);
                                                         } catch (IOException e) {
                                                             e.printStackTrace();

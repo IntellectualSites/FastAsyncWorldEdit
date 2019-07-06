@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.object.mask.*;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;

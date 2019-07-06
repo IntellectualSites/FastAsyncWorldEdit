@@ -24,6 +24,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -43,6 +44,21 @@ import javax.annotation.Nullable;
  * An interface for adapters of various Bukkit implementations.
  */
 public interface BukkitImplAdapter<T> extends IBukkitAdapter {
+
+    /**
+     * Get the Minecraft data version for the current world data.
+     *
+     * @return the data version
+     */
+    int getDataVersion();
+
+    /**
+     * Get a data fixer, or null if not supported
+     *
+     * @return the data fixer
+     */
+    @Nullable
+    DataFixer getDataFixer();
 
     /**
      * Get the block at the given location.
@@ -104,7 +120,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default BlockMaterial getMaterial(BlockType blockType) {
         return null;
     }
-    
+
     default BlockMaterial getMaterial(BlockState blockState) {
         return null;
     }
@@ -116,7 +132,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default T fromNative(Tag foreign) {
         return null;
     }
-    
+
     /**
      * Send the given NBT data to the player.
      *

@@ -8,7 +8,7 @@ import com.boydti.fawe.object.pattern.*;
 import com.boydti.fawe.object.random.SimplexRandom;
 import com.boydti.fawe.util.ColorUtil;
 import com.boydti.fawe.util.TextureUtil;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -47,7 +47,7 @@ public class PatternCommands extends MethodCommands {
     public PatternCommands(WorldEdit worldEdit) {
         super(worldEdit);
     }
-    
+
     @Command(
             aliases = {"#existing", "#*", "*", ".*"},
             desc = "Use the block that is already there",

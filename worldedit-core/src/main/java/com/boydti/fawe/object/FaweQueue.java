@@ -175,12 +175,6 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         fc.fillCuboid(0, 15, minY, maxY, 0, 15, combinedId);
         fc.optimize();
 
-        int bcx = (current.minX) >> 4;
-        int bcz = (current.minZ) >> 4;
-
-        int tcx = (current.maxX) >> 4;
-        int tcz = (current.maxZ) >> 4;
-        // [chunkx, chunkz, pos1x, pos1z, pos2x, pos2z, isedge]
         MainUtil.chunkTaskSync(current, new RunnableVal<int[]>() {
             @Override
             public void run(int[] value) {
@@ -228,6 +222,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
 
     File getSaveFolder();
 
+    @Override
     default int getMaxY() {
         World weWorld = getWEWorld();
         return weWorld == null ? 255 : weWorld.getMaxY();
@@ -452,7 +447,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
         try {
             return getCombinedId4Data(x, y, z);
         } catch (FaweException ignore) {
-            session.debug(BBC.WORLDEDIT_FAILED_LOAD_CHUNK, x >> 4, z >> 4);
+            BBC.WORLDEDIT_FAILED_LOAD_CHUNK.send(session.getPlayer(),x >> 4, z >> 4);
             return def;
         } catch (Throwable e) {
             e.printStackTrace();

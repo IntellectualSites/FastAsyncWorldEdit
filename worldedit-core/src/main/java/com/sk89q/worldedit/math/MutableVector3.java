@@ -2,7 +2,8 @@ package com.sk89q.worldedit.math;
 
 public class MutableVector3 extends Vector3 {
 
-    public MutableVector3() {}
+    public MutableVector3() {
+    }
 
     public MutableVector3(double x, double y, double z) {
         super(x, y, z);
@@ -45,11 +46,13 @@ public class MutableVector3 extends Vector3 {
         this.x = x;
         return this;
     }
+
     @Override
     public MutableVector3 mutZ(int z) {
         this.z = z;
         return this;
     }
+
     @Override
     public MutableVector3 mutX(double x) {
         this.x = x;

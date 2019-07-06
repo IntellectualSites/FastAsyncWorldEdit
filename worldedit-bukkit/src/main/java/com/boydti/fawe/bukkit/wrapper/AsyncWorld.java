@@ -158,6 +158,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         return parent;
     }
 
+    @Override
     public FaweQueue getQueue() {
         return queue;
     }
@@ -174,6 +175,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
         return wrap(world);
     }
 
+    @Override
     public Operation commit() {
         flush();
         return null;
@@ -1271,7 +1273,7 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 	public <T> void spawnParticle(Particle arg0, double arg1, double arg2, double arg3, int arg4, double arg5,
 			double arg6, double arg7, double arg8, T arg9, boolean arg10) {
 		parent.spawnParticle(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-		
+
 	}
 
 	@Override

@@ -51,6 +51,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.thevoxelbox.voxelsniper.brush.IBrush;
+import com.thevoxelbox.voxelsniper.brush.JockeyBrush;
 import com.thevoxelbox.voxelsniper.brush.SnipeBrush;
 import com.thevoxelbox.voxelsniper.brush.perform.PerformBrush;
 import com.thevoxelbox.voxelsniper.brush.perform.Performer;
@@ -201,22 +202,21 @@ public class Sniper {
                 changeQueue = new ChangeSetFaweQueue(changeSet, maskQueue);
             }
             LocalSession session = fp.getSession();
-            { // Set mask etc
-                Mask destMask = session.getMask();
-                if (!Masks.isNull(destMask)) {
-                    new MaskTraverser(destMask).reset(changeQueue);
-                    changeQueue = new FaweQueueDelegateExtent(changeQueue, new MaskingExtent(changeQueue, destMask));
-                }
-                Mask sourceMask = session.getSourceMask();
-                if (!Masks.isNull(sourceMask)) {
-                    new MaskTraverser(sourceMask).reset(changeQueue);
-                    changeQueue = new FaweQueueDelegateExtent(changeQueue, new SourceMaskExtent(changeQueue, sourceMask));
-                }
-                ResettableExtent transform = session.getTransform();
-                if (transform != null) {
-                    transform.setExtent(changeQueue);
-                    changeQueue = new FaweQueueDelegateExtent(changeQueue, transform);
-                }
+            // Set mask etc
+            Mask destMask = session.getMask();
+            if (!Masks.isNull(destMask)) {
+                new MaskTraverser(destMask).reset(changeQueue);
+                changeQueue = new FaweQueueDelegateExtent(changeQueue, new MaskingExtent(changeQueue, destMask));
+            }
+            Mask sourceMask = session.getSourceMask();
+            if (!Masks.isNull(sourceMask)) {
+                new MaskTraverser(sourceMask).reset(changeQueue);
+                changeQueue = new FaweQueueDelegateExtent(changeQueue, new SourceMaskExtent(changeQueue, sourceMask));
+            }
+            ResettableExtent transform = session.getTransform();
+            if (transform != null) {
+                transform.setExtent(changeQueue);
+                changeQueue = new FaweQueueDelegateExtent(changeQueue, transform);
             }
 
             AsyncWorld world = getWorld();
@@ -369,22 +369,19 @@ public class Sniper {
                     snipeData.setExtent(world);
                     Request.reset();
                     Request.request().setExtent(world);
-                    switch (brush.getClass().getSimpleName()) {
-                        case "JockeyBrush":
-                            TaskManager.IMP.sync(new RunnableVal<Object>() {
-                                @Override
-                                public void run(Object value) {
-                                    brush.perform(snipeAction, snipeData, targetBlock, lastBlock);
-                                }
-                            });
-                            break;
-                        default:
-                            if (sniperTool.getCurrentBrush() instanceof PerformBrush) {
-                                PerformBrush performerBrush = (PerformBrush) sniperTool.getCurrentBrush();
-                                performerBrush.initP(snipeData);
+                    if (brush instanceof JockeyBrush) {
+                        TaskManager.IMP.sync(new RunnableVal<Object>() {
+                            @Override
+                            public void run(Object value) {
+                                brush.perform(snipeAction, snipeData, targetBlock, lastBlock);
                             }
-                            brush.perform(snipeAction, snipeData, targetBlock, lastBlock);
-                            break;
+                        });
+                    } else {
+                        if (sniperTool.getCurrentBrush() instanceof PerformBrush) {
+                            PerformBrush performerBrush = (PerformBrush) sniperTool.getCurrentBrush();
+                            performerBrush.initP(snipeData);
+                        }
+                        brush.perform(snipeAction, snipeData, targetBlock, lastBlock);
                     }
                 } finally {
                     snipeData.setExtent(null);

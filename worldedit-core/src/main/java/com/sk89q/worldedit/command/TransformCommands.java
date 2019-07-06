@@ -10,7 +10,7 @@ import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.object.extent.ScaleTransform;
 import com.boydti.fawe.object.extent.TransformExtent;
 import com.boydti.fawe.util.ExtentTraverser;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;

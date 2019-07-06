@@ -26,7 +26,6 @@ public interface HeightMap {
     default void applyHeightMapData(int[][] data, EditSession session, BlockVector3 pos, int size, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
     	BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
-        int diameter = 2 * size + 1;
         Location min = new Location(session.getWorld(), pos.subtract(size, maxY, size).toVector3());
         BlockVector3 max = pos.add(size, maxY, size);
         Region region = new CuboidRegion(session.getWorld(), min.toBlockPoint(), max);
@@ -34,6 +33,7 @@ public interface HeightMap {
         if (smooth) {
             try {
                 HeightMapFilter filter = (HeightMapFilter) HeightMapFilter.class.getConstructors()[0].newInstance(GaussianKernel.class.getConstructors()[0].newInstance(5, 1));
+                int diameter = 2 * size + 1;
                 data[1] = filter.filter(data[1], diameter, diameter);
             } catch (Throwable e) {
                 e.printStackTrace();

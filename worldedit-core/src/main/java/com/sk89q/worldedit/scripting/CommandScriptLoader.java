@@ -8,11 +8,10 @@ import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.BrushProcessor;
+import com.sk89q.worldedit.command.BrushCommands;
 import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.DefaultPatternParser;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.util.command.ProcessedCallable;
 import com.sk89q.worldedit.util.command.parametric.FunctionParametricCallable;
 
@@ -63,15 +62,15 @@ public class CommandScriptLoader {
             if (name.endsWith(".js")) {
                 Fawe.debug("Loading script: " + name);
                 List<FunctionParametricCallable> cmds = getCommands(file, Collections.emptyMap());
-                FaweParser parser = null;
                 if (aliases.length == 1) {
+                    FaweParser parser = null;
                     switch (aliases[0]) {
                         case "brush":
                             if (!cmds.isEmpty()) {
-                                BrushProcessor processor = new BrushProcessor(WorldEdit.getInstance());
+                                BrushCommands processor = new BrushCommands(WorldEdit.getInstance());
                                 for (FunctionParametricCallable cmd : cmds) {
                                     ProcessedCallable processed = new ProcessedCallable(cmd, processor);
-                                    CommandManager.getInstance().registerCommand(aliases, cmd.getCommand(), processed);
+                                    PlatformCommandManager.getInstance().registerCommand(aliases, cmd.getCommand(), processed);
                                 }
                             }
                             return;
@@ -90,7 +89,7 @@ public class CommandScriptLoader {
                     }
                 }
                 for (FunctionParametricCallable cmd : cmds) {
-                    CommandManager.getInstance().registerCommand(aliases, cmd.getCommand(), cmd);
+                    PlatformCommandManager.getInstance().registerSubCommands(name);registerCommand(aliases, cmd.getCommand(), cmd);
                 }
             }
         }

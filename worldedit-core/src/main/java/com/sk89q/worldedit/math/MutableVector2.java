@@ -1,9 +1,9 @@
 package com.sk89q.worldedit.math;
 
-import java.io.Serializable;
-
 public class MutableVector2 extends Vector2 {
-    public MutableVector2() {}
+
+    public MutableVector2() {
+    }
 
     /**
      * Construct an instance.
@@ -47,21 +47,25 @@ public class MutableVector2 extends Vector2 {
         this.z = z;
         return this;
     }
+
     @Override
     public MutableVector2 mutX(int x) {
         this.x = x;
         return this;
     }
+
     @Override
     public MutableVector2 mutZ(int z) {
         this.z = z;
         return this;
     }
+
     @Override
     public MutableVector2 mutX(double x) {
         this.x = x;
         return this;
     }
+
     @Override
     public MutableVector2 mutZ(double z) {
         this.z = z;

@@ -26,7 +26,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -47,18 +47,18 @@ public class AreaPickaxe implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, com.sk89q.worldedit.util.Location clicked) {
+    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
         int ox = clicked.getBlockX();
         int oy = clicked.getBlockY();
         int oz = clicked.getBlockZ();
         BlockType initialType = clicked.getExtent().getBlock(clicked.toVector().toBlockPoint()).getBlockType();
 
         if (initialType.getMaterial().isAir()) {
-            return true;
+            return false;
         }
 
         if (initialType == BlockTypes.BEDROCK && !player.canDestroyBedrock()) {
-            return true;
+            return false;
         }
 
         try (EditSession editSession = session.createEditSession(player)) {
@@ -71,7 +71,9 @@ public class AreaPickaxe implements BlockTool {
                             if (editSession.getLazyBlock(x, y, z).getBlockType() != initialType) {
                                 continue;
                             }
+
                             editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
+
                         }
                     }
                 }

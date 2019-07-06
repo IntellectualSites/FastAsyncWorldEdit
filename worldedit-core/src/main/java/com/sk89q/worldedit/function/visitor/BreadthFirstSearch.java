@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.MappedFaweQueue;
@@ -26,8 +28,6 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.object.collection.BlockVectorSet;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -35,7 +35,6 @@ import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Direction;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -82,13 +81,13 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     private final RegionFunction function;
-    private BlockVectorSet visited;
-    private final MappedFaweQueue mFaweQueue;
     private BlockVectorSet queue;
+    private BlockVectorSet visited;
+    private int affected = 0;
     private int currentDepth = 0;
     private final int maxDepth;
     private List<BlockVector3> directions = new ArrayList<>();
-    private int affected = 0;
+    private final MappedFaweQueue mFaweQueue;
     private int maxBranch = Integer.MAX_VALUE;
 
     /**
@@ -184,9 +183,9 @@ public abstract class BreadthFirstSearch implements Operation {
      * @param position the position
      */
     public void visit(BlockVector3 position) {
-        if (!visited.contains(position)) {
-            BlockVector3 blockVector = position;
-            isVisitable(blockVector, blockVector); // Ignore this, just to initialize mask on this point
+        BlockVector3 blockVector = position;
+        if (!visited.contains(blockVector)) {
+            isVisitable(position, position); // Ignore this, just to initialize mask on this point
             queue.add(blockVector);
             visited.add(blockVector);
         }
@@ -308,15 +307,15 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     @Override
-    public void addStatusMessages(List<String> messages) {
-        messages.add(BBC.VISITOR_BLOCK.format(getAffected()));
-    }
-
-    @Override
     public void cancel() {
         queue.clear();
         visited.clear();
         affected = 0;
+    }
+
+    @Override
+    public void addStatusMessages(List<String> messages) {
+        messages.add(BBC.VISITOR_BLOCK.format(getAffected()));
     }
 
 }

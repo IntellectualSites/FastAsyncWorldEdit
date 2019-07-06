@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -42,14 +42,11 @@ public class SuperPickaxeCommands {
 
     @Command(
             aliases = {"single"},
-            usage = "",
             desc = "Enable the single block super pickaxe mode",
-            min = 0,
             max = 0
     )
     @CommandPermissions("worldedit.superpickaxe")
     public void single(Player player, LocalSession session) throws WorldEditException {
-
         session.setSuperPickaxe(new SinglePickaxe());
         session.enableSuperPickAxe();
         BBC.SUPERPICKAXE_AREA_ENABLED.send(player);

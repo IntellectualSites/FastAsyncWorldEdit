@@ -144,7 +144,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             return null;
         }
         int biomeId = mbb.get(HEADER_SIZE + (volume << 2) + index) & 0xFF;
-        return BiomeTypes.get(biomeId);
+        return BiomeTypes.register(biomeId);
     }
 
     @Override

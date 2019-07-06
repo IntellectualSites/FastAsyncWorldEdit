@@ -54,7 +54,6 @@ public class RegionVisitor implements Operation {
      * @param region
      * @param function
      */
-    @Deprecated
     public RegionVisitor(Region region, RegionFunction function) {
         this(region, function, (FaweQueue) null);
     }

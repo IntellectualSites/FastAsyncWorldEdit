@@ -318,7 +318,7 @@ public interface Extent extends InputExtent, OutputExtent {
     default boolean contains(BlockVector3 pt) {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
-        return (pt.containedWithin(min, max));
+        return pt.containedWithin(min, max);
     }
 
     default void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
@@ -350,7 +350,7 @@ public interface Extent extends InputExtent, OutputExtent {
         int[] counter = new int[BlockTypes.size()];
 
         for (final BlockVector3 pt : region) {
-            BlockType type = getBlockType(pt);
+            BlockType type = getBlock(pt).getBlockType();
             counter[type.getInternalId()]++;
         }
         List<Countable<BlockType>> distribution = new ArrayList<>();

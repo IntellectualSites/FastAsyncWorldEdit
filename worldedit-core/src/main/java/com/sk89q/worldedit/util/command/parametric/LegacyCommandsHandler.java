@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.util.command.parametric;
 
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.util.command.MissingParameterException;
@@ -41,7 +41,7 @@ public class LegacyCommandsHandler extends AbstractInvokeListener implements Inv
 
     @Override
     public void preProcess(Object object, Method method,
-            ParameterData[] parameters, CommandContext context) 
+            ParameterData[] parameters, CommandContext context)
                     throws CommandException, ParameterException {
     }
 
@@ -50,12 +50,12 @@ public class LegacyCommandsHandler extends AbstractInvokeListener implements Inv
             ParameterData[] parameters, Object[] args, CommandContext context)
             throws ParameterException {
         Command annotation = method.getAnnotation(Command.class);
-        
+
         if (annotation != null) {
             if (context.argsLength() < annotation.min()) {
                 throw new MissingParameterException();
             }
-    
+
             if (annotation.max() != -1 && context.argsLength() > annotation.max()) {
                 throw new UnconsumedParameterException(
                         context.getRemainingString(annotation.max()));
@@ -73,21 +73,21 @@ public class LegacyCommandsHandler extends AbstractInvokeListener implements Inv
     public void updateDescription(Object object, Method method,
             ParameterData[] parameters, SimpleDescription description) {
         Command annotation = method.getAnnotation(Command.class);
-        
+
         // Handle the case for old commands where no usage is set and all of its
         // parameters are provider bindings, so its usage information would
         // be blank and would imply that there were no accepted parameters
-        if (annotation != null && annotation.usage().isEmpty() 
+        if (annotation != null && annotation.usage().isEmpty()
                 && (annotation.min() > 0 || annotation.max() > 0)) {
             boolean hasUserParameters = false;
-            
+
             for (ParameterData parameter : parameters) {
                 if (parameter.getBinding().getBehavior(parameter) != BindingBehavior.PROVIDES) {
                     hasUserParameters = true;
                     break;
                 }
             }
-            
+
             if (!hasUserParameters) {
                 description.overrideUsage("(unknown usage information)");
             }

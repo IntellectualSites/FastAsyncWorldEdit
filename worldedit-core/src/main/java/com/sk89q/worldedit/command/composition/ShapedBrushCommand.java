@@ -37,7 +37,6 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
-import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.command.argument.CommandArgs;
 import com.sk89q.worldedit.util.command.composition.CommandExecutor;
 import com.sk89q.worldedit.util.command.composition.SimpleCommand;
@@ -77,7 +76,7 @@ public class ShapedBrushCommand extends SimpleCommand<Object> {
             tool.setFill(null);
             tool.setBrush(new OperationFactoryBrush(factory, regionFactory, session), permission);
         } catch (MaxBrushRadiusException | InvalidToolBindException e) {
-            WorldEdit.getInstance().getPlatformManager().getCommandManager().getExceptionConverter().convert(e);
+            WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getExceptionConverter().convert(e);
         }
 
         player.print("Set brush to " + factory);

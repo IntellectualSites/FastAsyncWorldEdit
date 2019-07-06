@@ -13,7 +13,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.expression.Expression;
@@ -62,7 +62,7 @@ public class BrushSettings {
     }
 
     public static BrushSettings get(BrushTool tool, Player player, LocalSession session, Map<String, Object> settings) throws CommandException, InputParseException {
-        Dispatcher dispatcher = CommandManager.getInstance().getDispatcher();
+        Dispatcher dispatcher = PlatformCommandManager.getInstance().getCommandManager();
         Dispatcher brushDispatcher = (Dispatcher) (dispatcher.get("brush").getCallable());
         if (brushDispatcher == null) {
             return null;

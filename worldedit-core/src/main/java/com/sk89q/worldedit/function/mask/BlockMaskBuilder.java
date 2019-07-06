@@ -4,21 +4,19 @@ import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
+
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class BlockMaskBuilder {
@@ -71,12 +69,15 @@ public class BlockMaskBuilder {
                 result = bitSets[type.getInternalId()] != null;
                 remove(type);
             }
-        } else if (value.length() == 0) {
-
-        } else if ((operator == EQUAL || operator == EQUAL_OR_NULL) && !StringMan.isAlphanumericUnd(value)) {
-            result = filterRegex(type, key, value.toString());
         } else {
-            result = filterOperator(type, key, operator, value);
+            if (value.length() == 0) {
+                return result;
+            }
+            if ((operator == EQUAL || operator == EQUAL_OR_NULL) && !StringMan.isAlphanumericUnd(value)) {
+                result = filterRegex(type, key, value.toString());
+            } else {
+                result = filterOperator(type, key, operator, value);
+            }
         }
         return result;
     }
@@ -229,7 +230,7 @@ public class BlockMaskBuilder {
         throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
             Set<PropertyKey> keys = new HashSet<>();
             finalTypes.forEach(t -> t.getProperties().stream().forEach(p -> keys.add(p.getKey())));
-            return keys.stream().map(p -> p.getId())
+            return keys.stream().map(PropertyKey::getId)
                     .filter(p -> StringMan.blockStateMatches(property, p))
                     .sorted(StringMan.blockStateComparator(property))
                     .collect(Collectors.toList());
@@ -243,10 +244,7 @@ public class BlockMaskBuilder {
     private boolean optimizedStates = true;
 
     public boolean isEmpty() {
-        for (long[] bitSet : bitSets) {
-            if (bitSet != null) return false;
-        }
-        return true;
+        return Arrays.stream(bitSets).noneMatch(Objects::nonNull);
     }
 
     public BlockMaskBuilder() {
@@ -258,17 +256,13 @@ public class BlockMaskBuilder {
     }
 
     public BlockMaskBuilder addAll() {
-        for (int i = 0; i < bitSets.length; i++) {
-            bitSets[i] = BlockMask.ALL;
-        }
+        Arrays.fill(bitSets, BlockMask.ALL);
         optimizedStates = true;
         return this;
     }
 
     public BlockMaskBuilder clear() {
-        for (int i = 0; i < bitSets.length; i++) {
-            bitSets[i] = null;
-        }
+        Arrays.fill(bitSets, null);
         optimizedStates = true;
         return this;
     }

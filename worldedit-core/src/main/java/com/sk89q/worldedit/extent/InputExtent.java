@@ -25,7 +25,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
 
 /**
  * Provides the current state of blocks, entities, and so on.
@@ -47,10 +46,6 @@ public interface InputExtent {
      * @return the block
      */
     BlockState getBlock(BlockVector3 position);
-
-    default BlockType getBlockType(BlockVector3 position) {
-        return getBlock(position).getBlockType();
-    }
 
     /**
      * Get a lazy, immutable snapshot of the block at the given location that only

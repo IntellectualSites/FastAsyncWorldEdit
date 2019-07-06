@@ -48,6 +48,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
         return false;
     }
 
+    @Override
     public final boolean contains(BlockVector3 p) {
         return contains(p.getBlockX(), p.getBlockY(), p.getBlockZ());
     }

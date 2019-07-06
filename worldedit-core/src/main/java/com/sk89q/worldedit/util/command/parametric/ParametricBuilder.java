@@ -19,13 +19,11 @@
 
 package com.sk89q.worldedit.util.command.parametric;
 
-import com.boydti.fawe.command.FawePrimitiveBinding;
-import com.boydti.fawe.config.Commands;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.command.FawePrimitiveBinding;
+import com.boydti.fawe.config.Commands;
 import com.google.common.collect.ImmutableBiMap.Builder;
-import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -42,11 +40,11 @@ import com.sk89q.worldedit.util.command.binding.PrimitiveBindings;
 import com.sk89q.worldedit.util.command.binding.StandardBindings;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.thoughtworks.paranamer.Paranamer;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.enginehub.piston.annotation.Command;
 
 /**
  * Creates commands using annotations placed on methods and individual parameters of

@@ -21,16 +21,20 @@ package com.sk89q.worldedit.bukkit;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public class BukkitCommandSender implements Actor {
 
@@ -87,6 +91,11 @@ public class BukkitCommandSender implements Actor {
         for (String part : msg.split("\n")) {
             sender.sendMessage("\u00A7c" + part);
         }
+    }
+
+    @Override
+    public void print(Component component) {
+        TextAdapter.sendComponent(sender, component);
     }
 
     @Override

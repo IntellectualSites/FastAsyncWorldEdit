@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-import com.boydti.fawe.config.BBC;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -37,13 +37,14 @@ import com.sk89q.worldedit.regions.polyhedron.Triangle;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 /**
  * Creates a {@code ConvexPolyhedralRegion} from a user's selections.
@@ -276,8 +277,4 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         }
     }
 
-    @Override
-    public List<BlockVector3> getVerticies() {
-        return new ArrayList<>(region.getVertices());
-    }
 }

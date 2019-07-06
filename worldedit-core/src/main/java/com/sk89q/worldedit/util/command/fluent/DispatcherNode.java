@@ -21,7 +21,7 @@ package com.sk89q.worldedit.util.command.fluent;
 
 import com.boydti.fawe.config.Commands;
 
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.worldedit.util.command.CallableProcessor;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.Dispatcher;

@@ -41,6 +41,7 @@ public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFa
         this.queue = queue;
     }
 
+    @Override
     public FaweQueue getQueue() {
         return queue;
     }

@@ -122,7 +122,7 @@ public class SchematicStreamer extends NBTStreamer {
         ByteReader biomeReader = new ByteReader() {
             @Override
             public void run(int index, int value) {
-                fc.setBiome(index, BiomeTypes.get(value));
+                fc.setBiome(index, BiomeTypes.register(value));
             }
         };
         NBTStreamReader<Integer, Integer> initializer23 = new NBTStreamReader<Integer, Integer>() {

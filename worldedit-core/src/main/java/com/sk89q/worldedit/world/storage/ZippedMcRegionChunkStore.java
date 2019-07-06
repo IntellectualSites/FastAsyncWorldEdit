@@ -87,6 +87,7 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
                 if (testEntry.getName().startsWith(worldName + "/")) {
                     if (pattern.matcher(testEntry.getName()).matches()) { // does entry end in .mca
                         folder = testEntry.getName().substring(0, testEntry.getName().lastIndexOf('/'));
+                        if (folder.endsWith("poi")) continue;
                         name = folder + "/" + name;
                         break;
                     }
@@ -102,7 +103,14 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
 
         ZipEntry entry = getEntry(name);
         if (entry == null) {
-            throw new MissingChunkException();
+            if (name.endsWith(".mca")) { // try old mcr format
+                entry = getEntry(name.replace(".mca", ".mcr"));
+                if (entry == null) {
+                    throw new MissingChunkException();
+                }
+            } else {
+                throw new MissingChunkException();
+            }
         }
         try {
             return zip.getInputStream(entry);
@@ -113,7 +121,7 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
 
     /**
      * Get an entry from the ZIP, trying both types of slashes.
-     * 
+     *
      * @param file the file
      * @return a ZIP entry
      */
@@ -136,7 +144,7 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
 
             ZipEntry testEntry = e.nextElement();
 
-            if (testEntry.getName().matches(".*\\.mcr$") || testEntry.getName().matches(".*\\.mca$")) { // TODO: does this need a separate class?
+            if (testEntry.getName().matches(".*\\.mcr$") || testEntry.getName().matches(".*\\.mca$")) {
                 return true;
             }
         }

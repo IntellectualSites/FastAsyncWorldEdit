@@ -20,7 +20,7 @@ import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.github.intellectualsites.plotsquared.plot.util.SetupUtils;
 import com.sk89q.worldedit.event.platform.CommandEvent;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 
 @CommandDeclaration(
         command = "replaceall",
@@ -57,7 +57,7 @@ public class ReplaceAll extends Command {
                 FakePlayer actor = FakePlayer.getConsole();
                 String cmd = "/replaceallpattern " + worldName + " " + StringMan.join(args, " ");
                 CommandEvent event = new CommandEvent(actor, cmd);
-                CommandManager.getInstance().handleCommandOnCurrentThread(event);
+                PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
                 TaskManager.IMP.sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {

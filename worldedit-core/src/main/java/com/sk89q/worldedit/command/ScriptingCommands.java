@@ -19,39 +19,48 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
+
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.minecraft.util.commands.Logging;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.command.util.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
 import com.sk89q.worldedit.scripting.RhinoCraftScriptEngine;
-import com.sk89q.worldedit.session.request.Request;
-import org.mozilla.javascript.NativeJavaObject;
-
-import javax.annotation.Nullable;
-import javax.script.ScriptException;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
+import javax.script.ScriptException;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.mozilla.javascript.NativeJavaObject;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
 
 /**
  * Commands related to scripting.
  */
-@Command(aliases = {}, desc = "Run craftscripts: [More Info](https://goo.gl/dHDxLG)")
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ScriptingCommands {
 
     private final WorldEdit worldEdit;
@@ -61,21 +70,18 @@ public class ScriptingCommands {
      *
      * @param worldEdit reference to WorldEdit
      */
-    public ScriptingCommands(final WorldEdit worldEdit) {
+    public ScriptingCommands(WorldEdit worldEdit) {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
     }
 
     @Command(
-            aliases = {"setupdispatcher"},
-            desc = "",
-            usage = "",
-            min = 1,
-            max = 1
+        name = "setupdispatcher",
+        desc = ""
     )
     @CommandPermissions("fawe.setupdispatcher")
     public void setupdispatcher(Player player, LocalSession session, final CommandContext args) throws WorldEditException {
-        CommandManager.getInstance().setupDispatcher();
+        PlatformCommandManager.getInstance().setupDispatcher();
     }
 
     public static <T> T runScript(Player player, File f, String[] args) throws WorldEditException {
@@ -112,7 +118,7 @@ public class ScriptingCommands {
             byte[] data = new byte[in.available()];
             in.readFully(data);
             in.close();
-            script = new String(data, 0, data.length, "utf-8");
+            script = new String(data, 0, data.length, StandardCharsets.UTF_8);
         } catch (IOException e) {
             actor.printError("Script read error: " + e.getMessage());
             return null;
@@ -157,9 +163,7 @@ public class ScriptingCommands {
             e.printStackTrace();
             actor.printError("Failed to execute:");
             actor.printRaw(e.getMessage());
-        } catch (NumberFormatException e) {
-            throw e;
-        } catch (WorldEditException e) {
+        } catch (NumberFormatException | WorldEditException e) {
             throw e;
         } catch (Throwable e) {
             actor.printError("Failed to execute (see console):");
@@ -172,22 +176,25 @@ public class ScriptingCommands {
         return (T) result;
     }
 
-    @Command(aliases = {"cs"}, usage = "<filename> [args...]", desc = "Execute a CraftScript", min = 1, max = -1)
+    @Command(
+        name = "cs",
+        desc = "Execute a CraftScript"
+    )
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void execute(final Player player, final LocalSession session, final CommandContext args) throws WorldEditException {
+    public void execute(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         final String[] scriptArgs = args.getSlice(1);
-        final String name = args.getString(0);
+        final String filename = args.getString(0);
 
-        if (!player.hasPermission("worldedit.scripting.execute." + name)) {
+        if (!player.hasPermission("worldedit.scripting.execute." + filename)) {
             BBC.SCRIPTING_NO_PERM.send(player);
             return;
         }
 
-        session.setLastScript(name);
+        session.setLastScript(filename);
 
-        final File dir = this.worldEdit.getWorkingDirectoryFile(this.worldEdit.getConfiguration().scriptsDir);
-        final File f = this.worldEdit.getSafeOpenFile(player, dir, name, "js", "js");
+        File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().scriptsDir);
+        File f = worldEdit.getSafeOpenFile(player, dir, filename, "js", "js");
         try {
             new RhinoCraftScriptEngine();
         } catch (NoClassDefFoundError e) {
@@ -200,10 +207,15 @@ public class ScriptingCommands {
         runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
     }
 
-    @Command(aliases = {".s"}, usage = "[args...]", desc = "Execute last CraftScript", min = 0, max = -1)
+    @Command(
+        name = ".s",
+        desc = "Execute last CraftScript"
+    )
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void executeLast(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void executeLast(Player player, LocalSession session,
+                            @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
+                                List<String> args) throws WorldEditException {
 
         String lastScript = session.getLastScript();
 
@@ -217,17 +229,10 @@ public class ScriptingCommands {
             return;
         }
 
-        final String[] scriptArgs = args.getSlice(0);
+        File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().scriptsDir);
+        File f = worldEdit.getSafeOpenFile(player, dir, lastScript, "js", "js");
 
-        final File dir = this.worldEdit.getWorkingDirectoryFile(this.worldEdit.getConfiguration().scriptsDir);
-        final File f = this.worldEdit.getSafeOpenFile(player, dir, lastScript, "js", "js");
-
-        try {
-            this.worldEdit.runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
-        } catch (final WorldEditException ex) {
-            BBC.SCRIPTING_ERROR.send(player);
-        }
+        worldEdit.runScript(player, f, Stream.concat(Stream.of(lastScript), args.stream())
+            .toArray(String[]::new));
     }
-
-
 }

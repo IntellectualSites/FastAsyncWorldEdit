@@ -22,6 +22,7 @@ package com.sk89q.worldedit.regions.selector;
 import com.boydti.fawe.config.BBC;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;

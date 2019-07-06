@@ -179,11 +179,7 @@ public class EllipsoidRegion extends AbstractRegion {
         this.radius = radius;
         radiusSqr = radius.multiply(radius);
         radiusLengthSqr = (int) radiusSqr.getX();
-        if (radius.getY() == radius.getX() && radius.getX() == radius.getZ()) {
-            this.sphere = true;
-        } else {
-            this.sphere = false;
-        }
+        this.sphere = radius.getY() == radius.getX() && radius.getX() == radius.getZ();
     }
 
     @Override

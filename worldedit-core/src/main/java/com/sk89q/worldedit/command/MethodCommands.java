@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.Commands;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.minecraft.util.commands.CommandPermissions;

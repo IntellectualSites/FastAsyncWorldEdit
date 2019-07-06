@@ -101,9 +101,18 @@ public class ExtentEntityCopy implements EntityFunction {
         if (state != null && state.getType() != EntityTypes.PLAYER) {
             Location newLocation;
             Location location = entity.getLocation();
+            // If the entity has stored the location in the NBT data, we use that location
+            CompoundTag tag = state.getNbtData();
+            boolean hasTilePosition = tag != null && tag.containsKey("TileX") && tag.containsKey("TileY") && tag.containsKey("TileZ");
+            if (hasTilePosition) {
+                location = location.setPosition(Vector3.at(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ")).add(0.5, 0.5, 0.5));
+            }
 
             Vector3 pivot = from.round().add(0.5, 0.5, 0.5);
             Vector3 newPosition = transform.apply(location.toVector().subtract(pivot));
+            if (hasTilePosition) {
+                newPosition = newPosition.subtract(0.5, 0.5, 0.5);
+            }
             Vector3 newDirection;
 
             newDirection = transform.isIdentity() ?
@@ -206,5 +215,4 @@ public class ExtentEntityCopy implements EntityFunction {
 
         return state;
     }
-
 }

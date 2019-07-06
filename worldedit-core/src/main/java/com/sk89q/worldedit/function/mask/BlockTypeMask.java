@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -109,7 +110,7 @@ public class BlockTypeMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return types[getExtent().getBlockType(vector).getInternalId()];
+        return types[getExtent().getBlock(vector).getInternalId()];
     }
 
     @Nullable

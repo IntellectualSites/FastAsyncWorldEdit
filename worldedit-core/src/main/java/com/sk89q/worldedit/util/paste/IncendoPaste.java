@@ -2,7 +2,6 @@ package com.sk89q.worldedit.util.paste;
 
 import com.boydti.fawe.Fawe;
 import com.google.common.base.Charsets;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -13,6 +12,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 /**
  * Single class paster for the Incendo paste service
@@ -53,19 +53,19 @@ public final class IncendoPaste implements Paster{
     }
 
 	@Override
-	public ListenableFuture<URL> paste(String content) {
-		return Pasters.getExecutor().submit(new PasteTask(content));
+	public Callable<URL> paste(String content) {
+		return new PasteTask(content);
 	}
-	
+
 	private final class PasteTask implements Callable<URL>{
 
 		private PasteTask(String content) {}
-		
+
 		@Override
 		public URL call() throws Exception {
 			return new URL(debugPaste());
 		}
-		
+
 	}
 
     /**
@@ -150,14 +150,11 @@ public final class IncendoPaste implements Paster{
             throw new IllegalStateException(String.format("Server returned status: %d %s",
                 httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
         }
-        final StringBuilder input = new StringBuilder();
+        final String input;
         try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()))) {
-            String line;
-            while ((line = inputStream.readLine()) != null) {
-                input.append(line).append("\n");
-            }
+            input = inputStream.lines().map(line -> line + "\n").collect(Collectors.joining());
         }
-        return input.toString();
+        return input;
     }
 
     /**
@@ -265,12 +262,9 @@ public final class IncendoPaste implements Paster{
 
     private static String readFile(final File file) throws IOException {
         final StringBuilder content = new StringBuilder();
-        final List<String> lines = new ArrayList<>();
+        final List<String> lines;
         try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
+            lines = reader.lines().collect(Collectors.toList());
         }
         for (int i = Math.max(0, lines.size() - 1000); i < lines.size(); i++) {
             content.append(lines.get(i)).append("\n");

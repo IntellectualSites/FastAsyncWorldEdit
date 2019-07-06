@@ -21,7 +21,7 @@ package com.sk89q.worldedit.event.platform;
 
 import com.sk89q.worldedit.event.AbstractCancellable;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -67,6 +67,6 @@ public class CommandEvent extends AbstractCancellable implements Runnable {
 
     @Override
     public void run() {
-        CommandManager.getInstance().handleCommandOnCurrentThread(this);
+        PlatformCommandManager.getInstance().handleCommandOnCurrentThread(this);
     }
 }

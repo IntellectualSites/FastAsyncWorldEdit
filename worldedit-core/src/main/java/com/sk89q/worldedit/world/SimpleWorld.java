@@ -20,28 +20,26 @@
 package com.sk89q.worldedit.world;
 
 import com.boydti.fawe.util.SetQueue;
-import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.function.mask.BlockTypeMask;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.TreeGenerator;
-import com.sk89q.worldedit.world.block.*;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
-
-import java.util.HashMap;
-import java.util.PriorityQueue;
-
 import javax.annotation.Nullable;
 
 /**

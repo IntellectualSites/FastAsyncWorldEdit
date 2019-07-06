@@ -1,10 +1,9 @@
 package com.sk89q.jnbt;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import net.jpountz.lz4.LZ4BlockInputStream;
 
 public abstract class CompressedCompoundTag<T> extends CompoundTag {
     private T in;
@@ -20,7 +19,7 @@ public abstract class CompressedCompoundTag<T> extends CompoundTag {
         return super.getValue();
     }
 
-    public abstract DataInputStream adapt(T src) throws IOException;
+    public abstract LZ4BlockInputStream adapt(T src) throws IOException;
 
     public T getSource() {
         return in;

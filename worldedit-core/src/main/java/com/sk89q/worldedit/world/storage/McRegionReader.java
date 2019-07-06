@@ -85,7 +85,7 @@ public class McRegionReader {
 
     /**
      * Construct the reader.
-     * 
+     *
      * @param stream the stream
      * @throws DataException
      * @throws IOException
@@ -99,11 +99,10 @@ public class McRegionReader {
 
     /**
      * Read the header.
-     * 
-     * @throws DataException
+     *
      * @throws IOException
      */
-    private void readHeader() throws DataException, IOException {
+    private void readHeader() throws IOException {
         offsets = new int[SECTOR_INTS];
 
         for (int i = 0; i < SECTOR_INTS; ++i) {
@@ -114,7 +113,7 @@ public class McRegionReader {
 
     /**
      * Gets the uncompressed data input stream for a chunk.
-     * 
+     *
      * @param position chunk position
      * @return an input stream
      * @throws IOException
@@ -138,7 +137,7 @@ public class McRegionReader {
         int sectorNumber = offset >> 8;
         int numSectors = offset & 0xFF;
 
-        stream.seek(sectorNumber * SECTOR_BYTES);
+        stream.seek((long) sectorNumber * SECTOR_BYTES);
         int length = dataStream.readInt();
 
         if (length > SECTOR_BYTES * numSectors) {
@@ -170,7 +169,7 @@ public class McRegionReader {
 
     /**
      * Get the offset for a chunk. May return 0 if it doesn't exist.
-     * 
+     *
      * @param x the X coordinate
      * @param z the Z coordinate
      * @return the offset

@@ -20,15 +20,16 @@
 package com.sk89q.worldedit.world.biome;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
 
 /**
  * Stores a list of common Biome String IDs.
  */
-public class BiomeTypes {
+public final class BiomeTypes {
 
     @Nullable public static final BiomeType BADLANDS = get("minecraft:badlands");
     @Nullable public static final BiomeType BADLANDS_PLATEAU = get("minecraft:badlands_plateau");
+    @Nullable public static final BiomeType BAMBOO_JUNGLE = get("minecraft:bamboo_jungle");
+    @Nullable public static final BiomeType BAMBOO_JUNGLE_HILLS = get("minecraft:bamboo_jungle_hills");
     @Nullable public static final BiomeType BEACH = get("minecraft:beach");
     @Nullable public static final BiomeType BIRCH_FOREST = get("minecraft:birch_forest");
     @Nullable public static final BiomeType BIRCH_FOREST_HILLS = get("minecraft:birch_forest_hills");
@@ -104,15 +105,15 @@ public class BiomeTypes {
     private BiomeTypes() {
     }
 
+    private static BiomeType register(final String id) {
+        return register(new BiomeType(id));
+    }
+
+    public static BiomeType register(final BiomeType biome) {
+        return BiomeType.REGISTRY.register(biome.getId(), biome);
+    }
+
     public static @Nullable BiomeType get(final String id) {
         return BiomeType.REGISTRY.get(id);
-    }
-
-    public static BiomeType get(int internalId) {
-        return BiomeType.REGISTRY.getByInternalId(internalId);
-    }
-
-    public static Collection<BiomeType> values() {
-        return BiomeType.REGISTRY.values();
     }
 }

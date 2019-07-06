@@ -176,7 +176,7 @@ public class Schematic {
         if (transform != null) {
             copy.setTransform(transform);
         }
-        copy.setCopyBiomes(!(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP.hasBiomes());
+        copy.setCopyingBiomes(!(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP.hasBiomes());
         if (extent instanceof EditSession) {
             EditSession editSession = (EditSession) extent;
             Mask sourceMask = editSession.getSourceMask();

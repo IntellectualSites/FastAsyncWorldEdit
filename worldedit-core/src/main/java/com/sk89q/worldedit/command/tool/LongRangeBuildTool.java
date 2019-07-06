@@ -64,7 +64,7 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
                 eS.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), secondary);
             }
             return true;
-        } catch (MaxChangedBlocksException e) {
+        } catch (MaxChangedBlocksException ignored) {
             // one block? eat it
         }
         return false;
@@ -84,14 +84,19 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
                 eS.setBlock(pos.toVector().subtract(pos.getDirection()).toBlockPoint(), primary);
             }
             return true;
-        } catch (MaxChangedBlocksException e) {
+        } catch (MaxChangedBlocksException ignored) {
             // one block? eat it
         }
-        return true;
+        return false;
     }
 
-    public Location getTargetFace(Player player) {
+    private Location getTargetFace(Player player) {
         Location target = player.getBlockTraceFace(getRange(), true);
+        if (this.range > -1) {
+            target = player.getBlockTrace(getRange(), true);
+        } else {
+            target = player.getBlockTrace(MAX_RANGE, false);
+        }
 
         if (target == null) {
             BBC.NO_BLOCK.send(player);

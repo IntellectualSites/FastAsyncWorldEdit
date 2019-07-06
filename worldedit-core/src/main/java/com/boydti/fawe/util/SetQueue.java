@@ -171,16 +171,7 @@ public class SetQueue {
                     e.printStackTrace();
                 }
                 if (pool.getQueuedSubmissionCount() != 0 || pool.getRunningThreadCount() != 0 || pool.getQueuedTaskCount() != 0) {
-//                        if (Fawe.get().isJava8())
-                    {
-                        pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-                    }
-//                        else {
-//                            pool.shutdown();
-//                            pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-//                            pool = new ForkJoinPool();
-//                            completer = new ExecutorCompletionService(pool);
-//                        }
+                    pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
                 }
                 queue.endSet(parallel);
             } catch (Throwable e) {

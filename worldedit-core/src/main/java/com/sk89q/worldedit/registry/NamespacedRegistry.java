@@ -23,11 +23,15 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import javax.annotation.Nullable;
 
-public final class NamespacedRegistry<V extends RegistryItem> extends Registry<V> {
+public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Registry<V> {
     private static final String MINECRAFT_NAMESPACE = "minecraft";
-
+    private final Set<String> knownNamespaces = new HashSet<>();
     private final String defaultNamespace;
     private final List<V> values = new ArrayList<>();
     private int lastInternalId = 0;
@@ -41,11 +45,18 @@ public final class NamespacedRegistry<V extends RegistryItem> extends Registry<V
         this.defaultNamespace = defaultNamespace;
     }
 
+    @Nullable
+    @Override
+    public V get(final String key) {
+        return super.get(this.orDefaultNamespace(key));
+    }
+
+    @Override
     public synchronized V register(final String key, final V value) {
         requireNonNull(key, "key");
-        int index = key.indexOf(':');
-        checkState(index > -1, "key is not namespaced");
-        V existing = super.get(key);
+        final int i = key.indexOf(':');
+        checkState(i > 0, "key is not namespaced");
+        final V existing = super.get(key);
         if (existing != null) {
             throw new UnsupportedOperationException("Replacing existing registrations is not supported");
         }
@@ -53,7 +64,7 @@ public final class NamespacedRegistry<V extends RegistryItem> extends Registry<V
         values.add(value);
         super.register(key, value);
         if (key.startsWith(defaultNamespace)) {
-            super.register(key.substring(index + 1), value);
+            super.register(key.substring(i + 1), value);
         }
         return value;
     }
@@ -68,6 +79,24 @@ public final class NamespacedRegistry<V extends RegistryItem> extends Registry<V
 
     public int size() {
         return values.size();
+    }
+
+    /**
+     * Get a set of the namespaces of all registered keys.
+     *
+     * @return set of namespaces
+     */
+    public Set<String> getKnownNamespaces() {
+        return Collections.unmodifiableSet(knownNamespaces);
+    }
+
+    /**
+     * Get the default namespace for this registry.
+     *
+     * @return the default namespace
+     */
+    public String getDefaultNamespace() {
+        return defaultNamespace;
     }
 
     private String orDefaultNamespace(final String key) {

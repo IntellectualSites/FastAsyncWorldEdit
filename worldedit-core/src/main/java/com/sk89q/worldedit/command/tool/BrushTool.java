@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
@@ -40,14 +42,13 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -67,15 +68,15 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockType;
-
-import javax.annotation.Nullable;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.Nullable;
 
 /**
  * Builds a shape at the place being looked at.
@@ -92,7 +93,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     protected static int MAX_RANGE = 500;
-    protected int range = 240;
+    protected int range = -1;
     private VisualMode visualMode = VisualMode.NONE;
     private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
     private Mask targetMask = null;
@@ -202,7 +203,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         }
     }
 
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
         lock = new ReentrantLock();
         boolean multi = stream.readBoolean();
         primary = (BrushSettings) stream.readObject();
@@ -323,17 +324,11 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      * @param permission the permission
      */
     public void setBrush(Brush brush, String permission) {
-        setBrush(brush, permission, null);
-        update();
-    }
-
-    @Deprecated
-    public void setBrush(Brush brush, String permission, Player player) {
-        if (player != null) clear(player);
         BrushSettings current = getContext();
         current.clearPerms();
         current.setBrush(brush);
         current.addPermission(permission);
+        update();
         update();
     }
 
@@ -360,8 +355,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      *
      * @return the material
      */
-    @Nullable
-    public Pattern getMaterial() {
+    @Nullable public Pattern getMaterial() {
         return getContext().getMaterial();
     }
 
@@ -410,6 +404,11 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         this.range = range;
     }
 
+    @Override
+    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+        return act(BrushAction.PRIMARY, server, config, player, session);
+    }
+
     public BlockVector3 getPosition(EditSession editSession, Player player) {
         Location loc = player.getLocation();
         switch (targetMode) {
@@ -456,84 +455,79 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         return TaskManager.IMP.sync(new RunnableVal<Vector3>() {
             @Override
             public void run(Vector3 value) {
-                Location result = tb.getMaskedTargetBlock(useLastBlock);
-                this.value = result;
+                this.value = tb.getMaskedTargetBlock(useLastBlock);
             }
         });
     }
 
     public boolean act(BrushAction action, Platform server, LocalConfiguration config, Player player, LocalSession session) {
-        switch (action) {
-            case PRIMARY:
-                setContext(primary);
-                break;
-            case SECONDARY:
-                setContext(secondary);
-                break;
+        if (action == BrushAction.PRIMARY) {
+            setContext(primary);
+        } else if (action == BrushAction.SECONDARY) {
+            setContext(secondary);
         }
-
-
         BrushSettings current = getContext();
         Brush brush = current.getBrush();
         if (brush == null) return false;
 
-        EditSession editSession = session.createEditSession(player);
-        if (current.setWorld(editSession.getWorld().getName()) && !current.canUse(player)) {
-            BBC.NO_PERM.send(player, StringMan.join(current.getPermissions(), ","));
-            return false;
-        }
-
-        BlockVector3 target = getPosition(editSession, player);
-
-        if (target == null) {
-            editSession.cancel();
-            BBC.NO_BLOCK.send(player);
-            return false;
-        }
         BlockBag bag = session.getBlockBag(player);
-        Request.request().setEditSession(editSession);
-        Mask mask = current.getMask();
-        if (mask != null) {
-            Mask existingMask = editSession.getMask();
 
-            if (existingMask == null) {
-                editSession.setMask(mask);
-            } else if (existingMask instanceof MaskIntersection) {
-                ((MaskIntersection) existingMask).add(mask);
-            } else {
-                MaskIntersection newMask = new MaskIntersection(existingMask);
-                newMask.add(mask);
-                editSession.setMask(newMask);
+        try (EditSession editSession = session.createEditSession(player)) {
+            if (current.setWorld(editSession.getWorld().getName()) && !current.canUse(player)) {
+                BBC.NO_PERM.send(player, StringMan.join(current.getPermissions(), ","));
+                return false;
             }
-        }
-        Mask sourceMask = current.getSourceMask();
-        if (sourceMask != null) {
-            editSession.addSourceMask(sourceMask);
-        }
-        ResettableExtent transform = current.getTransform();
-        if (transform != null) {
-            editSession.addTransform(transform);
-        }
-        try {
-            new PatternTraverser(current).reset(editSession);
-            double size = current.getSize();
-            WorldEdit.getInstance().checkMaxBrushRadius(size);
-            brush.build(editSession, target, current.getMaterial(), size);
-        } catch (WorldEditException e) {
-            player.printError("Max blocks change limit reached."); // Never happens
+
+            BlockVector3 target = getPosition(editSession, player);
+
+            if (target == null) {
+                editSession.cancel();
+                BBC.NO_BLOCK.send(player);
+                return true;
+            }
+
+            Request.request().setEditSession(editSession);
+            Mask mask = current.getMask();
+            if (mask != null) {
+                Mask existingMask = editSession.getMask();
+
+                if (existingMask == null) {
+                    editSession.setMask(mask);
+                } else if (existingMask instanceof MaskIntersection) {
+                    ((MaskIntersection) existingMask).add(mask);
+                } else {
+                    MaskIntersection newMask = new MaskIntersection(existingMask);
+                    newMask.add(mask);
+                    editSession.setMask(newMask);
+                }
+            }
+
+            Mask sourceMask = current.getSourceMask();
+            if (sourceMask != null) {
+                editSession.addSourceMask(sourceMask);
+            }
+            ResettableExtent transform = current.getTransform();
+            if (transform != null) {
+                editSession.addTransform(transform);
+            }
+            try {
+                new PatternTraverser(current).reset(editSession);
+                double size = current.getSize();
+                WorldEdit.getInstance().checkMaxBrushRadius(size);
+                brush.build(editSession, target, current.getMaterial(), size);
+            } catch (MaxChangedBlocksException e) {
+                player.printError("Max blocks change limit reached.");
+            } finally {
+                session.remember(editSession);
+            }
         } finally {
             if (bag != null) {
                 bag.flushChanges();
             }
-            session.remember(editSession);
             Request.reset();
         }
-        return true;
-    }
 
-    @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-        return act(BrushAction.PRIMARY, server, config, player, session);
+        return true;
     }
 
     @Override
@@ -569,7 +563,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
             if (this.visualMode != VisualMode.NONE) {
                 clear(player);
             }
-            this.visualMode = visualMode != null ? visualMode : VisualMode.NONE;
+            this.visualMode = visualMode;
             if (visualMode != VisualMode.NONE) {
                 try {
                     queueVisualization(FawePlayer.wrap(player));
@@ -647,10 +641,9 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         if (position != null) {
             editSession.setExtent(newVisualExtent);
             switch (mode) {
-                case POINT: {
+                case POINT:
                     editSession.setBlock(position, VisualChunk.VISUALIZE_BLOCK);
                     break;
-                }
                 case OUTLINE: {
                     new PatternTraverser(current).reset(editSession);
                     brush.build(editSession, position, current.getMaterial(), current.getSize());

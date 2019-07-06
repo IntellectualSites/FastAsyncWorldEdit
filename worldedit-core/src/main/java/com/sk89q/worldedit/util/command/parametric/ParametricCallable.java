@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.util.command.parametric;
 
 import com.google.common.primitives.Chars;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;

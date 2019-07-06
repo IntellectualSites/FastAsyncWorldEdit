@@ -125,6 +125,7 @@ public class RegionWrapper extends CuboidRegion {
         return this.minX + "," + this.minY + "," + this.minZ + "->" + this.maxX + "," + this.maxY + "," + this.maxZ;
     }
 
+    @Override
     public boolean isGlobal() {
         return minX == Integer.MIN_VALUE && minZ == Integer.MIN_VALUE && maxX == Integer.MAX_VALUE && maxZ == Integer.MAX_VALUE && minY <= 0 && maxY >= 255;
     }

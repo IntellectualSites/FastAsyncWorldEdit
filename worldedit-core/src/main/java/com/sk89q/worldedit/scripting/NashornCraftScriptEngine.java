@@ -58,8 +58,7 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
         }
 
        try {
-           Object result = engine.eval(script, bindings);
-           return result;
+           return engine.eval(script, bindings);
         } catch (Error e) {
             e.printStackTrace();
             throw new ScriptException(e.getMessage());
@@ -72,7 +71,6 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
                 throw e;
             }
             throw e;
-        } finally {
         }
     }
 

@@ -78,6 +78,7 @@ public class NullExtent implements Extent {
         return BlockTypes.AIR.getDefaultState();
     }
 
+    @Override
     public BlockState getLazyBlock(BlockVector3 position) {
         return BlockTypes.AIR.getDefaultState();
     }

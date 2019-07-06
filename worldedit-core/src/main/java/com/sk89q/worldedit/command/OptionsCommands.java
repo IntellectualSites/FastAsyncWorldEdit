@@ -12,7 +12,7 @@ import com.boydti.fawe.util.TextureUtil;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Sets;
-import com.sk89q.minecraft.util.commands.Command;
+import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.worldedit.EditSession;

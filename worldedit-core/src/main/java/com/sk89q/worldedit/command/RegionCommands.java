@@ -19,6 +19,16 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
+import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
@@ -28,20 +38,14 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.boydti.fawe.util.MathMan;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.minecraft.util.commands.Logging;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.ORIENTATION_REGION;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.command.util.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.GroundFunction;
@@ -67,31 +71,27 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
-import com.sk89q.worldedit.util.command.binding.Range;
-import com.sk89q.worldedit.util.command.binding.Switch;
-import com.sk89q.worldedit.util.command.binding.Text;
-import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
 
 /**
  * Commands that operate on regions.
  */
-@Command(aliases = {}, desc = "Commands that operate on regions: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Region_operations)")
-public class RegionCommands extends MethodCommands {
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+public class RegionCommands {
 
     private final WorldEdit worldEdit;
 
@@ -101,16 +101,13 @@ public class RegionCommands extends MethodCommands {
      * @param worldEdit reference to WorldEdit
      */
     public RegionCommands(WorldEdit worldEdit) {
-        super(worldEdit);
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
     }
 
     @Command(
-            aliases = {"/fixlighting"},
-            desc = "Get the light at a position",
-            min = 0,
-            max = 0
+            name = "/fixlighting",
+            desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
     public void fixlighting(Player player) throws WorldEditException {
@@ -127,10 +124,8 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/getlighting"},
-            desc = "Get the light at a position",
-            min = 0,
-            max = 0
+            name = "/getlighting",
+            desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
     public void getlighting(Player player) throws WorldEditException {
@@ -141,10 +136,8 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/removelight", "/removelighting"},
-            desc = "Removing lighting in a selection",
-            min = 0,
-            max = 0
+            name = "/removelighting",
+            desc = "Removing lighting in a selection"
     )
     @CommandPermissions("worldedit.light.remove")
     public void removelighting(Player player) {
@@ -160,7 +153,7 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/nbtinfo", "/nbt"},
+            name = "/nbtinfo",
             desc = "View nbt info for a block"
     )
     @CommandPermissions("worldedit.nbtinfo")
@@ -179,10 +172,8 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/setblocklight", "/setlight"},
-            desc = "Set block lighting in a selection",
-            min = 1,
-            max = 1
+            name = "/setblocklight",
+            desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
@@ -200,10 +191,8 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/setskylight"},
-            desc = "Set sky lighting in a selection",
-            min = 1,
-            max = 1
+            name = "/setskylight"
+            desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
@@ -221,30 +210,25 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "/line" },
-            usage = "<pattern> [thickness]",
-            desc = "Draws a line segment between cuboid selection corners",
-            help =
-                "Draws a line segment between cuboid selection corners.\n" +
-                "Can only be used with cuboid selections.\n" +
-                "Flags:\n" +
-                "  -h generates only a shell",
-            flags = "h",
-            min = 1,
-            max = 2
+        name = "/line",
+        desc = "Draws a line segment between cuboid selection corners",
+        descFooter = "Can only be used with a cuboid selection"
     )
     @CommandPermissions("worldedit.region.line")
     @Logging(REGION)
-    public void line(Player player, EditSession editSession,
-                     @Selection Region region,
-                     Pattern pattern,
-                     @Optional("0") @Range(min = 0) int thickness,
-                     @Switch('h') boolean shell) throws WorldEditException {
-
+    public int line(Player player, EditSession editSession,
+                    @Selection Region region,
+                    @Arg(desc = "The pattern of blocks to place")
+                        Pattern pattern,
+                    @Arg(desc = "The thickness of the line", def = "0")
+                        int thickness,
+                    @Switch(name = 'h', desc = "Generate only a shell")
+                        boolean shell) throws WorldEditException {
         if (!(region instanceof CuboidRegion)) {
             player.printError("//line only works with cuboid selections");
-            return;
+            return 0;
         }
+        checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
 
         CuboidRegion cuboidregion = (CuboidRegion) region;
         BlockVector3 pos1 = cuboidregion.getPos1();
@@ -252,34 +236,30 @@ public class RegionCommands extends MethodCommands {
         int blocksChanged = editSession.drawLine(pattern, pos1, pos2, thickness, !shell);
 
         BBC.VISITOR_BLOCK.send(player, blocksChanged);
+        return blocksChanged;
     }
 
     @Command(
-            aliases = {"/curve", "/spline"},
-            usage = "<pattern> [thickness]",
-            desc = "Draws a spline through selected points",
-            help =
-                "Draws a spline through selected points.\n" +
-                "Can only be used with convex polyhedral selections.\n" +
-                "Flags:\n" +
-                "  -h generates only a shell",
-            flags = "h",
-            min = 1,
-            max = 2
+        name = "/curve",
+        desc = "Draws a spline through selected points",
+        descFooter = "Can only be used with a convex polyhedral selection"
     )
     @CommandPermissions("worldedit.region.curve")
     @Logging(REGION)
     public void curve(FawePlayer player, EditSession editSession,
                       @Selection Region region,
-                      Pattern pattern,
-                      @Optional("0") @Range(min = 0) int thickness,
-                      @Switch('h') boolean shell,
+        @Arg(desc = "The pattern of blocks to place")
+            Pattern pattern,
+        @Arg(desc = "The thickness of the curve", def = "0")
+            int thickness,
+        @Switch(name = 'h', desc = "Generate only a shell")
+            boolean shell,
                       CommandContext context) throws WorldEditException {
         if (!(region instanceof ConvexPolyhedralRegion)) {
-            player.sendMessage("//curve only works with convex polyhedral selections");
+            player.printError("//curve only works with convex polyhedral selections");
             return;
         }
-        worldEdit.checkMaxRadius(thickness);
+        checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
 
         player.checkConfirmationRegion(() -> {
         ConvexPolyhedralRegion cpregion = (ConvexPolyhedralRegion) region;
@@ -292,12 +272,9 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/replace", "/re", "/rep" },
-        usage = "[from-mask] <to-pattern>",
-        desc = "Replace all blocks in the selection with another",
-        flags = "f",
-        min = 1,
-        max = 2
+        name = "/replace",
+        aliases = { "/re", "/rep" },
+        desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.region.replace")
     @Logging(REGION)
@@ -337,15 +314,14 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/overlay" },
-        usage = "<pattern>",
-        desc = "Set a block on top of blocks in the region",
-        min = 1,
-        max = 1
+        name = "/overlay",
+        desc = "Set a block on top of blocks in the region"
     )
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
-    public void overlay(FawePlayer player, EditSession editSession, @Selection Region region, Pattern pattern, CommandContext context) throws WorldEditException {
+    public void overlay(FawePlayer player, EditSession editSession, @Selection Region region,
+        @Arg(desc = "The pattern of blocks to overlay")
+            Pattern pattern, CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.overlayCuboidBlocks(region, pattern);
             BBC.VISITOR_BLOCK.send(player, affected);
@@ -363,13 +339,8 @@ public class RegionCommands extends MethodCommands {
     @Logging(REGION)
     public void lay(FawePlayer player, EditSession editSession, @Selection Region region, Pattern pattern, CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
-        	BlockVector3 min = region.getMinimumPoint();
-        	BlockVector3 max = region.getMaximumPoint();
+            BlockVector3 max = region.getMaximumPoint();
             int maxY = max.getBlockY();
-            int width = region.getWidth();
-            int height = region.getLength();
-            int bx = min.getBlockX();
-            int bz = min.getBlockZ();
             Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
             Iterator<BlockVector2> iter = new Fast2DIterator(flat, editSession).iterator();
             int y = 0;
@@ -386,12 +357,10 @@ public class RegionCommands extends MethodCommands {
         }, getArguments(context), region, context);
     }
 
-    @Command(
-        aliases = { "/center", "/middle" },
-        usage = "<pattern>",
-        desc = "Set the center block(s)",
-        min = 1,
-        max = 1
+    @org.enginehub.piston.annotation.Command(
+        name = "/center",
+        aliases = { "/middle" },
+        desc = "Set the center block(s)"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.region.center")
@@ -401,11 +370,8 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/naturalize" },
-        usage = "",
-        desc = "3 layers of dirt on top then rock below",
-        min = 0,
-        max = 0
+        name = "/naturalize",
+        desc = "3 layers of dirt on top then rock below"
     )
     @CommandPermissions("worldedit.region.naturalize")
     @Logging(REGION)
@@ -417,11 +383,8 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/walls" },
-        usage = "<pattern>",
-        desc = "Build the four sides of the selection",
-        min = 1,
-        max = 1
+        name = "/walls",
+        desc = "Build the four sides of the selection"
     )
     @CommandPermissions("worldedit.region.walls")
     @Logging(REGION)
@@ -433,11 +396,9 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/faces", "/outline" },
-        usage = "<pattern>",
-        desc = "Build the walls, ceiling, and floor of a selection",
-        min = 1,
-        max = 1
+        name = "/faces",
+        aliases = { "/outline" },
+        desc = "Build the walls, ceiling, and floor of a selection"
     )
     @CommandPermissions("worldedit.region.faces")
     @Logging(REGION)
@@ -449,15 +410,9 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/smooth" },
-        usage = "[iterations] [filter]",
+        name = "/smooth",
         desc = "Smooth the elevation in the selection",
-        help =
-            "Smooths the elevation in the selection.\n" +
-            "Optionally, restricts the height map to a set of blocks specified with mask syntax.\n" +
-            "For example, '//smooth 1 grass_block,dirt,stone' would only smooth natural surface terrain.",
-        min = 0,
-        max = 2
+        descFooter = "Example: '//smooth 1 grass_block,dirt,stone' would only smooth natural surface terrain."
     )
     @CommandPermissions("worldedit.region.smooth")
     @Logging(REGION)
@@ -524,20 +479,27 @@ public class RegionCommands extends MethodCommands {
                             "The -e ignores entities\n" +
                             "The -a ignores air blocks.\n" +
                             "Optionally fills the old location with <leave-id>.",
-            min = 0,
             max = 3
     )
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
     public void move(FawePlayer player, LocalSession session, EditSession editSession,
                      @Selection Region region,
-                     @Optional("1") @Range(min = 1) int count,
-                     @Optional(Direction.AIM) @Direction(includeDiagonals = true) BlockVector3 direction,
-                     @Optional("air") Pattern replace,
-                     @Switch('b') boolean copyBiomes,
+        @Arg(desc = "# of blocks to move", def = "1")
+                int count,
+        @Arg(desc = "The direction to move", def = Direction.AIM)
+        @Direction(includeDiagonals = true)
+            BlockVector3 direction,
+        @Arg(desc = "The pattern of blocks to leave", def = "air")
+            Pattern replace,
+        @Switch(name = 's', desc = "Shift the selection to the target location")
+            boolean moveSelection,
+        @Switch(name = 'a', desc = "Ignore air blocks")
+            boolean ignoreAirBlocks
+        @Switch('b') boolean copyBiomes,
+
                      @Switch('e') boolean skipEntities,
                      @Switch('a') boolean skipAir,
-                     @Switch('s') boolean moveSelection,
                      CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.moveRegion(region, direction, count, !skipAir, !skipEntities, copyBiomes, replace);
@@ -549,7 +511,7 @@ public class RegionCommands extends MethodCommands {
                     session.getRegionSelector(player.getWorld()).learnChanges();
                     session.getRegionSelector(player.getWorld()).explainRegionAdjust(player.getPlayer(), session);
                 } catch (RegionOperationException e) {
-                    player.sendMessage(e.getMessage());
+                    player.printError(e.getMessage());
                 }
             }
 
@@ -562,10 +524,8 @@ public class RegionCommands extends MethodCommands {
             usage = "[replace]",
             flags = "m",
             desc = "Have the blocks in the selection fall",
-            help =
-                    "Make the blocks in the selection fall\n" +
-                    "The -m flag will only fall within the vertical selection.",
-            min = 0,
+            help = "Make the blocks in the selection fall\n" +
+                   "The -m flag will only fall within the vertical selection.",
             max = 2
     )
     @CommandPermissions("worldedit.region.fall")
@@ -582,28 +542,24 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-        aliases = { "/stack" },
-        usage = "[count] [direction]",
-        flags = "sam",
-        desc = "Repeat the contents of the selection",
-        help =
-            "Repeats the contents of the selection.\n" +
-            "Flags:\n" +
-            "  -s shifts the selection to the last stacked copy\n" +
-            "  -a skips air blocks",
-        min = 0,
-        max = 2
+        name = "/stack",
+        desc = "Repeat the contents of the selection"
     )
     @CommandPermissions("worldedit.region.stack")
     @Logging(ORIENTATION_REGION)
     public void stack(FawePlayer player, EditSession editSession, LocalSession session,
                       @Selection Region region,
-                      @Optional("1") @Range(min = 1) int count,
-                      @Optional(Direction.AIM) @Direction(includeDiagonals = true) BlockVector3 direction,
-                      @Switch('s') boolean moveSelection,
-                      @Switch('b') boolean copyBiomes,
-                      @Switch('e') boolean skipEntities,
-                      @Switch('a') boolean ignoreAirBlocks, @Switch('m') Mask sourceMask, CommandContext context) throws WorldEditException {
+        @Arg(desc = "# of copies to stack", def = "1")
+            int count,
+        @Arg(desc = "The direction to stack", def = Direction.AIM)
+        @Direction(includeDiagonals = true)
+            BlockVector3 direction,
+        @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
+            boolean moveSelection,
+                      @Switch(name = 'b', desc = "//TODO") boolean copyBiomes,
+                      @Switch(name = 'e', desc = "//TODO") boolean skipEntities,
+        @Switch(name = 'a', desc = "Ignore air blocks")
+            boolean ignoreAirBlocks, @Switch('m') Mask sourceMask, CommandContext context) throws WorldEditException {
         player.checkConfirmationStack(() -> {
             if (sourceMask != null) {
                 editSession.addSourceMask(sourceMask);
@@ -637,17 +593,18 @@ public class RegionCommands extends MethodCommands {
                 "to modify the variables x, y and z to point to a new block\n" +
                 "to fetch. See also tinyurl.com/wesyntax.",
             flags = "ro",
-            min = 1,
-            max = -1
+            min = 1
     )
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
     public void deform(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                        @Selection Region region,
-                       @Text String expression,
-                       @Switch('r') boolean useRawCoords,
-                       @Switch('o') boolean offset,
-                       CommandContext context) throws WorldEditException {
+        @Arg(desc = "The expression to use", variable = true)
+            List<String> expression,
+        @Switch(name = 'r', desc = "Use the game's coordinate origin")
+            boolean useRawCoords,
+        @Switch(name = 'o', desc = "Use the selection's center as origin")
+            boolean offset) throws WorldEditException {
         final Vector3 zero;
         Vector3 unit;
 
@@ -676,7 +633,7 @@ public class RegionCommands extends MethodCommands {
                 player.findFreePosition();
                 BBC.VISITOR_BLOCK.send(fp, affected);
             } catch (ExpressionException e) {
-                fp.sendMessage(e.getMessage());
+                player.printError(e.getMessage());
             }
         }, getArguments(context), region, context);
     }
@@ -689,7 +646,6 @@ public class RegionCommands extends MethodCommands {
                     "Regenerates the contents of the current selection.\n" +
                             "This command might affect things outside the selection,\n" +
                             "if they are within the same chunk.",
-            min = 0,
             max = 2
     )
     @CommandPermissions("worldedit.regen")
@@ -697,7 +653,6 @@ public class RegionCommands extends MethodCommands {
     public void regenerateChunk(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             Mask mask = session.getMask();
-            Mask sourceMask = session.getSourceMask();
             session.setMask((Mask) null);
             session.setSourceMask((Mask) null);
             BiomeType biome = null;
@@ -730,19 +685,19 @@ public class RegionCommands extends MethodCommands {
         aliases = { "/hollow" },
         usage = "[<thickness>[ <pattern>]]",
         desc = "Hollows out the object contained in this selection",
-        help =
-            "Hollows out the object contained in this selection.\n" +
+        help = "Hollows out the object contained in this selection.\n" +
             "Optionally fills the hollowed out part with the given block.\n" +
             "Thickness is measured in manhattan distance.",
-        min = 0,
         max = 2
     )
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)
     public void hollow(FawePlayer player, EditSession editSession,
                        @Selection Region region,
-                       @Optional("0") @Range(min = 0) int thickness,
-                       @Optional("air") Pattern pattern,
+        @Arg(desc = "Thickness of the shell to leave", def = "0")
+            int thickness,
+        @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
+            Pattern pattern,
                        CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.hollowOutRegion(region, thickness, pattern);
@@ -751,30 +706,29 @@ public class RegionCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = { "/forest" },
-            usage = "[type] [density]",
-            desc = "Make a forest within the region",
-            min = 0,
-            max = 2
+        name = "/forest",
+        desc = "Make a forest within the region"
     )
     @CommandPermissions("worldedit.region.forest")
     @Logging(REGION)
-    public void forest(Player player, EditSession editSession, @Selection Region region, @Optional("tree") TreeType type,
-                       @Optional("5") @Range(min = 0, max = 100) double density) throws WorldEditException {
+    public void forest(Player player, EditSession editSession, @Selection Region region,
+        @Arg(desc = "The type of tree to place", def = "tree")
+            TreeType type,
+        @Arg(desc = "The density of the forest", def = "5")
+            double density) throws WorldEditException {
         int affected = editSession.makeForest(region, density / 100, type);
         BBC.COMMAND_TREE.send(player, affected);
     }
 
     @Command(
-            aliases = { "/flora" },
-            usage = "[density]",
-            desc = "Make flora within the region",
-            min = 0,
-            max = 1
+        name = "/flora",
+        desc = "Make flora within the region"
     )
     @CommandPermissions("worldedit.region.flora")
     @Logging(REGION)
-    public void flora(FawePlayer player, EditSession editSession, @Selection Region region, @Optional("10") @Range(min = 0, max = 100) double density, CommandContext context) throws WorldEditException {
+    public void flora(FawePlayer player, EditSession editSession, @Selection Region region,
+        @Arg(desc = "The density of the forest", def = "5")
+            double density, CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             FloraGenerator generator = new FloraGenerator(editSession);
             GroundFunction ground = new GroundFunction(new ExistingBlockMask(editSession), generator);

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.util.paste;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.worldedit.util.net.HttpRequest;
 import org.json.simple.JSONValue;
 
@@ -35,8 +34,8 @@ public class EngineHubPaste implements Paster {
     private static final Pattern URL_PATTERN = Pattern.compile("https?://.+$");
 
     @Override
-    public ListenableFuture<URL> paste(String content) {
-        return Pasters.getExecutor().submit(new PasteTask(content));
+    public Callable<URL> paste(String content) {
+        return new PasteTask(content);
     }
 
     private static final class PasteTask implements Callable<URL> {

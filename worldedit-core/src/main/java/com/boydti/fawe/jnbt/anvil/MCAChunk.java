@@ -9,14 +9,25 @@ import com.boydti.fawe.object.number.MutableLong;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.jnbt.*;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.NBTConstants;
+import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
-
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class MCAChunk extends FaweChunk<Void> {
@@ -105,12 +116,9 @@ public class MCAChunk extends FaweChunk<Void> {
             }
             out.writeNamedTag("HeightMap", heightMap);
             out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
-            nbtOut.getOutputStream().writeByte(NBTConstants.TYPE_COMPOUND);
-            int len = 0;
-            for (int[] id : ids) {
-                if (id != null) len++;
-            }
-            nbtOut.getOutputStream().writeInt(len);
+            nbtOut.writeByte(NBTConstants.TYPE_COMPOUND);
+            int len = (int) Arrays.stream(ids).filter(Objects::nonNull).count();
+            nbtOut.writeInt(len);
             for (int layer = 0; layer < ids.length; layer++) {
                 int[] idLayer = ids[layer];
                 if (idLayer == null) {
@@ -131,8 +139,7 @@ public class MCAChunk extends FaweChunk<Void> {
             buffer = new byte[8192];
         }
         FastByteArrayOutputStream buffered = new FastByteArrayOutputStream(buffer);
-        DataOutputStream dataOut = new DataOutputStream(buffered);
-        try (NBTOutputStream nbtOut = new NBTOutputStream((DataOutput) dataOut)) {
+        try (NBTOutputStream nbtOut = new NBTOutputStream(buffered)) {
             write(nbtOut);
         }
         return buffered.toByteArray();
@@ -603,14 +610,14 @@ public class MCAChunk extends FaweChunk<Void> {
     public BiomeType[] getBiomeArray() {
         BiomeType[] arr = new BiomeType[256];
         for (int i = 0; i < arr.length; i++) {
-            arr[i] = BiomeTypes.get(biomes[i]);
+            arr[i] = BiomeTypes.register(biomes[i]);
         }
         return arr;
     }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
-        return BiomeTypes.get(biomes[(x & 15) + ((z & 15) << 4)]);
+        return BiomeTypes.register(biomes[(x & 15) + ((z & 15) << 4)]);
     }
 
     @Override

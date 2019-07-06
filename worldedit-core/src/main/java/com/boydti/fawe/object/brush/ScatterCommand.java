@@ -10,7 +10,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
-import com.sk89q.worldedit.extension.platform.CommandManager;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
@@ -42,7 +42,7 @@ public class ScatterCommand extends ScatterBrush {
         List<String> cmds = StringMan.split(replaced, ';');
         for (String cmd : cmds) {
             CommandEvent event = new CommandEvent(wePlayer, cmd);
-            CommandManager.getInstance().handleCommandOnCurrentThread(event);
+            PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
     }
 }

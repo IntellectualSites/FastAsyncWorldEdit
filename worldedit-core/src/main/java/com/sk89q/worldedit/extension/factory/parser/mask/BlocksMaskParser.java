@@ -30,6 +30,7 @@ import com.sk89q.worldedit.session.request.RequestExtent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Parses mask input strings.
@@ -38,6 +39,11 @@ public class BlocksMaskParser extends InputParser<Mask> {
 
     public BlocksMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
+    }
+
+    @Override
+    public Stream<String> getSuggestions(String input) {
+        return worldEdit.getBlockFactory().getSuggestions(input).stream();
     }
 
     @Override

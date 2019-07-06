@@ -178,7 +178,7 @@ public class PassthroughBlockMaterial implements BlockMaterial {
         if (blockMaterial == null) {
             return true;
         } else {
-            return blockMaterial.isOpaque();
+            return blockMaterial.isBurnable();
         }
     }
 
