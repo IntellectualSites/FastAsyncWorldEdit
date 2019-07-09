@@ -8,7 +8,7 @@ repositories {
     maven { url "https://repo.codemc.org/repository/maven-public" }
     maven { url "https://papermc.io/repo/repository/maven-public/" }
     flatDir {
-        dirs 'lib'
+        dirs "$rootProject.projectDir/lib"
     }
 }
 
@@ -26,6 +26,7 @@ task downloadJarsToLibs(){
 }
 
 dependencies {
+    compile ('net.milkbowl.vault:VaultAPI:1.7')
     api project(':worldedit-core')
     api project(':worldedit-libs:bukkit')
     compileOnly 'com.sk89q:dummypermscompat:1.10'
@@ -38,7 +39,6 @@ dependencies {
 //    compile([fileTree(dir: 'lib', include: ['*.jar']),'commons-validator:commons-validator:1.4.1'])
     implementation('com.sk89q.worldguard:worldguard-core:7.0.0-20190215.210421-39'){transitive = false}
     implementation('com.sk89q.worldguard:worldguard-legacy:7.0.0-20190215.210421-39'){transitive = false}
-    implementation('net.milkbowl.vault:VaultAPI:1.7'){transitive = false}
     implementation('com.massivecraft:factions:2.8.0'){transitive = false}
     implementation('com.drtshock:factions:1.6.9.5'){transitive = false}
     implementation('com.factionsone:FactionsOne:1.2.2'){transitive = false}

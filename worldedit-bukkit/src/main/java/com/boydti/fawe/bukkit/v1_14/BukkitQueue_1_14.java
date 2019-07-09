@@ -72,8 +72,8 @@ import java.util.function.Supplier;
 
 public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R1.Chunk, ChunkSection[], ChunkSection> {
 
-    protected final static Field fieldBits;
-    protected final static Field fieldPalette;
+    public final static Field fieldBits;
+    public final static Field fieldPalette;
     protected final static Field fieldSize;
 
     protected final static Field fieldHashBlocks;

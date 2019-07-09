@@ -9,6 +9,7 @@ import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import net.minecraft.server.v1_14_R1.BiomeBase;
@@ -84,6 +85,8 @@ public class BukkitGetBlocks extends CharGetBlocks {
             lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {
+                Spigot_v1_14_R1 adapter = ((Spigot_v1_14_R1) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
                 final DataBits bits = (DataBits) BukkitQueue_1_14.fieldBits.get(blocks);
                 final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitQueue_1_14.fieldPalette.get(blocks);
@@ -112,7 +115,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
                                 if (ibd == null) {
                                     ordinal = BlockTypes.AIR.getDefaultState().getOrdinalChar();
                                 } else {
-                                    ordinal = ((Spigot_v1_14_R1) getAdapter()).adaptToChar(ibd);
+                                    ordinal = adapter.adaptToChar(ibd);
                                 }
                                 paletteToBlockChars[paletteVal] = ordinal;
                             }
@@ -132,7 +135,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
                     final int size = num_palette;
                     if (size != 1) {
                         for (int i = 0; i < size; i++) {
-                            char ordinal = ordinal(palette.a(i));
+                            char ordinal = ordinal(palette.a(i), adapter);
                             paletteToBlockChars[i] = ordinal;
                         }
                         for (int i = 0; i < 4096; i++) {
@@ -141,7 +144,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
                             data[i] = val;
                         }
                     } else {
-                        char ordinal = ordinal(palette.a(0));
+                        char ordinal = ordinal(palette.a(0), adapter);
                         Arrays.fill(data, ordinal);
                     }
                 } finally {
@@ -157,11 +160,11 @@ public class BukkitGetBlocks extends CharGetBlocks {
         }
     }
 
-    private final char ordinal(IBlockData ibd) {
+    private final char ordinal(IBlockData ibd, Spigot_v1_14_R1 adapter) {
         if (ibd == null) {
             return BlockTypes.AIR.getDefaultState().getOrdinalChar();
         } else {
-            return ((Spigot_v1_14_R1) getAdapter()).adaptToChar(ibd);
+            return adapter.adaptToChar(ibd);
         }
     }
 

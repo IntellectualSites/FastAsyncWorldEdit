@@ -7,6 +7,7 @@ import com.boydti.fawe.beta.implementation.SimpleCharQueueExtent;
 import com.boydti.fawe.beta.implementation.SingleThreadQueueExtent;
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.boydti.fawe.bukkit.adapter.v1_13_1.BlockMaterial_1_13;
+import com.boydti.fawe.bukkit.v1_14.adapter.BlockMaterial_1_14;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
@@ -234,12 +235,9 @@ public class BukkitQueue extends SimpleCharQueueExtent {
     }
 
     private PlayerChunk getPlayerChunk(final int cx, final int cz) {
-        final PlayerChunkMap chunkMap = nmsWorld.getPlayerChunkMap();
-        final PlayerChunk playerChunk = chunkMap.getChunk(cx, cz);
+        PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
+        PlayerChunk playerChunk = chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
         if (playerChunk == null) {
-            return null;
-        }
-        if (playerChunk.players.isEmpty()) {
             return null;
         }
         return playerChunk;
@@ -250,14 +248,20 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         if (playerChunk == null) {
             return false;
         }
-        if (playerChunk.e()) {
+//        ChunkSection[] sections = nmsChunk.getSections();
+//        for (int layer = 0; layer < 16; layer++) {
+//            if (sections[layer] == null && (mask & (1 << layer)) != 0) {
+//                sections[layer] = new ChunkSection(layer << 4);
+//            }
+//        }
+        if (playerChunk.hasBeenLoaded()) {
             TaskManager.IMP.sync(new Supplier<Object>() {
                 @Override
                 public Object get() {
                     try {
                         int dirtyBits = fieldDirtyBits.getInt(playerChunk);
                         if (dirtyBits == 0) {
-                            nmsWorld.getPlayerChunkMap().a(playerChunk);
+                            nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
                         }
                         if (mask == 0) {
                             dirtyBits = 65535;
@@ -267,14 +271,15 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 
                         fieldDirtyBits.set(playerChunk, dirtyBits);
                         fieldDirtyCount.set(playerChunk, 64);
-                    } catch (final IllegalAccessException e) {
+                    } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
                     return null;
                 }
             });
+            return true;
         }
-        return true;
+        return false;
     }
 
     /*
@@ -342,7 +347,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
                 final int ordinal = paletteToBlock[i];
                 blockToPalette[ordinal] = Integer.MAX_VALUE;
                 final BlockState state = BlockTypes.states[ordinal];
-                final IBlockData ibd = ((BlockMaterial_1_13) state.getMaterial()).getState();
+                final IBlockData ibd = ((BlockMaterial_1_14) state.getMaterial()).getState();
                 palette.a(ibd);
             }
             try {

@@ -7,7 +7,7 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
-import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
+import com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14;
 import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
@@ -71,6 +71,11 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
         }
     }
 
+    private void removeEntity(Entity entity) {
+        entity.die();
+        entity.valid = false;
+    }
+
     @Override
     public synchronized T call() {
         try {
@@ -99,7 +104,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                         }
                         if (set.getBlock(lx, ly, lz).getOrdinal() != 0) {
                             TileEntity tile = entry.getValue();
-                            tile.z();
+                            tile.n();
                             tile.invalidateBlockCache();
                         }
                     }
@@ -121,7 +126,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
-                        newSection = extent.newChunkSection(layer, hasSky, setArr);
+                        newSection = extent.newChunkSection(layer, setArr);
                         if (BukkitQueue.setSectionAtomic(sections, null, newSection, layer)) {
                             updateGet(get, nmsChunk, sections, newSection, setArr, layer);
                             continue;
@@ -159,7 +164,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                                     getArr[i] = value;
                                 }
                             }
-                            newSection = extent.newChunkSection(layer, hasSky, getArr);
+                            newSection = extent.newChunkSection(layer, getArr);
                             if (!BukkitQueue.setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
@@ -207,9 +212,7 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                                         final Entity entity = iter.next();
                                         if (entityRemoves.contains(entity.getUniqueID())) {
                                             iter.remove();
-                                            entity.b(false);
-                                            entity.die();
-                                            entity.valid = false;
+                                            removeEntity(entity);
                                         }
                                     }
                                 }
@@ -240,20 +243,24 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                                 final float yaw = rotTag.getFloat(0);
                                 final float pitch = rotTag.getFloat(1);
                                 final String id = idTag.getValue();
-                                final Entity entity = EntityTypes.a(nmsWorld, new MinecraftKey(id));
-                                if (entity != null) {
-                                    final UUID uuid = entity.getUniqueID();
-                                    entityTagMap.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
-                                    entityTagMap.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
-                                    if (nativeTag != null) {
-                                        final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
-                                        for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
-                                            tag.remove(name);
+
+                                EntityTypes<?> type = EntityTypes.a(id).orElse(null);
+                                if (type != null) {
+                                    Entity entity = type.a(nmsWorld);
+                                    if (entity != null) {
+                                        UUID uuid = entity.getUniqueID();
+                                        entityTagMap.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
+                                        entityTagMap.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
+                                        if (nativeTag != null) {
+                                            final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_14.fromNative(nativeTag);
+                                            for (final String name : Constants.NO_COPY_ENTITY_NBT_FIELDS) {
+                                                tag.remove(name);
+                                            }
+                                            entity.f(tag);
                                         }
-                                        entity.f(tag);
+                                        entity.setLocation(x, y, z, yaw, pitch);
+                                        nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                                     }
-                                    entity.setLocation(x, y, z, yaw, pitch);
-                                    nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                                 }
                             }
                         }
@@ -278,12 +285,12 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                                 final BlockPosition pos = new BlockPosition(x, y, z);
                                 synchronized (BukkitQueue_0.class) {
                                     TileEntity tileEntity = nmsWorld.getTileEntity(pos);
-                                    if (tileEntity == null || tileEntity.x()) {
-                                        nmsWorld.n(pos);
+                                    if (tileEntity == null || tileEntity.isRemoved()) {
+                                        nmsWorld.removeTileEntity(pos);
                                         tileEntity = nmsWorld.getTileEntity(pos);
                                     }
                                     if (tileEntity != null) {
-                                        final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_13.fromNative(nativeTag);
+                                        final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_14.fromNative(nativeTag);
                                         tag.set("x", new NBTTagInt(x));
                                         tag.set("y", new NBTTagInt(y));
                                         tag.set("z", new NBTTagInt(z));
@@ -302,8 +309,8 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                     int finalMask = bitMask;
                     callback = () -> {
                         // Set Modified
-                        nmsChunk.f(true);
-                        nmsChunk.mustSave = true;
+                        nmsChunk.d(true); // Set Modified
+                        nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
                         // send to player
                         extent.sendChunk(X, Z, finalMask);
