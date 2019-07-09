@@ -178,6 +178,11 @@ public class Fawe {
                 WEManager.IMP.managers.add(new PlotSquaredFeature());
                 Fawe.debug("Plugin 'PlotSquared' found. Using it now.");
             } catch (Throwable ignored) {}
+            try {
+                imp().startMetrics();
+            } catch (Throwable ignored) {
+                debug(ignored.getMessage());
+            }
         }, 0);
 
         TaskManager.IMP.repeat(timer, 1);

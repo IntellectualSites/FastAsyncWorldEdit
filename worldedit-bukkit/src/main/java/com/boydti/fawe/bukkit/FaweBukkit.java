@@ -46,6 +46,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
+import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.command.ConsoleCommandSender;
@@ -263,7 +264,7 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override public void startMetrics() {
-        new BStats(plugin);
+        new MetricsLite(plugin);
     }
 
     public ItemUtil getItemUtil() {
