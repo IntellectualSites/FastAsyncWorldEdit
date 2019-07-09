@@ -48,6 +48,8 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxBrushRadiusException;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -519,7 +521,9 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
             double size = current.getSize();
             WorldEdit.getInstance().checkMaxBrushRadius(size);
             brush.build(editSession, target, current.getMaterial(), size);
-        } catch (WorldEditException e) {
+        } catch (MaxBrushRadiusException e) {
+            player.printError("Max blocks change limit reached."); // Never happens
+        } catch (MaxChangedBlocksException e) {
             player.printError("Max blocks change limit reached."); // Never happens
         } finally {
             if (bag != null) {

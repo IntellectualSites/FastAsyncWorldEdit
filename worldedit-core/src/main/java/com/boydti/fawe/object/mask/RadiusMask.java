@@ -44,9 +44,4 @@ public class RadiusMask extends AbstractMask implements ResettableMask {
         return true;
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

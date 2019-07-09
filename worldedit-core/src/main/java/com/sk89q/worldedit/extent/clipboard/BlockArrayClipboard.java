@@ -37,7 +37,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -118,7 +117,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void finalize() {
         close();
     }
 
@@ -266,8 +265,6 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     public Operation commit() {
         return null;
     }
-
-
 
     @Override
     public int getLight(int x, int y, int z) {

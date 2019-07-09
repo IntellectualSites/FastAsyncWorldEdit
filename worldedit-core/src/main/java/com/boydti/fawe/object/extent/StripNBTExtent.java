@@ -30,7 +30,7 @@ public class StripNBTExtent extends AbstractDelegateExtent {
      */
     public StripNBTExtent(Extent extent, Set<String> strip) {
         super(extent);
-        this.strip = strip.toArray(new String[strip.size()]);
+        this.strip = strip.toArray(new String[0]);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class StripNBTExtent extends AbstractDelegateExtent {
         }
         return (B) localBlock;
     }
-    
+
     public <T extends NbtValued> T stripEntityNBT(T entity) {
         if (!entity.hasNbtData()) return entity;
         CompoundTag nbt = entity.getNbtData();

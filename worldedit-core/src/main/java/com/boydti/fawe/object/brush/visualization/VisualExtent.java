@@ -1,14 +1,12 @@
 package com.boydti.fawe.object.brush.visualization;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.example.IntFaweChunk;
 import com.boydti.fawe.example.NullQueueIntFaweChunk;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.visitor.FaweChunkVisitor;
 import com.boydti.fawe.util.MathMan;
+
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -17,7 +15,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 public class VisualExtent extends AbstractDelegateExtent {
 
@@ -67,9 +64,7 @@ public class VisualExtent extends AbstractDelegateExtent {
     }
 
     public void clear(VisualExtent other, FawePlayer... players) {
-        ObjectIterator<Long2ObjectMap.Entry<VisualChunk>> iter = chunks.long2ObjectEntrySet().iterator();
-        while (iter.hasNext()) {
-            Long2ObjectMap.Entry<VisualChunk> entry = iter.next();
+        for (Long2ObjectMap.Entry<VisualChunk> entry : chunks.long2ObjectEntrySet()) {
             long pair = entry.getLongKey();
             int cx = MathMan.unpairIntX(pair);
             int cz = MathMan.unpairIntY(pair);
@@ -79,21 +74,15 @@ public class VisualExtent extends AbstractDelegateExtent {
             final int bx = cx << 4;
             final int bz = cz << 4;
             if (otherChunk == null) {
-                chunk.forEachQueuedBlock(new FaweChunkVisitor() {
-                    @Override
-                    public void run(int localX, int y, int localZ, int combined) {
-                        combined = queue.getCombinedId4Data(bx + localX, y, bz + localZ, 0);
-                        newChunk.setBlock(localX, y, localZ, combined);
-                    }
+                chunk.forEachQueuedBlock((localX, y, localZ, combined) -> {
+                    combined = queue.getCombinedId4Data(bx + localX, y, bz + localZ, 0);
+                    newChunk.setBlock(localX, y, localZ, combined);
                 });
             } else {
-                chunk.forEachQueuedBlock(new FaweChunkVisitor() {
-                    @Override
-                    public void run(int localX, int y, int localZ, int combined) {
-                        if (combined != otherChunk.getBlockCombinedId(localX, y, localZ)) {
-                            combined = queue.getCombinedId4Data(bx + localX, y, bz + localZ, 0);
-                            newChunk.setBlock(localX, y, localZ, combined);
-                        }
+                chunk.forEachQueuedBlock((localX, y, localZ, combined) -> {
+                    if (combined != otherChunk.getBlockCombinedId(localX, y, localZ)) {
+                        combined = queue.getCombinedId4Data(bx + localX, y, bz + localZ, 0);
+                        newChunk.setBlock(localX, y, localZ, combined);
                     }
                 });
             }

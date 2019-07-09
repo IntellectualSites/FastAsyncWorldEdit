@@ -309,8 +309,4 @@ public class Location extends Vector3 {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 }

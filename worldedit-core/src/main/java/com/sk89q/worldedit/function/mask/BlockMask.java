@@ -35,7 +35,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -267,12 +266,6 @@ public class BlockMask extends AbstractExtentMask {
         if (bitSet == null) return false;
         if (bitSet.length == 0) return true;
         return FastBitSet.get(bitSet, block.getInternalPropertiesId());
-    }
-
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
     }
 
 }

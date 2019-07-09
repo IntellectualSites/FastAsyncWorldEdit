@@ -3,18 +3,8 @@ package com.boydti.fawe.object.schematic;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.FloatTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+
+import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -28,14 +18,15 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
-import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.storage.NBTConversions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,17 +36,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class StructureFormat implements ClipboardReader, ClipboardWriter {
+public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
     private static final int WARN_SIZE = 32;
 
-    private NBTInputStream in;
+    private NBTInputStream inputStream;
     private NBTOutputStream out;
 
-    public StructureFormat(NBTInputStream in) {
-        this.in = in;
+    public MinecraftStructure(@NotNull NBTInputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
-    public StructureFormat(NBTOutputStream out) {
+    public MinecraftStructure(NBTOutputStream out) {
         this.out = out;
     }
 
@@ -65,10 +56,13 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
     }
 
     public Clipboard read(UUID clipboardId) throws IOException {
-        NamedTag rootTag = in.readNamedTag();
-        if (!rootTag.getName().equals("")) {
-            throw new IOException("Root tag does not exist or is not first");
+        NamedTag rootTag = inputStream.readNamedTag();
+
+        // MC structures are all unnamed, but this doesn't seem to be necessary? might remove this later
+        if (!rootTag.getName().isEmpty()) {
+            throw new IOException("Root tag has name - are you sure this is a structure?");
         }
+
         Map<String, Tag> tags = ((CompoundTag) rootTag.getTag()).getValue();
 
         ListTag size = (ListTag) tags.get("size");
@@ -258,8 +252,8 @@ public class StructureFormat implements ClipboardReader, ClipboardWriter {
 
     @Override
     public void close() throws IOException {
-        if (in != null) {
-            in.close();
+        if (inputStream != null) {
+            inputStream.close();
         }
         if (out != null) {
             out.close();

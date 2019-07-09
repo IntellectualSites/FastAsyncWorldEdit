@@ -29,7 +29,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.helper.MCDirections;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -40,7 +39,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import static com.sk89q.worldedit.util.Direction.*;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -93,19 +91,11 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long[] adapt(Direction... dirs) {
-        long[] arr = new long[dirs.length];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = 1L << dirs[i].ordinal();
-        }
-        return arr;
+        return Arrays.stream(dirs).mapToLong(dir -> 1L << dir.ordinal()).toArray();
     }
 
     private static long[] adapt(Long... dirs) {
-        long[] arr = new long[dirs.length];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = dirs[i];
-        }
-        return arr;
+        return Arrays.stream(dirs).mapToLong(dir -> dir).toArray();
     }
 
     private static long[] getDirections(AbstractProperty property) {
@@ -219,9 +209,7 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long notIndex(long mask, int... indexes) {
-        for (int index : indexes) {
-            mask = mask | (1L << (index + values().length));
-        }
+        mask |= Arrays.stream(indexes).mapToLong(index -> (1L << (index + values().length))).reduce(0, (a, b) -> a | b);
         return mask;
     }
 
@@ -388,11 +376,6 @@ public class BlockTransformExtent extends ResettableExtent {
         }
     }
 
-    @Override
-    public ResettableExtent setExtent(Extent extent) {
-        return super.setExtent(extent);
-    }
-
     /**
      * Get the transform.
      *
@@ -469,7 +452,7 @@ public class BlockTransformExtent extends ResettableExtent {
         return BlockState.getFromInternalId(newMaskedId);
     }
 
-    public final BaseBlock transform(BlockStateHolder block) {
+    public final BaseBlock transform(BlockStateHolder<BaseBlock> block) {
         BlockState transformed = transform(block.toImmutableState());
         if (block.hasNbtData()) {
             return transformBaseBlockNBT(transformed, block.getNbtData(), transform);
@@ -501,11 +484,6 @@ public class BlockTransformExtent extends ResettableExtent {
     @Override
     public BlockState getLazyBlock(BlockVector3 position) {
         return transform(super.getLazyBlock(position));
-    }
-
-    @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return super.getBiome(position);
     }
 
     @Override

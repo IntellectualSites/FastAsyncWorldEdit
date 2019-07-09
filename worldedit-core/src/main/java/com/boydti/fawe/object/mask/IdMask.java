@@ -31,9 +31,4 @@ public class IdMask extends AbstractExtentMask implements ResettableMask {
         this.id = -1;
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

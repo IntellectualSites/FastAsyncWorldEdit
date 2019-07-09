@@ -27,7 +27,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 public class BlockStateMask extends AbstractExtentMask {
@@ -62,9 +61,4 @@ public class BlockStateMask extends AbstractExtentMask {
                 .allMatch(entry -> block.getState(entry.getKey()) == entry.getValue());
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

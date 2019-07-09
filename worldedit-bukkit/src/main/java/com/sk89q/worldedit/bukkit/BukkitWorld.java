@@ -47,10 +47,12 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -155,6 +157,11 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
+    public Path getStoragePath() {
+        return getWorld().getWorldFolder().toPath();
+    }
+
+    @Override
     public int getBlockLightLevel(BlockVector3 pt) {
         return getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).getLightLevel();
     }
@@ -239,11 +246,11 @@ public class BukkitWorld extends AbstractWorld {
             return false;
         }
         BlockState state = block.getState();
-        if (!(state instanceof org.bukkit.inventory.InventoryHolder)) {
+        if (!(state instanceof InventoryHolder)) {
             return false;
         }
 
-        org.bukkit.inventory.InventoryHolder chest = (org.bukkit.inventory.InventoryHolder) state;
+        InventoryHolder chest = (InventoryHolder) state;
         Inventory inven = chest.getInventory();
         if (chest instanceof Chest) {
             inven = getBlockInventory((Chest) chest);

@@ -3,7 +3,6 @@ package com.boydti.fawe.object.clipboard;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class OffsetFaweClipboard extends AbstractDelegateFaweClipboard {

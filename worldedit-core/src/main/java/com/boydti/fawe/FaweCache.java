@@ -1,12 +1,17 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.object.collection.IterableThreadLocal;
+
 import com.sk89q.jnbt.*;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FaweCache {
     public static final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<int[]>() {
@@ -115,7 +120,7 @@ public class FaweCache {
         } else if (value instanceof String) {
             return asTag((String) value);
         } else if (value instanceof Map) {
-            return asTag((Map) value);
+            return asTag((Map<String, Object>) value);
         } else if (value instanceof Collection) {
             return asTag((Collection) value);
         } else if (value instanceof Object[]) {
@@ -153,7 +158,7 @@ public class FaweCache {
     }
 
     public static ListTag asTag(Object... values) {
-        Class clazz = null;
+        Class<? extends Tag> clazz = null;
         List<Tag> list = new ArrayList<>(values.length);
         for (Object value : values) {
             Tag tag = asTag(value);
@@ -167,7 +172,7 @@ public class FaweCache {
     }
 
     public static ListTag asTag(Collection values) {
-        Class clazz = null;
+        Class<? extends Tag> clazz = null;
         List<Tag> list = new ArrayList<>(values.size());
         for (Object value : values) {
             Tag tag = asTag(value);

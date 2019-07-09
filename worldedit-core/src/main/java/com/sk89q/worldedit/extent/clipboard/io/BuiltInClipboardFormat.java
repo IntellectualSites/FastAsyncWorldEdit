@@ -22,7 +22,8 @@ package com.sk89q.worldedit.extent.clipboard.io;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.object.io.ResettableFileInputStream;
 import com.boydti.fawe.object.schematic.PNGWriter;
-import com.boydti.fawe.object.schematic.StructureFormat;
+import com.boydti.fawe.object.schematic.MinecraftStructure;
+
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
@@ -122,35 +123,41 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
      * The structure block format:
      * http://minecraft.gamepedia.com/Structure_block_file_format
      */
-    STRUCTURE("structure", "nbt") {
+    MINECRAFT_STRUCTURE("structure") {
+        @Override
+        public String getPrimaryFileExtension() {
+            return "nbt";
+        }
+
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
             inputStream = new BufferedInputStream(inputStream);
             NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(inputStream)));
-            return new StructureFormat(nbtStream);
+            return new MinecraftStructure(nbtStream);
         }
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             outputStream = new BufferedOutputStream(outputStream);
-            OutputStream gzip;
-            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
-                gzip = outputStream;
-            } else {
-                gzip = new PGZIPOutputStream(outputStream);
-            }
+            OutputStream gzip = new PGZIPOutputStream(outputStream);
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
-            return new StructureFormat(nbtStream);
+            return new MinecraftStructure(nbtStream);
         }
 
         @Override
         public boolean isFormat(File file) {
-            return file.getName().toLowerCase().endsWith(".nbt");
-        }
+            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                NamedTag rootTag = str.readNamedTag();
+                CompoundTag structureTag = (CompoundTag) rootTag.getTag();
+                Map<String, Tag> structure = structureTag.getValue();
+                if (!structure.containsKey("DataVersion")) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
 
-        @Override
-        public String getPrimaryFileExtension() {
-            return "nbt";
+            return true;
         }
     },
 

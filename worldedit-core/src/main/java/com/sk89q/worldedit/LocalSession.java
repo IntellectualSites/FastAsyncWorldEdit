@@ -1068,7 +1068,7 @@ public class LocalSession implements TextureHolder {
                 }
             }
         }
-        if (previous != null && player != null && previous instanceof BrushTool) {
+        if (player != null && previous instanceof BrushTool) {
             BrushTool brushTool = (BrushTool) previous;
             brushTool.clear(player);
         }

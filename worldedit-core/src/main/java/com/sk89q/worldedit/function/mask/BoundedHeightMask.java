@@ -20,10 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkArgument;
-
 import com.sk89q.worldedit.math.BlockVector3;
-
-import javax.annotation.Nullable;
 
 /**
  * Has the criteria where the Y value of passed positions must be within
@@ -49,12 +46,6 @@ public class BoundedHeightMask extends AbstractMask {
     @Override
     public boolean test(BlockVector3 vector) {
         return vector.getY() >= minY && vector.getY() <= maxY;
-    }
-
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
     }
 
 }

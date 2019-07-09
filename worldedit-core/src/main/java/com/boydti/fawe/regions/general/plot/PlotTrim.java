@@ -8,6 +8,7 @@ import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.SetQueue;
+
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.object.ChunkLoc;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
@@ -15,6 +16,7 @@ import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpireManager;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.File;
@@ -26,25 +28,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class PlotTrim {
     private final MCAQueue queue;
     private final PlotArea area;
     private final PlotPlayer player;
     private final MCAQueue originalQueue;
     private final File root;
-    private final File originalRoot;
     private int[][] ids;
-    private boolean deleteUnowned = true;
+    private boolean deleteUnowned;
 
     public PlotTrim(PlotPlayer player, PlotArea area, String worldName, boolean deleteUnowned) {
         FaweQueue tmpQueue = SetQueue.IMP.getNewQueue(worldName, true, false);
         File saveFolder = tmpQueue.getSaveFolder();
         this.root = new File(saveFolder.getParentFile().getParentFile(), worldName + "-Copy" + File.separator + "region");
-        this.originalRoot = saveFolder;
-        this.originalQueue = new MCAQueue(worldName, originalRoot, true);
+        this.originalQueue = new MCAQueue(worldName, saveFolder, true);
         this.queue = new MCAQueue(worldName + "-Copy", root, true);
         this.area = area;
         this.player = player;
@@ -124,10 +121,7 @@ public class PlotTrim {
             @Override
             public boolean appliesFile(int mcaX, int mcaZ) {
                 ChunkLoc loc = new ChunkLoc(mcaX, mcaZ);
-                if (mcas.contains(loc)) {
-                    return false;
-                }
-                return true;
+                return !mcas.contains(loc);
             }
 
             @Override
@@ -156,11 +150,6 @@ public class PlotTrim {
             }
 
             @Override
-            public boolean appliesChunk(int cx, int cz) {
-                return true;
-            }
-
-            @Override
             public MCAChunk applyChunk(MCAChunk chunk, Object ignore) {
                 long pair = MathMan.pairInt(chunk.getX(), chunk.getZ());
                 if (chunks.containsKey(pair)) {
@@ -180,8 +169,6 @@ public class PlotTrim {
         });
         player.sendMessage("Done!");
     }
-
-    private int count = 0;
 
     private boolean isEqual(int[] a, int[] b) {
         if (a == b) {

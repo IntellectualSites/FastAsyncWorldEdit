@@ -36,6 +36,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
+import java.nio.file.Path;
 import java.util.PriorityQueue;
 
 /**
@@ -56,6 +57,10 @@ public abstract class AbstractWorld implements World {
         return setBlock(pt, block, true);
     }
 
+    @Override
+    public Path getStoragePath() {
+        return null;
+    }
     @Override
     public int getMaxY() {
         return getMaximumPoint().getBlockY();

@@ -25,8 +25,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import javax.annotation.Nullable;
-
 public class SolidBlockMask extends BlockTypeMask {
 
     public static boolean[] getTypes() {
@@ -46,12 +44,6 @@ public class SolidBlockMask extends BlockTypeMask {
         Extent extent = getExtent();
         BlockState block = extent.getBlock(vector);
         return block.getBlockType().getMaterial().isMovementBlocker();
-    }
-
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
     }
 
 }

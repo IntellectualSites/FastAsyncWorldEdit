@@ -3,9 +3,8 @@ package com.boydti.fawe.object.extent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
+
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -15,6 +14,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
@@ -41,7 +41,7 @@ public class NullExtent extends FaweRegionExtent {
         super(new com.sk89q.worldedit.extent.NullExtent(), FaweLimit.MAX);
         this.reason = BBC.WORLDEDIT_CANCEL_REASON_MANUAL;
     }
-    
+
     @Override
     public ResettableExtent setExtent(Extent extent) {
         return this;
@@ -49,74 +49,66 @@ public class NullExtent extends FaweRegionExtent {
 
     @Override
     public BiomeType getBiome(final BlockVector2 arg0) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return null;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return null;
     }
 
     @Override
     public BlockState getBlock(final BlockVector3 arg0) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return null;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return null;
     }
 
     @Override
     public BlockState getLazyBlock(final BlockVector3 arg0) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return null;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return null;
     }
 
     @Override
     public boolean setBiome(final BlockVector2 arg0, final BiomeType arg1) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return false;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return false;
     }
 
     @Override
     public boolean setBlock(final BlockVector3 arg0, final BlockStateHolder arg1) throws WorldEditException {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return false;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return false;
     }
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return false;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return false;
     }
 
     @Override
     public BlockState getLazyBlock(int x, int y, int z) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return null;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return null;
     }
 
     @Override
     public Entity createEntity(final Location arg0, final BaseEntity arg1) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return null;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return null;
     }
 
     @Override
@@ -131,40 +123,33 @@ public class NullExtent extends FaweRegionExtent {
 
     @Override
     public BlockVector3 getMaximumPoint() {
-        return BlockVector3.at(0, 0, 0);
+        return BlockVector3.ZERO;
     }
 
     @Override
     public BlockVector3 getMinimumPoint() {
-        return BlockVector3.at(0, 0, 0);
+        return BlockVector3.ZERO;
     }
 
     @Override
     public boolean contains(int x, int z) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return false;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return false;
     }
 
     @Override
     public boolean contains(int x, int y, int z) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return false;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return false;
     }
 
     @Override
     public Collection<Region> getRegions() {
         return Collections.emptyList();
-    }
-
-    @Override
-    protected Operation commitBefore() {
-        return null;
     }
 
     @Nullable
@@ -175,29 +160,26 @@ public class NullExtent extends FaweRegionExtent {
 
     @Override
     public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return -1;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return -1;
     }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return -1;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return -1;
     }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
-        if(reason != null) {
-        	throw new FaweException(reason);
-        }else {
-        	return -1;
+        if (reason != null) {
+            throw new FaweException(reason);
         }
+        return -1;
     }
 
     @Override

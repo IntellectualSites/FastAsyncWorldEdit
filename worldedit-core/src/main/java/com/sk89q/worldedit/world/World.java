@@ -38,6 +38,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
+import javax.annotation.Nullable;
+import java.nio.file.Path;
+
 /**
  * Represents a world (dimension).
  */
@@ -51,10 +54,20 @@ public interface World extends Extent {
     String getName();
 
     /**
+     * Get the folder in which this world is stored. May return null if unknown
+     * or if this world is not serialized to disk.
+     *
+     * @return world storage path
+     */
+    @Nullable
+    Path getStoragePath();
+
+    /**
      * Get the maximum Y.
      *
      * @return the maximum Y
      */
+    @Override
     int getMaxY();
 
     /**

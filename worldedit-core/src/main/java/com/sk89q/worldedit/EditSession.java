@@ -131,6 +131,7 @@ import com.sk89q.worldedit.regions.shape.RegionShape;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.SimpleWorld;
@@ -149,6 +150,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -377,7 +379,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             } else {
                 this.extent = new ProcessedWEExtent(this.extent, this.limit);
                 if (allowedRegions.length == 1) {
-                    Region region = allowedRegions[0];
                     this.extent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
                 } else {
                     this.extent = new MultiRegionExtent(this.extent, this.limit, allowedRegions);
@@ -417,7 +418,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     public void resetLimit() {
         this.limit.set(this.originalLimit);
-        ExtentTraverser<ProcessedWEExtent> find = new ExtentTraverser(extent).find(ProcessedWEExtent.class);
+        ExtentTraverser<ProcessedWEExtent> find = new ExtentTraverser<>(extent).find(ProcessedWEExtent.class);
         if (find != null && find.get() != null) {
             find.get().setLimit(this.limit);
         }
@@ -456,7 +457,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return FaweRegionExtent (may be null)
      */
     public FaweRegionExtent getRegionExtent() {
-        ExtentTraverser<FaweRegionExtent> traverser = new ExtentTraverser(this.extent).find(FaweRegionExtent.class);
+        ExtentTraverser<FaweRegionExtent> traverser = new ExtentTraverser<>(this.extent).find(FaweRegionExtent.class);
         return traverser == null ? null : traverser.get();
     }
 
@@ -740,7 +741,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return mask, may be null
      */
     public Mask getMask() {
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser(this.extent).find(MaskingExtent.class);
+        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(MaskingExtent.class);
         return maskingExtent != null ? maskingExtent.get().getMask() : null;
     }
 
@@ -750,30 +751,29 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return mask, may be null
      */
     public Mask getSourceMask() {
-        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser(this.extent).find(SourceMaskExtent.class);
+        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(SourceMaskExtent.class);
         return maskingExtent != null ? maskingExtent.get().getMask() : null;
     }
 
     public void addTransform(ResettableExtent transform) {
         wrapped = true;
         if (transform == null) {
-            ExtentTraverser<AbstractDelegateExtent> traverser = new ExtentTraverser(this.extent).find(ResettableExtent.class);
+            ExtentTraverser<ResettableExtent> traverser = new ExtentTraverser<>(this.extent).find(ResettableExtent.class);
             AbstractDelegateExtent next = extent;
-            while (traverser != null && traverser.get() instanceof ResettableExtent) {
+            while (traverser != null && traverser.get() != null) {
                 traverser = traverser.next();
                 next = traverser.get();
             }
             this.extent = next;
-            return;
         } else {
             this.extent = transform.setExtent(extent);
         }
     }
 
     public @Nullable ResettableExtent getTransform() {
-        ExtentTraverser<AbstractDelegateExtent> traverser = new ExtentTraverser(this.extent).find(ResettableExtent.class);
+        ExtentTraverser<ResettableExtent> traverser = new ExtentTraverser<>(this.extent).find(ResettableExtent.class);
         if (traverser != null) {
-            return (ResettableExtent) traverser.get();
+            return traverser.get();
         }
         return null;
     }
@@ -789,7 +789,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         } else {
             new MaskTraverser(mask).reset(this);
         }
-        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser(this.extent).find(SourceMaskExtent.class);
+        ExtentTraverser<SourceMaskExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(SourceMaskExtent.class);
         if (maskingExtent != null && maskingExtent.get() != null) {
             Mask oldMask = maskingExtent.get().getMask();
             if (oldMask instanceof ResettableMask) {
@@ -828,7 +828,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         } else {
             new MaskTraverser(mask).reset(this);
         }
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser(this.extent).find(MaskingExtent.class);
+        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(this.extent).find(MaskingExtent.class);
         if (maskingExtent != null && maskingExtent.get() != null) {
             Mask oldMask = maskingExtent.get().getMask();
             if (oldMask instanceof ResettableMask) {
@@ -846,13 +846,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @return the survival simulation extent
      */
     public SurvivalModeExtent getSurvivalExtent() {
-        ExtentTraverser<SurvivalModeExtent> survivalExtent = new ExtentTraverser(this.extent).find(SurvivalModeExtent.class);
+        ExtentTraverser<SurvivalModeExtent> survivalExtent = new ExtentTraverser<>(this.extent).find(SurvivalModeExtent.class);
         if (survivalExtent != null) {
             return survivalExtent.get();
         } else {
             AbstractDelegateExtent extent = this.extent;
             SurvivalModeExtent survival = new SurvivalModeExtent(extent.getExtent(), getWorld());
-            new ExtentTraverser(extent).setNext(survival);
+            new ExtentTraverser<>(extent).setNext(survival);
             return survival;
         }
     }
@@ -879,21 +879,21 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (history == null) {
             return;
         }
-        ExtentTraverser traverseHistory = new ExtentTraverser(this.extent).find(HistoryExtent.class);
+        ExtentTraverser<HistoryExtent> traverseHistory = new ExtentTraverser<>(this.extent).find(HistoryExtent.class);
         if (disableHistory) {
             if (traverseHistory != null && traverseHistory.exists()) {
-                ExtentTraverser beforeHistory = traverseHistory.previous();
-                ExtentTraverser afterHistory = traverseHistory.next();
+                ExtentTraverser<HistoryExtent> beforeHistory = traverseHistory.previous();
+                ExtentTraverser<HistoryExtent> afterHistory = traverseHistory.next();
                 if (beforeHistory != null && beforeHistory.exists()) {
                     beforeHistory.setNext(afterHistory.get());
                 } else {
-                    extent = (AbstractDelegateExtent) afterHistory.get();
+                    extent = afterHistory.get();
                 }
             }
         } else if (traverseHistory == null || !traverseHistory.exists()) {
-            ExtentTraverser traverseBypass = new ExtentTraverser(this.extent).find(bypassHistory);
+            ExtentTraverser<AbstractDelegateExtent> traverseBypass = new ExtentTraverser<>(this.extent).find(bypassHistory);
             if (traverseBypass != null) {
-                ExtentTraverser beforeHistory = traverseBypass.previous();
+                ExtentTraverser<AbstractDelegateExtent> beforeHistory = traverseBypass.previous();
                 beforeHistory.setNext(history);
             }
         }
@@ -940,19 +940,19 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      *
      * @return a map of missing blocks
      */
-    public Map<com.sk89q.worldedit.world.block.BlockType, Integer> popMissingBlocks() {
+    public Map<BlockType, Integer> popMissingBlocks() {
         BlockBag bag = getBlockBag();
         if (bag != null) {
             bag.flushChanges();
 
-            Map<com.sk89q.worldedit.world.block.BlockType, Integer> missingBlocks;
+            Map<BlockType, Integer> missingBlocks;
             ChangeSet changeSet = getChangeSet();
 
 
             if (changeSet instanceof BlockBagChangeSet) {
                 missingBlocks = ((BlockBagChangeSet) changeSet).popMissing();
             } else {
-                ExtentTraverser<BlockBagExtent> find = new ExtentTraverser(extent).find(BlockBagExtent.class);
+                ExtentTraverser<BlockBagExtent> find = new ExtentTraverser<>(extent).find(BlockBagExtent.class);
                 if (find != null && find.get() != null) {
                     missingBlocks = find.get().popMissing();
                 } else {
@@ -1228,7 +1228,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
     }
 
-    @SuppressWarnings("deprecation")
     public boolean setBlock(final BlockVector3 position, final Pattern pattern) {
         this.changes++;
         try {
@@ -1238,7 +1237,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
     }
 
-    @SuppressWarnings("deprecation")
     public int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
         RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(extent, pattern), this);
         Operations.completeBlindly(visitor);
@@ -1276,7 +1274,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
     @Override
     @Nullable
-    public Entity createEntity(com.sk89q.worldedit.util.Location location, final BaseEntity entity) {
+    public Entity createEntity(Location location, final BaseEntity entity) {
         return this.extent.createEntity(location, entity);
     }
 
@@ -1407,7 +1405,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (used.MAX_FAILS > 0) {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
                 BBC.WORLDEDIT_SOME_FAILS.send(player, used.MAX_FAILS);
-            } else if (new ExtentTraverser(this).findAndGet(FaweRegionExtent.class) != null){
+            } else if (new ExtentTraverser<>(this).findAndGet(FaweRegionExtent.class) != null){
                 BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION.send(player);
             } else {
                 BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_LEVEL.send(player);
@@ -1447,12 +1445,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
         if (searchIDs.size() == 1) {
             final BlockType id = searchIDs.iterator().next();
-            RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-                @Override
-                public boolean apply(BlockVector3 position) throws WorldEditException {
-                    return getBlockType(position) == id;
-                }
-            }, this);
+            RegionVisitor visitor = new RegionVisitor(region, position -> getBlockType(position) == id, this);
             Operations.completeBlindly(visitor);
             return visitor.getAffected();
         }
@@ -1464,23 +1457,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public int countBlock(final Region region, final boolean[] ids) {
-        RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 position) throws WorldEditException {
-                return ids[getBlockType(position).getInternalId()];
-            }
-        }, this);
+        RegionVisitor visitor = new RegionVisitor(region, position -> ids[getBlockType(position).getInternalId()], this);
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
 
     public int countBlock(final Region region, final Mask mask) {
-        RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 position) throws WorldEditException {
-                return mask.test(position);
-            }
-        }, this);
+        RegionVisitor visitor = new RegionVisitor(region, mask::test, this);
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
@@ -1494,12 +1477,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public int countBlocks(Region region, Set<BlockStateHolder> searchBlocks) {
         Mask mask = new BlockMaskBuilder().addBlocks(searchBlocks).build(extent);
-        RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 position) throws WorldEditException {
-                return mask.test(position);
-            }
-        }, this);
+        RegionVisitor visitor = new RegionVisitor(region, mask::test, this);
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
@@ -1509,30 +1487,27 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final int startPerformY = region.getMinimumPoint().getBlockY();
         final int startCheckY = fullHeight ? 0 : startPerformY;
         final int endY = region.getMaximumPoint().getBlockY();
-        RegionVisitor visitor = new RegionVisitor(flat, new RegionFunction() {
-            @Override
-            public boolean apply(BlockVector3 pos) throws WorldEditException {
-                int x = pos.getBlockX();
-                int z = pos.getBlockZ();
-                int freeSpot = startCheckY;
-                for (int y = startCheckY; y <= endY; y++) {
-                    if (y < startPerformY) {
-                        if (!getBlockType(x, y, z).getMaterial().isAir()) {
-                            freeSpot = y + 1;
-                        }
-                        continue;
+        RegionVisitor visitor = new RegionVisitor(flat, pos -> {
+            int x = pos.getBlockX();
+            int z = pos.getBlockZ();
+            int freeSpot = startCheckY;
+            for (int y = startCheckY; y <= endY; y++) {
+                if (y < startPerformY) {
+                    if (!getBlockType(x, y, z).getMaterial().isAir()) {
+                        freeSpot = y + 1;
                     }
-                    BlockType block = getBlockType(x, y, z);
-                    if (!block.getMaterial().isAir()) {
-                        if (freeSpot != y) {
-                            setBlock(x, freeSpot, z, block);
-                            setBlock(x, y, z, replace);
-                        }
-                        freeSpot++;
-                    }
+                    continue;
                 }
-                return true;
+                BlockType block = getBlockType(x, y, z);
+                if (!block.getMaterial().isAir()) {
+                    if (freeSpot != y) {
+                        setBlock(x, freeSpot, z, block);
+                        setBlock(x, y, z, replace);
+                    }
+                    freeSpot++;
+                }
             }
+            return true;
         }, this);
         Operations.completeBlindly(visitor);
         return this.changes;
@@ -1813,7 +1788,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * returned by a given pattern.
      *
      * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param filter a list of block types to match, or null to use {@link ExistingBlockMask}
      * @param replacement the replacement block
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1827,7 +1802,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * returned by a given pattern.
      *
      * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param filter a list of block types to match, or null to use {@link ExistingBlockMask}
      * @param pattern the pattern that provides the new blocks
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed

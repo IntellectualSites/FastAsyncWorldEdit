@@ -1,25 +1,21 @@
 package com.boydti.fawe.object.pattern;
 
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 
 public class PatternExtent extends AbstractPattern implements Extent {
     private final Pattern pattern;
@@ -53,12 +49,6 @@ public class PatternExtent extends AbstractPattern implements Extent {
     @Override
     public List<? extends Entity> getEntities() {
         return new ArrayList<>();
-    }
-
-    @Nullable
-    @Override
-    public Entity createEntity(Location location, BaseEntity entity) {
-        return null;
     }
 
     @Override
@@ -114,12 +104,6 @@ public class PatternExtent extends AbstractPattern implements Extent {
     @Override
     public boolean setBiome(BlockVector2 position, BiomeType biome) {
         return false;
-    }
-
-    @Nullable
-    @Override
-    public Operation commit() {
-        return null;
     }
 
     @Override

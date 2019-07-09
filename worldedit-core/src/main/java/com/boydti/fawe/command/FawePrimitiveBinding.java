@@ -4,9 +4,9 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -30,23 +30,20 @@ import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.binding.Validate;
 import com.sk89q.worldedit.util.command.parametric.ArgumentStack;
 import com.sk89q.worldedit.util.command.parametric.BindingBehavior;
-import com.sk89q.worldedit.util.command.parametric.BindingHelper;
 import com.sk89q.worldedit.util.command.parametric.BindingMatch;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
+
+import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URI;
-import java.net.URL;
-import javax.annotation.Nullable;
 
 public class FawePrimitiveBinding {
     @BindingMatch(type = {Long.class, long.class},
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1,
-            provideModifiers = true)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
     public Long getLong(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         try {
             Long v = Long.parseLong(context.next());
@@ -80,11 +77,15 @@ public class FawePrimitiveBinding {
     public class ImageUri {
         public final URI uri;
         private BufferedImage image;
-        public ImageUri(URI uri) {
+
+        ImageUri(URI uri) {
             this.uri = uri;
         }
+
         public BufferedImage load() throws ParameterException {
-            if (image != null) return image;
+            if (image != null) {
+                return image;
+            }
             return image = ImageUtil.load(uri);
         }
     }
@@ -105,7 +106,9 @@ public class FawePrimitiveBinding {
     )
     public TextureUtil getTexture(ArgumentStack context) {
         Actor actor = context.getContext().getLocals().get(Actor.class);
-        if (actor == null) return Fawe.get().getCachedTextureUtil(true, 0, 100);
+        if (actor == null) {
+            return Fawe.get().getCachedTextureUtil(true, 0, 100);
+        }
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
         return session.getTextureUtil();
     }
@@ -117,12 +120,20 @@ public class FawePrimitiveBinding {
     )
     public Extent getExtent(ArgumentStack context) throws ParameterException {
         Extent extent = context.getContext().getLocals().get(EditSession.class);
-        if (extent != null) return extent;
+        if (extent != null) {
+            return extent;
+        }
         extent = Request.request().getExtent();
-        if (extent != null) return extent;
+        if (extent != null) {
+            return extent;
+        }
         Actor actor = context.getContext().getLocals().get(Actor.class);
-        if (actor == null) throw new ParameterException("No player to get a session for");
-        if (!(actor instanceof Player)) throw new ParameterException("Caller is not a player");
+        if (actor == null) {
+            throw new ParameterException("No player to get a session for");
+        }
+        if (!(actor instanceof Player)) {
+            throw new ParameterException("Caller is not a player");
+        }
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
         EditSession editSession = session.createEditSession((Player) actor);
         editSession.enableQueue();
@@ -139,7 +150,7 @@ public class FawePrimitiveBinding {
      * @throws ParameterException on other error
      */
     @BindingMatch(type = FawePlayer.class,
-            behavior = BindingBehavior.PROVIDES)
+                  behavior = BindingBehavior.PROVIDES)
     public FawePlayer getFawePlayer(ArgumentStack context) throws ParameterException, InputParseException {
         Actor sender = context.getContext().getLocals().get(Actor.class);
         if (sender == null) {
@@ -157,10 +168,12 @@ public class FawePrimitiveBinding {
      * @throws ParameterException on other error
      */
     @BindingMatch(type = ResettableExtent.class,
-            behavior = BindingBehavior.PROVIDES)
+                  behavior = BindingBehavior.PROVIDES)
     public ResettableExtent getResettableExtent(ArgumentStack context) throws ParameterException, InputParseException {
         String input = context.next();
-        if (input.equalsIgnoreCase("#null")) return new NullExtent();
+        if (input.equalsIgnoreCase("#null")) {
+            return new NullExtent();
+        }
         DefaultTransformParser parser = Fawe.get().getTransformParser();
         Actor actor = context.getContext().getLocals().get(Actor.class);
         ParserContext parserContext = new ParserContext();
@@ -178,17 +191,17 @@ public class FawePrimitiveBinding {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context   the context
-     * @param text      the text annotation
+     * @param context the context
+     * @param text the text annotation
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws ParameterException on error
      */
     @BindingMatch(classifier = Text.class,
-            type = String.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = -1,
-            provideModifiers = true)
+                  type = String.class,
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = -1,
+                  provideModifiers = true)
     public String getText(ArgumentStack context, Text text, Annotation[] modifiers)
             throws ParameterException {
         String v = context.remaining();
@@ -196,9 +209,9 @@ public class FawePrimitiveBinding {
         return v;
     }
 
-    @BindingMatch(type = { Expression.class },
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
+    @BindingMatch(type = {Expression.class},
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1)
     public Expression getExpression(ArgumentStack context) throws ParameterException, ExpressionException {
         String input = context.next();
         try {
@@ -222,15 +235,15 @@ public class FawePrimitiveBinding {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context   the context
+     * @param context the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws ParameterException on error
      */
     @BindingMatch(type = String.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1,
-            provideModifiers = true)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
     public String getString(ArgumentStack context, Annotation[] modifiers)
             throws ParameterException {
         String v = context.next();
@@ -246,8 +259,8 @@ public class FawePrimitiveBinding {
      * @throws ParameterException on error
      */
     @BindingMatch(type = {Boolean.class, boolean.class},
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1)
     public Boolean getBoolean(ArgumentStack context) throws ParameterException {
         return context.nextBoolean();
     }
@@ -260,9 +273,9 @@ public class FawePrimitiveBinding {
      * @throws ParameterException on error
      */
     @BindingMatch(type = Vector3.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1,
-            provideModifiers = true)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
     public Vector3 getVector3(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         String radiusString = context.next();
         String[] radii = radiusString.split(",");
@@ -293,9 +306,9 @@ public class FawePrimitiveBinding {
      * @throws ParameterException on error
      */
     @BindingMatch(type = Vector2.class,
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1,
-            provideModifiers = true)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
     public Vector2 getVector2(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         String radiusString = context.next();
         String[] radii = radiusString.split(",");
@@ -314,69 +327,71 @@ public class FawePrimitiveBinding {
                 throw new ParameterException("You must either specify 1 or 2 radius values.");
         }
         return Vector2.at(radiusX, radiusZ);
-    }    /**
+    }
+
+    /**
      * Gets a type from a {@link ArgumentStack}.
-    *
-    * @param context the context
-    * @return the requested type
-    * @throws ParameterException on error
-    */
-   @BindingMatch(type = BlockVector3.class,
-           behavior = BindingBehavior.CONSUMES,
-           consumedCount = 1,
-           provideModifiers = true)
-   public BlockVector3 getBlockVector3(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
-       String radiusString = context.next();
-       String[] radii = radiusString.split(",");
-       final double radiusX, radiusY, radiusZ;
-       switch (radii.length) {
-           case 1:
-               radiusX = radiusY = radiusZ = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[0]));
-               break;
+     *
+     * @param context the context
+     * @return the requested type
+     * @throws ParameterException on error
+     */
+    @BindingMatch(type = BlockVector3.class,
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
+    public BlockVector3 getBlockVector3(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
+        String radiusString = context.next();
+        String[] radii = radiusString.split(",");
+        final double radiusX, radiusY, radiusZ;
+        switch (radii.length) {
+            case 1:
+                radiusX = radiusY = radiusZ = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[0]));
+                break;
 
-           case 3:
-               radiusX = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[0]));
-               radiusY = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[1]));
-               radiusZ = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[2]));
-               break;
+            case 3:
+                radiusX = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[0]));
+                radiusY = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[1]));
+                radiusZ = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[2]));
+                break;
 
-           default:
-               throw new ParameterException("You must either specify 1 or 3 radius values.");
-       }
-       return BlockVector3.at(radiusX, radiusY, radiusZ);
-   }
+            default:
+                throw new ParameterException("You must either specify 1 or 3 radius values.");
+        }
+        return BlockVector3.at(radiusX, radiusY, radiusZ);
+    }
 
 
-   /**
-    * Gets a type from a {@link ArgumentStack}.
-    *
-    * @param context the context
-    * @return the requested type
-    * @throws ParameterException on error
-    */
-   @BindingMatch(type = BlockVector2.class,
-           behavior = BindingBehavior.CONSUMES,
-           consumedCount = 1,
-           provideModifiers = true)
-   public BlockVector2 getBlockVector2(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
-       String radiusString = context.next();
-       String[] radii = radiusString.split(",");
-       final double radiusX, radiusZ;
-       switch (radii.length) {
-           case 1:
-               radiusX = radiusZ = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[0]));
-               break;
+    /**
+     * Gets a type from a {@link ArgumentStack}.
+     *
+     * @param context the context
+     * @return the requested type
+     * @throws ParameterException on error
+     */
+    @BindingMatch(type = BlockVector2.class,
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
+    public BlockVector2 getBlockVector2(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
+        String radiusString = context.next();
+        String[] radii = radiusString.split(",");
+        final double radiusX, radiusZ;
+        switch (radii.length) {
+            case 1:
+                radiusX = radiusZ = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[0]));
+                break;
 
-           case 2:
-               radiusX = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[0]));
-               radiusZ = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[1]));
-               break;
+            case 2:
+                radiusX = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[0]));
+                radiusZ = Math.max(1, FawePrimitiveBinding.parseNumericInput(radii[1]));
+                break;
 
-           default:
-               throw new ParameterException("You must either specify 1 or 2 radius values.");
-       }
-       return BlockVector2.at(radiusX, radiusZ);
-   }
+            default:
+                throw new ParameterException("You must either specify 1 or 2 radius values.");
+        }
+        return BlockVector2.at(radiusX, radiusZ);
+    }
 
     /**
      * Try to parse numeric input as either a number or a mathematical expression.
@@ -410,15 +425,15 @@ public class FawePrimitiveBinding {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context   the context
+     * @param context the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws ParameterException on error
      */
     @BindingMatch(type = {Integer.class, int.class},
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1,
-            provideModifiers = true)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
     public Integer getInteger(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         Double v = parseNumericInput(context.next());
         if (v != null) {
@@ -433,15 +448,15 @@ public class FawePrimitiveBinding {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context   the context
+     * @param context the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws ParameterException on error
      */
     @BindingMatch(type = {Short.class, short.class},
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1,
-            provideModifiers = true)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
     public Short getShort(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         Integer v = getInteger(context, modifiers);
         if (v != null) {
@@ -453,15 +468,15 @@ public class FawePrimitiveBinding {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context   the context
+     * @param context the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws ParameterException on error
      */
     @BindingMatch(type = {Double.class, double.class},
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1,
-            provideModifiers = true)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
     public Double getDouble(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         Double v = parseNumericInput(context.next());
         if (v != null) {
@@ -475,15 +490,15 @@ public class FawePrimitiveBinding {
     /**
      * Gets a type from a {@link ArgumentStack}.
      *
-     * @param context   the context
+     * @param context the context
      * @param modifiers a list of modifiers
      * @return the requested type
      * @throws ParameterException on error
      */
     @BindingMatch(type = {Float.class, float.class},
-            behavior = BindingBehavior.CONSUMES,
-            consumedCount = 1,
-            provideModifiers = true)
+                  behavior = BindingBehavior.CONSUMES,
+                  consumedCount = 1,
+                  provideModifiers = true)
     public Float getFloat(ArgumentStack context, Annotation[] modifiers) throws ParameterException {
         Double v = getDouble(context, modifiers);
         if (v != null) {
@@ -495,7 +510,7 @@ public class FawePrimitiveBinding {
     /**
      * Validate a number value using relevant modifiers.
      *
-     * @param number    the number
+     * @param number the number
      * @param modifiers the list of modifiers to scan
      * @throws ParameterException on a validation error
      */
@@ -506,14 +521,10 @@ public class FawePrimitiveBinding {
                 Range range = (Range) modifier;
                 if (number < range.min()) {
                     throw new ParameterException(
-                            String.format(
-                                    "A valid value is greater than or equal to %s " +
-                                            "(you entered %s)", range.min(), number));
+                            String.format("A valid value is greater than or equal to %s (you entered %s)", range.min(), number));
                 } else if (number > range.max()) {
                     throw new ParameterException(
-                            String.format(
-                                    "A valid value is less than or equal to %s " +
-                                            "(you entered %s)", range.max(), number));
+                            String.format("A valid value is less than or equal to %s (you entered %s)", range.max(), number));
                 }
             }
         }
@@ -522,7 +533,7 @@ public class FawePrimitiveBinding {
     /**
      * Validate a number value using relevant modifiers.
      *
-     * @param number    the number
+     * @param number the number
      * @param modifiers the list of modifiers to scan
      * @throws ParameterException on a validation error
      */
@@ -534,13 +545,11 @@ public class FawePrimitiveBinding {
                 if (number < range.min()) {
                     throw new ParameterException(
                             String.format(
-                                    "A valid value is greater than or equal to %s " +
-                                            "(you entered %s)", range.min(), number));
+                                    "A valid value is greater than or equal to %s (you entered %s)", range.min(), number));
                 } else if (number > range.max()) {
                     throw new ParameterException(
                             String.format(
-                                    "A valid value is less than or equal to %s " +
-                                            "(you entered %s)", range.max(), number));
+                                    "A valid value is less than or equal to %s (you entered %s)", range.max(), number));
                 }
             }
         }
@@ -549,7 +558,7 @@ public class FawePrimitiveBinding {
     /**
      * Validate a string value using relevant modifiers.
      *
-     * @param string    the string
+     * @param string the string
      * @param modifiers the list of modifiers to scan
      * @throws ParameterException on a validation error
      */
@@ -567,8 +576,7 @@ public class FawePrimitiveBinding {
                     if (!string.matches(validate.regex())) {
                         throw new ParameterException(
                                 String.format(
-                                        "The given text doesn't match the right " +
-                                                "format (technically speaking, the 'format' is %s)",
+                                        "The given text doesn't match the right format (technically speaking, the 'format' is %s)",
                                         validate.regex()));
                     }
                 }
