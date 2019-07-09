@@ -222,8 +222,18 @@ public class AsyncBlock implements Block {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combined);
         switch (type.getInternalId()) {
-            case BlockID.SIGN:
-            case BlockID.WALL_SIGN:
+            case BlockID.ACACIA_SIGN:
+            case BlockID.SPRUCE_SIGN:
+            case BlockID.ACACIA_WALL_SIGN:
+            case BlockID.BIRCH_SIGN:
+            case BlockID.SPRUCE_WALL_SIGN:
+            case BlockID.BIRCH_WALL_SIGN:
+            case BlockID.DARK_OAK_SIGN:
+            case BlockID.DARK_OAK_WALL_SIGN:
+            case BlockID.JUNGLE_SIGN:
+            case BlockID.JUNGLE_WALL_SIGN:
+            case BlockID.OAK_SIGN:
+            case BlockID.OAK_WALL_SIGN:
                 return new AsyncSign(this, combined);
             default:
                 return new AsyncBlockState(this, combined);

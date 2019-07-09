@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -52,10 +53,6 @@ import java.util.stream.Stream;
 public final class BlockTypes {
     // Doesn't really matter what the hardcoded values are, as FAWE will update it on load
     @Nullable public static final BlockType __RESERVED__ = null;
-    @Nullable public static final BlockType AIR = null;
-    @Nullable public static final BlockType CAVE_AIR = null;
-    @Nullable public static final BlockType VOID_AIR = null;
-
     @Nullable public static final BlockType ACACIA_BUTTON = null;
     @Nullable public static final BlockType ACACIA_DOOR = null;
     @Nullable public static final BlockType ACACIA_FENCE = null;
@@ -65,21 +62,31 @@ public final class BlockTypes {
     @Nullable public static final BlockType ACACIA_PLANKS = null;
     @Nullable public static final BlockType ACACIA_PRESSURE_PLATE = null;
     @Nullable public static final BlockType ACACIA_SAPLING = null;
+    @Nullable public static final BlockType ACACIA_SIGN = null;
     @Nullable public static final BlockType ACACIA_SLAB = null;
     @Nullable public static final BlockType ACACIA_STAIRS = null;
     @Nullable public static final BlockType ACACIA_TRAPDOOR = null;
+    @Nullable public static final BlockType ACACIA_WALL_SIGN = null;
     @Nullable public static final BlockType ACACIA_WOOD = null;
     @Nullable public static final BlockType ACTIVATOR_RAIL = null;
+    @Nullable public static final BlockType AIR = null;
     @Nullable public static final BlockType ALLIUM = null;
     @Nullable public static final BlockType ANDESITE = null;
+    @Nullable public static final BlockType ANDESITE_SLAB = null;
+    @Nullable public static final BlockType ANDESITE_STAIRS = null;
+    @Nullable public static final BlockType ANDESITE_WALL = null;
     @Nullable public static final BlockType ANVIL = null;
     @Nullable public static final BlockType ATTACHED_MELON_STEM = null;
     @Nullable public static final BlockType ATTACHED_PUMPKIN_STEM = null;
     @Nullable public static final BlockType AZURE_BLUET = null;
+    @Nullable public static final BlockType BAMBOO = null;
+    @Nullable public static final BlockType BAMBOO_SAPLING = null;
+    @Nullable public static final BlockType BARREL = null;
     @Nullable public static final BlockType BARRIER = null;
     @Nullable public static final BlockType BEACON = null;
     @Nullable public static final BlockType BEDROCK = null;
     @Nullable public static final BlockType BEETROOTS = null;
+    @Nullable public static final BlockType BELL = null;
     @Nullable public static final BlockType BIRCH_BUTTON = null;
     @Nullable public static final BlockType BIRCH_DOOR = null;
     @Nullable public static final BlockType BIRCH_FENCE = null;
@@ -89,9 +96,11 @@ public final class BlockTypes {
     @Nullable public static final BlockType BIRCH_PLANKS = null;
     @Nullable public static final BlockType BIRCH_PRESSURE_PLATE = null;
     @Nullable public static final BlockType BIRCH_SAPLING = null;
+    @Nullable public static final BlockType BIRCH_SIGN = null;
     @Nullable public static final BlockType BIRCH_SLAB = null;
     @Nullable public static final BlockType BIRCH_STAIRS = null;
     @Nullable public static final BlockType BIRCH_TRAPDOOR = null;
+    @Nullable public static final BlockType BIRCH_WALL_SIGN = null;
     @Nullable public static final BlockType BIRCH_WOOD = null;
     @Nullable public static final BlockType BLACK_BANNER = null;
     @Nullable public static final BlockType BLACK_BED = null;
@@ -105,6 +114,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType BLACK_TERRACOTTA = null;
     @Nullable public static final BlockType BLACK_WALL_BANNER = null;
     @Nullable public static final BlockType BLACK_WOOL = null;
+    @Nullable public static final BlockType BLAST_FURNACE = null;
     @Nullable public static final BlockType BLUE_BANNER = null;
     @Nullable public static final BlockType BLUE_BED = null;
     @Nullable public static final BlockType BLUE_CARPET = null;
@@ -128,6 +138,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType BREWING_STAND = null;
     @Nullable public static final BlockType BRICK_SLAB = null;
     @Nullable public static final BlockType BRICK_STAIRS = null;
+    @Nullable public static final BlockType BRICK_WALL = null;
     @Nullable public static final BlockType BRICKS = null;
     @Nullable public static final BlockType BROWN_BANNER = null;
     @Nullable public static final BlockType BROWN_BED = null;
@@ -150,9 +161,12 @@ public final class BlockTypes {
     @Nullable public static final BlockType BUBBLE_CORAL_WALL_FAN = null;
     @Nullable public static final BlockType CACTUS = null;
     @Nullable public static final BlockType CAKE = null;
+    @Nullable public static final BlockType CAMPFIRE = null;
     @Nullable public static final BlockType CARROTS = null;
+    @Nullable public static final BlockType CARTOGRAPHY_TABLE = null;
     @Nullable public static final BlockType CARVED_PUMPKIN = null;
     @Nullable public static final BlockType CAULDRON = null;
+    @Nullable public static final BlockType CAVE_AIR = null;
     @Nullable public static final BlockType CHAIN_COMMAND_BLOCK = null;
     @Nullable public static final BlockType CHEST = null;
     @Nullable public static final BlockType CHIPPED_ANVIL = null;
@@ -174,13 +188,17 @@ public final class BlockTypes {
     @Nullable public static final BlockType COCOA = null;
     @Nullable public static final BlockType COMMAND_BLOCK = null;
     @Nullable public static final BlockType COMPARATOR = null;
+    @Nullable public static final BlockType COMPOSTER = null;
     @Nullable public static final BlockType CONDUIT = null;
+    @Nullable public static final BlockType CORNFLOWER = null;
     @Nullable public static final BlockType CRACKED_STONE_BRICKS = null;
     @Nullable public static final BlockType CRAFTING_TABLE = null;
     @Nullable public static final BlockType CREEPER_HEAD = null;
     @Nullable public static final BlockType CREEPER_WALL_HEAD = null;
     @Nullable public static final BlockType CUT_RED_SANDSTONE = null;
+    @Nullable public static final BlockType CUT_RED_SANDSTONE_SLAB = null;
     @Nullable public static final BlockType CUT_SANDSTONE = null;
+    @Nullable public static final BlockType CUT_SANDSTONE_SLAB = null;
     @Nullable public static final BlockType CYAN_BANNER = null;
     @Nullable public static final BlockType CYAN_BED = null;
     @Nullable public static final BlockType CYAN_CARPET = null;
@@ -204,9 +222,11 @@ public final class BlockTypes {
     @Nullable public static final BlockType DARK_OAK_PLANKS = null;
     @Nullable public static final BlockType DARK_OAK_PRESSURE_PLATE = null;
     @Nullable public static final BlockType DARK_OAK_SAPLING = null;
+    @Nullable public static final BlockType DARK_OAK_SIGN = null;
     @Nullable public static final BlockType DARK_OAK_SLAB = null;
     @Nullable public static final BlockType DARK_OAK_STAIRS = null;
     @Nullable public static final BlockType DARK_OAK_TRAPDOOR = null;
+    @Nullable public static final BlockType DARK_OAK_WALL_SIGN = null;
     @Nullable public static final BlockType DARK_OAK_WOOD = null;
     @Nullable public static final BlockType DARK_PRISMARINE = null;
     @Nullable public static final BlockType DARK_PRISMARINE_SLAB = null;
@@ -237,6 +257,9 @@ public final class BlockTypes {
     @Nullable public static final BlockType DIAMOND_BLOCK = null;
     @Nullable public static final BlockType DIAMOND_ORE = null;
     @Nullable public static final BlockType DIORITE = null;
+    @Nullable public static final BlockType DIORITE_SLAB = null;
+    @Nullable public static final BlockType DIORITE_STAIRS = null;
+    @Nullable public static final BlockType DIORITE_WALL = null;
     @Nullable public static final BlockType DIRT = null;
     @Nullable public static final BlockType DISPENSER = null;
     @Nullable public static final BlockType DRAGON_EGG = null;
@@ -252,6 +275,9 @@ public final class BlockTypes {
     @Nullable public static final BlockType END_PORTAL_FRAME = null;
     @Nullable public static final BlockType END_ROD = null;
     @Nullable public static final BlockType END_STONE = null;
+    @Nullable public static final BlockType END_STONE_BRICK_SLAB = null;
+    @Nullable public static final BlockType END_STONE_BRICK_STAIRS = null;
+    @Nullable public static final BlockType END_STONE_BRICK_WALL = null;
     @Nullable public static final BlockType END_STONE_BRICKS = null;
     @Nullable public static final BlockType ENDER_CHEST = null;
     @Nullable public static final BlockType FARMLAND = null;
@@ -261,6 +287,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType FIRE_CORAL_BLOCK = null;
     @Nullable public static final BlockType FIRE_CORAL_FAN = null;
     @Nullable public static final BlockType FIRE_CORAL_WALL_FAN = null;
+    @Nullable public static final BlockType FLETCHING_TABLE = null;
     @Nullable public static final BlockType FLOWER_POT = null;
     @Nullable public static final BlockType FROSTED_ICE = null;
     @Nullable public static final BlockType FURNACE = null;
@@ -270,6 +297,9 @@ public final class BlockTypes {
     @Nullable public static final BlockType GOLD_BLOCK = null;
     @Nullable public static final BlockType GOLD_ORE = null;
     @Nullable public static final BlockType GRANITE = null;
+    @Nullable public static final BlockType GRANITE_SLAB = null;
+    @Nullable public static final BlockType GRANITE_STAIRS = null;
+    @Nullable public static final BlockType GRANITE_WALL = null;
     @Nullable public static final BlockType GRASS = null;
     @Nullable public static final BlockType GRASS_BLOCK = null;
     @Nullable public static final BlockType GRASS_PATH = null;
@@ -298,6 +328,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType GREEN_TERRACOTTA = null;
     @Nullable public static final BlockType GREEN_WALL_BANNER = null;
     @Nullable public static final BlockType GREEN_WOOL = null;
+    @Nullable public static final BlockType GRINDSTONE = null;
     @Nullable public static final BlockType HAY_BLOCK = null;
     @Nullable public static final BlockType HEAVY_WEIGHTED_PRESSURE_PLATE = null;
     @Nullable public static final BlockType HOPPER = null;
@@ -318,6 +349,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType IRON_ORE = null;
     @Nullable public static final BlockType IRON_TRAPDOOR = null;
     @Nullable public static final BlockType JACK_O_LANTERN = null;
+    @Nullable public static final BlockType JIGSAW = null;
     @Nullable public static final BlockType JUKEBOX = null;
     @Nullable public static final BlockType JUNGLE_BUTTON = null;
     @Nullable public static final BlockType JUNGLE_DOOR = null;
@@ -328,17 +360,21 @@ public final class BlockTypes {
     @Nullable public static final BlockType JUNGLE_PLANKS = null;
     @Nullable public static final BlockType JUNGLE_PRESSURE_PLATE = null;
     @Nullable public static final BlockType JUNGLE_SAPLING = null;
+    @Nullable public static final BlockType JUNGLE_SIGN = null;
     @Nullable public static final BlockType JUNGLE_SLAB = null;
     @Nullable public static final BlockType JUNGLE_STAIRS = null;
     @Nullable public static final BlockType JUNGLE_TRAPDOOR = null;
+    @Nullable public static final BlockType JUNGLE_WALL_SIGN = null;
     @Nullable public static final BlockType JUNGLE_WOOD = null;
     @Nullable public static final BlockType KELP = null;
     @Nullable public static final BlockType KELP_PLANT = null;
     @Nullable public static final BlockType LADDER = null;
+    @Nullable public static final BlockType LANTERN = null;
     @Nullable public static final BlockType LAPIS_BLOCK = null;
     @Nullable public static final BlockType LAPIS_ORE = null;
     @Nullable public static final BlockType LARGE_FERN = null;
     @Nullable public static final BlockType LAVA = null;
+    @Nullable public static final BlockType LECTERN = null;
     @Nullable public static final BlockType LEVER = null;
     @Nullable public static final BlockType LIGHT_BLUE_BANNER = null;
     @Nullable public static final BlockType LIGHT_BLUE_BED = null;
@@ -366,6 +402,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType LIGHT_GRAY_WOOL = null;
     @Nullable public static final BlockType LIGHT_WEIGHTED_PRESSURE_PLATE = null;
     @Nullable public static final BlockType LILAC = null;
+    @Nullable public static final BlockType LILY_OF_THE_VALLEY = null;
     @Nullable public static final BlockType LILY_PAD = null;
     @Nullable public static final BlockType LIME_BANNER = null;
     @Nullable public static final BlockType LIME_BED = null;
@@ -379,6 +416,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType LIME_TERRACOTTA = null;
     @Nullable public static final BlockType LIME_WALL_BANNER = null;
     @Nullable public static final BlockType LIME_WOOL = null;
+    @Nullable public static final BlockType LOOM = null;
     @Nullable public static final BlockType MAGENTA_BANNER = null;
     @Nullable public static final BlockType MAGENTA_BED = null;
     @Nullable public static final BlockType MAGENTA_CARPET = null;
@@ -395,7 +433,12 @@ public final class BlockTypes {
     @Nullable public static final BlockType MELON = null;
     @Nullable public static final BlockType MELON_STEM = null;
     @Nullable public static final BlockType MOSSY_COBBLESTONE = null;
+    @Nullable public static final BlockType MOSSY_COBBLESTONE_SLAB = null;
+    @Nullable public static final BlockType MOSSY_COBBLESTONE_STAIRS = null;
     @Nullable public static final BlockType MOSSY_COBBLESTONE_WALL = null;
+    @Nullable public static final BlockType MOSSY_STONE_BRICK_SLAB = null;
+    @Nullable public static final BlockType MOSSY_STONE_BRICK_STAIRS = null;
+    @Nullable public static final BlockType MOSSY_STONE_BRICK_WALL = null;
     @Nullable public static final BlockType MOSSY_STONE_BRICKS = null;
     @Nullable public static final BlockType MOVING_PISTON = null;
     @Nullable public static final BlockType MUSHROOM_STEM = null;
@@ -403,6 +446,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType NETHER_BRICK_FENCE = null;
     @Nullable public static final BlockType NETHER_BRICK_SLAB = null;
     @Nullable public static final BlockType NETHER_BRICK_STAIRS = null;
+    @Nullable public static final BlockType NETHER_BRICK_WALL = null;
     @Nullable public static final BlockType NETHER_BRICKS = null;
     @Nullable public static final BlockType NETHER_PORTAL = null;
     @Nullable public static final BlockType NETHER_QUARTZ_ORE = null;
@@ -419,9 +463,11 @@ public final class BlockTypes {
     @Nullable public static final BlockType OAK_PLANKS = null;
     @Nullable public static final BlockType OAK_PRESSURE_PLATE = null;
     @Nullable public static final BlockType OAK_SAPLING = null;
+    @Nullable public static final BlockType OAK_SIGN = null;
     @Nullable public static final BlockType OAK_SLAB = null;
     @Nullable public static final BlockType OAK_STAIRS = null;
     @Nullable public static final BlockType OAK_TRAPDOOR = null;
+    @Nullable public static final BlockType OAK_WALL_SIGN = null;
     @Nullable public static final BlockType OAK_WOOD = null;
     @Nullable public static final BlockType OBSERVER = null;
     @Nullable public static final BlockType OBSIDIAN = null;
@@ -461,22 +507,31 @@ public final class BlockTypes {
     @Nullable public static final BlockType PLAYER_WALL_HEAD = null;
     @Nullable public static final BlockType PODZOL = null;
     @Nullable public static final BlockType POLISHED_ANDESITE = null;
+    @Nullable public static final BlockType POLISHED_ANDESITE_SLAB = null;
+    @Nullable public static final BlockType POLISHED_ANDESITE_STAIRS = null;
     @Nullable public static final BlockType POLISHED_DIORITE = null;
+    @Nullable public static final BlockType POLISHED_DIORITE_SLAB = null;
+    @Nullable public static final BlockType POLISHED_DIORITE_STAIRS = null;
     @Nullable public static final BlockType POLISHED_GRANITE = null;
+    @Nullable public static final BlockType POLISHED_GRANITE_SLAB = null;
+    @Nullable public static final BlockType POLISHED_GRANITE_STAIRS = null;
     @Nullable public static final BlockType POPPY = null;
     @Nullable public static final BlockType POTATOES = null;
     @Nullable public static final BlockType POTTED_ACACIA_SAPLING = null;
     @Nullable public static final BlockType POTTED_ALLIUM = null;
     @Nullable public static final BlockType POTTED_AZURE_BLUET = null;
+    @Nullable public static final BlockType POTTED_BAMBOO = null;
     @Nullable public static final BlockType POTTED_BIRCH_SAPLING = null;
     @Nullable public static final BlockType POTTED_BLUE_ORCHID = null;
     @Nullable public static final BlockType POTTED_BROWN_MUSHROOM = null;
     @Nullable public static final BlockType POTTED_CACTUS = null;
+    @Nullable public static final BlockType POTTED_CORNFLOWER = null;
     @Nullable public static final BlockType POTTED_DANDELION = null;
     @Nullable public static final BlockType POTTED_DARK_OAK_SAPLING = null;
     @Nullable public static final BlockType POTTED_DEAD_BUSH = null;
     @Nullable public static final BlockType POTTED_FERN = null;
     @Nullable public static final BlockType POTTED_JUNGLE_SAPLING = null;
+    @Nullable public static final BlockType POTTED_LILY_OF_THE_VALLEY = null;
     @Nullable public static final BlockType POTTED_OAK_SAPLING = null;
     @Nullable public static final BlockType POTTED_ORANGE_TULIP = null;
     @Nullable public static final BlockType POTTED_OXEYE_DAISY = null;
@@ -486,6 +541,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType POTTED_RED_TULIP = null;
     @Nullable public static final BlockType POTTED_SPRUCE_SAPLING = null;
     @Nullable public static final BlockType POTTED_WHITE_TULIP = null;
+    @Nullable public static final BlockType POTTED_WITHER_ROSE = null;
     @Nullable public static final BlockType POWERED_RAIL = null;
     @Nullable public static final BlockType PRISMARINE = null;
     @Nullable public static final BlockType PRISMARINE_BRICK_SLAB = null;
@@ -493,6 +549,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType PRISMARINE_BRICKS = null;
     @Nullable public static final BlockType PRISMARINE_SLAB = null;
     @Nullable public static final BlockType PRISMARINE_STAIRS = null;
+    @Nullable public static final BlockType PRISMARINE_WALL = null;
     @Nullable public static final BlockType PUMPKIN = null;
     @Nullable public static final BlockType PUMPKIN_STEM = null;
     @Nullable public static final BlockType PURPLE_BANNER = null;
@@ -524,11 +581,15 @@ public final class BlockTypes {
     @Nullable public static final BlockType RED_GLAZED_TERRACOTTA = null;
     @Nullable public static final BlockType RED_MUSHROOM = null;
     @Nullable public static final BlockType RED_MUSHROOM_BLOCK = null;
+    @Nullable public static final BlockType RED_NETHER_BRICK_SLAB = null;
+    @Nullable public static final BlockType RED_NETHER_BRICK_STAIRS = null;
+    @Nullable public static final BlockType RED_NETHER_BRICK_WALL = null;
     @Nullable public static final BlockType RED_NETHER_BRICKS = null;
     @Nullable public static final BlockType RED_SAND = null;
     @Nullable public static final BlockType RED_SANDSTONE = null;
     @Nullable public static final BlockType RED_SANDSTONE_SLAB = null;
     @Nullable public static final BlockType RED_SANDSTONE_STAIRS = null;
+    @Nullable public static final BlockType RED_SANDSTONE_WALL = null;
     @Nullable public static final BlockType RED_SHULKER_BOX = null;
     @Nullable public static final BlockType RED_STAINED_GLASS = null;
     @Nullable public static final BlockType RED_STAINED_GLASS_PANE = null;
@@ -549,18 +610,28 @@ public final class BlockTypes {
     @Nullable public static final BlockType SANDSTONE = null;
     @Nullable public static final BlockType SANDSTONE_SLAB = null;
     @Nullable public static final BlockType SANDSTONE_STAIRS = null;
+    @Nullable public static final BlockType SANDSTONE_WALL = null;
+    @Nullable public static final BlockType SCAFFOLDING = null;
     @Nullable public static final BlockType SEA_LANTERN = null;
     @Nullable public static final BlockType SEA_PICKLE = null;
     @Nullable public static final BlockType SEAGRASS = null;
     @Nullable public static final BlockType SHULKER_BOX = null;
-    @Nullable public static final BlockType SIGN = null;
     @Nullable public static final BlockType SKELETON_SKULL = null;
     @Nullable public static final BlockType SKELETON_WALL_SKULL = null;
     @Nullable public static final BlockType SLIME_BLOCK = null;
+    @Nullable public static final BlockType SMITHING_TABLE = null;
+    @Nullable public static final BlockType SMOKER = null;
     @Nullable public static final BlockType SMOOTH_QUARTZ = null;
+    @Nullable public static final BlockType SMOOTH_QUARTZ_SLAB = null;
+    @Nullable public static final BlockType SMOOTH_QUARTZ_STAIRS = null;
     @Nullable public static final BlockType SMOOTH_RED_SANDSTONE = null;
+    @Nullable public static final BlockType SMOOTH_RED_SANDSTONE_SLAB = null;
+    @Nullable public static final BlockType SMOOTH_RED_SANDSTONE_STAIRS = null;
     @Nullable public static final BlockType SMOOTH_SANDSTONE = null;
+    @Nullable public static final BlockType SMOOTH_SANDSTONE_SLAB = null;
+    @Nullable public static final BlockType SMOOTH_SANDSTONE_STAIRS = null;
     @Nullable public static final BlockType SMOOTH_STONE = null;
+    @Nullable public static final BlockType SMOOTH_STONE_SLAB = null;
     @Nullable public static final BlockType SNOW = null;
     @Nullable public static final BlockType SNOW_BLOCK = null;
     @Nullable public static final BlockType SOUL_SAND = null;
@@ -575,18 +646,23 @@ public final class BlockTypes {
     @Nullable public static final BlockType SPRUCE_PLANKS = null;
     @Nullable public static final BlockType SPRUCE_PRESSURE_PLATE = null;
     @Nullable public static final BlockType SPRUCE_SAPLING = null;
+    @Nullable public static final BlockType SPRUCE_SIGN = null;
     @Nullable public static final BlockType SPRUCE_SLAB = null;
     @Nullable public static final BlockType SPRUCE_STAIRS = null;
     @Nullable public static final BlockType SPRUCE_TRAPDOOR = null;
+    @Nullable public static final BlockType SPRUCE_WALL_SIGN = null;
     @Nullable public static final BlockType SPRUCE_WOOD = null;
     @Nullable public static final BlockType STICKY_PISTON = null;
     @Nullable public static final BlockType STONE = null;
     @Nullable public static final BlockType STONE_BRICK_SLAB = null;
     @Nullable public static final BlockType STONE_BRICK_STAIRS = null;
+    @Nullable public static final BlockType STONE_BRICK_WALL = null;
     @Nullable public static final BlockType STONE_BRICKS = null;
     @Nullable public static final BlockType STONE_BUTTON = null;
     @Nullable public static final BlockType STONE_PRESSURE_PLATE = null;
     @Nullable public static final BlockType STONE_SLAB = null;
+    @Nullable public static final BlockType STONE_STAIRS = null;
+    @Nullable public static final BlockType STONECUTTER = null;
     @Nullable public static final BlockType STRIPPED_ACACIA_LOG = null;
     @Nullable public static final BlockType STRIPPED_ACACIA_WOOD = null;
     @Nullable public static final BlockType STRIPPED_BIRCH_LOG = null;
@@ -603,6 +679,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType STRUCTURE_VOID = null;
     @Nullable public static final BlockType SUGAR_CANE = null;
     @Nullable public static final BlockType SUNFLOWER = null;
+    @Nullable public static final BlockType SWEET_BERRY_BUSH = null;
     @Nullable public static final BlockType TALL_GRASS = null;
     @Nullable public static final BlockType TALL_SEAGRASS = null;
     @Nullable public static final BlockType TERRACOTTA = null;
@@ -617,7 +694,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType TUBE_CORAL_WALL_FAN = null;
     @Nullable public static final BlockType TURTLE_EGG = null;
     @Nullable public static final BlockType VINE = null;
-    @Nullable public static final BlockType WALL_SIGN = null;
+    @Nullable public static final BlockType VOID_AIR = null;
     @Nullable public static final BlockType WALL_TORCH = null;
     @Nullable public static final BlockType WATER = null;
     @Nullable public static final BlockType WET_SPONGE = null;
@@ -635,6 +712,7 @@ public final class BlockTypes {
     @Nullable public static final BlockType WHITE_TULIP = null;
     @Nullable public static final BlockType WHITE_WALL_BANNER = null;
     @Nullable public static final BlockType WHITE_WOOL = null;
+    @Nullable public static final BlockType WITHER_ROSE = null;
     @Nullable public static final BlockType WITHER_SKELETON_SKULL = null;
     @Nullable public static final BlockType WITHER_SKELETON_WALL_SKULL = null;
     @Nullable public static final BlockType YELLOW_BANNER = null;
@@ -651,6 +729,10 @@ public final class BlockTypes {
     @Nullable public static final BlockType YELLOW_WOOL = null;
     @Nullable public static final BlockType ZOMBIE_HEAD = null;
     @Nullable public static final BlockType ZOMBIE_WALL_HEAD = null;
+
+    // deprecated
+    @Deprecated @Nullable public static BlockType SIGN;
+    @Deprecated @Nullable public static BlockType WALL_SIGN;
 
     /*
      -----------------------------------------------------
@@ -849,6 +931,10 @@ public final class BlockTypes {
             }
             states = stateList.toArray(new BlockState[stateList.size()]);
 
+
+            // Init deprecated
+            SIGN = OAK_SIGN;
+            WALL_SIGN = OAK_WALL_SIGN;
         } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);

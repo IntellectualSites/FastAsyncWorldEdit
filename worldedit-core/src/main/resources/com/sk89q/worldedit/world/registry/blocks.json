@@ -225,6 +225,31 @@
     }
   },
   {
+    "id": "minecraft:acacia_sign",
+    "localizedName": "Acacia Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:acacia_slab",
     "localizedName": "Acacia Slab",
     "material": {
@@ -258,7 +283,7 @@
       "hardness": 2.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -282,6 +307,31 @@
       "lightValue": 0,
       "hardness": 3.0,
       "resistance": 3.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:acacia_wall_sign",
+    "localizedName": "Acacia Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
       "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
@@ -425,6 +475,81 @@
     }
   },
   {
+    "id": "minecraft:andesite_slab",
+    "localizedName": "Andesite Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:andesite_stairs",
+    "localizedName": "Andesite Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:andesite_wall",
+    "localizedName": "Andesite Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:anvil",
     "localizedName": "Anvil",
     "material": {
@@ -525,6 +650,81 @@
     }
   },
   {
+    "id": "minecraft:bamboo",
+    "localizedName": "Bamboo",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
+      "ticksRandomly": true,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:bamboo_sapling",
+    "localizedName": "Bamboo Sapling",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
+      "ticksRandomly": true,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": false,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:barrel",
+    "localizedName": "Barrel",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.5,
+      "resistance": 2.5,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": true
+    }
+  },
+  {
     "id": "minecraft:barrier",
     "localizedName": "Barrier",
     "material": {
@@ -558,7 +758,7 @@
       "hardness": 3.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -571,7 +771,7 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -620,6 +820,31 @@
       "fragileWhenPushed": true,
       "unpushable": false,
       "mapColor": "#007c00",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:bell",
+    "localizedName": "Bell",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 5.0,
+      "resistance": 5.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#a7a7a7",
       "isTranslucent": false,
       "hasContainer": false
     }
@@ -850,6 +1075,31 @@
     }
   },
   {
+    "id": "minecraft:birch_sign",
+    "localizedName": "Birch Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:birch_slab",
     "localizedName": "Birch Slab",
     "material": {
@@ -883,7 +1133,7 @@
       "hardness": 2.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -907,6 +1157,31 @@
       "lightValue": 0,
       "hardness": 3.0,
       "resistance": 3.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:birch_wall_sign",
+    "localizedName": "Birch Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
       "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
@@ -971,7 +1246,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -1108,7 +1383,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -1116,10 +1391,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -1133,7 +1408,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -1201,7 +1476,7 @@
   },
   {
     "id": "minecraft:black_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Black Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -1221,7 +1496,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -1250,6 +1525,31 @@
     }
   },
   {
+    "id": "minecraft:blast_furnace",
+    "localizedName": "Blast Furnace",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 3.5,
+      "resistance": 3.5,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": true
+    }
+  },
+  {
     "id": "minecraft:blue_banner",
     "localizedName": "Blue Banner",
     "material": {
@@ -1271,7 +1571,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -1458,7 +1758,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -1466,10 +1766,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -1483,7 +1783,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -1551,7 +1851,7 @@
   },
   {
     "id": "minecraft:blue_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Blue Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -1571,7 +1871,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -1808,6 +2108,31 @@
       "hardness": 2.0,
       "resistance": 6.0,
       "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:brick_wall",
+    "localizedName": "Brick Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
@@ -1871,7 +2196,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -2058,7 +2383,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -2066,10 +2391,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -2083,7 +2408,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -2151,7 +2476,7 @@
   },
   {
     "id": "minecraft:brown_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Brown Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -2171,7 +2496,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -2375,6 +2700,31 @@
     }
   },
   {
+    "id": "minecraft:campfire",
+    "localizedName": "Campfire",
+    "material": {
+      "powerSource": false,
+      "lightValue": 15,
+      "hardness": 2.0,
+      "resistance": 2.0,
+      "ticksRandomly": true,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": true
+    }
+  },
+  {
     "id": "minecraft:carrots",
     "localizedName": "Carrots",
     "material": {
@@ -2395,6 +2745,31 @@
       "fragileWhenPushed": true,
       "unpushable": false,
       "mapColor": "#007c00",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:cartography_table",
+    "localizedName": "Cartography Table",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.5,
+      "resistance": 2.5,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
       "isTranslucent": false,
       "hasContainer": false
     }
@@ -2433,7 +2808,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -2496,7 +2871,7 @@
       "unpushable": false,
       "mapColor": "#a7a7a7",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -2658,7 +3033,7 @@
       "hardness": 0.4,
       "resistance": 0.4,
       "ticksRandomly": true,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -2858,7 +3233,7 @@
       "hardness": 2.0,
       "resistance": 6.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -2908,7 +3283,7 @@
       "hardness": 4.0,
       "resistance": 4.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -2971,7 +3346,7 @@
       "unpushable": false,
       "mapColor": "#a7a7a7",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -3000,6 +3375,31 @@
     }
   },
   {
+    "id": "minecraft:composter",
+    "localizedName": "Composter",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.6,
+      "resistance": 0.6,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:conduit",
     "localizedName": "Conduit",
     "material": {
@@ -3021,7 +3421,32 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:cornflower",
+    "localizedName": "Cornflower",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#007c00",
+      "isTranslucent": false,
+      "hasContainer": false
     }
   },
   {
@@ -3096,12 +3521,12 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
     "id": "minecraft:creeper_wall_head",
-    "localizedName": "Air",
+    "localizedName": "Creeper Head",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -3121,7 +3546,7 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -3134,6 +3559,31 @@
       "resistance": 0.8,
       "ticksRandomly": false,
       "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:cut_red_sandstone_slab",
+    "localizedName": "Cut Red Sandstone Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -3175,6 +3625,31 @@
     }
   },
   {
+    "id": "minecraft:cut_sandstone_slab",
+    "localizedName": "Cut Sandstone Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:cyan_banner",
     "localizedName": "Cyan Banner",
     "material": {
@@ -3196,7 +3671,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -3333,7 +3808,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -3341,10 +3816,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -3358,7 +3833,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -3426,7 +3901,7 @@
   },
   {
     "id": "minecraft:cyan_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Cyan Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -3446,7 +3921,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -3750,6 +4225,31 @@
     }
   },
   {
+    "id": "minecraft:dark_oak_sign",
+    "localizedName": "Dark Oak Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:dark_oak_slab",
     "localizedName": "Dark Oak Slab",
     "material": {
@@ -3783,7 +4283,7 @@
       "hardness": 2.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -3807,6 +4307,31 @@
       "lightValue": 0,
       "hardness": 3.0,
       "resistance": 3.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:dark_oak_wall_sign",
+    "localizedName": "Dark Oak Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
       "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
@@ -3908,7 +4433,7 @@
       "hardness": 1.5,
       "resistance": 6.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -3946,7 +4471,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -4575,6 +5100,81 @@
     }
   },
   {
+    "id": "minecraft:diorite_slab",
+    "localizedName": "Diorite Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:diorite_stairs",
+    "localizedName": "Diorite Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:diorite_wall",
+    "localizedName": "Diorite Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:dirt",
     "localizedName": "Dirt",
     "material": {
@@ -4671,12 +5271,12 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
     "id": "minecraft:dragon_wall_head",
-    "localizedName": "Air",
+    "localizedName": "Dragon Head",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -4696,7 +5296,7 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -4821,7 +5421,7 @@
       "unpushable": false,
       "mapColor": "#707070",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -4833,7 +5433,7 @@
       "hardness": -1.0,
       "resistance": 3600000.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -4846,7 +5446,7 @@
       "unpushable": true,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -4871,7 +5471,7 @@
       "unpushable": true,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -4950,6 +5550,81 @@
     }
   },
   {
+    "id": "minecraft:end_stone_brick_slab",
+    "localizedName": "End Stone Brick Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.8,
+      "resistance": 0.8,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:end_stone_brick_stairs",
+    "localizedName": "End Stone Brick Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.8,
+      "resistance": 0.8,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:end_stone_brick_wall",
+    "localizedName": "End Stone Brick Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.8,
+      "resistance": 0.8,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:end_stone_bricks",
     "localizedName": "End Stone Bricks",
     "material": {
@@ -4996,7 +5671,7 @@
       "unpushable": false,
       "mapColor": "#707070",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -5175,6 +5850,31 @@
     }
   },
   {
+    "id": "minecraft:fletching_table",
+    "localizedName": "Fletching Table",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.5,
+      "resistance": 2.5,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:flower_pot",
     "localizedName": "Flower Pot",
     "material": {
@@ -5258,7 +5958,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -5400,6 +6100,81 @@
     }
   },
   {
+    "id": "minecraft:granite_slab",
+    "localizedName": "Granite Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:granite_stairs",
+    "localizedName": "Granite Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:granite_wall",
+    "localizedName": "Granite Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:grass",
     "localizedName": "Grass",
     "material": {
@@ -5521,7 +6296,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -5658,7 +6433,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -5666,10 +6441,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -5683,7 +6458,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -5751,7 +6526,7 @@
   },
   {
     "id": "minecraft:gray_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Gray Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -5771,7 +6546,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -5821,7 +6596,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -5958,7 +6733,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -5966,10 +6741,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -5983,7 +6758,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -6051,7 +6826,7 @@
   },
   {
     "id": "minecraft:green_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Green Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -6071,7 +6846,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -6095,6 +6870,31 @@
       "fragileWhenPushed": false,
       "unpushable": false,
       "mapColor": "#c7c7c7",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:grindstone",
+    "localizedName": "Grindstone",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": true,
+      "mapColor": "#a7a7a7",
       "isTranslucent": false,
       "hasContainer": false
     }
@@ -6158,7 +6958,7 @@
       "hardness": 3.0,
       "resistance": 4.8,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -6600,6 +7400,31 @@
     }
   },
   {
+    "id": "minecraft:jigsaw",
+    "localizedName": "Jigsaw Block",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": -1.0,
+      "resistance": 3600000.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#a7a7a7",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:jukebox",
     "localizedName": "Jukebox",
     "material": {
@@ -6850,6 +7675,31 @@
     }
   },
   {
+    "id": "minecraft:jungle_sign",
+    "localizedName": "Jungle Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:jungle_slab",
     "localizedName": "Jungle Slab",
     "material": {
@@ -6883,7 +7733,7 @@
       "hardness": 2.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -6907,6 +7757,31 @@
       "lightValue": 0,
       "hardness": 3.0,
       "resistance": 3.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:jungle_wall_sign",
+    "localizedName": "Jungle Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
       "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
@@ -6983,7 +7858,7 @@
       "hardness": 0.0,
       "resistance": 0.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -7020,6 +7895,31 @@
       "fragileWhenPushed": true,
       "unpushable": false,
       "mapColor": "#000000",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:lantern",
+    "localizedName": "Lantern",
+    "material": {
+      "powerSource": false,
+      "lightValue": 15,
+      "hardness": 3.5,
+      "resistance": 3.5,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#a7a7a7",
       "isTranslucent": false,
       "hasContainer": false
     }
@@ -7083,7 +7983,7 @@
       "hardness": 0.0,
       "resistance": 0.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -7122,6 +8022,31 @@
       "mapColor": "#ff0000",
       "isTranslucent": false,
       "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:lectern",
+    "localizedName": "Lectern",
+    "material": {
+      "powerSource": true,
+      "lightValue": 0,
+      "hardness": 2.5,
+      "resistance": 2.5,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": true
     }
   },
   {
@@ -7171,7 +8096,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -7308,7 +8233,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -7316,10 +8241,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -7333,7 +8258,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -7401,7 +8326,7 @@
   },
   {
     "id": "minecraft:light_blue_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Light Blue Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -7421,7 +8346,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -7471,7 +8396,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -7608,7 +8533,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -7616,10 +8541,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -7633,7 +8558,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -7701,7 +8626,7 @@
   },
   {
     "id": "minecraft:light_gray_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Light Gray Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -7721,7 +8646,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -7783,7 +8708,7 @@
       "hardness": 0.0,
       "resistance": 0.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -7791,6 +8716,31 @@
       "burnable": true,
       "opaque": false,
       "replacedDuringPlacement": true,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#007c00",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:lily_of_the_valley",
+    "localizedName": "Lily of the Valley",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
       "toolRequired": false,
       "fragileWhenPushed": true,
       "unpushable": false,
@@ -7846,7 +8796,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -7983,7 +8933,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -7991,10 +8941,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -8008,7 +8958,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -8076,7 +9026,7 @@
   },
   {
     "id": "minecraft:lime_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Lime Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -8096,7 +9046,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -8125,6 +9075,31 @@
     }
   },
   {
+    "id": "minecraft:loom",
+    "localizedName": "Loom",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.5,
+      "resistance": 2.5,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:magenta_banner",
     "localizedName": "Magenta Banner",
     "material": {
@@ -8146,7 +9121,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -8283,7 +9258,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -8291,10 +9266,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -8308,7 +9283,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -8376,7 +9351,7 @@
   },
   {
     "id": "minecraft:magenta_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Magenta Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -8396,7 +9371,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -8525,12 +9500,137 @@
     }
   },
   {
+    "id": "minecraft:mossy_cobblestone_slab",
+    "localizedName": "Mossy Cobblestone Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:mossy_cobblestone_stairs",
+    "localizedName": "Mossy Cobblestone Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:mossy_cobblestone_wall",
     "localizedName": "Mossy Cobblestone Wall",
     "material": {
       "powerSource": false,
       "lightValue": 0,
       "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:mossy_stone_brick_slab",
+    "localizedName": "Mossy Stone Brick Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:mossy_stone_brick_stairs",
+    "localizedName": "Mossy Stone Brick Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:mossy_stone_brick_wall",
+    "localizedName": "Mossy Stone Brick Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
       "resistance": 6.0,
       "ticksRandomly": false,
       "fullCube": false,
@@ -8596,7 +9696,7 @@
       "unpushable": true,
       "mapColor": "#707070",
       "isTranslucent": true,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -8702,6 +9802,31 @@
   {
     "id": "minecraft:nether_brick_stairs",
     "localizedName": "Nether Brick Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:nether_brick_wall",
+    "localizedName": "Nether Brick Wall",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -9125,6 +10250,31 @@
     }
   },
   {
+    "id": "minecraft:oak_sign",
+    "localizedName": "Oak Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:oak_slab",
     "localizedName": "Oak Slab",
     "material": {
@@ -9158,7 +10308,7 @@
       "hardness": 2.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -9182,6 +10332,31 @@
       "lightValue": 0,
       "hardness": 3.0,
       "resistance": 3.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:oak_wall_sign",
+    "localizedName": "Oak Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
       "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
@@ -9296,7 +10471,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -9433,7 +10608,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -9441,10 +10616,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -9458,7 +10633,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -9551,7 +10726,7 @@
   },
   {
     "id": "minecraft:orange_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Orange Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -9571,7 +10746,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -9658,7 +10833,7 @@
       "hardness": 0.0,
       "resistance": 0.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -9721,7 +10896,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -9858,7 +11033,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -9866,10 +11041,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -9883,7 +11058,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -9976,7 +11151,7 @@
   },
   {
     "id": "minecraft:pink_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Pink Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -9996,7 +11171,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -10033,7 +11208,7 @@
       "hardness": 0.5,
       "resistance": 0.5,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -10096,12 +11271,12 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
     "id": "minecraft:player_wall_head",
-    "localizedName": "Air",
+    "localizedName": "Player Head",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -10121,7 +11296,7 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -10175,6 +11350,56 @@
     }
   },
   {
+    "id": "minecraft:polished_andesite_slab",
+    "localizedName": "Polished Andesite Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:polished_andesite_stairs",
+    "localizedName": "Polished Andesite Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:polished_diorite",
     "localizedName": "Polished Diorite",
     "material": {
@@ -10200,8 +11425,108 @@
     }
   },
   {
+    "id": "minecraft:polished_diorite_slab",
+    "localizedName": "Polished Diorite Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:polished_diorite_stairs",
+    "localizedName": "Polished Diorite Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:polished_granite",
     "localizedName": "Polished Granite",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:polished_granite_slab",
+    "localizedName": "Polished Granite Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:polished_granite_stairs",
+    "localizedName": "Polished Granite Stairs",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -10350,6 +11675,31 @@
     }
   },
   {
+    "id": "minecraft:potted_bamboo",
+    "localizedName": "Potted Bamboo",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#000000",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:potted_birch_sapling",
     "localizedName": "Potted Birch Sapling",
     "material": {
@@ -10427,6 +11777,31 @@
   {
     "id": "minecraft:potted_cactus",
     "localizedName": "Potted Cactus",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#000000",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:potted_cornflower",
+    "localizedName": "Potted Cornflower",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -10552,6 +11927,31 @@
   {
     "id": "minecraft:potted_jungle_sapling",
     "localizedName": "Potted Jungle Sapling",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#000000",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:potted_lily_of_the_valley",
+    "localizedName": "Potted Lily of the Valley",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -10800,6 +12200,31 @@
     }
   },
   {
+    "id": "minecraft:potted_wither_rose",
+    "localizedName": "Potted Wither Rose",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#000000",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:powered_rail",
     "localizedName": "Powered Rail",
     "material": {
@@ -10883,7 +12308,7 @@
       "hardness": 1.5,
       "resistance": 6.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -10952,6 +12377,31 @@
   {
     "id": "minecraft:prismarine_stairs",
     "localizedName": "Prismarine Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:prismarine_wall",
+    "localizedName": "Prismarine Wall",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -11046,7 +12496,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -11183,7 +12633,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -11191,10 +12641,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -11208,7 +12658,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -11276,7 +12726,7 @@
   },
   {
     "id": "minecraft:purple_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Purple Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -11296,7 +12746,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -11408,7 +12858,7 @@
       "hardness": 1.5,
       "resistance": 6.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -11508,7 +12958,7 @@
       "hardness": 0.8,
       "resistance": 0.8,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -11571,7 +13021,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -11750,6 +13200,81 @@
     }
   },
   {
+    "id": "minecraft:red_nether_brick_slab",
+    "localizedName": "Red Nether Brick Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:red_nether_brick_stairs",
+    "localizedName": "Red Nether Brick Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:red_nether_brick_wall",
+    "localizedName": "Red Nether Brick Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:red_nether_bricks",
     "localizedName": "Red Nether Bricks",
     "material": {
@@ -11858,6 +13383,31 @@
       "hardness": 0.8,
       "resistance": 0.8,
       "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:red_sandstone_wall",
+    "localizedName": "Red Sandstone Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.8,
+      "resistance": 0.8,
+      "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
@@ -11883,7 +13433,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -11891,10 +13441,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -11908,7 +13458,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -12001,7 +13551,7 @@
   },
   {
     "id": "minecraft:red_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Red Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -12021,7 +13571,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -12151,7 +13701,7 @@
   },
   {
     "id": "minecraft:redstone_wall_torch",
-    "localizedName": "Air",
+    "localizedName": "Redstone Torch",
     "material": {
       "powerSource": true,
       "lightValue": 7,
@@ -12176,7 +13726,7 @@
   },
   {
     "id": "minecraft:redstone_wire",
-    "localizedName": "Redstone Dust",
+    "localizedName": "Redstone Wire",
     "material": {
       "powerSource": true,
       "lightValue": 0,
@@ -12246,7 +13796,7 @@
       "unpushable": false,
       "mapColor": "#a7a7a7",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -12258,7 +13808,7 @@
       "hardness": 0.0,
       "resistance": 0.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -12358,6 +13908,31 @@
       "hardness": 0.8,
       "resistance": 0.8,
       "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:sandstone_wall",
+    "localizedName": "Sandstone Wall",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.8,
+      "resistance": 0.8,
+      "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
       "liquid": false,
@@ -12371,6 +13946,31 @@
       "unpushable": false,
       "mapColor": "#707070",
       "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:scaffolding",
+    "localizedName": "Scaffolding",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#000000",
+      "isTranslucent": true,
       "hasContainer": false
     }
   },
@@ -12458,7 +14058,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -12466,36 +14066,11 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
-      "fragileWhenPushed": false,
-      "unpushable": false,
-      "mapColor": "#707070",
-      "isTranslucent": true,
-      "hasContainer": true
-    }
-  },
-  {
-    "id": "minecraft:sign",
-    "localizedName": "Sign",
-    "material": {
-      "powerSource": false,
-      "lightValue": 0,
-      "hardness": 1.0,
-      "resistance": 1.0,
-      "ticksRandomly": false,
-      "fullCube": false,
-      "slipperiness": 0.6,
-      "liquid": false,
-      "solid": true,
-      "movementBlocker": true,
-      "burnable": true,
-      "opaque": true,
-      "replacedDuringPlacement": false,
       "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#8f7748",
-      "isTranslucent": false,
+      "mapColor": "#7f3fb2",
+      "isTranslucent": true,
       "hasContainer": true
     }
   },
@@ -12521,12 +14096,12 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
     "id": "minecraft:skeleton_wall_skull",
-    "localizedName": "Air",
+    "localizedName": "Skeleton Skull",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -12546,7 +14121,7 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -12575,8 +14150,108 @@
     }
   },
   {
+    "id": "minecraft:smithing_table",
+    "localizedName": "Smithing Table",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.5,
+      "resistance": 2.5,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:smoker",
+    "localizedName": "Smoker",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 3.5,
+      "resistance": 3.5,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": true
+    }
+  },
+  {
     "id": "minecraft:smooth_quartz",
     "localizedName": "Smooth Quartz",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:smooth_quartz_slab",
+    "localizedName": "Smooth Quartz Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:smooth_quartz_stairs",
+    "localizedName": "Smooth Quartz Stairs",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -12625,8 +14300,108 @@
     }
   },
   {
+    "id": "minecraft:smooth_red_sandstone_slab",
+    "localizedName": "Smooth Red Sandstone Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:smooth_red_sandstone_stairs",
+    "localizedName": "Smooth Red Sandstone Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:smooth_sandstone",
     "localizedName": "Smooth Sandstone",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:smooth_sandstone_slab",
+    "localizedName": "Smooth Sandstone Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:smooth_sandstone_stairs",
+    "localizedName": "Smooth Sandstone Stairs",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -12675,6 +14450,31 @@
     }
   },
   {
+    "id": "minecraft:smooth_stone_slab",
+    "localizedName": "Smooth Stone Slab",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 2.0,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:snow",
     "localizedName": "Snow",
     "material": {
@@ -12707,7 +14507,7 @@
       "lightValue": 0,
       "hardness": 0.2,
       "resistance": 0.2,
-      "ticksRandomly": true,
+      "ticksRandomly": false,
       "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
@@ -12771,7 +14571,7 @@
       "unpushable": false,
       "mapColor": "#707070",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -13025,6 +14825,31 @@
     }
   },
   {
+    "id": "minecraft:spruce_sign",
+    "localizedName": "Spruce Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:spruce_slab",
     "localizedName": "Spruce Slab",
     "material": {
@@ -13058,7 +14883,7 @@
       "hardness": 2.0,
       "resistance": 3.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -13082,6 +14907,31 @@
       "lightValue": 0,
       "hardness": 3.0,
       "resistance": 3.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": true,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#8f7748",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:spruce_wall_sign",
+    "localizedName": "Spruce Sign",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.0,
+      "resistance": 1.0,
       "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
@@ -13133,7 +14983,7 @@
       "hardness": 0.5,
       "resistance": 0.5,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -13202,6 +15052,31 @@
   {
     "id": "minecraft:stone_brick_stairs",
     "localizedName": "Stone Brick Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:stone_brick_wall",
+    "localizedName": "Stone Brick Wall",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -13307,6 +15182,56 @@
       "lightValue": 0,
       "hardness": 2.0,
       "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:stone_stairs",
+    "localizedName": "Stone Stairs",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 1.5,
+      "resistance": 6.0,
+      "ticksRandomly": false,
+      "fullCube": true,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": true,
+      "movementBlocker": true,
+      "burnable": false,
+      "opaque": true,
+      "replacedDuringPlacement": false,
+      "toolRequired": true,
+      "fragileWhenPushed": false,
+      "unpushable": false,
+      "mapColor": "#707070",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:stonecutter",
+    "localizedName": "Stonecutter",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 3.5,
+      "resistance": 3.5,
       "ticksRandomly": false,
       "fullCube": false,
       "slipperiness": 0.6,
@@ -13646,7 +15571,7 @@
       "unpushable": false,
       "mapColor": "#a7a7a7",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -13708,7 +15633,7 @@
       "hardness": 0.0,
       "resistance": 0.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -13716,6 +15641,31 @@
       "burnable": true,
       "opaque": false,
       "replacedDuringPlacement": true,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#007c00",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
+    "id": "minecraft:sweet_berry_bush",
+    "localizedName": "Sweet Berry Bush",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": true,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
       "toolRequired": false,
       "fragileWhenPushed": true,
       "unpushable": false,
@@ -13733,7 +15683,7 @@
       "hardness": 0.0,
       "resistance": 0.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": false,
@@ -14100,33 +16050,8 @@
     }
   },
   {
-    "id": "minecraft:wall_sign",
-    "localizedName": "Air",
-    "material": {
-      "powerSource": false,
-      "lightValue": 0,
-      "hardness": 1.0,
-      "resistance": 1.0,
-      "ticksRandomly": false,
-      "fullCube": false,
-      "slipperiness": 0.6,
-      "liquid": false,
-      "solid": true,
-      "movementBlocker": true,
-      "burnable": true,
-      "opaque": true,
-      "replacedDuringPlacement": false,
-      "toolRequired": false,
-      "fragileWhenPushed": false,
-      "unpushable": false,
-      "mapColor": "#8f7748",
-      "isTranslucent": false,
-      "hasContainer": true
-    }
-  },
-  {
     "id": "minecraft:wall_torch",
-    "localizedName": "Air",
+    "localizedName": "Torch",
     "material": {
       "powerSource": false,
       "lightValue": 14,
@@ -14246,7 +16171,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -14383,7 +16308,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -14391,10 +16316,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -14408,7 +16333,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -14501,7 +16426,7 @@
   },
   {
     "id": "minecraft:white_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "White Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -14521,7 +16446,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -14550,6 +16475,31 @@
     }
   },
   {
+    "id": "minecraft:wither_rose",
+    "localizedName": "Wither Rose",
+    "material": {
+      "powerSource": false,
+      "lightValue": 0,
+      "hardness": 0.0,
+      "resistance": 0.0,
+      "ticksRandomly": false,
+      "fullCube": false,
+      "slipperiness": 0.6,
+      "liquid": false,
+      "solid": false,
+      "movementBlocker": false,
+      "burnable": false,
+      "opaque": false,
+      "replacedDuringPlacement": false,
+      "toolRequired": false,
+      "fragileWhenPushed": true,
+      "unpushable": false,
+      "mapColor": "#007c00",
+      "isTranslucent": false,
+      "hasContainer": false
+    }
+  },
+  {
     "id": "minecraft:wither_skeleton_skull",
     "localizedName": "Wither Skeleton Skull",
     "material": {
@@ -14571,12 +16521,12 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
     "id": "minecraft:wither_skeleton_wall_skull",
-    "localizedName": "Air",
+    "localizedName": "Wither Skeleton Skull",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -14596,7 +16546,7 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -14621,7 +16571,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -14758,7 +16708,7 @@
       "hardness": 2.0,
       "resistance": 2.0,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -14766,10 +16716,10 @@
       "burnable": false,
       "opaque": true,
       "replacedDuringPlacement": false,
-      "toolRequired": true,
+      "toolRequired": false,
       "fragileWhenPushed": false,
       "unpushable": false,
-      "mapColor": "#707070",
+      "mapColor": "#7f3fb2",
       "isTranslucent": true,
       "hasContainer": true
     }
@@ -14783,7 +16733,7 @@
       "hardness": 0.3,
       "resistance": 0.3,
       "ticksRandomly": false,
-      "fullCube": false,
+      "fullCube": true,
       "slipperiness": 0.6,
       "liquid": false,
       "solid": true,
@@ -14851,7 +16801,7 @@
   },
   {
     "id": "minecraft:yellow_wall_banner",
-    "localizedName": "Air",
+    "localizedName": "Yellow Banner",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -14871,7 +16821,7 @@
       "unpushable": false,
       "mapColor": "#8f7748",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
@@ -14921,12 +16871,12 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   },
   {
     "id": "minecraft:zombie_wall_head",
-    "localizedName": "Air",
+    "localizedName": "Zombie Head",
     "material": {
       "powerSource": false,
       "lightValue": 0,
@@ -14946,7 +16896,7 @@
       "unpushable": false,
       "mapColor": "#000000",
       "isTranslucent": false,
-      "hasContainer": true
+      "hasContainer": false
     }
   }
 ]

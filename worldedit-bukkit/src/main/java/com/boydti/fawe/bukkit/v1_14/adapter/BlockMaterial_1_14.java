@@ -25,7 +25,7 @@ public class BlockMaterial_1_14 implements BlockMaterial {
         this.defaultState = defaultState;
         this.material = defaultState.getMaterial();
         this.craftBlockData = CraftBlockData.fromData(defaultState);
-        this.isTranslucent = ReflectionUtil.getField(Block.class, block, "n");
+        this.isTranslucent = ReflectionUtil.getField(Block.class, block, "v");
     }
 
     public Block getBlock() {
