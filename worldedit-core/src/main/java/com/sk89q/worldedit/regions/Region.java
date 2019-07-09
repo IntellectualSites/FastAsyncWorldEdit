@@ -19,12 +19,20 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
+import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -128,7 +136,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
      * @param position the position
      * @return true if contained
      */
-    boolean contains(BlockVector3 position);
+    default boolean contains(BlockVector3 position) {
+        return contains(position.getX(), position.getY(), position.getZ());
+    }
 
     /**
      * Get a list of chunks.
@@ -172,4 +182,63 @@ public interface Region extends Iterable<BlockVector3>, Cloneable {
      * @return the points.
      */
     List<BlockVector2> polygonize(int maxPoints);
+
+    default int getMinY() {
+        return getMinimumPoint().getY();
+    }
+
+    default int getMaxY() {
+        return getMaximumPoint().getY();
+    }
+
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
+        int minSection = Math.max(0, getMinY() >> 4);
+        int maxSection = Math.min(15, getMaxY() >> 4);
+        for (int layer = minSection; layer <= maxSection; layer++) {
+            if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
+            block = block.init(get, set, layer);
+            block.filter(filter, this);
+        }
+    }
+
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, final int minY, final int maxY) {
+        int minSection = minY >> 4;
+        int maxSection = maxY >> 4;
+        int yStart = (minY & 15);
+        int yEnd = (maxY & 15);
+        if (minSection == maxSection) {
+            filter(chunk, filter, block, get, set, minSection, yStart, yEnd);
+            return;
+        }
+        if (yStart != 0) {
+            filter(chunk, filter, block, get, set, minSection, yStart, 15);
+            minSection++;
+        }
+        if (yEnd != 15) {
+            filter(chunk, filter, block, get, set, minSection, 0, yEnd);
+            maxSection--;
+        }
+        for (int layer = minSection; layer < maxSection; layer++) {
+            filter(chunk, filter, block, get, set, layer);
+        }
+        return;
+    }
+
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer) {
+        if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
+        block = block.init(get, set, layer);
+        block.filter(filter);
+    }
+
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
+        block = block.init(get, set, layer);
+        block.filter(filter, minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int yStart, int yEnd) {
+        if (!get.hasSection(layer) || !filter.appliesLayer(chunk, layer)) return;
+        block = block.init(get, set, layer);
+        block.filter(filter, yStart, yEnd);
+    }
 }

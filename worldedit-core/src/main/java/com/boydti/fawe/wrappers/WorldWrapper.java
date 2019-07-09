@@ -236,11 +236,6 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return parent.getLazyBlock(position);
-    }
-
-    @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         return parent.getFullBlock(position);
     }

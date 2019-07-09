@@ -14,17 +14,17 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
  */
 @Link(clazz = UtilityCommands.class, value = "patterns")
 public interface FawePattern extends Pattern {
-
-    @Deprecated
-    default BaseBlock apply(BlockVector3 position) {
-        throw new UnsupportedOperationException("Please use apply(extent, get, set)");
-    }
-
-    /**
-     * Return a {@link BlockStateHolder} for the given position.
-     *
-     * @return a block
-     */
-    @Override
-    boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException;
+//
+//    @Deprecated
+//    default BaseBlock apply(BlockVector3 position) {
+//        throw new UnsupportedOperationException("Please use apply(extent, get, set)");
+//    }
+//
+//    /**
+//     * Return a {@link BlockStateHolder} for the given position.
+//     *
+//     * @return a block
+//     */
+//    @Override
+//    boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException;
 }

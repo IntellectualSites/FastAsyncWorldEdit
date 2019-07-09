@@ -425,6 +425,16 @@ public class CompoundTag extends Tag {
     }
 
     @Override
+    public Map<String, Object> toRaw() {
+        HashMap<String, Object> raw = new HashMap<>();
+        if (this.value.isEmpty()) return raw;
+        for (Map.Entry<String, Tag> entry : value.entrySet()) {
+            raw.put(entry.getKey(), entry.getValue().toRaw());
+        }
+        return raw;
+    }
+
+    @Override
     public String toString() {
         StringBuilder bldr = new StringBuilder();
         bldr.append("TAG_Compound").append(": ").append(getValue().size()).append(" entries\r\n{\r\n");

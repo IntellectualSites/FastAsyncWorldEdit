@@ -1,25 +1,37 @@
 package com.sk89q.worldedit.math;
 
+import com.boydti.fawe.FaweCache;
+
 public class MutableBlockVector3 extends BlockVector3 {
 
-    private static ThreadLocal<MutableBlockVector3> MUTABLE_CACHE = ThreadLocal.withInitial(() -> new MutableBlockVector3());
+    public static MutableBlockVector3 at(double x, double y, double z) {
+        return at((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
+    }
+
+    public static MutableBlockVector3 at(int x, int y, int z) {
+        return new MutableBlockVector3(x, y, z);
+    }
 
     public static MutableBlockVector3 get(int x, int y, int z) {
-        return MUTABLE_CACHE.get().setComponents(x, y, z);
+        return FaweCache.MUTABLE_BLOCKVECTOR3.get().setComponents(x, y, z);
     }
 
     public MutableBlockVector3() {}
 
     public MutableBlockVector3(BlockVector3 other) {
-        super(other.getX(), other.getY(), other.getZ());
+        this(other.getX(), other.getY(), other.getZ());
     }
 
     public MutableBlockVector3 setComponents(BlockVector3 other) {
         return setComponents(other.getBlockX(), other.getBlockY(), other.getBlockZ());
     }
 
+    private int x,y,z;
+
     public MutableBlockVector3(int x, int y, int z) {
-        super(x, y, z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Override
@@ -28,6 +40,21 @@ public class MutableBlockVector3 extends BlockVector3 {
         this.y = y;
         this.z = z;
         return this;
+    }
+
+    @Override
+    public final int getX() {
+        return x;
+    }
+
+    @Override
+    public final int getY() {
+        return y;
+    }
+
+    @Override
+    public final int getZ() {
+        return z;
     }
 
     @Override

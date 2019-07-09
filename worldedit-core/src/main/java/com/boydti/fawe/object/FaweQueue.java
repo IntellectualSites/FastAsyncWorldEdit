@@ -72,7 +72,7 @@ public interface FaweQueue extends HasFaweQueue, Extent {
     }
 
     @Override
-    default BlockState getLazyBlock(int x, int y, int z) {
+    default BlockState getBlock(int x, int y, int z) {
         int combinedId4Data = getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
         try {
             return BlockState.getFromInternalId(combinedId4Data);

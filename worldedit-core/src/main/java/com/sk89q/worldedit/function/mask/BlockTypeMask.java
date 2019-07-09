@@ -19,15 +19,12 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,6 +36,9 @@ import java.util.Set;
  * <p>This mask checks for ONLY the block type. If state should also be checked,
  * use {@link BlockMask}.</p>
  */
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@Deprecated
 public class BlockTypeMask extends AbstractExtentMask {
 
     private final boolean[] types;
@@ -111,11 +111,12 @@ public class BlockTypeMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return types[getExtent().getBlockType(vector).getInternalId()];
+        return test(vector.getBlock(getExtent()).getBlockType());
     }
-//    public boolean test(BlockVector3 vector) {
-//        return blocks.contains(getExtent().getBlock(vector).getBlockType());
-//    }
+
+    public boolean test(BlockType block) {
+        return types[block.getInternalId()];
+    }
 
     @Nullable
     @Override

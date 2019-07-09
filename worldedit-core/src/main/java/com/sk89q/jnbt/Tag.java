@@ -31,4 +31,8 @@ public abstract class Tag {
      */
     public abstract Object getValue();
 
+    public Object toRaw() {
+        return getValue();
+    }
+
 }

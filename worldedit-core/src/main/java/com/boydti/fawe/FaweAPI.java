@@ -8,6 +8,7 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -262,7 +263,7 @@ public class FaweAPI {
      */
     public static void cancelEdit(Extent extent, BBC reason) {
         try {
-            WEManager.IMP.cancelEdit(extent, reason);
+            WEManager.IMP.cancelEdit(extent, new FaweException(reason));
         } catch (WorldEditException ignore) {
         }
     }

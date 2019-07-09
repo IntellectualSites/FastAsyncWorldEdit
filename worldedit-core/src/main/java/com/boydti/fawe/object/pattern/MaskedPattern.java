@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
+import com.boydti.fawe.beta.SingleFilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -12,32 +14,30 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class MaskedPattern extends AbstractPattern {
 
-    private final PatternExtent patternExtent;
-    private final Pattern secondaryPattern;
+    private final Pattern primary;
+    private final Pattern secondary;
     private Mask mask;
 
-    public MaskedPattern(Mask mask, PatternExtent primary, Pattern secondary) {
+    public MaskedPattern(Mask mask, Pattern primary, Pattern secondary) {
         this.mask = mask;
-        this.patternExtent = primary;
-        this.secondaryPattern = secondary;
+        this.primary = primary;
+        this.secondary = secondary;
     }
 
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        patternExtent.setTarget(position);
         if (mask.test(position)) {
-            return patternExtent.getAndResetTarget().toBaseBlock();
+            return primary.apply(position);
         }
-        return secondaryPattern.apply(position);
+        return secondary.apply(position);
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-        patternExtent.setTarget(get);
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         if (mask.test(get)) {
-            return patternExtent.getAndResetTarget(extent, set, get);
+            return primary.apply(extent, get, set);
         }
-        return secondaryPattern.apply(extent, set, get);
+        return secondary.apply(extent, get, set);
     }
 }

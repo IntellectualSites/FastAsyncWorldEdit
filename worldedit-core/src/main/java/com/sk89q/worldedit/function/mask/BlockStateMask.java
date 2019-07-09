@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.blocks.Blocks;
 import com.sk89q.worldedit.extent.Extent;
@@ -30,6 +31,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import javax.annotation.Nullable;
 import java.util.Map;
 
+@Deprecated
 public class BlockStateMask extends AbstractExtentMask {
 
     private final Map<String, String> states;
@@ -52,7 +54,10 @@ public class BlockStateMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        BlockState block = getExtent().getBlock(vector);
+        return test(vector.getBlock(getExtent()));
+    }
+
+    public boolean test(BlockState block) {
         final Map<Property<Object>, Object> checkProps = cache
                 .computeIfAbsent(block.getBlockType(), (b -> Blocks.resolveProperties(states, b)));
         if (strict && checkProps.isEmpty()) {

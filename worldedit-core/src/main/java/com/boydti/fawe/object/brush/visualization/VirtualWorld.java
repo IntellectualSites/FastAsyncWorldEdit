@@ -24,7 +24,12 @@ public interface VirtualWorld extends SimpleWorld, FaweQueue, Closeable {
 
     @Override
     default BaseBlock getFullBlock(BlockVector3 position) {
-        return getLazyBlock(position).toBaseBlock();
+        return getBlock(position).toBaseBlock();
+    }
+
+    @Override
+    default BaseBlock getFullBlock(int x, int y, int z) {
+        return getBlock(x, y, z).toBaseBlock();
     }
 
     @Override

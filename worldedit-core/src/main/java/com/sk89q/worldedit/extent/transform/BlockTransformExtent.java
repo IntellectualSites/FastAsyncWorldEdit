@@ -494,13 +494,8 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
-        return transform(super.getLazyBlock(x, y, z));
-    }
-
-    @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return transform(super.getLazyBlock(position));
+    public BlockState getBlock(int x, int y, int z) {
+        return transform(super.getBlock(x, y, z));
     }
 
     @Override

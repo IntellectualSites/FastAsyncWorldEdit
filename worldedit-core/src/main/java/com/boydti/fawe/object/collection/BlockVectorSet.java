@@ -38,13 +38,15 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
             int newSize = count + size;
             if (newSize > index) {
                 int localIndex = index - count;
-                BlockVector3 pos = mutable.setComponents(set.getIndex(localIndex));
-                int pair = entry.getIntKey();
-                int cx = MathMan.unpairX(pair);
-                int cz = MathMan.unpairY(pair);
-                pos = pos.mutX((cx << 11) + pos.getBlockX());
-                pos = pos.mutZ((cz << 11) + pos.getBlockZ());
-                return pos;
+                BlockVector3 pos = set.getIndex(localIndex);
+                if (pos != null) {
+                    int pair = entry.getIntKey();
+                    int cx = MathMan.unpairX(pair);
+                    int cz = MathMan.unpairY(pair);
+                    pos = pos.mutX((cx << 11) + pos.getBlockX());
+                    pos = pos.mutZ((cz << 11) + pos.getBlockZ());
+                    return pos;
+                }
             }
             count += newSize;
         }

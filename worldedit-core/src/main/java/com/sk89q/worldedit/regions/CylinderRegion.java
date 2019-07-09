@@ -20,6 +20,12 @@
 package com.sk89q.worldedit.regions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -287,25 +293,21 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         minY += changeY;
     }
 
-    /**
-     * Checks to see if a point is inside this region.
-     */
     @Override
-    public boolean contains(BlockVector3 position) {
-        final int blockY = position.getBlockY();
-        if (blockY < minY || blockY > maxY) {
+    public boolean contains(int x, int y, int z) {
+        if (y < minY || y > maxY) {
             return false;
         }
-        //todo the following lines can possibly be removed and replaced with upstream
-        int px = position.getBlockX();
-        int pz = position.getBlockZ();
+        return contains(x, z);
+    }
 
-        double dx = Math.abs(px - center.getBlockX()) * radiusInverse.getX();
-        double dz = Math.abs(pz - center.getBlockZ()) * radiusInverse.getZ();
+    @Override
+    public boolean contains(int x, int z) {
+        double dx = Math.abs(x - center.getBlockX()) * radiusInverse.getX();
+        double dz = Math.abs(z - center.getBlockZ()) * radiusInverse.getZ();
 
         return dx * dx + dz * dz <= 1;
     }
-
 
     /**
      * Sets the height of the cylinder to fit the specified Y.
@@ -361,6 +363,16 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         return Polygons.polygonizeCylinder(center, radius, maxPoints);
     }
 
+    @Override
+    public int getMinY() {
+        return minY;
+    }
+
+    @Override
+    public int getMaxY() {
+        return maxY;
+    }
+
     /**
      * Return a new instance with the given center and radius in the X and Z
      * axes with a Y that extends from the bottom of the extent to the top
@@ -380,4 +392,16 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         return new CylinderRegion(center, radiusVec, minY, maxY);
     }
 
+    @Override
+    public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
+        int bcx = chunk.getX() >> 4;
+        int bcz = chunk.getZ() >> 4;
+        int tcx = bcx + 15;
+        int tcz = bcz + 15;
+        if (contains(bcx, bcz) && contains(tcx, tcz)) {
+            filter(chunk, filter, block, get, set, minY, maxY);
+            return;
+        }
+        super.filter(chunk, filter, block, get, set);
+    }
 }

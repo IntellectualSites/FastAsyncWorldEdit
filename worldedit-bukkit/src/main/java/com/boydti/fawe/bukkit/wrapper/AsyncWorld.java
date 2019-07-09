@@ -1,5 +1,6 @@
 package com.boydti.fawe.bukkit.wrapper;
 
+import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
 import com.boydti.fawe.object.FaweQueue;
@@ -172,11 +173,6 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
                 this.value = parent.getWorldBorder();
             }
         });
-    }
-
-    @Override
-    public boolean unloadChunkRequest(int x, int z) {
-        return unloadChunk(x, z);
     }
 
     @Override
@@ -391,6 +387,19 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
                 @Override
                 public void run(Boolean value) {
                     this.value = parent.unloadChunk(x, z, save);
+                }
+            });
+        }
+        return true;
+    }
+
+    @Override
+    public boolean unloadChunkRequest(int x, int z) {
+        if (isChunkLoaded(x, z)) {
+            return TaskManager.IMP.sync(new RunnableVal<Boolean>() {
+                @Override
+                public void run(Boolean value) {
+                    this.value = parent.unloadChunkRequest(x, z);
                 }
             });
         }

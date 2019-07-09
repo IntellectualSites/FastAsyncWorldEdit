@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.minecraft.util.commands.Link;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.UtilityCommands;
@@ -42,6 +43,6 @@ public interface Pattern {
     BaseBlock apply(BlockVector3 position);
 
     default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return extent.setBlock(set, apply(get));
+        return set.setFullBlock(extent, apply(get));
     }
 }

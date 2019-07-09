@@ -49,7 +49,7 @@ public class GravityBrush implements Brush {
             for (int z = position.getBlockZ() + size; z > position.getBlockZ() - size; --z) {
                 int freeSpot = startCheckY;
                 for (int y = startCheckY; y <= endY; y++) {
-                    BlockStateHolder block = editSession.getLazyBlock(x, y, z);
+                    BlockStateHolder block = editSession.getBlock(x, y, z);
                     if (!block.getBlockType().getMaterial().isAir()) {
                         if (y != freeSpot) {
                             editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());

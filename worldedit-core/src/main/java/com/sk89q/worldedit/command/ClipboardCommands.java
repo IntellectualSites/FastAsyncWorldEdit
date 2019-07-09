@@ -128,7 +128,7 @@ public class ClipboardCommands extends MethodCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw FaweException.MAX_CHECKS;
         }
         session.setClipboard(null);
         final BlockVector3 origin = region.getMinimumPoint();
@@ -168,7 +168,7 @@ public class ClipboardCommands extends MethodCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw FaweException.MAX_CHECKS;
         }
         BlockVector3 pos = session.getPlacementPosition(player);
         fp.checkConfirmationRegion(() -> {
@@ -218,10 +218,10 @@ public class ClipboardCommands extends MethodCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw FaweException.MAX_CHECKS;
         }
         if (volume >= limit.MAX_CHANGES) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
+            throw FaweException.MAX_CHANGES;
         }
         session.setClipboard(null);
         final BlockVector3 origin = region.getMinimumPoint();
@@ -258,10 +258,10 @@ public class ClipboardCommands extends MethodCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw FaweException.MAX_CHECKS;
         }
         if (volume >= limit.MAX_CHANGES) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
+            throw FaweException.MAX_CHANGES;
         }
         BlockVector3 pos = session.getPlacementPosition(player);
         fp.checkConfirmationRegion(() -> {
@@ -497,7 +497,7 @@ public class ClipboardCommands extends MethodCommands {
         if (holder instanceof URIClipboardHolder) uri = ((URIClipboardHolder) holder).getURI(clipboard);
         PasteEvent event = new PasteEvent(player, clipboard, uri, editSession, to);
         worldEdit.getEventBus().post(event);
-        if (event.isCancelled()) throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
+        if (event.isCancelled()) throw FaweException.MANUAL;
     }
 
     @Command(

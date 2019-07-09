@@ -19,7 +19,12 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.filters.SetFilter;
+import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.beta.filters.CountFilter;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.object.FaweLimit;
@@ -45,6 +50,7 @@ import com.sk89q.worldedit.function.generator.FloraGenerator;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.NoiseFilter2D;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.LayerVisitor;
@@ -65,10 +71,14 @@ import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.binding.Text;
 import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
 import java.util.ArrayList;
@@ -103,6 +113,43 @@ public class RegionCommands extends MethodCommands {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
     }
+
+
+    @Command(
+            aliases = {"debugtest"},
+            usage = "",
+            desc = "debugtest",
+            help = "debugtest"
+    )
+    @CommandPermissions("fawe.admin.debug")
+    public void debugtest(Player player, @Selection Region region) throws WorldEditException {
+        QueueHandler queueHandler = Fawe.get().getQueueHandler();
+        World world = player.getWorld();
+        CountFilter filter = new CountFilter();
+        long start = System.currentTimeMillis();
+        queueHandler.apply(world, region, filter);
+        long diff = System.currentTimeMillis() - start;
+        System.out.println(diff);
+    }
+
+    @Command(
+            aliases = {"db2"},
+            usage = "",
+            desc = "db2",
+            help = "db2"
+    )
+    @CommandPermissions("fawe.admin.debug")
+    public void db2(Player player, @Selection Region region, String blockStr) throws WorldEditException {
+        QueueHandler queueHandler = Fawe.get().getQueueHandler();
+        World world = player.getWorld();
+        BlockState block = BlockState.get(blockStr);
+        SetFilter filter = new SetFilter(block);
+        long start = System.currentTimeMillis();
+        queueHandler.apply(world, region, filter);
+        long diff = System.currentTimeMillis() - start;
+        System.out.println(diff);
+    }
+
 
     @Command(
             aliases = {"/fixlighting"},
@@ -465,7 +512,7 @@ public class RegionCommands extends MethodCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw FaweException.MAX_CHECKS;
         }
         player.checkConfirmationRegion(() -> {
             try {
@@ -733,7 +780,9 @@ public class RegionCommands extends MethodCommands {
         help =
             "Hollows out the object contained in this selection.\n" +
             "Optionally fills the hollowed out part with the given block.\n" +
-            "Thickness is measured in manhattan distance.",
+            "Thickness is measured in manhattan distance.\n" +
+            "Flags:\n" +
+            "  -m Mask, uses a mask to hollow",
         min = 0,
         max = 2
     )
@@ -743,9 +792,11 @@ public class RegionCommands extends MethodCommands {
                        @Selection Region region,
                        @Optional("0") @Range(min = 0) int thickness,
                        @Optional("air") Pattern pattern,
+                       @Switch('m') Mask mask,
                        CommandContext context) throws WorldEditException {
+        Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
         player.checkConfirmationRegion(() -> {
-            int affected = editSession.hollowOutRegion(region, thickness, pattern);
+            int affected = editSession.hollowOutRegion(region, thickness, pattern, finalMask);
             BBC.VISITOR_BLOCK.send(player, affected);
         }, getArguments(context), region, context);
     }

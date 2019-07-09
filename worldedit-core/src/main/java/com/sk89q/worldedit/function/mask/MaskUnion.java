@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.google.common.base.Function;
 import com.sk89q.worldedit.math.BlockVector3;
 

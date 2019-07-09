@@ -48,9 +48,8 @@ import java.util.List;
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
-public class AbstractDelegateExtent implements LightingExtent {
-    private transient final Extent extent;
-    protected MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
+public class AbstractDelegateExtent implements Extent, LightingExtent {
+    private final Extent extent;
 
     /**
      * Create a new instance.
@@ -62,11 +61,27 @@ public class AbstractDelegateExtent implements LightingExtent {
         this.extent = extent;
     }
 
-    public int getSkyLight(int x, int y, int z) {
-        if (extent instanceof LightingExtent) {
-            return ((LightingExtent) extent).getSkyLight(x, y, z);
-        }
-        return 0;
+    /**
+     * Get the extent.
+     *
+     * @return the extent
+     */
+    public Extent getExtent() {
+        return extent;
+    }
+
+    /*
+    Bounds
+     */
+
+    @Override
+    public BlockVector3 getMinimumPoint() {
+        return extent.getMinimumPoint();
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return extent.getMaximumPoint();
     }
 
     @Override
@@ -74,11 +89,40 @@ public class AbstractDelegateExtent implements LightingExtent {
         return extent.getMaxY();
     }
 
+    /*
+    Input + Output
+     */
+
     @Override
-    public BlockType getBlockType(BlockVector3 position) {
-        return extent.getBlockType(position);
+    public BlockState getBlock(int x, int y, int z) {
+        return extent.getBlock(x, y, z);
     }
 
+    @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return extent.getFullBlock(x, y, z);
+    }
+
+    @Override
+    public BiomeType getBiomeType(int x, int z) {
+        return extent.getBiomeType(x, z);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        return extent.setBiome(x, y, z, biome);
+    }
+
+    /*
+    Light
+     */
+
+    public int getSkyLight(int x, int y, int z) {
+        if (extent instanceof LightingExtent) {
+            return ((LightingExtent) extent).getSkyLight(x, y, z);
+        }
+        return 0;
+    }
 
     public int getBlockLight(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
@@ -91,7 +135,7 @@ public class AbstractDelegateExtent implements LightingExtent {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getOpacity(x, y, z);
         }
-        return getLazyBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
+        return getBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
     }
 
     @Override
@@ -106,164 +150,20 @@ public class AbstractDelegateExtent implements LightingExtent {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getBrightness(x, y, z);
         }
-        return getLazyBlock(x, y, z).getBlockType().getMaterial().getLightValue();
+        return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
     }
 
-    /**
-     * Get the extent.
-     *
-     * @return the extent
+    /*
+    Generic
      */
-    public Extent getExtent() {
-        return extent;
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
-        return extent.getLazyBlock(mutable.setComponents(x, y, z));
-    }
-
-    @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return extent.getLazyBlock(position);
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        return setBlock(mutable.setComponents(x, y, z), block);
-    }
-
-    public BlockState getBlock(BlockVector3 position) {
-        return extent.getBlock(position);
-    }
-
-    @Override
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return extent.getFullBlock(position);
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
-        return extent.setBlock(location, block);
-    }
-
-    @Override
-    @Nullable
-    public Entity createEntity(Location location, BaseEntity entity) {
-        return extent.createEntity(location, entity);
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return extent.getEntities();
-    }
-
-    @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return extent.getEntities(region);
-    }
-
-    @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return extent.getBiome(position);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return extent.setBiome(position, biome);
-    }
-
-    @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return extent.setBiome(x, y, z, biome);
-    }
-
-    @Override
-    public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
-        return extent.getHighestTerrainBlock(x, z, minY, maxY);
-    }
-
-    @Override
-    public BlockVector3 getMinimumPoint() {
-        return extent.getMinimumPoint();
-    }
-
-    @Override
-    public BlockVector3 getMaximumPoint() {
-        return extent.getMaximumPoint();
-    }
-
-    protected Operation commitBefore() {
-        return null;
-    }
 
     @Override
     public String toString() {
         return super.toString() + ":" + extent.toString();
     }
 
-    @Override
-    public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
-        return extent.getNearestSurfaceLayer(x, z, y, minY, maxY);
-    }
-
-    @Override
-    public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
-        return extent.getHighestTerrainBlock(x, z, minY, maxY, filter);
-    }
-
-    @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
-        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
-    }
-
-    @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
-    }
-
-    @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
-        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
-    }
-
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
-        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
-    }
-
-    @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
-        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
-    }
-
-    @Override
-    public void addCaves(Region region) throws WorldEditException {
-        extent.addCaves(region);
-    }
-
-    @Override
-    public void generate(Region region, GenBase gen) throws WorldEditException {
-        extent.generate(region, gen);
-    }
-
-    @Override
-    public void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
-        extent.spawnResource(region, gen, rarity, frequency);
-    }
-
-    @Override
-    public boolean contains(BlockVector3 pt) {
-        return extent.contains(pt);
-    }
-
-    @Override
-    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
-        extent.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
-    }
-
-    @Override
-    public void addOres(Region region, Mask mask) throws WorldEditException {
-        extent.addOres(region, mask);
+    protected Operation commitBefore() {
+        return null;
     }
 
     @Override
@@ -281,6 +181,4 @@ public class AbstractDelegateExtent implements LightingExtent {
             return null;
         }
     }
-
-
 }

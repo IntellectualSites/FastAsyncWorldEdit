@@ -79,7 +79,7 @@ public class MCAFile {
         this.queue = parent;
         this.file = file;
         if (!file.exists()) {
-            throw new FaweException.FaweChunkLoadException();
+            throw FaweException.CHUNK;
         }
         String[] split = file.getName().split("\\.");
         X = Integer.parseInt(split[1]);

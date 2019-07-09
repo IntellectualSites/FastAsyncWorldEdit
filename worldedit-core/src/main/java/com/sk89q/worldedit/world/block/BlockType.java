@@ -21,7 +21,6 @@ package com.sk89q.worldedit.world.block;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -33,14 +32,12 @@ import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -181,10 +178,15 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return The default state
      */
-    public BlockState getDefaultState() {
+    public final BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 
+    /**
+     * @Deprecated use a Mask instead
+     * @return
+     */
+    @Deprecated
     public FuzzyBlockState getFuzzyMatcher() { //
         return new FuzzyBlockState(this);
     }
@@ -296,7 +298,7 @@ public class BlockType implements FawePattern, Keyed {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return extent.setBlock(set, this.getDefaultState());
+        return set.setBlock(extent, getDefaultState());
     }
 
     @Override

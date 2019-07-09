@@ -49,7 +49,7 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
 
     @Override
     public int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return getLazyBlock(x, y, z).getInternalId();
+        return getBlock(x, y, z).getInternalId();
     }
 
     @Override
@@ -86,16 +86,4 @@ public class FaweQueueDelegateExtent extends DelegateFaweQueue {
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
         return parentExtent.setBlock(x, y, z, block);
     }
-
-    @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return parentExtent.getLazyBlock(position);
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
-        return parentExtent.getLazyBlock(x, y, z);
-    }
-
-
 }

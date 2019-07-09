@@ -102,16 +102,16 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         nbtCreateTagMethod.setAccessible(true);
     }
 
-    public int[] idbToStateOrdinal;
+    public char[] idbToStateOrdinal;
 
-    private boolean init() {
+    private synchronized boolean init() {
         if (idbToStateOrdinal != null) return false;
-        idbToStateOrdinal = new int[Block.REGISTRY_ID.a()]; // size
+        idbToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
         for (int i = 0; i < idbToStateOrdinal.length; i++) {
             BlockState state = BlockTypes.states[i];
             BlockMaterial_1_13 material = (BlockMaterial_1_13) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
-            idbToStateOrdinal[id] = state.getOrdinal();
+            idbToStateOrdinal[id] = state.getOrdinalChar();
         }
         return true;
     }
@@ -533,8 +533,18 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
             int id = Block.REGISTRY_ID.getId(ibd);
             return idbToStateOrdinal[id];
         } catch (NullPointerException e) {
-            if (init()) return adaptToInt(ibd);
-            throw e;
+            init();
+            return adaptToInt(ibd);
+        }
+    }
+
+    public char adaptToChar(IBlockData ibd) {
+        try {
+            int id = Block.REGISTRY_ID.getId(ibd);
+            return idbToStateOrdinal[id];
+        } catch (NullPointerException e) {
+            init();
+            return adaptToChar(ibd);
         }
     }
 

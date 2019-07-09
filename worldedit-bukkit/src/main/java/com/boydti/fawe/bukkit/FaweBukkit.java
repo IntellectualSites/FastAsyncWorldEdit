@@ -2,6 +2,9 @@ package com.boydti.fawe.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
+import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.bukkit.beta.BukkitQueue;
+import com.boydti.fawe.bukkit.beta.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.chat.BukkitChatManager;
 import com.boydti.fawe.bukkit.listener.AsyncTabCompleteListener;
 import com.boydti.fawe.bukkit.listener.BrushListener;
@@ -30,6 +33,7 @@ import com.boydti.fawe.bukkit.v0.BukkitQueue_All;
 import com.boydti.fawe.bukkit.v0.ChunkListener_8;
 import com.boydti.fawe.bukkit.v0.ChunkListener_9;
 import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
+import com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
@@ -43,6 +47,7 @@ import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -50,9 +55,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -149,6 +156,11 @@ public class FaweBukkit implements IFawe, Listener {
 //            packetListener = new CFIPacketListener(plugin);
 //        }
 //    }
+
+    @Override
+    public QueueHandler getQueueHandler() {
+        return new BukkitQueueHandler();
+    }
 
     @Override
     public synchronized ImageViewer getImageViewer(FawePlayer fp) {
@@ -575,6 +587,7 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     public enum Version {
+        v1_14_R1,
         v1_13_R2,
         NONE,
     }
@@ -583,6 +596,8 @@ public class FaweBukkit implements IFawe, Listener {
         switch (getVersion()) {
             case v1_13_R2:
                 return new BukkitQueue_1_13(world);
+            case v1_14_R1:
+                return new BukkitQueue_1_14(world);
             default:
             case NONE:
                 return new BukkitQueue_All(world);
@@ -593,6 +608,8 @@ public class FaweBukkit implements IFawe, Listener {
         switch (getVersion()) {
             case v1_13_R2:
                 return new BukkitQueue_1_13(world);
+            case v1_14_R1:
+                return new BukkitQueue_1_14(world);
             default:
             case NONE:
                 return new BukkitQueue_All(world);

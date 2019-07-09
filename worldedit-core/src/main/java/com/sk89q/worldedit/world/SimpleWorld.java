@@ -61,7 +61,7 @@ public interface SimpleWorld extends World {
 
     @Override
     default BaseBlock getFullBlock(BlockVector3 position) {
-        return getLazyBlock(position).toBaseBlock();
+        return getBlock(position).toBaseBlock();
     }
 
     @Override
@@ -74,7 +74,7 @@ public interface SimpleWorld extends World {
 
     @Override
     default Mask createLiquidMask() {
-        return new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        return new BlockMask(this).add(BlockTypes.LAVA, BlockTypes.WATER);
     }
 
     @Override

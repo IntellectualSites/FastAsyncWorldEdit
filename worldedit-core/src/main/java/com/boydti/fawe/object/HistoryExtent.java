@@ -29,7 +29,6 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     private FaweChangeSet changeSet;
     private final FaweQueue queue;
-    private final EditSession session;
 
     /**
      * Create a new instance.
@@ -37,12 +36,11 @@ public class HistoryExtent extends AbstractDelegateExtent {
      * @param extent    the extent
      * @param changeSet the change set
      */
-    public HistoryExtent(final EditSession session, final Extent extent, final FaweChangeSet changeSet, FaweQueue queue) {
+    public HistoryExtent(final Extent extent, final FaweChangeSet changeSet, FaweQueue queue) {
         super(extent);
         checkNotNull(changeSet);
         this.queue = queue;
         this.changeSet = changeSet;
-        this.session = session;
     }
 
     public FaweChangeSet getChangeSet() {
@@ -55,9 +53,9 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        BaseBlock previous = queue.getFullBlock(mutable.setComponents(x, y, z)).toBaseBlock();
+        BaseBlock previous = queue.getFullBlock(x, y, z);
         if (previous.getInternalId() == block.getInternalId()) {
-            if (!previous.hasNbtData() && (block instanceof BaseBlock && !((BaseBlock)block).hasNbtData())) {
+            if (!previous.hasNbtData() && (block instanceof BaseBlock && !block.hasNbtData())) {
                 return false;
             }
         }

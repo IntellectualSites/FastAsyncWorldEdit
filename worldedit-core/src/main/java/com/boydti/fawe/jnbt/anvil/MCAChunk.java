@@ -77,9 +77,6 @@ public class MCAChunk extends FaweChunk<Void> {
     }
 
     public void write(NBTOutputStream nbtOut) throws IOException {
-
-
-
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeLazyCompoundTag("Level", out -> {
             out.writeNamedTag("V", (byte) 1);

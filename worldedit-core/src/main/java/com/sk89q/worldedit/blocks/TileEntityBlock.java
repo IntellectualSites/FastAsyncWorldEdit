@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.blocks;
 
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.world.NbtValued;
 
 /**
@@ -34,6 +37,17 @@ public interface TileEntityBlock extends NbtValued {
      *
      * @return tile entity ID, non-null string
      */
-    String getNbtId();
+    default String getNbtId() {
+        CompoundTag nbtData = getNbtData();
+        if (nbtData == null) {
+            return "";
+        }
+        Tag idTag = nbtData.getValue().get("id");
+        if (idTag instanceof StringTag) {
+            return ((StringTag) idTag).getValue();
+        } else {
+            return "";
+        }
+    }
 
 }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
@@ -49,6 +50,7 @@ import java.util.stream.Stream;
 public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     private final int internalId;
     private final int ordinal;
+    private final char ordinalChar;
     private final BlockType blockType;
     private BlockMaterial material;
     private BaseBlock emptyBaseBlock;
@@ -57,7 +59,8 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
-        this.emptyBaseBlock = new BaseBlock(this);
+        this.ordinalChar = (char) ordinal;
+        this.emptyBaseBlock = new ImmutableBaseBlock(this);
     }
 
     /**
@@ -215,7 +218,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
     }
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return extent.setBlock(set, this);
+        return set.setBlock(extent, this);
     }
 
     @Override
@@ -259,6 +262,24 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
         }
+    }
+
+    public <V> BlockState withProperties(final BlockState other) {
+        BlockType ot = other.getBlockType();
+        if (ot == blockType) {
+            return other;
+        }
+        if (ot.getProperties().isEmpty() || blockType.getProperties().isEmpty()) {
+            return this;
+        }
+        BlockState newState = this;
+        for (Property<?> prop: ot.getProperties()) {
+            PropertyKey key = prop.getKey();
+            if (blockType.hasProperty(key)) {
+                newState = newState.with(key, other.getState(key));
+            }
+        }
+        return this;
     }
 
     @Override
@@ -327,10 +348,15 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         return material;
 	}
 
-	@Override
-	public int getOrdinal() {
-		return this.ordinal;
-	}
+    @Override
+    public final int getOrdinal() {
+        return this.ordinal;
+    }
+
+    @Override
+    public final char getOrdinalChar() {
+        return this.ordinalChar;
+    }
 
     @Override
     public String toString() {

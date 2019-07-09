@@ -40,7 +40,7 @@ public class VisualExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        BlockStateHolder previous = super.getLazyBlock(x, y, z);
+        BlockStateHolder previous = super.getBlock(x, y, z);
         int cx = x >> 4;
         int cz = z >> 4;
         long chunkPair = MathMan.pairInt(cx, cz);

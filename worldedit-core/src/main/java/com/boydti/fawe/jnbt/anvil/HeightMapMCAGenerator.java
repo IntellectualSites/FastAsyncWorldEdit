@@ -2,6 +2,12 @@ package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.ArrayFilterBlock;
+import com.boydti.fawe.beta.DelegateFilter;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.FilterBlock;
+import com.boydti.fawe.beta.SimpleFilterBlock;
+import com.boydti.fawe.beta.filters.ArrayImageMask;
 import com.boydti.fawe.example.SimpleIntFaweChunk;
 import com.boydti.fawe.jnbt.anvil.HeightMapMCADrawer;
 import com.boydti.fawe.jnbt.anvil.MCAChunk;
@@ -1023,7 +1029,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return getLazyBlock(position);
+        return getBlock(position.getX(), position.getY(), position.getZ());
     }
 
     public BlockState getFloor(int x, int z) {
@@ -1046,12 +1052,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return BlockState.getFromInternalId(getCombinedId4Data(x, y, z));
     }
 

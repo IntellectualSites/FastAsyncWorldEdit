@@ -2,6 +2,7 @@ package com.boydti.fawe.object.extent;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.Perm;
 import com.boydti.fawe.util.WEManager;
@@ -30,7 +31,7 @@ public class MemoryCheckingExtent extends AbstractDelegateExtent {
                         BBC.WORLDEDIT_OOM_ADMIN.send(this.player);
                     }
                 }
-                WEManager.IMP.cancelEdit(this, BBC.WORLDEDIT_CANCEL_REASON_LOW_MEMORY);
+                WEManager.IMP.cancelEdit(this, FaweException.LOW_MEMORY);
                 return false;
             }
             return true;

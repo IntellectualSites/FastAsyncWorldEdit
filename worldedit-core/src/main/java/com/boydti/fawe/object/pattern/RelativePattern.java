@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
@@ -13,8 +14,8 @@ import java.io.IOException;
 public class RelativePattern extends AbstractPattern implements ResettablePattern {
 
     private final Pattern pattern;
-    private transient BlockVector3 origin;
-    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
+    private BlockVector3 origin;
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public RelativePattern(Pattern pattern) {
         this.pattern = pattern;
@@ -32,19 +33,14 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         if (origin == null) {
-            origin = get;
+            origin = set;
         }
-        mutable.mutX((get.getX() - origin.getX()));
-        mutable.mutY((get.getY() - origin.getY()));
-        mutable.mutZ((get.getZ() - origin.getZ()));
-        return pattern.apply(extent, set, mutable);
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        mutable = new MutableBlockVector3();
+        mutable.mutX((set.getX() - origin.getX()));
+        mutable.mutY((set.getY() - origin.getY()));
+        mutable.mutZ((set.getZ() - origin.getZ()));
+        return pattern.apply(extent, get, mutable);
     }
 
     @Override

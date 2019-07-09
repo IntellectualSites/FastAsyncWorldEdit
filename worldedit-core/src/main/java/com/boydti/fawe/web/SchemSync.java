@@ -53,7 +53,7 @@ public class SchemSync implements Runnable {
 
     private void close(Error error) throws IOException {
         this.clientSocket.getOutputStream().write(error.ordinal());
-        throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
+        throw FaweException.MANUAL;
     }
 
     @Override

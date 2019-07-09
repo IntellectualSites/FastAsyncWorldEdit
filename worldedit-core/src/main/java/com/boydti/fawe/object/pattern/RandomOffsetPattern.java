@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
@@ -40,19 +41,10 @@ public class RandomOffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-        mutable.mutX((get.getX() + r.nextInt(dx2) - dx));
-        mutable.mutY((get.getY() + r.nextInt(dy2) - dy));
-        mutable.mutZ((get.getZ() + r.nextInt(dz2) - dz));
-        return pattern.apply(extent, set, mutable);
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        this.dx2 = dx * 2 + 1;
-        this.dy2 = dy * 2 + 1;
-        this.dz2 = dz * 2 + 1;
-        this.r = new SplittableRandom();
-        this.mutable = new MutableBlockVector3();
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        mutable.mutX((set.getX() + r.nextInt(dx2) - dx));
+        mutable.mutY((set.getY() + r.nextInt(dy2) - dy));
+        mutable.mutZ((set.getZ() + r.nextInt(dz2) - dz));
+        return pattern.apply(extent, get, mutable);
     }
 }

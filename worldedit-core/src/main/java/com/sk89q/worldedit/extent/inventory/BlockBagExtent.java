@@ -44,7 +44,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
     private final boolean mine;
     private int[] missingBlocks = new int[BlockTypes.size()];
-    private BlockBag blockBag;
+    private final BlockBag blockBag;
 
     /**
      * Create a new instance.
@@ -73,15 +73,6 @@ public class BlockBagExtent extends AbstractDelegateExtent {
     }
 
     /**
-     * Set the block bag.
-     *
-     * @param blockBag a block bag, which may be null if none is used
-     */
-    public void setBlockBag(@Nullable BlockBag blockBag) {
-        this.blockBag = blockBag;
-    }
-
-    /**
      * Gets the list of missing blocks and clears the list for the next
      * operation.
      *
@@ -106,31 +97,27 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        if (blockBag != null) {
-            BlockState existing = getLazyBlock(x, y, z);
-
-            if (!block.getBlockType().equals(existing.getBlockType())) {
-                if (!block.getBlockType().getMaterial().isAir()) {
-                    try {
-                        blockBag.fetchPlacedBlock(block.toImmutableState());
-                    } catch (UnplaceableBlockException e) {
-                        throw new FaweException.FaweBlockBagException();
-                    } catch (BlockBagException e) {
-                        missingBlocks[block.getBlockType().getInternalId()]++;
-                        throw new FaweException.FaweBlockBagException();
-                    }
+        BlockState existing = getBlock(x, y, z);
+        if (!block.getBlockType().equals(existing.getBlockType())) {
+            if (!block.getBlockType().getMaterial().isAir()) {
+                try {
+                    blockBag.fetchPlacedBlock(block.toImmutableState());
+                } catch (UnplaceableBlockException e) {
+                    throw FaweException.BLOCK_BAG;
+                } catch (BlockBagException e) {
+                    missingBlocks[block.getBlockType().getInternalId()]++;
+                    throw FaweException.BLOCK_BAG;
                 }
-                if (mine) {
-                    if (!existing.getBlockType().getMaterial().isAir()) {
-                        try {
-                            blockBag.storeDroppedBlock(existing);
-                        } catch (BlockBagException ignored) {
-                        }
+            }
+            if (mine) {
+                if (!existing.getBlockType().getMaterial().isAir()) {
+                    try {
+                        blockBag.storeDroppedBlock(existing);
+                    } catch (BlockBagException ignored) {
                     }
                 }
             }
         }
-
         return super.setBlock(x, y, z, block);
     }
 }

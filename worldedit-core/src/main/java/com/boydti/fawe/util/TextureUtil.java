@@ -1,15 +1,14 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.SingleFilterBlock;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.pattern.PatternExtent;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -66,14 +65,15 @@ public class TextureUtil implements TextureHolder {
 
     public static TextureUtil fromMask(Mask mask) throws FileNotFoundException {
         HashSet<BlockType> blocks = new HashSet<>();
-        BlockPattern pattern = new BlockPattern(BlockTypes.AIR.getDefaultState());
-        PatternExtent extent = new PatternExtent(pattern);
+
+        SingleFilterBlock extent = new SingleFilterBlock();
         new MaskTraverser(mask).reset(extent);
+
         TextureUtil tu = Fawe.get().getTextureUtil();
         for (int typeId : tu.getValidBlockIds()) {
             BlockType block = BlockTypes.get(typeId);
-            pattern.setBlock(block.getDefaultState());
-            if (mask.test(BlockVector3.ZERO)) {
+            extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
+            if (mask.test(extent)) {
                 blocks.add(block);
             }
         }
@@ -491,7 +491,7 @@ public class TextureUtil implements TextureHolder {
         BlockType block = getNearestBlock(color);
         TextureUtil.BiomeColor biome = getNearestBiome(color);
         int blockColor = getColor(block);
-        blockAndBiomeIdOutput[0] = block.getInternalId();
+        blockAndBiomeIdOutput[0] = block.getDefaultState().getOrdinalChar();
         blockAndBiomeIdOutput[1] = biome.id;
         if (colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor,
             color)) {

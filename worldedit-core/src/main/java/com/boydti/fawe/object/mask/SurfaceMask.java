@@ -7,11 +7,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class SurfaceMask extends AdjacentAnyMask {
-    private final transient Extent extent;
-
     public SurfaceMask(Extent extent) {
         super(getMask(extent));
-        this.extent = extent;
     }
 
     public static Mask getMask(Extent extent) {

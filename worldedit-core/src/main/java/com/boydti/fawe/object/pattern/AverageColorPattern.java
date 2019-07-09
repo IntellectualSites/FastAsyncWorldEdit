@@ -1,19 +1,14 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.awt.Color;
-import java.io.IOException;
 
 public class AverageColorPattern extends AbstractExtentPattern {
     private transient TextureHolder holder;
@@ -35,19 +30,14 @@ public class AverageColorPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
-        BlockType blockType = extent.getBlockType(getPosition);
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        BlockType blockType = get.getBlock(extent).getBlockType();
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(blockType);
         if (currentColor == 0) return false;
         int newColor = util.averageColor(currentColor, color);
         BlockType newBlock = util.getNearestBlock(newColor);
         if (newBlock == blockType) return false;
-        return extent.setBlock(setPosition, newBlock.getDefaultState());
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        holder = Fawe.get().getCachedTextureUtil(true, 0, 100);
+        return set.setBlock(extent, newBlock.getDefaultState());
     }
 }

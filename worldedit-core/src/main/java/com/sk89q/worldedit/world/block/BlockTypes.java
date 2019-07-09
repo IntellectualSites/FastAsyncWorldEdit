@@ -52,6 +52,10 @@ import java.util.stream.Stream;
 public final class BlockTypes {
     // Doesn't really matter what the hardcoded values are, as FAWE will update it on load
     @Nullable public static final BlockType __RESERVED__ = null;
+    @Nullable public static final BlockType AIR = null;
+    @Nullable public static final BlockType CAVE_AIR = null;
+    @Nullable public static final BlockType VOID_AIR = null;
+
     @Nullable public static final BlockType ACACIA_BUTTON = null;
     @Nullable public static final BlockType ACACIA_DOOR = null;
     @Nullable public static final BlockType ACACIA_FENCE = null;
@@ -66,7 +70,6 @@ public final class BlockTypes {
     @Nullable public static final BlockType ACACIA_TRAPDOOR = null;
     @Nullable public static final BlockType ACACIA_WOOD = null;
     @Nullable public static final BlockType ACTIVATOR_RAIL = null;
-    @Nullable public static final BlockType AIR = null;
     @Nullable public static final BlockType ALLIUM = null;
     @Nullable public static final BlockType ANDESITE = null;
     @Nullable public static final BlockType ANVIL = null;
@@ -150,7 +153,6 @@ public final class BlockTypes {
     @Nullable public static final BlockType CARROTS = null;
     @Nullable public static final BlockType CARVED_PUMPKIN = null;
     @Nullable public static final BlockType CAULDRON = null;
-    @Nullable public static final BlockType CAVE_AIR = null;
     @Nullable public static final BlockType CHAIN_COMMAND_BLOCK = null;
     @Nullable public static final BlockType CHEST = null;
     @Nullable public static final BlockType CHIPPED_ANVIL = null;
@@ -615,7 +617,6 @@ public final class BlockTypes {
     @Nullable public static final BlockType TUBE_CORAL_WALL_FAN = null;
     @Nullable public static final BlockType TURTLE_EGG = null;
     @Nullable public static final BlockType VINE = null;
-    @Nullable public static final BlockType VOID_AIR = null;
     @Nullable public static final BlockType WALL_SIGN = null;
     @Nullable public static final BlockType WALL_TORCH = null;
     @Nullable public static final BlockType WATER = null;

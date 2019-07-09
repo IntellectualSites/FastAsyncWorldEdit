@@ -12,8 +12,6 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import java.io.IOException;
-import java.io.NotSerializableException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,18 +22,19 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     private final Extent extent;
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private final List<ClipboardHolder> clipboards;
-    private boolean randomRotate;
-    private boolean randomFlip;
+    private final boolean randomRotate;
+    private final boolean randomFlip;
 
     public RandomFullClipboardPattern(Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate, boolean randomFlip) {
         checkNotNull(clipboards);
         this.clipboards = clipboards;
         this.extent = extent;
         this.randomRotate = randomRotate;
+        this.randomFlip = randomFlip;
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         ClipboardHolder holder = clipboards.get(ThreadLocalRandom.current().nextInt(clipboards.size()));
         AffineTransform transform = new AffineTransform();
         if (randomRotate) {
@@ -52,9 +51,9 @@ public class RandomFullClipboardPattern extends AbstractPattern {
         Schematic schematic = new Schematic(clipboard);
         Transform newTransform = holder.getTransform();
         if (newTransform.isIdentity()) {
-            schematic.paste(extent, setPosition, false);
+            schematic.paste(extent, set, false);
         } else {
-            schematic.paste(extent, setPosition, false, newTransform);
+            schematic.paste(extent, set, false, newTransform);
         }
         return true;
     }
@@ -62,9 +61,5 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     @Override
     public BaseBlock apply(BlockVector3 position) {
         throw new IllegalStateException("Incorrect use. This pattern can only be applied to an extent!");
-    }
-
-    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
-        throw new NotSerializableException("Clipboard cannot be serialized!");
     }
 }

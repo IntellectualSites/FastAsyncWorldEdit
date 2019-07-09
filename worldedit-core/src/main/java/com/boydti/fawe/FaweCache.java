@@ -1,14 +1,47 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.beta.Trimable;
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.jnbt.anvil.BitArray4096;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.*;
+import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-public class FaweCache {
+public class FaweCache implements Trimable {
+    public static final char[] EMPTY_CHAR_4096 = new char[4096];
+
+    /*
+    Palette buffers / cache
+     */
+
+    @Override
+    public boolean trim(boolean aggressive) {
+        BLOCK_TO_PALETTE.clean();
+        PALETTE_TO_BLOCK.clean();
+        BLOCK_STATES.clean();
+        SECTION_BLOCKS.clean();
+        PALETTE_CACHE.clean();
+        PALETTE_TO_BLOCK_CHAR.clean();
+
+        MUTABLE_VECTOR3.clean();
+        MUTABLE_BLOCKVECTOR3.clean();
+        return false;
+    }
+
     public static final IterableThreadLocal<int[]> BLOCK_TO_PALETTE = new IterableThreadLocal<int[]>() {
         @Override
         public int[] init() {
@@ -21,7 +54,16 @@ public class FaweCache {
     public static final IterableThreadLocal<int[]> PALETTE_TO_BLOCK = new IterableThreadLocal<int[]>() {
         @Override
         public int[] init() {
-            return new int[Character.MAX_VALUE];
+            return new int[Character.MAX_VALUE + 1];
+        }
+    };
+
+    public static final IterableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new IterableThreadLocal<char[]>() {
+        @Override
+        public char[] init() {
+            char[] result = new char[Character.MAX_VALUE + 1];
+            Arrays.fill(result, Character.MAX_VALUE);
+            return result;
         }
     };
 
@@ -39,6 +81,141 @@ public class FaweCache {
         }
     };
 
+    /**
+     * Holds data for a palette used in a chunk section
+     */
+    public static final class Palette {
+        public int paletteToBlockLength;
+        /**
+         * Reusable buffer array, MUST check paletteToBlockLength for actual length
+         */
+        public int[] paletteToBlock;
+
+        public int blockstatesLength;
+        /**
+         * Reusable buffer array, MUST check blockstatesLength for actual length
+         */
+        public long[] blockstates;
+    }
+
+    private static final IterableThreadLocal<Palette> PALETTE_CACHE = new IterableThreadLocal<Palette>() {
+        @Override
+        public Palette init() {
+            return new Palette();
+        }
+    };
+
+    /**
+     * Convert raw char array to palette
+     * @param layerOffset
+     * @param blocks
+     * @return palette
+     */
+    public static Palette toPalette(int layerOffset, char[] blocks) {
+        return toPalette(layerOffset, null, blocks);
+    }
+
+    /**
+     * Convert raw int array to palette
+     * @param layerOffset
+     * @param blocks
+     * @return palette
+     */
+    public static Palette toPalette(int layerOffset, int[] blocks) {
+        return toPalette(layerOffset, blocks, null);
+    }
+
+    private static Palette toPalette(int layerOffset, int[] blocksInts, char[] blocksChars) {
+        int[] blockToPalette = BLOCK_TO_PALETTE.get();
+        int[] paletteToBlock = PALETTE_TO_BLOCK.get();
+        long[] blockstates = BLOCK_STATES.get();
+        int[] blocksCopy = SECTION_BLOCKS.get();
+
+        int blockIndexStart = layerOffset << 12;
+        int blockIndexEnd = blockIndexStart + 4096;
+        int num_palette = 0;
+        try {
+            if (blocksChars != null) {
+                for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
+                    int ordinal = blocksChars[i];
+                    int palette = blockToPalette[ordinal];
+                    if (palette == Integer.MAX_VALUE) {
+//                        BlockState state = BlockTypes.states[ordinal];
+                        blockToPalette[ordinal] = palette = num_palette;
+                        paletteToBlock[num_palette] = ordinal;
+                        num_palette++;
+                    }
+                    blocksCopy[j] = palette;
+                }
+            } else if (blocksInts != null) {
+                for (int i = blockIndexStart, j = 0; i < blockIndexEnd; i++, j++) {
+                    int ordinal = blocksInts[i];
+                    int palette = blockToPalette[ordinal];
+                    if (palette == Integer.MAX_VALUE) {
+                        BlockState state = BlockTypes.states[ordinal];
+                        blockToPalette[ordinal] = palette = num_palette;
+                        paletteToBlock[num_palette] = ordinal;
+                        num_palette++;
+                    }
+                    blocksCopy[j] = palette;
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+
+            for (int i = 0; i < num_palette; i++) {
+                blockToPalette[paletteToBlock[i]] = Integer.MAX_VALUE;
+            }
+
+            // BlockStates
+            int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
+            int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
+            if (num_palette == 1) {
+                // Set a value, because minecraft needs it for some  reason
+                blockstates[0] = 0;
+                blockBitArrayEnd = 1;
+            } else {
+                BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                bitArray.fromRaw(blocksCopy);
+            }
+
+            // Construct palette
+            Palette palette = PALETTE_CACHE.get();
+            palette.paletteToBlockLength = num_palette;
+            palette.paletteToBlock = paletteToBlock;
+
+            palette.blockstatesLength = blockBitArrayEnd;
+            palette.blockstates = blockstates;
+
+            return palette;
+        } catch (Throwable e) {
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /*
+     * Vector cache
+     */
+
+    public static IterableThreadLocal<MutableBlockVector3> MUTABLE_BLOCKVECTOR3 = new IterableThreadLocal<MutableBlockVector3>() {
+        @Override
+        public MutableBlockVector3 init() {
+            return new MutableBlockVector3();
+        }
+    };
+
+    public static IterableThreadLocal<MutableVector3> MUTABLE_VECTOR3 = new IterableThreadLocal<MutableVector3>() {
+        @Override
+        public MutableVector3 init() {
+            return new MutableVector3();
+        }
+    };
+
+    /*
+    Conversion methods between JNBT tags and raw values
+     */
     public static Map<String, Object> asMap(Object... pairs) {
         HashMap<String, Object> map = new HashMap<>(pairs.length >> 1);
         for (int i = 0; i < pairs.length; i += 2) {
@@ -178,5 +355,17 @@ public class FaweCache {
         }
         if (clazz == null) clazz = EndTag.class;
         return new ListTag(clazz, list);
+    }
+
+    /*
+    Thread stuff
+     */
+    public static ThreadPoolExecutor newBlockingExecutor() {
+        int nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
+        ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads);
+        return new ThreadPoolExecutor(nThreads, nThreads,
+                0L, TimeUnit.MILLISECONDS, queue
+                , Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.CallerRunsPolicy());
     }
 }

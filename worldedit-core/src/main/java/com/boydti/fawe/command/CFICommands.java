@@ -2,6 +2,7 @@ package com.boydti.fawe.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.beta.SingleFilterBlock;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
@@ -9,7 +10,6 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
-import com.boydti.fawe.object.pattern.PatternExtent;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FilteredTextureUtil;
 import com.boydti.fawe.util.ImgurUtility;
@@ -37,7 +37,6 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -70,7 +69,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.boydti.fawe.util.image.ImageUtil.load;
@@ -419,9 +417,7 @@ public class CFICommands extends MethodCommands {
             }
             default: {
                 blocks = new HashSet<>();
-                BlockPattern pattern = new BlockPattern(BlockTypes.AIR.getDefaultState());
-                PatternExtent extent = new PatternExtent(pattern);
-
+                SingleFilterBlock extent = new SingleFilterBlock();
                 ParserContext parserContext = new ParserContext();
                 parserContext.setActor(player);
                 parserContext.setWorld(player.getWorld());
@@ -432,9 +428,10 @@ public class CFICommands extends MethodCommands {
                 TextureUtil tu = Fawe.get().getTextureUtil();
                 for (int typeId : tu.getValidBlockIds()) {
                     BlockType type = BlockTypes.get(typeId);
-                    BlockStateHolder block = type.getDefaultState();
-                    pattern.setBlock(block);
-                    if (mask.test(BlockVector3.ZERO)) blocks.add(type);
+                    extent.init(0, 0, 0, type.getDefaultState().toBaseBlock());
+                    if (mask.test(extent)) {
+                        blocks.add(type);
+                    }
                 }
                 break;
             }

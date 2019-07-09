@@ -19,260 +19,194 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.object.collection.FastBitSet;
-import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.StringMan;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.registry.state.AbstractProperty;
-import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Predicate;
 
-/**
- * A mask that checks whether blocks at the given positions are matched by
- * a block in a list.
- *
- * <p>This mask checks for both an exact block type and state value match,
- * respecting fuzzy status of the BlockState.</p>
- * @deprecated use BlockMaskBuilder
- */
-@Deprecated
-public class BlockMask extends AbstractExtentMask {
+public class BlockMask extends ABlockMask {
+    private final boolean[] ordinals;
 
-    private final long[][] bitSets;
-    protected final static long[] ALL = new long[0];
+    public BlockMask(Extent extent) {
+        this(extent, new boolean[BlockTypes.states.length]);
+    }
 
+    public BlockMask(Extent extent, boolean[] ordinals) {
+        super(extent);
+        this.ordinals = ordinals;
+    }
 
     /**
-     * Create a new block mask.
-     *
-     * @param extent the extent
-     * @param blocks a list of blocks to match
+     * @deprecated NBT not supported by this mask
      */
+    @Deprecated
     public BlockMask(Extent extent, Collection<BaseBlock> blocks) {
-        super(extent);
-        MainUtil.warnDeprecated(BlockMaskBuilder.class);
-        checkNotNull(blocks);
-        this.bitSets = new BlockMaskBuilder().addBlocks(blocks).optimize().getBits();
+        this(extent);
+        add(blocks);
+    }
+
+    public BlockMask add(Predicate<BlockState> predicate) {
+        for (int i = 0; i < ordinals.length; i++) {
+            if (!ordinals[i]) {
+                BlockState state = BlockTypes.states[i];
+                if (state != null) ordinals[i] = predicate.test(state);
+            }
+        }
+        return this;
+    }
+
+    public BlockMask add(BlockState... states) {
+        addStates(Arrays.asList(states));
+        return this;
+    }
+
+    public BlockMask addStates(Collection<BlockState> states) {
+        for (BlockState state : states) ordinals[state.getOrdinal()] = true;
+        return this;
+    }
+
+    public BlockMask add(BlockType... types) {
+        addTypes(Arrays.asList(types));
+        return this;
+    }
+
+    public BlockMask addTypes(Collection<BlockType> types) {
+        for (BlockType type : types) {
+            for (BlockState state : type.getAllStates()) {
+                ordinals[state.getOrdinal()] = true;
+            }
+        }
+        return this;
     }
 
     /**
-     * Create a new block mask.
-     *
-     * @param extent the extent
-     * @param block an array of blocks to match
+     * @deprecated NBT not supported by this mask
      */
-    public BlockMask(Extent extent, BaseBlock... block) {
-        super(extent);
-        MainUtil.warnDeprecated(BlockMaskBuilder.class);
-        checkNotNull(block);
-        this.bitSets = new BlockMaskBuilder().addBlocks(block).optimize().getBits();
-    }
-
-    public BlockMask() {
-        super(NullExtent.INSTANCE);
-        this.bitSets = new long[BlockTypes.size()][];
-    }
-
-    protected BlockMask(Extent extent, long[][] bitSets) {
-        super(extent);
-        this.bitSets = bitSets;
-    }
-
-    public BlockMaskBuilder toBuilder() {
-        return new BlockMaskBuilder(this.bitSets);
+    @Deprecated
+    public void add(Collection<BaseBlock> blocks) {
+        for (BaseBlock block : blocks) {
+            add(block.toBlockState());
+        }
     }
 
     @Override
-    public String toString() {
-        List<String> strings = new ArrayList<>();
-        for (int i = 0; i < bitSets.length; i++) {
-            if (bitSets[i] != null) {
-                long[] set = bitSets[i];
-                BlockType type = BlockTypes.get(i);
-                if (set == ALL) {
-                    strings.add(type.getId());
-                } else {
-                    for (BlockState state : type.getAllStates()) {
-                        if (test(state)) {
-                            strings.add(state.getAsString());
-                        }
-                    }
-                }
-            }
-        }
-        return StringMan.join(strings, ",");
+    public boolean test(BlockState state) {
+        return ordinals[state.getOrdinal()];
     }
 
     @Override
-    public Mask optimize() {
-        Map<Object, Integer> states = new HashMap<>();
-        int indexFound = -1;
-        {
-            int indexNull = -1;
-            int indexAll = -1;
-            for (int i = 0; i < bitSets.length; i++) {
-                long[] bs = bitSets[i];
-                if (bs == null) {
-                    indexNull = i;
-                    states.put(null, states.getOrDefault(null, 0) + 1);
-                } else if (bs.length == 0) {
-                    indexAll = i;
-                    states.put(ALL, states.getOrDefault(ALL, 0) + 1);
-                } else if (indexFound == -1) {
-                    indexFound = i;
-                } else {
-                    return this;
-                }
-            }
-            // Only types, no states
-            if (indexFound == -1) {
-                if (states.size() == 1) {
-                    return states.keySet().iterator().next() == null ? Masks.alwaysFalse() : Masks.alwaysTrue();
-                }
-                if (states.get(ALL) == 1) return new SingleBlockTypeMask(getExtent(), BlockTypes.get(indexAll));
-                if (states.get(null) == 1)
-                    return new SingleBlockTypeMask(getExtent(), BlockTypes.get(indexNull)).inverse();
-
-                boolean[] types = new boolean[BlockTypes.size()];
-                for (int i = 0; i < bitSets.length; i++) {
-                    if (bitSets[i].length == 0) types[i] = true;
-                }
-                return new BlockTypeMask(getExtent(), types);
-            }
-        }
-        BlockType type = BlockTypes.get(indexFound);
-        Mask mask = getOptimizedMask(type, bitSets[indexFound]);
-        if (mask == null) { // Try with inverse
-            long[] newBitSet = bitSets[indexFound];
-            for (int i = 0; i < newBitSet.length; i++) newBitSet[i] = ~newBitSet[i];
-            mask = getOptimizedMask(type, bitSets[indexFound]);
-            if (mask != null) mask = mask.inverse();
-        }
-        return mask;
-    }
-
-    private Mask getOptimizedMask(BlockType type, long[] bitSet) {
-        boolean single = true;
-        int and = type.getInternalId();
-        List<? extends Property> properties = type.getProperties();
-        for (AbstractProperty prop : (List<AbstractProperty<?>>) type.getProperties()) {
-            List values = prop.getValues();
-            int numSet = 0;
-            for (int i = 0; i < values.size(); i++) {
-                int localI = i << prop.getBitOffset();
-                if (FastBitSet.get(bitSet, localI)) {
-                    numSet++;
-                    and |= prop.modify(and, i);
-                }
-            }
-            // Cannot optimize multiple property values - use current mask (null)
-            if (numSet != values.size() && numSet != 1) {
-                return null;
-            }
-            single = single && numSet == 1;
-        }
-        if (single)
-            return new SingleBlockStateMask(getExtent(), BlockState.getFromInternalId(and));
-        return new SingleBlockStateBitMask(getExtent(), and);
+    public boolean test(BlockVector3 vector) {
+        return ordinals[vector.getOrdinal(getExtent())];
     }
 
     @Override
-    public Mask and(Mask other) {
-        if (other instanceof BlockMask) {
-            long[][] otherBitSets = ((BlockMask) other).bitSets;
-            for (int i = 0; i < otherBitSets.length; i++) {
-                long[] otherBitSet = otherBitSets[i];
-                long[] bitSet = bitSets[i];
-                if (otherBitSet == null) bitSets[i] = null;
-                else if (otherBitSet.length == 0) continue;
-                else if (bitSet == null) continue;
-                else if (bitSet.length == 0) bitSets[i] = otherBitSet;
-                else for (int j = 0; j < otherBitSet.length; j++) bitSet[j] &= otherBitSet[j];
+    public Mask and(Mask mask) {
+        if (mask instanceof ABlockMask) {
+            ABlockMask other = (ABlockMask) mask;
+            for (int i = 0; i < ordinals.length; i++) {
+                if (ordinals[i]) {
+                    ordinals[i] = other.test(BlockState.getFromOrdinal(i));
+                }
             }
             return this;
-        }
-        if (other instanceof SingleBlockStateMask) {
-            return new BlockMaskBuilder(bitSets).filter(((SingleBlockStateMask) other).getBlockState()).build(getExtent());
-        }
-        if (other instanceof SingleBlockTypeMask) {
-            return new BlockMaskBuilder(bitSets).filter(((SingleBlockTypeMask) other).getBlockType()).build(getExtent());
         }
         return null;
     }
 
     @Override
-    public Mask or(Mask other) {
-        if (other instanceof BlockMask) {
-            long[][] otherBitSets = ((BlockMask) other).bitSets;
-            for (int i = 0; i < otherBitSets.length; i++) {
-                long[] otherBitSet = otherBitSets[i];
-                long[] bitSet = bitSets[i];
-                if (otherBitSet == null) continue;
-                else if (otherBitSet.length == 0) bitSets[i] = ALL;
-                else if (bitSet == null) bitSets[i] = otherBitSet;
-                else if (bitSet.length == 0) continue;
-                else for (int j = 0; j < otherBitSet.length; j++) bitSet[j] |= otherBitSet[j];
+    public Mask or(Mask mask) {
+        if (mask instanceof ABlockMask) {
+            ABlockMask other = (ABlockMask) mask;
+            for (int i = 0; i < ordinals.length; i++) {
+                if (!ordinals[i]) {
+                    ordinals[i] = other.test(BlockState.getFromOrdinal(i));
+                }
             }
             return this;
         }
-        if (other instanceof SingleBlockStateMask) {
-            return new BlockMaskBuilder(bitSets).add(((SingleBlockStateMask) other).getBlockState()).build(getExtent());
+        return null;
+    }
+
+    @Override
+    public Mask optimize() {
+        int setStates = 0;
+        BlockState setState = null;
+        BlockState unsetState = null;
+        int totalStates = 0;
+
+        int setTypes = 0;
+        BlockType setType = null;
+        BlockType unsetType = null;
+        int totalTypes = 0;
+
+        for (BlockType type : BlockTypes.values) {
+            if (type != null) {
+                totalTypes++;
+                boolean hasAll = true;
+                boolean hasAny = false;
+                List<BlockState> all = type.getAllStates();
+                for (BlockState state : all) {
+                    totalStates++;
+                    hasAll &= test(state);
+                    hasAny = true;
+                }
+                if (hasAll) {
+                    setTypes++;
+                    setType = type;
+                    setStates += all.size();
+                    setState = type.getDefaultState();
+                } else if (hasAny) {
+                    for (BlockState state : all) {
+                        if (test(state)) {
+                            setStates++;
+                            setState = state;
+                        } else {
+                            unsetState = state;
+                        }
+                    }
+                } else {
+                    unsetType = type;
+                }
+            }
         }
-        if (other instanceof SingleBlockTypeMask) {
-            return new BlockMaskBuilder(bitSets).add(((SingleBlockTypeMask) other).getBlockType()).build(getExtent());
+        if (setStates == 0) {
+            return Masks.alwaysFalse();
         }
+        if (setStates == totalStates) {
+            return Masks.alwaysTrue();
+        }
+
+        if (setStates == 1) {
+            return new SingleBlockStateMask(getExtent(), setState);
+        }
+
+        if (setStates == totalStates - 1) {
+            return new InverseSingleBlockStateMask(getExtent(), unsetState);
+        }
+
+        if (setTypes == 1) {
+            return new SingleBlockTypeMask(getExtent(), setType);
+        }
+
+        if (setTypes == totalTypes - 1) {
+            return new InverseSingleBlockTypeMask(getExtent(), unsetType);
+        }
+
         return null;
     }
 
     @Override
     public Mask inverse() {
-        long[][] cloned = bitSets.clone();
-        for (int i = 0; i < cloned.length; i++) {
-            if (cloned[i] == null) cloned[i] = ALL;
-            else if (cloned[i] == ALL) cloned[i] = null;
-            else {
-                for (int j = 0; j < cloned[i].length; j++)
-                    cloned[i][j] = ~cloned[i][j];
-            }
-        }
+        boolean[] cloned = ordinals.clone();
+        for (int i = 0; i < cloned.length; i++) cloned[i] = !cloned[i];
         return new BlockMask(getExtent(), cloned);
-    }
-
-    public boolean test(BlockState block) {
-        long[] bitSet = bitSets[block.getInternalBlockTypeId()];
-        if (bitSet == null) return false;
-        if (bitSet.length == 0) return true;
-        return FastBitSet.get(bitSet, block.getInternalPropertiesId());
-    }
-
-    @Override
-    public boolean test(BlockVector3 vector) {
-        BlockStateHolder block = getExtent().getBlock(vector);
-        long[] bitSet = bitSets[block.getInternalBlockTypeId()];
-        if (bitSet == null) return false;
-        if (bitSet.length == 0) return true;
-        return FastBitSet.get(bitSet, block.getInternalPropertiesId());
-    }
-
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
     }
 
 }

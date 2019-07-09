@@ -101,7 +101,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         this.offsetZ = z;
     }
 
-    public BlockVector3 getIndex(int getIndex) {
+    protected BlockVector3 getIndex(int getIndex) {
         int size = size();
         if (getIndex > size) {
             return null;

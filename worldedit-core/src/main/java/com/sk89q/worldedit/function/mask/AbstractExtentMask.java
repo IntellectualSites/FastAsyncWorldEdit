@@ -44,7 +44,7 @@ public abstract class AbstractExtentMask extends AbstractMask {
      *
      * @return the extent
      */
-    public Extent getExtent() {
+    public final Extent getExtent() {
         return extent;
     }
 

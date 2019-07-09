@@ -257,8 +257,8 @@ public class Settings extends Config {
     public static class QUEUE {
         @Comment({
                 "This should equal the number of processors you have",
-                " - Set this to 1 if you need reliable `/timings`"
         })
+        @Final
         public int PARALLEL_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors());
         @Create
         public static PROGRESS PROGRESS;

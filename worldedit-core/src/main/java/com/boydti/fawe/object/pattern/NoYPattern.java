@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.DelegateFilterBlock;
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -15,29 +17,23 @@ import java.io.IOException;
 public class NoYPattern extends AbstractPattern {
 
     private final Pattern pattern;
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public NoYPattern(Pattern pattern) {
         this.pattern = pattern;
     }
 
-//    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
-
     @Override
     public BaseBlock apply(BlockVector3 pos) {
-//        mutable.mutX((pos.getX()));
-//        mutable.mutZ((pos.getZ()));
-        return pattern.apply(pos);
+        mutable.mutX((pos.getX()));
+        mutable.mutZ((pos.getZ()));
+        return pattern.apply(mutable);
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-//        mutable.mutX((get.getX()));
-//        mutable.mutZ((get.getZ()));
-        return pattern.apply(extent, set, get);
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-//        mutable = new MutableBlockVector3();
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        mutable.mutX((get.getX()));
+        mutable.mutZ((get.getZ()));
+        return pattern.apply(extent, mutable, set);
     }
 }

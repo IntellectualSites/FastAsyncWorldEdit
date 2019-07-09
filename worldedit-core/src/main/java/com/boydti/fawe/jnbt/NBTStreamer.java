@@ -42,7 +42,7 @@ public class NBTStreamer {
         try {
             is.readNamedTagLazy(node -> {
                 if (readers.isEmpty()) {
-                    throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
+                    throw FaweException.MANUAL;
                 }
                 return readers.remove(node);
             });

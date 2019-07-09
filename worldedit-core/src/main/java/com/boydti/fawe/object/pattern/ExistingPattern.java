@@ -1,12 +1,10 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class ExistingPattern extends AbstractExtentPattern {
     public ExistingPattern(Extent extent) {
@@ -19,10 +17,10 @@ public class ExistingPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-        if (set.equals(get)) {
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        if (set == get || set.equals(get)) {
             return false;
         }
-        return extent.setBlock(set, extent.getBlock(get));
+        return set.setFullBlock(extent, get.getFullBlock(extent));
     }
 }

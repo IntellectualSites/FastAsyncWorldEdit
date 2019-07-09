@@ -35,5 +35,4 @@ public interface RegionFunction {
      * @throws WorldEditException thrown on an error
      */
     boolean apply(BlockVector3 position) throws WorldEditException;
-
 }

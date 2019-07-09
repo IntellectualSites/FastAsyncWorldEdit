@@ -235,7 +235,7 @@ public class PatternCommands extends MethodCommands {
             min = 2,
             max = 2
     )
-    public Pattern iddatamask(Actor actor, LocalSession session, Extent extent, @Range(min = 0, max = 15) int bitmask, Pattern pattern) {
+    public Pattern iddatamask(Extent extent, @Range(min = 0, max = 15) int bitmask, Pattern pattern) {
         return new IdDataMaskPattern(extent, pattern, bitmask);
     }
 
@@ -246,7 +246,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern id(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+    public Pattern id(Extent extent, Pattern pattern) {
         return new IdPattern(extent, pattern);
     }
 
@@ -257,7 +257,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern data(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+    public Pattern data(Extent extent, Pattern pattern) {
         return new DataPattern(extent, pattern);
     }
 
@@ -268,7 +268,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern biome(Actor actor, LocalSession session, Extent extent, BiomeType biome) {
+    public Pattern biome(Extent extent, BiomeType biome) {
         return new BiomePattern(extent, biome);
     }
 
@@ -279,7 +279,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern relative(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+    public Pattern relative(Pattern pattern) {
         return new RelativePattern(pattern);
     }
 
@@ -292,7 +292,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern nox(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+    public Pattern nox(Pattern pattern) {
         return new NoXPattern(pattern);
     }
 
@@ -303,7 +303,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern noy(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+    public Pattern noy(Pattern pattern) {
         return new NoYPattern(pattern);
     }
 
@@ -314,7 +314,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern noz(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+    public Pattern noz(Pattern pattern) {
         return new NoZPattern(pattern);
     }
 
@@ -325,9 +325,8 @@ public class PatternCommands extends MethodCommands {
             min = 3,
             max = 3
     )
-    public Pattern mask(Actor actor, LocalSession session, Mask mask, Pattern pass, Pattern fail) {
-        PatternExtent extent = new PatternExtent(pass);
-        return new MaskedPattern(mask, extent, fail);
+    public Pattern mask(Mask mask, Pattern pass, @Optional Pattern fail) {
+        return new MaskedPattern(mask, pass, fail);
     }
 
     @Command(
@@ -337,7 +336,7 @@ public class PatternCommands extends MethodCommands {
             min = 4,
             max = 4
     )
-    public Pattern offset(Actor actor, LocalSession session, double x, double y, double z, Pattern pattern) {
+    public Pattern offset(double x, double y, double z, Pattern pattern) {
         return new OffsetPattern(pattern, (int) x, (int) y, (int) z);
     }
 
@@ -348,7 +347,7 @@ public class PatternCommands extends MethodCommands {
             min = 2,
             max = 2
     )
-    public Pattern surfacespread(Actor actor, LocalSession session, double distance, Pattern pattern) {
+    public Pattern surfacespread(double distance, Pattern pattern) {
         return new SurfaceRandomOffsetPattern(pattern, (int) distance);
     }
 
@@ -359,7 +358,7 @@ public class PatternCommands extends MethodCommands {
             min = 4,
             max = 4
     )
-    public Pattern solidspread(Actor actor, LocalSession session, double x, double y, double z, Pattern pattern) {
+    public Pattern solidspread(double x, double y, double z, Pattern pattern) {
         return new SolidRandomOffsetPattern(pattern, (int) x, (int) y, (int) z);
     }
 
@@ -370,7 +369,7 @@ public class PatternCommands extends MethodCommands {
             min = 4,
             max = 4
     )
-    public Pattern spread(Actor actor, LocalSession session, double x, double y, double z, Pattern pattern) {
+    public Pattern spread(double x, double y, double z, Pattern pattern) {
         return new RandomOffsetPattern(pattern, (int) x, (int) y, (int) z);
     }
 
@@ -381,7 +380,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern linear(Actor actor, LocalSession session, Pattern other) {
+    public Pattern linear(Pattern other) {
         if (other instanceof RandomPattern) {
             Set<Pattern> patterns = ((RandomPattern) other).getPatterns();
             return new LinearBlockPattern(patterns.toArray(new Pattern[patterns.size()]));
@@ -396,7 +395,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern linear3d(Actor actor, LocalSession session, Pattern other) {
+    public Pattern linear3d(Pattern other) {
         if (other instanceof RandomPattern) {
             Set<Pattern> patterns = ((RandomPattern) other).getPatterns();
             return new Linear3DBlockPattern(patterns.toArray(new Pattern[patterns.size()]));
@@ -411,7 +410,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern linear2d(Actor actor, LocalSession session, Pattern other) {
+    public Pattern linear2d(Pattern other) {
         if (other instanceof RandomPattern) {
             Set<Pattern> patterns = ((RandomPattern) other).getPatterns();
             return new Linear2DBlockPattern(patterns.toArray(new Pattern[patterns.size()]));
@@ -426,7 +425,7 @@ public class PatternCommands extends MethodCommands {
             min = 1,
             max = 1
     )
-    public Pattern expression(Actor actor, LocalSession session, Extent extent, String input) throws ExpressionException {
+    public Pattern expression(Extent extent, String input) throws ExpressionException {
         Expression exp = Expression.compile(input, "x", "y", "z");
         WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
         exp.setEnvironment(env);

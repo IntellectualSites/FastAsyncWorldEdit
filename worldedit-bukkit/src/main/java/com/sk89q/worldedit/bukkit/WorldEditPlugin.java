@@ -23,7 +23,7 @@ import com.bekvon.bukkit.residence.commands.message;
 import com.bekvon.bukkit.residence.containers.cmd;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
+import com.boydti.fawe.bukkit.v1_14.adapter.Spigot_v1_14_R1;
 import com.boydti.fawe.util.MainUtil;
 
 import com.google.common.base.Joiner;
@@ -322,7 +322,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // Attempt to load a Bukkit adapter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
         try {
-            adapterLoader.addClass(Spigot_v1_13_R2.class);
+            adapterLoader.addClass(Spigot_v1_14_R1.class);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

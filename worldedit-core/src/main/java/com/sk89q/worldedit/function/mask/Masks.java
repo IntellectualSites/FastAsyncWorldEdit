@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -140,7 +141,7 @@ public final class Masks {
 
         @Override
         public Mask or(Mask other) {
-            return other;
+            return this;
         }
     }
 

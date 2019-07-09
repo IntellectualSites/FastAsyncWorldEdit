@@ -50,6 +50,7 @@ public class SurfaceSpline implements Brush {
             n.setContinuity(continuity);
             nodes.add(n);
         }
+        MutableBlockVector3 mutable = MutableBlockVector3.at(0, 0, 0);
         interpol.setNodes(nodes);
         final double splinelength = interpol.arcLength(0, 1);
         for (double loop = 0; loop <= 1; loop += 1D / splinelength / quality) {
@@ -60,7 +61,7 @@ public class SurfaceSpline implements Brush {
             tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, 0, maxY);
             if (tipy == -1) continue;
             if (radius == 0) {
-            	BlockVector3 set = MutableBlockVector3.get(tipx, tipy, tipz);
+            	BlockVector3 set = mutable.setComponents(tipx, tipy, tipz);
                 try {
                     pattern.apply(editSession, set, set);
                 } catch (WorldEditException e) {

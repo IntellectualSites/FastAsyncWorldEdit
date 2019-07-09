@@ -178,10 +178,6 @@ public class MaskIntersection extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        if (masks.isEmpty()) {
-            return false;
-        }
-
         for (Mask mask : masksArray) {
             if (!mask.test(vector)) {
                 return false;

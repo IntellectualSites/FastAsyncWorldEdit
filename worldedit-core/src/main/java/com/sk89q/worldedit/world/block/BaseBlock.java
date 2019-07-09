@@ -45,9 +45,8 @@ import java.util.Objects;
  * may be missing.</p>
  */
 public class BaseBlock implements BlockStateHolder<BaseBlock> {
-
-    private BlockState blockState;
-    @Nullable protected CompoundTag nbtData;
+    private final BlockState blockState;
+    private final CompoundTag nbtData;
 
     @Deprecated
     public BaseBlock() {
@@ -70,6 +69,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
      */
     public BaseBlock(BlockState blockState) {
     	this.blockState = blockState;
+        nbtData = null;
     }
 
     /**
@@ -180,7 +180,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 
     @Override
     public void setNbtData(@Nullable CompoundTag nbtData) {
-        this.nbtData = nbtData;
+        throw new UnsupportedOperationException("Immutable");
     }
 
     /**
@@ -232,7 +232,12 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
     }
 
     @Override
-    public BaseBlock toBaseBlock() {
+    public final char getOrdinalChar() {
+        return blockState.getOrdinalChar();
+    }
+
+    @Override
+    public final BaseBlock toBaseBlock() {
         return this;
     }
 
@@ -247,6 +252,10 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
         }
     }
 
+    public BlockState toBlockState() {
+        return blockState;
+    }
+
     @Override
     public int hashCode() {
         return getOrdinal();
@@ -254,7 +263,8 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
 
 	@Override
 	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-		return extent.setBlock(set, this);
+        set.setFullBlock(extent, this);
+        return true;
 	}
 
 	@Override

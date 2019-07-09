@@ -220,34 +220,9 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
         }
     }
 
-    public static ConcurrentHashMap<Long, Long> keepLoaded = new ConcurrentHashMap<>(8, 0.9f, 1);
-
-
-    @EventHandler
-    public static void onChunkLoad(ChunkLoadEvent event) {
-        Chunk chunk = event.getChunk();
-        long pair = MathMan.pairInt(chunk.getX(), chunk.getZ());
-        keepLoaded.putIfAbsent(pair, Fawe.get().getTimer().getTickStart());
-    }
-
-    @EventHandler
-    public static void onChunkUnload(ChunkUnloadEvent event) {
-        Chunk chunk = event.getChunk();
-        long pair = MathMan.pairInt(chunk.getX(), chunk.getZ());
-        Long lastLoad = keepLoaded.get(pair);
-        if (lastLoad != null) {
-            if (Fawe.get().getTimer().getTickStart() - lastLoad < 10000) {
-                event.setCancelled(true);
-            } else {
-                keepLoaded.remove(pair);
-            }
-        }
-    }
-
     @Override
     public boolean queueChunkLoad(int cx, int cz) {
         if (super.queueChunkLoad(cx, cz)) {
-            keepLoaded.put(MathMan.pairInt(cx, cz), System.currentTimeMillis());
             return true;
         }
         return false;
@@ -282,7 +257,6 @@ public abstract class BukkitQueue_0<CHUNK, CHUNKSECTIONS, SECTION> extends NMSMa
 
     @Override
     public boolean regenerateChunk(World world, int x, int z, BiomeType biome, Long seed) {
-        if (!keepLoaded.isEmpty()) keepLoaded.remove(MathMan.pairInt(x, z));
         return world.regenerateChunk(x, z);
     }
 

@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.changeset;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
@@ -10,7 +9,6 @@ import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.extent.inventory.UnplaceableBlockException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -89,10 +87,10 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
             try {
                 blockBag.fetchPlacedBlock(typeTo.getDefaultState());
             } catch (UnplaceableBlockException e) {
-                throw new FaweException.FaweBlockBagException();
+                throw FaweException.BLOCK_BAG;
             } catch (BlockBagException e) {
                 missingBlocks[typeTo.getInternalId()]++;
-                throw new FaweException.FaweBlockBagException();
+                throw FaweException.BLOCK_BAG;
             }
         }
         if (mine) {

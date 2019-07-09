@@ -19,10 +19,8 @@ public class FuzzyRegion extends AbstractRegion {
 
     private final Mask mask;
     private BlockVectorSet set = new BlockVectorSet();
-    private boolean populated;
     private int minX, minY, minZ, maxX, maxY, maxZ;
     private Extent extent;
-    private int count = 0;
 
     {
         minX = minY = minZ = Integer.MAX_VALUE;
@@ -59,7 +57,7 @@ public class FuzzyRegion extends AbstractRegion {
 
     @Override
     public Iterator<BlockVector3> iterator() {
-        return (Iterator) set.iterator();
+        return set.iterator();
     }
 
     private final void setMinMax(int x, int y, int z) {
