@@ -92,10 +92,6 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
     protected final static Field fieldTickingBlockCount;
     protected final static Field fieldNonEmptyBlockCount;
     protected final static Field fieldSection;
-    protected final static Field fieldLiquidCount;
-    protected final static Field fieldEmittedLight;
-    protected final static Field fieldSkyLight;
-
 
 //    protected final static Field fieldBiomes;
 
@@ -118,13 +114,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
         try {
             emptySection = new ChunkSection(0);
             fieldSection = ChunkSection.class.getDeclaredField("blockIds");
-            fieldLiquidCount = ChunkSection.class.getDeclaredField("e");
-            fieldEmittedLight = ChunkSection.class.getDeclaredField("emittedLight");
-            fieldSkyLight = ChunkSection.class.getDeclaredField("skyLight");
             fieldSection.setAccessible(true);
-            fieldLiquidCount.setAccessible(true);
-            fieldEmittedLight.setAccessible(true);
-            fieldSkyLight.setAccessible(true);
 
             fieldFluidCount = ChunkSection.class.getDeclaredField("e");
             fieldTickingBlockCount = ChunkSection.class.getDeclaredField("tickingBlockCount");
@@ -192,7 +182,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
 //            methodResize.setAccessible(true);
 
             fieldDirtyCount = PlayerChunk.class.getDeclaredField("dirtyCount");
-            fieldDirtyBits = PlayerChunk.class.getDeclaredField("h");
+            fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
             fieldDirtyCount.setAccessible(true);
             fieldDirtyBits.setAccessible(true);
 
@@ -793,13 +783,13 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
     }
 
     public static void setCount(int tickingBlockCount, int nonEmptyBlockCount, ChunkSection section) throws NoSuchFieldException, IllegalAccessException {
-        fieldFluidCount.set(section, 0); // TODO FIXME
-        fieldTickingBlockCount.set(section, tickingBlockCount);
-        fieldNonEmptyBlockCount.set(section, nonEmptyBlockCount);
+        fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
+        fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
+        fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
     }
 
     public int getNonEmptyBlockCount(ChunkSection section) throws IllegalAccessException {
-        return (int) fieldNonEmptyBlockCount.get(section);
+        return fieldNonEmptyBlockCount.getShort(section);
     }
 
     public void setPalette(ChunkSection section, DataPaletteBlock palette) throws NoSuchFieldException, IllegalAccessException {

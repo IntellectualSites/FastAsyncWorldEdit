@@ -198,13 +198,13 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // platforms to be worried about... at the current time of writing
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
 
-        // Register 1.13 Material ids with LegacyMapper
-        LegacyMapper legacyMapper = LegacyMapper.getInstance();
-        for (Material m : Material.values()) {
-            if (!m.isLegacy() && m.isBlock()) {
-                legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
-            }
-        }
+//        // Register 1.13 Material ids with LegacyMapper
+//        LegacyMapper legacyMapper = LegacyMapper.getInstance();
+//        for (Material m : Material.values()) {
+//            if (!m.isLegacy() && m.isBlock()) {
+//                legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
+//            }
+//        }
     }
 
     public void setupRegistries() {

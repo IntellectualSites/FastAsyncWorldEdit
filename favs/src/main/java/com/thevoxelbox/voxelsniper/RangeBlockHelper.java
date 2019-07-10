@@ -211,46 +211,6 @@ public class RangeBlockHelper {
         return this.getCurBlock();
     }
 
-    public final void setCurBlock(int type) {
-        if(this.getCurBlock() != null) {
-            this.world.getBlockAt(this.targetX, this.targetY, this.targetZ).setType(getType(type));
-        }
-
-    }
-
-    public final void setFaceBlock(int type) {
-        while(this.getNextBlock() != null && isAir(this.getCurBlock().getType())) {
-            ;
-        }
-
-        if(this.getCurBlock() != null) {
-            this.world.getBlockAt(this.targetX, this.targetY, this.targetZ).setType(getType(type));
-        }
-
-    }
-
-    private Material getType(int id) {
-        return BukkitAdapter.adapt(LegacyMapper.getInstance().getBlockFromLegacy(id).getBlockType());
-    }
-
-    public final void setLastBlock(int type) {
-        if(this.getLastBlock() != null) {
-            this.world.getBlockAt(this.lastX, this.lastY, this.lastZ).setType(getType(type));
-        }
-
-    }
-
-    public final void setTargetBlock(int type) {
-        while(this.getNextBlock() != null && isAir(this.getCurBlock().getType())) {
-            ;
-        }
-
-        if(this.getCurBlock() != null) {
-            this.world.getBlockAt(this.targetX, this.targetY, this.targetZ).setType(getType(type));
-        }
-
-    }
-
     private AsyncBlock getRange() {
         this.lastX = this.targetX;
         this.lastY = this.targetY;

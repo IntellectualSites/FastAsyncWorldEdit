@@ -312,7 +312,7 @@ public class BlockType implements FawePattern, Keyed {
 
 
     @Deprecated
-    public int getLegacyId() { //
+    public int getLegacyId() {
         Integer id = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
         if (id != null) {
             return id >> 4;

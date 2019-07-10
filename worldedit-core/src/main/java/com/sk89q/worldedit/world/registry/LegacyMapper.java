@@ -203,7 +203,7 @@ public class LegacyMapper {
 
     public void register(int id, int data, BlockStateHolder state) {
         int combinedId = ((id << 4) + data);
-        extraId4DataToStateId.put((int) combinedId, (Integer) state.getInternalId());
+        extraId4DataToStateId.put(combinedId, (Integer) state.getInternalId());
         blockStateToLegacyId4Data.putIfAbsent(state.getInternalId(), combinedId);
     }
 

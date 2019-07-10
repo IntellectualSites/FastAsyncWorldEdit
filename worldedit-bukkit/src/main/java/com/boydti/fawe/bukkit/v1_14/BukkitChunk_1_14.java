@@ -184,14 +184,14 @@ public class BukkitChunk_1_14 extends IntFaweChunk<Chunk, BukkitQueue_1_14> {
         ChunkSection newSection = new ChunkSection(current.getYPosition());
 
         // Copy counters
-        Object nonEmptyBlockCount = BukkitQueue_1_14.fieldNonEmptyBlockCount.get(current);
-        BukkitQueue_1_14.fieldNonEmptyBlockCount.set(newSection, nonEmptyBlockCount);
+        short nonEmptyBlockCount = BukkitQueue_1_14.fieldNonEmptyBlockCount.getShort(current);
+        BukkitQueue_1_14.fieldNonEmptyBlockCount.setShort(newSection, nonEmptyBlockCount);
 
-        Object tickingBlockCount = BukkitQueue_1_14.fieldTickingBlockCount.get(current);
-        BukkitQueue_1_14.fieldTickingBlockCount.set(newSection, tickingBlockCount);
+        short tickingBlockCount = BukkitQueue_1_14.fieldTickingBlockCount.getShort(current);
+        BukkitQueue_1_14.fieldTickingBlockCount.setShort(newSection, tickingBlockCount);
 
-        Object liquidCount = BukkitQueue_1_14.fieldLiquidCount.get(current);
-        BukkitQueue_1_14.fieldLiquidCount.set(newSection, liquidCount);
+        short liquidCount = BukkitQueue_1_14.fieldFluidCount.getShort(current);
+        BukkitQueue_1_14.fieldFluidCount.setShort(newSection, liquidCount);
 
         // Copy blocks
         DataPaletteBlock<IBlockData> blocks = current.getBlocks();

@@ -26,9 +26,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
         setOrigin(pos);
     }
 
-    protected void setOrigin(BlockVector3 pos) {
-
-    }
+    protected void setOrigin(BlockVector3 pos) {}
 
     public ResettableExtent setExtent(Extent extent) {
         checkNotNull(extent);

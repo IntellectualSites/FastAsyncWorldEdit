@@ -113,6 +113,11 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         return extent.setBiome(x, y, z, biome);
     }
 
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+        return extent.setBlock(x, y, z, block);
+    }
+
     /*
     Light
      */
