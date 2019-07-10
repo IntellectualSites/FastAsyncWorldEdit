@@ -946,7 +946,7 @@ public final class BlockTypes {
         // Get the enum name (remove namespace if minecraft:)
         int propStart = id.indexOf('[');
         String typeName = id.substring(0, propStart == -1 ? id.length() : propStart);
-        String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase();
+        String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase(Locale.ROOT);
         BlockType existing = new BlockType(id, internalId, states);
 
 

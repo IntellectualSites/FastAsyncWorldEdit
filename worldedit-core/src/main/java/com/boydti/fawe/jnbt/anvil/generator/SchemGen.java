@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class SchemGen extends Resource {
+public class SchemGen implements Resource {
 
     private final Extent extent;
     private final List<ClipboardHolder> clipboards;

@@ -4,6 +4,7 @@ import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
+
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -13,6 +14,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.MethodCommands;
 import com.sk89q.worldedit.util.command.SimpleDispatcher;
 import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
+
 import java.io.IOException;
 
 public class CFICommand extends MethodCommands {
@@ -29,9 +31,6 @@ public class CFICommand extends MethodCommands {
 
     @Command(
             aliases = {"cfi", "createfromimage"},
-            usage = "",
-            min = 0,
-            max = -1,
             anyFlags = true,
             desc = "Start CreateFromImage"
     )
@@ -51,49 +50,41 @@ public class CFICommand extends MethodCommands {
 
     private void dispatch(FawePlayer fp, CFICommands.CFISettings settings, CommandContext context) throws CommandException {
         if (!settings.hasGenerator()) {
-            switch (context.argsLength()) {
-                case 0: {
-                    String hmCmd = child.alias() + " ";
-                    if (settings.image == null) {
-                        hmCmd += "image";
-                    } else {
-                        hmCmd = Commands.getAlias(CFICommands.class, "heightmap") + " " + settings.imageArg;
-                    }
-                    child.msg("What do you want to use as the base?").newline()
-                            .text("&7[&aHeightMap&7]").cmdTip(hmCmd).text(" - A heightmap like ").text("&7[&athis&7]").linkTip("http://i.imgur.com/qCd30MR.jpg")
-                            .newline()
-                            .text("&7[&aEmpty&7]").cmdTip(child.alias() + " empty").text("- An empty map of a specific size")
-                            .send(fp);
-                    break;
+            if (context.argsLength() == 0) {
+                String hmCmd = child.alias() + " ";
+                if (settings.image == null) {
+                    hmCmd += "image";
+                } else {
+                    hmCmd = Commands.getAlias(CFICommands.class, "heightmap") + " " + settings.imageArg;
                 }
-                default: {
-                    String remaining = context.getJoinedStrings(0);
-                    if (!dispatcher.contains(context.getString(0))) {
-                        switch (context.argsLength()) {
-                            case 1: {
-                                String cmd = Commands.getAlias(CFICommands.class, "heightmap") + " " + context.getJoinedStrings(0);
-                                dispatcher.call(cmd, context.getLocals(), new String[0]);
-                                return;
-                            }
-                            case 2: {
-                                String cmd = Commands.getAlias(CFICommands.class, "empty") + " " + context.getJoinedStrings(0);
-                                dispatcher.call(cmd, context.getLocals(), new String[0]);
-                                return;
-                            }
+                child.msg("What do you want to use as the base?").newline()
+                     .text("&7[&aHeightMap&7]").cmdTip(hmCmd).text(" - A heightmap like ").text("&7[&athis&7]").linkTip("http://i.imgur.com/qCd30MR.jpg")
+                     .newline()
+                     .text("&7[&aEmpty&7]").cmdTip(child.alias() + " empty").text("- An empty map of a specific size")
+                     .send(fp);
+            } else {
+                String remaining = context.getJoinedStrings(0);
+                if (!dispatcher.contains(context.getString(0))) {
+                    switch (context.argsLength()) {
+                        case 1: {
+                            String cmd = Commands.getAlias(CFICommands.class, "heightmap") + " " + context.getJoinedStrings(0);
+                            dispatcher.call(cmd, context.getLocals(), new String[0]);
+                            return;
                         }
+                        case 2:
+                            String cmd = Commands.getAlias(CFICommands.class, "empty") + " " + context.getJoinedStrings(0);
+                            dispatcher.call(cmd, context.getLocals(), new String[0]);
+                            return;
                     }
-                    dispatcher.call(remaining, context.getLocals(), new String[0]);
                 }
+                dispatcher.call(remaining, context.getLocals(), new String[0]);
             }
         } else {
-            switch (context.argsLength()) {
-                case 0:
-                    settings.setCategory("");
-                    child.mainMenu(fp);
-                    break;
-                default:
-                    dispatcher.call(context.getJoinedStrings(0), context.getLocals(), new String[0]);
-                    break;
+            if (context.argsLength() == 0) {
+                settings.setCategory("");
+                child.mainMenu(fp);
+            } else {
+                dispatcher.call(context.getJoinedStrings(0), context.getLocals(), new String[0]);
             }
         }
     }

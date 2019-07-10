@@ -391,7 +391,7 @@ public class NMSRelighter implements Relighter {
     }
 
     private void fixSkyLighting(List<RelightSkyEntry> sorted) {
-        RelightSkyEntry[] chunks = sorted.toArray(new RelightSkyEntry[sorted.size()]);
+        RelightSkyEntry[] chunks = sorted.toArray(new RelightSkyEntry[0]);
         boolean remove = this.removeFirst;
         BlockVectorSet chunkSet = null;
         if (remove) {

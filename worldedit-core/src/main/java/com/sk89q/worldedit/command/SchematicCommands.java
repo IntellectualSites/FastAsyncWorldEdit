@@ -27,7 +27,7 @@ import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
-import com.boydti.fawe.object.schematic.StructureFormat;
+import com.boydti.fawe.object.schematic.MinecraftStructure;
 //import com.boydti.fawe.object.schematic.visualizer.SchemVis;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.chat.Message;
@@ -44,7 +44,6 @@ import com.sk89q.worldedit.event.extent.PlayerSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
@@ -65,7 +64,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.regex.Pattern;
 
 import static com.boydti.fawe.util.ReflectionUtils.as;
@@ -353,8 +351,8 @@ public class SchematicCommands extends MethodCommands {
                 if (holder instanceof URIClipboardHolder) uri = ((URIClipboardHolder) holder).getURI(clipboard);
                 if (new PlayerSaveClipboardEvent(player, clipboard, uri, f.toURI()).call()) {
                     try (ClipboardWriter writer = format.getWriter(fos)) {
-                        if (writer instanceof StructureFormat) {
-                            ((StructureFormat) writer).write(target, player.getName());
+                        if (writer instanceof MinecraftStructure) {
+                            ((MinecraftStructure) writer).write(target, player.getName());
                         } else {
                             writer.write(target);
                         }

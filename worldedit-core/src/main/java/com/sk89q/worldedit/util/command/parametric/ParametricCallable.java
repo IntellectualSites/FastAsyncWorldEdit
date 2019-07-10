@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -348,10 +349,10 @@ public class ParametricCallable extends AParametricCallable {
      */
     private static String generateName(Type type, Annotation classifier, int index) {
         if (classifier != null) {
-            return classifier.annotationType().getSimpleName().toLowerCase();
+            return classifier.annotationType().getSimpleName().toLowerCase(Locale.ROOT);
         } else {
             if (type instanceof Class<?>) {
-                return ((Class<?>) type).getSimpleName().toLowerCase();
+                return ((Class<?>) type).getSimpleName().toLowerCase(Locale.ROOT);
             } else {
                 return "unknown" + index;
             }

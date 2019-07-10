@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -118,9 +118,4 @@ public class BlockTypeMask extends AbstractExtentMask {
         return types[block.getInternalId()];
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

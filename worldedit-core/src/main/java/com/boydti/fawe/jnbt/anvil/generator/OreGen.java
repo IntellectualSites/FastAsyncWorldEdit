@@ -9,7 +9,7 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 
 import java.util.Random;
 
-public class OreGen extends Resource {
+public class OreGen implements Resource {
     private final int maxSize;
     private final double maxSizeO8;
     private final double maxSizeO16;
@@ -21,9 +21,9 @@ public class OreGen extends Resource {
     private final Mask mask;
     private MutableBlockVector3 mutable = new MutableBlockVector3();
 
-    private double ONE_2 = 1 / 2F;
-    private double ONE_8 = 1 / 8F;
-    private double ONE_16 = 1 / 16F;
+    private final double ONE_2 = 1 / 2F;
+    private final double ONE_8 = 1 / 8F;
+    private final double ONE_16 = 1 / 16F;
 
     public int laced = 0;
 
@@ -47,16 +47,13 @@ public class OreGen extends Resource {
         }
         double f = rand.nextDouble() * Math.PI;
 
-        int x8 = x;
-        int z8 = z;
         double so8 = maxSizeO8;
-        double so16 = maxSizeO16;
         double sf = MathMan.sinInexact(f) * so8;
         double cf = MathMan.cosInexact(f) * so8;
-        double d1 = x8 + sf;
-        double d2 = x8 - sf;
-        double d3 = z8 + cf;
-        double d4 = z8 - cf;
+        double d1 = x + sf;
+        double d2 = x - sf;
+        double d3 = z + cf;
+        double d4 = z - cf;
 
         double d5 = y + rand.nextInt(3) - 2;
         double d6 = y + rand.nextInt(3) - 2;
@@ -71,7 +68,7 @@ public class OreGen extends Resource {
             double d8 = d5 + yd * iFactor;
             double d9 = d3 + zd * iFactor;
 
-            double d10 = rand.nextDouble() * so16;
+            double d10 = rand.nextDouble() * maxSizeO16;
             double sif = MathMan.sinInexact(Math.PI * iFactor);
             double d11 = (sif + 1.0) * d10 + 1.0;
             double d12 = (sif + 1.0) * d10 + 1.0;

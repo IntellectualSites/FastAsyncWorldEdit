@@ -322,8 +322,8 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         }
     }
 
-    public static abstract class BlockVectorSetVisitor {
-        public abstract void run(int x, int y, int z, int index);
+    public interface BlockVectorSetVisitor {
+        void run(int x, int y, int z, int index);
     }
 
     @Override

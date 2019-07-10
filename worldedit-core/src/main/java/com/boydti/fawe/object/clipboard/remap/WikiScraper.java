@@ -2,14 +2,18 @@ package com.boydti.fawe.object.clipboard.remap;
 
 
 import com.boydti.fawe.util.MainUtil;
+
 import com.google.common.io.Resources;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +27,7 @@ public class WikiScraper {
         Wiki(String url) {this.url = url;}
     }
 
-    private Map<Wiki, Map<String, Integer>> cache = new HashMap<>();
+    private EnumMap<Wiki, Map<String, Integer>> cache = new EnumMap<>(WikiScraper.Wiki.class);
 
     public Map<String, Integer> expand(Map<String, Integer> map) {
         HashMap<String, Integer> newMap = new HashMap<>(map);
@@ -50,8 +54,8 @@ public class WikiScraper {
                     String str = Resources.toString(file.toURL(), Charset.defaultCharset());
                     return gson.fromJson(str, new TypeToken<Map<String, Integer>>() {
                     }.getType());
-                } catch (Throwable ignore) {
-                    ignore.printStackTrace();
+                } catch (JsonSyntaxException | IOException e) {
+                    e.printStackTrace();
                 }
             }
             map = scrape(wiki);
@@ -94,15 +98,15 @@ public class WikiScraper {
             return map;
         } else {
             String header = wiki == Wiki.ITEM_MAPPINGS_PE ? "=== Item IDs ===" : "{{";
-            String footer = "{{-}}";
-            String prefix = "{{id table|";
 
             int headerIndex = text.indexOf(header);
             if (headerIndex == -1) return map;
+            String footer = "{{-}}";
             int endIndex = text.indexOf(footer, headerIndex);
             String part = text.substring(headerIndex, endIndex == -1 ? text.length() : endIndex);
 
             int id = 255;
+            String prefix = "{{id table|";
             for (String line : part.split("\n")) {
                 String lower = line.toLowerCase();
                 if (lower.startsWith(prefix)) {

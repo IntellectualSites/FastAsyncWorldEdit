@@ -23,8 +23,6 @@ import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 
-import javax.annotation.Nullable;
-
 /**
  * A mask that returns true whenever the block at the location is not
  * an air block (it contains some other block).
@@ -43,12 +41,6 @@ public class ExistingBlockMask extends AbstractExtentMask {
     @Override
     public boolean test(BlockVector3 vector) {
         return !vector.getBlock(getExtent()).getMaterial().isAir();
-    }
-
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
     }
 
 }

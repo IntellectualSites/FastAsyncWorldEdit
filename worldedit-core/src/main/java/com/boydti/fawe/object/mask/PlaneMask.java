@@ -61,9 +61,4 @@ public class PlaneMask extends AbstractMask implements ResettableMask {
         mode = -1;
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

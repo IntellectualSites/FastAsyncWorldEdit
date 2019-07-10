@@ -6,6 +6,7 @@ import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -100,7 +101,7 @@ public enum PropertyKey {
         PropertyKey property = PropertyKey.get(id);
         if (property == null) {
             Fawe.debug("Registering property " + id);
-            property = ReflectionUtils.addEnum(PropertyKey.class, id.toUpperCase());
+            property = ReflectionUtils.addEnum(PropertyKey.class, id.toUpperCase(Locale.ROOT));
             if (property.getId() == null) {
                 try {
                     ReflectionUtils.setFailsafeFieldValue(PropertyKey.class.getDeclaredField("id"), property, property.name().toLowerCase());

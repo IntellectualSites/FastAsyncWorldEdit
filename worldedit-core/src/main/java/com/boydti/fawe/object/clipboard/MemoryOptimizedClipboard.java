@@ -1,23 +1,21 @@
 package com.boydti.fawe.object.clipboard;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.ReflectionUtils;
+
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -31,9 +29,9 @@ import java.util.Map;
 
 public class MemoryOptimizedClipboard extends FaweClipboard {
 
-    public static final int BLOCK_SIZE = 1048576 * 4;
-    public static final int BLOCK_MASK = 1048575;
-    public static final int BLOCK_SHIFT = 20;
+    private static final int BLOCK_SIZE = 1048576 * 4;
+    private static final int BLOCK_MASK = 1048575;
+    private static final int BLOCK_SHIFT = 20;
 
     private int length;
     private int height;
@@ -341,9 +339,9 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
     public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
         int combinedId = block.getInternalId();
         setCombinedId(index, combinedId);
-        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
-            setTile(index, ((BaseBlock)block).getNbtData());
+            setTile(index, block.getNbtData());
         }
         return true;
     }

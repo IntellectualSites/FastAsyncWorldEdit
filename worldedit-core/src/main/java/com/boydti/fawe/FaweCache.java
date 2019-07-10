@@ -292,7 +292,7 @@ public class FaweCache implements Trimable {
         } else if (value instanceof String) {
             return asTag((String) value);
         } else if (value instanceof Map) {
-            return asTag((Map) value);
+            return asTag((Map<String, Object>) value);
         } else if (value instanceof Collection) {
             return asTag((Collection) value);
         } else if (value instanceof Object[]) {
@@ -330,7 +330,7 @@ public class FaweCache implements Trimable {
     }
 
     public static ListTag asTag(Object... values) {
-        Class clazz = null;
+        Class<? extends Tag> clazz = null;
         List<Tag> list = new ArrayList<>(values.length);
         for (Object value : values) {
             Tag tag = asTag(value);
@@ -344,7 +344,7 @@ public class FaweCache implements Trimable {
     }
 
     public static ListTag asTag(Collection values) {
-        Class clazz = null;
+        Class<? extends Tag> clazz = null;
         List<Tag> list = new ArrayList<>(values.size());
         for (Object value : values) {
             Tag tag = asTag(value);

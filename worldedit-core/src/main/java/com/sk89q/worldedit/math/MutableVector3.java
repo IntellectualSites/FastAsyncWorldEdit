@@ -84,7 +84,4 @@ public class MutableVector3 extends Vector3 {
         return this;
     }
 
-    public double getY() {
-        return y;
-    }
 }

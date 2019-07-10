@@ -30,6 +30,7 @@ import com.sk89q.worldedit.util.command.argument.CommandArgs;
 import com.sk89q.worldedit.util.command.argument.MissingArgumentException;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,7 +56,7 @@ public abstract class BranchingCommand<T> implements CommandExecutor<T> {
     public T call(CommandArgs args, CommandLocals locals) throws CommandException {
         try {
             String classifier = args.next();
-            CommandExecutor<? extends T> executor = options.get(classifier.toLowerCase());
+            CommandExecutor<? extends T> executor = options.get(classifier.toLowerCase(Locale.ROOT));
             if (executor != null) {
                 return executor.call(args, locals);
             } else {
@@ -72,7 +73,7 @@ public abstract class BranchingCommand<T> implements CommandExecutor<T> {
     public List<String> getSuggestions(CommandArgs args, CommandLocals locals) throws MissingArgumentException {
         String classifier = args.next();
         try {
-            CommandExecutor<? extends T> executor = options.get(classifier.toLowerCase());
+            CommandExecutor<? extends T> executor = options.get(classifier.toLowerCase(Locale.ROOT));
             if (executor != null) {
                 return executor.getSuggestions(args, locals);
             }

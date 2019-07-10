@@ -1,16 +1,14 @@
 package com.boydti.fawe.jnbt;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.exception.FaweException;
+
 import com.sk89q.jnbt.NBTInputStream;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class NBTStreamer {
     private final NBTInputStream is;
@@ -27,7 +25,7 @@ public class NBTStreamer {
      * @throws IOException
      */
     public void readFully() throws IOException {
-        is.readNamedTagLazy(node -> readers.get(node));
+        is.readNamedTagLazy(readers::get);
         is.close();
     }
 
@@ -57,12 +55,6 @@ public class NBTStreamer {
         readers.put(node, run);
     }
 
-    public <T, V> void addReader(BiConsumer<T, V> run, String... nodes) {
-        for (String node : nodes) {
-            addReader(node, run);
-        }
-    }
-
     public static abstract class NBTStreamReader<T, V> implements BiConsumer<T, V> {
         private String node;
 
@@ -84,7 +76,7 @@ public class NBTStreamer {
         public abstract void run(int index, int byteValue);
     }
 
-    public static abstract class LazyReader implements BiConsumer<Integer, DataInputStream> {}
+    public interface LazyReader extends BiConsumer<Integer, DataInputStream> {}
 
     public static abstract class LongReader implements BiConsumer<Integer, Long> {
         @Override

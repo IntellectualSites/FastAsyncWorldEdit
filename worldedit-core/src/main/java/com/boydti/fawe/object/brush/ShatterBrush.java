@@ -27,8 +27,6 @@ public class ShatterBrush extends ScatterBrush {
     @Override
     public void finish(EditSession editSession, LocalBlockVectorSet placed, final BlockVector3 position, Pattern pattern, double size) {
         int radius2 = (int) (size * size);
-        // Keep track of where we've visited
-        LocalBlockVectorSet tmp = new LocalBlockVectorSet();
         // Individual frontier for each point
         LocalBlockVectorSet[] frontiers = new LocalBlockVectorSet[placed.size()];
         // Keep track of where each frontier has visited
@@ -51,6 +49,8 @@ public class ShatterBrush extends ScatterBrush {
         final SurfaceMask surfaceTest = new SurfaceMask(editSession);
         // Expand
         boolean notEmpty = true;
+        // Keep track of where we've visited
+        LocalBlockVectorSet tmp = new LocalBlockVectorSet();
         while (notEmpty) {
             notEmpty = false;
             for (i = 0; i < frontiers.length; i++) {
@@ -59,37 +59,33 @@ public class ShatterBrush extends ScatterBrush {
                 final LocalBlockVectorSet frontierVisited = frontiersVisited[i];
                 // This is a temporary set with the next blocks the frontier will visit
                 final LocalBlockVectorSet finalTmp = tmp;
-                frontier.forEach(new LocalBlockVectorSet.BlockVectorSetVisitor() {
-                    @Override
-                    public void run(int x, int y, int z, int index) {
-                        if (ThreadLocalRandom.current().nextInt(2) == 0) {
-                            finalTmp.add(x, y, z);
-                            return;
-                        }
-                        for (int i = 0; i < BreadthFirstSearch.DIAGONAL_DIRECTIONS.length; i++) {
-                        	BlockVector3 direction = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
-                            int x2 = x + direction.getBlockX();
-                            int y2 = y + direction.getBlockY();
-                            int z2 = z + direction.getBlockZ();
-                            // Check boundary
-                            int dx = position.getBlockX() - x2;
-                            int dy = position.getBlockY() - y2;
-                            int dz = position.getBlockZ() - z2;
-                            int dSqr = (dx * dx) + (dy * dy) + (dz * dz);
-                            if (dSqr <= radius2) {
-                                MutableBlockVector3 v = mutable.setComponents(x2, y2, z2);
-                                BlockVector3 bv = v;
-                                if (surfaceTest.test(bv) && finalMask.test(bv)) {
-                                    // (collision) If it's visited and part of another frontier, set the block
-                                    if (!placed.add(x2, y2, z2)) {
-                                        if (!frontierVisited.contains(x2, y2, z2)) {
-                                            editSession.setBlock(x2, y2, z2, pattern);
-                                        }
-                                    } else {
-                                        // Hasn't visited and not a collision = add it
-                                        finalTmp.add(x2, y2, z2);
-                                        frontierVisited.add(x2, y2, z2);
+                frontier.forEach((x, y, z, index) -> {
+                    if (ThreadLocalRandom.current().nextInt(2) == 0) {
+                        finalTmp.add(x, y, z);
+                        return;
+                    }
+                    for (int i1 = 0; i1 < BreadthFirstSearch.DIAGONAL_DIRECTIONS.length; i1++) {
+                        BlockVector3 direction = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i1];
+                        int x2 = x + direction.getBlockX();
+                        int y2 = y + direction.getBlockY();
+                        int z2 = z + direction.getBlockZ();
+                        // Check boundary
+                        int dx = position.getBlockX() - x2;
+                        int dy = position.getBlockY() - y2;
+                        int dz = position.getBlockZ() - z2;
+                        int dSqr = (dx * dx) + (dy * dy) + (dz * dz);
+                        if (dSqr <= radius2) {
+                            BlockVector3 bv = mutable.setComponents(x2, y2, z2);
+                            if (surfaceTest.test(bv) && finalMask.test(bv)) {
+                                // (collision) If it's visited and part of another frontier, set the block
+                                if (!placed.add(x2, y2, z2)) {
+                                    if (!frontierVisited.contains(x2, y2, z2)) {
+                                        editSession.setBlock(x2, y2, z2, pattern);
                                     }
+                                } else {
+                                    // Hasn't visited and not a collision = add it
+                                    finalTmp.add(x2, y2, z2);
+                                    frontierVisited.add(x2, y2, z2);
                                 }
                             }
                         }

@@ -29,7 +29,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.helper.MCDirections;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -40,7 +39,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
 import static com.sk89q.worldedit.util.Direction.*;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -52,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -93,19 +92,11 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long[] adapt(Direction... dirs) {
-        long[] arr = new long[dirs.length];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = 1L << dirs[i].ordinal();
-        }
-        return arr;
+        return Arrays.stream(dirs).mapToLong(dir -> 1L << dir.ordinal()).toArray();
     }
 
     private static long[] adapt(Long... dirs) {
-        long[] arr = new long[dirs.length];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = dirs[i];
-        }
-        return arr;
+        return Arrays.stream(dirs).mapToLong(dir -> dir).toArray();
     }
 
     private static long[] getDirections(AbstractProperty property) {
@@ -137,7 +128,7 @@ public class BlockTransformExtent extends ResettableExtent {
                 case FACING: {
                     List<Direction> directions = new ArrayList<>();
                     for (Object value : values) {
-                        directions.add(Direction.valueOf(value.toString().toUpperCase()));
+                        directions.add(Direction.valueOf(value.toString().toUpperCase(Locale.ROOT)));
                     }
                     return adapt(directions.toArray(new Direction[0]));
                 }
@@ -219,9 +210,7 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long notIndex(long mask, int... indexes) {
-        for (int index : indexes) {
-            mask = mask | (1L << (index + values().length));
-        }
+        mask |= Arrays.stream(indexes).mapToLong(index -> (1L << (index + values().length))).reduce(0, (a, b) -> a | b);
         return mask;
     }
 
@@ -343,10 +332,10 @@ public class BlockTransformExtent extends ResettableExtent {
             Object southState = tmp.getState(PropertyKey.SOUTH);
             Object westState = tmp.getState(PropertyKey.WEST);
 
-            tmp = tmp.with(PropertyKey.valueOf(newNorth.name().toUpperCase()), northState);
-            tmp = tmp.with(PropertyKey.valueOf(newEast.name().toUpperCase()), eastState);
-            tmp = tmp.with(PropertyKey.valueOf(newSouth.name().toUpperCase()), southState);
-            tmp = tmp.with(PropertyKey.valueOf(newWest.name().toUpperCase()), westState);
+            tmp = tmp.with(PropertyKey.valueOf(newNorth.name().toUpperCase(Locale.ROOT)), northState);
+            tmp = tmp.with(PropertyKey.valueOf(newEast.name().toUpperCase(Locale.ROOT)), eastState);
+            tmp = tmp.with(PropertyKey.valueOf(newSouth.name().toUpperCase(Locale.ROOT)), southState);
+            tmp = tmp.with(PropertyKey.valueOf(newWest.name().toUpperCase(Locale.ROOT)), westState);
 
             newMaskedId = tmp.getInternalId();
         }
@@ -386,11 +375,6 @@ public class BlockTransformExtent extends ResettableExtent {
                 BLOCK_ROTATION_BITMASK[i] = bitMask;
             }
         }
-    }
-
-    @Override
-    public ResettableExtent setExtent(Extent extent) {
-        return super.setExtent(extent);
     }
 
     /**
@@ -469,7 +453,7 @@ public class BlockTransformExtent extends ResettableExtent {
         return BlockState.getFromInternalId(newMaskedId);
     }
 
-    public final BaseBlock transform(BlockStateHolder block) {
+    public final BaseBlock transform(BlockStateHolder<BaseBlock> block) {
         BlockState transformed = transform(block.toImmutableState());
         if (block.hasNbtData()) {
             return transformBaseBlockNBT(transformed, block.getNbtData(), transform);
@@ -496,11 +480,6 @@ public class BlockTransformExtent extends ResettableExtent {
     @Override
     public BlockState getBlock(int x, int y, int z) {
         return transform(super.getBlock(x, y, z));
-    }
-
-    @Override
-    public BiomeType getBiome(BlockVector2 position) {
-        return super.getBiome(position);
     }
 
     @Override

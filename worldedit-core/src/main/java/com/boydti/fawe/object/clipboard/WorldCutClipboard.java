@@ -25,6 +25,7 @@ public class WorldCutClipboard extends WorldCopyClipboard {
         return block;
     }
 
+    @Override
     public BaseBlock getBlockAbs(int x, int y, int z) {
         BaseBlock block = extent.getFullBlock(BlockVector3.at(x, y, z));
         extent.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());

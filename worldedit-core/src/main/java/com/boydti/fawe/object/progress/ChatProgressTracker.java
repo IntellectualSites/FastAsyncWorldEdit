@@ -10,16 +10,6 @@ public class ChatProgressTracker extends DefaultProgressTracker {
     }
 
     @Override
-    public void sendTask() {
-        super.sendTask();
-    }
-
-    @Override
-    public void doneTask() {
-        super.doneTask();
-    }
-
-    @Override
     public void sendTile(String title, String sub) {
         getPlayer().sendMessage(BBC.getPrefix() + title + sub);
     }

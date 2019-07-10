@@ -1,13 +1,11 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 
 import java.util.Arrays;
-import javax.annotation.Nullable;
 
 public class AngleMask extends SolidBlockMask implements ResettableMask {
     public static double ADJACENT_MOD = 0.5;
@@ -160,9 +158,4 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         return testSlope(x, y, z);
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

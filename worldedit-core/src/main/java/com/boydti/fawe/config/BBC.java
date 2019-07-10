@@ -434,7 +434,7 @@ public enum BBC {
                 allNames.add(c.name());
                 allCats.add(c.category.toLowerCase());
             }
-            final HashSet<BBC> captions = new HashSet<>();
+            final EnumSet<BBC> captions = EnumSet.noneOf(BBC.class);
             boolean changed = false;
             for (final String key : keys) {
                 final Object value = yml.get(key);
