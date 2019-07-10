@@ -140,8 +140,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     private void init() {
         if (lookupNames != null) {
-            lookupNames.putIfAbsent("FastAsyncWorldEdit".toLowerCase(Locale.ENGLISH), this);
-            lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ENGLISH), this);
+            lookupNames.putIfAbsent("FastAsyncWorldEdit".toLowerCase(Locale.ROOT), this);
+            lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ROOT), this);
             lookupNames.putIfAbsent("FastAsyncWorldEdit", this);
             lookupNames.putIfAbsent("WorldEdit", this);
             rename();
@@ -246,7 +246,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
             String mcid = entityType.getName();
             if (mcid != null) {
-                EntityType.REGISTRY.register("minecraft:" + mcid.toLowerCase(), new EntityType("minecraft:" + mcid.toLowerCase()));
+                EntityType.REGISTRY.register("minecraft:" + mcid.toLowerCase(Locale.ROOT), new EntityType("minecraft:" + mcid.toLowerCase(Locale.ROOT)));
             }
         }
     }

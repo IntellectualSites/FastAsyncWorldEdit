@@ -26,6 +26,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Locale;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public interface IBukkitAdapter {
@@ -231,7 +233,7 @@ public interface IBukkitAdapter {
      */
     default GameMode adapt(org.bukkit.GameMode gameMode) {
         checkNotNull(gameMode);
-        return GameModes.get(gameMode.name().toLowerCase());
+        return GameModes.get(gameMode.name().toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -241,14 +243,14 @@ public interface IBukkitAdapter {
      * @return WorldEdit EntityType
      */
     default EntityType adapt(org.bukkit.entity.EntityType entityType) {
-        return EntityTypes.get(entityType.getName().toLowerCase());
+        return EntityTypes.get(entityType.getName().toLowerCase(Locale.ROOT));
     }
 
     default org.bukkit.entity.EntityType adapt(EntityType entityType) {
         if (!entityType.getId().startsWith("minecraft:")) {
             throw new IllegalArgumentException("Bukkit only supports vanilla entities");
         }
-        return org.bukkit.entity.EntityType.fromName(entityType.getId().substring(10).toLowerCase());
+        return org.bukkit.entity.EntityType.fromName(entityType.getId().substring(10).toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -371,6 +373,6 @@ public interface IBukkitAdapter {
     }
 
     default BiomeType adapt(Biome biome) {
-        return BiomeTypes.get(biome.name().toLowerCase());
+        return BiomeTypes.get(biome.name().toLowerCase(Locale.ROOT));
     }
 }

@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -812,7 +813,7 @@ public final class BlockTypes {
             for (Field field : oldFields) {
                 if (field.getType() == int.class) {
                     int internalId = field.getInt(null);
-                    String id = "minecraft:" + field.getName().toLowerCase();
+                    String id = "minecraft:" + field.getName().toLowerCase(Locale.ROOT);
                     String defaultState = blockMap.remove(id);
                     if (defaultState == null) {
                         if (internalId != 0) {
@@ -844,7 +845,7 @@ public final class BlockTypes {
 
             // Add to $Registry
             for (BlockType type : values) {
-                $REGISTRY.put(type.getId().toLowerCase(), type);
+                $REGISTRY.put(type.getId().toLowerCase(Locale.ROOT), type);
             }
             states = stateList.toArray(new BlockState[stateList.size()]);
 
@@ -888,7 +889,7 @@ public final class BlockTypes {
      */
 
     public static BlockType parse(final String type) throws InputParseException {
-        final String inputLower = type.toLowerCase();
+        final String inputLower = type.toLowerCase(Locale.ROOT);
         String input = inputLower;
 
         if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
