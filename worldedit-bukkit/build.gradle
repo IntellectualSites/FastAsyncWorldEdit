@@ -7,21 +7,11 @@ repositories {
     maven { url "https://hub.spigotmc.org/nexus/content/groups/public" }
     maven { url "https://repo.codemc.org/repository/maven-public" }
     maven { url "https://papermc.io/repo/repository/maven-public/" }
-    flatDir {
-        dirs "$rootProject.projectDir/lib"
-    }
 }
 
 configurations.all { Configuration it ->
     it.resolutionStrategy { ResolutionStrategy rs ->
         rs.force("com.google.guava:guava:21.0")
-    }
-}
-
-task downloadJarsToLibs(){
-    def f = new File('lib/spigot-1.14.jar')
-    if (!f.exists()) {
-        new URL('https://ci.athion.net/job/BuildTools/lastSuccessfulBuild/artifact/spigot-1.14.jar').withInputStream{ i -> f.withOutputStream{ it << i }}
     }
 }
 
@@ -35,8 +25,7 @@ dependencies {
     compile 'com.destroystokyo.paper:paper-api:1.14.3-R0.1-SNAPSHOT'
     implementation('io.papermc:paperlib:1.0.2'){transitive = false}
     compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
-    compile name: 'spigot-1.14.3'
-//    compile([fileTree(dir: 'lib', include: ['*.jar']),'commons-validator:commons-validator:1.4.1'])
+    compile 'BuildTools:lastSuccessfulBuild:spigot-1.14@jar'
     implementation('com.sk89q.worldguard:worldguard-core:7.0.0-20190215.210421-39'){transitive = false}
     implementation('com.sk89q.worldguard:worldguard-legacy:7.0.0-20190215.210421-39'){transitive = false}
     implementation('com.massivecraft:factions:2.8.0'){transitive = false}

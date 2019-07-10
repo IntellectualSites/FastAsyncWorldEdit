@@ -84,6 +84,12 @@ subprojects {
         maven { url "http://repo.spongepowered.org/maven" }
         maven { url "http://dl.bintray.com/tastybento/maven-repo" }
         maven { url "http://ci.emc.gs/nexus/content/groups/aikar/" }
+        ivy {
+            url 'https://ci.athion.net/job'
+            layout 'pattern', {
+                artifact '/[organisation]/[module]/artifact/[revision].[ext]'
+            }
+        }
     }
     configurations.all {
         resolutionStrategy {
