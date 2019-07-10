@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -365,7 +366,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
                 property = new BooleanProperty(state.a(), ImmutableList.copyOf(state.d()));
             } else if (state instanceof BlockStateDirection) {
                 property = new DirectionalProperty(state.a(),
-                        (List<Direction>) state.d().stream().map(e -> Direction.valueOf(((INamable) e).getName().toUpperCase())).collect(Collectors.toList()));
+                        (List<Direction>) state.d().stream().map(e -> Direction.valueOf(((INamable) e).getName().toUpperCase(Locale.ROOT))).collect(Collectors.toList()));
             } else if (state instanceof BlockStateEnum) {
                 property = new EnumProperty(state.a(),
                         (List<String>) state.d().stream().map(e -> ((INamable) e).getName()).collect(Collectors.toList()));

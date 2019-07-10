@@ -181,7 +181,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     }
                     state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
                 } else {
-                    BlockType type = BlockTypes.get(split[0].toLowerCase());
+                    BlockType type = BlockTypes.get(split[0].toLowerCase(Locale.ROOT));
                     if (type != null) {
                         int data = Integer.parseInt(split[1]);
                         if (data < 0 || data >= 16) {
@@ -247,7 +247,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     state = item.getType().getBlockType().getDefaultState();
                     nbt = item.getNbtData();
                 } else {
-                    BlockType type = BlockTypes.parse(typeString.toLowerCase());
+                    BlockType type = BlockTypes.parse(typeString.toLowerCase(Locale.ROOT));
 
                         if (type != null) {
                             state = type.getDefaultState();
@@ -309,15 +309,15 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             if (blockAndExtraData.length > 1) {
                 String mobName = blockAndExtraData[1];
                 for (MobType mobType : MobType.values()) {
-                    if (mobType.getName().toLowerCase().equals(mobName.toLowerCase())) {
+                    if (mobType.getName().toLowerCase().equals(mobName.toLowerCase(Locale.ROOT))) {
                         mobName = mobType.getName();
                         break;
                     }
                 }
                 if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
-                    String finalMobName = mobName.toLowerCase();
+                    String finalMobName = mobName.toLowerCase(Locale.ROOT);
                     throw new SuggestInputParseException("Unknown mob type '" + mobName + "'", mobName, () -> Stream.of(MobType.values())
-                                                                                                                    .map(m -> m.getName().toLowerCase())
+                                                                                                                    .map(m -> m.getName().toLowerCase(Locale.ROOT))
                                                                                                                     .filter(s -> s.startsWith(finalMobName))
                                                                                                                     .collect(Collectors.toList()));
                 }

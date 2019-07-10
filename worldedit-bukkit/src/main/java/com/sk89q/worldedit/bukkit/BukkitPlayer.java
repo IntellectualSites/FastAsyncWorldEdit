@@ -53,6 +53,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -185,7 +186,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public GameMode getGameMode() {
-        return GameModes.get(player.getGameMode().name().toLowerCase());
+        return GameModes.get(player.getGameMode().name().toLowerCase(Locale.ROOT));
     }
 
     @Override

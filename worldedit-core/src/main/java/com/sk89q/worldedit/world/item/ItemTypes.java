@@ -24,6 +24,7 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Locale;
 
 public final class ItemTypes {
 
@@ -823,7 +824,7 @@ public final class ItemTypes {
 
     @Nullable
     public static ItemType parse(String input) {
-        input = input.toLowerCase();
+        input = input.toLowerCase(Locale.ROOT);
         if (!Character.isAlphabetic(input.charAt(0))) {
             try {
                 ItemType legacy = LegacyMapper.getInstance().getItemFromLegacy(input);

@@ -210,7 +210,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     public void setupRegistries() {
         // Biome
         for (Biome biome : Biome.values()) {
-            BiomeType.REGISTRY.register("minecraft:" + biome.name().toLowerCase(), new BiomeType("minecraft:" + biome.name().toLowerCase()));
+            BiomeType.REGISTRY.register("minecraft:" + biome.name().toLowerCase(Locale.ROOT), new BiomeType("minecraft:" + biome.name().toLowerCase(Locale.ROOT)));
         }
         // Block & Item
         for (Material material : Material.values()) {

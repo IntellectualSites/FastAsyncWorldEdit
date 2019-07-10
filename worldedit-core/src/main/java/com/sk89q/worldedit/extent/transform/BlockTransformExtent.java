@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -127,7 +128,7 @@ public class BlockTransformExtent extends ResettableExtent {
                 case FACING: {
                     List<Direction> directions = new ArrayList<>();
                     for (Object value : values) {
-                        directions.add(Direction.valueOf(value.toString().toUpperCase()));
+                        directions.add(Direction.valueOf(value.toString().toUpperCase(Locale.ROOT)));
                     }
                     return adapt(directions.toArray(new Direction[0]));
                 }
@@ -331,10 +332,10 @@ public class BlockTransformExtent extends ResettableExtent {
             Object southState = tmp.getState(PropertyKey.SOUTH);
             Object westState = tmp.getState(PropertyKey.WEST);
 
-            tmp = tmp.with(PropertyKey.valueOf(newNorth.name().toUpperCase()), northState);
-            tmp = tmp.with(PropertyKey.valueOf(newEast.name().toUpperCase()), eastState);
-            tmp = tmp.with(PropertyKey.valueOf(newSouth.name().toUpperCase()), southState);
-            tmp = tmp.with(PropertyKey.valueOf(newWest.name().toUpperCase()), westState);
+            tmp = tmp.with(PropertyKey.valueOf(newNorth.name().toUpperCase(Locale.ROOT)), northState);
+            tmp = tmp.with(PropertyKey.valueOf(newEast.name().toUpperCase(Locale.ROOT)), eastState);
+            tmp = tmp.with(PropertyKey.valueOf(newSouth.name().toUpperCase(Locale.ROOT)), southState);
+            tmp = tmp.with(PropertyKey.valueOf(newWest.name().toUpperCase(Locale.ROOT)), westState);
 
             newMaskedId = tmp.getInternalId();
         }

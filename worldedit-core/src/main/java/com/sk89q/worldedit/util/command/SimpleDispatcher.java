@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -104,12 +105,12 @@ public class SimpleDispatcher implements Dispatcher {
 
     @Override
     public boolean contains(String alias) {
-        return commands.containsKey(alias.toLowerCase());
+        return commands.containsKey(alias.toLowerCase(Locale.ROOT));
     }
 
     @Override
     public CommandMapping get(String alias) {
-        return commands.get(alias.toLowerCase());
+        return commands.get(alias.toLowerCase(Locale.ROOT));
     }
 
     @Override

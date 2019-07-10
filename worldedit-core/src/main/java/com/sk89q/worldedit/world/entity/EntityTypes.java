@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.entity;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 
 public class EntityTypes {
 
@@ -162,7 +163,7 @@ public class EntityTypes {
                     }
                     return parse(result.toString());
                 }
-                switch (id.toLowerCase()) {
+                switch (id.toLowerCase(Locale.ROOT)) {
                     case "xp_orb":
                         return EntityTypes.EXPERIENCE_ORB;
                     case "xp_bottle":
