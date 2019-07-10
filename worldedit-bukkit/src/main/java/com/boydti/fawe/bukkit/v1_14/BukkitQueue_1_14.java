@@ -49,6 +49,7 @@ import net.minecraft.server.v1_14_R1.PacketDataSerializer;
 import net.minecraft.server.v1_14_R1.PacketPlayOutMultiBlockChange;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
+import net.minecraft.server.v1_14_R1.ProtoChunkExtension;
 import net.minecraft.server.v1_14_R1.RegistryID;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.WorldChunkManager;
@@ -70,7 +71,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R1.Chunk, ChunkSection[], ChunkSection> {
+public class BukkitQueue_1_14 extends BukkitQueue_0<IChunkAccess, ChunkSection[], ChunkSection> {
 
     public final static Field fieldBits;
     public final static Field fieldPalette;
@@ -204,12 +205,12 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
     }
 
     @Override
-    public ChunkSection[] getSections(net.minecraft.server.v1_14_R1.Chunk chunk) {
+    public ChunkSection[] getSections(IChunkAccess chunk) {
         return chunk.getSections();
     }
 
     @Override
-    public net.minecraft.server.v1_14_R1.Chunk loadChunk(World world, int x, int z, boolean generate) {
+    public IChunkAccess loadChunk(World world, int x, int z, boolean generate) {
         ChunkProviderServer provider = ((CraftWorld) world).getHandle().getChunkProvider();
         IChunkAccess chunk;
         if (generate) {
@@ -217,12 +218,20 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
         } else {
             chunk = provider.getChunkAt(x, z, ChunkStatus.FEATURES, false);
         }
-        return (net.minecraft.server.v1_14_R1.Chunk) chunk;
+        return cast(chunk);
+    }
+
+    private IChunkAccess cast(IChunkAccess chunkAccess) {
+        if (chunkAccess instanceof ProtoChunkExtension) {
+            ProtoChunkExtension proto = (ProtoChunkExtension) chunkAccess;
+            if (proto.u() != null) chunkAccess = proto.u();
+        }
+        return chunkAccess;
     }
 
     @Override
     public ChunkSection[] getCachedSections(World world, int cx, int cz) {
-        net.minecraft.server.v1_14_R1.Chunk chunk = (net.minecraft.server.v1_14_R1.Chunk) ((CraftWorld) world).getHandle().getChunkProvider().getChunkAt(cx, cz, ChunkStatus.FEATURES, false);
+        IChunkAccess chunk = ((CraftWorld) world).getHandle().getChunkProvider().getChunkAt(cx, cz, ChunkStatus.FEATURES, false);
         if (chunk != null) {
             return chunk.getSections();
         }
@@ -230,8 +239,8 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
     }
 
     @Override
-    public net.minecraft.server.v1_14_R1.Chunk getCachedChunk(World world, int cx, int cz) {
-        return (net.minecraft.server.v1_14_R1.Chunk) ((CraftWorld) world).getHandle().getChunkProvider().getChunkAt(cx, cz, ChunkStatus.FEATURES, false);
+    public IChunkAccess getCachedChunk(World world, int cx, int cz) {
+        return cast(((CraftWorld) world).getHandle().getChunkProvider().getChunkAt(cx, cz, ChunkStatus.FEATURES, false));
     }
 
     @Override
@@ -240,10 +249,16 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
     }
 
     @Override
-    public void saveChunk(net.minecraft.server.v1_14_R1.Chunk nmsChunk) {
-        nmsChunk.d(true); // Set Modified
-        nmsChunk.mustNotSave = false;
-        nmsChunk.markDirty();
+    public void saveChunk(IChunkAccess chunkAccess) {
+        chunkAccess = cast(chunkAccess);
+        if (chunkAccess instanceof Chunk) {
+            net.minecraft.server.v1_14_R1.Chunk nmsChunk = (net.minecraft.server.v1_14_R1.Chunk) chunkAccess;
+            nmsChunk.d(true); // Set Modified
+            nmsChunk.mustNotSave = false;
+            nmsChunk.markDirty();
+        } else {
+            chunkAccess.setNeedsSaving(true);
+        }
     }
 
     @Override
@@ -520,7 +535,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
     }
 
     @Override
-    public BiomeType getBiome(net.minecraft.server.v1_14_R1.Chunk chunk, int x, int z) {
+    public BiomeType getBiome(IChunkAccess chunk, int x, int z) {
         BiomeBase base = chunk.getBiomeIndex()[((z & 15) << 4) + (x & 15)];
         return getAdapter().adapt(CraftBlock.biomeBaseToBiome(base));
     }
@@ -542,9 +557,9 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
 
     @Override
     public void sendChunk(int x, int z, int bitMask) {
-        net.minecraft.server.v1_14_R1.Chunk chunk = getCachedChunk(getWorld(), x, z);
+        IChunkAccess chunk = getCachedChunk(getWorld(), x, z);
         if (chunk != null) {
-            sendChunk(getPlayerChunk((WorldServer) chunk.getWorld(), x, z), chunk, bitMask);
+            sendChunk(getPlayerChunk((WorldServer) nmsWorld, x, z), chunk, bitMask);
         }
     }
 
@@ -656,7 +671,7 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
         return playerChunk;
     }
 
-    public boolean sendChunk(PlayerChunk playerChunk, net.minecraft.server.v1_14_R1.Chunk nmsChunk, int mask) {
+    public boolean sendChunk(PlayerChunk playerChunk, IChunkAccess nmsChunk, int mask) {
         if (playerChunk == null) {
             return false;
         }
@@ -882,8 +897,8 @@ public class BukkitQueue_1_14 extends BukkitQueue_0<net.minecraft.server.v1_14_R
     protected BlockPosition.MutableBlockPosition pos = new BlockPosition.MutableBlockPosition(0, 0, 0);
 
     @Override
-    public CompoundTag getTileEntity(net.minecraft.server.v1_14_R1.Chunk chunk, int x, int y, int z) {
-        Map<BlockPosition, TileEntity> tiles = chunk.getTileEntities();
+    public CompoundTag getTileEntity(IChunkAccess chunk, int x, int y, int z) {
+        Map<BlockPosition, TileEntity> tiles = ((net.minecraft.server.v1_14_R1.Chunk) cast(chunk)).getTileEntities();
         pos.c(x, y, z);
         TileEntity tile = tiles.get(pos);
         return tile != null ? getTag(tile) : null;

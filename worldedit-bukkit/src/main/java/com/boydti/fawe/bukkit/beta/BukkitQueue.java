@@ -33,8 +33,10 @@ import net.minecraft.server.v1_14_R1.DataPaletteBlock;
 import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.IChunkAccess;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
+import net.minecraft.server.v1_14_R1.ProtoChunkExtension;
 import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
@@ -206,11 +208,12 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 
     public static Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
         ChunkProviderServer provider = (ChunkProviderServer) nmsWorld.getChunkProvider();
-
-
-        Chunk nmsChunk = (Chunk) provider.getChunkAt(X, Z, ChunkStatus.FEATURES, false);;
+        IChunkAccess nmsChunk = provider.getChunkAt(X, Z, ChunkStatus.FEATURES, false);
         if (nmsChunk != null) {
-            return nmsChunk;
+            if (nmsChunk instanceof ProtoChunkExtension) {
+                return ((ProtoChunkExtension) nmsChunk).u();
+            }
+            return (Chunk) nmsChunk;
         }
         if (Fawe.isMainThread()) {
             return nmsWorld.getChunkAt(X, Z);
