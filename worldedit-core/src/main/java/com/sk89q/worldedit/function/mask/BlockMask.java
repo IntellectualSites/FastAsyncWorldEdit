@@ -67,6 +67,23 @@ public class BlockMask extends ABlockMask {
         return this;
     }
 
+    public BlockMask remove(BlockState... states) {
+        for (BlockState state : states) ordinals[state.getOrdinal()] = false;
+        return this;
+    }
+
+    public BlockMask clear() {
+        Arrays.fill(ordinals, false);
+        return this;
+    }
+
+    public boolean isEmpty() {
+        for (boolean value : ordinals) {
+            if (value) return false;
+        }
+        return true;
+    }
+
     public BlockMask addStates(Collection<BlockState> states) {
         for (BlockState state : states) ordinals[state.getOrdinal()] = true;
         return this;
