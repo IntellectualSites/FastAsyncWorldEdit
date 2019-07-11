@@ -72,7 +72,7 @@ public class WorldEditCommands {
     public void version(Actor actor) throws WorldEditException {
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
-        actor.print("FastAsyncWorldEdit-1.13" + fVerStr + " by Empire92");
+        actor.print("FastAsyncWorldEdit-1.14" + fVerStr + " by Empire92");
         if (fVer != null) {
             actor.printDebug("----------- Platforms -----------");
             FaweVersion version = Fawe.get().getVersion();

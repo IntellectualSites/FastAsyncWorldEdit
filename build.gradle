@@ -40,7 +40,7 @@ println """
 
 group = 'com.boydti.fawe'
 
-def rootVersion = "1.13"
+def rootVersion = "1.14"
 def revision = ""
 def buildNumber = ""
 def date = ""
