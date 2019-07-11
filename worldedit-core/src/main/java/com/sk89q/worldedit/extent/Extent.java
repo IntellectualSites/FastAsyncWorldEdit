@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.jnbt.anvil.generator.CavesGen;
 import com.boydti.fawe.jnbt.anvil.generator.GenBase;
 import com.boydti.fawe.jnbt.anvil.generator.OreGen;
@@ -26,22 +27,35 @@ import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
 
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.function.RegionMaskingFilter;
+import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -51,7 +65,10 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A world, portion of a world, clipboard, or other object that can have blocks
@@ -328,7 +345,7 @@ public interface Extent extends InputExtent, OutputExtent {
         int[] counter = new int[BlockTypes.size()];
 
         for (final BlockVector3 pt : region) {
-            BlockType type = getBlockType(pt);
+            BlockType type = getBlock(pt).getBlockType();
             counter[type.getInternalId()]++;
         }
         List<Countable<BlockType>> distribution = new ArrayList<>();
@@ -385,6 +402,10 @@ public interface Extent extends InputExtent, OutputExtent {
         return null;
     }
 
+    default boolean cancel() {
+
+    }
+
     default int getMaxY() {
         return 255;
     }
@@ -401,4 +422,163 @@ public interface Extent extends InputExtent, OutputExtent {
         weClipboard.setOrigin(region.getMinimumPoint());
         return weClipboard;
     }
+
+
+    /**
+     * Count the number of blocks of a list of types in a region.
+     *
+     * @param region the region
+     * @param searchBlocks the list of blocks to search
+     * @return the number of blocks that matched the block
+     */
+    default int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
+        BlockMask mask = new BlockMask(this, searchBlocks);
+        return countBlocks(region, mask);
+    }
+
+    /**
+     * Count the number of blocks of a list of types in a region.
+     *
+     * @param region the region
+     * @param searchMask mask to match
+     * @return the number of blocks that matched the mask
+     */
+    default int countBlocks(Region region, Mask searchMask) {
+        RegionVisitor visitor = new RegionVisitor(region, searchMask::test);
+        Operations.completeBlindly(visitor);
+        return visitor.getAffected();
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given block type.
+     *
+     * @param region the region
+     * @param block the block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default  <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(block);
+        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+
+        if (canBypassAll(region, false, true) && !hasNbt) {
+            return changes = queue.setBlocks((CuboidRegion) region, block.getInternalId());
+        }
+        try {
+            if (hasExtraExtents()) {
+                RegionVisitor visitor = new RegionVisitor(region, new BlockReplace(getExtent(), (block)), this);
+                Operations.completeBlindly(visitor);
+                this.changes += visitor.getAffected();
+            } else {
+                for (BlockVector3 blockVector3 : region) {
+                    if (getExtent().setBlock(blockVector3, block)) {
+                        changes++;
+                    }
+                }
+            }
+        } catch (final WorldEditException e) {
+            throw new RuntimeException("Unexpected exception", e);
+        }
+        return changes;
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given pattern.
+     *
+     * @param region the region
+     * @param pattern the pattern that provides the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(pattern);
+        if (pattern instanceof BlockPattern) {
+            return setBlocks(region, ((BlockPattern) pattern).getBlock());
+        }
+        if (pattern instanceof BlockStateHolder) {
+            return setBlocks(region, (BlockStateHolder) pattern);
+        }
+        BlockReplace replace = new BlockReplace(this, pattern);
+        RegionVisitor visitor = new RegionVisitor(region, replace, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
+        Operations.completeBlindly(visitor);
+        return this.changes = visitor.getAffected();
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param replacement the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default  <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+        return replaceBlocks(region, filter, new BlockPattern(replacement));
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
+        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMask(this, filter);
+        return replaceBlocks(region, mask, pattern);
+    }
+
+    /**
+     * Replaces all the blocks matching a given mask, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param mask the mask that blocks must match
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(mask);
+        checkNotNull(pattern);
+
+        BlockReplace replace = new BlockReplace(this, pattern);
+        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
+        RegionVisitor visitor = new RegionVisitor(region, filter);
+        Operations.completeLegacy(visitor);
+        return visitor.getAffected();
+    }
+
+
+    /**
+     * Sets the blocks at the center of the given region to the given pattern.
+     * If the center sits between two blocks on a certain axis, then two blocks
+     * will be placed to mark the center.
+     *
+     * @param region the region to find the center of
+     * @param pattern the replacement pattern
+     * @return the number of blocks placed
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(pattern);
+
+        Vector3 center = region.getCenter();
+        Region centerRegion = new CuboidRegion(
+                getWorld(), // Causes clamping of Y range
+                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
+                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
+                        center.getY(), MathUtils.roundHalfUp(center.getZ())));
+        return setBlocks(centerRegion, pattern);
+    }
+
 }

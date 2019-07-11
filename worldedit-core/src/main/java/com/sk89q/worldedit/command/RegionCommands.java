@@ -21,10 +21,9 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.filters.SetFilter;
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.beta.filters.CountFilter;
+import com.boydti.fawe.beta.filters.DistrFilter;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.example.NMSMappedFaweQueue;
 import com.boydti.fawe.object.FaweLimit;
@@ -77,8 +76,6 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
 import java.util.ArrayList;
@@ -125,7 +122,7 @@ public class RegionCommands extends MethodCommands {
     public void debugtest(Player player, @Selection Region region) throws WorldEditException {
         QueueHandler queueHandler = Fawe.get().getQueueHandler();
         World world = player.getWorld();
-        CountFilter filter = new CountFilter();
+        DistrFilter filter = new DistrFilter();
         long start = System.currentTimeMillis();
         queueHandler.apply(world, region, filter);
         long diff = System.currentTimeMillis() - start;

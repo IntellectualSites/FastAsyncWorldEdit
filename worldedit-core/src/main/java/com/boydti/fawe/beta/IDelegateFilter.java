@@ -46,5 +46,7 @@ public interface IDelegateFilter extends Filter {
         return this;
     }
 
-    Filter newInstance(Filter other);
+    default Filter newInstance(Filter other) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 }

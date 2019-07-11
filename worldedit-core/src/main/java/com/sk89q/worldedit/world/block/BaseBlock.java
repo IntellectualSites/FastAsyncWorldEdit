@@ -25,6 +25,7 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.ABlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
@@ -300,5 +301,4 @@ public class BaseBlock implements BlockStateHolder<BaseBlock> {
             return getAsString();
         }
     }
-
 }

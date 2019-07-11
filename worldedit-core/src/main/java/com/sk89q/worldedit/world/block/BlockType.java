@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.ABlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
@@ -306,7 +307,11 @@ public class BlockType implements FawePattern, Keyed {
         return this.getDefaultState().toBaseBlock();
     }
 
-    public Mask toMask(Extent extent) {
+    public SingleBlockTypeMask toMask() {
+        return toMask(null);
+    }
+
+    public SingleBlockTypeMask toMask(Extent extent) {
         return new SingleBlockTypeMask(extent, this);
     }
 

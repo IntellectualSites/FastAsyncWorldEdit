@@ -199,13 +199,9 @@ public class BukkitQueue extends SimpleCharQueueExtent {
     }
 
     public static Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
-        ChunkProviderServer provider = (ChunkProviderServer) nmsWorld.getChunkProvider();
-        IChunkAccess nmsChunk = provider.getChunkAt(X, Z, ChunkStatus.FEATURES, false);
+        Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
         if (nmsChunk != null) {
-            if (nmsChunk instanceof ProtoChunkExtension) {
-                return ((ProtoChunkExtension) nmsChunk).u();
-            }
-            return (Chunk) nmsChunk;
+            return nmsChunk;
         }
         if (Fawe.isMainThread()) {
             return nmsWorld.getChunkAt(X, Z);

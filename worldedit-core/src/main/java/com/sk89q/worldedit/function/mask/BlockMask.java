@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -34,12 +35,16 @@ import java.util.function.Predicate;
 public class BlockMask extends ABlockMask {
     private final boolean[] ordinals;
 
+    public BlockMask() {
+        this(new NullExtent());
+    }
+
     public BlockMask(Extent extent) {
         this(extent, new boolean[BlockTypes.states.length]);
     }
 
     public BlockMask(Extent extent, boolean[] ordinals) {
-        super(extent);
+        super(extent == null ? new NullExtent() : extent);
         this.ordinals = ordinals;
     }
 

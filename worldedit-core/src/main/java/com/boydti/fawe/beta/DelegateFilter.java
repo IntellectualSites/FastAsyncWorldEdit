@@ -1,13 +1,18 @@
 package com.boydti.fawe.beta;
 
-public abstract class DelegateFilter implements IDelegateFilter {
+public class DelegateFilter<T extends Filter> implements IDelegateFilter {
     private final Filter parent;
 
-    public DelegateFilter(Filter parent) {
+    public DelegateFilter(T parent) {
         this.parent = parent;
     }
     @Override
-    public Filter getParent() {
-        return parent;
+    public T getParent() {
+        return (T) parent;
+    }
+
+    @Override
+    public Filter newInstance(Filter other) {
+        return new DelegateFilter(other);
     }
 }

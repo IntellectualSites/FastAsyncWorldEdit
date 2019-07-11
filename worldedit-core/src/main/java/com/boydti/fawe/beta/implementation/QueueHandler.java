@@ -70,6 +70,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
         return forkJoinPoolSecondary.submit(call);
     }
 
+    public ForkJoinTask submit(final Runnable call) {
+        return forkJoinPoolPrimary.submit(call);
+    }
+
     public <T> Future<T> sync(final Runnable run, final T value) {
         final FutureTask<T> result = new FutureTask<>(run, value);
         syncTasks.add(result);
@@ -142,62 +146,5 @@ public abstract class QueueHandler implements Trimable, Runnable {
             }
         }
         return result;
-    }
-
-    public void apply(final World world, final Region region, final Filter filter) {
-        // The chunks positions to iterate over
-        final Set<BlockVector2> chunks = region.getChunks();
-        final Iterator<BlockVector2> chunksIter = chunks.iterator();
-
-        // Get a pool, to operate on the chunks in parallel
-        final int size = Math.min(chunks.size(), Settings.IMP.QUEUE.PARALLEL_THREADS);
-        final ForkJoinTask[] tasks = new ForkJoinTask[size];
-        for (int i = 0; i < size; i++) {
-            tasks[i] = forkJoinPoolPrimary.submit(new Runnable() {
-                @Override
-                public void run() {
-                    final Filter newFilter = filter.fork();
-                    // Create a chunk that we will reuse/reset for each operation
-                    final IQueueExtent queue = getQueue(world);
-                    synchronized (queue) {
-                        ChunkFilterBlock block = null;
-
-                        while (true) {
-                            // Get the next chunk posWeakChunk
-                            final int X, Z;
-                            synchronized (chunksIter) {
-                                if (!chunksIter.hasNext()) break;
-                                final BlockVector2 pos = chunksIter.next();
-                                X = pos.getX();
-                                Z = pos.getZ();
-                            }
-                            if (!newFilter.appliesChunk(X, Z)) {
-                                continue;
-                            }
-                            IChunk chunk = queue.getCachedChunk(X, Z);
-                            // Initialize
-                            chunk.init(queue, X, Z);
-
-                            IChunk newChunk = newFilter.applyChunk(chunk, region);
-                            if (newChunk != null) {
-                                chunk = newChunk;
-                                if (block == null) block = queue.initFilterBlock();
-                                chunk.filterBlocks(newFilter, block, region);
-                            }
-                            queue.submit(chunk);
-                        }
-                        queue.flush();
-                    }
-                }
-            });
-        }
-        // Join filters
-        for (int i = 0; i < tasks.length; i++) {
-            final ForkJoinTask task = tasks[i];
-            if (task != null) {
-                task.quietlyJoin();
-            }
-        }
-        filter.join();
     }
 }

@@ -56,10 +56,6 @@ public interface InputExtent {
         return getBlock(MutableBlockVector3.get(x, y, z));
     }
 
-    default BlockType getBlockType(BlockVector3 position) {
-        return getBlock(position).getBlockType();
-    }
-
     /**
      * Get a immutable snapshot of the block at the given location.
      *

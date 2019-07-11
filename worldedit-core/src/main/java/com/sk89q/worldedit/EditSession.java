@@ -20,48 +20,33 @@
 package com.sk89q.worldedit;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.example.MappedFaweQueue;
-import com.boydti.fawe.jnbt.anvil.MCAQueue;
-import com.boydti.fawe.jnbt.anvil.MCAWorld;
-import com.boydti.fawe.logging.LoggingChangeSet;
-import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.HistoryExtent;
-import com.boydti.fawe.object.NullChangeSet;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.BlockBagChangeSet;
-import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
-import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
-import com.boydti.fawe.object.changeset.MemoryOptimizedHistory;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.*;
+import com.boydti.fawe.object.extent.FaweRegionExtent;
+import com.boydti.fawe.object.extent.NullExtent;
+import com.boydti.fawe.object.extent.ProcessedWEExtent;
+import com.boydti.fawe.object.extent.ResettableExtent;
+import com.boydti.fawe.object.extent.SourceMaskExtent;
 import com.boydti.fawe.object.function.SurfaceRegionFunction;
 import com.boydti.fawe.object.mask.ResettableMask;
 import com.boydti.fawe.object.pattern.ExistingPattern;
-import com.boydti.fawe.object.progress.ChatProgressTracker;
-import com.boydti.fawe.object.progress.DefaultProgressTracker;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.MemUtil;
-import com.boydti.fawe.util.Perm;
 import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.wrappers.WorldWrapper;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Supplier;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -77,17 +62,25 @@ import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
-import com.sk89q.worldedit.function.mask.*;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
+import com.sk89q.worldedit.function.mask.BoundedHeightMask;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.MaskUnion;
+import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.NoiseFilter2D;
+import com.sk89q.worldedit.function.mask.RegionMask;
+import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.WaterloggedRemover;
 import com.sk89q.worldedit.function.util.RegionOffset;
@@ -108,7 +101,6 @@ import com.sk89q.worldedit.internal.expression.runtime.ExpressionTimeoutExceptio
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector2;
@@ -123,16 +115,12 @@ import com.sk89q.worldedit.regions.EllipsoidRegion;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 import com.sk89q.worldedit.regions.shape.ArbitraryBiomeShape;
 import com.sk89q.worldedit.regions.shape.ArbitraryShape;
 import com.sk89q.worldedit.regions.shape.RegionShape;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.SimpleWorld;
@@ -151,7 +139,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -162,6 +149,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -211,7 +204,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
     private final World world;
     private final String worldName;
-    private final FaweQueue queue;
     private boolean wrapped;
     private boolean fastMode;
     private final HistoryExtent history;
@@ -232,19 +224,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     public static final UUID CONSOLE = UUID.fromString("1-1-3-3-7");
 
     @Deprecated
-    public EditSession(@Nonnull World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
-        this(null, world, queue, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, bus, event);
+    public EditSession(@Nonnull World world, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
+        this(null, world, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, bus, event);
     }
 
-    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
-        this(new EditSessionBuilder(world, worldName).queue(queue).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
+    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
+        this(new EditSessionBuilder(world, worldName).player(player).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
     }
 
     public EditSession(EditSessionBuilder builder) {
         super(builder.compile().getExtent());
         this.world = builder.getWorld();
         this.worldName = builder.getWorldName();
-        this.queue = builder.getQueue();
         this.wrapped = builder.isWrapped();
         this.fastMode = builder.hasFastMode();
         this.history = builder.getHistory();
@@ -268,7 +259,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param event the event to call with the extent
      */
     public EditSession(EventBus eventBus, World world, int maxBlocks, @Nullable BlockBag blockBag, EditSessionEvent event) {
-        this(world, null, null, null, null, null, true, null, null, null, blockBag, eventBus, event);
+        this(world, null, null, null, null, true, null, null, null, blockBag, eventBus, event);
     }
 
     public void setExtent(AbstractDelegateExtent extent) {
@@ -360,36 +351,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
         bypassHistory = nullExtent;
         bypassAll = nullExtent;
-        dequeue();
-        if (!queue.isEmpty()) {
-            if (Fawe.isMainThread()) {
-                queue.clear();
-            } else {
-                SetQueue.IMP.addTask(() -> queue.clear());
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Remove this EditSession from the queue<br>
-     * - This doesn't necessarily stop it from being queued again
-     */
-    public void dequeue() {
-        if (queue != null) {
-            SetQueue.IMP.dequeue(queue);
-        }
-    }
-
-    /**
-     * Add a task to run when this EditSession is done dispatching
-     *
-     * @param whenDone
-     */
-    public void addNotifyTask(Runnable whenDone) {
-        if (queue != null) {
-            queue.addNotifyTask(whenDone);
-        }
+        return super.cancel();
     }
 
     /**
@@ -400,16 +362,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public void debug(BBC message, Object... args) {
         message.send(player, args);
-    }
-
-    /**
-     * Get the FaweQueue this EditSession uses to queue the changes<br>
-     * - Note: All implementation queues for FAWE are instances of NMSMappedFaweQueue
-     *
-     * @return
-     */
-    public FaweQueue getQueue() {
-        return queue;
     }
 
     // pkg private for TracedEditSession only, may later become public API
@@ -478,26 +430,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public void setRawChangeSet(@Nullable FaweChangeSet set) {
         changeTask = set;
-        changes++;
-    }
-
-    /**
-     * Change the ChangeSet being used for this EditSession
-     * - If history is disabled, no changeset can be set
-     *
-     * @param set (null = remove the changeset)
-     */
-    public void setChangeSet(@Nullable FaweChangeSet set) {
-        if (set == null) {
-            disableHistory(true);
-        } else {
-            if (history != null) {
-                history.setChangeSet(set);
-            } else {
-                changeTask = set;
-                set.addChangeTask(queue);
-            }
-        }
         changes++;
     }
 
@@ -847,31 +779,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         return this.getExtent().setBiome(x, y, z, biome);
     }
 
-    @Override
-    public int getLight(int x, int y, int z) {
-        return queue.getLight(x, y, z);
-    }
-
-    @Override
-    public int getBlockLight(int x, int y, int z) {
-        return queue.getEmmittedLight(x, y, z);
-    }
-
-    @Override
-    public int getSkyLight(int x, int y, int z) {
-        return queue.getSkyLight(x, y, z);
-    }
-
-    @Override
-    public int getBrightness(int x, int y, int z) {
-        return queue.getBrightness(x, y, z);
-    }
-
-    @Override
-    public int getOpacity(int x, int y, int z) {
-        return queue.getOpacity(x, y, z);
-    }
-
     public BlockState getBlock(int x, int y, int z) {
         return getExtent().getBlock(x, y, z);
     }
@@ -907,6 +814,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param maxY maximal height
      * @return height of highest block found or 'minY'
      */
+    @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
         for (int y = maxY; y >= minY; --y) {
             if (getBlock(x, y, z).getBlockType().getMaterial().isMovementBlocker()) {
@@ -926,22 +834,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      * @param filter a mask of blocks to consider, or null to consider any solid (movement-blocking) block
      * @return height of highest block found or 'minY'
      */
+    @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
         for (int y = maxY; y >= minY; --y) {
             if (filter.test(mutablebv.setComponents(x, y, z))) {
                 return y;
             }
         }
-
         return minY;
     }
 
     public BlockType getBlockType(int x, int y, int z) {
-        if (!limit.MAX_CHECKS()) {
-            throw FaweException.MAX_CHECKS;
-        }
-        int combinedId4Data = queue.getCombinedId4DataDebug(x, y, z, BlockTypes.AIR.getInternalId(), this);
-        return BlockTypes.getFromStateId(combinedId4Data);
+        return getBlock(x, y, z).getBlockType();
     }
 
     /**
@@ -1208,15 +1112,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         // Reset limit
         limit.set(originalLimit);
         // Enqueue it
-        if (queue == null || queue.isEmpty()) {
-            queue.dequeue();
-            return;
-        }
-        if (Fawe.isMainThread()) {
-            SetQueue.IMP.flush(queue);
-        } else {
-            queue.flush();
-        }
+        super.commit();
         if (getChangeSet() != null) {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {
                 ((FaweChangeSet) getChangeSet()).closeAsync();
@@ -1224,56 +1120,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 ((FaweChangeSet) getChangeSet()).close();
             }
         }
-    }
-
-    /**
-     * Count the number of blocks of a given list of types in a region.
-     *
-     * @param region    the region
-     * @param searchIDs a list of IDs to search
-     * @return the number of found blocks
-     */
-    public int countBlock(final Region region, final Set<BlockType> searchIDs) {
-        if (searchIDs.isEmpty()) {
-            return 0;
-        }
-        if (searchIDs.size() == 1) {
-            final BlockType id = searchIDs.iterator().next();
-            RegionVisitor visitor = new RegionVisitor(region, position -> getBlockType(position) == id, this);
-            Operations.completeBlindly(visitor);
-            return visitor.getAffected();
-        }
-        final boolean[] ids = new boolean[BlockTypes.size()];
-        for (final BlockType id : searchIDs) {
-            ids[id.getInternalId()] = true;
-        }
-        return this.countBlock(region, ids);
-    }
-
-    public int countBlock(final Region region, final boolean[] ids) {
-        RegionVisitor visitor = new RegionVisitor(region, position -> ids[getBlockType(position).getInternalId()], this);
-        Operations.completeBlindly(visitor);
-        return visitor.getAffected();
-    }
-
-    public int countBlock(final Region region, final Mask mask) {
-        RegionVisitor visitor = new RegionVisitor(region, mask::test, this);
-        Operations.completeBlindly(visitor);
-        return visitor.getAffected();
-    }
-
-    /**
-     * Count the number of blocks of a list of types in a region.
-     *
-     * @param region the region
-     * @param searchBlocks the list of blocks to search
-     * @return the number of blocks that matched the pattern
-     */
-    public int countBlocks(Region region, Set<BlockStateHolder> searchBlocks) {
-        Mask mask = new BlockMaskBuilder().addBlocks(searchBlocks).build(getExtent());
-        RegionVisitor visitor = new RegionVisitor(region, mask::test, this);
-        Operations.completeBlindly(visitor);
-        return visitor.getAffected();
     }
 
     public int fall(final Region region, boolean fullHeight, final BlockStateHolder replace) {
@@ -1521,137 +1367,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     /**
-     * Sets all the blocks inside a region to a given block type.
-     *
-     * @param region the region
-     * @param block the block
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        checkNotNull(region);
-        checkNotNull(block);
-        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
-
-        if (canBypassAll(region, false, true) && !hasNbt) {
-            return changes = queue.setBlocks((CuboidRegion) region, block.getInternalId());
-        }
-        try {
-            if (hasExtraExtents()) {
-                RegionVisitor visitor = new RegionVisitor(region, new BlockReplace(getExtent(), (block)), this);
-                Operations.completeBlindly(visitor);
-                this.changes += visitor.getAffected();
-            } else {
-                for (BlockVector3 blockVector3 : region) {
-                    if (getExtent().setBlock(blockVector3, block)) {
-                        changes++;
-                    }
-                }
-            }
-        } catch (final WorldEditException e) {
-            throw new RuntimeException("Unexpected exception", e);
-        }
-        return changes;
-    }
-
-    /**
-     * Sets all the blocks inside a region to a given pattern.
-     *
-     * @param region the region
-     * @param pattern the pattern that provides the replacement block
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        checkNotNull(region);
-        checkNotNull(pattern);
-        if (pattern instanceof BlockPattern) {
-            return setBlocks(region, ((BlockPattern) pattern).getBlock());
-        }
-        if (pattern instanceof BlockStateHolder) {
-            return setBlocks(region, (BlockStateHolder) pattern);
-        }
-        BlockReplace replace = new BlockReplace(this, pattern);
-        RegionVisitor visitor = new RegionVisitor(region, replace, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
-        Operations.completeBlindly(visitor);
-        return this.changes = visitor.getAffected();
-    }
-
-    /**
-     * Replaces all the blocks matching a given filter, within a given region, to a block
-     * returned by a given pattern.
-     *
-     * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link ExistingBlockMask}
-     * @param replacement the replacement block
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
-        return replaceBlocks(region, filter, (replacement));
-    }
-
-    /**
-     * Replaces all the blocks matching a given filter, within a given region, to a block
-     * returned by a given pattern.
-     *
-     * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link ExistingBlockMask}
-     * @param pattern the pattern that provides the new blocks
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
-        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMaskBuilder().addBlocks(filter).build(this);
-        return replaceBlocks(region, mask, pattern);
-    }
-
-    /**
-     * Replaces all the blocks matching a given mask, within a given region, to a block
-     * returned by a given pattern.
-     *
-     * @param region the region to replace the blocks within
-     * @param mask the mask that blocks must match
-     * @param pattern the pattern that provides the new blocks
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
-        checkNotNull(region);
-        checkNotNull(mask);
-        checkNotNull(pattern);
-
-        BlockReplace replace = new BlockReplace(this, pattern);
-        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
-        RegionVisitor visitor = new RegionVisitor(region, filter, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
-        Operations.completeBlindly(visitor);
-        return this.changes = visitor.getAffected();
-    }
-
-    /**
-     * Sets the blocks at the center of the given region to the given pattern.
-     * If the center sits between two blocks on a certain axis, then two blocks
-     * will be placed to mark the center.
-     *
-     * @param region the region to find the center of
-     * @param pattern the replacement pattern
-     * @return the number of blocks placed
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    public int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        checkNotNull(region);
-        checkNotNull(pattern);
-
-        Vector3 center = region.getCenter();
-        Region centerRegion = new CuboidRegion(
-                getWorld(), // Causes clamping of Y range
-                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
-                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
-                            center.getY(), MathUtils.roundHalfUp(center.getZ())));
-        return setBlocks(centerRegion, pattern);
-    }
-
-    /**
      * Make the faces of the given region as if it was a {@link CuboidRegion}.
      *
      * @param region the region
@@ -1750,14 +1465,18 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (region instanceof CuboidRegion) {
             return makeCuboidWalls(region, pattern);
         } else {
-            for (BlockVector3 position : region) {
-                int x = position.getBlockX();
-                int y = position.getBlockY();
-                int z = position.getBlockZ();
-                if (!region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(x - 1, z)) {
-                    setBlock(position, pattern);
+            replaceBlocks(region, new Mask() {
+                @Override
+                public boolean test(BlockVector3 position) {
+                    int x = position.getBlockX();
+                    int y = position.getBlockY();
+                    int z = position.getBlockZ();
+                    if (!region.contains(x, z + 1) || !region.contains(x, z - 1) || !region.contains(x + 1, z) || !region.contains(x - 1, z)) {
+                        return true;
+                    }
+                    return false;
                 }
-            }
+            }, pattern);
         }
         return changes;
     }
@@ -1773,7 +1492,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
      */
     public <B extends BlockStateHolder<B>> int overlayCuboidBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(block);
-
         return overlayCuboidBlocks(region, (block));
     }
 
@@ -3207,23 +2925,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             Direction.DOWN.toBlockVector(),
     };
 
-    private static double lengthSq(double x, double y, double z) {
-        return (x * x) + (y * y) + (z * z);
-    }
-
-    private static double lengthSq(double x, double z) {
-        return (x * x) + (z * z);
-    }
-
-
     @Override
     public String getName() {
         return worldName;
-    }
-
-    @Override
-    public int getBlockLightLevel(BlockVector3 position) {
-        return queue.getEmmittedLight(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
     @Override
@@ -3251,14 +2955,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         for (int x = pos1.getX(); x <= pos2.getX(); x++) {
             for (int z = pos1.getBlockZ(); z <= pos2.getBlockZ(); z++) {
                 for (int y = pos1.getY(); y <= pos2.getY(); y++) {
-                    int from = queue.getCombinedId4Data(x, y, z);
-                    queue.setBlock(x, y, z, from);
-                    if (BlockTypes.getFromStateId(from).getMaterial().hasContainer()) {
-                        CompoundTag tile = queue.getTileEntity(x, y, z);
-                        if (tile != null) {
-                            queue.setTile(x, y, z, tile);
-                        }
-                    }
+                    setBlock(x, y, z, getFullBlock(x, y, z));
                 }
             }
         }
@@ -3363,8 +3060,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         if (changes != 0) {
             flushQueue();
             return true;
-        } else {
-            this.queue.clear();
         }
         return false;
     }
