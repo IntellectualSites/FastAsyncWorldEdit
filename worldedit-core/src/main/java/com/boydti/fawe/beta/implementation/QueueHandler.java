@@ -10,6 +10,7 @@ import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MemUtil;
+import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -51,10 +52,60 @@ public abstract class QueueHandler implements Trimable, Runnable {
         TaskManager.IMP.repeat(this, 1);
     }
 
+    /**
+     * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the server
+     */
+    private long last;
+    private long allocate = 50;
+    private double targetTPS = 18;
+
     @Override
     public void run() {
         if (!Fawe.isMainThread()) {
             throw new IllegalStateException("Not main thread");
+        }
+        if (!syncTasks.isEmpty()) {
+            long now = System.currentTimeMillis();
+            targetTPS = 18 - Math.max(Settings.IMP.QUEUE.EXTRA_TIME_MS * 0.05, 0);
+            long diff = (50 + this.last) - (this.last = now);
+            long absDiff = Math.abs(diff);
+            if (diff == 0) {
+                allocate = Math.min(50, allocate + 1);
+            } else if (diff < 0) {
+                allocate = Math.max(5, allocate + diff);
+            } else if (!Fawe.get().getTimer().isAbove(targetTPS)) {
+                allocate = Math.max(5, allocate - 1);
+            }
+            long currentAllocate = allocate - absDiff;
+
+            if (!MemUtil.isMemoryFree()) {
+                // TODO reduce mem usage
+            }
+
+            long taskAllocate = currentAllocate;
+            boolean wait = false;
+            do {
+                Runnable task = syncTasks.poll();
+                if (task == null) {
+                    if (wait) {
+                        synchronized (syncTasks) {
+                            try {
+                                syncTasks.wait(1);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        task = syncTasks.poll();
+                        wait = false;
+                    } else {
+                        break;
+                    }
+                }
+                if (task != null) {
+                    task.run();
+                    wait = true;
+                }
+            } while (System.currentTimeMillis() - now < taskAllocate);
         }
         while (!syncTasks.isEmpty()) {
             final FutureTask task = syncTasks.poll();
@@ -77,19 +128,28 @@ public abstract class QueueHandler implements Trimable, Runnable {
     public <T> Future<T> sync(final Runnable run, final T value) {
         final FutureTask<T> result = new FutureTask<>(run, value);
         syncTasks.add(result);
+        notifySync();
         return result;
     }
 
     public <T> Future<T> sync(final Runnable run) {
         final FutureTask<T> result = new FutureTask<>(run, null);
         syncTasks.add(result);
+        notifySync();
         return result;
     }
 
     public <T> Future<T> sync(final Callable<T> call) {
         final FutureTask<T> result = new FutureTask<>(call);
         syncTasks.add(result);
+        notifySync();
         return result;
+    }
+
+    private void notifySync() {
+        synchronized (syncTasks) {
+            syncTasks.notifyAll();
+        }
     }
 
     public <T extends Future<T>> T submit(final IChunk<T> chunk) {
