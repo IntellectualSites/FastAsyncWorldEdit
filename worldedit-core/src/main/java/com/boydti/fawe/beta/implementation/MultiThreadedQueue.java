@@ -17,6 +17,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.World;
@@ -103,6 +104,10 @@ public class MultiThreadedQueue extends AbstractDelegateExtent implements IQueue
         return filter;
     }
 
+    public int getChanges() {
+        return -1;
+    }
+
     @Override
     public int countBlocks(final Region region, final Mask searchMask) {
         return
@@ -116,19 +121,25 @@ public class MultiThreadedQueue extends AbstractDelegateExtent implements IQueue
     @Override
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
         apply(region, block);
-        return 0;
+        return getChanges();
     }
 
     @Override
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
         apply(region, pattern);
-        return 0;
+        return getChanges();
+    }
+
+    @Override
+    public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
+        TODO
+        return getChanges();
     }
 
     @Override
     public int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
         apply(region, mask.toFilter(pattern));
-        return 0;
+        return getChanges();
     }
 
     @Override

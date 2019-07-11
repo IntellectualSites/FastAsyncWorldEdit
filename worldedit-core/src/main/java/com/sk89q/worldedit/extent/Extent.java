@@ -581,4 +581,10 @@ public interface Extent extends InputExtent, OutputExtent {
         return setBlocks(centerRegion, pattern);
     }
 
+    default int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
+        RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(getExtent(), pattern));
+        Operations.completeBlindly(visitor);
+        return 0;
+    }
+
 }

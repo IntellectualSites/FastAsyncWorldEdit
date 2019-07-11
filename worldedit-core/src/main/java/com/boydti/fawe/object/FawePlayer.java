@@ -686,39 +686,4 @@ public abstract class FawePlayer<T> extends Metadatable {
         }
         return proxy;
     }
-
-
-    /**
-     * Get the tracked EditSession(s) for this player<br>
-     * - Queued or autoqueued EditSessions are considered tracked
-     *
-     * @param requiredStage
-     * @return
-     */
-    public Map<EditSession, SetQueue.QueueStage> getTrackedSessions(SetQueue.QueueStage requiredStage) {
-        Map<EditSession, SetQueue.QueueStage> map = new ConcurrentHashMap<>(8, 0.9f, 1);
-        if (requiredStage == null || requiredStage == SetQueue.QueueStage.ACTIVE) {
-            for (FaweQueue queue : SetQueue.IMP.getActiveQueues()) {
-                Collection<EditSession> sessions = queue.getEditSessions();
-                for (EditSession session : sessions) {
-                    FawePlayer currentPlayer = session.getPlayer();
-                    if (currentPlayer == this) {
-                        map.put(session, SetQueue.QueueStage.ACTIVE);
-                    }
-                }
-            }
-        }
-        if (requiredStage == null || requiredStage == SetQueue.QueueStage.INACTIVE) {
-            for (FaweQueue queue : SetQueue.IMP.getInactiveQueues()) {
-                Collection<EditSession> sessions = queue.getEditSessions();
-                for (EditSession session : sessions) {
-                    FawePlayer currentPlayer = session.getPlayer();
-                    if (currentPlayer == this) {
-                        map.put(session, SetQueue.QueueStage.INACTIVE);
-                    }
-                }
-            }
-        }
-        return map;
-    }
 }

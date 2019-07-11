@@ -24,8 +24,6 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
@@ -45,7 +43,6 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.google.common.base.Supplier;
 import com.sk89q.jnbt.CompoundTag;
@@ -944,7 +941,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
     }
 
     public int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
-        RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(getExtent(), pattern), this);
+        RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(getExtent(), pattern));
         Operations.completeBlindly(visitor);
         changes += visitor.getAffected();
         return changes;

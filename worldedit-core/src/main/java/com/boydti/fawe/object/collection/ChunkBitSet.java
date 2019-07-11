@@ -26,6 +26,10 @@ public class ChunkBitSet {
         return rows[x >> 4].get(this.rows, x, y, z);
     }
 
+    public void add(int x, int y, int z) {
+        rows[x >> 4].add(this.rows, x, y, z);
+    }
+
     public void set(int x, int y, int z) {
         rows[x >> 4].set(this.rows, x, y, z);
     }
@@ -37,6 +41,10 @@ public class ChunkBitSet {
     private interface IRow {
         default boolean get(IRow[] rows, int x, int y, int z) { return false; }
         void set(IRow[] rows, int x, int y, int z);
+        default boolean add(IRow[] rows, int x, int y, int z) {
+            set(rows, x, y, z);
+            return true;
+        }
         default void clear(IRow[] rows, int x, int y, int z) { return; }
     }
 
@@ -86,6 +94,11 @@ public class ChunkBitSet {
         }
 
         @Override
+        public boolean add(IRow[] parent, int x, int y, int z) {
+            return this.rows[z >> 4].add(this.rows, x, y, z);
+        }
+
+        @Override
         public void clear(IRow[] parent, int x, int y, int z) {
             this.rows[z >> 4].clear(this.rows, x, y, z);
         }
@@ -107,6 +120,11 @@ public class ChunkBitSet {
         @Override
         public void set(IRow[] parent, int x, int y, int z) {
             this.rows[y >> 4].set(this.rows, x, y, z);
+        }
+
+        @Override
+        public boolean add(IRow[] parent, int x, int y, int z) {
+            return this.rows[y >> 4].add(this.rows, x, y, z);
         }
 
         @Override
@@ -132,6 +150,19 @@ public class ChunkBitSet {
         public void set(IRow[] parent, int x, int y, int z) {
             int i = ((y & 15) << 8) | ((z & 15) << 4) | (x & 15);
             bits[i >> 6] |= (1L << (i & 0x3F));
+        }
+
+        @Override
+        public boolean add(IRow[] parent, int x, int y, int z) {
+            int i = ((y & 15) << 8) | ((z & 15) << 4) | (x & 15);
+            int offset = i >> 6;
+            long value = bits[offset];
+            long mask = (1L << (i & 0x3F));
+            if ((value & mask) != 0) {
+                bits[offset] = value | mask;
+                return true;
+            }
+            return false;
         }
 
         @Override
