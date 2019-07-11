@@ -4,19 +4,14 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.implementation.SimpleCharQueueExtent;
-import com.boydti.fawe.beta.implementation.SingleThreadQueueExtent;
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
-import com.boydti.fawe.bukkit.adapter.v1_13_1.BlockMaterial_1_13;
 import com.boydti.fawe.bukkit.v1_14.adapter.BlockMaterial_1_14;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.anvil.BitArray4096;
-import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -41,6 +36,7 @@ import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -48,11 +44,7 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
-
-import sun.misc.Unsafe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -257,7 +249,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 //                sections[layer] = new ChunkSection(layer << 4);
 //            }
 //        }
-        if (playerChunk.hasBeenLoaded()) {
+        if (playerChunk.k()) {
             TaskManager.IMP.sync(new Supplier<Object>() {
                 @Override
                 public Object get() {
