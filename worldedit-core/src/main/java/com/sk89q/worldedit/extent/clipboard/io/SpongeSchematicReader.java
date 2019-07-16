@@ -184,7 +184,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 }
                 int[] pos = value.getIntArray("Pos");
                 int x,y,z;
-                if (pos == null) {
+                if (pos.length != 3) {
                     System.out.println("Invalid tile " + value);
                     if (!value.containsKey("x") || !value.containsKey("y") || !value.containsKey("z")) {
                         return;
