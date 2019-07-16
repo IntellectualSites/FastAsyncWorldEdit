@@ -1125,8 +1125,8 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final int startCheckY = fullHeight ? 0 : startPerformY;
         final int endY = region.getMaximumPoint().getBlockY();
         RegionVisitor visitor = new RegionVisitor(flat, pos -> {
-            int x = pos.getBlockX();
-            int z = pos.getBlockZ();
+            int x = pos.getX();
+            int z = pos.getZ();
             int freeSpot = startCheckY;
             for (int y = startCheckY; y <= endY; y++) {
                 if (y < startPerformY) {
@@ -1175,7 +1175,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         final BlockReplace replace = new BlockReplace(EditSession.this, pattern);
 
         // Pick how we're going to visit blocks
-        RecursiveVisitor visitor = new DirectionalVisitor(mask, replace, origin, direction, (int) (radius * 2 + 1), this);
+        RecursiveVisitor visitor = new DirectionalVisitor(mask, replace, origin, direction, (int) (radius * 2 + 1));
 
         // Start at the origin
         visitor.visit(origin);
@@ -1230,9 +1230,9 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         // Pick how we're going to visit blocks
         RecursiveVisitor visitor;
         if (recursive) {
-            visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
+            visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1));
         } else {
-            visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1), this);
+            visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1));
         }
 
         // Start at the origin
@@ -1510,7 +1510,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         int minY = region.getMinimumPoint().getBlockY();
         int maxY = Math.min(getMaximumPoint().getBlockY(), region.getMaximumPoint().getBlockY() + 1);
         SurfaceRegionFunction surface = new SurfaceRegionFunction(this, offset, minY, maxY);
-        FlatRegionVisitor visitor = new FlatRegionVisitor(asFlatRegion(region), surface, this);
+        FlatRegionVisitor visitor = new FlatRegionVisitor(asFlatRegion(region), surface);
         Operations.completeBlindly(visitor);
         return this.changes = visitor.getAffected();
     }
@@ -1674,7 +1674,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         } else {
             replace = new BlockReplace(this, (BlockTypes.AIR.getDefaultState()));
         }
-        RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
+        RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1));
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
@@ -2556,7 +2556,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     throw new RuntimeException(e);
                 }
             }
-        }, this);
+        });
         Operations.completeBlindly(visitor);
         changes += visitor.getAffected();
         return changes;
@@ -3060,12 +3060,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         }
         return false;
     }
-
-//    public void dropItem(BlockVector3 position, BaseItemStack item) {
-//        if (getWorld() != null) {
-//            getWorld().dropItem(position, item);
-//        }
-//    }
 
     @Override
     public void simulateBlockMine(BlockVector3 position) {

@@ -19,14 +19,9 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import com.boydti.fawe.object.HasFaweQueue;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-
-import java.util.Collection;
-
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,11 +38,11 @@ public class DirectionalVisitor extends RecursiveVisitor {
     private final BlockVector3 dirVec;
 
     public DirectionalVisitor(Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction) {
-        this(mask, function, origin, direction, Integer.MAX_VALUE, null);
+        this(mask, function, origin, direction, Integer.MAX_VALUE);
     }
 
-    public DirectionalVisitor(Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction, int distance, HasFaweQueue hasFaweQueue) {
-        super(mask, function, distance, hasFaweQueue);
+    public DirectionalVisitor(Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction, int distance) {
+        super(mask, function, distance);
         checkNotNull(mask);
         this.origin = origin;
         this.dirVec = direction;

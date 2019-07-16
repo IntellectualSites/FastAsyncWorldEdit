@@ -19,13 +19,11 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.jnbt.anvil.generator.CavesGen;
 import com.boydti.fawe.jnbt.anvil.generator.GenBase;
 import com.boydti.fawe.jnbt.anvil.generator.OreGen;
 import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
-
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -35,7 +33,6 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -54,7 +51,6 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -403,7 +399,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default boolean cancel() {
-
+        return true;
     }
 
     default int getMaxY() {

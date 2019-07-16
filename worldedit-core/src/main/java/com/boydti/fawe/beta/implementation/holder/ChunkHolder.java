@@ -110,8 +110,10 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
 
     private IChunkGet newGet() {
         if (extent instanceof SingleThreadQueueExtent) {
-            final WorldChunkCache cache = ((SingleThreadQueueExtent) extent).getCache();
-            return cache.get(MathMan.pairInt(X, Z), this);
+            IChunkGet newGet = extent.getCachedGet(X, Z, this);
+            if (newGet != null) {
+                return newGet;
+            }
         }
         return get();
     }

@@ -20,14 +20,7 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.example.MappedFaweQueue;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
-import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.object.collection.BlockVectorSet;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -39,10 +32,10 @@ import com.sk89q.worldedit.util.Direction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Performs a breadth-first search starting from points added with
@@ -87,7 +80,6 @@ public abstract class BreadthFirstSearch implements Operation {
     private final RegionFunction function;
     private BlockVector3[] directions;
     private BlockVectorSet visited;
-    private final MappedFaweQueue mFaweQueue;
     private BlockVectorSet queue;
     private int currentDepth = 0;
     private final int maxDepth;
@@ -105,15 +97,7 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     public BreadthFirstSearch(RegionFunction function, int maxDepth) {
-        this(function, maxDepth, null);
         checkNotNull(function);
-
-    }
-
-    public BreadthFirstSearch(RegionFunction function, int maxDepth, HasFaweQueue faweQueue) {
-        checkNotNull(function);
-        FaweQueue fq = faweQueue != null ? faweQueue.getQueue() : null;
-        this.mFaweQueue = fq instanceof MappedFaweQueue ? (MappedFaweQueue) fq : null;
         this.queue = new BlockVectorSet();
         this.visited = new BlockVectorSet();
         this.function = function;
@@ -236,28 +220,6 @@ public abstract class BreadthFirstSearch implements Operation {
         BlockVectorSet tempQueue = new BlockVectorSet();
         BlockVectorSet chunkLoadSet = new BlockVectorSet();
         for (currentDepth = 0; !queue.isEmpty() && currentDepth <= maxDepth; currentDepth++) {
-            if (mFaweQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNKS > 1) {
-                int cx = Integer.MIN_VALUE;
-                int cz = Integer.MIN_VALUE;
-                for (BlockVector3 from : queue) {
-                    for (BlockVector3 direction : dirs) {
-                        int x = from.getBlockX() + direction.getX();
-                        int z = from.getBlockZ() + direction.getZ();
-                        if (cx != (cx = x >> 4) || cz != (cz = z >> 4)) {
-                            int y = from.getBlockY() + direction.getY();
-                            if (y < 0 || y >= 256) {
-                                continue;
-                            }
-                            if (!visited.contains(x, y, z)) {
-                                chunkLoadSet.add(cx, 0, cz);
-                            }
-                        }
-                    }
-                }
-                for (BlockVector3 chunk : chunkLoadSet) {
-                    mFaweQueue.queueChunkLoad(chunk.getBlockX(), chunk.getBlockZ());
-                }
-            }
             for (BlockVector3 from : queue) {
                 if (function.apply(from)) affected++;
                 for (int i = 0, j = 0; i < dirs.length && j < maxBranch; i++) {

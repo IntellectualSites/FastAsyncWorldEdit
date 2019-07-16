@@ -9,23 +9,16 @@ import com.boydti.fawe.beta.filters.DistrFilter;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
-import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Iterator;
 import java.util.List;
@@ -132,7 +125,12 @@ public class MultiThreadedQueue extends AbstractDelegateExtent implements IQueue
 
     @Override
     public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
-        TODO
+        if (vset instanceof Region) {
+            setBlocks((Region) vset, pattern);
+        }
+        for (BlockVector3 blockVector3 : vset) {
+            pattern.apply(this, blockVector3, blockVector3);
+        }
         return getChanges();
     }
 

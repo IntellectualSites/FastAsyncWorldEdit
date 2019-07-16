@@ -2,6 +2,7 @@ package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.holder.ReferenceChunk;
 import com.boydti.fawe.config.Settings;
@@ -13,6 +14,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -38,8 +40,8 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public WorldChunkCache getCache() {
-        return cache;
+    public IChunkGet getCachedGet(int X, int Z, Supplier<IChunkGet> supplier) {
+        return cache.get(MathMan.pairInt(X, Z), supplier);
     }
 
     /**

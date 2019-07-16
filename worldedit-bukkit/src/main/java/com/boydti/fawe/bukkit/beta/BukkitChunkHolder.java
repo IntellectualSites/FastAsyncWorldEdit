@@ -6,8 +6,6 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
-import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
-import com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14;
 import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
@@ -24,7 +22,6 @@ import net.minecraft.server.v1_14_R1.Chunk;
 import net.minecraft.server.v1_14_R1.ChunkSection;
 import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityTypes;
-import net.minecraft.server.v1_14_R1.MinecraftKey;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import net.minecraft.server.v1_14_R1.NBTTagInt;
 import net.minecraft.server.v1_14_R1.TileEntity;
@@ -283,14 +280,14 @@ public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
                                 final int y = (blockHash & 0xFF);
                                 final int z = (blockHash >> 8 & 0xF) + bz;
                                 final BlockPosition pos = new BlockPosition(x, y, z);
-                                synchronized (BukkitQueue_0.class) {
+                                synchronized (nmsWorld) {
                                     TileEntity tileEntity = nmsWorld.getTileEntity(pos);
                                     if (tileEntity == null || tileEntity.isRemoved()) {
                                         nmsWorld.removeTileEntity(pos);
                                         tileEntity = nmsWorld.getTileEntity(pos);
                                     }
                                     if (tileEntity != null) {
-                                        final NBTTagCompound tag = (NBTTagCompound) BukkitQueue_1_14.fromNative(nativeTag);
+                                        final NBTTagCompound tag = (NBTTagCompound) fromNative(nativeTag);
                                         tag.set("x", new NBTTagInt(x));
                                         tag.set("y", new NBTTagInt(y));
                                         tag.set("z", new NBTTagInt(z));

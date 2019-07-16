@@ -10,6 +10,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.Flushable;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 /**
  * TODO: implement Extent (need to refactor Extent first)
@@ -22,7 +23,7 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      * Get the {@link WorldChunkCache}
      * @return
      */
-    WorldChunkCache getCache();
+    IChunkGet getCachedGet(int X, int Z, Supplier<IChunkGet> supplier);
 
     /**
      * Get the IChunk at a position (and cache it if it's not already)
@@ -67,12 +68,12 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
 
     @Override
     default BlockVector3 getMinimumPoint() {
-        return getCache().getWorld().getMinimumPoint();
+        return getWorld().getMinimumPoint();
     }
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return getCache().getWorld().getMaximumPoint();
+        return getWorld().getMaximumPoint();
     }
     /**
      * Create a new root IChunk object<br>
