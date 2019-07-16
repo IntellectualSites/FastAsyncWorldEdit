@@ -570,7 +570,10 @@ public class BukkitChunk_1_13 extends IntFaweChunk<Chunk, BukkitQueue_1_13> {
                         for (Map.Entry<BlockPosition, TileEntity> entry : toRemove.entrySet()) {
                             BlockPosition bp = entry.getKey();
                             TileEntity tile = entry.getValue();
-                            nmsWorld.n(bp);
+                            tile.y();
+//                            nmsWorld.c.remove(bp);
+//                            nmsWorld.tileEntityList.remove(bp);
+//                            nmsWorld.tileEntityListTick.remove(bp);
                             tiles.remove(bp);
                             tile.z();
                             tile.invalidateBlockCache();
