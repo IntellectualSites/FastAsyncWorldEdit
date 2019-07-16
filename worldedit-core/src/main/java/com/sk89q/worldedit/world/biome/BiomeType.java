@@ -29,12 +29,20 @@ public class BiomeType implements RegistryItem {
 
     public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type");
     private final String id;
+    private int legacyId = -1;
+    private int internalId;
 
     public BiomeType(String id) {
         this.id = id;
     }
 
-    private int internalId;
+    public int getLegacyId() {
+        return legacyId;
+    }
+
+    public void setLegacyId(int legacyId) {
+        this.legacyId = legacyId;
+    }
 
     @Override
     public void setInternalId(int internalId) {
