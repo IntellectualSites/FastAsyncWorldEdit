@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.entity;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 
 public class EntityTypes {
 
@@ -133,71 +134,113 @@ public class EntityTypes {
         return EntityType.REGISTRY.get(id);
     }
 
-    public static EntityType parse(String id) {
+    private static String convertEntityId(String id) {
         if (id.startsWith("minecraft:")) id = id.substring(10);
-        switch (id) {
-            case "FallingSand": return EntityTypes.FALLING_BLOCK;
-            case "FireworksRocketEntity": return EntityTypes.FIREWORK_ROCKET;
-            case "LavaSlime": return EntityTypes.MAGMA_CUBE;
-            case "MinecartChest": return EntityTypes.CHEST_MINECART;
-            case "MinecartCommandBlock": return EntityTypes.COMMAND_BLOCK_MINECART;
-            case "MinecartFurnace": return EntityTypes.FURNACE_MINECART;
-            case "MinecartHopper": return EntityTypes.HOPPER_MINECART;
-            case "MinecartRideable": return EntityTypes.MINECART;
-            case "MinecartSpawner": return EntityTypes.SPAWNER_MINECART;
-            case "MinecartTNT": return EntityTypes.TNT_MINECART;
-            case "MushroomCow": return EntityTypes.MOOSHROOM;
-            case "PigZombie": return EntityTypes.ZOMBIE_PIGMAN;
-            case "PrimedTnt": return EntityTypes.TNT;
-            case "SnowMan": return EntityTypes.SNOW_GOLEM;
-            case "ThrownEgg": return EntityTypes.EGG;
-            case "ThrownEnderpearl": return EntityTypes.ENDER_PEARL;
-            case "ThrownExpBottle": return EntityTypes.EXPERIENCE_BOTTLE;
-            case "ThrownPotion": return EntityTypes.POTION;
-            case "WitherBoss": return EntityTypes.WITHER;
-            case "XPOrb": return EntityTypes.EXPERIENCE_ORB;
-            default:
+        switch(id) {
+            case "AreaEffectCloud": return "area_effect_cloud";
+            case "ArmorStand": return "armor_stand";
+            case "CaveSpider": return "cave_spider";
+            case "MinecartChest": return "chest_minecart";
+            case "DragonFireball": return "dragon_fireball";
+            case "ThrownEgg": return "egg";
+            case "EnderDragon": return "ender_dragon";
+            case "ThrownEnderpearl": return "ender_pearl";
+            case "FallingSand": return "falling_block";
+            case "FireworksRocketEntity": return "fireworks_rocket";
+            case "MinecartFurnace": return "furnace_minecart";
+            case "MinecartHopper": return "hopper_minecart";
+            case "EntityHorse": return "horse";
+            case "ItemFrame": return "item_frame";
+            case "LeashKnot": return "leash_knot";
+            case "LightningBolt": return "lightning_bolt";
+            case "LavaSlime": return "magma_cube";
+            case "MinecartRideable": return "minecart";
+            case "MushroomCow": return "mooshroom";
+            case "Ozelot": return "ocelot";
+            case "PolarBear": return "polar_bear";
+            case "ThrownPotion": return "potion";
+            case "ShulkerBullet": return "shulker_bullet";
+            case "SmallFireball": return "small_fireball";
+            case "MinecartSpawner": return "spawner_minecart";
+            case "SpectralArrow": return "spectral_arrow";
+            case "PrimedTnt": return "tnt";
+            case "MinecartTNT": return "tnt_minecart";
+            case "VillagerGolem": return "villager_golem";
+            case "WitherBoss": return "wither";
+            case "WitherSkull": return "wither_skull";
+            case "PigZombie": return "zombie_pigman";
+            case "XPOrb": return "experience_orb";
+            case "ThrownExpBottle": return "experience_bottle";
+            case "EyeOfEnderSignal": return "eye_of_ender";
+            case "EnderCrystal": return "end_crystal";
+            case "MinecartCommandBlock": return "command_block_minecart";
+            case "SnowMan": return "snow_golem";
+            case "areaeffectcloud": return "area_effect_cloud";
+            case "armorstand": return "armor_stand";
+            case "cavespider": return "cave_spider";
+            case "minecartchest": return "chest_minecart";
+            case "dragonfireball": return "dragon_fireball";
+            case "thrownegg": return "egg";
+            case "enderdragon": return "ender_dragon";
+            case "thrownenderpearl": return "ender_pearl";
+            case "fallingsand": return "falling_block";
+            case "fireworksrocketentity": return "fireworks_rocket";
+            case "minecartfurnace": return "furnace_minecart";
+            case "minecarthopper": return "hopper_minecart";
+            case "entityhorse": return "horse";
+            case "itemframe": return "item_frame";
+            case "leashknot": return "leash_knot";
+            case "lightningbolt": return "lightning_bolt";
+            case "lavaslime": return "magma_cube";
+            case "minecartrideable": return "minecart";
+            case "mushroomcow": return "mooshroom";
+            case "ozelot": return "ocelot";
+            case "polarbear": return "polar_bear";
+            case "thrownpotion": return "potion";
+            case "shulkerbullet": return "shulker_bullet";
+            case "smallfireball": return "small_fireball";
+            case "minecartspawner": return "spawner_minecart";
+            case "spectralarrow": return "spectral_arrow";
+            case "primedtnt": return "tnt";
+            case "minecarttnt": return "tnt_minecart";
+            case "villagergolem": return "villager_golem";
+            case "witherboss": return "wither";
+            case "witherskull": return "wither_skull";
+            case "pigzombie": return "zombie_pigman";
+            case "xporb":
+            case "xp_orb":
+                return "experience_orb";
+            case "thrownexpbottle":
+            case "xp_bottle":
+                return "experience_bottle";
+            case "eyeofendersignal":
+            case "eye_of_ender_signal":
+                return "eye_of_ender";
+            case "endercrystal":
+            case "ender_crystal":
+                return "end_crystal";
+            case "fireworks_rocket": return "firework_rocket";
+            case "minecartcommandblock":
+            case "commandblock_minecart":
+                return "command_block_minecart";
+            case "snowman":
+                return "snow_golem";
+            case "villager_golem": return "iron_golem";
+            case "evocation_fangs": return "evoker_fangs";
+            case "evocation_illager": return "evoker";
+            case "vindication_illager": return "vindicator";
+            case "illusion_illager": return "illusioner";
+            default: {
                 if (Character.isUpperCase(id.charAt(0))) {
-                    StringBuilder result = new StringBuilder();
-                    for (int i = 0; i < id.length(); i++) {
-                        char c = id.charAt(i);
-                        if (Character.isUpperCase(c)) {
-                            c = Character.toLowerCase(c);
-                            if (i != 0) result.append('_');
-                        }
-                        result.append(c);
-                    }
-                    return parse(result.toString());
+                    return convertEntityId(id.toLowerCase(Locale.ROOT));
                 }
-                switch (id.toLowerCase()) {
-                    case "xp_orb":
-                        return EntityTypes.EXPERIENCE_ORB;
-                    case "xp_bottle":
-                        return EntityTypes.EXPERIENCE_BOTTLE;
-                    case "eye_of_ender_signal":
-                        return EntityTypes.EYE_OF_ENDER;
-                    case "ender_crystal":
-                        return EntityTypes.END_CRYSTAL;
-                    case "fireworks_rocket":
-                        return EntityTypes.FIREWORK_ROCKET;
-                    case "commandblock_minecart":
-                        return EntityTypes.COMMAND_BLOCK_MINECART;
-                    case "snowman":
-                        return EntityTypes.SNOW_GOLEM;
-                    case "villager_golem":
-                        return EntityTypes.IRON_GOLEM;
-                    case "evocation_fangs":
-                        return EntityTypes.EVOKER_FANGS;
-                    case "evocation_illager":
-                        return EntityTypes.EVOKER;
-                    case "vindication_illager":
-                        return EntityTypes.VINDICATOR;
-                    case "illusion_illager":
-                        return EntityTypes.ILLUSIONER;
-                    default:
-                        return get(id);
-                }
+                return id;
+            }
         }
+    }
+
+    public static EntityType parse(String id) {
+        return get(convertEntityId(id));
     }
 
 }

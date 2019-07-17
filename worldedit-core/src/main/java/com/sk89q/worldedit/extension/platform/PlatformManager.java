@@ -408,7 +408,6 @@ public class PlatformManager {
         }
 
         try {
-            Tool tool = session.getTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
             switch (event.getInputType()) {
                 case PRIMARY: {
                     if (getConfiguration().navigationWandMaxDistance > 0 && player.getItemInHand(HandSide.MAIN_HAND).getType().getId().equals(getConfiguration().navigationWand)) {
@@ -426,7 +425,7 @@ public class PlatformManager {
                         event.setCancelled(true);
                         return;
                     }
-
+                    Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
                         FawePlayer<?> fp = FawePlayer.wrap(player);
                         fp.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING), getConfiguration(), player, session));
@@ -450,7 +449,7 @@ public class PlatformManager {
                         event.setCancelled(true);
                         return;
                     }
-
+                    Tool tool = session.getTool(player);
                     if (tool instanceof TraceTool && tool.canUse(player)) {
                         FawePlayer<?> fp = FawePlayer.wrap(player);
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true

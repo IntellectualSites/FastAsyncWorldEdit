@@ -65,7 +65,7 @@ public class BiomeType implements RegistryItem, Keyed {
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return this.internalId; // stop changing this
     }
 
     @Override

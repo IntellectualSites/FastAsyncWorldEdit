@@ -15,7 +15,7 @@ public class SingleBlockTypeMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return getExtent().getBlock(vector).getInternalId() == internalId;
+        return getExtent().getBlock(vector).getBlockType().getInternalId() == internalId;
     }
 
     @Override

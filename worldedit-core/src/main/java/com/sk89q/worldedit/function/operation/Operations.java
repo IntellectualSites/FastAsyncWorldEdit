@@ -27,6 +27,8 @@ import com.sk89q.worldedit.WorldEditException;
  */
 public final class Operations {
 
+    private static final RunContext context = new RunContext();
+
     private Operations() {
     }
 
@@ -38,7 +40,7 @@ public final class Operations {
      */
     public static void complete(Operation op) throws WorldEditException {
         while (op != null) {
-            op = op.resume(new RunContext());
+            op = op.resume(context);
         }
     }
 
@@ -52,7 +54,7 @@ public final class Operations {
     public static void completeLegacy(Operation op) throws MaxChangedBlocksException {
         while (op != null) {
             try {
-                op = op.resume(new RunContext());
+                op = op.resume(context);
             } catch (MaxChangedBlocksException e) {
                 throw e;
             } catch (WorldEditException e) {
@@ -71,7 +73,7 @@ public final class Operations {
     public static void completeBlindly(Operation op) {
         while (op != null) {
             try {
-                op = op.resume(new RunContext());
+                op = op.resume(context);
             } catch (WorldEditException e) {
                 throw new RuntimeException(e);
             }

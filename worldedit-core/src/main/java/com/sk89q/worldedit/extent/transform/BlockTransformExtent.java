@@ -94,11 +94,19 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     private static long[] adapt(Direction... dirs) {
-        return Arrays.stream(dirs).mapToLong(dir -> 1L << dir.ordinal()).toArray();
+        long[] arr = new long[dirs.length];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = 1L << dirs[i].ordinal();
+        }
+        return arr;
     }
 
     private static long[] adapt(Long... dirs) {
-        return Arrays.stream(dirs).mapToLong(dir -> dir).toArray();
+        long[] arr = new long[dirs.length];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = dirs[i];
+        }
+        return arr;
     }
 
     private static long[] getDirections(AbstractProperty property) {
@@ -506,37 +514,4 @@ public class BlockTransformExtent extends ResettableExtent {
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
         return super.setBlock(x, y, z, transformInverse(block));
     }
-
-    /**
-     * Get the new value with the transformed direction.
-     *
-     * @param allowedStates the allowed states
-     * @param transform the transform
-     * @param oldDirection the old direction to transform
-     * @return a new state or null if none could be found
-     */
-    @Nullable
-    private static Vector3 getNewStateValue(List<Direction> allowedStates, Transform transform, Vector3 oldDirection) {
-        Vector3 newDirection = transform.apply(oldDirection).subtract(transform.apply(Vector3.ZERO)).normalize();
-        Vector3 newValue = null;
-        double closest = -2;
-        boolean found = false;
-
-        for (Direction v : allowedStates) {
-            double dot = v.toVector().normalize().dot(newDirection);
-            if (dot >= closest) {
-                closest = dot;
-                newValue = v.toVector();
-                found = true;
-            }
-        }
-
-        if (found) {
-            return newValue;
-        } else {
-            return null;
-        }
-    }
-
-
 }

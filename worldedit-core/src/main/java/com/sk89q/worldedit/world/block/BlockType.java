@@ -99,6 +99,18 @@ public class BlockType implements FawePattern, Keyed {
         }
     }
 
+    public BlockState withProperties(String properties) { //
+        int id = getInternalId();
+        for (String keyPair : properties.split(",")) {
+            String[] split = keyPair.split("=");
+            String name = split[0];
+            String value = split[1];
+            AbstractProperty btp = settings.propertiesMap.get(name);
+            id = btp.modify(id, btp.getValueFor(value));
+        }
+        return withStateId(id);
+    }
+
     @Deprecated
     public BlockState withPropertyId(int propertyId) {
         if (settings.stateOrdinals == null) return settings.defaultState;
@@ -140,11 +152,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return The property
      */
     public <V> Property<V> getProperty(String name) {
-        // Assume it works, CCE later at runtime if not.
-        @SuppressWarnings("unchecked")
-        Property<V> property = (Property<V>) getPropertyMap().get(name);
-        checkArgument(property != null, "%s has no property named %s", this, name);
-        return property;
+        return (Property<V>) this.settings.propertiesMap.get(name);  // stop changing this (performance)
     }
 
     public boolean hasProperty(PropertyKey key) {
@@ -269,12 +277,12 @@ public class BlockType implements FawePattern, Keyed {
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return settings.internalId; // stop changing this to WEs bad hashcode
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof BlockType && this.id.equals(((BlockType) obj).id);
+        return obj == this; // stop changing this to a shitty string comparison
     }
 
 

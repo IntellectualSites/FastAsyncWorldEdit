@@ -9,25 +9,14 @@ import com.boydti.fawe.object.number.MutableLong;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.NBTConstants;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.Tag;
+import com.sk89q.jnbt.*;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class MCAChunk extends FaweChunk<Void> {
@@ -88,9 +77,6 @@ public class MCAChunk extends FaweChunk<Void> {
     }
 
     public void write(NBTOutputStream nbtOut) throws IOException {
-
-
-
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeLazyCompoundTag("Level", out -> {
             out.writeNamedTag("V", (byte) 1);
@@ -107,7 +93,7 @@ public class MCAChunk extends FaweChunk<Void> {
                 out.writeNamedEmptyList("TileEntities");
             } else {
                 out.writeNamedTag("TileEntities", new ListTag(CompoundTag.class,
-                    new ArrayList<>(tiles.values())));
+                        new ArrayList<>(tiles.values())));
             }
             out.writeNamedTag("InhabitedTime", inhabitedTime);
             out.writeNamedTag("LastUpdate", lastUpdate);
@@ -116,9 +102,12 @@ public class MCAChunk extends FaweChunk<Void> {
             }
             out.writeNamedTag("HeightMap", heightMap);
             out.writeNamedTagName("Sections", NBTConstants.TYPE_LIST);
-            nbtOut.writeByte(NBTConstants.TYPE_COMPOUND);
-            int len = (int) Arrays.stream(ids).filter(Objects::nonNull).count();
-            nbtOut.writeInt(len);
+            nbtOut.getOutputStream().writeByte(NBTConstants.TYPE_COMPOUND);
+            int len = 0;
+            for (int[] id : ids) {
+                if (id != null) len++;
+            }
+            nbtOut.getOutputStream().writeInt(len);
             for (int layer = 0; layer < ids.length; layer++) {
                 int[] idLayer = ids[layer];
                 if (idLayer == null) {
@@ -436,9 +425,9 @@ public class MCAChunk extends FaweChunk<Void> {
         blockLight = new byte[16][];
         NBTStreamer streamer = new NBTStreamer(nis);
         streamer.addReader(".Level.InhabitedTime",
-            (BiConsumer<Integer, Long>) (index, value) -> inhabitedTime = value);
+                (BiConsumer<Integer, Long>) (index, value) -> inhabitedTime = value);
         streamer.addReader(".Level.LastUpdate",
-            (BiConsumer<Integer, Long>) (index, value) -> lastUpdate = value);
+                (BiConsumer<Integer, Long>) (index, value) -> lastUpdate = value);
         streamer.addReader(".Level.Sections.#", (BiConsumer<Integer, CompoundTag>) (index, tag) -> {
             int layer = tag.getByte("Y");
             ids[layer] = tag.getIntArray("Blocks");
@@ -446,31 +435,31 @@ public class MCAChunk extends FaweChunk<Void> {
             blockLight[layer] = tag.getByteArray("BlockLight");
         });
         streamer.addReader(".Level.TileEntities.#",
-            (BiConsumer<Integer, CompoundTag>) (index, tile) -> {
-                int x1 = tile.getInt("x") & 15;
-                int y = tile.getInt("y");
-                int z1 = tile.getInt("z") & 15;
-                short pair = MathMan.tripleBlockCoord(x1, y, z1);
-                tiles.put(pair, tile);
-            });
+                (BiConsumer<Integer, CompoundTag>) (index, tile) -> {
+                    int x1 = tile.getInt("x") & 15;
+                    int y = tile.getInt("y");
+                    int z1 = tile.getInt("z") & 15;
+                    short pair = MathMan.tripleBlockCoord(x1, y, z1);
+                    tiles.put(pair, tile);
+                });
         streamer.addReader(".Level.Entities.#",
-            (BiConsumer<Integer, CompoundTag>) (index, entityTag) -> {
-                if (entities == null) {
-                    entities = new HashMap<>();
-                }
-                long least = entityTag.getLong("UUIDLeast");
-                long most = entityTag.getLong("UUIDMost");
-                entities.put(new UUID(most, least), entityTag);
-            });
+                (BiConsumer<Integer, CompoundTag>) (index, entityTag) -> {
+                    if (entities == null) {
+                        entities = new HashMap<>();
+                    }
+                    long least = entityTag.getLong("UUIDLeast");
+                    long most = entityTag.getLong("UUIDMost");
+                    entities.put(new UUID(most, least), entityTag);
+                });
         streamer.addReader(".Level.Biomes",
-            (BiConsumer<Integer, byte[]>) (index, value) -> biomes = value);
+                (BiConsumer<Integer, byte[]>) (index, value) -> biomes = value);
         streamer.addReader(".Level.HeightMap",
-            (BiConsumer<Integer, int[]>) (index, value) -> heightMap = value);
+                (BiConsumer<Integer, int[]>) (index, value) -> heightMap = value);
         if (readPos) {
             streamer.addReader(".Level.xPos",
-                (BiConsumer<Integer, Integer>) (index, value) -> MCAChunk.this.setLoc(getParent(), value, getZ()));
+                    (BiConsumer<Integer, Integer>) (index, value) -> MCAChunk.this.setLoc(getParent(), value, getZ()));
             streamer.addReader(".Level.zPos",
-                (BiConsumer<Integer, Integer>) (index, value) -> MCAChunk.this.setLoc(getParent(), getX(), value));
+                    (BiConsumer<Integer, Integer>) (index, value) -> MCAChunk.this.setLoc(getParent(), getX(), value));
         }
         streamer.readFully();
     }
@@ -610,14 +599,14 @@ public class MCAChunk extends FaweChunk<Void> {
     public BiomeType[] getBiomeArray() {
         BiomeType[] arr = new BiomeType[256];
         for (int i = 0; i < arr.length; i++) {
-            arr[i] = BiomeTypes.register(biomes[i]);
+            arr[i] = BiomeTypes.get(biomes[i]);
         }
         return arr;
     }
 
     @Override
     public BiomeType getBiomeType(int x, int z) {
-        return BiomeTypes.register(biomes[(x & 15) + ((z & 15) << 4)]);
+        return BiomeTypes.get(biomes[(x & 15) + ((z & 15) << 4)]);
     }
 
     @Override

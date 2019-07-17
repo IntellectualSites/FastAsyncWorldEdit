@@ -62,7 +62,9 @@ import java.util.Map;
 
 /**
  * Reads schematic files that are compatible with MCEdit and other editors.
+ * @deprecated Use SchematicStreamer
  */
+@Deprecated
 public class MCEditSchematicReader extends NBTSchematicReader {
 
     private static final Logger log = LoggerFactory.getLogger(MCEditSchematicReader.class);
@@ -355,6 +357,10 @@ public class MCEditSchematicReader extends NBTSchematicReader {
 
     private String convertBlockEntityId(String id) {
         switch (id) {
+            case "Chest":
+                return "chest";
+            case "Sign":
+                return "sign";
             case "Cauldron":
                 return "brewing_stand";
             case "Control":

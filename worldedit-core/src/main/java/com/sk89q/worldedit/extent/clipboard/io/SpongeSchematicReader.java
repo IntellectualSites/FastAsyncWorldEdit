@@ -125,49 +125,22 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         }
     }
 
-    private Clipboard reader(UUID uuid) throws IOException {
-        NamedTag rootTag = inputStream.readNamedTag();
-        if (!rootTag.getName().equals("Schematic")) {
-            throw new IOException("Tag 'Schematic' does not exist or is not first");
-        }
-        CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
-
-        // Check
-        Map<String, Tag> schematic = schematicTag.getValue();
-
-        int version = requireTag(schematic, "Version", IntTag.class).getValue();
-        final Platform platform = WorldEdit.getInstance().getPlatformManager()
-                .queryCapability(Capability.WORLD_EDITING);
-        int liveDataVersion = platform.getDataVersion();
-
-        if (version == 1) {
-            dataVersion = 1631; // this is a relatively safe assumption unless someone imports a schematic from 1.12, e.g. sponge 7.1-
-            fixer = platform.getDataFixer();
-            return readVersion1(uuid);
-        } else if (version == 2) {
-            dataVersion = requireTag(schematic, "DataVersion", IntTag.class).getValue();
-            if (dataVersion > liveDataVersion) {
-                log.warn("Schematic was made in a newer Minecraft version ({} > {}). Data may be incompatible.",
-                         dataVersion, liveDataVersion);
-            } else if (dataVersion < liveDataVersion) {
-                fixer = platform.getDataFixer();
-                if (fixer != null) {
-                    log.info("Schematic was made in an older Minecraft version ({} < {}), will attempt DFU.",
-                             dataVersion, liveDataVersion);
-                } else {
-                    log.info("Schematic was made in an older Minecraft version ({} < {}), but DFU is not available. Data may be incompatible.",
-                             dataVersion, liveDataVersion);
-                }
-            }
-
-            BlockArrayClipboard clip = readVersion1(uuid);
-            return readVersion2(clip, schematicTag);
-        }
-
-        throw new IOException("This schematic version is currently not supported");
+    private String fix(String palettePart) {
+        if (fixer == null || dataVersion == -1) return palettePart;
+        return fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, palettePart, dataVersion);
     }
 
-    private BlockArrayClipboard readVersion1(UUID uuid) throws IOException {
+    private CompoundTag fixBlockEntity(CompoundTag tag) {
+        if (fixer == null || dataVersion == -1) return tag;
+        return fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, tag, dataVersion);
+    }
+
+    private CompoundTag fixEntity(CompoundTag tag) {
+        if (fixer == null || dataVersion == -1) return tag;
+        return fixer.fixUp(DataFixer.FixTypes.ENTITY, tag, dataVersion);
+    }
+
+    private Clipboard reader(UUID uuid) throws IOException {
         width = height = length = offsetX = offsetY = offsetZ = Integer.MIN_VALUE;
 
         final BlockArrayClipboard clipboard = new BlockArrayClipboard(new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(0, 0, 0)), fc);
@@ -176,6 +149,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 
 
         NBTStreamer streamer = new NBTStreamer(inputStream);
+        streamer.addReader("Schematic.DataVersion", (BiConsumer<Integer, Short>) (i, v) -> dataVersion = v);
         streamer.addReader("Schematic.Width", (BiConsumer<Integer, Short>) (i, v) -> width = v);
         streamer.addReader("Schematic.Height", (BiConsumer<Integer, Short>) (i, v) -> height = v);
         streamer.addReader("Schematic.Length", (BiConsumer<Integer, Short>) (i, v) -> length = v);
@@ -188,7 +162,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             for (Map.Entry<String, Tag> entry : v.entrySet()) {
                 BlockState state = null;
                 try {
-                    state = BlockState.get(entry.getKey());
+                    String palettePart = fix(entry.getKey());
+                    state = BlockState.get(palettePart);
                 } catch (InputParseException e) {
                     e.printStackTrace();
                 }
@@ -196,6 +171,9 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 palette[index] = (char) state.getOrdinal();
             }
         });
+
+        /// readBiomes
+
         streamer.addReader("Schematic.BlockData.#", new NBTStreamer.LazyReader() {
             @Override
             public void accept(Integer arrayLen, DataInputStream dis) {
@@ -224,21 +202,40 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             int x = pos[0];
             int y = pos[1];
             int z = pos[2];
+            Map<String, Tag> values = value.getValue();
+            Tag id = values.get("Id");
+            if (id != null) {
+                values.put("x", new IntTag(x));
+                values.put("y", new IntTag(y));
+                values.put("z", new IntTag(z));
+                values.put("id", id);
+            }
+            values.remove("Id");
+            values.remove("Pos");
+            value = fixBlockEntity(value);
             fc.setTile(x, y, z, value);
         });
         streamer.addReader("Schematic.Entities.#", (BiConsumer<Integer, CompoundTag>) (index, compound) -> {
             if (fc == null) {
                 setupClipboard(0, uuid);
             }
-            String id = compound.getString("id");
-            if (id.isEmpty()) {
-                return;
+            Map<String, Tag> value = compound.getValue();
+            StringTag id = (StringTag) value.get("Id");
+            if (id == null) {
+                id = (StringTag) value.get("id");
+                if (id == null) {
+                    return;
+                }
+            } else {
+                value.put("id", id);
+                value.remove("Id");
             }
+
             ListTag positionTag = compound.getListTag("Pos");
             ListTag directionTag = compound.getListTag("Rotation");
-            EntityType type = EntityTypes.parse(id);
+            EntityType type = EntityTypes.parse(id.getValue());
             if (type != null) {
-                compound.getValue().put("Id", new StringTag(type.getId()));
+                compound = fixEntity(compound);
                 BaseEntity state = new BaseEntity(type, compound);
                 fc.createEntity(clipboard, positionTag.asDouble(0), positionTag.asDouble(1), positionTag.asDouble(2), (float) directionTag.asDouble(0), (float) directionTag.asDouble(1), state);
             } else {
@@ -274,24 +271,13 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
                 int volume = width * length;
                 for (int index = 0; index < volume; index++) {
-                    fc.setBiome(index, BiomeTypes.register(fis.read()));
+                    fc.setBiome(index, BiomeTypes.get(fis.read()));
                 }
             }
         }
         clipboard.init(region, fc);
         clipboard.setOrigin(origin);
         return clipboard;
-    }
-
-    private Clipboard readVersion2(BlockArrayClipboard version1, CompoundTag schematicTag) throws IOException {
-        Map<String, Tag> schematic = schematicTag.getValue();
-        if (schematic.containsKey("BiomeData")) {
-            readBiomes(version1, schematic);
-        }
-        if (schematic.containsKey("Entities")) {
-            readEntities(version1, schematic);
-        }
-        return version1;
     }
 
     private void readBiomes(BlockArrayClipboard clipboard, Map<String, Tag> schematic) throws IOException {
@@ -309,7 +295,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             if (fixer != null) {
                 key = fixer.fixUp(DataFixer.FixTypes.BIOME, key, dataVersion);
             }
-            BiomeType biome = BiomeTypes.register(key);
+            BiomeType biome = BiomeTypes.get(key);
             if (biome == null) {
                 log.warn("Unknown biome type :" + key +
                         " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
@@ -349,37 +335,6 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             BiomeType type = palette.get(bVal);
             clipboard.setBiome(min.add(x, z), type);
             biomeIndex++;
-        }
-    }
-
-    private void readEntities(BlockArrayClipboard clipboard, Map<String, Tag> schematic) throws IOException {
-        List<Tag> entList = requireTag(schematic, "Entities", ListTag.class).getValue();
-        if (entList.isEmpty()) {
-            return;
-        }
-        for (Tag et : entList) {
-            if (!(et instanceof CompoundTag)) {
-                continue;
-            }
-            CompoundTag entityTag = (CompoundTag) et;
-            Map<String, Tag> tags = entityTag.getValue();
-            String id = requireTag(tags, "Id", StringTag.class).getValue();
-            entityTag = entityTag.createBuilder().putString("id", id).remove("Id").build();
-
-            if (fixer != null) {
-                entityTag = fixer.fixUp(DataFixer.FixTypes.ENTITY, entityTag, dataVersion);
-            }
-
-            EntityType entityType = EntityTypes.get(id);
-            if (entityType != null) {
-                Location location = NBTConversions.toLocation(clipboard,
-                        requireTag(tags, "Pos", ListTag.class),
-                        requireTag(tags, "Rotation", ListTag.class));
-                BaseEntity state = new BaseEntity(entityType, entityTag);
-                clipboard.createEntity(location, state);
-            } else {
-                log.warn("Unknown entity when pasting schematic: " + id);
-            }
         }
     }
 

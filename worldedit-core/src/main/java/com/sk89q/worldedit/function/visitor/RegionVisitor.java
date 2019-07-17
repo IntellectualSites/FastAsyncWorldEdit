@@ -39,7 +39,9 @@ import java.util.List;
 
 /**
  * Utility class to apply region functions to {@link com.sk89q.worldedit.regions.Region}.
+ * @deprecated let the queue iterate, not the region function which lacks any kind of optimizations / parallelism
  */
+@Deprecated
 public class RegionVisitor implements Operation {
 
     public final Region region;

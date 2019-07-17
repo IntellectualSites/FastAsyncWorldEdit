@@ -25,8 +25,10 @@ import com.boydti.fawe.util.IOUtil;
 import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.*;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -107,7 +109,8 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
         final DataOutput rawStream = outputStream.getOutputStream();
         outputStream.writeLazyCompoundTag("Schematic", out -> {
-            out.writeNamedTag("Version", 1);
+            out.writeNamedTag("DataVersion", WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion());
+            out.writeNamedTag("Version", CURRENT_VERSION);
             out.writeNamedTag("Width", (short) width);
             out.writeNamedTag("Height", (short) height);
             out.writeNamedTag("Length", (short) length);
@@ -224,6 +227,11 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 out.writeNamedEmptyList("TileEntities");
             }
 
+            if (clipboard.hasBiomes()) {
+                writeBiomes(clipboard, out);
+            }
+
+            TODO optimize
             List<Tag> entities = new ArrayList<>();
             for (Entity entity : clipboard.getEntities()) {
                 BaseEntity state = entity.getState();
@@ -238,7 +246,8 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                     }
 
                     // Store our location data, overwriting any
-                    values.put("id", new StringTag(state.getType().getId()));
+                    values.remove("id");
+                    values.put("Id", new StringTag(state.getType().getId()));
                     values.put("Pos", writeVector(entity.getLocation()));
                     values.put("Rotation", writeRotation(entity.getLocation()));
 
@@ -251,20 +260,11 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             } else {
                 out.writeNamedTag("Entities", new ListTag(CompoundTag.class, entities));
             }
-
-            // version 2 stuff
-            if (clipboard.hasBiomes()) {
-                writeBiomes(clipboard, out);
-            }
-
-            if (!clipboard.getEntities().isEmpty()) {
-                writeEntities(clipboard, out);
-            }
-
         });
     }
 
     private void writeBiomes(Clipboard clipboard, NBTOutputStream schematic) throws IOException {
+        TODO optimize
         BlockVector3 min = clipboard.getMinimumPoint();
         int width = clipboard.getRegion().getWidth();
         int length = clipboard.getRegion().getLength();

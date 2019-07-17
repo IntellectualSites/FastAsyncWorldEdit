@@ -75,7 +75,7 @@ public class ForwardExtentCopy implements Operation {
     private int repetitions = 1;
     private Mask sourceMask = Masks.alwaysTrue();
     private boolean removingEntities;
-    private boolean copyingEntities = true; // default to true for backwards compatibility, sort of
+    private boolean copyingEntities = true; // default to true for backwards compatibility, sort of // No, it's not for compatibility, it makes sense for entities to be copied and people will get annoyed if it doesn't
     private boolean copyingBiomes;
     private RegionFunction sourceFunction = null;
     private Transform transform = new Identity();
