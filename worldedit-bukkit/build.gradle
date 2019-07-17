@@ -18,25 +18,25 @@ configurations.all { Configuration it ->
 dependencies {
     api project(':worldedit-core')
     api project(':worldedit-libs:bukkit')
-    compile 'net.milkbowl.vault:VaultAPI:1.7'
-    compile 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
+    compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
+    compileOnly 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
     implementation 'io.papermc:paperlib:1.0.2'
     compileOnly 'com.sk89q:dummypermscompat:1.10'
-    compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
     implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.8.1'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
-    compile 'com.massivecraft:factions:2.8.0'
-    compile 'com.drtshock:factions:1.6.9.5'
-    compile 'com.factionsone:FactionsOne:1.2.2'
-    compile 'me.ryanhamshire:GriefPrevention:11.5.2'
-    compile 'com.massivecraft:mcore:7.0.1'
-    compile 'net.sacredlabyrinth.Phaed:PreciousStones:10.0.4-SNAPSHOT'
-    compile 'net.jzx7:regios:5.9.9'
-    compile 'com.bekvon.bukkit.residence:Residence:4.5._13.1'
-    compile 'com.palmergames.bukkit:towny:0.84.0.9'
-    compile 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
-    compile 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
-    compile 'com.wasteofplastic:askyblock:3.0.8.2'
+    compileOnly 'com.massivecraft:factions:2.8.0'
+    compileOnly 'com.drtshock:factions:1.6.9.5'
+    compileOnly 'com.factionsone:FactionsOne:1.2.2'
+    compileOnly 'me.ryanhamshire:GriefPrevention:11.5.2'
+    compileOnly 'com.massivecraft:mcore:7.0.1'
+    compileOnly 'net.sacredlabyrinth.Phaed:PreciousStones:10.0.4-SNAPSHOT'
+    compileOnly 'net.jzx7:regios:5.9.9'
+    compileOnly 'com.bekvon.bukkit.residence:Residence:4.5._13.1'
+    compileOnly 'com.palmergames.bukkit:towny:0.84.0.9'
+    compileOnly 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
+    compileOnly 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
+    compileOnly 'com.wasteofplastic:askyblock:3.0.8.2'
 }
 
 processResources {
@@ -55,27 +55,29 @@ processResources {
 
 jar.archiveName="fawe-bukkit-${project.parent.version}.jar"
 jar.destinationDir = file '../mvn/com/boydti/fawe-bukkit/' + project.parent.version
-task createPom << {
-    pom {
-        project {
-            groupId 'com.boydti'
-            artifactId 'fawe-bukkit'
-            version project.parent.version
+task createPom {
+    doLast {
+        pom {
+            project {
+                groupId 'com.boydti'
+                artifactId 'fawe-bukkit'
+                version project.parent.version
+            }
         }
-    }
-    .getEffectivePom()
-            .setDependencies(new ArrayList<>())
-            .writeTo("../mvn/com/boydti/fawe-bukkit/${project.parent.version}/fawe-bukkit-${project.parent.version}.pom")
-    pom {
-        project {
-            groupId 'com.boydti'
-            artifactId 'fawe-bukkit'
-            version 'latest'
+        .getEffectivePom()
+                .setDependencies(new ArrayList<>())
+                .writeTo("../mvn/com/boydti/fawe-bukkit/${project.parent.version}/fawe-bukkit-${project.parent.version}.pom")
+        pom {
+            project {
+                groupId 'com.boydti'
+                artifactId 'fawe-bukkit'
+                version 'latest'
+            }
         }
+        .getEffectivePom()
+                .setDependencies(new ArrayList<>())
+                .writeTo("../mvn/com/boydti/fawe-bukkit/latest/fawe-bukkit-latest.pom")
     }
-    .getEffectivePom()
-            .setDependencies(new ArrayList<>())
-            .writeTo("../mvn/com/boydti/fawe-bukkit/latest/fawe-bukkit-latest.pom")
 }
 task copyFiles {
     doLast {
@@ -87,22 +89,5 @@ task copyFiles {
         }
     }
 }
-
-shadowJar {
-    dependencies {
-        relocate "org.slf4j", "com.sk89q.worldedit.slf4j"
-        relocate "org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge"
-        include(dependency(':worldedit-core'))
-        include(dependency('org.slf4j:slf4j-api'))
-        include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
-        relocate ("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib:1.0.2"))
-        }
-    }
-    archiveName = "${parent.name}-${project.name.replaceAll("worldedit-", "")}-${parent.version}.jar"
-    destinationDir = file '../target'
-}
-
-build.dependsOn(shadowJar)
 build.finalizedBy(copyFiles)
 copyFiles.dependsOn(createPom)

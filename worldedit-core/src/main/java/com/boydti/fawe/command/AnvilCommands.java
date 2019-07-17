@@ -41,6 +41,7 @@ import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.World;
@@ -613,8 +614,7 @@ public class AnvilCommands {
             desc = "Paste chunks from your anvil clipboard",
             descFooter =
                     "Paste the chunks from your anvil clipboard.\n" +
-                            "The -c flag will align the paste to the chunks.",
-
+                            "The -c flag will align the paste to the chunks."
     )
     @CommandPermissions("worldedit.anvil.pastechunks")
     public void paste(Player player, LocalSession session, EditSession editSession, @Switch(name='c', desc = "TODO") boolean alignChunk) throws WorldEditException, IOException {

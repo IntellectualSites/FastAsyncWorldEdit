@@ -1,6 +1,12 @@
-apply plugin: 'java-library'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+plugins {
+    id("java-library")
+    id("eclipse")
+    id("idea")
+    id("net.ltgt.apt") version "0.21" apply false
+    id "net.ltgt.apt-eclipse" version "0.21"
+    id "net.ltgt.apt-idea" version "0.21"
+}
+
 repositories {
     maven {url "http://ci.athion.net/job/PlotSquared-Breaking/ws/mvn/"}
 }
@@ -33,8 +39,8 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
 
     // Fawe depends
-    compile 'net.fabiozumbi12:redprotect:1.9.6'
-    compile ("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
+    compileOnly 'net.fabiozumbi12:redprotect:1.9.6'
+    compileOnly ("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         transitive = false
     }
     compile 'com.mojang:datafixerupper:1.0.20'
@@ -43,6 +49,7 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    dependsOn(":worldedit-libs:build")
     it.options.compilerArgs.add("-Aarg.name.key.prefix=")
 }
 
@@ -72,27 +79,29 @@ processResources {
 
 jar.archiveName="fawe-api-${project.parent.version}.jar"
 jar.destinationDir = file '../mvn/com/boydti/fawe-api/' + project.parent.version
-task createPom << {
-    pom {
-        project {
-            groupId 'com.boydti'
-            artifactId 'fawe-api'
-            version project.parent.version
+task createPom {
+    doLast {
+        pom {
+            project {
+                groupId 'com.boydti'
+                artifactId 'fawe-api'
+                version project.parent.version
+            }
         }
-    }
-    .getEffectivePom()
-            .setDependencies(new ArrayList<>())
-            .writeTo("../mvn/com/boydti/fawe-api/${project.parent.version}/fawe-api-${project.parent.version}.pom")
-    pom {
-        project {
-            groupId 'com.boydti'
-            artifactId 'fawe-api'
-            version 'latest'
+        .getEffectivePom()
+                .setDependencies(new ArrayList<>())
+                .writeTo("../mvn/com/boydti/fawe-api/${project.parent.version}/fawe-api-${project.parent.version}.pom")
+        pom {
+            project {
+                groupId 'com.boydti'
+                artifactId 'fawe-api'
+                version 'latest'
+            }
         }
+        .getEffectivePom()
+                .setDependencies(new ArrayList<>())
+                .writeTo("../mvn/com/boydti/fawe-api/latest/fawe-api-latest.pom")
     }
-    .getEffectivePom()
-            .setDependencies(new ArrayList<>())
-            .writeTo("../mvn/com/boydti/fawe-api/latest/fawe-api-latest.pom")
 }
 task copyFiles {
     doLast {

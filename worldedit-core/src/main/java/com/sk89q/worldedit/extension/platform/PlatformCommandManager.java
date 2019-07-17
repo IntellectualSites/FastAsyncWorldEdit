@@ -45,11 +45,18 @@ import com.sk89q.worldedit.command.BiomeCommands;
 import com.sk89q.worldedit.command.BiomeCommandsRegistration;
 import com.sk89q.worldedit.command.BrushCommands;
 import com.sk89q.worldedit.command.ChunkCommands;
+import com.sk89q.worldedit.command.ChunkCommandsRegistration;
 import com.sk89q.worldedit.command.ClipboardCommands;
+import com.sk89q.worldedit.command.ClipboardCommandsRegistration;
+import com.sk89q.worldedit.command.ExpandCommands;
 import com.sk89q.worldedit.command.GeneralCommands;
+import com.sk89q.worldedit.command.GeneralCommandsRegistration;
 import com.sk89q.worldedit.command.GenerationCommands;
 import com.sk89q.worldedit.command.HistoryCommands;
+import com.sk89q.worldedit.command.HistoryCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
+import com.sk89q.worldedit.command.NavigationCommandsRegistration;
+import com.sk89q.worldedit.command.PaintBrushCommands;
 import com.sk89q.worldedit.command.RegionCommands;
 import com.sk89q.worldedit.command.SchematicCommands;
 import com.sk89q.worldedit.command.SchematicCommandsRegistration;
@@ -210,7 +217,7 @@ public final class PlatformCommandManager {
         DirectionConverter.register(worldEdit, commandManager);
         FactoryConverter.register(worldEdit, commandManager);
         for (int count = 2; count <= 3; count++) {
-            commandManager.registerConverter(Key.of(double.class, Annotations.radii(count)),
+            commandManager.registerConverter(Key.of(double.class, com.sk89q.worldedit.extension.platform.Annotations.radii(count)),
                 CommaSeparatedValuesConverter.wrapAndLimit(ArgumentConverters.get(
                     TypeToken.of(double.class)
                 ), count)
@@ -309,15 +316,15 @@ public final class PlatformCommandManager {
                 new SuperPickaxeCommands(worldEdit)
             );
             registerSubCommands(
-                "brush",
-                ImmutableList.of("br", "/brush", "/br"),
-                "Brushing commands",
-                BrushCommandsRegistration.builder(),
-                new BrushCommands(worldEdit),
-                manager -> {
-                    PaintBrushCommands.register(commandManagerService, manager, registration);
-                    ApplyBrushCommands.register(commandManagerService, manager, registration);
-                }
+                    "brush",
+                    ImmutableList.of("br", "/brush", "/br"),
+                    "Brushing commands",
+                    BrushCommandsRegistration.builder(),
+                    new BrushCommands(worldEdit),
+                    (Consumer<CommandManager>) manager -> {
+                        PaintBrushCommands.register(commandManagerService, manager, registration);
+                        ApplyBrushCommands.register(commandManagerService, manager, registration);
+                    }
             );
             registerSubCommands(
                 "worldedit",

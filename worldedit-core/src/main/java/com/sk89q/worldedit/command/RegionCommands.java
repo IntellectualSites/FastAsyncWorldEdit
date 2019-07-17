@@ -490,7 +490,7 @@ public class RegionCommands {
         @Switch(name = 's', desc = "Shift the selection to the target location")
             boolean moveSelection,
         @Switch(name = 'a', desc = "Ignore air blocks")
-            boolean ignoreAirBlocks
+            boolean ignoreAirBlocks,
         @Switch(name='b', desc = "TODO") boolean copyBiomes,
 
                      @Switch(name='e', desc = "TODO") boolean skipEntities,
