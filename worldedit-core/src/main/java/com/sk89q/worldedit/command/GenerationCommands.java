@@ -88,7 +88,6 @@ public class GenerationCommands {
 
     @Command(
             name = "/caves",
-            usage = "[size=8] [freq=40] [rarity=7] [minY=8] [maxY=127] [sysFreq=1] [sysRarity=25] [pocketRarity=0] [pocketMin=0] [pocketMax=3]",
             desc = "Generates a cave network"
     )
     @CommandPermissions("worldedit.generation.caves")
@@ -126,9 +125,8 @@ public class GenerationCommands {
     }
 
     @Command(
-            aliases = {"/image", "/img"},
-            desc = "Generate an image",
-            usage = "<imgur> [randomize=true] [complexity=100] [dimensions=100,100]"
+            name = "/img",
+            desc = "Generate an image"
     )
     @CommandPermissions("worldedit.generation.image")
     @Logging(PLACEMENT)
@@ -169,7 +167,6 @@ public class GenerationCommands {
 
     @Command(
             name = "/ore",
-            usage = "<mask> <pattern> <size> <freq> <rarity> <minY> <maxY>",
             desc = "Generates ores"
     )
     @CommandPermissions("worldedit.generation.ore")
@@ -183,13 +180,7 @@ public class GenerationCommands {
 
     @Command(
         name = "/hcyl",
-        usage = "<pattern> <radius>[,<radius>] [height]",
-        desc = "Generates a hollow cylinder.",
-        help =
-            "Generates a hollow cylinder.\n" +
-            "By specifying 2 radii, separated by a comma,\n" +
-            "you can generate elliptical cylinders.\n" +
-            "The 1st radius is north/south, the 2nd radius is east/west."
+        desc = "Generates a hollow cylinder."
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
@@ -211,12 +202,7 @@ public class GenerationCommands {
 
     @Command(
         name = "/cyl",
-        desc = "Generates a cylinder.",
-        help =
-            "Generates a cylinder.\n" +
-            "By specifying 2 radii, separated by a comma,\n" +
-            "you can generate elliptical cylinders.\n" +
-            "The 1st radius is north/south, the 2nd radius is east/west."
+        desc = "Generates a cylinder."
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
@@ -239,13 +225,7 @@ public class GenerationCommands {
 
     @Command(
         name = "/hsphere",
-        usage = "<pattern> <radius>[,<radius>,<radius>] [raised?]",
-        desc = "Generates a hollow sphere.",
-        help =
-            "Generates a hollow sphere.\n" +
-            "By specifying 3 radii, separated by commas,\n" +
-            "you can generate an ellipsoid. The order of the ellipsoid radii\n" +
-            "is north/south, up/down, east/west."
+        desc = "Generates a hollow sphere."
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
@@ -263,12 +243,7 @@ public class GenerationCommands {
 
     @Command(
         name = "/sphere",
-        desc = "Generates a filled sphere.",
-        help =
-            "Generates a filled sphere.\n" +
-            "By specifying 3 radii, separated by commas,\n" +
-            "you can generate an ellipsoid. The order of the ellipsoid radii\n" +
-            "is north/south, up/down, east/west."
+        desc = "Generates a filled sphere."
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
@@ -345,11 +320,11 @@ public class GenerationCommands {
     @Logging(POSITION)
     public int pumpkins(Player player, LocalSession session, EditSession editSession,
                         @Arg(desc = "The size of the patch", def = "10")
-                                int size,
-                         @Arg(desc = "//TODO", def = "10")
-                                     int apothem,
-                         @Arg(desc = "//TODO ", def = "0.02")
-                                     double density) throws WorldEditException {
+                            int size,
+                        @Arg(desc = "//TODO", def = "10")
+                            int apothem,
+                        @Arg(desc = "//TODO ", def = "0.02")
+                            double density) throws WorldEditException {
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
         BBC.COMMAND_PUMPKIN.send(player, affected);
         return affected;
@@ -362,10 +337,10 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
     public void hollowPyramid(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
-        @Arg(desc = "The pattern of blocks to set")
-            Pattern pattern,
-        @Arg(desc = "The size of the pyramid")
-            int size, CommandContext context) throws WorldEditException {
+                             @Arg(desc = "The pattern of blocks to set")
+                                 Pattern pattern,
+                             @Arg(desc = "The size of the pyramid")
+                                 int size, CommandContext context) throws WorldEditException {
         pyramid(fp, player, session, editSession, pattern, size, true, context);
     }
 
@@ -376,12 +351,12 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
     public void pyramid(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
-                        @Arg(desc = "The pattern of blocks to set")
-                            Pattern pattern,
-                        @Arg(desc = "The size of the pyramid")
-                                    int size,
-                        @Switch(name = 'h', desc = "Make a hollow pyramid")
-                                    boolean hollow,
+                       @Arg(desc = "The pattern of blocks to set")
+                           Pattern pattern,
+                       @Arg(desc = "The size of the pyramid")
+                           int size,
+                       @Switch(name = 'h', desc = "Make a hollow pyramid")
+                           boolean hollow,
                         CommandContext context) throws WorldEditException {
         BlockVector3 pos = session.getPlacementPosition(player);
         worldEdit.checkMaxRadius(size);
@@ -396,7 +371,7 @@ public class GenerationCommands {
         name = "/generate",
         aliases = { "/gen", "/g" },
         desc = "Generates a shape according to a formula.",
-        descFooter = "See also https://tinyurl.com/wesyntax."
+        descFooter = "See also https://tinyurl.com/weexpr."
     )
     @CommandPermissions("worldedit.generation.shape")
     @Logging(ALL)
@@ -462,11 +437,11 @@ public class GenerationCommands {
         name = "/generatebiome",
         aliases = { "/genbiome", "/gb" },
         desc = "Sets biome according to a formula.",
-        descFooter = "See also https://tinyurl.com/wesyntax."
+        descFooter = "See also https://tinyurl.com/weexpr."
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
-    public int generateBiome(Player player, LocalSession session, EditSession editSession,
+    public int generateBiome(FawePlayer fp, LocalSession session, EditSession editSession,
                              @Selection Region region,
                              @Arg(desc = "The biome type to set")
                                  BiomeType target,
@@ -487,7 +462,7 @@ public class GenerationCommands {
             zero = Vector3.ZERO;
             unit = Vector3.ONE;
         } else if (offset) {
-            zero = session.getPlacementPosition(player).toVector3();
+            zero = session.getPlacementPosition(fp.toWorldEditPlayer()).toVector3();
             unit = Vector3.ONE;
         } else if (offsetCenter) {
             final Vector3 min = region.getMinimumPoint().toVector3();
@@ -508,10 +483,9 @@ public class GenerationCommands {
         }
 
         final Vector3 unit1 = unit;
-
         fp.checkConfirmationRegion(() -> {
             try {
-                final int affected = editSession.makeBiomeShape(region, zero, unit1, target, expression, hollow);
+                final int affected = editSession.makeBiomeShape(region, zero, unit1, target, String.join(" ", expression), hollow, session.getTimeout());
                 player.findFreePosition();
                 BBC.VISITOR_FLAT.send(fp, affected);
             } catch (ExpressionException e) {
