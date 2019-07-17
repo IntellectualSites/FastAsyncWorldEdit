@@ -551,11 +551,9 @@ public class SchematicCommands {
 
 /*
     @Command(
-            aliases = {"show"},
+            name = "show",
             desc = "Show a schematic",
-            usage = "[global|mine|<filter>]",
-            flags = "dnp",
-            help = "List all schematics in the schematics directory\n" +
+            descFooter = "List all schematics in the schematics directory\n" +
                     " -f <format> restricts by format\n"
     )
     @CommandPermissions("worldedit.schematic.show")

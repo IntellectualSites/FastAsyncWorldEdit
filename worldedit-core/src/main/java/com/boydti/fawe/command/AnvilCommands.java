@@ -141,13 +141,11 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"replaceall", "rea", "repall"},
-            usage = "<folder> [from-block] <to-block>",
+            name = "replaceall",
+            aliases = {"rea", "repall"},
             desc = "Replace all blocks in the selection with another",
-            help = "Replace all blocks in the selection with another\n" +
-                    "The -d flag disabled wildcard data matching\n",
-            flags = "df"
-    )
+            descFooter = "The -d flag disabled wildcard data matching\n"
+)
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAll(Player player, String folder, @Optional String from, String to, @Switch('d') boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;
@@ -166,9 +164,8 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"remapall"},
-            usage = "<folder>",
-            help = "Remap the world between MCPE/PC values",
+            name = "remapall",
+            descFooter = "Remap the world between MCPE/PC values",
             desc = "Remap the world between MCPE/PC values"
     )
     @CommandPermissions("worldedit.anvil.remapall")
@@ -185,10 +182,10 @@ public class AnvilCommands {
 
 
     @Command(
-            aliases = {"deleteallunvisited", "delunvisited" },
-            usage = "<folder> <age-ticks> [file-age=60000]",
+            name = "deleteallunvisited",
+            aliases = {"delunvisited" },
             desc = "Delete all chunks which haven't been occupied",
-            help = "Delete all chunks which haven't been occupied for `age-ticks` (20t = 1s) and \n" +
+            descFooter = "occupied for `age-ticks` (20t = 1s) and \n" +
                     "Have not been accessed since `file-duration` (ms) after creation and\n" +
                     "Have not been used in the past `chunk-inactivity` (ms)" +
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
@@ -201,16 +198,15 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"deleteallunclaimed", "delallunclaimed" },
-            usage = "<age-ticks> [file-age=60000]",
-            desc = "(Supports: WG, P2, GP) Delete all chunks which haven't been occupied AND claimed",
-            help = "(Supports: WG, P2, GP) Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n" +
+            name = "deleteallunclaimed",
+            aliases = {"delallunclaimed" },
+            desc = "Delete all chunks which haven't been occupied",
+            descFooter = "Supports: WG, P2, GP:\n" +
+                    "Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n" +
                     "Have not been accessed since `file-duration` (ms) after creation and\n" +
                     "Have not been used in the past `chunk-inactivity` (ms)" +
-                    "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`",
-            min = 1,
-            max = 3
-    )
+                    "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
+)
     @CommandPermissions("worldedit.anvil.deleteallunclaimed")
     public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Optional("60000") int fileDurationMillis, @Switch('d') boolean debug) throws WorldEditException {
         String folder = player.getWorld().getName();
@@ -222,15 +218,14 @@ public class AnvilCommands {
 
     @Command(
             name = "deleteunclaimed",
-            usage = "<age-ticks> [file-age=60000]",
-            desc = "(Supports: WG, P2, GP) Delete all chunks which haven't been occupied AND claimed",
-            help = "(Supports: WG, P2, GP) Delete all chunks which aren't claimed AND haven't been occupied for `age-ticks` (20t = 1s) and \n" +
+            desc = "Delete all chunks which haven't been occupied",
+            descFooter = "(Supports: WG, P2, GP):\n" +
+                    "Is not claimed\n" +
+                    "Has not been occupied for `age-ticks` (20t = 1s) and \n" +
                     "Have not been accessed since `file-duration` (ms) after creation and\n" +
                     "Have not been used in the past `chunk-inactivity` (ms)" +
-                    "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`",
-            min = 1,
-            max = 3
-    )
+                    "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
+)
     @CommandPermissions("worldedit.anvil.deleteunclaimed")
     public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Optional("60000") int fileDurationMillis, @Switch('d') boolean debug) throws WorldEditException {
         DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
@@ -240,11 +235,10 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"deletealloldregions", "deloldreg" },
-            usage = "<folder> <time>",
+            name = "deletealloldregions",
+            aliases = {"deloldreg" },
             desc = "Delete regions which haven't been accessed in a certain amount of time",
-            help = "Delete regions which haven't been accessed in a certain amount of time\n" +
-                    "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n" +
+            descFooter = "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n" +
                     "(months are not a unit of time)\n" +
                     "E.g. 8h5m12s\n"
     )
@@ -259,8 +253,7 @@ public class AnvilCommands {
     @Command(
             name = "trimallplots",
             desc = "Trim chunks in a Plot World",
-            help = "Trim chunks in a Plot World\n" +
-                    "Unclaimed chunks will be deleted\n" +
+            descFooter = "Unclaimed chunks will be deleted\n" +
                     "Unmodified chunks will be deleted\n" +
                     "Use -v to also delete unvisited chunks\n"
     )
@@ -310,11 +303,10 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"replaceallpattern", "reap", "repallpat"},
-            usage = "<folder> [from-block] <to-pattern>",
-            desc = "Replace all blocks in the selection with another",
-            flags = "dm"
-    )
+            name = "replaceallpattern",
+            aliases = {"reap", "repallpat"},
+            desc = "Replace all blocks in the selection with another"
+)
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAllPattern(Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;
@@ -340,11 +332,9 @@ public class AnvilCommands {
     }
 //
     @Command(
-            aliases = {"countall"},
-            usage = "<folder> [hasSky] <id>",
-            desc = "Count all blocks in a world",
-            flags = "d"
-    )
+            name = "countall",
+            desc = "Count all blocks in a world"
+)
     @CommandPermissions("worldedit.anvil.countall")
     public void countAll(Player player, EditSession editSession, String folder, String arg, @Switch('d') boolean useData) throws WorldEditException {
 //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);
@@ -363,7 +353,8 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"clear", "unset"},
+            name = "clear",
+            aliases = {"unset"},
             desc = "Clear the chunks in a selection (delete without defrag)"
     )
     @CommandPermissions("worldedit.anvil.clear")
@@ -413,13 +404,9 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"count"},
-            usage = "<ids>",
-            desc = "Count blocks in a selection",
-            flags = "d",
-            min = 1,
-            max = 2
-    )
+            name = "count",
+            desc = "Count blocks in a selection"
+)
     @CommandPermissions("worldedit.anvil.count")
     public void count(Player player, EditSession editSession, @Selection Region selection, String arg, @Switch('d') boolean useData) throws WorldEditException {
 //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);
@@ -438,7 +425,7 @@ public class AnvilCommands {
     }
 //
     @Command(
-            aliases = {"distr"},
+            name = "distr",
             desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.distr")
@@ -515,8 +502,8 @@ public class AnvilCommands {
     }
 //
     @Command(
-            aliases = {"replace", "r"},
-            usage = "[from-block] <to-block>",
+            name = "replace",
+            aliases = {"r"},
             desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.replace")
@@ -536,8 +523,8 @@ public class AnvilCommands {
     }
 //
     @Command(
-            aliases = {"replacepattern", "preplace", "rp"},
-            usage = "[from-mask] <to-pattern>",
+            name = "replacepattern",
+            aliases = {"preplace", "rp"},
             desc = "Replace all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.replace")
@@ -568,8 +555,7 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"set"},
-            usage = "<to-pattern>",
+            name = "set",
             desc = "Set all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.set")
@@ -583,10 +569,9 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"removelayers"},
-            usage = "<id>",
+            name = "removelayers",
             desc = "Removes matching chunk layers",
-            help = "Remove if all the selected layers in a chunk match the provided id"
+            descFooter = "Only if a chunk matches the provided id"
     )
     @CommandPermissions("worldedit.anvil.removelayer")
     public void removeLayers(Player player, EditSession editSession, @Selection Region selection, int id) throws WorldEditException {
@@ -603,7 +588,7 @@ public class AnvilCommands {
 
 
     @Command(
-            aliases = {"copy"},
+            name = "copy",
             desc = "Lazily copy chunks to your anvil clipboard"
     )
     @CommandPermissions("worldedit.anvil.copychunks")
@@ -624,12 +609,11 @@ public class AnvilCommands {
     }
 
     @Command(
-            aliases = {"paste"},
+            name = "paste",
             desc = "Paste chunks from your anvil clipboard",
-            help =
+            descFooter =
                     "Paste the chunks from your anvil clipboard.\n" +
                             "The -c flag will align the paste to the chunks.",
-            flags = "c"
 
     )
     @CommandPermissions("worldedit.anvil.pastechunks")

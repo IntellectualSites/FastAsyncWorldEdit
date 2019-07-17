@@ -39,6 +39,7 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -73,6 +74,7 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
+import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
@@ -191,7 +193,7 @@ public class RegionCommands {
     }
 
     @Command(
-            name = "/setskylight"
+            name = "/setskylight",
             desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
@@ -295,11 +297,8 @@ public class RegionCommands {
 
     @Command(
             aliases = { "/set", "/s" },
-            usage = "[pattern]",
-            desc = "Set all blocks within selection",
-            min = 1,
-            max = 1
-    )
+            desc = "Set all blocks within selection"
+)
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
     public void set(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region selection, Pattern to, CommandContext context) throws WorldEditException {
@@ -329,12 +328,9 @@ public class RegionCommands {
     }
 
     @Command(
-            aliases = {"/lay"},
-            usage = "<pattern>",
-            desc = "Set the top block in the region",
-            min = 1,
-            max = 1
-    )
+            name = "/lay",
+            desc = "Set the top block in the region"
+)
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
     public void lay(FawePlayer player, EditSession editSession, @Selection Region region, Pattern pattern, CommandContext context) throws WorldEditException {
@@ -437,9 +433,10 @@ public class RegionCommands {
     }
 
     @Command(
-            aliases = {"/wea", "wea", "worldeditanywhere", "/worldeditanywhere", "/weanywhere"},
+            name = "/wea",
+            aliases = {"wea", "worldeditanywhere", "/worldeditanywhere", "/weanywhere"},
             desc = "Bypass region restrictions",
-            help = "Bypass region restrictions"
+            descFooter = "Bypass region restrictions"
     )
     @CommandPermissions("fawe.admin")
     public void wea(Player player) throws WorldEditException {
@@ -451,9 +448,10 @@ public class RegionCommands {
     }
 
     @Command(
-            aliases = {"/wer", "wer", "worldeditregion", "/worldeditregion", "select", "/select"},
+            name = "/wer",
+            aliases = {"wer", "worldeditregion", "/worldeditregion", "select", "/select"},
             desc = "Select your current allowed region",
-            help = "Select your current allowed region"
+            descFooter = "Select your current allowed region"
     )
     @CommandPermissions("fawe.worldeditregion")
     public void wer(FawePlayer fp) throws WorldEditException {
@@ -468,19 +466,16 @@ public class RegionCommands {
 
 
     @Command(
-            aliases = { "/move" },
-            usage = "[count] [direction] [leave-id]",
-            flags = "saeb",
+            name = "/move",
             desc = "Move the contents of the selection",
-            help =
+            descFooter =
                     "Moves the contents of the selection.\n" +
                             "The -s flag shifts the selection to the target location.\n" +
                             "The -b also copies biomes\n" +
                             "The -e ignores entities\n" +
                             "The -a ignores air blocks.\n" +
-                            "Optionally fills the old location with <leave-id>.",
-            max = 3
-    )
+                            "Optionally fills the old location with <leave-id>."
+)
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
     public void move(FawePlayer player, LocalSession session, EditSession editSession,
@@ -520,14 +515,11 @@ public class RegionCommands {
     }
 
     @Command(
-            aliases = { "/fall" },
-            usage = "[replace]",
-            flags = "m",
+            name = "/fall",
             desc = "Have the blocks in the selection fall",
-            help = "Make the blocks in the selection fall\n" +
-                   "The -m flag will only fall within the vertical selection.",
-            max = 2
-    )
+            descFooter = "Make the blocks in the selection fall\n" +
+                   "The -m flag will only fall within the vertical selection."
+)
     @CommandPermissions("worldedit.region.fall")
     @Logging(ORIENTATION_REGION)
     public void fall(FawePlayer player, EditSession editSession, LocalSession session,
@@ -584,17 +576,14 @@ public class RegionCommands {
     }
 
     @Command(
-            aliases = { "/deform" },
-            usage = "<expression>",
+            name = "/deform",
             desc = "Deforms a selected region with an expression",
-            help =
+            descFooter =
                 "Deforms a selected region with an expression\n" +
                 "The expression is executed for each block and is expected\n" +
                 "to modify the variables x, y and z to point to a new block\n" +
-                "to fetch. See also tinyurl.com/wesyntax.",
-            flags = "ro",
-            min = 1
-    )
+                "to fetch. See also tinyurl.com/wesyntax."
+)
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
     public void deform(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
@@ -639,15 +628,13 @@ public class RegionCommands {
     }
 
     @Command(
-            aliases = { "/regen" },
-            usage = "[biome] [seed]",
+            name = "/regen",
             desc = "Regenerates the contents of the selection",
-            help =
+            descFooter =
                     "Regenerates the contents of the current selection.\n" +
                             "This command might affect things outside the selection,\n" +
-                            "if they are within the same chunk.",
-            max = 2
-    )
+                            "if they are within the same chunk."
+)
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
     public void regenerateChunk(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, CommandContext context) throws WorldEditException {
@@ -682,13 +669,11 @@ public class RegionCommands {
     }
 
     @Command(
-        aliases = { "/hollow" },
-        usage = "[<thickness>[ <pattern>]]",
+            name = "/hollow",
         desc = "Hollows out the object contained in this selection",
-        help = "Hollows out the object contained in this selection.\n" +
+        descFooter = "Hollows out the object contained in this selection.\n" +
             "Optionally fills the hollowed out part with the given block.\n" +
-            "Thickness is measured in manhattan distance.",
-        max = 2
+            "Thickness is measured in manhattan distance."
     )
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)

@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 
 @Command(aliases = {"masks"},
         desc = "Help for the various masks. [More Info](https://git.io/v9r4K)",
-        help = "Masks determine if a block can be placed\n" +
+        descFooter = "Masks determine if a block can be placed\n" +
                 " - Use [brackets] for arguments\n" +
                 " - Use , to OR multiple\n" +
                 " - Use & to AND multiple\n" +
@@ -38,12 +38,9 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#simplex"},
-            desc = "Use simplex noise as the mask",
-            usage = "<scale=10> <min=0> <max=100>",
-            min = 3,
-            max = 3
-    )
+            name = "#simplex",
+            desc = "Use simplex noise as the mask"
+)
     public Mask simplex(double scale, double min, double max) {
         scale = (1d / Math.max(1, scale));
         min = (min - 50) / 50;
@@ -52,18 +49,16 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#light"},
-            desc = "Restrict to specific light levels",
-            usage = "<min> <max>",
-            min = 2,
-            max = 2
-    )
+            name = "#light",
+            desc = "Restrict to specific light levels"
+)
     public Mask light(Extent extent, double min, double max) {
         return new LightMask(extent, (int) min, (int) max);
     }
 
     @Command(
-            aliases = {"false", "#false"},
+            name = "false",
+            aliases = {"#false"},
             desc = "Always false"
     )
     public Mask falseMask(Extent extent) {
@@ -71,7 +66,8 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"true", "#true"},
+            name = "true",
+            aliases = {"#true"},
             desc = "Always true"
     )
     public Mask trueMask(Extent extent) {
@@ -79,62 +75,48 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#skylight"},
-            desc = "Restrict to specific sky light levels",
-            usage = "<min> <max>",
-            min = 2,
-            max = 2
-    )
+            name = "#skylight",
+            desc = "Restrict to specific sky light levels"
+)
     public Mask skylight(Extent extent, double min, double max) {
         return new SkyLightMask(extent, (int) min, (int) max);
     }
 
     @Command(
-            aliases = {"#blocklight", "#emittedlight"},
-            desc = "Restrict to specific block light levels",
-            usage = "<min> <max>",
-            min = 2,
-            max = 2
-    )
+            name = "#blocklight",
+            aliases = {"#emittedlight"},
+            desc = "Restrict to specific block light levels"
+)
     public Mask blocklight(Extent extent, double min, double max) {
         return new BlockLightMask(extent, (int) min, (int) max);
     }
 
     @Command(
-            aliases = {"#opacity"},
-            desc = "Restrict to specific opacity levels",
-            usage = "<min> <max>",
-            min = 2,
-            max = 2
-    )
+            name = "#opacity",
+            desc = "Restrict to specific opacity levels"
+)
     public Mask opacity(Extent extent, double min, double max) {
         return new OpacityMask(extent, (int) min, (int) max);
     }
 
     @Command(
-            aliases = {"#brightness"},
-            desc = "Restrict to specific block brightness",
-            usage = "<min> <max>",
-            min = 2,
-            max = 2
-    )
+            name = "#brightness",
+            desc = "Restrict to specific block brightness"
+)
     public Mask brightness(Extent extent, double min, double max) {
         return new BrightnessMask(extent, (int) min, (int) max);
     }
 
     @Command(
-            aliases = {"#offset"},
-            desc = "Offset a mask",
-            usage = "<dx> <dy> <dz> <mask>",
-            min = 4,
-            max = 4
-    )
+            name = "#offset",
+            desc = "Offset a mask"
+)
     public Mask offset(double x, double y, double z, Mask mask) {
         return new OffsetMask(mask, BlockVector3.at(x, y, z));
     }
 
     @Command(
-            aliases = {"#haslight"},
+            name = "#haslight",
             desc = "Restricts to blocks with light (sky or emitted)"
     )
     public Mask haslight(Extent extent) {
@@ -142,7 +124,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#nolight"},
+            name = "#nolight",
             desc = "Restrict to blocks without light (sky or emitted)"
     )
     public Mask nolight(Extent extent) {
@@ -150,7 +132,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#existing"},
+            name = "#existing",
             desc = "If there is a non air block"
     )
     public Mask existing(Extent extent) {
@@ -158,7 +140,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#solid"},
+            name = "#solid",
             desc = "If there is a solid block"
     )
     public Mask solid(Extent extent) {
@@ -166,7 +148,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#liquid"},
+            name = "#liquid",
             desc = "If there is a solid block"
     )
     public Mask liquid(Extent extent) {
@@ -174,7 +156,8 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#dregion", "#dselection", "#dsel"},
+            name = "#dregion",
+            aliases = {"#dselection", "#dsel"},
             desc = "inside the player's selection"
     )
     public Mask dregion() {
@@ -182,7 +165,8 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#region", "#selection", "#sel"},
+            name = "#region",
+            aliases = {"#selection", "#sel"},
             desc = "inside the provided selection"
     )
     public Mask selection(Player player, LocalSession session) throws IncompleteRegionException {
@@ -190,7 +174,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#xaxis"},
+            name = "#xaxis",
             desc = "Restrict to initial x axis"
     )
     public Mask xaxis() {
@@ -198,7 +182,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#yaxis"},
+            name = "#yaxis",
             desc = "Restrict to initial y axis"
     )
     public Mask yaxis() {
@@ -206,7 +190,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#zaxis"},
+            name = "#zaxis",
             desc = "Restrict to initial z axis"
     )
     public Mask zaxis() {
@@ -214,7 +198,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#id"},
+            name = "#id",
             desc = "Restrict to initial id"
     )
     public Mask id(Extent extent) {
@@ -222,7 +206,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#data"},
+            name = "#data",
             desc = "Restrict to initial data"
     )
     public Mask data(Extent extent) {
@@ -230,7 +214,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#iddata"},
+            name = "#iddata",
             desc = "Restrict to initial block id and data"
     )
     public Mask iddata(Extent extent) {
@@ -238,7 +222,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#air"},
+            name = "#air",
             desc = "Restrict to types of air"
     )
     public Mask air(Extent extent) {
@@ -246,7 +230,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#wall"},
+            name = "#wall",
             desc = "Restrict to walls (any block n,e,s,w of air)"
     )
     public Mask wall(Extent extent) {
@@ -255,7 +239,7 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#surface"},
+            name = "#surface",
             desc = "Restrict to surfaces (any solid block touching air)"
     )
     public Mask surface(Extent extent) {
@@ -263,17 +247,16 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"\\", "/", "#angle", "#\\", "#/"},
+            name = "\\",
+            aliases = {"/", "#angle", "#\\", "#/"},
             desc = "Restrict to specific terrain angle",
-            help = "Restrict to specific terrain angle\n" +
+            descFooter = "Restrict to specific terrain angle\n" +
                     "The -o flag will only overlay\n" +
                     "Example: /[0d][45d]\n" +
                     "Explanation: Allows any block where the adjacent block is between 0 and 45 degrees.\n" +
                     "Example: /[3][20]\n" +
-                    "Explanation: Allows any block where the adjacent block is between 3 and 20 blocks below",
-            usage = "<min> <max> [distance=1]",
-            min = 2
-    )
+                    "Explanation: Allows any block where the adjacent block is between 3 and 20 blocks below"
+)
     public Mask angle(Extent extent, String min, String max, @Switch('o') boolean overlay, @Optional("1") int distance) throws ExpressionException {
         double y1, y2;
         boolean override;
@@ -290,16 +273,15 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"(", ")", "#roc", "#(", "#)"},
+            name = "(",
+            aliases = {")", "#roc", "#(", "#)"},
             desc = "Restrict to near specific terrain slope rate of change",
-            help = "Restrict to near specific terrain slope rate of change\n" +
+            descFooter = "Restrict to near specific terrain slope rate of change\n" +
                     "The -o flag will only overlay\n" +
                     "Example: ([0d][45d][5]\n" +
                     "Explanation: Restrict near where the angle changes between 0-45 degrees within 5 blocks\n" +
-                    "Note: Use negatives for decreasing slope",
-            usage = "<min> <max> [distance=4]",
-            min = 2
-    )
+                    "Note: Use negatives for decreasing slope"
+)
     public Mask roc(Extent extent, String min, String max, @Switch('o') boolean overlay, @Optional("4") int distance) throws ExpressionException {
         double y1, y2;
         boolean override;
@@ -316,17 +298,15 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"^", "#extrema", "#^"},
+            name = "^",
+            aliases = {"#extrema", "#^"},
             desc = "Restrict to near specific terrain extrema",
-            help = "Restrict to near specific terrain extrema\n" +
+            descFooter = "Restrict to near specific terrain extrema\n" +
                     "The -o flag will only overlay\n" +
                     "Example: ([0d][45d][5]\n" +
                     "Explanation: Restrict to near 45 degrees of local maxima\n" +
-                    "Note: Use negatives for local minima",
-            usage = "<min> <max> [distance=1]",
-            min = 2,
-            max = 4
-    )
+                    "Note: Use negatives for local minima"
+)
     public Mask extrema(Extent extent, String min, String max, @Switch('o') boolean overlay, @Optional("4") int distance) throws ExpressionException {
         double y1, y2;
         boolean override;
@@ -343,34 +323,28 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"{", "#{"},
-            desc = "Restricts blocks to within a specific radius range of the initial block",
-            usage = "<min> <max>",
-            min = 2,
-            max = 2
-    )
+            name = "{",
+            aliases = {"#{"},
+            desc = "Restricts blocks to within a specific radius range of the initial block"
+)
     public Mask radius(double min, double max) throws ExpressionException {
         return new RadiusMask((int) min, (int) max);
     }
 
     @Command(
-            aliases = {"|", "#|", "#side"},
-            desc = "sides with a specific number of other blocks",
-            usage = "<mask> <min> <max>",
-            min = 3,
-            max = 3
-    )
+            name = "|",
+            aliases = {"#|", "#side"},
+            desc = "sides with a specific number of other blocks"
+)
     public Mask wall(Mask mask, double min, double max) throws ExpressionException {
         return new WallMask(mask, (int) min, (int) max);
     }
 
     @Command(
-            aliases = {"~", "#~", "#adjacent"},
-            desc = "Adjacent to a specific number of other blocks",
-            usage = "<mask> [min=1] [max=8]",
-            min = 1,
-            max = 3
-    )
+            name = "~",
+            aliases = {"#~", "#adjacent"},
+            desc = "Adjacent to a specific number of other blocks"
+)
     public Mask adjacent(Mask mask, @Optional("-1") double min, @Optional("-1") double max) throws ExpressionException {
         if (min == -1 && max == -1) {
             min = 1;
@@ -383,60 +357,50 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"<", "#<", "#below"},
-            desc = "below a specific block",
-            usage = "<mask>",
-            min = 1,
-            max = 1
-    )
+            name = "<",
+            aliases = {"#<", "#below"},
+            desc = "below a specific block"
+)
     public Mask below(Mask mask) throws ExpressionException {
         OffsetMask offsetMask = new OffsetMask(mask, BlockVector3.at(0, 1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(mask));
     }
 
     @Command(
-            aliases = {">", "#>", "#above"},
-            desc = "above a specific block",
-            usage = "<mask>",
-            min = 1,
-            max = 1
-    )
+            name = ">",
+            aliases = {"#>", "#above"},
+            desc = "above a specific block"
+)
     public Mask above(Mask mask) throws ExpressionException {
         OffsetMask offsetMask = new OffsetMask(mask, BlockVector3.at(0, -1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(mask));
     }
 
     @Command(
-            aliases = {"$", "#biome", "#$"},
+            name = "$",
+            aliases = {"#biome", "#$"},
             desc = "in a specific biome",
-            help = "in a specific biome. For a list of biomes use //biomelist",
-            usage = "<biome>",
-            min = 1,
-            max = 1
-    )
+            descFooter = "in a specific biome. For a list of biomes use //biomelist"
+)
     public Mask biome(Extent extent, BiomeType biome) throws ExpressionException {
         return new BiomeMask(extent, biome);
     }
 
     @Command(
-            aliases = {"%", "#%", "#percent"},
-            desc = "percentage chance",
-            usage = "<chance>",
-            min = 1,
-            max = 1
-    )
+            name = "%",
+            aliases = {"#%", "#percent"},
+            desc = "percentage chance"
+)
     public Mask random(double chance) throws ExpressionException {
         chance = chance / 100;
         return new RandomMask(chance);
     }
 
     @Command(
-            aliases = {"=", "#=", "#expression"},
-            desc = "expression mask",
-            usage = "<expression>",
-            min = 1,
-            max = 1
-    )
+            name = "=",
+            aliases = {"#=", "#expression"},
+            desc = "expression mask"
+)
     public Mask expression(Extent extent, String input) throws ExpressionException {
         Expression exp = Expression.compile(input, "x", "y", "z");
         WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
@@ -445,12 +409,10 @@ public class MaskCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"!", "#not", "#negate", "#!"},
-            desc = "Negate another mask",
-            usage = "<mask>",
-            min = 1,
-            max = 1
-    )
+            name = "!",
+            aliases = {"#not", "#negate", "#!"},
+            desc = "Negate another mask"
+)
     public Mask expression(Mask mask) throws ExpressionException {
         return Masks.negate(mask);
     }

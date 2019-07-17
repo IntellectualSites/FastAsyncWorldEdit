@@ -101,7 +101,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"heightmap"},
+            name = "heightmap",
             desc = "Start CFI with a height map as a base"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -291,7 +291,8 @@ public class CFICommands extends MethodCommands {
 
     @Command(
             name = "overlay",
-            aliases = {"overlay", "setoverlay"},
+            name = "overlay",
+            aliases = {"setoverlay"},
             desc = "Set the overlay block",
             descFooter = "Change the block directly above the floor (default: air)\n" +
                     "e.g. Tallgrass"
@@ -307,7 +308,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"smooth"},
+            name = "smooth",
             desc = "Smooth the terrain",
             descFooter = "Smooth terrain within an image-mask, or worldedit mask\n" +
                     " - You can use !0 as the mask to smooth everything\n" +
@@ -572,7 +573,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"baseid", "bedrockid"},
+            name = "baseid",
+            aliases = {"bedrockid"},
             desc = "Change the block used for the base\ne.g. Bedrock"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -585,7 +587,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"worldthickness", "width", "thickness"},
+            name = "worldthickness",
+            aliases = {"width", "thickness"},
             desc = "Set the thickness of the generated world\n" +
                     " - A value of 0 is the default and will not modify the height"
     )
@@ -597,7 +600,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"floorthickness", "floorheight", "floorwidth"},
+            name = "floorthickness",
+            aliases = {"floorheight", "floorwidth"},
             desc = "Set the thickness of the top layer\n" +
                     " - A value of 0 is the default and will only set the top block"
     )
@@ -609,7 +613,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"update", "refresh", "resend"},
+            name = "update",
+            aliases = {"refresh", "resend"},
             desc = "Resend the CFI chunks"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -620,7 +625,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"tp", "visit", "home"},
+            name = "tp",
+            aliases = {"visit", "home"},
             desc = "Teleport to the CFI virtual world"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -635,7 +641,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"waterheight", "sealevel", "setwaterheight"},
+            name = "waterheight",
+            aliases = {"sealevel", "setwaterheight"},
             desc = "Set the level water is generated at\n" +
                     "Set the level water is generated at\n" +
                     " - By default water is disabled (with a value of 0)"
@@ -648,8 +655,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"glass", "glasscolor", "setglasscolor"},
-            usage = "<url>",
+            name = "glass",
+            aliases = {"glasscolor", "setglasscolor"},
             desc = "Color terrain using glass"
     )
     // ![79,174,212,5:3,5:4,18,161,20]
@@ -663,10 +670,10 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"color", "setcolor", "blockcolor", "blocks"},
-            usage = "<url> [imageMask|mask]",
+            name = "color",
+            aliases = {"setcolor", "blockcolor", "blocks"},
             desc = "Set the color with blocks and biomes",
-            help = "Color the terrain using only blocks\n" +
+            descFooter = "Color the terrain using only blocks\n" +
                     "Provide an image, or worldedit mask for the 2nd argument to restrict what areas are colored\n" +
                     "The -w (disableWhiteOnly) will randomly apply depending on the pixel luminance"
     )
@@ -683,10 +690,10 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"blockbiomecolor", "setblockandbiomecolor", "blockandbiome"},
-            usage = "<url> [imageMask|mask]",
+            name = "blockbiomecolor",
+            aliases = {"setblockandbiomecolor", "blockandbiome"},
             desc = "Set the color with blocks and biomes",
-            help = "Color the terrain using blocks and biomes.\n" +
+            descFooter = "Color the terrain using blocks and biomes.\n" +
                     "Provide an image, or worldedit mask to restrict what areas are colored\n" +
             "The -w (disableWhiteOnly) will randomly apply depending on the pixel luminance"
     )
@@ -700,8 +707,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"biomecolor", "setbiomecolor", "biomes"},
-            usage = "<url> [imageMask|mask]",
+            name = "biomecolor",
+            aliases = {"setbiomecolor", "biomes"},
             desc = "Color the terrain using biomes.\n" +
                     "Note: Biome coloring does not change blocks:\n" +
                     " - If you changed the block to something other than grass you will not see anything."
@@ -717,7 +724,8 @@ public class CFICommands extends MethodCommands {
 
 
     @Command(
-            aliases = {"coloring", "palette"},
+            name = "coloring",
+            aliases = {"palette"},
             usage = "",
             desc = "Color the world using an image"
     )
@@ -794,8 +802,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"mask"},
-            usage = "<imageMask|mask>",
+            name = "mask",
             desc = "Select a mask"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -820,8 +827,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"pattern"},
-            usage = "<pattern>",
+            name = "pattern",
             desc = "Select a pattern"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -845,7 +851,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"download"},
+            name = "download",
             desc = "Download the current image"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -861,8 +867,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"image"},
-            usage = "<image>",
+            name = "image",
             desc = "Select an image"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -895,7 +900,7 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"populate"},
+            name = "populate",
             usage = "",
             desc = ""
     )
@@ -912,7 +917,8 @@ public class CFICommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"component", "components"},
+            name = "component",
+            aliases = {"components"},
             usage = "",
             desc = "Components menu"
     )

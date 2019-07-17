@@ -65,8 +65,8 @@ processResources {
                 version: "${project.parent.version}",
                 name: project.parent.name,
                 commit: "${git.head().abbreviatedId}",
-                date: "${git.head().getDate().format("yy.MM.dd")}",
-        )
+                date: "${git.head().getDate().format("yy.MM.dd")}"
+)
     }
 }
 

@@ -14,7 +14,6 @@ import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
         command = "trimchunks",
         permission = "plots.admin",
         description = "Delete unmodified portions of your plotworld",
-        usage = "/plot trimchunks <world> <boolean-delete-unowned>",
         requiredType = RequiredType.PLAYER,
         category = CommandCategory.ADMINISTRATION)
 public class FaweTrim extends SubCommand {

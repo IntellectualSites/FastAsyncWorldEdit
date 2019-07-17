@@ -55,13 +55,12 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"savebrush", "save"},
-            usage = "[name]",
+            name = "savebrush",
+            aliases = {"save"},
             desc = "Save your current brush",
-            help = "Save your current brush\n" +
-                    "use the -g flag to save globally",
-            min = 1
-    )
+            descFooter = "Save your current brush\n" +
+                    "use the -g flag to save globally"
+)
     @CommandPermissions("worldedit.brush.save")
     public void saveBrush(Player player, LocalSession session, String name, @Switch('g') boolean root) throws WorldEditException, IOException {
         BrushTool tool = session.getBrushTool(player);
@@ -93,11 +92,10 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"loadbrush", "load"},
-            desc = "load a brush",
-            usage = "[name]",
-            min = 1
-    )
+            name = "loadbrush",
+            aliases = {"load"},
+            desc = "load a brush"
+)
     @CommandPermissions("worldedit.brush.load")
     public void loadBrush(Player player, LocalSession session, String name) throws WorldEditException, IOException {
         name = FileSystems.getDefault().getPath(name).getFileName().toString();
@@ -130,13 +128,10 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"/listbrush"},
+            name = "/listbrush",
             desc = "List saved brushes",
-            usage = "[mine|<filter>] [page=1]",
-            min = 0,
             max = -1,
-            flags = "dnp",
-            help = "List all brushes in the brush directory\n" +
+            descFooter = "List all brushes in the brush directory\n" +
                     " -p <page> prints the requested page\n"
     )
     @CommandPermissions("worldedit.brush.list")
@@ -153,20 +148,19 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"none", "/none"},
+            name = "none",
+            aliases = {"/none"},
             usage = "",
-            desc = "Unbind a bound tool from your current item",
-            min = 0,
-            max = 0
-    )
+            desc = "Unbind a bound tool from your current item"
+)
     public void none(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         session.setTool(player, null);
         BBC.TOOL_NONE.send(player);
     }
 
     @Command(
-            aliases = {"/", ","},
-            usage = "[on|off]",
+            name = "/",
+            aliases = {","},
             desc = "Toggle the super pickaxe function"
     )
     @CommandPermissions("worldedit.superpickaxe")
@@ -192,12 +186,10 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"primary"},
-            usage = "[brush-arguments]",
+            name = "primary",
             desc = "Set the right click brush",
-            help = "Set the right click brush",
-            min = 1
-    )
+            descFooter = "Set the right click brush"
+)
     @CommandPermissions("worldedit.brush.primary")
     public void primary(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
@@ -213,12 +205,10 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"secondary"},
-            usage = "[brush-arguments]",
+            name = "secondary",
             desc = "Set the left click brush",
-            help = "Set the left click brush",
-            min = 1
-    )
+            descFooter = "Set the left click brush"
+)
     @CommandPermissions("worldedit.brush.secondary")
     public void secondary(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
@@ -234,16 +224,14 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"visualize", "visual", "vis"},
-            usage = "[mode=0]",
+            name = "visualize",
+            aliases = {"visual", "vis"},
             desc = "Toggle between different visualization modes",
-            help = "Toggle between different visualization modes\n" +
+            descFooter = "Toggle between different visualization modes\n" +
                     "0 = No visualization\n" +
                     "1 = Single block at target position\n" +
-                    "2 = Glass showing what blocks will be changed",
-            min = 0,
-            max = 1
-    )
+                    "2 = Glass showing what blocks will be changed"
+)
     @CommandPermissions("worldedit.brush.visualize")
     public void visual(Player player, LocalSession session, @Range(min = 0, max = 2)int mode) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -258,12 +246,10 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"target", "tar"},
-            usage = "[mode]",
-            desc = "Toggle between different target modes",
-            min = 0,
-            max = 1
-    )
+            name = "target",
+            aliases = {"tar"},
+            desc = "Toggle between different target modes"
+)
     @CommandPermissions("worldedit.brush.target")
     public void target(Player player, LocalSession session, @Optional("0") int mode) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -278,10 +264,9 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"targetmask", "tarmask", "tm"},
-            usage = "[mask]",
+            name = "targetmask",
+            aliases = {"tarmask", "tm"},
             desc = "Set the targeting mask",
-            min = 1,
             max = -1
     )
     @CommandPermissions("worldedit.brush.targetmask")
@@ -302,10 +287,9 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"targetoffset", "to"},
-            usage = "[mask]",
+            name = "targetoffset",
+            aliases = {"to"},
             desc = "Set the targeting mask",
-            min = 1,
             max = -1
     )
     @CommandPermissions("worldedit.brush.targetoffset")
@@ -320,10 +304,8 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"scroll"},
-            usage = "[none|clipboard|mask|pattern|range|size|visual|target|targetoffset]",
+            name = "scroll",
             desc = "Toggle between different target modes",
-            min = 1,
             max = -1
     )
     @CommandPermissions("worldedit.brush.scroll")
@@ -347,10 +329,9 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"mask", "/mask"},
-            usage = "[mask]",
+            name = "mask",
+            aliases = {"/mask"},
             desc = "Set the brush destination mask",
-            min = 0,
             max = -1
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
@@ -379,11 +360,10 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"smask", "/smask", "/sourcemask", "sourcemask"},
-            usage = "[mask]",
+            name = "smask",
+            aliases = {"/smask", "/sourcemask", "sourcemask"},
             desc = "Set the brush source mask",
-            help = "Set the brush source mask",
-            min = 0,
+            descFooter = "Set the brush source mask",
             max = -1
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
@@ -412,10 +392,8 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"transform"},
-            usage = "[transform]",
+            name = "transform",
             desc = "Set the brush transform",
-            min = 0,
             max = -1
     )
     @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
@@ -444,12 +422,10 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"mat", "material"},
-            usage = "[pattern]",
-            desc = "Set the brush material",
-            min = 1,
-            max = 1
-    )
+            name = "mat",
+            aliases = {"material"},
+            desc = "Set the brush material"
+)
     @CommandPermissions("worldedit.brush.options.material")
     public void material(Player player, EditSession editSession, LocalSession session, Pattern pattern, @Switch('h') boolean offHand, CommandContext context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -470,12 +446,9 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"range"},
-            usage = "[pattern]",
-            desc = "Set the brush range",
-            min = 1,
-            max = 1
-    )
+            name = "range",
+            desc = "Set the brush range"
+)
     @CommandPermissions("worldedit.brush.options.range")
     public void range(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         int range = Math.max(0, Math.min(256, args.getInteger(0)));
@@ -489,12 +462,9 @@ public class BrushOptionsCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"size"},
-            usage = "[pattern]",
-            desc = "Set the brush size",
-            min = 1,
-            max = 1
-    )
+            name = "size",
+            desc = "Set the brush size"
+)
     @CommandPermissions("worldedit.brush.options.size")
     public void size(Player player, LocalSession session, CommandContext args, @Switch('h') boolean offHand) throws WorldEditException {
         int radius = args.getInteger(0);

@@ -23,7 +23,7 @@ import java.util.Set;
 
 @Command(aliases = {"transforms"},
         desc = "Help for the various transforms. [More Info](https://git.io/v9KHO)",
-        help = "Transforms modify how a block is placed\n" +
+        descFooter = "Transforms modify how a block is placed\n" +
                 " - Use [brackets] for arguments\n" +
                 " - Use , to OR multiple\n" +
                 " - Use & to AND multiple\n" +
@@ -35,12 +35,10 @@ public class TransformCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#linear", "#l"},
-            desc = "Sequentially pick from a list of transform",
-            usage = "<transform>",
-            min = 1,
-            max = 2
-    )
+            name = "#linear",
+            aliases = {"#l"},
+            desc = "Sequentially pick from a list of transform"
+)
     public ResettableExtent linear(Actor actor, LocalSession session, @Optional("#null") ResettableExtent other) {
         if (other instanceof RandomTransform) {
             Set<ResettableExtent> extents = ((RandomTransform) other).getExtents();
@@ -50,12 +48,10 @@ public class TransformCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#linear3d", "#l3d"},
-            desc = "Use the x,y,z coordinate to pick a transform from the list",
-            usage = "<transform>",
-            min = 1,
-            max = 2
-    )
+            name = "#linear3d",
+            aliases = {"#l3d"},
+            desc = "Use the x,y,z coordinate to pick a transform from the list"
+)
     public ResettableExtent linear3d(Actor actor, LocalSession session, @Optional("#null") ResettableExtent other) {
         if (other instanceof RandomTransform) {
             Set<ResettableExtent> extents = ((RandomTransform) other).getExtents();
@@ -65,56 +61,42 @@ public class TransformCommands extends MethodCommands {
     }
 
     @Command(
-            aliases = {"#pattern"},
-            desc = "Always use a specific pattern",
-            usage = "<pattern> [transform]",
-            min = 1,
-            max = 2
-    )
+            name = "#pattern",
+            desc = "Always use a specific pattern"
+)
     public ResettableExtent pattern(Actor actor, LocalSession session, Pattern pattern, @Optional("#null") ResettableExtent other) {
         return new PatternTransform(other, pattern);
     }
 
     @Command(
-            aliases = {"#offset"},
-            desc = "Offset transform",
-            usage = "<dx> <dy> <dz> [transform]",
-            min = 3,
-            max = 4
-    )
+            name = "#offset",
+            desc = "Offset transform"
+)
     public ResettableExtent offset(Actor actor, LocalSession session, double x, double y, double z, @Optional("#null") ResettableExtent other) {
         return new OffsetExtent(other, (int) x, (int) y, (int) z);
     }
 
     @Command(
-            aliases = {"#spread", "#randomoffset"},
-            desc = "Random offset transform",
-            usage = "<dx> <dy> <dz> [transform]",
-            min = 3,
-            max = 4
-    )
+            name = "#spread",
+            aliases = {"#randomoffset"},
+            desc = "Random offset transform"
+)
     public ResettableExtent randomoffset(Actor actor, LocalSession session, double x, double y, double z, @Optional("#null") ResettableExtent other) {
         return new RandomOffsetTransform(other, (int) x, (int) y, (int) z);
     }
 
     @Command(
-            aliases = {"#scale"},
-            desc = "All changes will be scaled",
-            usage = "<dx> <dy> <dz> [transform]",
-            min = 3,
-            max = 4
-    )
+            name = "#scale",
+            desc = "All changes will be scaled"
+)
     public ResettableExtent scale(Actor actor, LocalSession session, double x, double y, double z, @Optional("#null") ResettableExtent other) {
         return new ScaleTransform(other, x, y, z);
     }
 
     @Command(
-            aliases = {"#rotate"},
-            desc = "All changes will be rotate around the initial position",
-            usage = "<rotateX> <rotateY> <rotateZ> [transform]",
-            min = 3,
-            max = 4
-    )
+            name = "#rotate",
+            desc = "All changes will be rotate around the initial position"
+)
     public ResettableExtent rotate(Player player, LocalSession session, double x, double y, double z, @Optional("#null") ResettableExtent other) {
         ExtentTraverser traverser = new ExtentTraverser(other).find(TransformExtent.class);
         BlockTransformExtent affine = (TransformExtent) (traverser != null ? traverser.get() : null);

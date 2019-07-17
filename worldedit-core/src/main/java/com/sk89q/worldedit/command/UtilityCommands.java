@@ -207,7 +207,7 @@ public class UtilityCommands {
     @Command(
         name = "patterns",
         desc = "View help about patterns",
-        help = "Patterns determine what blocks are placed\n" +
+        descFooter = "Patterns determine what blocks are placed\n" +
             " - Use [brackets] for arguments\n" +
             " - Use , to OR multiple\n" +
             "e.g. #surfacespread[10][#existing],andesite\n" +
@@ -221,9 +221,8 @@ public class UtilityCommands {
 
     @Command(
         name = "masks",
-        usage = "[page=1|search|mask]",
         desc = "View help about masks",
-        help = "Masks determine if a block can be placed\n" +
+        descFooter = "Masks determine if a block can be placed\n" +
             " - Use [brackets] for arguments\n" +
             " - Use , to OR multiple\n" +
             " - Use & to AND multiple\n" +
@@ -239,7 +238,7 @@ public class UtilityCommands {
     @Command(
         name = "transforms",
         desc = "View help about transforms",
-        help = "Transforms modify how a block is placed\n" +
+        descFooter = "Transforms modify how a block is placed\n" +
             " - Use [brackets] for arguments\n" +
             " - Use , to OR multiple\n" +
             " - Use & to AND multiple\n" +

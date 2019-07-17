@@ -71,8 +71,8 @@ public class HistoryCommands extends MethodCommands {
 
     @Command(
         name = "fawerollback",
-            aliases = {"/frb", "frb", "fawerollback", "/fawerollback", "/rollback"},
-            usage = "<user=Empire92> <radius=5> <time=3d4h>",
+            name = "/frb",
+            aliases = {"frb", "fawerollback", "/fawerollback", "/rollback"},
             desc = "Undo a specific edit. " +
                    " - The time uses s, m, h, d, y.\n" +
                    " - Import from disk: /frb #import"
@@ -199,7 +199,6 @@ public class HistoryCommands extends MethodCommands {
     @Command(
             name = "fawerestore",
             alias = {"/fawerestore", "/frestore"},
-            usage = "<user=Empire92|*> <radius=5> <time=3d4h>",
             desc = "Redo a specific edit. " +
                    " - The time uses s, m, h, d, y.\n" +
                    " - Import from disk: /frb #import"

@@ -54,7 +54,8 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = {"/tips", "tips"},
+            name = "/tips",
+            aliases = {"tips"},
             desc = "Toggle FAWE tips"
     )
     @CommandPermissions("fawe.tips")
@@ -68,12 +69,9 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = {"/fast"},
-            usage = "[on|off]",
-            desc = "Toggles FAWE undo",
-            min = 0,
-            max = 1
-    )
+            name = "/fast",
+            desc = "Toggles FAWE undo"
+)
     @CommandPermissions("worldedit.fast")
     public void fast(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
@@ -98,11 +96,10 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = {"/gtexture", "gtexture"},
-            usage = "[mask|#clipboard|complexity] [randomization=true]",
-            help = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
+            name = "/gtexture",
+            aliases = {"gtexture"},
+            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
             desc = "Set the global mask",
-            min = 0,
             max = -1
     )
     @CommandPermissions("worldedit.global-texture")
@@ -158,11 +155,10 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = {"/gmask", "gmask", "globalmask", "/globalmask"},
-            usage = "[mask]",
-            help = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
+            name = "/gmask",
+            aliases = {"gmask", "globalmask", "/globalmask"},
+            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e. the blocks in the world).",
             desc = "Set the global mask",
-            min = 0,
             max = -1
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
@@ -183,11 +179,10 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = {"/gsmask", "gsmask", "globalsourcemask", "/globalsourcemask"},
-            usage = "[mask]",
+            name = "/gsmask",
+            aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
             desc = "Set the global source mask",
-            help = "The global source mask applies to all edits you do and masks based on the source blocks (e.g. the blocks in your clipboard)",
-            min = 0,
+            descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g. the blocks in your clipboard)",
             max = -1
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
@@ -208,10 +203,9 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = {"/gtransform", "gtransform"},
-            usage = "[transform]",
+            name = "/gtransform",
+            aliases = {"gtransform"},
             desc = "Set the global transform",
-            min = 0,
             max = -1
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
@@ -232,12 +226,11 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = {"/toggleplace", "toggleplace"},
+            name = "/toggleplace",
+            aliases = {"toggleplace"},
             usage = "",
-            desc = "Switch between your position and pos1 for placement",
-            min = 0,
-            max = 0
-    )
+            desc = "Switch between your position and pos1 for placement"
+)
     public void togglePlace(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
         if (session.togglePlacementPosition()) {
@@ -248,12 +241,9 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = { "/timeout" },
-            usage = "[time]",
-            desc = "Modify evaluation timeout time.",
-            min = 0,
-            max = 1
-    )
+            name = "/timeout",
+            desc = "Modify evaluation timeout time."
+)
     @CommandPermissions("worldedit.timeout")
     public void timeout(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
@@ -278,12 +268,9 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = { "/drawsel" },
-            usage = "[on|off]",
-            desc = "Toggle drawing the current selection",
-            min = 0,
-            max = 1
-    )
+            name = "/drawsel",
+            desc = "Toggle drawing the current selection"
+)
     @CommandPermissions("worldedit.drawsel")
     public void drawSelection(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
@@ -313,18 +300,15 @@ public class OptionsCommands {
     }
 
     @Command(
-            aliases = {"/searchitem", "/l", "/search", "searchitem"},
-            usage = "<query>",
-            flags = "bi",
+            name = "/searchitem",
+            aliases = {"/l", "/search", "searchitem"},
             desc = "Search for an item",
-            help =
+            descFooter =
                     "Searches for an item.\n" +
                             "Flags:\n" +
                             "  -b only search for blocks\n" +
-                            "  -i only search for items",
-            min = 1,
-            max = 1
-    )
+                            "  -i only search for items"
+)
     @CommandPermissions("worldedit.searchitem")
     public void searchItem(Actor actor, CommandContext args) throws WorldEditException {
 

@@ -60,6 +60,8 @@ import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.util.ColorUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.image.ImageUtil;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.minecraft.util.commands.Step;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -98,6 +100,7 @@ import com.sk89q.worldedit.util.command.CallableProcessor;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.InvalidUsageException;
 import com.sk89q.worldedit.util.command.parametric.AParametricCallable;
+import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -137,9 +140,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"blendball", "bb", "blend"},
+            name = "blendball",
+            aliases = {"bb", "blend"},
             desc = "Smooths and blends terrain",
-            help = "Smooths and blends terrain\n" +
+            descFooter = "Smooths and blends terrain\n" +
                     "Pic: https://i.imgur.com/cNUQUkj.png -> https://i.imgur.com/hFOFsNf.png"
     )
     @CommandPermissions("worldedit.brush.blendball")
@@ -299,10 +303,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"recursive", "recurse", "r"},
-            usage = "<pattern-to> [radius=5]",
+            name = "recursive",
+            aliases = {"recurse", "r"},
             desc = "Set all connected blocks",
-            help = "Set all connected blocks\n" +
+            descFooter = "Set all connected blocks\n" +
                     "The -d flag Will apply in depth first order\n" +
                     "Note: Set a mask to recurse along specific blocks"
     )
@@ -343,11 +347,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"line", "l"},
-            usage = "<pattern> [radius=0]",
-            flags = "hsf",
+            name = "line",
+            aliases = {"l"},
             desc = "Create lines",
-            help = "Create lines.\n" +
+            descFooter = "Create lines.\n" +
                    "The -h flag creates only a shell\n" +
                    "The -s flag selects the clicked point after drawing\n" +
                    "The -f flag creates a flat line"
@@ -389,10 +392,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"spline", "spl", "curve"},
-            usage = "<pattern>",
+            name = "spline",
+            aliases = {"spl", "curve"},
             desc = "Join multiple objects together in a curve",
-            help = "Click to select some objects,click the same block twice to connect the objects.\n" +
+            descFooter = "Click to select some objects,click the same block twice to connect the objects.\n" +
                     "Insufficient brush radius, or clicking the the wrong spot will result in undesired shapes. The shapes must be simple lines or loops.\n" +
                     "Pic1: http://i.imgur.com/CeRYAoV.jpg -> http://i.imgur.com/jtM0jA4.png\n" +
                     "Pic2: http://i.imgur.com/bUeyc72.png -> http://i.imgur.com/tg6MkcF.png" +
@@ -437,10 +440,10 @@ public class BrushCommands {
 
     // Adapted from: https://github.com/Rafessor/VaeronTools
     @Command(
-            aliases = {"sweep", "sw", "vaesweep"},
-            usage = "[copies=-1]",
+            name = "sweep",
+            aliases = {"sw", "vaesweep"},
             desc = "Sweep your clipboard content along a curve",
-            help = "Sweeps your clipboard content along a curve.\n" +
+            descFooter = "Sweeps your clipboard content along a curve.\n" +
                    "Define a curve by selecting the individual points with a brush\n" +
                    "Set [copies] to a value > 0 if you want to have your selection pasted a limited amount of times equally spaced on the curve"
     )
@@ -479,10 +482,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"catenary", "cat", "gravityline", "saggedline"},
-            usage = "<pattern> [lengthFactor=1.2] [size=0]",
+            name = "catenary",
+            aliases = {"cat", "gravityline", "saggedline"},
             desc = "Create a hanging line between two points",
-            help = "Create a hanging line between two points.\n" +
+            descFooter = "Create a hanging line between two points.\n" +
                     "The lengthFactor controls how long the line is\n" +
                     "The -h flag creates only a shell\n" +
                     "The -s flag selects the clicked point after drawing\n" +
@@ -525,10 +528,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"sspl", "sspline", "surfacespline"},
-            usage = "<pattern> [size=0] [tension=0] [bias=0] [continuity=0] [quality=10]",
+            name = "sspl",
+            aliases = {"sspline", "surfacespline"},
             desc = "Draws a spline (curved line) on the surface",
-            help = "Create a spline on the surface\n" +
+            descFooter = "Create a spline on the surface\n" +
                    "Video: https://www.youtube.com/watch?v=zSN-2jJxXlM"
     )
     @CommandPermissions("worldedit.brush.surfacespline") // 0, 0, 0, 10, 0,
@@ -569,9 +572,8 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"rock", "blob"},
-            usage = "<pattern> [radius=10] [roundness=100] [frequency=30] [amplitude=50]",
-            flags = "h",
+            name = "rock",
+            aliases = {"blob"},
             desc = "Creates a distorted sphere"
     )
     @CommandPermissions("worldedit.brush.rock")
@@ -675,10 +677,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"shatter", "partition", "split"},
-            usage = "<pattern> [radius=10] [count=10]",
+            name = "shatter",
+            aliases = {"partition", "split"},
             desc = "Creates random lines to break the terrain into pieces",
-            help = "Creates uneven lines separating terrain into multiple pieces\n" +
+            descFooter = "Creates uneven lines separating terrain into multiple pieces\n" +
                    "Pic: https://i.imgur.com/2xKsZf2.png"
     )
     @CommandPermissions("worldedit.brush.shatter")
@@ -719,14 +721,12 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"stencil"},
-            usage = "<pattern> [radius=5] [file|#clipboard|imgur=null] [rotation=360] [yscale=1.0]",
+            name = "stencil",
             desc = "Use a height map to paint a surface",
-            help = "Use a height map to paint any surface.\n" +
+            descFooter = "Use a height map to paint any surface.\n" +
                    "The -w flag will only apply at maximum saturation\n" +
-                   "The -r flag will apply random rotation",
-            min = 1
-    )
+                   "The -r flag will apply random rotation"
+)
     @CommandPermissions("worldedit.brush.stencil")
     public BrushSettings stencilBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("5") Expression radius, @Optional() final String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Optional("1") final double yscale, @Switch('w') boolean onlyWhite, @Switch('r') boolean randomRotate, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -771,15 +771,13 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"image", "color"},
-            usage = "<radius> <image> [yscale=1]",
+            name = "image",
+            aliases = {"color"},
             desc = "Use a height map to paint a surface",
-            flags = "a",
-            help = "Use a height map to paint any surface.\n" +
+            descFooter = "Use a height map to paint any surface.\n" +
                    "The -a flag will use image alpha\n" +
-                   "The -f blends the image with the existing terrain",
-            min = 1
-    )
+                   "The -f blends the image with the existing terrain"
+)
     @CommandPermissions("worldedit.brush.stencil")
     public BrushSettings imageBrush(Player player, EditSession editSession, LocalSession session, @Optional("5") Expression radius, FawePrimitiveBinding.ImageUri imageUri, @Optional("1") @Range(min=Double.MIN_NORMAL) final double yscale, @Switch('a') boolean alpha, @Switch('f') boolean fadeOut, CommandContext context) throws WorldEditException, IOException, ParameterException {
         BufferedImage image = imageUri.load();
@@ -824,14 +822,13 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"surface", "surf"},
-            usage = "<pattern> [radius=5]",
+            name = "surface",
+            aliases = {"surf"},
             desc = "Use a height map to paint a surface",
-            help = "Use a height map to paint any surface.\n" +
+            descFooter = "Use a height map to paint any surface.\n" +
                    "The -w flag will only apply at maximum saturation\n" +
-                   "The -r flag will apply random rotation",
-            min = 1
-    )
+                   "The -r flag will apply random rotation"
+)
     @CommandPermissions("worldedit.brush.surface")
     public BrushSettings surfaceBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("5") Expression radius, CommandContext context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -868,12 +865,11 @@ public class BrushCommands {
 
     @Command(
             name = "scatter",
-            usage = "<pattern> [radius=5] [points=5] [distance=1]",
             desc = "Scatter a pattern on a surface",
-            help = "Set a number of blocks randomly on a surface each a certain distance apart.\n" +
+            descFooter = "Set a number of blocks randomly on a surface each a certain distance apart.\n" +
                    " The -o flag will overlay the block\n" +
-                   "Video: https://youtu.be/RPZIaTbqoZw?t=34s",
-    )
+                   "Video: https://youtu.be/RPZIaTbqoZw?t=34s"
+)
     @CommandPermissions("worldedit.brush.scatter")
     public BrushSettings scatterBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("5") Expression radius, @Optional("5") double points, @Optional("1") double distance, @Switch('o') boolean overlay, CommandContext context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
@@ -914,10 +910,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"populateschematic", "populateschem", "popschem", "pschem", "ps"},
-            usage = "<mask> <file|folder|url> [radius=30] [points=5]",
+            name = "populateschematic",
+            aliases = {"populateschem", "popschem", "pschem", "ps"},
             desc = "Scatter a schematic on a surface",
-            help = "Chooses the scatter schematic brush.\n" +
+            descFooter = "Chooses the scatter schematic brush.\n" +
                    "The -r flag will apply random rotation"
     )
     @CommandPermissions("worldedit.brush.populateschematic")
@@ -973,9 +969,8 @@ public class BrushCommands {
 
     @Command(
             name = "layer",
-            usage = "<radius> [color|<pattern1> <patern2>...]",
             desc = "Replaces terrain with a layer.",
-            help = "Replaces terrain with a layer.\n" +
+            descFooter = "Replaces terrain with a layer.\n" +
                    "Example: /br layer 5 95:1 95:2 35:15 - Places several layers on a surface\n" +
                    "Pic: https://i.imgur.com/XV0vYoX.png"
     )
@@ -1037,7 +1032,7 @@ public class BrushCommands {
     @Command(
             name = "splatter",
             desc = "Splatter a pattern on a surface",
-            help = "Sets a bunch of blocks randomly on a surface.\n" +
+            descFooter = "Sets a bunch of blocks randomly on a surface.\n" +
                    "Pic: https://i.imgur.com/hMD29oO.png\n" +
                    "Example: /br splatter stone,dirt 30 15\n" +
                    "Note: The seeds define how many splotches there are, recursion defines how large, solid defines whether the pattern is applied per seed, else per block."
@@ -1077,10 +1072,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"scmd", "scattercmd", "scattercommand", "scommand"},
-            usage = "<scatter-radius> <points> <cmd-radius=1> <cmd1;cmd2...>",
+            name = "scmd",
+            aliases = {"scattercmd", "scattercommand", "scommand"},
             desc = "Run commands at random points on a surface",
-            help =
+            descFooter =
                     "Run commands at random points on a surface\n" +
                             " - The scatter radius is the min distance between each point\n" +
                             " - Your selection will be expanded to the specified size around each point\n" +
@@ -1209,7 +1204,7 @@ public class BrushCommands {
             name = "clipboard",
             aliases = { "copy" },
             desc = "Choose the clipboard brush (Recommended: `/br copypaste`)",
-            help = "Chooses the clipboard brush.\n" +
+            descFooter = "Chooses the clipboard brush.\n" +
                    "The -a flag makes it not paste air.\n" +
                    "Without the -p flag, the paste will appear centered at the target location. " +
                    "With the flag, then the paste will appear relative to where you had " +
@@ -1409,11 +1404,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"height", "heightmap"},
-            usage = "[radius=5] [file|#clipboard|imgur=null] [rotation=0] [yscale=1.00]",
-            flags = "h",
+            name = "height",
+            aliases = {"heightmap"},
             desc = "Raise or lower terrain using a heightmap",
-            help = "This brush raises and lowers land.\n" +
+            descFooter = "This brush raises and lowers land.\n" +
                    " - The `-r` flag enables random off-axis rotation\n" +
                    " - The `-l` flag will work on snow layers\n" +
                    " - The `-s` flag disables smoothing\n" +
@@ -1426,11 +1420,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"cliff", "flatcylinder"},
-            usage = "[radius=5] [file|#clipboard|imgur=null] [rotation=0] [yscale=1.00]",
-            flags = "h",
+            name = "cliff",
+            aliases = {"flatcylinder"},
             desc = "Cliff brush",
-            help = "This brush flattens terrain and creates cliffs.\n" +
+            descFooter = "This brush flattens terrain and creates cliffs.\n" +
                    " - The `-r` flag enables random off-axis rotation\n" +
                    " - The `-l` flag will work on snow layers\n" +
                    " - The `-s` flag disables smoothing"
@@ -1441,10 +1434,9 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"flatten", "flatmap", "flat"},
-            usage = "[radius=5] [file|#clipboard|imgur=null] [rotation=0] [yscale=1.00]",
-            flags = "h",
-            help = "Flatten brush flattens terrain\n" +
+            name = "flatten",
+            aliases = {"flatmap", "flat"},
+            descFooter = "Flatten brush flattens terrain\n" +
                    " - The `-r` flag enables random off-axis rotation\n" +
                    " - The `-l` flag will work on snow layers\n" +
                    " - The `-s` flag disables smoothing",
@@ -1516,10 +1508,10 @@ public class BrushCommands {
 
 
     @Command(
-            aliases = {"copypaste", "copy", "paste", "cp", "copypasta"},
-            usage = "[depth=5]",
+            name = "copypaste",
+            aliases = {"copy", "paste", "cp", "copypasta"},
             desc = "Copy Paste brush",
-            help = "Left click the base of an object to copy.\n" +
+            descFooter = "Left click the base of an object to copy.\n" +
                    "Right click to paste\n" +
                    "The -r flag Will apply random rotation on paste\n" +
                    "The -a flag Will apply auto view based rotation on paste\n" +
@@ -1563,10 +1555,10 @@ public class BrushCommands {
     }
 
     @Command(
-            aliases = {"command", "cmd"},
-            usage = "<radius> [cmd1;cmd2...]",
+            name = "command",
+            aliases = {"cmd"},
             desc = "Command brush",
-            help = "Run the commands at the clicked position.\n" +
+            descFooter = "Run the commands at the clicked position.\n" +
                    " - Your selection will be expanded to the specified size around each point\n" +
                    " - Placeholders: {x}, {y}, {z}, {world}, {size}"
     )

@@ -41,10 +41,9 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-            aliases = {"single"},
-            desc = "Enable the single block super pickaxe mode",
-            max = 0
-    )
+            name = "single",
+            desc = "Enable the single block super pickaxe mode"
+)
     @CommandPermissions("worldedit.superpickaxe")
     public void single(Player player, LocalSession session) throws WorldEditException {
         session.setSuperPickaxe(new SinglePickaxe());
@@ -53,12 +52,9 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-            aliases = {"area"},
-            usage = "<radius>",
-            desc = "Enable the area super pickaxe pickaxe mode",
-            min = 1,
-            max = 1
-    )
+            name = "area",
+            desc = "Enable the area super pickaxe pickaxe mode"
+)
     @CommandPermissions("worldedit.superpickaxe.area")
     public void area(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 
@@ -76,12 +72,10 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-            aliases = {"recur", "recursive"},
-            usage = "<radius>",
-            desc = "Enable the recursive super pickaxe pickaxe mode",
-            min = 1,
-            max = 1
-    )
+            name = "recur",
+            aliases = {"recursive"},
+            desc = "Enable the recursive super pickaxe pickaxe mode"
+)
     @CommandPermissions("worldedit.superpickaxe.recursive")
     public void recursive(Player player, LocalSession session, CommandContext args) throws WorldEditException {
 

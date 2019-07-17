@@ -379,8 +379,8 @@ public class ClipboardCommands {
 
     @Command(
             name = "asset",
-            desc = "Saves your clipboard to the asset web interface",
-    )
+            desc = "Saves your clipboard to the asset web interface"
+)
     @CommandPermissions({"worldedit.clipboard.asset"})
     public void asset(final Player player, final LocalSession session, String category) throws WorldEditException {
         final ClipboardFormat format = BuiltInClipboardFormat.MCEDIT_SCHEMATIC;
@@ -479,8 +479,8 @@ public class ClipboardCommands {
 
     @Command(
             name = "/place",
-            desc = "Place the clipboard's contents without applying transformations (e.g. rotate)",
-    )
+            desc = "Place the clipboard's contents without applying transformations (e.g. rotate)"
+)
     @CommandPermissions("worldedit.clipboard.place")
     @Logging(PLACEMENT)
     public void place(Player player, LocalSession session, final EditSession editSession,
