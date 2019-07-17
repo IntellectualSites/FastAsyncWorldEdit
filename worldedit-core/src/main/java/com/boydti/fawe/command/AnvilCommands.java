@@ -147,7 +147,7 @@ public class AnvilCommands {
             descFooter = "The -d flag disabled wildcard data matching\n"
 )
     @CommandPermissions("worldedit.anvil.replaceall")
-    public void replaceAll(Player player, String folder, @Optional String from, String to, @Switch('d') boolean useData) throws WorldEditException {
+    public void replaceAll(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, String to, @Switch('d') boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;
 //        if (from == null) {
 //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -191,7 +191,7 @@ public class AnvilCommands {
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
     )
     @CommandPermissions("worldedit.anvil.deleteallunvisited")
-    public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Optional("60000") int fileDurationMillis) throws WorldEditException {
+    public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis) throws WorldEditException {
         DeleteUninhabitedFilter filter = new DeleteUninhabitedFilter(fileDurationMillis, inhabitedTicks, fileDurationMillis);
         DeleteUninhabitedFilter result = runWithWorld(player, folder, filter, true);
         if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
@@ -208,7 +208,7 @@ public class AnvilCommands {
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
 )
     @CommandPermissions("worldedit.anvil.deleteallunclaimed")
-    public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Optional("60000") int fileDurationMillis, @Switch('d') boolean debug) throws WorldEditException {
+    public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch('d') boolean debug) throws WorldEditException {
         String folder = player.getWorld().getName();
         DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
         if (debug) filter.enableDebug();
@@ -227,7 +227,7 @@ public class AnvilCommands {
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
 )
     @CommandPermissions("worldedit.anvil.deleteunclaimed")
-    public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Optional("60000") int fileDurationMillis, @Switch('d') boolean debug) throws WorldEditException {
+    public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch('d') boolean debug) throws WorldEditException {
         DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
         if (debug) filter.enableDebug();
         DeleteUnclaimedFilter result = runWithSelection(player, editSession, selection, filter);
@@ -308,7 +308,7 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with another"
 )
     @CommandPermissions("worldedit.anvil.replaceall")
-    public void replaceAllPattern(Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
+    public void replaceAllPattern(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
@@ -507,7 +507,7 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.replace")
-    public void replace(Player player, EditSession editSession, @Selection Region selection, @Optional String from, String to, @Switch('d') boolean useData) throws WorldEditException {
+    public void replace(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, String to, @Switch('d') boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;
 //        if (from == null) {
 //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -528,8 +528,8 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.replace")
-    // Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap
-    public void replacePattern(Player player, EditSession editSession, @Selection Region selection, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
+    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap
+    public void replacePattern(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
@@ -559,7 +559,7 @@ public class AnvilCommands {
             desc = "Set all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.set")
-    // Player player, String folder, @Optional String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap
+    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch('d') boolean useData, @Switch('m') boolean useMap
     public void set(Player player, EditSession editSession, @Selection Region selection, final Pattern to) throws WorldEditException {
         MCAFilterCounter filter = new SetPatternFilter(to);
         MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);

@@ -280,7 +280,7 @@ public class ClipboardCommands {
     )
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.download"})
-    public void download(final Player player, final LocalSession session, @Optional("schem") final String formatName) throws WorldEditException {
+    public void download(final Player player, final LocalSession session, @Arg(name = "format", desc = "String", def = "schem") final String formatName) throws WorldEditException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
             BBC.CLIPBOARD_INVALID_FORMAT.send(player, formatName);

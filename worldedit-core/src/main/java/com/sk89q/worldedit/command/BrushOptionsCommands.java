@@ -135,7 +135,7 @@ public class BrushOptionsCommands extends MethodCommands {
                     " -p <page> prints the requested page\n"
     )
     @CommandPermissions("worldedit.brush.list")
-    public void list(Actor actor, CommandContext args, @Switch('p') @Optional("1") int page) throws WorldEditException {
+    public void list(Actor actor, CommandContext args, @Switch('p') @Arg(name = "page", desc = "int", def = "1") int page) throws WorldEditException {
         String baseCmd = Commands.getAlias(BrushCommands.class, "brush") + " " + Commands.getAlias(BrushOptionsCommands.class, "loadbrush");
         File dir = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
         UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
@@ -251,7 +251,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Toggle between different target modes"
 )
     @CommandPermissions("worldedit.brush.target")
-    public void target(Player player, LocalSession session, @Optional("0") int mode) throws WorldEditException {
+    public void target(Player player, LocalSession session, @Arg(name = "mode", desc = "int", def = "0") int mode) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             BBC.BRUSH_NONE.send(player);

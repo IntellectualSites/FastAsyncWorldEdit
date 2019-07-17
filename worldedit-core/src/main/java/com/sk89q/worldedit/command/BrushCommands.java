@@ -448,7 +448,7 @@ public class BrushCommands {
                    "Set [copies] to a value > 0 if you want to have your selection pasted a limited amount of times equally spaced on the curve"
     )
     @CommandPermissions("worldedit.brush.sweep")
-    public BrushSettings sweepBrush(Player player, LocalSession session, EditSession editSession, @Optional("-1") int copies, CommandContext context) throws WorldEditException {
+    public BrushSettings sweepBrush(Player player, LocalSession session, EditSession editSession, @Arg(name = "copies", desc = "int", def = "-1") int copies, CommandContext context) throws WorldEditException {
         player.print(BBC.BRUSH_SPLINE.s());
         Brush brush = new SweepBrush(copies);
         CommandLocals locals = context.getLocals();
@@ -537,7 +537,7 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.surfacespline") // 0, 0, 0, 10, 0,
     public BrushSettings surfaceSpline(Player player, EditSession editSession, LocalSession session, Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "0")
-            double radius, @Optional("0") double tension, @Optional("0") double bias, @Optional("0") double continuity, @Optional("10") double quality, CommandContext context) throws WorldEditException {
+            double radius, @Arg(name = "tension", desc = "double", def = "0") double tension, @Arg(name = "bias", desc = "double", def = "0") double bias, @Arg(name = "continuity", desc = "double", def = "0") double continuity, @Arg(name = "quality", desc = "double", def = "10") double quality, CommandContext context) throws WorldEditException {
         player.print(BBC.BRUSH_SPLINE.f(radius));
         worldEdit.checkMaxBrushRadius(radius);
         Brush brush = new SurfaceSpline(tension, bias, continuity, quality);
@@ -577,7 +577,7 @@ public class BrushCommands {
             desc = "Creates a distorted sphere"
     )
     @CommandPermissions("worldedit.brush.rock")
-    public BrushSettings blobBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("10") Vector3 radius, @Optional("100") double sphericity, @Optional("30") double frequency, @Optional("50") double amplitude, CommandContext context) throws WorldEditException {
+    public BrushSettings blobBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Arg(name = "radius", desc = "Vector3", def = "10") Vector3 radius, @Arg(name = "sphericity", desc = "double", def = "100") double sphericity, @Arg(name = "frequency", desc = "double", def = "30") double frequency, @Arg(name = "amplitude", desc = "double", def = "50") double amplitude, CommandContext context) throws WorldEditException {
         double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
         worldEdit.checkMaxBrushRadius(max);
         Brush brush = new BlobBrush(radius.divide(max), frequency / 100, amplitude / 100, sphericity / 100);
@@ -728,7 +728,7 @@ public class BrushCommands {
                    "The -r flag will apply random rotation"
 )
     @CommandPermissions("worldedit.brush.stencil")
-    public BrushSettings stencilBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("5") Expression radius, @Optional() final String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Optional("1") final double yscale, @Switch('w') boolean onlyWhite, @Switch('r') boolean randomRotate, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
+    public BrushSettings stencilBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Arg(name = "yscale", desc = "double", def = "1") final double yscale, @Switch('w') boolean onlyWhite, @Switch('r') boolean randomRotate, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
         worldEdit.checkMaxBrushRadius(radius);
         InputStream stream = getHeightmapStream(image);
         HeightBrush brush;
@@ -779,7 +779,7 @@ public class BrushCommands {
                    "The -f blends the image with the existing terrain"
 )
     @CommandPermissions("worldedit.brush.stencil")
-    public BrushSettings imageBrush(Player player, EditSession editSession, LocalSession session, @Optional("5") Expression radius, FawePrimitiveBinding.ImageUri imageUri, @Optional("1") @Range(min=Double.MIN_NORMAL) final double yscale, @Switch('a') boolean alpha, @Switch('f') boolean fadeOut, CommandContext context) throws WorldEditException, IOException, ParameterException {
+    public BrushSettings imageBrush(Player player, EditSession editSession, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, FawePrimitiveBinding.ImageUri imageUri, @Optional("1") @Range(min=Double.MIN_NORMAL) final double yscale, @Switch('a') boolean alpha, @Switch('f') boolean fadeOut, CommandContext context) throws WorldEditException, IOException, ParameterException {
         BufferedImage image = imageUri.load();
         worldEdit.checkMaxBrushRadius(radius);
         if (yscale != 1) {
@@ -830,7 +830,7 @@ public class BrushCommands {
                    "The -r flag will apply random rotation"
 )
     @CommandPermissions("worldedit.brush.surface")
-    public BrushSettings surfaceBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("5") Expression radius, CommandContext context) throws WorldEditException {
+    public BrushSettings surfaceBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, CommandContext context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         Brush brush = new SurfaceSphereBrush();
         CommandLocals locals = context.getLocals();
@@ -871,7 +871,7 @@ public class BrushCommands {
                    "Video: https://youtu.be/RPZIaTbqoZw?t=34s"
 )
     @CommandPermissions("worldedit.brush.scatter")
-    public BrushSettings scatterBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("5") Expression radius, @Optional("5") double points, @Optional("1") double distance, @Switch('o') boolean overlay, CommandContext context) throws WorldEditException {
+    public BrushSettings scatterBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "points", desc = "double", def = "5") double points, @Arg(name = "distance", desc = "double", def = "1") double distance, @Switch('o') boolean overlay, CommandContext context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         Brush brush;
         if (overlay) {
@@ -917,7 +917,7 @@ public class BrushCommands {
                    "The -r flag will apply random rotation"
     )
     @CommandPermissions("worldedit.brush.populateschematic")
-    public BrushSettings scatterSchemBrush(Player player, EditSession editSession, LocalSession session, Mask mask, String clipboard, @Optional("30") Expression radius, @Optional("50") double density, @Switch('r') boolean rotate, CommandContext context) throws WorldEditException {
+    public BrushSettings scatterSchemBrush(Player player, EditSession editSession, LocalSession session, Mask mask, String clipboard, @Arg(name = "radius", desc = "Expression", def = "30") Expression radius, @Arg(name = "density", desc = "double", def = "50") double density, @Switch('r') boolean rotate, CommandContext context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
 
 
@@ -1038,7 +1038,7 @@ public class BrushCommands {
                    "Note: The seeds define how many splotches there are, recursion defines how large, solid defines whether the pattern is applied per seed, else per block."
     )
     @CommandPermissions("worldedit.brush.splatter")
-    public BrushSettings splatterBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Optional("5") Expression radius, @Optional("1") double points, @Optional("5") double recursion, @Optional("true") boolean solid, CommandContext context) throws WorldEditException {
+    public BrushSettings splatterBrush(Player player, EditSession editSession, LocalSession session, Pattern fill, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "points", desc = "double", def = "1") double points, @Arg(name = "recursion", desc = "double", def = "5") double recursion, @Arg(name = "solid", desc = "boolean", def = "true") boolean solid, CommandContext context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         Brush brush = new SplatterBrush((int) points, (int) recursion, solid);
         CommandLocals locals = context.getLocals();
@@ -1415,7 +1415,7 @@ public class BrushCommands {
                    "Snow Pic: https://i.imgur.com/Hrzn0I4.png"
     )
     @CommandPermissions("worldedit.brush.height")
-    public BrushSettings heightBrush(Player player, LocalSession session, @Optional("5") Expression radius, @Optional() final String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Optional("1") final double yscale, @Switch('r') boolean randomRotate, @Switch('l') boolean layers, @Switch('s') boolean dontSmooth, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
+    public BrushSettings heightBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") final String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Arg(name = "yscale", desc = "double", def = "1") final double yscale, @Switch('r') boolean randomRotate, @Switch('l') boolean layers, @Switch('s') boolean dontSmooth, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
         return terrainBrush(player, session, radius, image, rotation, yscale, false, randomRotate, layers, !dontSmooth, ScalableHeightMap.Shape.CONE, context);
     }
 
@@ -1429,7 +1429,7 @@ public class BrushCommands {
                    " - The `-s` flag disables smoothing"
     )
     @CommandPermissions("worldedit.brush.height")
-    public BrushSettings cliffBrush(Player player, LocalSession session, @Optional("5") Expression radius, @Optional() final String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Optional("1") final double yscale, @Switch('r') boolean randomRotate, @Switch('l') boolean layers, @Switch('s') boolean dontSmooth, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
+    public BrushSettings cliffBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Arg(name = "yscale", desc = "double", def = "1") final double yscale, @Switch('r') boolean randomRotate, @Switch('l') boolean layers, @Switch('s') boolean dontSmooth, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
         return terrainBrush(player, session, radius, image, rotation, yscale, true, randomRotate, layers, !dontSmooth, ScalableHeightMap.Shape.CYLINDER, context);
     }
 
@@ -1443,7 +1443,7 @@ public class BrushCommands {
             desc = "This brush raises or lowers land towards the clicked point"
     )
     @CommandPermissions("worldedit.brush.height")
-    public BrushSettings flattenBrush(Player player, LocalSession session, @Optional("5") Expression radius, @Optional() final String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Optional("1") final double yscale, @Switch('r') boolean randomRotate, @Switch('l') boolean layers, @Switch('s') boolean dontSmooth, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
+    public BrushSettings flattenBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") final String image, @Optional("0") @Step(90) @Range(min=0, max=360) final int rotation, @Arg(name = "yscale", desc = "double", def = "1") final double yscale, @Switch('r') boolean randomRotate, @Switch('l') boolean layers, @Switch('s') boolean dontSmooth, CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
         return terrainBrush(player, session, radius, image, rotation, yscale, true, randomRotate, layers, !dontSmooth, ScalableHeightMap.Shape.CONE, context);
     }
 
@@ -1519,7 +1519,7 @@ public class BrushCommands {
                    "Video: https://www.youtube.com/watch?v=RPZIaTbqoZw"
     )
     @CommandPermissions("worldedit.brush.copy")
-    public BrushSettings copy(Player player, LocalSession session, @Optional("5") Expression radius, @Switch('r') boolean randomRotate, @Switch('a') boolean autoRotate, CommandContext context) throws WorldEditException {
+    public BrushSettings copy(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Switch('r') boolean randomRotate, @Switch('a') boolean autoRotate, CommandContext context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         player.print(BBC.BRUSH_COPY.f(radius));
 

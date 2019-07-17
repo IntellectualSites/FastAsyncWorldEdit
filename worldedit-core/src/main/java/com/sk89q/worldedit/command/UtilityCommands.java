@@ -114,7 +114,7 @@ public class UtilityCommands {
             desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
     )
     @CommandPermissions("fawe.admin")
-    public void heightmapInterface(Player player, @Optional("100") int min, @Optional("200") int max) throws IOException {
+    public void heightmapInterface(Player player, @Arg(name = "min", desc = "int", def = "100") int min, @Arg(name = "max", desc = "int", def = "200") int max) throws IOException {
         player.print("Please wait while we generate the minified heightmaps.");
         File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
 

@@ -103,7 +103,7 @@ public class OptionsCommands {
             max = -1
     )
     @CommandPermissions("worldedit.global-texture")
-    public void gtexture(FawePlayer player, LocalSession session, EditSession editSession, @Optional CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
+    public void gtexture(FawePlayer player, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "CommandContext", def = "") CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
         if (context == null || context.argsLength() == 0) {
             session.setTextureUtil(null);
             BBC.TEXTURE_DISABLED.send(player);
@@ -162,7 +162,7 @@ public class OptionsCommands {
             max = -1
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gmask(Player player, LocalSession session, EditSession editSession, @Optional CommandContext context) throws WorldEditException {
+    public void gmask(Player player, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "CommandContext", def = "") CommandContext context) throws WorldEditException {
         if (context == null || context.argsLength() == 0) {
             session.setMask((Mask) null);
             BBC.MASK_DISABLED.send(player);
@@ -186,7 +186,7 @@ public class OptionsCommands {
             max = -1
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gsmask(Player player, LocalSession session, EditSession editSession, @Optional CommandContext context) throws WorldEditException {
+    public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "CommandContext", def = "") CommandContext context) throws WorldEditException {
         if (context == null || context.argsLength() == 0) {
             session.setSourceMask((Mask) null);
             BBC.SOURCE_MASK_DISABLED.send(player);
@@ -209,7 +209,7 @@ public class OptionsCommands {
             max = -1
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
-    public void gtransform(Player player, EditSession editSession, LocalSession session, @Optional CommandContext context) throws WorldEditException {
+    public void gtransform(Player player, EditSession editSession, LocalSession session, @Arg(name = "context", desc = "CommandContext", def = "") CommandContext context) throws WorldEditException {
         if (context == null || context.argsLength() == 0) {
             session.setTransform(null);
             BBC.TRANSFORM_DISABLED.send(player);

@@ -280,7 +280,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.replace")
     @Logging(REGION)
-    public void replace(FawePlayer player, EditSession editSession, @Selection Region region, @Optional Mask from, Pattern to, CommandContext context) throws WorldEditException {
+    public void replace(FawePlayer player, EditSession editSession, @Selection Region region, @Arg(name = "from", desc = "Mask", def = "") Mask from, Pattern to, CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.replaceBlocks(region, from == null ? new ExistingBlockMask(editSession) : from, to);
             BBC.VISITOR_BLOCK.send(player, affected);
@@ -412,7 +412,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.smooth")
     @Logging(REGION)
-    public void smooth(FawePlayer player, EditSession editSession, @Selection Region region, @Optional("1") int iterations, @Optional Mask mask, @Switch('s') boolean snow, CommandContext context) throws WorldEditException {
+    public void smooth(FawePlayer player, EditSession editSession, @Selection Region region, @Arg(name = "iterations", desc = "int", def = "1") int iterations, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('s') boolean snow, CommandContext context) throws WorldEditException {
     	BlockVector3 min = region.getMinimumPoint();
     	BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
@@ -524,7 +524,7 @@ public class RegionCommands {
     @Logging(ORIENTATION_REGION)
     public void fall(FawePlayer player, EditSession editSession, LocalSession session,
                      @Selection Region region,
-                     @Optional("air") BlockStateHolder replace,
+                     @Arg(name = "replace", desc = "BlockStateHolder", def = "air") BlockStateHolder replace,
                      @Switch('m') boolean notFullHeight,
                      CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {

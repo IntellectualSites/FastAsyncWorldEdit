@@ -56,7 +56,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Use the block that is already there",
             usage = "[properties]"
     )
-    public Pattern existing(Extent extent, @Optional String properties) { // TODO FIXME , @Optional String properties
+    public Pattern existing(Extent extent, @Arg(name = "properties", desc = "String", def = "") String properties) { // TODO FIXME , @Arg(name = "properties", desc = "String", def = "") String properties
         if (properties == null) return new ExistingPattern(extent);
         return new PropertyPattern(extent).addRegex(".*[" + properties + "]");
     }
@@ -97,7 +97,7 @@ public class PatternCommands extends MethodCommands {
             name = "#anglecolor",
             desc = "A darker block based on the existing terrain angle"
 )
-    public Pattern anglecolor(Extent extent, LocalSession session, @Optional("true") boolean randomize, @Optional("100") double maxComplexity, @Optional("1") int distance) {
+    public Pattern anglecolor(Extent extent, LocalSession session, @Arg(name = "randomize", desc = "boolean", def = "true") boolean randomize, @Arg(name = "maxcomplexity", desc = "double", def = "100") double maxComplexity, @Arg(name = "distance", desc = "int", def = "1") int distance) {
         return new AngleColorPattern(extent, session, distance);
     }
 
@@ -105,7 +105,7 @@ public class PatternCommands extends MethodCommands {
             name = "#angledata",
             desc = "Block data based on the existing terrain angle"
     )
-    public Pattern angledata(Extent extent, @Optional("1") int distance) {
+    public Pattern angledata(Extent extent, @Arg(name = "distance", desc = "int", def = "1") int distance) {
         return new DataAnglePattern(extent, distance);
     }
 
@@ -131,7 +131,7 @@ public class PatternCommands extends MethodCommands {
             name = "#desaturate",
             desc = "Desaturated color of the existing block"
 )
-    public Pattern desaturate(Extent extent, LocalSession session, @Optional("100") double percent) {
+    public Pattern desaturate(Extent extent, LocalSession session, @Arg(name = "percent", desc = "double", def = "100") double percent) {
         return new DesaturatePattern(extent, percent / 100d, session);
     }
 
@@ -155,7 +155,7 @@ public class PatternCommands extends MethodCommands {
             name = "#fullcopy",
             desc = "Places your full clipboard at each block"
 )
-    public Pattern fullcopy(Player player, Extent extent, LocalSession session, @Optional("#copy") String location, @Optional("false") boolean rotate, @Optional("false") boolean flip) throws EmptyClipboardException, InputParseException, IOException {
+    public Pattern fullcopy(Player player, Extent extent, LocalSession session, @Arg(name = "location", desc = "String", def = "#copy") String location, @Arg(name = "rotate", desc = "boolean", def = "false") boolean rotate, @Arg(name = "flip", desc = "boolean", def = "false") boolean flip) throws EmptyClipboardException, InputParseException, IOException {
         List<ClipboardHolder> clipboards;
         switch (location.toLowerCase()) {
             case "#copy":

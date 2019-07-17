@@ -130,8 +130,8 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.image")
     @Logging(PLACEMENT)
-    public void image(Player player, LocalSession session, EditSession editSession, String arg, @Optional("true") boolean randomize,
-                      @Arg(desc = "TODO", def = "100") int threshold, @Optional BlockVector2 dimensions) throws WorldEditException, IOException {
+    public void image(Player player, LocalSession session, EditSession editSession, String arg, @Arg(name = "randomize", desc = "boolean", def = "true") boolean randomize,
+                      @Arg(desc = "TODO", def = "100") int threshold, @Arg(name = "dimensions", desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
         TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(arg);
         if (!url.getHost().equalsIgnoreCase("i.imgur.com") && !url.getHost().equalsIgnoreCase("empcraft.com")) {
@@ -190,7 +190,7 @@ public class GenerationCommands {
         BlockVector2 radius,
                     @Arg(desc = "The height of the cylinder", def = "1")
                                 int height,
-                    @Range(min = 1) @Optional("1") double thickness, CommandContext context) throws WorldEditException {
+                    @Range(min = 1) @Arg(name = "thickness", desc = "double", def = "1") double thickness, CommandContext context) throws WorldEditException {
         double max = MathMan.max(radius.getBlockX(), radius.getBlockZ());
         worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(player);
