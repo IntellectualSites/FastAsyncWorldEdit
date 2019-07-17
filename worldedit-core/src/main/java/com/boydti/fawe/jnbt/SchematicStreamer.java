@@ -22,6 +22,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -109,7 +110,6 @@ public class SchematicStreamer extends NBTStreamer {
                 if (value != 0) {
                     int first = value & 0x0F;
                     int second = (value & 0xF0) >> 4;
-                    int gIndex = index << 1;
                     try {
                         if (first != 0) adds.write(first);
                         if (second != 0) adds.write(second);
@@ -122,7 +122,10 @@ public class SchematicStreamer extends NBTStreamer {
         ByteReader biomeReader = new ByteReader() {
             @Override
             public void run(int index, int value) {
-                fc.setBiome(index, BiomeTypes.get(value));
+                BiomeType biome = BiomeTypes.getLegacy(value);
+                if (biome != null) {
+                    fc.setBiome(index, biome);
+                }
             }
         };
         NBTStreamReader<Integer, Integer> initializer23 = new NBTStreamReader<Integer, Integer>() {

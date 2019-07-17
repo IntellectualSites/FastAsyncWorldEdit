@@ -23,6 +23,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public final class NamespacedRegistry<V extends RegistryItem> extends Registry<V> {
@@ -59,7 +61,11 @@ public final class NamespacedRegistry<V extends RegistryItem> extends Registry<V
     }
 
     public V getByInternalId(int index) {
-        return values.get(index);
+        try {
+            return values.get(index);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     public int getInternalId(V value) {
