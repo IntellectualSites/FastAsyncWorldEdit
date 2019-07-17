@@ -24,7 +24,7 @@ public class WEManager {
 
     public final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
 
-    public void cancelEditSafe(Extent parent, BBC reason) throws FaweException {
+    public void cancelEditSafe(Extent parent, FaweException reason) throws FaweException {
         try {
             final Field field = AbstractDelegateExtent.class.getDeclaredField("extent");
             field.setAccessible(true);
@@ -35,10 +35,10 @@ public class WEManager {
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        throw new FaweException(reason);
+        throw reason;
     }
 
-    public void cancelEdit(Extent parent, BBC reason) throws WorldEditException {
+    public void cancelEdit(Extent parent, FaweException reason) throws WorldEditException {
         cancelEditSafe(parent, reason);
     }
 

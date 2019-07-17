@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;

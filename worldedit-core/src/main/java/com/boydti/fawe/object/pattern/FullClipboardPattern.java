@@ -36,9 +36,8 @@ public class FullClipboardPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
-        Region region = clipboard.getRegion();
-        ForwardExtentCopy copy = new ForwardExtentCopy(clipboard, clipboard.getRegion(), clipboard.getOrigin(), extent, setPosition);
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        ForwardExtentCopy copy = new ForwardExtentCopy(clipboard, clipboard.getRegion(), clipboard.getOrigin(), extent, set);
         copy.setSourceMask(new ExistingBlockMask(clipboard));
         Operations.completeBlindly(copy);
         return true;

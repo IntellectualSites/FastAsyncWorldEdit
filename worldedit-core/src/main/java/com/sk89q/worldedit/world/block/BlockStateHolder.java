@@ -64,6 +64,9 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends FawePat
     @Deprecated
     int getOrdinal();
 
+    @Deprecated
+    char getOrdinalChar();
+
     BlockMaterial getMaterial();
     /**
      * Get type id (legacy uses)

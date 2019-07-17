@@ -67,6 +67,7 @@ public interface World extends Extent {
      *
      * @return the maximum Y
      */
+    @Override
     int getMaxY();
 
     /**
@@ -106,7 +107,9 @@ public interface World extends Extent {
      * @param notifyAndLight true to to notify and light
      * @return true if the block was successfully set (return value may not be accurate)
      */
-    <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException;
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
+        return setBlock(position, block);
+    }
 
     /**
      * Notifies the simulation that the block at the given location has

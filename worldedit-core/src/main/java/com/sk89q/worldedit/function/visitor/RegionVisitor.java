@@ -20,13 +20,6 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.example.MappedFaweQueue;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
-import com.boydti.fawe.object.exception.FaweException;
-
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -34,7 +27,6 @@ import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -48,7 +40,6 @@ public class RegionVisitor implements Operation {
     public final RegionFunction function;
     public int affected = 0;
     public final Iterable<? extends BlockVector3> iterable;
-    private final MappedFaweQueue queue;
 
     /**
      * Deprecated in favor of the other constructors which will preload chunks during iteration
@@ -57,22 +48,14 @@ public class RegionVisitor implements Operation {
      * @param function
      */
     public RegionVisitor(Region region, RegionFunction function) {
-        this(region, function, (FaweQueue) null);
+        this((Iterable<BlockVector3>) region, function);
     }
 
-    public RegionVisitor(Region region, RegionFunction function, EditSession editSession) {
-        this(region, function, editSession != null ? editSession.getQueue() : null);
-    }
-
-    public RegionVisitor(Region region, RegionFunction function, FaweQueue queue) {
-        this((Iterable<BlockVector3>) region, function, queue);
-    }
-
-    public RegionVisitor(Iterable<? extends BlockVector3> iterable, RegionFunction function, HasFaweQueue hasQueue) {
+    @Deprecated
+    public RegionVisitor(Iterable<BlockVector3> iterable, RegionFunction function) {
         this.region = iterable instanceof Region ? (Region) iterable : null;
         this.function = function;
         this.iterable = iterable;
-        this.queue = hasQueue != null && hasQueue.getQueue() instanceof MappedFaweQueue ? (MappedFaweQueue) hasQueue.getQueue() : null;
     }
 
     /**
@@ -86,100 +69,8 @@ public class RegionVisitor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        if (queue != null && Settings.IMP.QUEUE.PRELOAD_CHUNKS > 1) {
-        	/*
-             * The following is done to reduce iteration cost
-             *  - Preload chunks just in time
-             *  - Only check every 16th block for potential chunk loads
-             *  - Stop iteration on exception instead of hasNext
-             *  - Do not calculate the stacktrace as it is expensive
-             */
-            Iterator<? extends BlockVector3> trailIter = iterable.iterator();
-            Iterator<? extends BlockVector3> leadIter = iterable.iterator();
-            int lastTrailChunkX = Integer.MIN_VALUE;
-            int lastTrailChunkZ = Integer.MIN_VALUE;
-            int lastLeadChunkX = Integer.MIN_VALUE;
-            int lastLeadChunkZ = Integer.MIN_VALUE;
-            int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNKS;
-            try {
-                for (; ; ) {
-                    BlockVector3 pt = trailIter.next();
-                    apply(pt);
-                    int cx = pt.getBlockX() >> 4;
-                    int cz = pt.getBlockZ() >> 4;
-                    if (cx != lastTrailChunkX || cz != lastTrailChunkZ) {
-                        lastTrailChunkX = cx;
-                        lastTrailChunkZ = cz;
-                        int amount;
-                        if (lastLeadChunkX == Integer.MIN_VALUE) {
-                            lastLeadChunkX = cx;
-                            lastLeadChunkZ = cz;
-                            amount = loadingTarget;
-                        } else {
-                            amount = 1;
-                        }
-                        for (int count = 0; count < amount; ) {
-                            BlockVector3 v = leadIter.next();
-                            int vcx = v.getBlockX() >> 4;
-                            int vcz = v.getBlockZ() >> 4;
-                            if (vcx != lastLeadChunkX || vcz != lastLeadChunkZ) {
-                                lastLeadChunkX = vcx;
-                                lastLeadChunkZ = vcz;
-                                queue.queueChunkLoad(vcx, vcz);
-                                count++;
-                            }
-                            // Skip the next 15 blocks
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                        }
-                    }
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                }
-            } catch (FaweException e) {
-                throw new RuntimeException(e);
-            } catch (Throwable ignore) {
-                ignore.printStackTrace();
-            }
-            try {
-                while (true) {
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                }
-            } catch (FaweException e) {
-                throw new RuntimeException(e);
-            } catch (Throwable ignore) {
-            }
-        } else {
-            for (BlockVector3 pt : iterable) {
-                apply(pt);
-            }
+        for (BlockVector3 pt : iterable) {
+            apply(pt);
         }
         return null;
     }

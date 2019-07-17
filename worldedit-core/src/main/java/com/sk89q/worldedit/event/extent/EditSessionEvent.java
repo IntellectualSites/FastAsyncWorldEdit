@@ -66,7 +66,6 @@ public class EditSessionEvent extends Event implements Cancellable {
     private final int maxBlocks;
     private final Stage stage;
     private Extent extent;
-    private EditSession session;
     private boolean cancelled;
 
     /**
@@ -82,14 +81,6 @@ public class EditSessionEvent extends Event implements Cancellable {
         this.actor = actor;
         this.maxBlocks = maxBlocks;
         this.stage = stage;
-    }
-
-    public void setEditSession(EditSession session) {
-        this.session = session;
-    }
-
-    public EditSession getEditSession() {
-        return session;
     }
 
     /**
@@ -165,9 +156,7 @@ public class EditSessionEvent extends Event implements Cancellable {
      * @return a new event
      */
     public EditSessionEvent clone(Stage stage) {
-        EditSessionEvent clone = new EditSessionEvent(world, actor, maxBlocks, stage);
-        clone.setEditSession(session);
-        return clone;
+        return new EditSessionEvent(world, actor, maxBlocks, stage);
     }
 
 }

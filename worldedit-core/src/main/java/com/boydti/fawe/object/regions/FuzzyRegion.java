@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.regions;
 
-import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
@@ -19,10 +18,8 @@ public class FuzzyRegion extends AbstractRegion {
 
     private final Mask mask;
     private BlockVectorSet set = new BlockVectorSet();
-    private boolean populated;
     private int minX, minY, minZ, maxX, maxY, maxZ;
     private Extent extent;
-    private int count = 0;
 
     {
         minX = minY = minZ = Integer.MAX_VALUE;
@@ -51,7 +48,7 @@ public class FuzzyRegion extends AbstractRegion {
                 setMinMax(p.getBlockX(), p.getBlockY(), p.getBlockZ());
                 return true;
             }
-        }, 256, extent instanceof HasFaweQueue ? (HasFaweQueue) extent : null);
+        }, 256);
         search.setVisited(set);
         search.visit(BlockVector3.at(x, y, z));
         Operations.completeBlindly(search);
@@ -59,7 +56,7 @@ public class FuzzyRegion extends AbstractRegion {
 
     @Override
     public Iterator<BlockVector3> iterator() {
-        return (Iterator) set.iterator();
+        return set.iterator();
     }
 
     private final void setMinMax(int x, int y, int z) {

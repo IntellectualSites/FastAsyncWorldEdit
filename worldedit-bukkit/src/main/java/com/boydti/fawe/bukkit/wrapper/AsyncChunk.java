@@ -11,6 +11,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 public class AsyncChunk implements Chunk {
 
@@ -86,16 +87,8 @@ public class AsyncChunk implements Chunk {
         if (queue instanceof BukkitQueue_0) {
             BukkitQueue_0 bq = (BukkitQueue_0) queue;
             if (world.isChunkLoaded(x, z)) {
-                long pair = MathMan.pairInt(x, z);
-                Long originalKeep = BukkitQueue_0.keepLoaded.get(pair);
-                BukkitQueue_0.keepLoaded.put(pair, Long.MAX_VALUE);
                 if (world.isChunkLoaded(x, z)) {
                     task.run();
-                    if (originalKeep != null) {
-                        BukkitQueue_0.keepLoaded.put(pair, originalKeep);
-                    } else {
-                        BukkitQueue_0.keepLoaded.remove(pair);
-                    }
                     return task.value;
                 }
             }
@@ -130,14 +123,14 @@ public class AsyncChunk implements Chunk {
     }
 
     @Override
-    public BlockState[] getTileEntities(boolean b) {
+    public @NotNull BlockState[] getTileEntities(boolean useSnapshot) {
         if (!isLoaded()) {
             return new BlockState[0];
         }
         return TaskManager.IMP.sync(new RunnableVal<BlockState[]>() {
             @Override
             public void run(BlockState[] value) {
-                this.value = world.getChunkAt(x, z).getTileEntities(b);
+                this.value = world.getChunkAt(x, z).getTileEntities(useSnapshot);
             }
         });
     }
@@ -162,13 +155,8 @@ public class AsyncChunk implements Chunk {
         return load(false);
     }
 
-    //Do not use the safe variable in this method for compatibility with 1.14+
-    public boolean unload(boolean save, boolean safe) {
-        return world.unloadChunk(x, z, save);
-    }
-
     public boolean unload(boolean save) {
-        return unload(true, false);
+        return world.unloadChunk(x, z, save);
     }
 
     @Override

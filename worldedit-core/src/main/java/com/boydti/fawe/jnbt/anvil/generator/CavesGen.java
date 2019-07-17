@@ -149,7 +149,7 @@ public class CavesGen extends GenBase {
                 for (int local_z = i3; (!waterFound) && (local_z < i4); local_z++) {
                     for (int local_y = i2 + 1; (!waterFound) && (local_y >= i1 - 1); local_y--) {
                         if (local_y < 255) {
-                            BlockStateHolder material = chunk.getLazyBlock(bx + local_x, local_y, bz + local_z);
+                            BlockStateHolder material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
                             if (material.getBlockType() == BlockTypes.WATER) {
                                 waterFound = true;
                             }
@@ -173,8 +173,8 @@ public class CavesGen extends GenBase {
                         for (int local_y = i2; local_y > i1; local_y--) {
                             double d11 = ((local_y - 1) + 0.5D - y) / d4;
                             if ((d11 > -0.7D) && (d9 * d9 + d11 * d11 + d10 * d10 < 1.0D)) {
-                                BlockStateHolder material = chunk.getLazyBlock(bx + local_x, local_y, bz + local_z);
-                                BlockStateHolder materialAbove = chunk.getLazyBlock(bx + local_x, local_y + 1, bz + local_z);
+                                BlockStateHolder material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
+                                BlockStateHolder materialAbove = chunk.getBlock(bx + local_x, local_y + 1, bz + local_z);
                                 BlockType blockType = material.getBlockType();
                                 switch (blockType.getInternalId()) {
                                     case BlockID.MYCELIUM:
@@ -191,7 +191,7 @@ public class CavesGen extends GenBase {
                                         // If grass was just deleted, try to
                                         // move it down
                                         if (grassFound) {
-                                            BlockStateHolder block = chunk.getLazyBlock(bx + local_x, local_y - 1, bz + local_z);
+                                            BlockStateHolder block = chunk.getBlock(bx + local_x, local_y - 1, bz + local_z);
                                             if (block.getBlockType() == BlockTypes.DIRT) {
                                                 chunk.setBlock(bx + local_x, local_y - 1, bz + local_z, BlockTypes.STONE.getDefaultState());
                                             }

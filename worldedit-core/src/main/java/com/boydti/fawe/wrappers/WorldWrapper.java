@@ -2,7 +2,10 @@ package com.boydti.fawe.wrappers;
 
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.*;
+
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -28,7 +31,6 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class WorldWrapper extends AbstractWorld {
 
@@ -99,7 +101,7 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
-        return TaskManager.IMP.sync((Supplier<Boolean>) () -> {
+        return TaskManager.IMP.sync(() -> {
             try {
                 return parent.generateTree(type, editSession, position);
             } catch (MaxChangedBlocksException e) {
@@ -233,11 +235,6 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public BlockState getBlock(BlockVector3 position) {
         return parent.getBlock(position);
-    }
-
-    @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return parent.getLazyBlock(position);
     }
 
     @Override

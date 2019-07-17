@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 public final class ArgumentUtils {
 
@@ -35,7 +36,7 @@ public final class ArgumentUtils {
         }
         List<String> suggestions = Lists.newArrayList();
         for (String item : items) {
-            if (item.toLowerCase().startsWith(s)) {
+            if (item.toLowerCase(Locale.ROOT).startsWith(s)) {
                 suggestions.add(item);
             }
         }

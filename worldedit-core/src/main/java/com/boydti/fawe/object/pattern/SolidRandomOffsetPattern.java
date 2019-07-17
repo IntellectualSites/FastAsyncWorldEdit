@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
@@ -9,6 +10,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.io.IOException;
 import java.util.SplittableRandom;
@@ -17,25 +20,27 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     private final int dx, dy, dz;
     private final Pattern pattern;
 
-    private transient int dx2, dy2, dz2;
-    private transient MutableBlockVector3 mutable;
-    private transient boolean[] solid;
+    private final int dx2, dy2, dz2;
+    private final MutableBlockVector3 mutable;
     private SplittableRandom r;
 
+    public static boolean[] getTypes() {
+        boolean[] types = new boolean[BlockTypes.size()];
+        for (BlockType type : BlockTypes.values) {
+            types[type.getInternalId()] = type.getMaterial().isSolid();
+        }
+        return types;
+    }
 
     public SolidRandomOffsetPattern(Pattern pattern, int dx, int dy, int dz) {
         this.pattern = pattern;
         this.dx = dx;
         this.dy = dy;
         this.dz = dz;
-        init();
-    }
 
-    private void init() {
         this.dx2 = dx * 2 + 1;
         this.dy2 = dy * 2 + 1;
         this.dz2 = dz * 2 + 1;
-        solid = SolidBlockMask.getTypes();
         this.r = new SplittableRandom();
         this.mutable = new MutableBlockVector3();
     }
@@ -46,7 +51,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         mutable.mutY((position.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((position.getZ() + r.nextInt(dz2) - dz));
         BaseBlock block = pattern.apply(mutable);
-        if (solid[block.getInternalBlockTypeId()]) {
+        if (block.getMaterial().isSolid()) {
             return block;
         } else {
             return pattern.apply(position);
@@ -54,20 +59,15 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-        mutable.mutX((get.getX() + r.nextInt(dx2) - dx));
-        mutable.mutY((get.getY() + r.nextInt(dy2) - dy));
-        mutable.mutZ((get.getZ() + r.nextInt(dz2) - dz));
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        mutable.mutX((set.getX() + r.nextInt(dx2) - dx));
+        mutable.mutY((set.getY() + r.nextInt(dy2) - dy));
+        mutable.mutZ((set.getZ() + r.nextInt(dz2) - dz));
         BlockStateHolder block = pattern.apply(mutable);
-        if (solid[block.getInternalBlockTypeId()]) {
-            return pattern.apply(extent, set, mutable);
+        if (block.getMaterial().isSolid()) {
+            return pattern.apply(extent, get, mutable);
         } else {
-            return pattern.apply(extent, set, get);
+            return pattern.apply(extent, get, set);
         }
-    }
-
-    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        init();
     }
 }

@@ -117,7 +117,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void finalize() {
         close();
     }
 
@@ -197,11 +197,6 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return getBlock(position);
-    }
-
-    @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         if(region.contains(position)) {
             int x = position.getBlockX() - mx;
@@ -266,8 +261,6 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
         return null;
     }
 
-
-
     @Override
     public int getLight(int x, int y, int z) {
         return getBlockLight(x, y, z);
@@ -285,11 +278,11 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
 
     @Override
     public int getOpacity(int x, int y, int z) {
-        return getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().getLightOpacity();
+        return getBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
     }
 
     @Override
     public int getBrightness(int x, int y, int z) {
-        return getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().getLightValue();
+        return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
     }
 }

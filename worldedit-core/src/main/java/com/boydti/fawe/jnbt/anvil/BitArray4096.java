@@ -14,7 +14,6 @@ public final class BitArray4096 {
         maxEntryValue = (1 << bitsPerEntry) - 1;
         this.longLen = (this.bitsPerEntry * 4096) >> 6;
         if (buffer.length < longLen) {
-            System.out.println("Invalid buffer " + buffer.length + " | " + longLen);
             this.data = new long[longLen];
         } else {
             this.data = buffer;
@@ -127,6 +126,40 @@ public final class BitArray4096 {
     }
 
     public final int[] toRaw(int[] buffer) {
+        final long[] data = this.data;
+        final int dataLength = longLen;
+        final int bitsPerEntry = this.bitsPerEntry;
+        final int maxEntryValue = this.maxEntryValue;
+        final int maxSeqLocIndex = this.maxSeqLocIndex;
+
+        int localStart = 0;
+        char lastVal;
+        int arrI = 0;
+        long l;
+        for (int i = 0; i < dataLength; i++) {
+            l = data[i];
+            for (; localStart <= maxSeqLocIndex; localStart += bitsPerEntry) {
+                lastVal = (char) (l >>> localStart & maxEntryValue);
+                buffer[arrI++] = lastVal;
+            }
+            if (localStart < 64) {
+                if (i != dataLength - 1) {
+                    lastVal = (char) (l >>> localStart);
+                    localStart -= maxSeqLocIndex;
+                    l = data[i + 1];
+                    int localShift = bitsPerEntry - localStart;
+                    lastVal |= l << localShift;
+                    lastVal &= maxEntryValue;
+                    buffer[arrI++] = lastVal;
+                }
+            } else {
+                localStart = 0;
+            }
+        }
+        return buffer;
+    }
+
+    public final char[] toRaw(char[] buffer) {
         final long[] data = this.data;
         final int dataLength = longLen;
         final int bitsPerEntry = this.bitsPerEntry;

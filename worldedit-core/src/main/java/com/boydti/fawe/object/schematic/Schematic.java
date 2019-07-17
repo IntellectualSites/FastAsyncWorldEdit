@@ -122,7 +122,6 @@ public class Schematic {
     public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, boolean copyEntities, @Nullable Transform transform) {
         checkNotNull(world);
         checkNotNull(to);
-        Region region = clipboard.getRegion();
         EditSession editSession;
         if (world instanceof EditSession) {
             editSession = (EditSession) world;

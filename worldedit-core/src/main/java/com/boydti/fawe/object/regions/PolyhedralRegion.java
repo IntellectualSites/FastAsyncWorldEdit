@@ -159,7 +159,7 @@ public class PolyhedralRegion extends AbstractRegion {
 
             case 3:
                 // Generate minimal mesh to start from
-                final BlockVector3[] v = vertices.toArray(new BlockVector3[vertices.size()]);
+                final BlockVector3[] v = vertices.toArray(new BlockVector3[0]);
 
                 triangles.add((new Triangle(v[0], v[size - 2], v[size - 1])));
                 triangles.add((new Triangle(v[0], v[size - 1], v[size - 2])));

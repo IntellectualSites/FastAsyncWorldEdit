@@ -1,5 +1,6 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
@@ -56,5 +57,7 @@ public interface IFawe {
     default String getDebugInfo() {
         return "";
     }
+
+    QueueHandler getQueueHandler();
 
 }

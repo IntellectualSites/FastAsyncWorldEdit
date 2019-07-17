@@ -43,7 +43,7 @@ public final class IncendoPaster {
         if (pasteApplication == null || pasteApplication.isEmpty()) {
             throw new IllegalArgumentException("paste application cannot be null, nor empty");
         }
-        if (!VALID_APPLICATIONS.contains(pasteApplication.toLowerCase(Locale.ENGLISH))) {
+        if (!VALID_APPLICATIONS.contains(pasteApplication.toLowerCase(Locale.ROOT))) {
             throw new IllegalArgumentException(
                 String.format("Unknown application name: %s", pasteApplication));
         }

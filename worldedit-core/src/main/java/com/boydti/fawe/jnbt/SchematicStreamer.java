@@ -57,21 +57,21 @@ public class SchematicStreamer extends NBTStreamer {
     }
 
     public void addBlockReaders() throws IOException {
-        NBTStreamReader idInit = new NBTStreamReader<Integer, Integer>() {
+        NBTStreamReader<? extends Integer, ? extends Integer> idInit = new NBTStreamReader<Integer, Integer>() {
             @Override
             public void accept(Integer length, Integer type) {
                 setupClipboard(length);
                 ids = new FaweOutputStream(new LZ4BlockOutputStream(idOut));
             }
         };
-        NBTStreamReader dataInit = new NBTStreamReader<Integer, Integer>() {
+        NBTStreamReader<? extends Integer, ? extends Integer> dataInit = new NBTStreamReader<Integer, Integer>() {
             @Override
             public void accept(Integer length, Integer type) {
                 setupClipboard(length);
                 datas = new FaweOutputStream(new LZ4BlockOutputStream(dataOut));
             }
         };
-        NBTStreamReader addInit = new NBTStreamReader<Integer, Integer>() {
+        NBTStreamReader<? extends Integer, ? extends Integer> addInit = new NBTStreamReader<Integer, Integer>() {
             @Override
             public void accept(Integer length, Integer type) {
                 setupClipboard(length*2);
@@ -225,19 +225,19 @@ public class SchematicStreamer extends NBTStreamer {
                         Direction left = facing.getLeft();
                         Direction right = facing.getRight();
 
-                        BlockStateHolder forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
+                        BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> forwardBlock = fc.getBlock(x + forward.getBlockX(), y + forward.getBlockY(), z + forward.getBlockZ());
                         BlockType forwardType = forwardBlock.getBlockType();
                         if (forwardType.hasProperty(PropertyKey.SHAPE) && forwardType.hasProperty(PropertyKey.FACING)) {
                             Direction forwardFacing = (Direction) forwardBlock.getState(PropertyKey.FACING);
                             if (forwardFacing == left) {
-                                BlockStateHolder rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
+                                BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
                                 BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_left"));
                                 }
                                 return;
                             } else if (forwardFacing == right) {
-                                BlockStateHolder leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
+                                BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
                                 BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "inner_right"));
@@ -246,19 +246,19 @@ public class SchematicStreamer extends NBTStreamer {
                             }
                         }
 
-                        BlockStateHolder backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
+                        BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> backwardsBlock = fc.getBlock(x - forward.getBlockX(), y - forward.getBlockY(), z - forward.getBlockZ());
                         BlockType backwardsType = backwardsBlock.getBlockType();
                         if (backwardsType.hasProperty(PropertyKey.SHAPE) && backwardsType.hasProperty(PropertyKey.FACING)) {
                             Direction backwardsFacing = (Direction) backwardsBlock.getState(PropertyKey.FACING);
                             if (backwardsFacing == left) {
-                                BlockStateHolder rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
+                                BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> rightBlock = fc.getBlock(x + right.toBlockVector().getBlockX(), y + right.toBlockVector().getBlockY(), z + right.toBlockVector().getBlockZ());
                                 BlockType rightType = rightBlock.getBlockType();
                                 if (!rightType.hasProperty(PropertyKey.SHAPE) || rightBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_left"));
                                 }
                                 return;
                             } else if (backwardsFacing == right) {
-                                BlockStateHolder leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
+                                BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> leftBlock = fc.getBlock(x + left.toBlockVector().getBlockX(), y + left.toBlockVector().getBlockY(), z + left.toBlockVector().getBlockZ());
                                 BlockType leftType = leftBlock.getBlockType();
                                 if (!leftType.hasProperty(PropertyKey.SHAPE) || leftBlock.getState(PropertyKey.FACING) != facing) {
                                     fc.setBlock(x, y, z, block.with(PropertyKey.SHAPE, "outer_right"));
@@ -298,7 +298,7 @@ public class SchematicStreamer extends NBTStreamer {
     }, true).build();
 
     private boolean merge(int group, int x, int y, int z) {
-        BlockStateHolder block = fc.getBlock(x, y, z);
+        BlockStateHolder<com.sk89q.worldedit.world.block.BaseBlock> block = fc.getBlock(x, y, z);
         BlockType type = block.getBlockType();
         return group(type) == group || fullCube.apply(type);
     }

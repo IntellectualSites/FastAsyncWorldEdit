@@ -57,19 +57,11 @@ public class TemporalExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        if (position.getX() == x && position.getY() == y && position.getZ() == z) {
-            return block.toImmutableState();
-        }
-        return super.getLazyBlock(position);
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         if (this.x == x && this.y == y && this.z == z) {
             return block.toImmutableState();
         }
-        return super.getLazyBlock(x, y, z);
+        return super.getBlock(x, y, z);
     }
 
     @Override

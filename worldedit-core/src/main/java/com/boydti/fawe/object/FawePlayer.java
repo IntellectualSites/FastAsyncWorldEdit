@@ -236,9 +236,9 @@ public abstract class FawePlayer<T> extends Metadatable {
         Region[] allowed = WEManager.IMP.getMask(this, FaweMaskManager.MaskType.OWNER);
         HashSet<Region> allowedSet = new HashSet<>(Arrays.asList(allowed));
         if (allowed.length == 0) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_NO_REGION);
+            throw FaweException.NO_REGION;
         } else if (!WEManager.IMP.regionContains(wrappedSelection, allowedSet)) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+            throw FaweException.OUTSIDE_REGION;
         }
     }
 
@@ -660,40 +660,5 @@ public abstract class FawePlayer<T> extends Metadatable {
             proxy.setOffset(Vector3.ZERO.subtract(((VirtualWorld) world).getOrigin()));
         }
         return proxy;
-    }
-
-
-    /**
-     * Get the tracked EditSession(s) for this player<br>
-     * - Queued or autoqueued EditSessions are considered tracked
-     *
-     * @param requiredStage
-     * @return
-     */
-    public Map<EditSession, SetQueue.QueueStage> getTrackedSessions(SetQueue.QueueStage requiredStage) {
-        Map<EditSession, SetQueue.QueueStage> map = new ConcurrentHashMap<>(8, 0.9f, 1);
-        if (requiredStage == null || requiredStage == SetQueue.QueueStage.ACTIVE) {
-            for (FaweQueue queue : SetQueue.IMP.getActiveQueues()) {
-                Collection<EditSession> sessions = queue.getEditSessions();
-                for (EditSession session : sessions) {
-                    FawePlayer currentPlayer = session.getPlayer();
-                    if (currentPlayer == this) {
-                        map.put(session, SetQueue.QueueStage.ACTIVE);
-                    }
-                }
-            }
-        }
-        if (requiredStage == null || requiredStage == SetQueue.QueueStage.INACTIVE) {
-            for (FaweQueue queue : SetQueue.IMP.getInactiveQueues()) {
-                Collection<EditSession> sessions = queue.getEditSessions();
-                for (EditSession session : sessions) {
-                    FawePlayer currentPlayer = session.getPlayer();
-                    if (currentPlayer == this) {
-                        map.put(session, SetQueue.QueueStage.INACTIVE);
-                    }
-                }
-            }
-        }
-        return map;
     }
 }

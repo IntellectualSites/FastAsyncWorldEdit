@@ -11,8 +11,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements Iterable<T> {
-    private ThreadLocal<T> flag;
-    private ConcurrentLinkedDeque<T> allValues = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<T> allValues = new ConcurrentLinkedDeque<>();
 
     public IterableThreadLocal() {
     }
@@ -21,7 +20,9 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
     protected final T initialValue() {
         T value = init();
         if (value != null) {
-            allValues.add(value);
+            synchronized (this) {
+                allValues.add(value);
+            }
         }
         return value;
     }
@@ -36,7 +37,12 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
     }
 
     public void clean() {
-        IterableThreadLocal.clean(this);
+        if (!allValues.isEmpty()) {
+            synchronized (this) {
+                IterableThreadLocal.clean(this);
+                allValues.clear();
+            }
+        }
     }
 
     public static void clean(ThreadLocal instance) {

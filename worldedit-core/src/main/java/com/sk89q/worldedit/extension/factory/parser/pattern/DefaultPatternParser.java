@@ -43,6 +43,7 @@ import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -101,7 +102,7 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
                                 () -> {
                                     if (full.length() == 1) return new ArrayList<>(dispatcher.getPrimaryAliases());
                                     return dispatcher.getAliases().stream().filter(
-                                            s -> s.startsWith(command.toLowerCase())
+                                            s -> s.startsWith(command.toLowerCase(Locale.ROOT))
                                     ).collect(Collectors.toList());
                                 }
                         );

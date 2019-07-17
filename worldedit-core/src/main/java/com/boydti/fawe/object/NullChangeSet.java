@@ -54,11 +54,6 @@ public class NullChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void addChangeTask(FaweQueue queue) {
-
-    }
-
-    @Override
     public Iterator<Change> getIterator(BlockBag blockBag, int mode, boolean redo) {
         return getIterator(redo);
     }

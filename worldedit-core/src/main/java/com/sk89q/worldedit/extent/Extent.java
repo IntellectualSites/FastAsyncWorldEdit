@@ -24,24 +24,34 @@ import com.boydti.fawe.jnbt.anvil.generator.GenBase;
 import com.boydti.fawe.jnbt.anvil.generator.OreGen;
 import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
-
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.function.RegionMaskingFilter;
+import com.sk89q.worldedit.function.block.BlockReplace;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -51,7 +61,10 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A world, portion of a world, clipboard, or other object that can have blocks
@@ -120,33 +133,11 @@ public interface Extent extends InputExtent, OutputExtent {
         return null;
     }
 
-    @Override
-    default BlockState getBlock(BlockVector3 position) {
-        return getFullBlock(position).toImmutableState();
-    }
-
-    @Override
-    default BlockState getLazyBlock(BlockVector3 position) {
-        return getFullBlock(position).toImmutableState();
-    }
-
-    default BlockState getLazyBlock(int x, int y, int z) {
-        return getLazyBlock(BlockVector3.at(x, y, z));
-    }
-
-    default <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T state) throws WorldEditException {
-        return setBlock(BlockVector3.at(x, y, z), state);
-    }
-
-    default boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return setBiome(BlockVector2.at(x, z), biome);
-    }
-
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
         maxY = Math.min(maxY, Math.max(0, maxY));
         minY = Math.max(0, minY);
         for (int y = maxY; y >= minY; --y) {
-            BlockState block = getLazyBlock(x, y, z);
+            BlockState block = getBlock(x, y, z);
             if (block.getBlockType().getMaterial().isMovementBlocker()) {
                 return y;
             }
@@ -170,20 +161,20 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
 
-        BlockState block = getLazyBlock(x, y, z);
+        BlockState block = getBlock(x, y, z);
         boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
         int data1 = PropertyGroup.LEVEL.get(block);
         int data2 = data1;
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            block = getLazyBlock(x, y1, z);
+            block = getBlock(x, y1, z);
             if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
                 return ((y1 - offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data1));
             }
             data1 = PropertyGroup.LEVEL.get(block);
             int y2 = y - d;
-            block = getLazyBlock(x, y2, z);
+            block = getBlock(x, y2, z);
             if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
                 return ((y2 + offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data2));
             }
@@ -192,15 +183,15 @@ public interface Extent extends InputExtent, OutputExtent {
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    block = getLazyBlock(x, layer, z);
+                    block = getBlock(x, layer, z);
                     if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
-                        return layer + offset << 4;
+                        return ((layer + offset) << 4) + 0;
                     }
                     data1 = PropertyGroup.LEVEL.get(block);
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    block = getLazyBlock(x, layer, z);
+                    block = getBlock(x, layer, z);
                     if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
                         return ((layer - offset) << 4) - (15 - (state ? PropertyGroup.LEVEL.get(block) : data2));
                     }
@@ -255,33 +246,33 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        BlockStateHolder block = getLazyBlock(x, y, z);
+        BlockStateHolder block = getBlock(x, y, z);
         boolean state = !block.getBlockType().getMaterial().isMovementBlocker();
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            block = getLazyBlock(x, y1, z);
+            block = getBlock(x, y1, z);
             if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return y1 - offset;
             int y2 = y - d;
-            block = getLazyBlock(x, y2, z);
+            block = getBlock(x, y2, z);
             if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return y2 + offset;
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    block = getLazyBlock(x, layer, z);
+                    block = getBlock(x, layer, z);
                     if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return layer + offset;
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    block = getLazyBlock(x, layer, z);
+                    block = getBlock(x, layer, z);
                     if (block.getMaterial().isMovementBlocker() == state && block.getBlockType() != BlockTypes.__RESERVED__) return layer - offset;
                 }
             }
         }
         int result = state ? failedMin : failedMax;
         if(result > 0 && !ignoreAir) {
-            block = getLazyBlock(x, result, z);
+            block = getBlock(x, result, z);
             return block.getBlockType().getMaterial().isAir() ? -1 : result;
         }
         return result;
@@ -407,6 +398,10 @@ public interface Extent extends InputExtent, OutputExtent {
         return null;
     }
 
+    default boolean cancel() {
+        return true;
+    }
+
     default int getMaxY() {
         return 255;
     }
@@ -423,4 +418,169 @@ public interface Extent extends InputExtent, OutputExtent {
         weClipboard.setOrigin(region.getMinimumPoint());
         return weClipboard;
     }
+
+
+    /**
+     * Count the number of blocks of a list of types in a region.
+     *
+     * @param region the region
+     * @param searchBlocks the list of blocks to search
+     * @return the number of blocks that matched the block
+     */
+    default int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
+        BlockMask mask = new BlockMask(this, searchBlocks);
+        return countBlocks(region, mask);
+    }
+
+    /**
+     * Count the number of blocks of a list of types in a region.
+     *
+     * @param region the region
+     * @param searchMask mask to match
+     * @return the number of blocks that matched the mask
+     */
+    default int countBlocks(Region region, Mask searchMask) {
+        RegionVisitor visitor = new RegionVisitor(region, searchMask::test);
+        Operations.completeBlindly(visitor);
+        return visitor.getAffected();
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given block type.
+     *
+     * @param region the region
+     * @param block the block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default  <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(block);
+        boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
+
+        if (canBypassAll(region, false, true) && !hasNbt) {
+            return changes = queue.setBlocks((CuboidRegion) region, block.getInternalId());
+        }
+        try {
+            if (hasExtraExtents()) {
+                RegionVisitor visitor = new RegionVisitor(region, new BlockReplace(getExtent(), (block)), this);
+                Operations.completeBlindly(visitor);
+                this.changes += visitor.getAffected();
+            } else {
+                for (BlockVector3 blockVector3 : region) {
+                    if (getExtent().setBlock(blockVector3, block)) {
+                        changes++;
+                    }
+                }
+            }
+        } catch (final WorldEditException e) {
+            throw new RuntimeException("Unexpected exception", e);
+        }
+        return changes;
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given pattern.
+     *
+     * @param region the region
+     * @param pattern the pattern that provides the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(pattern);
+        if (pattern instanceof BlockPattern) {
+            return setBlocks(region, ((BlockPattern) pattern).getBlock());
+        }
+        if (pattern instanceof BlockStateHolder) {
+            return setBlocks(region, (BlockStateHolder) pattern);
+        }
+        BlockReplace replace = new BlockReplace(this, pattern);
+        RegionVisitor visitor = new RegionVisitor(region, replace, queue instanceof MappedFaweQueue ? (MappedFaweQueue) queue : null);
+        Operations.completeBlindly(visitor);
+        return this.changes = visitor.getAffected();
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param replacement the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default  <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+        return replaceBlocks(region, filter, new BlockPattern(replacement));
+    }
+
+    /**
+     * Replaces all the blocks matching a given filter, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
+        Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMask(this, filter);
+        return replaceBlocks(region, mask, pattern);
+    }
+
+    /**
+     * Replaces all the blocks matching a given mask, within a given region, to a block
+     * returned by a given pattern.
+     *
+     * @param region the region to replace the blocks within
+     * @param mask the mask that blocks must match
+     * @param pattern the pattern that provides the new blocks
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(mask);
+        checkNotNull(pattern);
+
+        BlockReplace replace = new BlockReplace(this, pattern);
+        RegionMaskingFilter filter = new RegionMaskingFilter(mask, replace);
+        RegionVisitor visitor = new RegionVisitor(region, filter);
+        Operations.completeLegacy(visitor);
+        return visitor.getAffected();
+    }
+
+
+    /**
+     * Sets the blocks at the center of the given region to the given pattern.
+     * If the center sits between two blocks on a certain axis, then two blocks
+     * will be placed to mark the center.
+     *
+     * @param region the region to find the center of
+     * @param pattern the replacement pattern
+     * @return the number of blocks placed
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    default int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(pattern);
+
+        Vector3 center = region.getCenter();
+        Region centerRegion = new CuboidRegion(
+                getWorld(), // Causes clamping of Y range
+                BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
+                BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
+                        center.getY(), MathUtils.roundHalfUp(center.getZ())));
+        return setBlocks(centerRegion, pattern);
+    }
+
+    default int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
+        RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(getExtent(), pattern));
+        Operations.completeBlindly(visitor);
+        return 0;
+    }
+
 }

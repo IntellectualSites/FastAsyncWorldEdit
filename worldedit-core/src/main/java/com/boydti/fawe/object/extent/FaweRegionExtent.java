@@ -2,6 +2,7 @@ package com.boydti.fawe.object.extent;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.WEManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -58,21 +59,10 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        if (!contains(location)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return false;
-        }
-        return super.setBlock(location, block);
-    }
-
-    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return false;
         }
@@ -80,21 +70,10 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        if (!contains(position)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return false;
-        }
-        return super.setBiome(position, biome);
-    }
-
-    @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return false;
         }
@@ -105,7 +84,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     public BiomeType getBiome(BlockVector2 position) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return null;
         }
@@ -113,10 +92,21 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     }
 
     @Override
+    public BiomeType getBiomeType(int x, int z) {
+        if (!contains(x, z)) {
+            if (!limit.MAX_FAILS()) {
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
+            }
+            return null;
+        }
+        return super.getBiomeType(x, z);
+    }
+
+    @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
@@ -127,7 +117,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     public BlockState getBlock(BlockVector3 position) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return BlockTypes.AIR.getDefaultState();
         }
@@ -135,32 +125,10 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        if (!contains(position)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return BlockTypes.AIR.getDefaultState();
-        }
-        return super.getLazyBlock(position);
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
-        if (!contains(x, y, z)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
-            }
-            return BlockTypes.AIR.getDefaultState();
-        }
-        return super.getLazyBlock(x, y, z);
-    }
-
-    @Override
     public int getBlockLight(int x, int y, int z) {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return 0;
         }
@@ -171,7 +139,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     public int getBrightness(int x, int y, int z) {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return 0;
         }
@@ -182,7 +150,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     public int getLight(int x, int y, int z) {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return 0;
         }
@@ -193,7 +161,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     public int getOpacity(int x, int y, int z) {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return 0;
         }
@@ -204,7 +172,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     public int getSkyLight(int x, int y, int z) {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return 0;
         }
@@ -216,7 +184,7 @@ public abstract class FaweRegionExtent extends ResettableExtent {
     public Entity createEntity(Location location, BaseEntity entity) {
         if (!contains(location.getBlockX(), location.getBlockY(), location.getBlockZ())) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, BBC.WORLDEDIT_CANCEL_REASON_OUTSIDE_REGION);
+                WEManager.IMP.cancelEditSafe(this, FaweException.OUTSIDE_REGION);
             }
             return null;
         }

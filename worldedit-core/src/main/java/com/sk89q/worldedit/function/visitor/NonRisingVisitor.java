@@ -44,13 +44,13 @@ public class NonRisingVisitor extends RecursiveVisitor {
 
     public NonRisingVisitor(Mask mask, RegionFunction function, int depth, HasFaweQueue hasFaweQueue) {
         super(mask, function, depth, hasFaweQueue);
-        Collection<BlockVector3> directions = getDirections();
-        directions.clear();
-        directions.add(BlockVector3.UNIT_X);
-        directions.add(BlockVector3.UNIT_MINUS_X);
-        directions.add(BlockVector3.UNIT_Z);
-        directions.add(BlockVector3.UNIT_MINUS_Z);
-        directions.add(BlockVector3.UNIT_MINUS_Y);
+        setDirections(
+            BlockVector3.UNIT_X,
+            BlockVector3.UNIT_MINUS_X,
+            BlockVector3.UNIT_Z,
+            BlockVector3.UNIT_MINUS_Z,
+            BlockVector3.UNIT_MINUS_Y
+        );
     }
 
 }

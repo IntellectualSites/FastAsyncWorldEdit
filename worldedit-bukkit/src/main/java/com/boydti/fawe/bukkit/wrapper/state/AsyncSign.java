@@ -8,7 +8,13 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import java.util.Map;
+
+import net.minecraft.server.v1_14_R1.TileEntitySign;
+import org.bukkit.DyeColor;
 import org.bukkit.block.Sign;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AsyncSign extends AsyncBlockState implements Sign {
     public AsyncSign(AsyncBlock block, int combined) {
@@ -63,4 +69,28 @@ public class AsyncSign extends AsyncBlockState implements Sign {
 	public void setEditable(boolean arg0) {
 		this.isEditable = arg0;
 	}
+
+    @Override
+    public @NotNull PersistentDataContainer getPersistentDataContainer() {
+        return new AsyncDataContainer(getNbtData());
+    }
+
+    @Override
+    public @Nullable DyeColor getColor() {
+        CompoundTag nbt = getNbtData();
+        if (nbt != null) {
+            String color = nbt.getString("Color").toUpperCase();
+            if (color != null) return DyeColor.valueOf(color);
+        }
+        return DyeColor.BLACK;
+    }
+
+    @Override
+    public void setColor(DyeColor color) {
+        CompoundTag nbt = getNbtData();
+        if (nbt != null) {
+            Map<String, Tag> map = ReflectionUtils.getMap(nbt.getValue());
+            map.put("Color", new StringTag(color.name().toLowerCase()));
+        }
+    }
 }

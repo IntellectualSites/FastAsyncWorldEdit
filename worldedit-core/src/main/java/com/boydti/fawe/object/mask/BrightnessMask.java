@@ -1,12 +1,10 @@
 package com.boydti.fawe.object.mask;
 
 import com.boydti.fawe.object.extent.LightingExtent;
+
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
-import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.math.BlockVector3;
-
-import javax.annotation.Nullable;
 
 public class BrightnessMask extends AbstractExtentMask {
 
@@ -28,9 +26,4 @@ public class BrightnessMask extends AbstractExtentMask {
         return false;
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

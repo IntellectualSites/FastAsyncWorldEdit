@@ -21,6 +21,7 @@ package com.sk89q.jnbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -414,6 +415,18 @@ public final class ListTag extends Tag {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public ArrayList toRaw() {
+        ArrayList raw = new ArrayList<>();
+        if (this.value.isEmpty()) {
+            return raw;
+        }
+        for (Tag elem : this.value) {
+            raw.add(elem.toRaw());
+        }
+        return raw;
     }
 
     @Override

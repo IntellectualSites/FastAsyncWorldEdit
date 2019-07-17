@@ -1,5 +1,6 @@
 package com.thevoxelbox.voxelsniper.brush;
 
+import com.sk89q.worldedit.world.block.BlockID;
 import com.thevoxelbox.voxelsniper.Message;
 import com.thevoxelbox.voxelsniper.SnipeData;
 import org.bukkit.Material;
@@ -11,8 +12,18 @@ public class BlockResetBrush extends Brush {
     private static final ArrayList<Material> DENIED_UPDATES = new ArrayList<>();
 
     static {
-        BlockResetBrush.DENIED_UPDATES.add(Material.SIGN);
-        BlockResetBrush.DENIED_UPDATES.add(Material.WALL_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.ACACIA_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.SPRUCE_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.ACACIA_WALL_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.BIRCH_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.SPRUCE_WALL_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.BIRCH_WALL_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.DARK_OAK_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.DARK_OAK_WALL_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.JUNGLE_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.JUNGLE_WALL_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.OAK_SIGN);
+        BlockResetBrush.DENIED_UPDATES.add(Material.OAK_WALL_SIGN);
         BlockResetBrush.DENIED_UPDATES.add(Material.CHEST);
         BlockResetBrush.DENIED_UPDATES.add(Material.FURNACE);
         BlockResetBrush.DENIED_UPDATES.add(Material.REDSTONE_TORCH);

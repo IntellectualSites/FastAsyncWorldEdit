@@ -2,27 +2,24 @@ package com.boydti.fawe.object.clipboard;
 
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.util.ReflectionUtils;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class FaweClipboard {
     public abstract BaseBlock getBlock(int x, int y, int z);
@@ -66,8 +63,8 @@ public abstract class FaweClipboard {
      */
     public abstract void forEach(BlockReader task, boolean air);
 
-    public static abstract class BlockReader {
-        public abstract <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block);
+    public interface BlockReader {
+        <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block);
     }
 
     public abstract void streamBiomes(final NBTStreamer.ByteReader task);
@@ -86,7 +83,6 @@ public abstract class FaweClipboard {
     public List<CompoundTag> getTileEntities() {
         final List<CompoundTag> tiles = new ArrayList<>();
         forEach(new BlockReader() {
-            private int index = 0;
 
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {

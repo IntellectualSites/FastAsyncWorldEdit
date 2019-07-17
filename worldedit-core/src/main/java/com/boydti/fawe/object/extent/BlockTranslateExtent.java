@@ -52,17 +52,12 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
 
     @Override
     public BlockState getBlock(BlockVector3 location) {
-        return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return getBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 location) {
-        return getLazyBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
-        return super.getLazyBlock(x + dx, y + dy, z + dz);
+    public BlockState getBlock(int x, int y, int z) {
+        return super.getBlock(x + dx, y + dy, z + dz);
     }
     
     @Override

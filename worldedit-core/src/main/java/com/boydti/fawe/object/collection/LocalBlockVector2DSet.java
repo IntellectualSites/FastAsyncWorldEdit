@@ -3,6 +3,7 @@ package com.boydti.fawe.object.collection;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector2;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -209,25 +210,16 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        for (Object o : c) {
-            if (!contains(o)) {
-                return false;
-            }
-        }
-        return true;
+        return c.stream().allMatch(this::contains);
     }
 
     @Override
     public boolean addAll(Collection<? extends BlockVector2> c) {
-        boolean result = false;
-        for (BlockVector2 v : c) {
-            result |= add(v);
-        }
-        return result;
+        return c.stream().map(this::add).reduce(false, (a, b) -> a || b);
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(@NotNull Collection<?> c) {
         boolean result = false;
         int size = size();
         int index = -1;
@@ -246,27 +238,7 @@ public class LocalBlockVector2DSet implements Set<BlockVector2> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        boolean result = false;
-        for (Object o : c) {
-            result |= remove(o);
-        }
-        return result;
-    }
-
-    public void forEach(BlockVector2DSetVisitor visitor) {
-        int size = size();
-        int index = -1;
-        for (int i = 0; i < size; i++) {
-            index = set.nextSetBit(index + 1);
-            int x = MathMan.unpairSearchCoordsX(index);
-            int y = MathMan.unpairSearchCoordsY(index);
-            mutable.setComponents(x, y);
-            visitor.run(x, y, index);
-        }
-    }
-
-    public static abstract class BlockVector2DSetVisitor {
-        public abstract void run(int x, int y, int index);
+        return c.stream().map(this::remove).reduce(false, (a, b) -> a || b);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class NBTStreamer {
         try {
             is.readNamedTagLazy(node -> {
                 if (readers.isEmpty()) {
-                    throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MANUAL);
+                    throw FaweException.MANUAL;
                 }
                 return readers.remove(node);
             });
@@ -53,12 +53,6 @@ public class NBTStreamer {
             ((NBTStreamReader) run).init(node);
         }
         readers.put(node, run);
-    }
-
-    public <T, V> void addReader(BiConsumer<T, V> run, String... nodes) {
-        for (String node : nodes) {
-            addReader(node, run);
-        }
     }
 
     public static abstract class NBTStreamReader<T, V> implements BiConsumer<T, V> {
@@ -82,7 +76,7 @@ public class NBTStreamer {
         public abstract void run(int index, int byteValue);
     }
 
-    public static abstract class LazyReader implements BiConsumer<Integer, DataInputStream> {}
+    public interface LazyReader extends BiConsumer<Integer, DataInputStream> {}
 
     public static abstract class LongReader implements BiConsumer<Integer, Long> {
         @Override

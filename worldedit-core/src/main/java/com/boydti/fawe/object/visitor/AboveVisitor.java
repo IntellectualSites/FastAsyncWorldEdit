@@ -6,6 +6,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 
@@ -39,14 +40,14 @@ public class AboveVisitor extends RecursiveVisitor {
 
         this.baseY = baseY;
 
-        Collection<BlockVector3> directions = getDirections();
-        directions.clear();
-        directions.add(BlockVector3.at(1, 0, 0));
-        directions.add(BlockVector3.at(-1, 0, 0));
-        directions.add(BlockVector3.at(0, 0, 1));
-        directions.add(BlockVector3.at(0, 0, -1));
-        directions.add(BlockVector3.at(0, 1, 0));
-        directions.add(BlockVector3.at(0, -1, 0));
+        setDirections(
+                BlockVector3.UNIT_MINUS_X,
+                BlockVector3.UNIT_MINUS_Y,
+                BlockVector3.UNIT_MINUS_Z,
+                BlockVector3.UNIT_X,
+                BlockVector3.UNIT_Y,
+                BlockVector3.UNIT_Z
+        );
     }
 
     @Override

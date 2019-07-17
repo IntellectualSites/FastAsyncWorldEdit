@@ -79,22 +79,19 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
         if (region instanceof CuboidRegion) {
             if (air) {
                 ((CuboidRegion) region).setUseOldIterator(true);
-                RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-                    @Override
-                    public boolean apply(BlockVector3 pos) throws WorldEditException {
-                        BaseBlock block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
-                        int x = pos.getBlockX() - mx;
-                        int y = pos.getBlockY() - my;
-                        int z = pos.getBlockZ() - mz;
-                        if (block.hasNbtData()) {
-                            Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
-                            values.put("x", new IntTag(x));
-                            values.put("y", new IntTag(y));
-                            values.put("z", new IntTag(z));
-                        }
-                        task.run(x, y, z, block);
-                        return true;
+                RegionVisitor visitor = new RegionVisitor(region, pos1 -> {
+                    BaseBlock block = getBlockAbs(pos1.getBlockX(), pos1.getBlockY(), pos1.getBlockZ());
+                    int x = pos1.getBlockX() - mx;
+                    int y = pos1.getBlockY() - my;
+                    int z = pos1.getBlockZ() - mz;
+                    if (block.hasNbtData()) {
+                        Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
+                        values.put("x", new IntTag(x));
+                        values.put("y", new IntTag(y));
+                        values.put("z", new IntTag(z));
                     }
+                    task.run(x, y, z, block);
+                    return true;
                 }, extent instanceof EditSession ? (EditSession) extent : null);
                 Operations.completeBlindly(visitor);
             } else {
@@ -107,7 +104,6 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                         int y = pos.getBlockY() - my;
                         int z = pos.getBlockZ() - mz;
                         if (region.contains(pos)) {
-//                            BlockState block = getBlockAbs(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
                         	BaseBlock block = extent.getFullBlock(pos);
                             if (block.hasNbtData()) {
                                 Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
@@ -118,9 +114,8 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                             if (!block.getBlockType().getMaterial().isAir()) {
                                 task.run(x, y, z, block);
                             }
-                        } else {
-//                            task.run(x, y, z, EditSession.nullBlock);
                         }
+
                         return true;
                     }
                 }, extent instanceof EditSession ? (EditSession) extent : null);

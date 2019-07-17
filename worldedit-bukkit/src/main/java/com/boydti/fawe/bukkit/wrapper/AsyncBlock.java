@@ -3,6 +3,7 @@ package com.boydti.fawe.bukkit.wrapper;
 import com.boydti.fawe.bukkit.wrapper.state.AsyncSign;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.TaskManager;
+import com.destroystokyo.paper.block.BlockSoundGroup;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -221,15 +222,26 @@ public class AsyncBlock implements Block {
         int combined = queue.getCombinedId4Data(x, y, z, 0);
         BlockType type = BlockTypes.getFromStateId(combined);
         switch (type.getInternalId()) {
-            case BlockID.SIGN:
-            case BlockID.WALL_SIGN:
+            case BlockID.ACACIA_SIGN:
+            case BlockID.SPRUCE_SIGN:
+            case BlockID.ACACIA_WALL_SIGN:
+            case BlockID.BIRCH_SIGN:
+            case BlockID.SPRUCE_WALL_SIGN:
+            case BlockID.BIRCH_WALL_SIGN:
+            case BlockID.DARK_OAK_SIGN:
+            case BlockID.DARK_OAK_WALL_SIGN:
+            case BlockID.JUNGLE_SIGN:
+            case BlockID.JUNGLE_WALL_SIGN:
+            case BlockID.OAK_SIGN:
+            case BlockID.OAK_WALL_SIGN:
                 return new AsyncSign(this, combined);
             default:
                 return new AsyncBlockState(this, combined);
         }
     }
 
-    @NotNull @Override
+    @Override
+    @NotNull
     public AsyncBlockState getState(boolean useSnapshot) {
         return getState();
     }
@@ -277,7 +289,14 @@ public class AsyncBlock implements Block {
 
     @Override
     public boolean isEmpty() {
-        return getType().isEmpty();
+        switch (getType()) {
+            case AIR:
+            case CAVE_AIR:
+            case VOID_AIR:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
@@ -361,4 +380,9 @@ public class AsyncBlock implements Block {
 	public BoundingBox getBoundingBox() {
 		return this.getUnsafeBlock().getBoundingBox();
 	}
+
+    @Override
+    public @NotNull BlockSoundGroup getSoundGroup() {
+        return TaskManager.IMP.sync(() -> getUnsafeBlock().getSoundGroup());
+    }
 }

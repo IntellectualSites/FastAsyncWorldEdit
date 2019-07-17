@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.pattern;
 
+import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.object.collection.RandomCollection;
 import com.boydti.fawe.object.random.SimpleRandom;
 import com.boydti.fawe.object.random.TrueRandom;
@@ -84,8 +85,8 @@ public class RandomPattern extends AbstractPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 set, BlockVector3 get) throws WorldEditException {
-        return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, set, get);
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, get, set);
     }
 
 

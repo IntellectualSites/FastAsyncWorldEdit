@@ -26,9 +26,4 @@ public class XAxisMask extends AbstractMask implements ResettableMask {
         this.layer = -1;
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

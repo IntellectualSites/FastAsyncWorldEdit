@@ -34,6 +34,7 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import org.bukkit.entity.EntityType;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 
 import javax.annotation.Nullable;
 
@@ -88,7 +89,7 @@ public class BukkitEntity implements Entity {
 
     @Override
     public com.sk89q.worldedit.world.entity.EntityType getType() {
-        return EntityTypes.get(type.getName().toUpperCase());
+        return EntityTypes.get(type.getName().toUpperCase(Locale.ROOT));
     }
 
     @Override

@@ -88,9 +88,4 @@ public class SolidPlaneMask extends SolidBlockMask implements ResettableMask {
         mutable = new MutableBlockVector3();
     }
 
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
-    }
 }

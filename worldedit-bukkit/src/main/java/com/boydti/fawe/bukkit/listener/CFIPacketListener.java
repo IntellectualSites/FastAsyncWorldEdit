@@ -85,11 +85,17 @@ public class CFIPacketListener implements Listener {
                     ItemStack hand = enumHand == EnumWrappers.Hand.MAIN_HAND ? inv.getItemInMainHand() : inv.getItemInOffHand();
                     if (hand.getType().isBlock()) {
                         Material type = hand.getType();
-                        if (!type.isEmpty()) {
-                            BlockStateHolder block = BukkitAdapter.asBlockState(hand);
-                            if (block != null) {
-                                gen.setBlock(pt, block);
-                                return;
+                        switch (type) {
+                            case AIR:
+                            case CAVE_AIR:
+                            case VOID_AIR:
+                                break;
+                            default: {
+                                BlockStateHolder block = BukkitAdapter.asBlockState(hand);
+                                if (block != null) {
+                                    gen.setBlock(pt, block);
+                                    return;
+                                }
                             }
                         }
                     }

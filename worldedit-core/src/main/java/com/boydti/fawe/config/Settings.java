@@ -29,7 +29,7 @@ public class Settings extends Config {
     @Comment({"Options: cn, de, es, fr, it, nl, ru, tr",
             "Create a PR to contribute a translation: https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/tree/master/worldedit-core/src/main/resources",})
     public String LANGUAGE = "";
-    @Comment("Send anonymous usage statistics")
+    @Comment("@deprecated - use bstats config.yml")
     public boolean METRICS = true;
     @Comment({
             "Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).",
@@ -257,8 +257,8 @@ public class Settings extends Config {
     public static class QUEUE {
         @Comment({
                 "This should equal the number of processors you have",
-                " - Set this to 1 if you need reliable `/timings`"
         })
+        @Final
         public int PARALLEL_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors());
         @Create
         public static PROGRESS PROGRESS;
