@@ -2317,6 +2317,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
+        double xSqr, zSqr;
         double distanceSq;
         double nextXn = 0;
 
@@ -2331,12 +2332,14 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 nextMinXn = (x + 1) * minInvRadiusX;
                 double nextZn = 0;
                 double nextMinZn = 0;
+                xSqr = xn * xn;
                 forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                     final double zn = nextZn;
                     double dz2 = nextMinZn * nextMinZn;
                     nextZn = (z + 1) * invRadiusZ;
                     nextMinZn = (z + 1) * minInvRadiusZ;
-                    distanceSq = lengthSq(xn, zn);
+                    zSqr = zn * zn;
+                    distanceSq = xSqr + zSqr;
                     if (distanceSq > 1) {
                         if (z == 0) {
                             break forX;
@@ -2360,13 +2363,13 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             forX: for (int x = 0; x <= ceilRadiusX; ++x) {
                 final double xn = nextXn;
                 nextXn = (x + 1) * invRadiusX;
-                double dx = xn * xn;
                 double nextZn = 0;
+                xSqr = xn * xn;
                 forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                     final double zn = nextZn;
                     nextZn = (z + 1) * invRadiusZ;
-                    double dz = zn * zn;
-                    distanceSq = lengthSq(xn,zn);
+                    zSqr = zn * zn;
+                    distanceSq = xSqr + zSqr;
                     if (distanceSq > 1) {
                         if (z == 0) {
                             break forX;
@@ -2375,7 +2378,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     if (!filled) {
-                        if ((dz + nextXn * nextXn <= 1) && (nextZn * nextZn + dx <= 1)) {
+                        if ((zSqr + nextXn * nextXn <= 1) && (nextZn * nextZn + xSqr <= 1)) {
                             continue;
                         }
                     }
@@ -2528,18 +2531,20 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         double nextXn = invRadiusX;
         forX: for (int x = 0; x <= ceilRadiusX; ++x) {
             final double xn = nextXn;
+            double dx = xn * xn;
             nextXn = (x + 1) * invRadiusX;
             double nextZn = invRadiusZ;
-            double dx = xn * xn;
             forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                 final double zn = nextZn;
                 double dz = zn * zn;
+                double dxz = dx + dz;
                 nextZn = (z + 1) * invRadiusZ;
                 double nextYn = invRadiusY;
 
                 forY: for (int y = 0; y <= ceilRadiusY; ++y) {
                     final double yn = nextYn;
-                    double dxyz = lengthSq(zn, yn, zn);
+                    double dy = yn * yn;
+                    double dxyz = dxz + dy;
                     nextYn = (y + 1) * invRadiusY;
 
                     if (dxyz > 1) {
@@ -2553,8 +2558,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                     }
 
                     if (!filled) {
-                        double dy = yn * yn;
-                        if (lengthSq(nextXn, yn, zn) <= 1 && lengthSq(xn, nextYn, zn) <= 1 && lengthSq(xn, yn, nextZn) <= 1) {
+                        if (nextXn * nextXn + dy + dz <= 1 && nextYn * nextYn + dx + dz <= 1 && nextZn * nextZn + dx + dy <= 1) {
                             continue;
                         }
                     }
@@ -2762,19 +2766,21 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
                 if (dx2 + dz2 > radiusSq) {
                     continue;
                 }
-
+                loop:
                 for (int y = maxY; y >= 1; --y) {
-                    final BlockState block = getBlock(x, y, z);
-
-                    if (block.getBlockType() == BlockTypes.DIRT ||
-                            (!onlyNormalDirt && block.getBlockType() == BlockTypes.COARSE_DIRT)) {
-                        this.setBlock(x, y, z, grass);
-
-                        break;
-                    } else if (block.getBlockType() == BlockTypes.WATER || block.getBlockType() == BlockTypes.LAVA) {
-                        break;
-                    } else if (block.getBlockType().getMaterial().isMovementBlocker()) {
-                        break;
+                    final BlockType block = getBlockType(x, y, z);
+                    switch (block.getInternalId()) {
+                        case BlockID.COARSE_DIRT:
+                            if (onlyNormalDirt) break loop;
+                        case BlockID.DIRT:
+                            this.setBlock(x, y, z, grass);
+                            break loop;
+                        case BlockID.WATER:
+                        case BlockID.LAVA:
+                        default:
+                            if (block.getMaterial().isMovementBlocker()) {
+                                break loop;
+                            }
                     }
                 }
             }
@@ -3302,11 +3308,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         for (double loop = 0; loop <= 1; loop += 1D / splinelength / quality) {
             BlockVector3 tipv = interpol.getPosition(loop).toBlockPoint();
             if (radius == 0) {
-                try {
-                    pattern.apply(this, tipv, tipv);
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
-                }
+                pattern.apply(this, tipv, tipv);
             } else {
                 vset.add(tipv);
             }
@@ -3484,14 +3486,6 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             Direction.UP.toBlockVector(),
             Direction.DOWN.toBlockVector(),
     };
-
-    private static double lengthSq(double x, double y, double z) {
-        return (x * x) + (y * y) + (z * z);
-    }
-
-    private static double lengthSq(double x, double z) {
-        return (x * x) + (z * z);
-    }
 
 
     @Override

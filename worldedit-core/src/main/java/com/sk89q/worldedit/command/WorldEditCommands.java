@@ -118,6 +118,7 @@ public class WorldEditCommands {
         name = "report",
         aliases = { "debugpaste" },
         desc = "Writes a report of latest.log, config.yml, message.yml and your commands.yml to https://athion.net/ISPaster/paste"
+//      queued = false
     )
     @CommandPermissions({"worldedit.report", "worldedit.debugpaste"})
     public void report(Actor actor) throws WorldEditException, IOException {

@@ -36,6 +36,7 @@ import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -300,4 +301,8 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         return "cuboid";
     }
 
+    @Override
+    public List<BlockVector3> getVerticies() {
+        return Arrays.asList(position1, position2);
+    }
 }

@@ -225,25 +225,25 @@ public class HistoryCommands extends MethodCommands {
             BBC.COMMAND_UNDO_DISABLED.send(player);
             return;
         }
+        LocalSession undoSession;
+        if (context.argsLength() == 2) {
+            player.checkPermission("worldedit.history.undo.other");
+            undoSession = worldEdit.getSessionManager().findByName(playerName);
+            if (undoSession == null) {
+                BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, playerName);
+                return;
+            }
+        } else {
+            undoSession = session;
+        }
         times = Math.max(1, times);
-        LocalSession undoSession = session;
         int finalTimes = times;
         FawePlayer.wrap(player).checkConfirmation(() -> {
-            player.checkPermission("worldedit.history.undo.other");
             EditSession undone = null;
             int i = 0;
             for (; i < finalTimes; ++i) {
-                if (context.argsLength() < 2) {
-                    undone = undoSession.undo(undoSession.getBlockBag(player), player);
-                } else {
-                    LocalSession sess = worldEdit.getSessionManager().findByName(playerName);
-                    if (sess == null) {
-                        BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, playerName);
-                        break;
-                    }
-                    undone = sess.undo(session.getBlockBag(player), player);
-                    if (undone == null) break;
-                }
+                undone = undoSession.undo(undoSession.getBlockBag(player), player);
+                if (undone == null) break;
             }
             if (undone == null) i--;
             if (i > 0) {
@@ -273,7 +273,7 @@ public class HistoryCommands extends MethodCommands {
             player.checkPermission("worldedit.history.redo.other");
             redoSession = worldEdit.getSessionManager().findByName(playerName);
             if (redoSession == null) {
-                player.printError("Unable to find session for " + playerName);
+                BBC.COMMAND_HISTORY_OTHER_ERROR.send(player, playerName);
                 return;
             }
         }
@@ -288,7 +288,7 @@ public class HistoryCommands extends MethodCommands {
             }
         }
         if (timesRedone > 0) {
-            player.print("Redid " + timesRedone + " available edits.");
+            BBC.COMMAND_REDO_SUCCESS.send(player, timesRedone == 1 ? "" : " x" + timesRedone);
         } else {
             BBC.COMMAND_REDO_ERROR.send(player);
         }

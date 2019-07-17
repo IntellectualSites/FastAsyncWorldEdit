@@ -1216,8 +1216,8 @@ public class BrushCommands {
                                    boolean ignoreAir,
                                @Switch(name = 'o', desc = "Paste starting at the target location, instead of centering on it")
                                    boolean usingOrigin,
-                               @Switch(name = 'e', desc = "Paste entities if available")
-                                   boolean pasteEntities,
+                               @Switch(name = 'e', desc = "Skip paste entities if available")
+                                   boolean skipEntities,
                                @Switch(name = 'b', desc = "Paste biomes if available")
                                    boolean pasteBiomes,
                                @ArgFlag(name = 'm', desc = "Skip blocks matching this mask in the clipboard", def = "")
@@ -1231,7 +1231,7 @@ public class BrushCommands {
         worldEdit.checkMaxBrushRadius(size.getBlockX());
         worldEdit.checkMaxBrushRadius(size.getBlockY());
         worldEdit.checkMaxBrushRadius(size.getBlockZ());
-        Brush brush = new ClipboardBrush(holder, ignoreAir, usingOrigin);
+        Brush brush = new ClipboardBrush(holder, ignoreAir, usingOrigin, !skipEntities, pasteBiomes, sourceMask);
         CommandLocals locals = context.getLocals();
         BrushSettings bs = new BrushSettings();
 
@@ -1645,7 +1645,7 @@ public class BrushCommands {
         flags.or(CreatureButcher.Flags.TAGGED        , killWithName, "worldedit.butcher.tagged");
         flags.or(CreatureButcher.Flags.ARMOR_STAND   , killArmorStands, "worldedit.butcher.armorstands");
 
-        BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+        BrushTool tool = session.getBrushTool(player);
         tool.setSize(radius);
         ButcherBrush brush = new ButcherBrush(flags);
         tool.setBrush(brush, "worldedit.brush.butcher");

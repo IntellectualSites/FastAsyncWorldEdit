@@ -277,4 +277,8 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         }
     }
 
+    @Override
+    public List<BlockVector3> getVerticies() {
+        return new ArrayList<>(region.getVertices());
+    }
 }

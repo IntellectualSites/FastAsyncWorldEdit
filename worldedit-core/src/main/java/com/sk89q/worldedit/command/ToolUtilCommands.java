@@ -75,7 +75,7 @@ public class ToolUtilCommands {
     public void mask(Player player, LocalSession session,
                      @Arg(desc = "The mask to set", def = "")
                          Mask mask) throws WorldEditException {
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setMask(mask);
+        session.getBrushTool(player).setMask(mask);
         if (mask == null) {
             player.print("Brush mask disabled.");
         } else {
@@ -92,7 +92,7 @@ public class ToolUtilCommands {
     public void material(Player player, LocalSession session,
                          @Arg(desc = "The pattern of blocks to use")
                              Pattern pattern) throws WorldEditException {
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setFill(pattern);
+        session.getBrushTool(player).setFill(pattern);
         player.print("Brush material set.");
     }
 
@@ -104,7 +104,7 @@ public class ToolUtilCommands {
     public void range(Player player, LocalSession session,
                       @Arg(desc = "The range of the brush")
                           int range) throws WorldEditException {
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setRange(range);
+        session.getBrushTool(player).setRange(range);
         player.print("Brush range set.");
     }
 
@@ -118,7 +118,7 @@ public class ToolUtilCommands {
                          int size) throws WorldEditException {
         we.checkMaxBrushRadius(size);
 
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(size);
+        session.getBrushTool(player).setSize(size);
         player.print("Brush size set.");
     }
 
@@ -130,8 +130,7 @@ public class ToolUtilCommands {
     public void traceMask(Player player, LocalSession session,
                           @Arg(desc = "The trace mask to set", def = "")
                              Mask mask) throws WorldEditException {
-        //TODO TraceMask
-        //session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setTraceMask(mask);
+        session.getBrushTool(player).setTraceMask(mask);
         if (mask == null) {
             player.print("Trace mask disabled.");
         } else {

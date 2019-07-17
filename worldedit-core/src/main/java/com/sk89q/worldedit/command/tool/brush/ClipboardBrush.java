@@ -44,7 +44,7 @@ public class ClipboardBrush implements Brush {
         this.ignoreAirBlocks = ignoreAirBlocks;
         this.usingOrigin = usingOrigin;
         this.pasteBiomes = false;
-        this.pasteEntities = false;
+        this.pasteEntities = true;
         this.sourceMask = null;
     }
 

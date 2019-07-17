@@ -408,7 +408,6 @@ public class SelectionCommands {
         Region region;
         if (clipboardInfo) {
             ClipboardHolder root = session.getClipboard();
-//            Clipboard clipboard = holder.getClipboard();
             int index = 0;
             for (ClipboardHolder holder : root.getHolders()) {
                 Clipboard clipboard = holder.getClipboard();
@@ -471,7 +470,7 @@ public class SelectionCommands {
                       @Arg(desc = "The mask of blocks to match")
                           Mask mask) throws WorldEditException {
         int count = editSession.countBlock(session.getSelection(player.getWorld()), mask);
-        player.print("Counted: " + count);
+        BBC.SELECTION_COUNT.send(player, count);
     }
 
     @Command(
@@ -527,6 +526,7 @@ public class SelectionCommands {
     public void select(Player player, LocalSession session, EditSession editSession,
                        @Arg(desc = "Selector to switch to", def = "")
                            SelectorChoice selector,
+                       @Arg(desc = "Selector mask", def = "") Mask mask,
                        @Switch(name = 'd', desc = "Set default selector")
                            boolean setDefaultSelector) throws WorldEditException {
         final World world = player.getWorld();
@@ -537,7 +537,6 @@ public class SelectionCommands {
             return;
         }
 
-        final String typeName = args.getString(0);
         final RegionSelector oldSelector = session.getRegionSelector(world);
 
         final RegionSelector newSelector;
@@ -587,15 +586,7 @@ public class SelectionCommands {
                 break;
             case FUZZY:
             case MAGIC:
-                Mask mask;
-                if (typeName.length() > 6) {
-                    ParserContext parserContext = new ParserContext();
-                    parserContext.setActor(player);
-                    parserContext.setWorld(player.getWorld());
-                    parserContext.setSession(session);
-                    parserContext.setExtent(editSession);
-                    mask = we.getMaskFactory().parseFromInput(typeName.substring(6), parserContext);
-                } else {
+                if (mask == null) {
                     mask = new IdMask(world);
                 }
                 newSelector = new FuzzyRegionSelector(player, editSession, mask);

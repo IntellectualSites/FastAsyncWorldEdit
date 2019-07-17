@@ -932,18 +932,22 @@ public class LocalSession implements TextureHolder {
      * @return the tool, which may be {@code null}
      */
     @Nullable
+    @Deprecated
     public Tool getTool(ItemType item) {
         return tools[item.getInternalId()];
     }
 
     @Nullable
     public Tool getTool(Player player) {
+        if (!Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && !hasTool) {
+            return null;
+        }
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         return getTool(item, player);
     }
 
     public Tool getTool(BaseItem item, Player player) {
-        if (item.getNativeItem() != null) {
+        if (Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             BrushTool tool = BrushCache.getTool(player, this, item);
             if (tool != null) return tool;
         }
@@ -955,12 +959,14 @@ public class LocalSession implements TextureHolder {
      * or the tool is not assigned, the slot will be replaced with the
      * brush tool.
      *
+     * @deprecated FAWE binds to the item, not the type - this allows brushes to persist
      * @param item the item type
      * @return the tool, or {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
      */
+    @Deprecated
     public BrushTool getBrushTool(ItemType item) throws InvalidToolBindException {
-        return getBrushTool(item, null, true);
+        return getBrushTool(item.getDefaultState(), null, true);
     }
 
     public BrushTool getBrushTool(Player player) throws InvalidToolBindException {
@@ -968,19 +974,16 @@ public class LocalSession implements TextureHolder {
     }
 
     public BrushTool getBrushTool(Player player, boolean create) throws InvalidToolBindException {
-        ItemType item = player.getItemInHand(HandSide.MAIN_HAND).getType();
+        BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         return getBrushTool(item, player, create);
     }
-    public BrushTool getBrushTool(ItemType item, boolean create) throws InvalidToolBindException {
-        return getBrushTool(item, null, create);
-    }
 
-    public BrushTool getBrushTool(ItemType item, Player player, boolean create) throws InvalidToolBindException {
-        Tool tool = getTool(item.getDefaultState(), player);
+    public BrushTool getBrushTool(BaseItem item, Player player, boolean create) throws InvalidToolBindException {
+        Tool tool = getTool(item, player);
         if (!(tool instanceof BrushTool)) {
             if (create) {
                 tool = new BrushTool();
-                setTool(item.getDefaultState(), tool, player);
+                setTool(item, tool, player);
             } else {
                 return null;
             }
@@ -1022,7 +1025,7 @@ public class LocalSession implements TextureHolder {
             throw new InvalidToolBindException(type, "Already used for the navigation wand");
         }
         Tool previous;
-        if (player != null && (tool instanceof BrushTool || tool == null) && item.getNativeItem() != null) {
+        if (player != null && (tool instanceof BrushTool || tool == null) && Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             previous = BrushCache.getCachedTool(item);
             BrushCache.setTool(item, (BrushTool) tool);
             if (tool != null) {
@@ -1330,13 +1333,15 @@ public class LocalSession implements TextureHolder {
 
         BlockBag blockBag = getBlockBag(player);
 
-        // Create an edit session
-        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory()
-                .getEditSession(player.isPlayer() ? player.getWorld() : null,
-                        getBlockChangeLimit(), blockBag, player);
-        Request.request().setEditSession(editSession);
+        World world = player.getWorld();
+        boolean isPlayer = player.isPlayer();
+        EditSessionBuilder builder = new EditSessionBuilder(world);
+        if (player.isPlayer()) builder.player(FawePlayer.wrap(player));
+        builder.blockBag(blockBag);
+        builder.fastmode(fastMode);
 
-        editSession.setFastMode(fastMode);
+        EditSession editSession = builder.build();
+
         if (mask != null) {
             editSession.setMask(mask);
         }

@@ -229,4 +229,8 @@ public class PolyhedralRegionSelector implements RegionSelector, CUIRegion {
         }
     }
 
+    @Override
+    public List<BlockVector3> getVerticies() {
+        return new ArrayList<>(region.getVertices());
+    }
 }

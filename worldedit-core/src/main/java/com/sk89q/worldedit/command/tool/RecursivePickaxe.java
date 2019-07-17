@@ -88,37 +88,4 @@ public class RecursivePickaxe implements BlockTool {
 
         return true;
     }
-
-    private static void recurse(Platform server, EditSession editSession, World world, BlockVector3 pos,
-            BlockVector3 origin, double size, BlockType initialType, Set<BlockVector3> visited) throws MaxChangedBlocksException {
-
-        final double distanceSq = origin.distanceSq(pos);
-        if (distanceSq > size*size || visited.contains(pos)) {
-            return;
-        }
-
-        visited.add(pos);
-
-        if (editSession.getBlock(pos).getBlockType() != initialType) {
-            return;
-        }
-
-        editSession.setBlock(pos, BlockTypes.AIR.getDefaultState());
-
-        world.queueBlockBreakEffect(server, pos, initialType, distanceSq);
-
-        recurse(server, editSession, world, pos.add(1, 0, 0),
-                origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(-1, 0, 0),
-                origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(0, 0, 1),
-                origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(0, 0, -1),
-                origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(0, 1, 0),
-                origin, size, initialType, visited);
-        recurse(server, editSession, world, pos.add(0, -1, 0),
-                origin, size, initialType, visited);
-    }
-
 }

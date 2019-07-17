@@ -46,6 +46,7 @@ import java.util.List;
  * Snapshot commands.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+@Command(aliases = {"snapshot", "snap"}, desc = "List, load and view information related to snapshots")
 public class SnapshotCommands {
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");

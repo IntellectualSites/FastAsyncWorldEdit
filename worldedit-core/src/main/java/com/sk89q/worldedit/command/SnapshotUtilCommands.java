@@ -127,12 +127,12 @@ public class SnapshotUtilCommands {
             if (restore.hadTotalFailure()) {
                 String error = restore.getLastErrorMessage();
                 if (!restore.getMissingChunks().isEmpty()) {
-                    player.printError("Chunks were not present in snapshot.");
+                    BBC.SNAPSHOT_ERROR_RESTORE.send(player);
                 } else if (error != null) {
                     player.printError("Errors prevented any blocks from being restored.");
                     player.printError("Last error: " + error);
                 } else {
-                    player.printError("No chunks could be loaded. (Bad archive?)");
+                    BBC.SNAPSHOT_ERROR_RESTORE_CHUNKS.send(player);
                 }
             } else {
                 player.print(String.format("Restored; %d "

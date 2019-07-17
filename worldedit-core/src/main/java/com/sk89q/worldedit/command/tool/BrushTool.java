@@ -93,10 +93,11 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     protected static int MAX_RANGE = 500;
+    protected static int DEFAULT_RANGE = 240;
     protected int range = -1;
     private VisualMode visualMode = VisualMode.NONE;
     private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
-    private Mask targetMask = null;
+    private Mask traceMask;
     private int targetOffset;
 
     private transient BrushSettings primary = new BrushSettings();
@@ -179,7 +180,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         if (targetMode != TargetMode.TARGET_BLOCK_RANGE) {
             map.put("target", targetMode);
         }
-        if (range != -1 && range != 240) {
+        if (range != -1 && range != DEFAULT_RANGE) {
             map.put("range", range);
         }
         if (targetOffset != 0) {
@@ -308,6 +309,25 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     /**
+     * Get the mask used for identifying where to stop traces.
+     *
+     * @return the mask used to stop block traces
+     */
+    public @Nullable Mask getTraceMask() {
+        return traceMask;
+    }
+
+    /**
+     * Set the block mask used for identifying where to stop traces.
+     *
+     * @param traceMask the mask used to stop block traces
+     */
+    public void setTraceMask(@Nullable Mask traceMask) {
+        this.traceMask = traceMask;
+        update();
+    }
+
+    /**
      * Set the block filter used for identifying blocks to replace.
      *
      * @param filter the filter to set
@@ -328,7 +348,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         current.clearPerms();
         current.setBrush(brush);
         current.addPermission(permission);
-        update();
         update();
     }
 
@@ -392,7 +411,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      * @return the range of the brush in blocks
      */
     public int getRange() {
-        return (range < 0) ? MAX_RANGE : Math.min(range, MAX_RANGE);
+        return (range < 0) ? DEFAULT_RANGE : Math.min(range, MAX_RANGE);
     }
 
     /**
@@ -401,7 +420,11 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      * @param range the range of the brush in blocks
      */
     public void setRange(int range) {
-        this.range = range;
+        if (range == DEFAULT_RANGE) {
+            range = -1;
+        } else {
+            this.range = range;
+        }
     }
 
     @Override
@@ -449,7 +472,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     private Vector3 trace(EditSession editSession, Player player, int range, boolean useLastBlock) {
-        Mask mask = targetMask == null ? new SolidBlockMask(editSession) : targetMask;
+        Mask mask = traceMask == null ? new SolidBlockMask(editSession) : traceMask;
         new MaskTraverser(mask).reset(editSession);
         MaskedTargetBlock tb = new MaskedTargetBlock(mask, player, range, 0.2);
         return TaskManager.IMP.sync(new RunnableVal<Vector3>() {
@@ -461,23 +484,23 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     public boolean act(BrushAction action, Platform server, LocalConfiguration config, Player player, LocalSession session) {
-        if (action == BrushAction.PRIMARY) {
-            setContext(primary);
-        } else if (action == BrushAction.SECONDARY) {
-            setContext(secondary);
+        switch (action) {
+            case PRIMARY:
+                setContext(primary);
+                break;
+            case SECONDARY:
+                setContext(secondary);
+                break;
         }
         BrushSettings current = getContext();
         Brush brush = current.getBrush();
         if (brush == null) return false;
 
-        BlockBag bag = session.getBlockBag(player);
-
+        if (current.setWorld(player.getWorld().getName()) && !current.canUse(player)) {
+            BBC.NO_PERM.send(player, StringMan.join(current.getPermissions(), ","));
+            return false;
+        }
         try (EditSession editSession = session.createEditSession(player)) {
-            if (current.setWorld(editSession.getWorld().getName()) && !current.canUse(player)) {
-                BBC.NO_PERM.send(player, StringMan.join(current.getPermissions(), ","));
-                return false;
-            }
-
             BlockVector3 target = getPosition(editSession, player);
 
             if (target == null) {
@@ -485,6 +508,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 BBC.NO_BLOCK.send(player);
                 return true;
             }
+            BlockBag bag = editSession.getBlockBag();
 
             Request.request().setEditSession(editSession);
             Mask mask = current.getMask();
@@ -519,11 +543,11 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 player.printError("Max blocks change limit reached.");
             } finally {
                 session.remember(editSession);
+                if (bag != null) {
+                    bag.flushChanges();
+                }
             }
         } finally {
-            if (bag != null) {
-                bag.flushChanges();
-            }
             Request.reset();
         }
 
@@ -552,11 +576,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         update();
     }
 
-    public void setTargetMask(Mask mask) {
-        this.targetMask = mask;
-        update();
-    }
-
     public void setVisualMode(Player player, VisualMode visualMode) {
         if (visualMode == null) visualMode = VisualMode.NONE;
         if (this.visualMode != visualMode) {
@@ -581,10 +600,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
 
     public int getTargetOffset() {
         return targetOffset;
-    }
-
-    public Mask getTargetMask() {
-        return targetMask;
     }
 
     public VisualMode getVisualMode() {

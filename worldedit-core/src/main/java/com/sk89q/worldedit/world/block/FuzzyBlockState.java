@@ -39,7 +39,11 @@ public class FuzzyBlockState extends BlockState {
     private final Map<PropertyKey, Object> props;
 
     FuzzyBlockState(BlockType blockType) {
-        super(blockType);
+        this(blockType.getDefaultState(), null);
+    }
+
+    public FuzzyBlockState(BlockState state) {
+        this(state, null);
     }
 
     private FuzzyBlockState(BlockState state, Map<Property<?>, Object> values) {

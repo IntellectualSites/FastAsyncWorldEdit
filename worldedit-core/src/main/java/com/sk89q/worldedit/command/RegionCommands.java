@@ -74,6 +74,7 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
+import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -92,6 +93,7 @@ import org.enginehub.piston.annotation.param.Switch;
 /**
  * Commands that operate on regions.
  */
+@Command(aliases = {}, desc = "Commands that operate on regions: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Region_operations)")
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class RegionCommands {
 
@@ -222,7 +224,7 @@ public class RegionCommands {
                     @Selection Region region,
                     @Arg(desc = "The pattern of blocks to place")
                         Pattern pattern,
-                    @Arg(desc = "The thickness of the line", def = "0")
+                    @Range(min = 0) @Arg(desc = "The thickness of the line", def = "0")
                         int thickness,
                     @Switch(name = 'h', desc = "Generate only a shell")
                         boolean shell) throws WorldEditException {
@@ -230,8 +232,6 @@ public class RegionCommands {
             player.printError("//line only works with cuboid selections");
             return 0;
         }
-        checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
-
         CuboidRegion cuboidregion = (CuboidRegion) region;
         BlockVector3 pos1 = cuboidregion.getPos1();
         BlockVector3 pos2 = cuboidregion.getPos2();
@@ -252,7 +252,7 @@ public class RegionCommands {
                       @Selection Region region,
         @Arg(desc = "The pattern of blocks to place")
             Pattern pattern,
-        @Arg(desc = "The thickness of the curve", def = "0")
+      @Range(min = 0) @Arg(desc = "The thickness of the curve", def = "0")
             int thickness,
         @Switch(name = 'h', desc = "Generate only a shell")
             boolean shell,
@@ -261,7 +261,6 @@ public class RegionCommands {
             player.printError("//curve only works with convex polyhedral selections");
             return;
         }
-        checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
 
         player.checkConfirmationRegion(() -> {
         ConvexPolyhedralRegion cpregion = (ConvexPolyhedralRegion) region;

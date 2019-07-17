@@ -281,7 +281,7 @@ public class BrushOptionsCommands extends MethodCommands {
         parserContext.setSession(session);
         parserContext.setExtent(editSession);
         Mask mask = worldEdit.getMaskFactory().parseFromInput(context.getJoinedStrings(0), parserContext);
-        tool.setTargetMask(mask);
+        tool.setTraceMask(mask);
         BBC.BRUSH_TARGET_MASK_SET.send(player, context.getJoinedStrings(0));
     }
 

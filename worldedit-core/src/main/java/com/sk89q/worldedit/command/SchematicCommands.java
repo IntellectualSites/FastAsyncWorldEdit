@@ -324,7 +324,9 @@ public class SchematicCommands {
             return;
         }
 
+        boolean other = false;
         if (filename.contains("../")) {
+            other = true;
             if (!player.hasPermission("worldedit.schematic.save.other")) {
                 BBC.NO_PERM.send(player, "worldedit.schematic.save.other");
                 return;
@@ -341,6 +343,12 @@ public class SchematicCommands {
         if (overwrite) {
             if (!player.hasPermission("worldedit.schematic.delete")) {
                 throw new StopExecutionException(TextComponent.of("That schematic already exists!"));
+            }
+            if (other) {
+                if (!player.hasPermission("worldedit.schematic.delete.other")) {
+                    BBC.NO_PERM.send(player, "worldedit.schematic.delete.other");
+                    return;
+                }
             }
             if (!allowOverwrite) {
                 player.printError("That schematic already exists. Use the -f flag to overwrite it.");
@@ -373,9 +381,8 @@ public class SchematicCommands {
                 BBC.SCHEMATIC_MOVE_EXISTS.send(player, f.getName());
             }
 
-        ClipboardHolder holder = session.getClipboard();
-
             try (FileOutputStream fos = new FileOutputStream(f)) {
+                ClipboardHolder holder = session.getClipboard();
                 Clipboard clipboard = holder.getClipboard();
                 Transform transform = holder.getTransform();
                 Clipboard target;
@@ -502,7 +509,7 @@ public class SchematicCommands {
                 BBC.NO_PERM.send(actor, "worldedit.schematic.delete.other");
                 continue;
             }
-            if (!f.delete()) {
+            if (!delete(f)) {
                 actor.printError("Deletion of " + filename + " failed! Maybe it is read-only.");
                 continue;
             }
@@ -813,5 +820,13 @@ public class SchematicCommands {
             }
         }
         return fileList;
+    }
+
+    private boolean delete(File file) {
+        if (file.delete()) {
+            new File(file.getParentFile(), "." + file.getName() + ".cached").delete();
+            return true;
+        }
+        return false;
     }
 }
