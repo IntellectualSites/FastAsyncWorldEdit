@@ -50,6 +50,7 @@ import java.util.List;
 public abstract class ChunkListener implements Listener {
 
     protected int rateLimit = 0;
+    protected Location lastCancelPos;
     private int[] badLimit = new int[]{Settings.IMP.TICK_LIMITER.PHYSICS_MS, Settings.IMP.TICK_LIMITER.FALLING, Settings.IMP.TICK_LIMITER.ITEMS};
 
     public ChunkListener() {
@@ -59,6 +60,10 @@ public abstract class ChunkListener implements Listener {
             plm.registerEvents(this, plugin);
             try { plm.registerEvents(new ChunkListener_8Plus(this), plugin); } catch (Throwable ignore) {}
             TaskManager.IMP.repeat(() -> {
+                Location tmpLoc = lastCancelPos;
+                if (tmpLoc != null) {
+                    Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled physics lag source at " + tmpLoc);
+                }
                 rateLimit--;
                 physicsFreeze = false;
                 itemFreeze = false;
@@ -66,6 +71,7 @@ public abstract class ChunkListener implements Listener {
                 physSkip = 0;
                 physCancelPair = Long.MIN_VALUE;
                 physCancel = false;
+                lastCancelPos = null;
 
                 counter.clear();
                 for (Long2ObjectMap.Entry<Boolean> entry : badChunks.long2ObjectEntrySet()) {
@@ -231,7 +237,7 @@ public abstract class ChunkListener implements Listener {
                 physCancelPair = MathMan.pairInt(cx, cz);
                 if (rateLimit <= 0) {
                     rateLimit = 20;
-                    Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled physics  lag source at " + block.getLocation());
+                    lastCancelPos = block.getLocation();
                 }
                 cancelNearby(cx, cz);
                 event.setCancelled(true);
@@ -305,7 +311,7 @@ public abstract class ChunkListener implements Listener {
                     cancelNearby(cx, cz);
                     if (rateLimit <= 0) {
                         rateLimit = 20;
-                        Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled falling block lag source at " + block.getLocation());
+                        lastCancelPos = block.getLocation();
                     }
                     event.setCancelled(true);
                     return;
