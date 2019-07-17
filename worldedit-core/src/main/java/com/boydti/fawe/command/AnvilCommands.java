@@ -30,7 +30,7 @@ import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.SetQueue;
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;

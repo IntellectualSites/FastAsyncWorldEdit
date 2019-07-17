@@ -55,6 +55,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
+import com.sk89q.worldedit.util.command.binding.Range;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 import org.enginehub.piston.annotation.Command;
@@ -72,6 +73,7 @@ import java.net.URL;
  * Commands for the generation of shapes and other objects.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+@Command(aliases = {}, desc = "Create structures and features: [More Info](https://goo.gl/KuLFRW)")
 public class GenerationCommands {
 
     private final WorldEdit worldEdit;
@@ -232,9 +234,7 @@ public class GenerationCommands {
     public void hsphere(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                        @Arg(desc = "The pattern of blocks to generate")
                            Pattern pattern,
-                       @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
-                       @Radii(3)
-                           List<Double> radii,
+                       @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W") BlockVector3 radii,
                        @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
                            boolean raised,
                         CommandContext context) throws WorldEditException {
@@ -247,46 +247,19 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
-    public int sphere(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
+    public void sphere(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                       @Arg(desc = "The pattern of blocks to generate")
                           Pattern pattern,
                       @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
-                      @Radii(3)
-                          List<Double> radii,
+                      BlockVector3 radii,
                       @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
                           boolean raised,
                       @Switch(name = 'h', desc = "Make a hollow sphere")
                           boolean hollow) throws WorldEditException {
-        final double radiusX, radiusY, radiusZ;
-        switch (radii.size()) {
-        case 1:
-            radiusX = radiusY = radiusZ = Math.max(1, radii.get(0));
-            break;
-
-        case 3:
-            radiusX = Math.max(1, radii.get(0));
-            radiusY = Math.max(1, radii.get(1));
-            radiusZ = Math.max(1, radii.get(2));
-            break;
-
-        default:
-            player.printError("You must either specify 1 or 3 radius values.");
-            return 0;
-        }
-
-        worldEdit.checkMaxRadius(radiusX);
-        worldEdit.checkMaxRadius(radiusY);
-        worldEdit.checkMaxRadius(radiusZ);
-
         BlockVector3 pos = session.getPlacementPosition(player);
-        BlockVector3 finalPos;
-        if (raised) {
-            finalPos = pos.add(0, (int) radiusY, 0);
-        } else {
-            finalPos = pos;
-        }
+        BlockVector3 finalPos = raised ? pos.add(0, radii.getY(), 0) : pos;
         fp.checkConfirmationRadius(() -> {
-            int affected = editSession.makeSphere(finalPos, pattern, radiusX, radiusY, radiusZ, !hollow);
+            int affected = editSession.makeSphere(finalPos, pattern, radii.getX(), radii.getY(), radii.getZ(), !hollow);
             player.findFreePosition();
             BBC.VISITOR_BLOCK.send(fp, affected);
         }, getArguments(context), (int) max, context);
@@ -303,9 +276,8 @@ public class GenerationCommands {
                              int size,
                          @Arg(desc = "The type of forest", def = "tree")
                              TreeType type,
-                         @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
+                         @Range(min=0, max = 100) @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                              double density) throws WorldEditException {
-        checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         density = density / 100;
         int affected = editSession.makeForest(session.getPlacementPosition(player), size, density, type);
         player.print(affected + " trees created.");
@@ -323,7 +295,7 @@ public class GenerationCommands {
                             int size,
                         @Arg(desc = "//TODO", def = "10")
                             int apothem,
-                        @Arg(desc = "//TODO ", def = "0.02")
+                        @Range(min=0, max = 100) @Arg(desc = "//TODO ", def = "0.02")
                             double density) throws WorldEditException {
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
         BBC.COMMAND_PUMPKIN.send(player, affected);
@@ -375,7 +347,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.shape")
     @Logging(ALL)
-    public int generate(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
+    public void generate(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
                         @Selection Region region,
                         @Arg(desc = "The pattern of blocks to set")
                             Pattern pattern,
@@ -419,25 +391,25 @@ public class GenerationCommands {
 
         final Vector3 unit1 = unit;
 
-        final int affected = 0;
         fp.checkConfirmationRegion(() -> {
             try {
-                affected = editSession.makeShape(region, zero, unit1, pattern, String.join(" ", expression), hollow, session.getTimeout());
+                int affected = editSession.makeShape(region, zero, unit1, pattern, String.join(" ", expression), hollow, session.getTimeout());
                 player.findFreePosition();
                 BBC.VISITOR_BLOCK.send(fp, affected);
             } catch (ExpressionException e) {
                 player.printError(e.getMessage());
-                return 0;
             }
         }, getArguments(context), region, context);
-        return affected;
     }
 
     @Command(
         name = "/generatebiome",
         aliases = { "/genbiome", "/gb" },
         desc = "Sets biome according to a formula.",
-        descFooter = "See also https://tinyurl.com/weexpr."
+
+        descFooter = "Formula must return positive numbers (true) if the point is inside the shape\n" +
+                "Sets the biome of blocks in that shape.\n"
+                +"See also https://tinyurl.com/weexpr."
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)

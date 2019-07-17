@@ -20,7 +20,7 @@
 package com.sk89q.bukkit.util;
 
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandsManager;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.Plugin;

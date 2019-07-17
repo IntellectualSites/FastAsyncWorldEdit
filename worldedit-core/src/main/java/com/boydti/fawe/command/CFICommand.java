@@ -7,7 +7,7 @@ import com.boydti.fawe.object.changeset.CFIChangeSet;
 import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.MethodCommands;

@@ -26,6 +26,8 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import net.jpountz.lz4.LZ4BlockInputStream;
+
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -90,7 +92,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp); BufferedOutputStream output = new BufferedOutputStream(new PGZIPOutputStream(stream))) {
-                        DataInputStream is = cTag.adapt(cTag.getSource());
+                        LZ4BlockInputStream is = cTag.adapt(cTag.getSource());
                         IOUtil.copy(is, stream);
                     }
                 }

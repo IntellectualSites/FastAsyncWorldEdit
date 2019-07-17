@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -727,7 +727,6 @@ public class CFICommands extends MethodCommands {
     @Command(
             name = "coloring",
             aliases = {"palette"},
-            usage = "",
             desc = "Color the world using an image"
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -902,7 +901,6 @@ public class CFICommands extends MethodCommands {
 
     @Command(
             name = "populate",
-            usage = "",
             desc = ""
     )
     @CommandPermissions("worldedit.anvil.cfi")
@@ -920,7 +918,6 @@ public class CFICommands extends MethodCommands {
     @Command(
             name = "component",
             aliases = {"components"},
-            usage = "",
             desc = "Components menu"
     )
     @CommandPermissions("worldedit.anvil.cfi")

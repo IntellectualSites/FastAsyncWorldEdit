@@ -32,6 +32,7 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.jnbt.anvil.MCAQueue;
 import com.boydti.fawe.jnbt.anvil.MCAWorld;
+import com.boydti.fawe.logging.LoggingChangeSet;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
@@ -253,13 +254,15 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         this(null, world, queue, player, limit, changeSet, allowedRegions, autoQueue, fastmode, checkMemory, combineStages, blockBag, bus, event);
     }
 
-    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @NotNull EventBus bus, @Nullable EditSessionEvent event) {
+    public EditSession(@Nullable String worldName, @Nullable World world, @Nullable FaweQueue queue, @Nullable FawePlayer player, @Nullable FaweLimit limit, @Nullable FaweChangeSet changeSet, @Nullable Region[] allowedRegions, @Nullable Boolean autoQueue, @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages, @Nullable BlockBag blockBag, @Nullable EventBus bus, @Nullable EditSessionEvent event) {
         super(world);
         this.worldName = worldName == null ? world == null ? queue == null ? "" : queue.getWorldName() : world.getName() : worldName;
         if (world == null && this.worldName != null) world = FaweAPI.getWorld(this.worldName);
 
         this.world = world;
-
+        if (bus == null) { // don't change
+            bus = WorldEdit.getInstance().getEventBus();
+        }
         if (event == null) {
             event = new EditSessionEvent(world, player == null ? null : (player.getPlayer()), -1, null);
         }
@@ -361,7 +364,15 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
             if (this.limit.SPEED_REDUCTION > 0) {
                 this.bypassHistory = new SlowExtent(this.bypassHistory, this.limit.SPEED_REDUCTION);
             }
+            // don't delete
+            if (changeSet instanceof NullChangeSet && Fawe.imp().getBlocksHubApi() != null && player != null) {
+                changeSet = LoggingChangeSet.wrap(player, changeSet);
+            }
             if (!(changeSet instanceof NullChangeSet)) {
+                // don't delete
+                if (!(changeSet instanceof LoggingChangeSet) && player != null && Fawe.imp().getBlocksHubApi() != null) {
+                    changeSet = LoggingChangeSet.wrap(player, changeSet);
+                }
                 if (this.blockBag != null) {
                     changeSet = new BlockBagChangeSet(changeSet, blockBag, limit.INVENTORY_MODE == 1);
                 }

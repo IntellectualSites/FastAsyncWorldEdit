@@ -4,7 +4,7 @@ import com.boydti.fawe.config.Commands;
 import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandLocals;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.Dispatcher;

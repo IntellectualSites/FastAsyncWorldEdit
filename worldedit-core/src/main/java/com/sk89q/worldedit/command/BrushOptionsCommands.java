@@ -14,7 +14,7 @@ import com.boydti.fawe.util.MathMan;
 
 import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -131,7 +131,7 @@ public class BrushOptionsCommands extends MethodCommands {
     @Command(
             name = "/listbrush",
             desc = "List saved brushes",
-            max = -1,
+
             descFooter = "List all brushes in the brush directory\n" +
                     " -p <page> prints the requested page\n"
     )
@@ -151,7 +151,6 @@ public class BrushOptionsCommands extends MethodCommands {
     @Command(
             name = "none",
             aliases = {"/none"},
-            usage = "",
             desc = "Unbind a bound tool from your current item"
 )
     public void none(Player player, LocalSession session, CommandContext args) throws WorldEditException {
@@ -267,8 +266,7 @@ public class BrushOptionsCommands extends MethodCommands {
     @Command(
             name = "targetmask",
             aliases = {"tarmask", "tm"},
-            desc = "Set the targeting mask",
-            max = -1
+            desc = "Set the targeting mask"
     )
     @CommandPermissions("worldedit.brush.targetmask")
     public void targetMask(Player player, EditSession editSession, LocalSession session, CommandContext context) throws WorldEditException {
@@ -290,8 +288,7 @@ public class BrushOptionsCommands extends MethodCommands {
     @Command(
             name = "targetoffset",
             aliases = {"to"},
-            desc = "Set the targeting mask",
-            max = -1
+            desc = "Set the targeting mask"
     )
     @CommandPermissions("worldedit.brush.targetoffset")
     public void targetOffset(Player player, EditSession editSession, LocalSession session, int offset) throws WorldEditException {
@@ -306,8 +303,7 @@ public class BrushOptionsCommands extends MethodCommands {
 
     @Command(
             name = "scroll",
-            desc = "Toggle between different target modes",
-            max = -1
+            desc = "Toggle between different target modes"
     )
     @CommandPermissions("worldedit.brush.scroll")
     public void scroll(Player player, EditSession editSession, LocalSession session, @Optional @Switch(name='h', desc = "TODO") boolean offHand, CommandContext args) throws WorldEditException {
@@ -332,8 +328,7 @@ public class BrushOptionsCommands extends MethodCommands {
     @Command(
             name = "mask",
             aliases = {"/mask"},
-            desc = "Set the brush destination mask",
-            max = -1
+            desc = "Set the brush destination mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
     public void mask(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, CommandContext context) throws WorldEditException {
@@ -364,8 +359,7 @@ public class BrushOptionsCommands extends MethodCommands {
             name = "smask",
             aliases = {"/smask", "/sourcemask", "sourcemask"},
             desc = "Set the brush source mask",
-            descFooter = "Set the brush source mask",
-            max = -1
+            descFooter = "Set the brush source mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
     public void smask(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, CommandContext context) throws WorldEditException {
@@ -394,8 +388,7 @@ public class BrushOptionsCommands extends MethodCommands {
 
     @Command(
             name = "transform",
-            desc = "Set the brush transform",
-            max = -1
+            desc = "Set the brush transform"
     )
     @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
     public void transform(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, CommandContext context) throws WorldEditException {

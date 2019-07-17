@@ -19,6 +19,8 @@
 
 package com.sk89q.jnbt;
 
+import com.boydti.fawe.object.io.LittleEndianOutputStream;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.Closeable;
@@ -43,7 +45,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     /**
      * The output stream.
      */
-    private final DataOutputStream os;
+    private final DataOutput os;
 
     /**
      * Creates a new {@code NBTOutputStream}, which will write data to the
@@ -55,7 +57,17 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      *             if an I/O error occurs.
      */
     public NBTOutputStream(OutputStream os) throws IOException {
-        this.os = new DataOutputStream(os);
+        this(os instanceof DataOutput ? (DataOutput) os : new DataOutputStream(os));
+    }
+
+    // Don't delete
+    public NBTOutputStream(DataOutput os) throws IOException {
+        this.os = os;
+    }
+
+    // Don't delete
+    public NBTOutputStream(OutputStream os, boolean littleEndian) throws IOException {
+        this(littleEndian ? new LittleEndianOutputStream(os) : os);
     }
 
     public DataOutput getOutputStream() {
@@ -405,7 +417,9 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
 
     @Override
     public void close() throws IOException {
-        os.close();
+        if (os instanceof Closeable) {
+            ((Closeable) os).close();
+        }
     }
 
     @Override
@@ -485,6 +499,8 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      */
     @Override
     public void flush() throws IOException {
-        ((Flushable) os).flush();
+        if (os instanceof Flushable) {
+            ((Flushable) os).flush();
+        }
     }
 }

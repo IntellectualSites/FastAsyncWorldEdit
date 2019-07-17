@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.internal.util;
 
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.command.*;
 

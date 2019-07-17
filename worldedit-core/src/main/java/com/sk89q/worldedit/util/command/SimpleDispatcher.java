@@ -26,7 +26,7 @@ import com.google.common.base.Joiner;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.worldedit.command.util.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
 
 import java.util.ArrayList;

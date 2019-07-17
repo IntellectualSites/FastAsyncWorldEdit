@@ -22,7 +22,7 @@ package com.boydti.fawe.util;
 import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.CFICommands;
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.command.BiomeCommands;
 import com.sk89q.worldedit.command.BrushCommands;

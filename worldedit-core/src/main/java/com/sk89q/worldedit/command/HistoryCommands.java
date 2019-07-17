@@ -59,6 +59,7 @@ import org.enginehub.piston.annotation.param.Arg;
  * Commands to undo, redo, and clear history.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+@Command(aliases = {}, desc = "Commands to undo, redo, and clear history: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Features#History)")
 public class HistoryCommands extends MethodCommands {
 
     /**
@@ -72,8 +73,7 @@ public class HistoryCommands extends MethodCommands {
 
     @Command(
         name = "fawerollback",
-            name = "/frb",
-            aliases = {"frb", "fawerollback", "/fawerollback", "/rollback"},
+            aliases = {"frb", "/fawerollback", "/rollback"},
             desc = "Undo a specific edit. " +
                    " - The time uses s, m, h, d, y.\n" +
                    " - Import from disk: /frb #import"
@@ -199,7 +199,7 @@ public class HistoryCommands extends MethodCommands {
 
     @Command(
             name = "fawerestore",
-            alias = {"/fawerestore", "/frestore"},
+            aliases = {"/fawerestore", "/frestore"},
             desc = "Redo a specific edit. " +
                    " - The time uses s, m, h, d, y.\n" +
                    " - Import from disk: /frb #import"

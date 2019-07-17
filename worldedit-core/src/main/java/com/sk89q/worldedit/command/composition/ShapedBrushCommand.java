@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.worldedit.command.util.CommandPermissionsException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxBrushRadiusException;
 import com.sk89q.worldedit.WorldEdit;

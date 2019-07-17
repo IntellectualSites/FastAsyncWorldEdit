@@ -7,7 +7,7 @@ import org.enginehub.piston.annotation.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.worldedit.command.util.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import com.sk89q.worldedit.util.command.CommandCallable;
 import com.sk89q.worldedit.util.command.InvalidUsageException;
