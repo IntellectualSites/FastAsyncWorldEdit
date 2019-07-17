@@ -436,8 +436,8 @@ public class BukkitChunk_1_14 extends IntFaweChunk<Chunk, BukkitQueue_1_14> {
                                     }
                                     entity.f(tag);
                                 }
-                                entity.setLocation(x, y, z, yaw, pitch);
                                 synchronized (BukkitQueue_0.class) {
+                                    entity.setLocation(x, y, z, yaw, pitch);
                                     nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                                 }
                             }
