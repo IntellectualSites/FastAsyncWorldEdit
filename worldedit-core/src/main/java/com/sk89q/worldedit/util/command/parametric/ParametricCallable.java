@@ -33,7 +33,7 @@ import com.sk89q.worldedit.util.command.MissingParameterException;
 import com.sk89q.worldedit.util.command.Parameter;
 import com.sk89q.worldedit.util.command.SimpleDescription;
 import com.sk89q.worldedit.util.command.UnconsumedParameterException;
-import com.sk89q.worldedit.util.command.binding.Switch;
+import org.enginehub.piston.annotation.param.Switch;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

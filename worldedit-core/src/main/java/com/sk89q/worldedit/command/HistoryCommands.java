@@ -45,7 +45,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.binding.Range;
-import com.sk89q.worldedit.util.command.binding.Switch;
+import org.enginehub.piston.annotation.param.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
@@ -79,7 +79,7 @@ public class HistoryCommands extends MethodCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void faweRollback(final Player player, LocalSession session, final String user, @Optional("0") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch('r') boolean restore) throws WorldEditException {
+    public void faweRollback(final Player player, LocalSession session, final String user, @Optional("0") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name='r', desc = "TODO") boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
             return;

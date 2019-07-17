@@ -38,7 +38,7 @@ import com.sk89q.worldedit.util.command.NullCompleter;
 import com.sk89q.worldedit.util.command.ProcessedCallable;
 import com.sk89q.worldedit.util.command.binding.PrimitiveBindings;
 import com.sk89q.worldedit.util.command.binding.StandardBindings;
-import com.sk89q.worldedit.util.command.binding.Switch;
+import org.enginehub.piston.annotation.param.Switch;
 import com.thoughtworks.paranamer.Paranamer;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;

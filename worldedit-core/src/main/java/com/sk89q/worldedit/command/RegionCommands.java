@@ -412,7 +412,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.smooth")
     @Logging(REGION)
-    public void smooth(FawePlayer player, EditSession editSession, @Selection Region region, @Arg(name = "iterations", desc = "int", def = "1") int iterations, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('s') boolean snow, CommandContext context) throws WorldEditException {
+    public void smooth(FawePlayer player, EditSession editSession, @Selection Region region, @Arg(name = "iterations", desc = "int", def = "1") int iterations, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='s', desc = "TODO") boolean snow, CommandContext context) throws WorldEditException {
     	BlockVector3 min = region.getMinimumPoint();
     	BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
@@ -491,10 +491,10 @@ public class RegionCommands {
             boolean moveSelection,
         @Switch(name = 'a', desc = "Ignore air blocks")
             boolean ignoreAirBlocks
-        @Switch('b') boolean copyBiomes,
+        @Switch(name='b', desc = "TODO") boolean copyBiomes,
 
-                     @Switch('e') boolean skipEntities,
-                     @Switch('a') boolean skipAir,
+                     @Switch(name='e', desc = "TODO") boolean skipEntities,
+                     @Switch(name='a', desc = "TODO") boolean skipAir,
                      CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.moveRegion(region, direction, count, !skipAir, !skipEntities, copyBiomes, replace);
@@ -525,7 +525,7 @@ public class RegionCommands {
     public void fall(FawePlayer player, EditSession editSession, LocalSession session,
                      @Selection Region region,
                      @Arg(name = "replace", desc = "BlockStateHolder", def = "air") BlockStateHolder replace,
-                     @Switch('m') boolean notFullHeight,
+                     @Switch(name='m', desc = "TODO") boolean notFullHeight,
                      CommandContext context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.fall(region, !notFullHeight, replace);
@@ -551,7 +551,7 @@ public class RegionCommands {
                       @Switch(name = 'b', desc = "//TODO") boolean copyBiomes,
                       @Switch(name = 'e', desc = "//TODO") boolean skipEntities,
         @Switch(name = 'a', desc = "Ignore air blocks")
-            boolean ignoreAirBlocks, @Switch('m') Mask sourceMask, CommandContext context) throws WorldEditException {
+            boolean ignoreAirBlocks, @Switch(name='m', desc = "TODO") Mask sourceMask, CommandContext context) throws WorldEditException {
         player.checkConfirmationStack(() -> {
             if (sourceMask != null) {
                 editSession.addSourceMask(sourceMask);

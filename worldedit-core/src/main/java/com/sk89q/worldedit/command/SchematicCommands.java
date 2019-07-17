@@ -557,7 +557,7 @@ public class SchematicCommands {
                     " -f <format> restricts by format\n"
     )
     @CommandPermissions("worldedit.schematic.show")
-    public void show(Player player, CommandContext args, @Switch('f') String formatName) {
+    public void show(Player player, CommandContext args, @Switch(name='f', desc = "TODO") String formatName) {
         FawePlayer fp = FawePlayer.wrap(player);
         if (args.argsLength() == 0) {
             if (fp.getSession().getVirtualWorld() != null) fp.setVirtualWorld(null);

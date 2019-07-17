@@ -16,7 +16,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.request.RequestSelection;
-import com.sk89q.worldedit.util.command.binding.Switch;
+import org.enginehub.piston.annotation.param.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -257,7 +257,7 @@ public class MaskCommands extends MethodCommands {
                     "Example: /[3][20]\n" +
                     "Explanation: Allows any block where the adjacent block is between 3 and 20 blocks below"
 )
-    public Mask angle(Extent extent, String min, String max, @Switch('o') boolean overlay, @Arg(name = "distance", desc = "int", def = "1") int distance) throws ExpressionException {
+    public Mask angle(Extent extent, String min, String max, @Switch(name='o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "1") int distance) throws ExpressionException {
         double y1, y2;
         boolean override;
         if (max.endsWith("d")) {
@@ -282,7 +282,7 @@ public class MaskCommands extends MethodCommands {
                     "Explanation: Restrict near where the angle changes between 0-45 degrees within 5 blocks\n" +
                     "Note: Use negatives for decreasing slope"
 )
-    public Mask roc(Extent extent, String min, String max, @Switch('o') boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distance) throws ExpressionException {
+    public Mask roc(Extent extent, String min, String max, @Switch(name='o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distance) throws ExpressionException {
         double y1, y2;
         boolean override;
         if (max.endsWith("d")) {
@@ -307,7 +307,7 @@ public class MaskCommands extends MethodCommands {
                     "Explanation: Restrict to near 45 degrees of local maxima\n" +
                     "Note: Use negatives for local minima"
 )
-    public Mask extrema(Extent extent, String min, String max, @Switch('o') boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distance) throws ExpressionException {
+    public Mask extrema(Extent extent, String min, String max, @Switch(name='o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distance) throws ExpressionException {
         double y1, y2;
         boolean override;
         if (max.endsWith("d")) {

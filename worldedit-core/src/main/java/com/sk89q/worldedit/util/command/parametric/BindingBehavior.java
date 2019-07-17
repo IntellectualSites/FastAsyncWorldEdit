@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.util.command.parametric;
 
 import com.sk89q.minecraft.util.commands.CommandLocals;
-import com.sk89q.worldedit.util.command.binding.Switch;
+import org.enginehub.piston.annotation.param.Switch;
 
 /**
  * Determines the type of binding.

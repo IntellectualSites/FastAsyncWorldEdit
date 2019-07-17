@@ -48,7 +48,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.binding.Switch;
+import org.enginehub.piston.annotation.param.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
@@ -75,6 +75,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
 
 import static com.boydti.fawe.util.image.ImageUtil.load;
 
@@ -241,7 +242,7 @@ public class CFICommands extends MethodCommands {
             desc = "Set the floor and main block"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void column(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void column(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) gen.setColumn(load(image), pattern, !disableWhiteOnly);
         else if (mask != null) gen.setColumn(mask, pattern);
@@ -256,14 +257,14 @@ public class CFICommands extends MethodCommands {
             desc = "Set the floor (default: grass)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void floorCmd(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void floorCmd(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         floor(fp, pattern, image, mask, disableWhiteOnly);
         fp.sendMessage("Set floor!");
         assertSettings(fp).resetComponent();
         component(fp);
     }
 
-    private void floor(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException {
+    private void floor(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException {
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) gen.setFloor(load(image), pattern, !disableWhiteOnly);
         else if (mask != null) gen.setFloor(mask, pattern);
@@ -275,14 +276,14 @@ public class CFICommands extends MethodCommands {
             desc = "Set the main block (default: stone)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void mainCmd(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void mainCmd(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         main(fp, pattern, image, mask, disableWhiteOnly);
         fp.sendMessage("Set main!");
         assertSettings(fp).resetComponent();
         component(fp);
     }
 
-    public void main(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void main(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) gen.setMain(load(image), pattern, !disableWhiteOnly);
         else if (mask != null) gen.setMain(mask, pattern);
@@ -298,7 +299,7 @@ public class CFICommands extends MethodCommands {
                     "e.g. Tallgrass"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void overlay(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void overlay(FawePlayer fp, Pattern pattern, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) gen.setOverlay(load(image), pattern, !disableWhiteOnly);
         else if (mask != null) gen.setOverlay(mask, pattern);
@@ -316,13 +317,13 @@ public class CFICommands extends MethodCommands {
                     " - A good value for radius and iterations would be 1 8."
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void smoothCmd(FawePlayer fp, int radius, int iterations, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void smoothCmd(FawePlayer fp, int radius, int iterations, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         smooth(fp, radius, iterations, image, mask, disableWhiteOnly);
         assertSettings(fp).resetComponent();
         component(fp);
     }
 
-    private void smooth(FawePlayer fp, int radius, int iterations, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    private void smooth(FawePlayer fp, int radius, int iterations, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) gen.smooth(load(image), !disableWhiteOnly, radius, iterations);
         else gen.smooth(mask, radius, iterations);
@@ -333,7 +334,7 @@ public class CFICommands extends MethodCommands {
             desc = "Create some snow"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void snow(FawePlayer fp, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void snow(FawePlayer fp, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         floor(fp, BlockTypes.SNOW.getDefaultState().with(PropertyKey.LAYERS, 7), image, mask, disableWhiteOnly);
         main(fp, BlockTypes.SNOW_BLOCK, image, mask, disableWhiteOnly);
@@ -498,7 +499,7 @@ public class CFICommands extends MethodCommands {
                     " - If a mask is used, the biome will be set anywhere the mask applies"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void biome(FawePlayer fp, BiomeType biome, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException{
+    public void biome(FawePlayer fp, BiomeType biome, @Optional FawePrimitiveBinding.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException{
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) gen.setBiome(load(image), biome, !disableWhiteOnly);
         else if (mask != null) gen.setBiome(mask, biome);
@@ -661,7 +662,7 @@ public class CFICommands extends MethodCommands {
     )
     // ![79,174,212,5:3,5:4,18,161,20]
     @CommandPermissions("worldedit.anvil.cfi")
-    public void glass(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException, WorldEditException {
+    public void glass(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException, WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setColorWithGlass(load(image));
         msg("Set color with glass!").send(fp);
@@ -678,7 +679,7 @@ public class CFICommands extends MethodCommands {
                     "The -w (disableWhiteOnly) will randomly apply depending on the pixel luminance"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void color(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException, WorldEditException {
+    public void color(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException, WorldEditException {
         CFISettings settings = assertSettings(fp);
         HeightMapMCAGenerator gen = settings.getGenerator();
         if (imageMask != null) gen.setColor(load(image), load(imageMask), !disableWhiteOnly);
@@ -698,7 +699,7 @@ public class CFICommands extends MethodCommands {
             "The -w (disableWhiteOnly) will randomly apply depending on the pixel luminance"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void blockbiome(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException, WorldEditException {
+    public void blockbiome(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException, WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setBlockAndBiomeColor(load(image), mask, load(imageMask), !disableWhiteOnly);
         msg("Set color with blocks and biomes!").send(fp);
@@ -714,7 +715,7 @@ public class CFICommands extends MethodCommands {
                     " - If you changed the block to something other than grass you will not see anything."
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void biomecolor(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly) throws ParameterException, WorldEditException {
+    public void biomecolor(FawePlayer fp, FawePrimitiveBinding.ImageUri image, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly) throws ParameterException, WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setBiomeColor(load(image));
         msg("Set color with biomes!").send(fp);
@@ -806,7 +807,7 @@ public class CFICommands extends MethodCommands {
             desc = "Select a mask"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void mask(FawePlayer fp, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch('w') boolean disableWhiteOnly, CommandContext context) throws ParameterException{
+    public void mask(FawePlayer fp, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly, CommandContext context) throws ParameterException{
         CFISettings settings = assertSettings(fp);
         String[] split = getArguments(context).split(" ");
         int index = 2;
