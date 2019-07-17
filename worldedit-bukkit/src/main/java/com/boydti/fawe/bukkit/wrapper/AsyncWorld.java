@@ -17,6 +17,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -1176,6 +1177,31 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 	public Collection<Chunk> getForceLoadedChunks() {
 		return parent.getForceLoadedChunks();
 	}
+
+    @Override
+    public boolean addPluginChunkTicket(int x, int z, @NotNull Plugin plugin) {
+        return getBukkitWorld().addPluginChunkTicket(x, z, plugin);
+    }
+
+    @Override
+    public boolean removePluginChunkTicket(int x, int z, @NotNull Plugin plugin) {
+        return getBukkitWorld().removePluginChunkTicket(x, z, plugin);
+    }
+
+    @Override
+    public void removePluginChunkTickets(@NotNull Plugin plugin) {
+        getBukkitWorld().removePluginChunkTickets(plugin);
+    }
+
+    @Override
+    public @NotNull Collection<Plugin> getPluginChunkTickets(int x, int z) {
+        return getBukkitWorld().getPluginChunkTickets(x, z);
+    }
+
+    @Override
+    public @NotNull Map<Plugin, Collection<Chunk>> getPluginChunkTickets() {
+        return getBukkitWorld().getPluginChunkTickets();
+    }
 
     @Override
     public int getHighestBlockYAt(int x, int z, com.destroystokyo.paper.HeightmapType heightmap) throws UnsupportedOperationException {
