@@ -37,6 +37,14 @@ public final class IOUtil {
         return i;
     }
 
+    public static void writeVarInt(OutputStream out, int value) throws IOException {
+        while ((value & -128) != 0) {
+            out.write(value & 127 | 128);
+            value >>>= 7;
+        }
+        out.write(value);
+    }
+
     public static void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buf = new byte[8192];
         while (true) {

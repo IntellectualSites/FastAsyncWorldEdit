@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.util.IOUtil;
 
@@ -37,6 +38,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -51,11 +53,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Writes schematic files using the Sponge schematic format.
@@ -175,11 +179,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                             palette[ordinal] = value = (char) size;
                             paletteList.add(ordinal);
                         }
-                        while ((value & -128) != 0) {
-                            blocksOut.write(value & 127 | 128);
-                            value >>>= 7;
-                        }
-                        blocksOut.write(value);
+                        IOUtil.writeVarInt(blocksOut, value);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -231,7 +231,6 @@ public class SpongeSchematicWriter implements ClipboardWriter {
                 writeBiomes(clipboard, out);
             }
 
-            TODO optimize
             List<Tag> entities = new ArrayList<>();
             for (Entity entity : clipboard.getEntities()) {
                 BaseEntity state = entity.getState();
@@ -263,49 +262,63 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         });
     }
 
-    private void writeBiomes(Clipboard clipboard, NBTOutputStream schematic) throws IOException {
-        TODO optimize
-        BlockVector3 min = clipboard.getMinimumPoint();
-        int width = clipboard.getRegion().getWidth();
-        int length = clipboard.getRegion().getLength();
+    private void writeBiomes(Clipboard clipboard, NBTOutputStream out) throws IOException {
+        ByteArrayOutputStream biomesCompressed = new ByteArrayOutputStream();
+        DataOutputStream biomesOut = new DataOutputStream(new LZ4BlockOutputStream(biomesCompressed));
 
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream(width * length);
-
-        int paletteMax = 0;
-        Map<String, Integer> palette = new HashMap<>();
-
-        for (int z = 0; z < length; z++) {
-            int z0 = min.getBlockZ() + z;
-            for (int x = 0; x < width; x++) {
-                int x0 = min.getBlockX() + x;
-                BlockVector2 pt = BlockVector2.at(x0, z0);
-                BiomeType biome = clipboard.getBiome(pt);
-
-                String biomeKey = biome.getId();
-                int biomeId;
-                if (palette.containsKey(biomeKey)) {
-                    biomeId = palette.get(biomeKey);
-                } else {
-                    biomeId = paletteMax;
-                    palette.put(biomeKey, biomeId);
-                    paletteMax++;
+        List<Integer> paletteList = new ArrayList<>();
+        int[] palette = new int[BiomeTypes.getMaxId() + 1];
+        Arrays.fill(palette, Integer.MAX_VALUE);
+        int[] paletteMax = {0};
+        NBTStreamer.ByteReader task = new NBTStreamer.ByteReader() {
+            @Override
+            public void run(int index, int ordinal) {
+                try {
+                    int value = palette[ordinal];
+                    if (value == Integer.MAX_VALUE) {
+                        int size = paletteMax[0]++;
+                        palette[ordinal] = value = size;
+                        paletteList.add(ordinal);
+                    }
+                    IOUtil.writeVarInt(biomesOut, value);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
-                while ((biomeId & -128) != 0) {
-                    buffer.write(biomeId & 127 | 128);
-                    biomeId >>>= 7;
+            }
+        };
+        if (clipboard instanceof BlockArrayClipboard) {
+            ((BlockArrayClipboard) clipboard).IMP.streamBiomes(task);
+        } else {
+            BlockVector3 min = clipboard.getMinimumPoint();
+            int width = clipboard.getRegion().getWidth();
+            int length = clipboard.getRegion().getLength();
+            for (int z = 0, i = 0; z < length; z++) {
+                int z0 = min.getBlockZ() + z;
+                for (int x = 0; x < width; x++, i++) {
+                    int x0 = min.getBlockX() + x;
+                    BlockVector2 pt = BlockVector2.at(x0, z0);
+                    BiomeType biome = clipboard.getBiome(pt);
+                    task.run(i, biome.getInternalId());
                 }
-                buffer.write(biomeId);
             }
         }
+        biomesOut.close();
 
-        schematic.writeNamedTag("BiomePaletteMax", new IntTag(paletteMax));
+        out.writeNamedTag("BiomePaletteMax", paletteMax[0]);
 
-        Map<String, Tag> paletteTag = new HashMap<>();
-        palette.forEach((key, value) -> paletteTag.put(key, new IntTag(value)));
+        out.writeLazyCompoundTag("BiomePalette", out12 -> {
+            for (int i = 0; i < paletteList.size(); i++) {
+                int ordinal = paletteList.get(i);
+                BiomeType state = BiomeTypes.get(ordinal);
+                out12.writeNamedTag(state.getId(), i);
+            }
+        });
 
-        schematic.writeNamedTag("BiomePalette", new CompoundTag(paletteTag));
-        schematic.writeNamedTag("BiomeData", new ByteArrayTag(buffer.toByteArray()));
+        out.writeNamedTagName("BiomeData", NBTConstants.TYPE_BYTE_ARRAY);
+        out.writeInt(biomesOut.size());
+        try (LZ4BlockInputStream in = new LZ4BlockInputStream(new ByteArrayInputStream(biomesCompressed.toByteArray()))) {
+            IOUtil.copy(in, (DataOutput) out);
+        }
     }
 
     private void writeEntities(Clipboard clipboard, NBTOutputStream schematic) throws IOException {

@@ -135,6 +135,16 @@ public final class BiomeTypes {
         return BiomeType.REGISTRY.values();
     }
 
+    public static int getMaxId() {
+        int maxBiomeId = 0;
+        for (BiomeType type : BiomeType.REGISTRY.values()) {
+            if (type.getInternalId() > maxBiomeId) {
+                maxBiomeId = type.getInternalId();
+            }
+        }
+        return maxBiomeId;
+    }
+
     static {
         OCEAN.setLegacyId(0);
         PLAINS.setLegacyId(1);
