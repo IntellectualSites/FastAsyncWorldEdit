@@ -1,55 +1,75 @@
 package com.boydti.fawe.jnbt.anvil;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.example.SimpleIntFaweChunk;
-import com.boydti.fawe.object.*;
+import com.boydti.fawe.object.FaweInputStream;
+import com.boydti.fawe.object.FaweOutputStream;
+import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.Metadatable;
+import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.change.StreamChange;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
-import com.boydti.fawe.object.collection.*;
+import com.boydti.fawe.object.collection.DifferentialArray;
+import com.boydti.fawe.object.collection.DifferentialBlockBuffer;
+import com.boydti.fawe.object.collection.IterableThreadLocal;
+import com.boydti.fawe.object.collection.LocalBlockVector2DSet;
+import com.boydti.fawe.object.collection.SummedAreaTable;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.queue.LazyFaweChunk;
 import com.boydti.fawe.object.schematic.Schematic;
-import com.boydti.fawe.util.*;
+import com.boydti.fawe.util.CachedTextureUtil;
+import com.boydti.fawe.util.RandomTextureUtil;
+import com.boydti.fawe.util.ReflectionUtils;
+import com.boydti.fawe.util.SetQueue;
+import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.registry.state.PropertyKey;
-import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.block.BlockID;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.annotation.Nullable;
 
 // TODO FIXME
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
@@ -190,11 +210,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         this.editSession = session;
     }
 
-    @Override
-    public boolean supports(Capability capability) {
-        return false;
-    }
-
     // Used for visualizing the world on a map
     private ImageViewer viewer;
     // Used for visualizing the world by sending chunk packets
@@ -227,11 +242,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     public Metadatable getMetaData() {
         return metaData;
-    }
-
-    @Override
-    public FaweQueue getQueue() {
-        throw new UnsupportedOperationException("Not supported: Queue is not backed by a real world");
     }
 
     @Override
@@ -1019,7 +1029,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return getLazyBlock(position);
+        return getBlock(position.getX(), position.getY(), position.getZ());
     }
 
     public BlockState getFloor(int x, int z) {
@@ -1042,12 +1052,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return getLazyBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-    }
-
-    @Override
-    public BlockState getLazyBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return BlockState.getFromInternalId(getCombinedId4Data(x, y, z));
     }
 

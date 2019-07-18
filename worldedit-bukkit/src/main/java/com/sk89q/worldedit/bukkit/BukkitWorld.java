@@ -199,9 +199,9 @@ public class BukkitWorld extends AbstractWorld {
 
                         // We have to restore the block if it was outside
                         if (!region.contains(pt)) {
-                            editSession.smartSetBlock(pt, history[index]);
+                            editSession.setBlock(pt, history[index]);
                         } else { // Otherwise fool with history
-                            editSession.getChangeSet().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
+                            editSession.setBlock().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
                         }
                     }
                 }
@@ -446,11 +446,6 @@ public class BukkitWorld extends AbstractWorld {
             bukkitBlock.setBlockData(BukkitAdapter.adapt(block), false);
             return true;
         }
-    }
-
-    @Override
-    public com.sk89q.worldedit.world.block.BlockState getLazyBlock(BlockVector3 position) {
-        return getBlock(position);
     }
 
     @Override

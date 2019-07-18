@@ -48,6 +48,7 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxBrushRadiusException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -643,15 +644,16 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         Brush brush = current.getBrush();
         if (brush == null) return;
         FawePlayer<Object> fp = FawePlayer.wrap(player);
-        EditSession editSession = new EditSessionBuilder(player.getWorld())
+        EditSessionBuilder builder = new EditSessionBuilder(player.getWorld())
                 .player(fp)
                 .allowedRegionsEverywhere()
                 .autoQueue(false)
                 .blockBag(null)
                 .changeSetNull()
-                .combineStages(false)
-                .build();
-        VisualExtent newVisualExtent = new VisualExtent(editSession.getExtent(), editSession.getQueue());
+                .combineStages(false);
+        EditSession editSession = builder.build();
+
+        VisualExtent newVisualExtent = new VisualExtent(builder.getExtent(), builder.getQueue());
         BlockVector3 position = getPosition(editSession, player);
         if (position != null) {
             editSession.setExtent(newVisualExtent);

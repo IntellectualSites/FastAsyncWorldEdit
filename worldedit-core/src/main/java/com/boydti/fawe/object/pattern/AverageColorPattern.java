@@ -32,19 +32,14 @@ public class AverageColorPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
-        BlockType blockType = extent.getBlock(getPosition).getBlockType();
+    public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
+        BlockType blockType = get.getBlock(extent).getBlockType();
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(blockType);
         if (currentColor == 0) return false;
         int newColor = util.averageColor(currentColor, color);
         BlockType newBlock = util.getNearestBlock(newColor);
         if (newBlock == blockType) return false;
-        return extent.setBlock(setPosition, newBlock.getDefaultState());
-    }
-
-    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        stream.defaultReadObject();
-        holder = Fawe.get().getCachedTextureUtil(true, 0, 100);
+        return set.setBlock(extent, newBlock.getDefaultState());
     }
 }

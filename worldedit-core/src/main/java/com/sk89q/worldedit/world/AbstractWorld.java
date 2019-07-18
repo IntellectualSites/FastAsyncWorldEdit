@@ -20,17 +20,16 @@
 package com.sk89q.worldedit.world;
 
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -69,7 +68,7 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public Mask createLiquidMask() {
-        return new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER);
+        return new BlockMask(this).add(BlockTypes.LAVA, BlockTypes.WATER);
     }
 
     @Override
@@ -94,11 +93,6 @@ public abstract class AbstractWorld implements World {
     @Override
     public boolean playEffect(Vector3 position, int type, int data) {
         return false;
-    }
-
-    @Override
-    public BlockState getLazyBlock(BlockVector3 position) {
-        return getBlock(position);
     }
 
     @Override

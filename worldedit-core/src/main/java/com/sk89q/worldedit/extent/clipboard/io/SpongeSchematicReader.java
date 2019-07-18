@@ -199,9 +199,20 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 setupClipboard(0, uuid);
             }
             int[] pos = value.getIntArray("Pos");
-            int x = pos[0];
-            int y = pos[1];
-            int z = pos[2];
+            int x,y,z;
+            if (pos.length != 3) {
+                System.out.println("Invalid tile " + value);
+                if (!value.containsKey("x") || !value.containsKey("y") || !value.containsKey("z")) {
+                    return;
+                }
+                x = value.getInt("x");
+                y = value.getInt("y");
+                z = value.getInt("z");
+            } else {
+                x = pos[0];
+                y = pos[1];
+                z = pos[2];
+            }
             Map<String, Tag> values = value.getValue();
             Tag id = values.get("Id");
             if (id != null) {

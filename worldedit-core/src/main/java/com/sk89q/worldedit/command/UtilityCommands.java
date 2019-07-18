@@ -22,6 +22,7 @@ package com.sk89q.worldedit.command;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 
 import com.boydti.fawe.Fawe;
+
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.DelegateConsumer;
@@ -60,6 +61,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
+
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector3;

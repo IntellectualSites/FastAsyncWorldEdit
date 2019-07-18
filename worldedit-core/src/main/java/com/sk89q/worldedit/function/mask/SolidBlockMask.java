@@ -27,10 +27,10 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
 
-public class SolidBlockMask extends BlockTypeMask {
-
+public class SolidBlockMask extends BlockMask {
     public SolidBlockMask(Extent extent) {
-        super(extent, getTypes());
+        super(extent);
+        add(state -> state.getMaterial().isSolid());
     }
 
     @Override

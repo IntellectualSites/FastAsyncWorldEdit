@@ -27,6 +27,7 @@ import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
 import com.boydti.fawe.object.regions.selector.PolyhedralRegionSelector;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -490,7 +491,7 @@ public class SelectionCommands {
             // TODO multi clipboard distribution
             Clipboard clipboard = session.getClipboard().getClipboard(); // throws if missing
             region = clipboard.getRegion();
-            editSession.setExtent(new AbstractDelegateExtent(clipboard));
+            new ExtentTraverser<AbstractDelegateExtent>(editSession).setNext(new AbstractDelegateExtent(clipboard));
         } else {
             region = session.getSelection(player.getWorld());
         }
@@ -498,6 +499,7 @@ public class SelectionCommands {
             distribution = (List) editSession.getBlockDistributionWithData(region);
         else
             distribution = (List) editSession.getBlockDistribution(region);
+
 
         if (distribution.isEmpty()) {  // *Should* always be false
             player.printError("No blocks counted.");

@@ -26,6 +26,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.ABlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
@@ -47,8 +48,8 @@ import java.util.Objects;
  */
 public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
-    private BlockState blockState;
-    @Nullable protected CompoundTag nbtData;
+    private final BlockState blockState;
+    private final CompoundTag nbtData;
 
     @Deprecated
     public BaseBlock() {
@@ -71,6 +72,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      */
     public BaseBlock(BlockState blockState) {
     	this.blockState = blockState;
+        nbtData = null;
     }
 
     /**
@@ -181,7 +183,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public void setNbtData(@Nullable CompoundTag nbtData) {
-        this.nbtData = nbtData;
+        throw new UnsupportedOperationException("Immutable");
     }
 
     /**
@@ -233,13 +235,19 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Override
-    public BaseBlock toBaseBlock() {
+    public final char getOrdinalChar() {
+        return blockState.getOrdinalChar();
+    }
+
+    @Override
+    public final BaseBlock toBaseBlock() {
         return this;
     }
 
 	@Override
 	public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-		return extent.setBlock(set, this);
+        set.setFullBlock(extent, this);
+        return true;
 	}
 
 	@Override
@@ -280,7 +288,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public int hashCode() {
-        return blockState.hashCode(); // stop changing this
+        return getOrdinal();
     }
 
     @Override
@@ -291,5 +299,4 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
             return blockState.getAsString();
 //        }
     }
-
 }

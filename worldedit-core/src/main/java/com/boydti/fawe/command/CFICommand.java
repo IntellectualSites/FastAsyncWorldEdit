@@ -13,6 +13,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.MethodCommands;
 import com.sk89q.worldedit.util.command.SimpleDispatcher;
 import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
+
 import java.io.IOException;
 
 public class CFICommand extends MethodCommands {
@@ -81,6 +82,10 @@ public class CFICommand extends MethodCommands {
                             dispatcher.call(cmd, context.getLocals(), new String[0]);
                             return;
                         }
+                        case 2:
+                            String cmd = Commands.getAlias(CFICommands.class, "empty") + " " + context.getJoinedStrings(0);
+                            dispatcher.call(cmd, context.getLocals(), new String[0]);
+                            return;
                     }
                 }
                 dispatcher.call(remaining, context.getLocals(), new String[0]);

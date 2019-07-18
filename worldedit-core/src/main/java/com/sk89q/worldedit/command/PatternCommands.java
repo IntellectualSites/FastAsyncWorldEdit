@@ -205,6 +205,7 @@ public class PatternCommands extends MethodCommands {
                     " - Use to replace slabs or where the data values needs to be shifted instead of set"
 )
     public Pattern iddatamask(Actor actor, LocalSession session, Extent extent, @Range(min = 0, max = 15) int bitmask, Pattern pattern) {
+
         return new IdDataMaskPattern(extent, pattern, bitmask);
     }
 
@@ -213,6 +214,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Only change the block id"
 )
     public Pattern id(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+
         return new IdPattern(extent, pattern);
     }
 
@@ -221,6 +223,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Only change the block data"
 )
     public Pattern data(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+
         return new DataPattern(extent, pattern);
     }
 
@@ -230,6 +233,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Set the biome"
 )
     public Pattern biome(Actor actor, LocalSession session, Extent extent, BiomeType biome) {
+
         return new BiomePattern(extent, biome);
     }
 
@@ -239,6 +243,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Offset the pattern to where you click"
 )
     public Pattern relative(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+
         return new RelativePattern(pattern);
     }
 
@@ -250,6 +255,7 @@ public class PatternCommands extends MethodCommands {
                     "Example: #!x[#!z[#~[#l3d[pattern]]]]"
 )
     public Pattern nox(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+
         return new NoXPattern(pattern);
     }
 
@@ -259,6 +265,7 @@ public class PatternCommands extends MethodCommands {
             desc = "The pattern will not be provided the y axis info"
 )
     public Pattern noy(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+
         return new NoYPattern(pattern);
     }
 
@@ -268,6 +275,7 @@ public class PatternCommands extends MethodCommands {
             desc = "The pattern will not be provided the z axis info"
 )
     public Pattern noz(Actor actor, LocalSession session, Extent extent, Pattern pattern) {
+
         return new NoZPattern(pattern);
     }
 
@@ -285,6 +293,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Offset a pattern"
 )
     public Pattern offset(Actor actor, LocalSession session, double x, double y, double z, Pattern pattern) {
+
         return new OffsetPattern(pattern, (int) x, (int) y, (int) z);
     }
 
@@ -293,6 +302,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Applies to only blocks on a surface. Selects a block from provided pattern with a given ranomized offset `[0, <distance>)`. e.g. Use `#existing` to randomly offset blocks in the world, or `#copy` to offset blocks in your clipboard"
 )
     public Pattern surfacespread(Actor actor, LocalSession session, double distance, Pattern pattern) {
+
         return new SurfaceRandomOffsetPattern(pattern, (int) distance);
     }
 
@@ -301,6 +311,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Randomly spread solid blocks"
 )
     public Pattern solidspread(Actor actor, LocalSession session, double x, double y, double z, Pattern pattern) {
+
         return new SolidRandomOffsetPattern(pattern, (int) x, (int) y, (int) z);
     }
 
@@ -310,6 +321,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Randomly spread blocks"
 )
     public Pattern spread(Actor actor, LocalSession session, double x, double y, double z, Pattern pattern) {
+
         return new RandomOffsetPattern(pattern, (int) x, (int) y, (int) z);
     }
 
@@ -319,6 +331,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Sequentially set blocks from a list of patterns"
 )
     public Pattern linear(Actor actor, LocalSession session, Pattern other) {
+
         if (other instanceof RandomPattern) {
             Set<Pattern> patterns = ((RandomPattern) other).getPatterns();
             return new LinearBlockPattern(patterns.toArray(new Pattern[patterns.size()]));
@@ -332,6 +345,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Use the x,y,z coordinate to pick a block from the list"
 )
     public Pattern linear3d(Actor actor, LocalSession session, Pattern other) {
+
         if (other instanceof RandomPattern) {
             Set<Pattern> patterns = ((RandomPattern) other).getPatterns();
             return new Linear3DBlockPattern(patterns.toArray(new Pattern[patterns.size()]));
@@ -345,6 +359,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Use the x,z coordinate to pick a block from the list"
 )
     public Pattern linear2d(Actor actor, LocalSession session, Pattern other) {
+
         if (other instanceof RandomPattern) {
             Set<Pattern> patterns = ((RandomPattern) other).getPatterns();
             return new Linear2DBlockPattern(patterns.toArray(new Pattern[patterns.size()]));
@@ -358,6 +373,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Expression pattern: http://wiki.sk89q.com/wiki/WorldEdit/Expression_syntax"
 )
     public Pattern expression(Actor actor, LocalSession session, Extent extent, String input) throws ExpressionException {
+
         Expression exp = Expression.compile(input, "x", "y", "z");
         WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
         exp.setEnvironment(env);

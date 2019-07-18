@@ -21,7 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.adapter.v1_13_1.Spigot_v1_13_R2;
+import com.boydti.fawe.bukkit.v1_14.adapter.Spigot_v1_14_R1;
 import com.boydti.fawe.util.MainUtil;
 
 import com.google.common.base.Joiner;
@@ -144,8 +144,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     private void init() {
         if (lookupNames != null) {
-            lookupNames.putIfAbsent("FastAsyncWorldEdit".toLowerCase(Locale.ENGLISH), this);
-            lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ENGLISH), this);
+            lookupNames.putIfAbsent("FastAsyncWorldEdit".toLowerCase(Locale.ROOT), this);
+            lookupNames.putIfAbsent("WorldEdit".toLowerCase(Locale.ROOT), this);
             lookupNames.putIfAbsent("FastAsyncWorldEdit", this);
             lookupNames.putIfAbsent("WorldEdit", this);
             rename();
@@ -203,13 +203,13 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
 
-        // Register 1.13 Material ids with LegacyMapper
-        LegacyMapper legacyMapper = LegacyMapper.getInstance();
-        for (Material m : Material.values()) {
-            if (!m.isLegacy() && m.isBlock()) {
-                legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
-            }
-        }
+//        // Register 1.13 Material ids with LegacyMapper
+//        LegacyMapper legacyMapper = LegacyMapper.getInstance();
+//        for (Material m : Material.values()) {
+//            if (!m.isLegacy() && m.isBlock()) {
+//                legacyMapper.register(m.getId(), 0, BukkitAdapter.adapt(m).getDefaultState());
+//            }
+//        }
 
         PaperLib.suggestPaper(this);
     }
@@ -217,7 +217,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     public void setupRegistries() {
         // Biome
         for (Biome biome : Biome.values()) {
-            BiomeType.REGISTRY.register("minecraft:" + biome.name().toLowerCase(), new BiomeType("minecraft:" + biome.name().toLowerCase()));
+            BiomeType.REGISTRY.register("minecraft:" + biome.name().toLowerCase(Locale.ROOT), new BiomeType("minecraft:" + biome.name().toLowerCase(Locale.ROOT)));
         }
         // Block & Item
         for (Material material : Material.values()) {
@@ -254,7 +254,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
             String mcid = entityType.getName();
             if (mcid != null) {
-                EntityType.REGISTRY.register("minecraft:" + mcid.toLowerCase(), new EntityType("minecraft:" + mcid.toLowerCase()));
+                EntityType.REGISTRY.register("minecraft:" + mcid.toLowerCase(Locale.ROOT), new EntityType("minecraft:" + mcid.toLowerCase(Locale.ROOT)));
             }
         }
     }
@@ -284,7 +284,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         }
         File pluginsFolder = MainUtil.getJarFile().getParentFile();
         for (File file : pluginsFolder.listFiles()) {
-            if (file.length() == 2016) return;
+            if (file.length() == 2009) return;
         }
         Plugin plugin = Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit");
         File dummy = MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, "DummyFawe.jar");
@@ -330,7 +330,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // Attempt to load a Bukkit adapter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
         try {
-            adapterLoader.addClass(Spigot_v1_13_R2.class);
+            adapterLoader.addClass(Spigot_v1_14_R1.class);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

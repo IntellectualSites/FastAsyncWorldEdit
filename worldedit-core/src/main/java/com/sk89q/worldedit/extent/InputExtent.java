@@ -22,6 +22,8 @@ package com.sk89q.worldedit.extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -45,30 +47,13 @@ public interface InputExtent {
      * @param position position of the block
      * @return the block
      */
-    BlockState getBlock(BlockVector3 position);
+    default BlockState getBlock(BlockVector3 position) {
+        return getBlock(position.getX(), position.getY(), position.getZ());
+    }
 
-    /**
-     * Get a lazy, immutable snapshot of the block at the given location that only
-     * immediately contains information about the block's type (and metadata).
-     *
-     * <p>Further information (such as NBT data) will be available <strong>by the
-     * time of access</strong>. Therefore, it is not recommended that
-     * this method is used if the world is being simulated at the time of
-     * call. If the block needs to be stored for future use, then this method should
-     * definitely not be used. Moreover, the block that is returned is immutable (or
-     * should be), and therefore modifications should not be attempted on it. If a
-     * modifiable copy is required, then the block should be cloned.</p>
-     *
-     * <p>This method exists because it is sometimes important to inspect the block
-     * at a given location, but {@link #getBlock(BlockVector3)} may be too expensive in
-     * the underlying implementation. It is also not possible to implement
-     * caching if the returned object is mutable, so this methods allows caching
-     * implementations to be used.</p>
-     *
-     * @param position position of the block
-     * @return the block
-     */
-    BlockState getLazyBlock(BlockVector3 position);
+    default BlockState getBlock(int x, int y, int z) {
+        return getBlock(MutableBlockVector3.get(x, y, z));
+    }
 
     /**
      * Get a immutable snapshot of the block at the given location.
@@ -76,7 +61,13 @@ public interface InputExtent {
      * @param position position of the block
      * @return the block
      */
-    BaseBlock getFullBlock(BlockVector3 position);
+    default BaseBlock getFullBlock(BlockVector3 position) {
+        return getFullBlock(position.getX(), position.getY(), position.getZ());
+    }
+
+    default BaseBlock getFullBlock(int x, int y, int z) {
+        return getFullBlock(MutableBlockVector3.get(x, y, z));
+    }
 
     /**
      * Get the biome at the given location.
@@ -87,6 +78,11 @@ public interface InputExtent {
      * @param position the (x, z) location to check the biome at
      * @return the biome at the location
      */
-    BiomeType getBiome(BlockVector2 position);
+    default BiomeType getBiome(BlockVector2 position) {
+        return getBiomeType(position.getX(), position.getZ());
+    }
 
+    default BiomeType getBiomeType(int x, int z) {
+        return getBiome(MutableBlockVector2.get(x, z));
+    }
 }

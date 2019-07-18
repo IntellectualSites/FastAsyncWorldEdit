@@ -22,11 +22,7 @@ package com.sk89q.worldedit.function.visitor;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.example.MappedFaweQueue;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
-import com.boydti.fawe.object.IntegerTrio;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -38,7 +34,10 @@ import com.sk89q.worldedit.util.Direction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Performs a breadth-first search starting from points added with
@@ -81,13 +80,12 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     private final RegionFunction function;
-    private BlockVectorSet queue;
+    private BlockVector3[] directions;
     private BlockVectorSet visited;
+    private BlockVectorSet queue;
     private int affected = 0;
     private int currentDepth = 0;
     private final int maxDepth;
-    private List<BlockVector3> directions = new ArrayList<>();
-    private final MappedFaweQueue mFaweQueue;
     private int maxBranch = Integer.MAX_VALUE;
 
     /**
@@ -101,33 +99,20 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     public BreadthFirstSearch(RegionFunction function, int maxDepth) {
-        this(function, maxDepth, null);
         checkNotNull(function);
-
-    }
-
-    public BreadthFirstSearch(RegionFunction function, int maxDepth, HasFaweQueue faweQueue) {
-        checkNotNull(function);
-        FaweQueue fq = faweQueue != null ? faweQueue.getQueue() : null;
-        this.mFaweQueue = fq instanceof MappedFaweQueue ? (MappedFaweQueue) fq : null;
         this.queue = new BlockVectorSet();
         this.visited = new BlockVectorSet();
         this.function = function;
-        this.directions.addAll(Arrays.asList(DEFAULT_DIRECTIONS));
+        this.directions = DEFAULT_DIRECTIONS;
         this.maxDepth = maxDepth;
     }
 
-    public void setDirections(List<BlockVector3> directions) {
+    public void setDirections(BlockVector3... directions) {
         this.directions = directions;
     }
 
-    private IntegerTrio[] getIntDirections() {
-        IntegerTrio[] array = new IntegerTrio[directions.size()];
-        for (int i = 0; i < array.length; i++) {
-        	BlockVector3 dir = directions.get(i);
-            array[i] = new IntegerTrio(dir.getBlockX(), dir.getBlockY(), dir.getBlockZ());
-        }
-        return array;
+    public void setDirections(Collection<BlockVector3> directions) {
+        setDirections(directions.toArray(new BlockVector3[0]));
     }
 
     /**
@@ -138,34 +123,36 @@ public abstract class BreadthFirstSearch implements Operation {
      * unit vectors. An example of a valid direction is
      * {@code BlockVector3.at(1, 0, 1)}.</p>
      *
-     * <p>The list of directions can be cleared.</p>
-     *
      * @return the list of directions
      */
-    protected Collection<BlockVector3> getDirections() {
-        return directions;
+    public Collection<BlockVector3> getDirections() {
+        return Arrays.asList(directions);
     }
 
     /**
      * Add the directions along the axes as directions to visit.
      */
-    protected void addAxes() {
-        directions.add(BlockVector3.UNIT_MINUS_Y);
-        directions.add(BlockVector3.UNIT_Y);
-        directions.add(BlockVector3.UNIT_MINUS_X);
-        directions.add(BlockVector3.UNIT_X);
-        directions.add(BlockVector3.UNIT_MINUS_Z);
-        directions.add(BlockVector3.UNIT_Z);
+    public void addAxes() {
+        HashSet<BlockVector3> set = new HashSet<>(Arrays.asList(directions));
+        set.add(BlockVector3.UNIT_MINUS_Y);
+        set.add(BlockVector3.UNIT_Y);
+        set.add(BlockVector3.UNIT_MINUS_X);
+        set.add(BlockVector3.UNIT_X);
+        set.add(BlockVector3.UNIT_MINUS_Z);
+        set.add(BlockVector3.UNIT_Z);
+        setDirections(set);
     }
 
     /**
      * Add the diagonal directions as directions to visit.
      */
-    protected void addDiagonal() {
-        directions.add(Direction.NORTHEAST.toBlockVector());
-        directions.add(Direction.SOUTHEAST.toBlockVector());
-        directions.add(Direction.SOUTHWEST.toBlockVector());
-        directions.add(Direction.NORTHWEST.toBlockVector());
+    public void addDiagonal() {
+        HashSet<BlockVector3> set = new HashSet<>(Arrays.asList(directions));
+        set.add(Direction.NORTHEAST.toBlockVector());
+        set.add(Direction.SOUTHEAST.toBlockVector());
+        set.add(Direction.SOUTHWEST.toBlockVector());
+        set.add(Direction.NORTHWEST.toBlockVector());
+        setDirections(set);
     }
 
     /**
@@ -206,21 +193,6 @@ public abstract class BreadthFirstSearch implements Operation {
     public void setMaxBranch(int maxBranch) {
         this.maxBranch = maxBranch;
     }
-    /**
-     * Try to visit the given 'to' location.
-     *
-     * @param from the origin block
-     * @param to the block under question
-     */
-    private void visit(BlockVector3 from, BlockVector3 to) {
-        BlockVector3 blockVector = to;
-        if (!visited.contains(blockVector)) {
-            visited.add(blockVector);
-            if (isVisitable(from, to)) {
-                queue.add(blockVector);
-            }
-        }
-    }
 
     /**
      * Return whether the given 'to' block should be visited, starting from the
@@ -244,42 +216,22 @@ public abstract class BreadthFirstSearch implements Operation {
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         MutableBlockVector3 mutable = new MutableBlockVector3();
-        IntegerTrio[] dirs = getIntDirections();
+//        MutableBlockVector3 mutable2 = new MutableBlockVector3();
+        boolean shouldTrim = false;
+        BlockVector3[] dirs = directions;
         BlockVectorSet tempQueue = new BlockVectorSet();
         BlockVectorSet chunkLoadSet = new BlockVectorSet();
         for (currentDepth = 0; !queue.isEmpty() && currentDepth <= maxDepth; currentDepth++) {
-            if (mFaweQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNKS > 1) {
-                int cx = Integer.MIN_VALUE;
-                int cz = Integer.MIN_VALUE;
-                for (BlockVector3 from : queue) {
-                    for (IntegerTrio direction : dirs) {
-                        int x = from.getBlockX() + direction.x;
-                        int z = from.getBlockZ() + direction.z;
-                        if (cx != (cx = x >> 4) || cz != (cz = z >> 4)) {
-                            int y = from.getBlockY() + direction.y;
-                            if (y < 0 || y >= 256) {
-                                continue;
-                            }
-                            if (!visited.contains(x, y, z)) {
-                                chunkLoadSet.add(cx, 0, cz);
-                            }
-                        }
-                    }
-                }
-                for (BlockVector3 chunk : chunkLoadSet) {
-                    mFaweQueue.queueChunkLoad(chunk.getBlockX(), chunk.getBlockZ());
-                }
-            }
             for (BlockVector3 from : queue) {
                 if (function.apply(from)) affected++;
                 for (int i = 0, j = 0; i < dirs.length && j < maxBranch; i++) {
-                    IntegerTrio direction = dirs[i];
-                    int y = from.getBlockY() + direction.y;
+                    BlockVector3 direction = dirs[i];
+                    int y = from.getBlockY() + direction.getY();
                     if (y < 0 || y >= 256) {
                         continue;
                     }
-                    int x = from.getBlockX() + direction.x;
-                    int z = from.getBlockZ() + direction.z;
+                    int x = from.getBlockX() + direction.getX();
+                    int z = from.getBlockZ() + direction.getZ();
                     if (!visited.contains(x, y, z)) {
                         if (isVisitable(from, mutable.setComponents(x, y, z))) {
                             j++;

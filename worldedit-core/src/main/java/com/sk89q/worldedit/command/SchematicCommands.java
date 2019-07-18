@@ -31,6 +31,7 @@ import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
 import com.boydti.fawe.object.schematic.StructureFormat;
+
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.chat.Message;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -80,6 +81,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+
 import java.util.regex.Pattern;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -403,8 +405,8 @@ public class SchematicCommands {
                 }
                 if (new PlayerSaveClipboardEvent(player, clipboard, uri, f.toURI()).call()) {
                     try (ClipboardWriter writer = format.getWriter(fos)) {
-                        if (writer instanceof StructureFormat) {
-                            ((StructureFormat) writer).write(target, player.getName());
+                        if (writer instanceof MinecraftStructure) {
+                            ((MinecraftStructure) writer).write(target, player.getName());
                         } else {
                             writer.write(target);
                         }

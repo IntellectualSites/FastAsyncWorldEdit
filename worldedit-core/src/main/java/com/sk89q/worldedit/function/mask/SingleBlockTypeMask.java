@@ -2,10 +2,11 @@ package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-public class SingleBlockTypeMask extends AbstractExtentMask {
+public class SingleBlockTypeMask extends ABlockMask {
     private final int internalId;
 
     public SingleBlockTypeMask(Extent extent, BlockType type) {
@@ -15,12 +16,17 @@ public class SingleBlockTypeMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return getExtent().getBlock(vector).getBlockType().getInternalId() == internalId;
+        return test(vector.getBlock(getExtent()));
+    }
+
+    @Override
+    public final boolean test(BlockState state) {
+        return state.getBlockType().getInternalId() == internalId;
     }
 
     @Override
     public Mask inverse() {
-        return new BlockMaskBuilder().add(BlockTypes.get(internalId)).build(getExtent()).inverse();
+        return new InverseSingleBlockTypeMask(getExtent(), BlockTypes.values[internalId]);
     }
 
     public BlockType getBlockType() {

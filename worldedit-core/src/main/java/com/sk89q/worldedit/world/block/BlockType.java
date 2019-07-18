@@ -19,14 +19,11 @@
 
 package com.sk89q.worldedit.world.block;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -38,13 +35,16 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class BlockType implements FawePattern, Keyed {
 	private final String id;
@@ -173,10 +173,15 @@ public class BlockType implements FawePattern, Keyed {
      *
      * @return The default state
      */
-    public BlockState getDefaultState() {
+    public final BlockState getDefaultState() {
         return this.settings.defaultState;
     }
 
+    /**
+     * @Deprecated use a Mask instead
+     * @return
+     */
+    @Deprecated
     public FuzzyBlockState getFuzzyMatcher() {
         return new FuzzyBlockState(this);
     }
@@ -288,7 +293,7 @@ public class BlockType implements FawePattern, Keyed {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return extent.setBlock(set, this.getDefaultState());
+        return set.setBlock(extent, getDefaultState());
     }
 
     @Override
@@ -296,7 +301,11 @@ public class BlockType implements FawePattern, Keyed {
         return this.getDefaultState().toBaseBlock();
     }
 
-    public Mask toMask(Extent extent) {
+    public SingleBlockTypeMask toMask() {
+        return toMask(null);
+    }
+
+    public SingleBlockTypeMask toMask(Extent extent) {
         return new SingleBlockTypeMask(extent, this);
     }
 

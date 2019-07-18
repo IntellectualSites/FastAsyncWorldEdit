@@ -16,27 +16,30 @@ configurations.all { Configuration it ->
 }
 
 dependencies {
+    compile ('net.milkbowl.vault:VaultAPI:1.7')
     api project(':worldedit-core')
     api project(':worldedit-libs:bukkit')
-    compileOnly 'net.milkbowl.vault:VaultAPI:1.7'
-    compileOnly 'com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT'
-    implementation 'io.papermc:paperlib:1.0.2'
     compileOnly 'com.sk89q:dummypermscompat:1.10'
-    compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.8.1'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
-    compileOnly 'com.massivecraft:factions:2.8.0'
-    compileOnly 'com.drtshock:factions:1.6.9.5'
-    compileOnly 'com.factionsone:FactionsOne:1.2.2'
-    compileOnly 'me.ryanhamshire:GriefPrevention:11.5.2'
-    compileOnly 'com.massivecraft:mcore:7.0.1'
-    compileOnly 'net.sacredlabyrinth.Phaed:PreciousStones:10.0.4-SNAPSHOT'
-    compileOnly 'net.jzx7:regios:5.9.9'
-    compileOnly 'com.bekvon.bukkit.residence:Residence:4.5._13.1'
-    compileOnly 'com.palmergames.bukkit:towny:0.84.0.9'
-    compileOnly 'com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'
-    compileOnly 'com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'
-    compileOnly 'com.wasteofplastic:askyblock:3.0.8.2'
+    implementation('org.apache.logging.log4j:log4j-slf4j-impl:2.8.1'){transitive = false}
+    compileOnly 'com.destroystokyo.paper:paper-api:1.14.3-R0.1-SNAPSHOT'
+    implementation('io.papermc:paperlib:1.0.2'){transitive = false}
+    compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
+    compileOnly 'BuildTools:lastSuccessfulBuild:spigot-1.14.3@jar'
+    implementation('com.sk89q.worldguard:worldguard-core:7.0.0-20190215.210421-39'){transitive = false}
+    implementation('com.sk89q.worldguard:worldguard-legacy:7.0.0-20190215.210421-39'){transitive = false}
+    implementation('com.massivecraft:factions:2.8.0'){transitive = false}
+    implementation('com.drtshock:factions:1.6.9.5'){transitive = false}
+    implementation('com.factionsone:FactionsOne:1.2.2'){transitive = false}
+    implementation('me.ryanhamshire:GriefPrevention:11.5.2'){transitive = false}
+    implementation('com.massivecraft:mcore:7.0.1'){transitive = false}
+    implementation('net.sacredlabyrinth.Phaed:PreciousStones:10.0.4-SNAPSHOT'){transitive = false}
+    implementation('net.jzx7:regios:5.9.9'){transitive = false}
+    implementation('com.bekvon.bukkit.residence:Residence:4.5._13.1'){transitive = false}
+    implementation('com.palmergames.bukkit:towny:0.84.0.9'){transitive = false}
+    implementation('com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'){transitive = false}
+    implementation('com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'){transitive = false}
+    implementation('com.wasteofplastic:askyblock:3.0.8.2'){transitive = false}
 }
 
 processResources {

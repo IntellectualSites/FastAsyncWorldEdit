@@ -38,6 +38,7 @@ import com.boydti.fawe.util.MaskTraverser;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.minecraft.util.commands.CommandContext;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -91,6 +92,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+
 /**
  * Clipboard commands.
  */
@@ -123,20 +125,24 @@ public class ClipboardCommands {
                         Mask mask, CommandContext context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
+
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw FaweException.MAX_CHECKS;
         }
         fp.checkConfirmationRegion(() -> {
             session.setClipboard(null);
+
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
+
             session.setClipboard(new ClipboardHolder(clipboard));
 
             clipboard.setOrigin(session.getPlacementPosition(player));
             ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
             copy.setCopyingEntities(!skipEntities);
             copy.setCopyingBiomes(copyBiomes);
+
             Mask sourceMask = editSession.getSourceMask();
             if (sourceMask != null) {
                 new MaskTraverser(sourceMask).reset(editSession);
@@ -204,12 +210,13 @@ public class ClipboardCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw FaweException.MAX_CHECKS;
         }
         if (volume >= limit.MAX_CHANGES) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
+            throw FaweException.MAX_CHANGES;
         }
         session.setClipboard(null);
+
         ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region, lazyClipboard);
         clipboard.setOrigin(session.getPlacementPosition(player));
@@ -221,6 +228,7 @@ public class ClipboardCommands {
         name = "/cut",
         desc = "Cut the selection to the clipboard",
         descFooter = "WARNING: Cutting and pasting entities cannot be undone!"
+
     )
     @CommandPermissions("worldedit.clipboard.cut")
     @Logging(REGION)
@@ -237,21 +245,24 @@ public class ClipboardCommands {
                     CommandContext context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
+
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHECKS);
+            throw FaweException.MAX_CHECKS;
         }
         if (volume >= limit.MAX_CHANGES) {
-            throw new FaweException(BBC.WORLDEDIT_CANCEL_REASON_MAX_CHANGES);
+            throw FaweException.MAX_CHANGES;
         }
         fp.checkConfirmationRegion(() -> {
             session.setClipboard(null);
+
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, player.getUniqueId());
             clipboard.setOrigin(session.getPlacementPosition(player));
+
             ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
             copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
-            copy.setCopyingEntities(!skipEntities);
+            copy.setCopyingEntities(copyEntities);
             copy.setRemovingEntities(true);
             copy.setCopyingBiomes(copyBiomes);
             Mask sourceMask = editSession.getSourceMask();
@@ -413,6 +424,7 @@ public class ClipboardCommands {
     @Command(
         name = "/paste",
         desc = "Paste the clipboard's contents"
+
     )
     @CommandPermissions("worldedit.clipboard.paste")
     @Logging(PLACEMENT)
@@ -481,6 +493,7 @@ public class ClipboardCommands {
             name = "/place",
             desc = "Place the clipboard's contents without applying transformations (e.g. rotate)"
 )
+
     @CommandPermissions("worldedit.clipboard.place")
     @Logging(PLACEMENT)
     public void place(Player player, LocalSession session, final EditSession editSession,
@@ -551,6 +564,7 @@ public class ClipboardCommands {
     public void flip(Player player, LocalSession session,
                      @Arg(desc = "The direction to flip, defaults to look direction.", def = Direction.AIM)
                      @Direction BlockVector3 direction) throws WorldEditException {
+
         ClipboardHolder holder = session.getClipboard();
         AffineTransform transform = new AffineTransform();
         transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());
@@ -563,7 +577,7 @@ public class ClipboardCommands {
         desc = "Clear your clipboard"
     )
     @CommandPermissions("worldedit.clipboard.clear")
-    public void clearClipboard(Player player, LocalSession session) throws WorldEditException {
+    public void clearClipboard(Player player, LocalSession session, EditSession editSession) throws WorldEditException {
         session.setClipboard(null);
         BBC.CLIPBOARD_CLEARED.send(player);
     }

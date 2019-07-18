@@ -53,8 +53,6 @@ import java.util.function.Consumer;
 @Command(aliases = {"/anvil"}, desc = "Manipulate billions of blocks: [More Info](https://github.com/boy0001/FastAsyncWorldedit/wiki/Anvil-API)")
 public class AnvilCommands {
 
-    private final WorldEdit worldEdit;
-
     /**
      * Create a new instance.
      *
@@ -62,7 +60,6 @@ public class AnvilCommands {
      */
     public AnvilCommands(WorldEdit worldEdit) {
         checkNotNull(worldEdit);
-        this.worldEdit = worldEdit;
     }
 
     /**
@@ -171,14 +168,15 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.remapall")
     public void remapall(Player player, String folder) throws WorldEditException {
-        ClipboardRemapper mapper;
         ClipboardRemapper.RemapPlatform from;
         ClipboardRemapper.RemapPlatform to;
         from = ClipboardRemapper.RemapPlatform.PE;
         to = ClipboardRemapper.RemapPlatform.PC;
         RemapFilter filter = new RemapFilter(from, to);
         RemapFilter result = runWithWorld(player, folder, filter, true);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
 
@@ -195,7 +193,9 @@ public class AnvilCommands {
     public void deleteAllUnvisited(Player player, String folder, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis) throws WorldEditException {
         DeleteUninhabitedFilter filter = new DeleteUninhabitedFilter(fileDurationMillis, inhabitedTicks, fileDurationMillis);
         DeleteUninhabitedFilter result = runWithWorld(player, folder, filter, true);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
@@ -212,9 +212,13 @@ public class AnvilCommands {
     public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch(name='d', desc = "TODO") boolean debug) throws WorldEditException {
         String folder = player.getWorld().getName();
         DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
-        if (debug) filter.enableDebug();
+        if (debug) {
+            filter.enableDebug();
+        }
         DeleteUnclaimedFilter result = runWithWorld(player, folder, filter, true);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
@@ -230,9 +234,13 @@ public class AnvilCommands {
     @CommandPermissions("worldedit.anvil.deleteunclaimed")
     public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch(name='d', desc = "TODO") boolean debug) throws WorldEditException {
         DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
-        if (debug) filter.enableDebug();
+        if (debug) {
+            filter.enableDebug();
+        }
         DeleteUnclaimedFilter result = runWithSelection(player, editSession, selection, filter);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
@@ -248,11 +256,14 @@ public class AnvilCommands {
         long duration = MainUtil.timeToSec(time) * 1000L;
         DeleteOldFilter filter = new DeleteOldFilter(duration);
         DeleteOldFilter result = runWithWorld(player, folder, filter, true);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
             name = "trimallplots",
+
             desc = "Trim chunks in a Plot World",
             descFooter = "Unclaimed chunks will be deleted\n" +
                     "Unmodified chunks will be deleted\n" +
@@ -267,40 +278,51 @@ public class AnvilCommands {
         FaweQueue defaultQueue = SetQueue.IMP.getNewQueue(folder, true, false);
         MCAQueue queue = new MCAQueue(defaultQueue);
         PlotTrimFilter result = queue.filterWorld(filter);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
             name = "deletebiomechunks",
+
             desc = "Delete chunks matching a specific biome"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
     public void deleteBiome(Player player, String folder, BiomeType biome, @Switch(name='u', desc = "TODO") boolean unsafe) {
         DeleteBiomeFilterSimple filter = new DeleteBiomeFilterSimple(biome);
         DeleteBiomeFilterSimple result = runWithWorld(player, folder, filter, true, unsafe);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
             name = "trimallair",
+
             desc = "Trim all air in the world"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
     public void trimAllAir(Player player, String folder, @Switch(name='u', desc = "TODO") boolean unsafe) throws WorldEditException {
         TrimAirFilter filter = new TrimAirFilter();
         TrimAirFilter result = runWithWorld(player, folder, filter, true, unsafe);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
             name = "debugfixroads",
+
             desc = "debug - do not use"
     )
     @CommandPermissions("worldedit.anvil.debugfixroads")
     public void debugfixroads(Player player, String folder) throws WorldEditException {
         DebugFixP2Roads filter = new DebugFixP2Roads();
         DebugFixP2Roads result = runWithWorld(player, folder, filter, true, true);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
@@ -310,6 +332,7 @@ public class AnvilCommands {
 )
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAllPattern(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name='d', desc = "TODO") boolean useData, @Switch(name='m', desc = "TODO") boolean useMap) throws WorldEditException {
+
 //        MCAFilterCounter filter;
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
@@ -331,7 +354,8 @@ public class AnvilCommands {
 //        MCAFilterCounter result = runWithWorld(player, folder, filter, true);
 //        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
     }
-//
+
+    //
     @Command(
             name = "countall",
             desc = "Count all blocks in a world"
@@ -401,7 +425,9 @@ public class AnvilCommands {
             }
         };
         MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
-        if (result != null) player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        if (result != null) {
+            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
+        }
     }
 
     @Command(
@@ -424,7 +450,8 @@ public class AnvilCommands {
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
 //        if (result != null) player.print(BBC.SELECTION_COUNT.format(result.getTotal()));
     }
-//
+
+    //
     @Command(
             name = "distr",
             desc = "Replace all blocks in the selection with another"
@@ -501,7 +528,8 @@ public class AnvilCommands {
 //            }
 //        }
     }
-//
+
+    //
     @Command(
             name = "replace",
             aliases = {"r"},
@@ -509,6 +537,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.replace")
     public void replace(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, String to, @Switch(name='d', desc = "TODO") boolean useData) throws WorldEditException {
+
 //        final FaweBlockMatcher matchFrom;
 //        if (from == null) {
 //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -522,7 +551,8 @@ public class AnvilCommands {
 //            player.print(BBC.VISITOR_BLOCK.format(result.getTotal()));
 //        }
     }
-//
+
+    //
     @Command(
             name = "replacepattern",
             aliases = {"preplace", "rp"},
@@ -531,6 +561,7 @@ public class AnvilCommands {
     @CommandPermissions("worldedit.anvil.replace")
     // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name='d', desc = "TODO") boolean useData, @Switch(name='m', desc = "TODO") boolean useMap
     public void replacePattern(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name='d', desc = "TODO") boolean useData, @Switch(name='m', desc = "TODO") boolean useMap) throws WorldEditException {
+
 //        MCAFilterCounter filter;
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
@@ -618,6 +649,7 @@ public class AnvilCommands {
     )
     @CommandPermissions("worldedit.anvil.pastechunks")
     public void paste(Player player, LocalSession session, EditSession editSession, @Switch(name='c', desc = "TODO") boolean alignChunk) throws WorldEditException, IOException {
+
 //        FawePlayer fp = FawePlayer.wrap(player);
 //        MCAClipboard clipboard = fp.getMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD);
 //        if (clipboard == null) {

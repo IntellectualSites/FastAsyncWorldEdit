@@ -22,6 +22,11 @@ package com.sk89q.worldedit.regions;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.beta.ChunkFilterBlock;
+import com.boydti.fawe.beta.Filter;
+import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -387,7 +392,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return chunks;
     }
 
-
     @Override
     public boolean contains(int x, int y, int z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ && y >= this.minY && y <= this.maxY;
@@ -396,14 +400,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     @Override
     public boolean contains(int x, int z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ;
-    }
-
-    @Override
-    public boolean contains(BlockVector3 position) {
-        BlockVector3 min = getMinimumPoint();
-        BlockVector3 max = getMaximumPoint();
-
-        return position.containedWithin(min, max);
     }
 
     @Override
@@ -609,5 +605,52 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         checkArgument(apothem >= 0, "apothem => 0 required");
         BlockVector3 size = BlockVector3.ONE.multiply(apothem);
         return new CuboidRegion(origin.subtract(size), origin.add(size));
+    }
+
+    @Override
+    public int getMinY() {
+        return minY;
+    }
+
+    @Override
+    public int getMaxY() {
+        return maxY;
+    }
+
+    @Override
+    public void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
+        int X = chunk.getX();
+        int Z = chunk.getZ();
+        block = block.init(X, Z, get);
+
+        if ((minX + 15) >> 4 <= X && (maxX - 15) >> 4 >= X && (minZ + 15) >> 4 <= Z && (maxZ - 15) >> 4 >= Z) {
+            filter(chunk, filter, block, get, set, minY, maxY);
+            return;
+        }
+        int localMinX = Math.max(minX, X << 4) & 15;
+        int localMaxX = Math.min(maxX, 15 + X << 4) & 15;
+        int localMinZ = Math.max(minZ, Z << 4) & 15;
+        int localMaxZ = Math.min(maxZ, 15 + Z << 4) & 15;
+
+        int yStart = (minY & 15);
+        int yEnd = (maxY & 15);
+
+        int minSection = minY >> 4;
+        int maxSection = maxY >> 4;
+        if (minSection == maxSection) {
+            filter(chunk, filter, block, get, set, minSection, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ);
+            return;
+        }
+        if (yStart != 0) {
+            filter(chunk, filter, block, get, set, minSection, localMinX, yStart, localMinZ, localMaxX, 15, localMaxZ);
+            minSection++;
+        }
+        if (yEnd != 15) {
+            filter(chunk, filter, block, get, set, minSection, localMinX, 0, localMinZ, localMaxX, 15, localMaxZ);
+            maxSection--;
+        }
+        for (int layer = minSection; layer < maxSection; layer++) {
+            filter(chunk, filter, block, get, set, layer, localMinX, yStart, localMinZ, localMaxX, yEnd, localMaxZ);
+        }
     }
 }

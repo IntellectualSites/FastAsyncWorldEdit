@@ -50,9 +50,8 @@ public final class NBTInputStream implements Closeable {
      * from the specified input stream.
      *
      * @param is the input stream
-     * @throws IOException if an I/O error occurs
      */
-    public NBTInputStream(InputStream is) throws IOException {
+    public NBTInputStream(InputStream is) {
         this.is = new DataInputStream(is);
     }
 
@@ -364,7 +363,7 @@ public final class NBTInputStream implements Closeable {
                     int toRead = Math.min(length << 2, buf.length);
                     is.readFully(buf, 0, toRead);
                     for (int i = 0; i < toRead; i += 4, index++) {
-                        data[index] = ((buf[i + 0] & 0xFF) << 24) + ((buf[i + 1] & 0xFF) << 16) + ((buf[i + 2] & 0xFF) << 8) + (buf[i + 3] & 0xFF);
+                        data[index] = ((buf[i] & 0xFF) << 24) + ((buf[i + 1] & 0xFF) << 16) + ((buf[i + 2] & 0xFF) << 8) + (buf[i + 3] & 0xFF);
                     }
                     length -= toRead;
                 }
