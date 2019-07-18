@@ -62,6 +62,11 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
         this(delegate, Masks.alwaysTrue());
     }
 
+    @Override
+    public boolean isQueueEnabled() {
+        return true;
+    }
+
     /**
      * Create a new extent buffer that will buffer changes that meet the criteria
      * of the given mask.

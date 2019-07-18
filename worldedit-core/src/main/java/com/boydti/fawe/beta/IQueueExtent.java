@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
+import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -17,6 +18,24 @@ import java.util.function.Supplier;
  * Interface for a queue based extent which uses chunks
  */
 public interface IQueueExtent extends Flushable, Trimable, Extent {
+
+    @Override
+    default boolean isQueueEnabled() {
+        return true;
+    }
+
+    /**
+     * Must ensure that it is enqueued with QueueHandler
+     */
+    @Override
+    void enableQueue();
+
+    /**
+     * Must ensure it is not in the queue handler
+     */
+    @Override
+    void disableQueue();
+
     void init(WorldChunkCache world);
 
     /**

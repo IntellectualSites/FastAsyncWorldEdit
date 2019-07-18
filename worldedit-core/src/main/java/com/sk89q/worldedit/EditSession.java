@@ -29,7 +29,6 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
@@ -365,7 +364,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * chunk batching}.
      */
     public void enableStandardMode() {
-        setBatchingChunks(true);
     }
 
     /**
@@ -374,17 +372,29 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @param reorderMode The reorder mode
      */
     public void setReorderMode(ReorderMode reorderMode) {
-        //TODO Not working yet. - It shouldn't need to work. FAWE doesn't need reordering.
+        switch (reorderMode) {
+            case MULTI_STAGE:
+                enableQueue();
+                break;
+            case NONE: // Functionally the same, since FAWE doesn't perform physics
+            case FAST:
+                disableQueue();
+                break;
+            default:
+                throw new UnsupportedOperationException("Not implemented: " + reorderMode);
+        }
     }
 
-    //TODO: Reorder mode.
     /**
      * Get the reorder mode.
      *
      * @return the reorder mode
      */
     public ReorderMode getReorderMode() {
-        return null;
+        if (isQueueEnabled()) {
+            return ReorderMode.MULTI_STAGE;
+        }
+        return ReorderMode.FAST;
     }
 
     /**
@@ -463,6 +473,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      */
     @Deprecated
     public void enableQueue() {
+        super.enableQueue();
     }
 
     /**
@@ -470,9 +481,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      */
     @Deprecated
     public void disableQueue() {
-        if (isQueueEnabled()) {
-            this.flushQueue();
-        }
+        super.disableQueue();
     }
 
     /**
@@ -730,6 +739,11 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @param batchingChunks {@code true} to enable, {@code false} to disable
      */
     public void setBatchingChunks(boolean batchingChunks) {
+        if (batchingChunks) {
+            enableQueue();
+        } else {
+            disableQueue();
+        }
     }
 
     /**
@@ -739,6 +753,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @see #setBatchingChunks(boolean)
      */
     public void disableBuffering() {
+        disableQueue();
     }
 
     /**
@@ -1028,7 +1043,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         UndoContext context = new UndoContext();
         context.setExtent(editSession.bypassAll);
         ChangeSet changeSet = getChangeSet();
-        editSession.getQueue().setChangeTask(null);
+        setChangeSet(null);
         Operations.completeBlindly(ChangeSetExecutor.create(changeSet, context, ChangeSetExecutor.Type.UNDO, editSession.getBlockBag(), editSession.getLimit().INVENTORY_MODE));
         flushQueue();
         editSession.changes = 1;
@@ -1052,7 +1067,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         UndoContext context = new UndoContext();
         context.setExtent(editSession.bypassAll);
         ChangeSet changeSet = getChangeSet();
-        editSession.getQueue().setChangeTask(null);
+        setChangeSet(null);
         Operations.completeBlindly(ChangeSetExecutor.create(changeSet, context, ChangeSetExecutor.Type.REDO, editSession.getBlockBag(), editSession.getLimit().INVENTORY_MODE));
         flushQueue();
         editSession.changes = 1;
@@ -1146,28 +1161,31 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         final int startPerformY = region.getMinimumPoint().getBlockY();
         final int startCheckY = fullHeight ? 0 : startPerformY;
         final int endY = region.getMaximumPoint().getBlockY();
-        RegionVisitor visitor = new RegionVisitor(flat, pos -> {
-            int x = pos.getX();
-            int z = pos.getZ();
-            int freeSpot = startCheckY;
-            for (int y = startCheckY; y <= endY; y++) {
-                if (y < startPerformY) {
-                    if (!getBlockType(x, y, z).getMaterial().isAir()) {
-                        freeSpot = y + 1;
+        RegionVisitor visitor = new RegionVisitor(flat, new RegionFunction() {
+            @Override
+            public boolean apply(BlockVector3 pos) throws WorldEditException {
+                int x = pos.getX();
+                int z = pos.getZ();
+                int freeSpot = startCheckY;
+                for (int y = startCheckY; y <= endY; y++) {
+                    if (y < startPerformY) {
+                        if (!getBlockType(x, y, z).getMaterial().isAir()) {
+                            freeSpot = y + 1;
+                        }
+                        continue;
                     }
-                    continue;
-                }
-                BlockType block = getBlockType(x, y, z);
-                if (!block.getMaterial().isAir()) {
-                    if (freeSpot != y) {
-                        setBlock(x, freeSpot, z, block);
-                        setBlock(x, y, z, replace);
+                    BlockType block = getBlockType(x, y, z);
+                    if (!block.getMaterial().isAir()) {
+                        if (freeSpot != y) {
+                            setBlock(x, freeSpot, z, block);
+                            setBlock(x, y, z, replace);
+                        }
+                        freeSpot++;
                     }
-                    freeSpot++;
                 }
-            }
-            return true;
-        }, this);
+                return true;
+        }
+        });
         Operations.completeBlindly(visitor);
         return this.changes;
     }
@@ -1612,7 +1630,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
 
         if (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size.getBlockZ()) {
             // Buffer if overlapping
-            queue.dequeue();
+            disableQueue();
         }
 
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
@@ -3029,9 +3047,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
 
     public boolean regenerate(final Region region, final BiomeType biome, final Long seed) {
         //TODO Optimize - avoid Vector2D creation (make mutable)
-        final FaweQueue queue = this.getQueue();
-        queue.setChangeTask(null);
         final FaweChangeSet fcs = (FaweChangeSet) this.getChangeSet();
+        this.setChangeSet(null);
         final FaweRegionExtent fe = this.getRegionExtent();
         final boolean cuboid = region instanceof CuboidRegion;
         if (fe != null && cuboid) {
@@ -3117,7 +3134,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 TaskManager.IMP.sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
-                        queue.regenerateChunk(cx, cz, biome, seed);
+                        regenerateChunk(cx, cz, biome, seed);
                     }
                 });
             }

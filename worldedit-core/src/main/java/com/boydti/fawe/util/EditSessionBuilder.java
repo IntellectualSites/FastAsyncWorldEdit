@@ -199,6 +199,11 @@ public class EditSessionBuilder {
         return this;
     }
 
+    public EditSessionBuilder eventBus(@Nullable EventBus eventBus) {
+        this.eventBus = eventBus;
+        return this;
+    }
+
     public EditSessionBuilder event(@Nullable EditSessionEvent event) {
         this.event = event;
         return this;

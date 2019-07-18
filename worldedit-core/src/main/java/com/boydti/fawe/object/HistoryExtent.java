@@ -28,7 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class HistoryExtent extends AbstractDelegateExtent {
 
     private FaweChangeSet changeSet;
-    private final FaweQueue queue;
 
     /**
      * Create a new instance.
@@ -36,10 +35,9 @@ public class HistoryExtent extends AbstractDelegateExtent {
      * @param extent    the extent
      * @param changeSet the change set
      */
-    public HistoryExtent(final Extent extent, final FaweChangeSet changeSet, FaweQueue queue) {
+    public HistoryExtent(final Extent extent, final FaweChangeSet changeSet) {
         super(extent);
         checkNotNull(changeSet);
-        this.queue = queue;
         this.changeSet = changeSet;
     }
 
@@ -53,7 +51,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        BaseBlock previous = queue.getFullBlock(x, y, z);
+        BaseBlock previous = getFullBlock(x, y, z);
         if (previous.getInternalId() == block.getInternalId()) {
             if (!previous.hasNbtData() && (block instanceof BaseBlock && !block.hasNbtData())) {
                 return false;
@@ -62,6 +60,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
         this.changeSet.add(x, y, z, previous, block.toBaseBlock());
         return getExtent().setBlock(x, y, z, block);
     }
+
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(final BlockVector3 location, final B block) throws WorldEditException {

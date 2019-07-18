@@ -272,4 +272,9 @@ public interface World extends Extent {
     @Override
     int hashCode();
 
+    @Override
+    default boolean isWorld() {
+        return true;
+    }
+
 }

@@ -21,12 +21,18 @@ package com.sk89q.worldedit.extent;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.jnbt.anvil.generator.GenBase;
 import com.boydti.fawe.jnbt.anvil.generator.Resource;
+import com.boydti.fawe.object.HistoryExtent;
+import com.boydti.fawe.object.changeset.FaweChangeSet;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
+import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
@@ -67,6 +73,58 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
      */
     public final Extent getExtent() {
         return extent;
+    }
+
+    /*
+    Queue based methods
+    TODO NOT IMPLEMENTED: IQueueExtent and such need to implement these
+     */
+    public boolean isQueueEnabled() {
+        return extent.isQueueEnabled();
+    }
+
+    @Override
+    public void disableQueue() {
+        try {
+            if (!(extent instanceof ForgetfulExtentBuffer)) { // placeholder
+                extent.disableQueue();
+            }
+        } catch (FaweException disableQueue) {}
+        if (extent instanceof AbstractDelegateExtent) {
+            Extent next = ((AbstractDelegateExtent) extent).getExtent();
+            new ExtentTraverser(this).setNext(next);
+        } else {
+            Fawe.debug("Cannot disable queue");
+        }
+    }
+
+    @Override
+    public void enableQueue() {
+        try {
+            extent.enableQueue();
+        } catch (FaweException enableQueue) {
+            // TODO NOT IMPLEMENTED - THIS IS IMPORTANT (ForgetfulExtentBuffer is just a placeholder for now, it won't work)
+            new ExtentTraverser<>(this).setNext(new ForgetfulExtentBuffer(extent));
+        }
+    }
+
+    /*
+     History
+     */
+    public void setChangeSet(FaweChangeSet changeSet) {
+        if (extent instanceof HistoryExtent) {
+            HistoryExtent history = ((HistoryExtent) extent);
+            if (changeSet == null) {
+                new ExtentTraverser(this).setNext(history.getExtent());
+            } else {
+                history.setChangeSet(changeSet);
+            }
+        }
+        else if (extent instanceof AbstractDelegateExtent) {
+            ((AbstractDelegateExtent) extent).setChangeSet(changeSet);
+        } else if (changeSet != null) {
+            new ExtentTraverser<>(this).setNext(new HistoryExtent(extent, changeSet));
+        }
     }
 
     /*

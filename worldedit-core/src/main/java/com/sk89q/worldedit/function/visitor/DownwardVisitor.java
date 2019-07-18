@@ -19,15 +19,11 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import com.boydti.fawe.object.HasFaweQueue;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-
-import java.util.Collection;
 
 /**
  * Visits adjacent points on the same X-Z plane as long as the points
@@ -48,11 +44,11 @@ public class DownwardVisitor extends RecursiveVisitor {
      * @param baseY the base Y
      */
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
-        this(mask, function, baseY, Integer.MAX_VALUE, null);
+        this(mask, function, baseY, Integer.MAX_VALUE);
     }
 
-    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, HasFaweQueue hasFaweQueue) {
-        super(mask, function, depth, hasFaweQueue);
+    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth) {
+        super(mask, function, depth);
         checkNotNull(mask);
 
         this.baseY = baseY;

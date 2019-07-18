@@ -25,6 +25,7 @@ import com.boydti.fawe.jnbt.anvil.generator.OreGen;
 import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.jnbt.anvil.generator.SchemGen;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
+import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -51,6 +52,7 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -132,6 +134,42 @@ public interface Extent extends InputExtent, OutputExtent {
     default @Nullable Entity createEntity(Location location, BaseEntity entity) {
         return null;
     }
+
+    /*
+    Queue based methods
+    TODO NOT IMPLEMENTED:
+     */
+    default boolean isQueueEnabled() {
+        return false;
+    }
+
+    default void enableQueue() {
+        if (!isQueueEnabled()) throw FaweException._enableQueue;
+    }
+
+    default void disableQueue() {
+        if (isQueueEnabled()) throw FaweException._disableQueue;
+    }
+
+    /*
+    World based methods
+    TODO NOT IMPLEMENTED:
+     */
+
+    default boolean isWorld() {
+        return false;
+    }
+
+    default boolean regenerateChunk(int x, int z, @Nullable BiomeType type, @Nullable Long seed) {
+        throw new UnsupportedOperationException("TODO NOT IMPLEMENTED: " + isWorld());
+    }
+
+    /*
+    Shifting operations down the pipeline from EditSession -> Extent
+         - This allows certain extents (e.g. multithreaded extent) to override and optimize as needed
+         - The EditSession shouldn't need to worry about implementation details
+         - TODO: actually optimize these
+     */
 
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
         maxY = Math.min(maxY, Math.max(0, maxY));

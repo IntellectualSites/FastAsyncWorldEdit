@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
@@ -113,8 +114,24 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
     }
 
+    public <T extends Future<T>> void complete(Future<T> task) {
+        try {
+            while (task != null) {
+                task = task.get();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
     public <T> Future<T> async(final Runnable run, final T value) {
         return forkJoinPoolSecondary.submit(run, value);
+    }
+
+    public Future<?> async(final Runnable run) {
+        return forkJoinPoolSecondary.submit(run);
     }
 
     public <T> Future<T> async(final Callable<T> call) {
