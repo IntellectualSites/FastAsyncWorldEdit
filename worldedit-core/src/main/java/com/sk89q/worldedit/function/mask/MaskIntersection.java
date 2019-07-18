@@ -123,14 +123,16 @@ public class MaskIntersection extends AbstractMask {
             outer:
             for (Mask mask : masks) {
                 for (Mask other : masks) {
-                    AbstractMap.SimpleEntry<Mask, Mask> pair = new AbstractMap.SimpleEntry<>(mask, other);
-                    if (failedCombines.contains(pair)) continue;
-                    Mask combined = pairing.apply(pair);
-                    if (combined != null) {
-                        result = new Mask[]{combined, mask, other};
-                        break outer;
-                    } else {
-                        failedCombines.add(pair);
+                    if (mask != other) {
+                        AbstractMap.SimpleEntry<Mask, Mask> pair = new AbstractMap.SimpleEntry<>(mask, other);
+                        if (failedCombines.contains(pair)) continue;
+                        Mask combined = pairing.apply(pair);
+                        if (combined != null) {
+                            result = new Mask[]{combined, mask, other};
+                            break outer;
+                        } else {
+                            failedCombines.add(pair);
+                        }
                     }
                 }
             }
