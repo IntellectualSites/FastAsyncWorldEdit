@@ -120,7 +120,7 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
         if (!hasBiomes()) {
             return null;
         }
-        return BiomeTypes.register(biomes[index]);
+        return BiomeTypes.get(biomes[index]);
     }
 
     @Override

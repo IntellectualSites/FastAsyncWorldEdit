@@ -25,11 +25,11 @@ public class MutableBiomeChange implements Change {
 
     @Override
     public void undo(UndoContext context) throws WorldEditException {
-        context.getExtent().setBiome(mutable, BiomeTypes.register(from));
+        context.getExtent().setBiome(mutable, BiomeTypes.get(from));
     }
 
     @Override
     public void redo(UndoContext context) throws WorldEditException {
-        context.getExtent().setBiome(mutable, BiomeTypes.register(to));
+        context.getExtent().setBiome(mutable, BiomeTypes.get(to));
     }
 }

@@ -936,7 +936,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public BiomeType getBiomeType(int x, int z) throws FaweException.FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) index = Math.floorMod(index, getArea());
-        return BiomeTypes.register(biomes.getByte(index));
+        return BiomeTypes.get(biomes.getByte(index));
     }
 
     @Override
