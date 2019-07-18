@@ -11,7 +11,10 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 public class AsyncChunk implements Chunk {
 
@@ -178,4 +181,19 @@ public class AsyncChunk implements Chunk {
 	public void setForceLoaded(boolean arg0) {
 		world.getChunkAt(x, z).setForceLoaded(arg0);
 	}
+
+    @Override
+    public boolean addPluginChunkTicket(final Plugin plugin) {
+        return world.addPluginChunkTicket(this.getX(), this.getZ(), plugin);
+    }
+
+    @Override
+    public boolean removePluginChunkTicket(final Plugin plugin) {
+        return world.removePluginChunkTicket(this.getX(), this.getZ(), plugin);
+    }
+
+    @Override
+    public Collection<Plugin> getPluginChunkTickets() {
+        return world.getPluginChunkTickets(this.getX(), this.getZ());
+    }
 }

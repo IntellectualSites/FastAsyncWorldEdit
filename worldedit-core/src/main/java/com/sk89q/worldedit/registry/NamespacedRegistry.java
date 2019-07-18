@@ -70,7 +70,11 @@ public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Re
     }
 
     public V getByInternalId(int index) {
-        return values.get(index);
+        try {
+            return values.get(index);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     public int getInternalId(V value) {

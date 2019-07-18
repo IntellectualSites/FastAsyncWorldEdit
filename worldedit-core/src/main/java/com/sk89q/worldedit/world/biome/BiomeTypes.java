@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.biome;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  * Stores a list of common Biome String IDs.
@@ -113,7 +114,102 @@ public final class BiomeTypes {
         return BiomeType.REGISTRY.register(biome.getId(), biome);
     }
 
+    public static BiomeType getLegacy(int legacyId) {
+        for (BiomeType type : values()) {
+            if (type.getLegacyId() == legacyId) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    public static BiomeType get(int internalId) {
+        return BiomeType.REGISTRY.getByInternalId(internalId);
+    }
+
     public static @Nullable BiomeType get(final String id) {
         return BiomeType.REGISTRY.get(id);
+    }
+
+    public static Collection<BiomeType> values() {
+        return BiomeType.REGISTRY.values();
+    }
+
+    static {
+        OCEAN.setLegacyId(0);
+        PLAINS.setLegacyId(1);
+        DESERT.setLegacyId(2);
+        MOUNTAINS.setLegacyId(3);
+        FOREST.setLegacyId(4);
+        TAIGA.setLegacyId(5);
+        SWAMP.setLegacyId(6);
+        RIVER.setLegacyId(7);
+        NETHER.setLegacyId(8);
+        THE_END.setLegacyId(9);
+        FROZEN_OCEAN.setLegacyId(10);
+        FROZEN_RIVER.setLegacyId(11);
+        SNOWY_TUNDRA.setLegacyId(12);
+        SNOWY_MOUNTAINS.setLegacyId(13);
+        MUSHROOM_FIELDS.setLegacyId(14);
+        MUSHROOM_FIELD_SHORE.setLegacyId(15);
+        BEACH.setLegacyId(16);
+        DESERT_HILLS.setLegacyId(17);
+        WOODED_HILLS.setLegacyId(18);
+        TAIGA_HILLS.setLegacyId(19);
+        MOUNTAIN_EDGE.setLegacyId(20);
+        JUNGLE.setLegacyId(21);
+        JUNGLE_HILLS.setLegacyId(22);
+        JUNGLE_EDGE.setLegacyId(23);
+        DEEP_OCEAN.setLegacyId(24);
+        STONE_SHORE.setLegacyId(25);
+        SNOWY_BEACH.setLegacyId(26);
+        BIRCH_FOREST.setLegacyId(27);
+        BIRCH_FOREST_HILLS.setLegacyId(28);
+        DARK_FOREST.setLegacyId(29);
+        SNOWY_TAIGA.setLegacyId(30);
+        SNOWY_TAIGA_HILLS.setLegacyId(31);
+        GIANT_TREE_TAIGA.setLegacyId(32);
+        GIANT_TREE_TAIGA_HILLS.setLegacyId(33);
+        WOODED_MOUNTAINS.setLegacyId(34);
+        SAVANNA.setLegacyId(35);
+        SAVANNA_PLATEAU.setLegacyId(36);
+        BADLANDS.setLegacyId(37);
+        WOODED_BADLANDS_PLATEAU.setLegacyId(38);
+        BADLANDS_PLATEAU.setLegacyId(39);
+        SMALL_END_ISLANDS.setLegacyId(40);
+        END_MIDLANDS.setLegacyId(41);
+        END_HIGHLANDS.setLegacyId(42);
+        END_BARRENS.setLegacyId(43);
+        WARM_OCEAN.setLegacyId(44);
+        LUKEWARM_OCEAN.setLegacyId(45);
+        COLD_OCEAN.setLegacyId(46);
+        DEEP_WARM_OCEAN.setLegacyId(47);
+        DEEP_LUKEWARM_OCEAN.setLegacyId(48);
+        DEEP_COLD_OCEAN.setLegacyId(49);
+        DEEP_FROZEN_OCEAN.setLegacyId(50);
+        THE_VOID.setLegacyId(127);
+        SUNFLOWER_PLAINS.setLegacyId(129);
+        DESERT_LAKES.setLegacyId(130);
+        GRAVELLY_MOUNTAINS.setLegacyId(131);
+        FLOWER_FOREST.setLegacyId(132);
+        TAIGA_MOUNTAINS.setLegacyId(133);
+        SWAMP_HILLS.setLegacyId(134);
+        ICE_SPIKES.setLegacyId(140);
+        MODIFIED_JUNGLE.setLegacyId(149);
+        MODIFIED_JUNGLE_EDGE.setLegacyId(151);
+        TALL_BIRCH_FOREST.setLegacyId(155);
+        TALL_BIRCH_HILLS.setLegacyId(156);
+        DARK_FOREST_HILLS.setLegacyId(157);
+        SNOWY_TAIGA_MOUNTAINS.setLegacyId(158);
+        GIANT_SPRUCE_TAIGA.setLegacyId(160);
+        GIANT_SPRUCE_TAIGA_HILLS.setLegacyId(161);
+        MODIFIED_GRAVELLY_MOUNTAINS.setLegacyId(162);
+        SHATTERED_SAVANNA.setLegacyId(163);
+        SHATTERED_SAVANNA_PLATEAU.setLegacyId(164);
+        ERODED_BADLANDS.setLegacyId(165);
+        MODIFIED_WOODED_BADLANDS_PLATEAU.setLegacyId(166);
+        MODIFIED_BADLANDS_PLATEAU.setLegacyId(167);
+//        BAMBOO_JUNGLE.setLegacyId(168);
+//        BAMBOO_JUNGLE_HILLS.setLegacyId(169);
     }
 }

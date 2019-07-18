@@ -60,7 +60,7 @@ public class ChunkListener_9 extends ChunkListener {
                 physCancelPair = MathMan.pairInt(cx, cz);
                 if (rateLimit <= 0) {
                     rateLimit = 20;
-                    Fawe.debug("[FAWE `tick-limiter`] Detected and cancelled physics lag source at " + block.getLocation());
+                    lastCancelPos = block.getLocation();
                 }
                 cancelNearby(cx, cz);
                 event.setCancelled(true);
