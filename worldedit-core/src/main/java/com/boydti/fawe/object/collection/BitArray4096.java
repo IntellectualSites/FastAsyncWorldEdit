@@ -1,4 +1,4 @@
-package com.boydti.fawe.jnbt.anvil;
+package com.boydti.fawe.object.collection;
 
 public final class BitArray4096 {
 

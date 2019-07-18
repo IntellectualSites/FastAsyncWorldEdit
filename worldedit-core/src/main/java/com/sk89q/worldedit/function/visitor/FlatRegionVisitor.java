@@ -20,9 +20,9 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.example.MappedFaweQueue;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.example.MappedIQueueExtent;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.HasIQueueExtent;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,7 +41,7 @@ import java.util.List;
 public class FlatRegionVisitor implements Operation {
 
     private final FlatRegionFunction function;
-    private MappedFaweQueue queue;
+    private MappedIQueueExtent queue;
     private int affected = 0;
     private final Iterable<BlockVector2> iterator;
 
@@ -59,13 +59,13 @@ public class FlatRegionVisitor implements Operation {
         this.iterator = flatRegion.asFlatRegion();
     }
 
-    public FlatRegionVisitor(final FlatRegion flatRegion, final FlatRegionFunction function, HasFaweQueue hasFaweQueue) {
+    public FlatRegionVisitor(final FlatRegion flatRegion, final FlatRegionFunction function, HasIQueueExtent hasIQueueExtent) {
         checkNotNull(flatRegion);
         checkNotNull(function);
         this.function = function;
         this.iterator = flatRegion.asFlatRegion();
-        FaweQueue queue = hasFaweQueue.getQueue();
-        this.queue = (MappedFaweQueue) (queue instanceof MappedFaweQueue ? queue : null);
+        IQueueExtent queue = hasIQueueExtent.getQueue();
+        this.queue = (MappedIQueueExtent) (queue instanceof MappedIQueueExtent ? queue : null);
     }
 
     /**

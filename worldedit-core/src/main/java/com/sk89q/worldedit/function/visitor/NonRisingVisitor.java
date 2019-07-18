@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.object.HasIQueueExtent;
 
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -42,8 +42,8 @@ public class NonRisingVisitor extends RecursiveVisitor {
         this(mask, function, Integer.MAX_VALUE, null);
     }
 
-    public NonRisingVisitor(Mask mask, RegionFunction function, int depth, HasFaweQueue hasFaweQueue) {
-        super(mask, function, depth, hasFaweQueue);
+    public NonRisingVisitor(Mask mask, RegionFunction function, int depth, HasIQueueExtent hasIQueueExtent) {
+        super(mask, function, depth, hasIQueueExtent);
         setDirections(
             BlockVector3.UNIT_X,
             BlockVector3.UNIT_MINUS_X,

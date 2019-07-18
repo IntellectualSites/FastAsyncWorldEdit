@@ -1,7 +1,7 @@
-package com.boydti.fawe.jnbt.anvil;
+package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.FaweChunk;
+import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class WritableMCAChunk extends FaweChunk<Void> {
+public class WritableMCAChunk {
     public final boolean[] hasSections = new boolean[16];
     public final byte[] skyLight = new byte[65536];
     public final byte[] blockLight = new byte[65536];
@@ -44,7 +44,6 @@ public class WritableMCAChunk extends FaweChunk<Void> {
     public int chunkX, chunkZ;
 
     protected WritableMCAChunk() {
-        super(null, 0, 0);
     }
 
     public int getX() {
@@ -100,7 +99,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
                 out.writeNamedEmptyList("TileEntities");
             } else {
                 out.writeNamedTag("TileEntities", new ListTag(CompoundTag.class,
-                                                              new ArrayList<>(tiles.values())));
+                        new ArrayList<>(tiles.values())));
             }
             out.writeNamedTag("InhabitedTime", inhabitedTime);
             out.writeNamedTag("LastUpdate", lastUpdate);
@@ -405,20 +404,7 @@ public class WritableMCAChunk extends FaweChunk<Void> {
         Arrays.fill(biomes, (byte) biome.getInternalId());
     }
 
-    @Override
-    public FaweChunk<Void> copy(boolean shallow) {
-        throw new UnsupportedOperationException("Unsupported");
-    }
-
     public void removeEntity(UUID uuid) {
         entities.remove(uuid);
-    }
-
-    public Void getChunk() {
-        throw new UnsupportedOperationException("Not applicable for this");
-    }
-
-    public FaweChunk call() {
-        throw new UnsupportedOperationException("Not supported");
     }
 }

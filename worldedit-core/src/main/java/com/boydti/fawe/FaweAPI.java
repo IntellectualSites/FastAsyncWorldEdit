@@ -173,7 +173,7 @@ public class FaweAPI {
      * @param world     The name of the world
      * @param autoqueue If it should start dispatching before you enqueue it.
      * @return
-     * @see FaweQueue#enqueue()
+     * @see IQueueExtent#enqueue()
      */
     public static IQueueExtent createQueue(World world, boolean autoqueue) {
         IQueueExtent queue = Fawe.get().getQueueHandler().getQueue(world);

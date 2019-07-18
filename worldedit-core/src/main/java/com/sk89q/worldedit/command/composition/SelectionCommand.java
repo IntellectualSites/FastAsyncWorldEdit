@@ -21,7 +21,7 @@ package com.sk89q.worldedit.command.composition;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.extent.FaweRegionExtent;
@@ -111,7 +111,7 @@ public class SelectionCommand extends SimpleCommand<Operation> {
                             Pattern pattern = (Pattern) field.get(replace);
                             if (pattern instanceof BlockStateHolder) {
                                 BlockStateHolder block = ((BlockStateHolder) pattern);
-                                final FaweQueue queue = editSession.getQueue();
+                                final IQueueExtent queue = editSession.getQueue();
                                 final int minY = cuboid.getMinimumY();
                                 final int maxY = cuboid.getMaximumY();
 

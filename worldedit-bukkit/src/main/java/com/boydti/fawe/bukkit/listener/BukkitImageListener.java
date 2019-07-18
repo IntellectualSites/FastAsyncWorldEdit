@@ -2,7 +2,7 @@ package com.boydti.fawe.bukkit.listener;
 
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.command.CFICommands;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.extent.FastWorldEditExtent;

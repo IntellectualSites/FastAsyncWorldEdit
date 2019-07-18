@@ -1,6 +1,6 @@
 package com.boydti.fawe.object.visitor;
 
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.object.HasIQueueExtent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
@@ -34,8 +34,8 @@ public class AboveVisitor extends RecursiveVisitor {
         this(mask, function, baseY, Integer.MAX_VALUE, null);
     }
 
-    public AboveVisitor(Mask mask, RegionFunction function, int baseY, int depth, HasFaweQueue hasFaweQueue) {
-        super(mask, function, depth, hasFaweQueue);
+    public AboveVisitor(Mask mask, RegionFunction function, int baseY, int depth, HasIQueueExtent hasIQueueExtent) {
+        super(mask, function, depth, hasIQueueExtent);
         checkNotNull(mask);
 
         this.baseY = baseY;

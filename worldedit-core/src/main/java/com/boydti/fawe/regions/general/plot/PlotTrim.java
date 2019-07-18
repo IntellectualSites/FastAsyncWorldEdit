@@ -4,7 +4,7 @@ import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAFile;
 import com.boydti.fawe.jnbt.anvil.MCAFilter;
 import com.boydti.fawe.jnbt.anvil.MCAQueue;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.SetQueue;
@@ -38,7 +38,7 @@ public class PlotTrim {
     private boolean deleteUnowned;
 
     public PlotTrim(PlotPlayer player, PlotArea area, String worldName, boolean deleteUnowned) {
-        FaweQueue tmpQueue = SetQueue.IMP.getNewQueue(worldName, true, false);
+        IQueueExtent tmpQueue = SetQueue.IMP.getNewQueue(worldName, true, false);
         File saveFolder = tmpQueue.getSaveFolder();
         this.root = new File(saveFolder.getParentFile().getParentFile(), worldName + "-Copy" + File.separator + "region");
         this.originalQueue = new MCAQueue(worldName, saveFolder, true);

@@ -2,7 +2,7 @@ package com.boydti.fawe.object;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
-import com.boydti.fawe.object.queue.DelegateFaweQueue;
+import com.boydti.fawe.object.queue.DelegateIQueueExtent;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -12,10 +12,10 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-public class ChangeSetFaweQueue extends DelegateFaweQueue {
+public class ChangeSetIQueueExtent extends DelegateIQueueExtent {
     private FaweChangeSet set;
 
-    public ChangeSetFaweQueue(FaweChangeSet set, FaweQueue parent) {
+    public ChangeSetIQueueExtent(FaweChangeSet set, IQueueExtent parent) {
         super(parent);
         this.set = set;
     }

@@ -1,4 +1,4 @@
-package com.boydti.fawe.jnbt.anvil;
+package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.object.io.BufferedRandomAccessFile;

@@ -1,6 +1,6 @@
 package com.boydti.fawe.object.schematic;
 
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.object.HasIQueueExtent;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -266,7 +266,7 @@ public class Schematic {
                     extent.setBlock(xx, mutable.getBlockY() + rely, zz, block);
                     return false;
                 }
-            }, (HasFaweQueue) (null));
+            }, (HasIQueueExtent) (null));
             Operations.completeBlindly(visitor);
         }
         // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)

@@ -1,7 +1,7 @@
 package com.boydti.fawe.util.task;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.Metadatable;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.SetQueue;
@@ -322,7 +322,7 @@ public class TaskBuilder extends Metadatable {
         }
     }
 
-    private FaweQueue queue;
+    private IQueueExtent queue;
     private long last;
     private long start;
     private Object asyncWaitLock = new Object();
@@ -430,7 +430,7 @@ public class TaskBuilder extends Metadatable {
     public static abstract class SplitTask extends RunnableTask {
 
         private final long allocation;
-        private final FaweQueue queue;
+        private final IQueueExtent queue;
         private long last;
         private long start;
         private Object asyncWaitLock = new Object();

@@ -2,7 +2,7 @@ package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.RunnableVal;
 
 import org.jetbrains.annotations.NotNull;
@@ -138,7 +138,7 @@ public abstract class TaskManager {
      * @param queue
      * @param run
      */
-    public void runUnsafe(FaweQueue queue, Runnable run) {
+    public void runUnsafe(IQueueExtent queue, Runnable run) {
         queue.startSet(true);
         try {
             run.run();

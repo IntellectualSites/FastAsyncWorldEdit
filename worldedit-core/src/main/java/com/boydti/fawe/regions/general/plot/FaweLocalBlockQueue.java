@@ -2,7 +2,7 @@ package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.util.SetQueue;
 import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
@@ -25,7 +25,7 @@ import java.util.List;
 // TODO FIXME
 public class FaweLocalBlockQueue extends LocalBlockQueue {
 
-    public final FaweQueue IMP;
+    public final IQueueExtent IMP;
     private final LegacyMapper legacyMapper;
 
     public FaweLocalBlockQueue(String world) {

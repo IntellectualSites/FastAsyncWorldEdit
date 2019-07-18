@@ -1,9 +1,7 @@
 package com.boydti.fawe.object.brush.visualization;
 
-import com.boydti.fawe.example.IntFaweChunk;
-import com.boydti.fawe.example.NullQueueIntFaweChunk;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.MathMan;
 
 import com.sk89q.worldedit.WorldEditException;
@@ -18,10 +16,10 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class VisualExtent extends AbstractDelegateExtent {
 
-    private final FaweQueue queue;
+    private final IQueueExtent queue;
     private Long2ObjectMap<VisualChunk> chunks = new Long2ObjectOpenHashMap<>();
 
-    public VisualExtent(Extent parent, FaweQueue queue) {
+    public VisualExtent(Extent parent, IQueueExtent queue) {
         super(parent);
         this.queue = queue;
     }

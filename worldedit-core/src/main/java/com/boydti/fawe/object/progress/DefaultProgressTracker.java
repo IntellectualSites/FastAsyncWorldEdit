@@ -3,7 +3,7 @@ package com.boydti.fawe.object.progress;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
@@ -11,7 +11,7 @@ import com.boydti.fawe.util.TaskManager;
 /**
  * The default progress tracker uses titles
  */
-public class DefaultProgressTracker extends RunnableVal2<FaweQueue.ProgressType, Integer> {
+public class DefaultProgressTracker extends RunnableVal2<IQueueExtent.ProgressType, Integer> {
 
     private final FawePlayer player;
     private final long start;
@@ -55,7 +55,7 @@ public class DefaultProgressTracker extends RunnableVal2<FaweQueue.ProgressType,
     private boolean done = false;
 
     @Override
-    public void run(FaweQueue.ProgressType type, Integer amount) {
+    public void run(IQueueExtent.ProgressType type, Integer amount) {
         switch (type) {
             case DISPATCH:
                 amountDispatch++;

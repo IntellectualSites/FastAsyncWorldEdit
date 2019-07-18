@@ -1,7 +1,7 @@
 package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -47,9 +47,9 @@ public class FaweSchematicHandler extends SchematicHandler {
             queue.setTile(x, y, z, compoundTag);
             return true;
         }
-        FaweQueue faweQueue = SetQueue.IMP.getNewQueue(((FaweLocalBlockQueue) queue).IMP.getWEWorld(), true, false);
-        faweQueue.setTile(x, y, z, (CompoundTag) FaweCache.asTag(compoundTag));
-        faweQueue.flush();
+        IQueueExtent IQueueExtent = SetQueue.IMP.getNewQueue(((FaweLocalBlockQueue) queue).IMP.getWEWorld(), true, false);
+        IQueueExtent.setTile(x, y, z, (CompoundTag) FaweCache.asTag(compoundTag));
+        IQueueExtent.flush();
         return false;
     }
 

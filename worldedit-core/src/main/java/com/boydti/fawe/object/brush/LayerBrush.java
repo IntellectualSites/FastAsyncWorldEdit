@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.beta.FilterBlock;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.object.mask.AdjacentAnyMask;
 import com.boydti.fawe.object.mask.RadiusMask;
@@ -35,7 +35,7 @@ public class LayerBrush implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern ignore, double size) throws MaxChangedBlocksException {
-        final FaweQueue queue = editSession.getQueue();
+        final IQueueExtent queue = editSession.getQueue();
         final AdjacentAnyMask adjacent = new AdjacentAnyMask(new BlockMask(editSession).add(BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR));
         final SolidBlockMask solid = new SolidBlockMask(editSession);
         final RadiusMask radius = new RadiusMask(0, (int) size);

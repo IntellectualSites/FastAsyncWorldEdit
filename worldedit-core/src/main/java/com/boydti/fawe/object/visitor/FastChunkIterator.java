@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.visitor;
 
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.example.MappedFaweQueue;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.example.MappedIQueueExtent;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.HasIQueueExtent;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
@@ -17,23 +17,23 @@ import javax.annotation.Nullable;
 public class FastChunkIterator implements Iterable<BlockVector2> {
 
     private final Iterable<? extends BlockVector2> iterable;
-    private final MappedFaweQueue queue;
+    private final MappedIQueueExtent queue;
 
     public FastChunkIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable EditSession extent) {
-        this(iter, (HasFaweQueue) extent);
+        this(iter, (HasIQueueExtent) extent);
     }
 
     public FastChunkIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable Extent extent) {
-        this(iter, (HasFaweQueue) (extent != null ? (extent instanceof HasFaweQueue ? extent : new ExtentTraverser(extent).findAndGet(HasFaweQueue.class)) : null));
+        this(iter, (HasIQueueExtent) (extent != null ? (extent instanceof HasIQueueExtent ? extent : new ExtentTraverser(extent).findAndGet(HasIQueueExtent.class)) : null));
     }
 
-    public FastChunkIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable HasFaweQueue editSession) {
+    public FastChunkIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable HasIQueueExtent editSession) {
         this(iter, editSession != null ? editSession.getQueue() : null);
     }
 
-    public FastChunkIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable FaweQueue faweQueue) {
+    public FastChunkIterator(@Nonnull Iterable<? extends BlockVector2> iter, @Nullable IQueueExtent IQueueExtent) {
         this.iterable = iter;
-        this.queue = faweQueue instanceof MappedFaweQueue ? (MappedFaweQueue) faweQueue : null;
+        this.queue = IQueueExtent instanceof MappedIQueueExtent ? (MappedIQueueExtent) IQueueExtent : null;
     }
 
     public Iterable<? extends BlockVector2> getIterable() {

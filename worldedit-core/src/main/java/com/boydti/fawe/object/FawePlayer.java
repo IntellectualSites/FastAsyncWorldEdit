@@ -119,10 +119,10 @@ public abstract class FawePlayer<T> extends Metadatable {
     }
 
     public int cancel(boolean close) {
-//        Collection<FaweQueue> queues = SetQueue.IMP.getAllQueues(); TODO NOT IMPLEMENTED
+//        Collection<IQueueExtent> queues = SetQueue.IMP.getAllQueues(); TODO NOT IMPLEMENTED
         int cancelled = 0;
 //        clearActions();
-//        for (FaweQueue queue : queues) {
+//        for (IQueueExtent queue : queues) {
 //            Collection<EditSession> sessions = queue.getEditSessions();
 //            for (EditSession session : sessions) {
 //                FawePlayer currentPlayer = session.getPlayer();

@@ -4,7 +4,7 @@ import com.boydti.fawe.object.extent.FaweRegionExtent;
 import com.boydti.fawe.object.extent.HeightBoundExtent;
 import com.boydti.fawe.object.extent.MultiRegionExtent;
 import com.boydti.fawe.object.extent.SingleRegionExtent;
-import com.boydti.fawe.object.queue.DelegateFaweQueue;
+import com.boydti.fawe.object.queue.DelegateIQueueExtent;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -14,10 +14,10 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-public class MaskedFaweQueue extends DelegateFaweQueue {
+public class MaskedIQueueExtent extends DelegateIQueueExtent {
     private FaweRegionExtent region;
 
-    public MaskedFaweQueue(FaweQueue parent, Region[] mask) {
+    public MaskedIQueueExtent(IQueueExtent parent, Region[] mask) {
         super(parent);
         setMask(mask);
     }

@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -29,7 +29,7 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
-    public void addChangeTask(FaweQueue queue) {
+    public void addChangeTask(IQueueExtent queue) {
         super.addChangeTask(queue);
     }
 

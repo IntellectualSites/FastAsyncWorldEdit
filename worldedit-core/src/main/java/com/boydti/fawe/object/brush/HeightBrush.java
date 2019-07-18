@@ -1,8 +1,8 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.brush.heightmap.HeightMap;
 import com.boydti.fawe.object.brush.heightmap.RotatableHeightMap;
 import com.boydti.fawe.object.brush.heightmap.ScalableHeightMap;
@@ -75,7 +75,7 @@ public class HeightBrush implements Brush {
         HeightMap map = getHeightMap();
         map.setSize(size);
 
-        FaweQueue queue = editSession.getQueue();
+        IQueueExtent queue = editSession.getQueue();
         // Optimized application of height map
         if (queue instanceof HeightMapMCAGenerator) {
             HeightMapMCAGenerator hmmg = (HeightMapMCAGenerator) queue;

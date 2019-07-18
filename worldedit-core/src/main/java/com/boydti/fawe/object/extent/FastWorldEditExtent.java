@@ -1,7 +1,7 @@
 package com.boydti.fawe.object.extent;
 
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.HasIQueueExtent;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
@@ -30,19 +30,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FastWorldEditExtent extends AbstractDelegateExtent implements HasFaweQueue {
+public class FastWorldEditExtent extends AbstractDelegateExtent implements HasIQueueExtent {
 
     private final World world;
-    private FaweQueue queue;
+    private IQueueExtent queue;
 
-    public FastWorldEditExtent(final World world, FaweQueue queue) {
+    public FastWorldEditExtent(final World world, IQueueExtent queue) {
         super(queue);
         this.world = world;
         this.queue = queue;
     }
 
     @Override
-    public FaweQueue getQueue() {
+    public IQueueExtent getQueue() {
         return queue;
     }
 

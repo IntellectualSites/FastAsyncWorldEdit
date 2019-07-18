@@ -1,4 +1,4 @@
-package com.boydti.fawe.jnbt.anvil.generator;
+package com.sk89q.worldedit.function.generator;
 
 import com.sk89q.worldedit.WorldEditException;
 

@@ -2,8 +2,8 @@ package com.boydti.fawe.object.change;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.HasIQueueExtent;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -33,7 +33,7 @@ public class MutableChunkChange implements Change {
         create(context, false);
     }
 
-    private FaweQueue queue;
+    private IQueueExtent queue;
     private boolean checkedQueue;
 
     public void create(UndoContext context, boolean undo) {
@@ -43,16 +43,16 @@ public class MutableChunkChange implements Change {
         if (!checkedQueue) {
             checkedQueue = true;
             Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser(extent).find(HasFaweQueue.class);
+            ExtentTraverser found = new ExtentTraverser(extent).find(HasIQueueExtent.class);
             if (found != null) {
-                perform(queue = ((HasFaweQueue) found.get()).getQueue(), undo);
+                perform(queue = ((HasIQueueExtent) found.get()).getQueue(), undo);
             } else {
                 Fawe.debug("FAWE does not support: " + extent + " for " + getClass() + " (bug Empire92)");
             }
         }
     }
 
-    public void perform(FaweQueue queue, boolean undo) {
+    public void perform(IQueueExtent queue, boolean undo) {
         if (undo) {
             if (checkEmpty) {
                 int[][] previousIds = from.getCombinedIdArrays();

@@ -183,7 +183,7 @@ public class HistoryCommands extends MethodCommands {
         // TODO mask the regions bot / top to the bottom and top coord in the allowedRegions
         // TODO: then mask the edit to the bot / top
 //        if (allowedRegions.length != 1 || !allowedRegions[0].isGlobal()) {
-//            finalQueue = new MaskedFaweQueue(SetQueue.IMP.getNewQueue(fp.getWorld(), true, false), allowedRegions);
+//            finalQueue = new MaskedIQueueExtent(SetQueue.IMP.getNewQueue(fp.getWorld(), true, false), allowedRegions);
 //        } else {
 //            finalQueue = SetQueue.IMP.getNewQueue(fp.getWorld(), true, false);
 //        }

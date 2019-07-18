@@ -6,7 +6,7 @@ import com.boydti.fawe.jnbt.anvil.MCAChunk;
 import com.boydti.fawe.jnbt.anvil.MCAQueue;
 import com.boydti.fawe.jnbt.anvil.MCAWriter;
 import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.util.SetQueue;
 import com.github.intellectualsites.plotsquared.commands.Command;
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
@@ -162,7 +162,7 @@ public class MoveTo512 /*extends Command*/ {
 //
 //        WorldUtil.IMP.saveWorld(area.worldname);
 //
-//        FaweQueue defaultQueue = SetQueue.IMP.getNewQueue(area.worldname, true, false);
+//        IQueueExtent defaultQueue = SetQueue.IMP.getNewQueue(area.worldname, true, false);
 //        MCAQueue queueFrom = new MCAQueue(area.worldname, defaultQueue.getSaveFolder(), defaultQueue.hasSky());
 //
 //        String world = args[0];

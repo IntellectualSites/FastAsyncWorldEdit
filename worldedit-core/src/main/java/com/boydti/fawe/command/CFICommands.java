@@ -5,16 +5,14 @@ import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.beta.SingleFilterBlock;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FilteredTextureUtil;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
@@ -46,10 +44,7 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.command.Dispatcher;
 import org.enginehub.piston.annotation.param.Switch;
-import com.sk89q.worldedit.util.command.parametric.Optional;
-import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -95,7 +90,7 @@ public class CFICommands extends MethodCommands {
     public static File getFolder(String worldName) {
         Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
         List<? extends World> worlds = platform.getWorlds();
-        FaweQueue queue = SetQueue.IMP.getNewQueue(worlds.get(0), true, false);
+        IQueueExtent queue = SetQueue.IMP.getNewQueue(worlds.get(0), true, false);
         return new File(queue.getSaveFolder().getParentFile().getParentFile(), worldName + File.separator + "region");
     }
 
@@ -182,7 +177,7 @@ public class CFICommands extends MethodCommands {
             desc = "Create the world"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void done(FawePlayer fp) throws ParameterException, IOException {
+    public void done(FawePlayer fp) {
         CFISettings settings = assertSettings(fp);
         HeightMapMCAGenerator generator = settings.getGenerator();
 

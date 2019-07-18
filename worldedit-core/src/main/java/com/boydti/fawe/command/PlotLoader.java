@@ -1,7 +1,5 @@
 package com.boydti.fawe.command;
 
-import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
@@ -17,12 +15,9 @@ import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
-import com.sk89q.worldedit.function.pattern.FawePattern;
-import com.sk89q.worldedit.util.Location;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class PlotLoader {

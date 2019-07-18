@@ -307,12 +307,12 @@ public class EditSessionBuilder {
 //        if (queue == null) {
 //            boolean placeChunks = this.fastmode || this.limit.FAST_PLACEMENT;
 //            World unwrapped = WorldWrapper.unwrap(world);
-//            if (unwrapped instanceof FaweQueue) {
-//                queue = (FaweQueue) unwrapped;
+//            if (unwrapped instanceof IQueueExtent) {
+//                queue = (IQueueExtent) unwrapped;
 //            } else if (unwrapped instanceof MCAWorld) {
 //                queue = ((MCAWorld) unwrapped).getQueue();
 //            } else if (player != null && world.equals(player.getWorld())) {
-//                queue = player.getFaweQueue(placeChunks, autoQueue);
+//                queue = player.getIQueueExtent(placeChunks, autoQueue);
 //            } else {
 //                queue = SetQueue.IMP.getNewQueue(world, placeChunks, autoQueue);
 //            }
@@ -324,7 +324,7 @@ public class EditSessionBuilder {
 //                            // If fast placement is disabled, it's slower to perform a copy on each chunk
 //                            && this.limit.FAST_PLACEMENT
 //                            // If the specific queue doesn't support it
-//                            && queue.supports(FaweQueue.Capability.CHANGE_TASKS)
+//                            && queue.supports(IQueueExtent.Capability.CHANGE_TASKS)
 //                            // If the edit uses items from the inventory we can't use a delayed task
 //                            && this.blockBag == null;
 //        }

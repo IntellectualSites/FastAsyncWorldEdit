@@ -35,10 +35,10 @@ import com.boydti.fawe.beta.filters.SetFilter;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.filters.DistrFilter;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.example.NMSMappedFaweQueue;
+import com.boydti.fawe.example.NMSMappedIQueueExtent;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.boydti.fawe.util.MathMan;
@@ -166,7 +166,7 @@ public class RegionCommands {
             final int cz = loc.getBlockZ() >> 4;
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection,null, FaweQueue.RelightMode.ALL);
+        int count = FaweAPI.fixLighting(player.getWorld(), selection,null, IQueueExtent.RelightMode.ALL);
         BBC.LIGHTING_PROPOGATE_SELECTION.send(fp, count);
     }
 
@@ -178,7 +178,7 @@ public class RegionCommands {
     public void getlighting(Player player) throws WorldEditException {
         FawePlayer fp = FawePlayer.wrap(player);
         final Location loc = player.getLocation();
-        FaweQueue queue = fp.getFaweQueue(false);
+        IQueueExtent queue = fp.getIQueueExtent(false);
         fp.sendMessage("Light: " + queue.getEmmittedLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()) + " | " + queue.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 
@@ -195,7 +195,7 @@ public class RegionCommands {
             final int cz = player.getLocation().getBlockZ() >> 4;
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection, null, FaweQueue.RelightMode.NONE);
+        int count = FaweAPI.fixLighting(player.getWorld(), selection, null, IQueueExtent.RelightMode.NONE);
         BBC.UPDATED_LIGHTING_SELECTION.send(fp, count);
     }
 
@@ -225,7 +225,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
         FawePlayer fp = FawePlayer.wrap(player);
-        final NMSMappedFaweQueue queue = (NMSMappedFaweQueue) fp.getFaweQueue(false);
+        final NMSMappedIQueueExtent queue = (NMSMappedIQueueExtent) fp.getIQueueExtent(false);
         for (BlockVector3 pt : region) {
             queue.setBlockLight(pt.getX(), pt.getY(), pt.getZ(), value);
         }
@@ -244,7 +244,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
         FawePlayer fp = FawePlayer.wrap(player);
-        final NMSMappedFaweQueue queue = (NMSMappedFaweQueue) fp.getFaweQueue(false);
+        final NMSMappedIQueueExtent queue = (NMSMappedIQueueExtent) fp.getIQueueExtent(false);
         for (BlockVector3 pt : region) {
             queue.setSkyLight(pt.getX(), pt.getY(), pt.getZ(), value);
         }

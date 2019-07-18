@@ -1,8 +1,8 @@
 package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.HasIQueueExtent;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MainUtil;
@@ -23,7 +23,7 @@ public class MutableAnvilChange implements Change {
         this.source = source;
     }
 
-    private FaweQueue queue;
+    private IQueueExtent queue;
     private boolean checkedQueue;
 
     @Override
@@ -34,9 +34,9 @@ public class MutableAnvilChange implements Change {
         if (!checkedQueue) {
             checkedQueue = true;
             Extent extent = context.getExtent();
-            ExtentTraverser found = new ExtentTraverser(extent).find(HasFaweQueue.class);
+            ExtentTraverser found = new ExtentTraverser(extent).find(HasIQueueExtent.class);
             if (found != null) {
-                queue = ((HasFaweQueue) found.get()).getQueue();
+                queue = ((HasIQueueExtent) found.get()).getQueue();
                 destDir = queue.getSaveFolder().toPath();
                 perform(queue);
             } else {
@@ -45,7 +45,7 @@ public class MutableAnvilChange implements Change {
         }
     }
 
-    public void perform(FaweQueue queue) {
+    public void perform(IQueueExtent queue) {
         Path dest = destDir.resolve(source.getFileName());
         try {
             Files.move(source, dest, StandardCopyOption.ATOMIC_MOVE);

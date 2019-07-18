@@ -1,7 +1,7 @@
 package com.boydti.fawe.command;
 
 import com.boydti.fawe.config.Commands;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
 import org.enginehub.piston.annotation.Command;

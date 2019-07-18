@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.change;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
-import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.HasFaweQueue;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
+import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.object.HasIQueueExtent;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.history.UndoContext;
@@ -23,9 +23,9 @@ public class CFIChange implements Change {
     }
 
     private HeightMapMCAGenerator getQueue(UndoContext context) {
-        ExtentTraverser found = new ExtentTraverser(context.getExtent()).find(HasFaweQueue.class);
+        ExtentTraverser found = new ExtentTraverser(context.getExtent()).find(HasIQueueExtent.class);
         if (found != null) {
-            FaweQueue queue = ((HasFaweQueue) found.get()).getQueue();
+            IQueueExtent queue = ((HasIQueueExtent) found.get()).getQueue();
             if (queue instanceof HeightMapMCAGenerator) return (HeightMapMCAGenerator) queue;
         }
         Fawe.debug("FAWE does not support: " + context.getExtent() + " for " + getClass() + " (bug Empire92)");

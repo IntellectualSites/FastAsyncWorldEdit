@@ -1,6 +1,7 @@
-package com.boydti.fawe.jnbt.anvil;
+package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.FawePlayer;
@@ -15,7 +16,6 @@ import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.object.collection.LocalBlockVector2DSet;
 import com.boydti.fawe.object.collection.SummedAreaTable;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.queue.LazyFaweChunk;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.RandomTextureUtil;
@@ -202,7 +202,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         blocks.clearChanges(); // blocks.redoChanges(in); Unsupported
     }
 
-    @Override
+//    @Override TODO NOT IMPLEMENTED
     public void addEditSession(EditSession session) {
         session.setFastMode(true);
         this.editSession = session;
@@ -212,7 +212,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     private ImageViewer viewer;
     // Used for visualizing the world by sending chunk packets
     // These three variables should be set together
-//    private FaweQueue packetQueue;
+//    private IQueueExtent packetQueue;
     private FawePlayer player;
     private BlockVector2 chunkOffset = BlockVector2.ZERO;
     private EditSession editSession;
@@ -283,44 +283,44 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         if (viewer != null) {
             viewer.view(this);
         }
-        if (chunkOffset != null && player != null) {
-            FaweQueue packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
-
-            if (!packetQueue.supports(Capability.CHUNK_PACKETS)) {
-                return;
-            }
-
-            int lenCX = (getWidth() + 15) >> 4;
-            int lenCZ = (getLength() + 15) >> 4;
-
-            int OX = chunkOffset.getBlockX();
-            int OZ = chunkOffset.getBlockZ();
-
-            Location position = player.getLocation();
-            int pcx = (position.getBlockX() >> 4) - OX;
-            int pcz = (position.getBlockZ() >> 4) - OZ;
-
-            int scx = Math.max(0, pcx - 15);
-            int scz = Math.max(0, pcz - 15);
-            int ecx = Math.min(lenCX - 1, pcx + 15);
-            int ecz = Math.min(lenCZ - 1, pcz + 15);
-
-            for (int cz = scz; cz <= ecz; cz++) {
-                for (int cx = scx; cx <= ecx; cx++) {
-                    final int finalCX = cx;
-                    final int finalCZ = cz;
-                    TaskManager.IMP.getPublicForkJoinPool().submit(() -> {
-                        try {
-                            FaweChunk toSend = getSnapshot(finalCX, finalCZ);
-                            toSend.setLoc(HeightMapMCAGenerator.this, finalCX + OX, finalCZ + OZ);
-                            packetQueue.sendChunkUpdate(toSend, player);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
-            }
-        }
+//        if (chunkOffset != null && player != null) { TODO NOT IMPLEMENTED
+//            IQueueExtent packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
+//
+//            if (!packetQueue.supports(Capability.CHUNK_PACKETS)) {
+//                return;
+//            }
+//
+//            int lenCX = (getWidth() + 15) >> 4;
+//            int lenCZ = (getLength() + 15) >> 4;
+//
+//            int OX = chunkOffset.getBlockX();
+//            int OZ = chunkOffset.getBlockZ();
+//
+//            Location position = player.getLocation();
+//            int pcx = (position.getBlockX() >> 4) - OX;
+//            int pcz = (position.getBlockZ() >> 4) - OZ;
+//
+//            int scx = Math.max(0, pcx - 15);
+//            int scz = Math.max(0, pcz - 15);
+//            int ecx = Math.min(lenCX - 1, pcx + 15);
+//            int ecz = Math.min(lenCZ - 1, pcz + 15);
+//
+//            for (int cz = scz; cz <= ecz; cz++) {
+//                for (int cx = scx; cx <= ecx; cx++) {
+//                    final int finalCX = cx;
+//                    final int finalCZ = cz;
+//                    TaskManager.IMP.getPublicForkJoinPool().submit(() -> {
+//                        try {
+//                            FaweChunk toSend = getSnapshot(finalCX, finalCZ);
+//                            toSend.setLoc(HeightMapMCAGenerator.this, finalCX + OX, finalCZ + OZ);
+//                            packetQueue.sendChunkUpdate(toSend, player);
+//                        } catch (Throwable e) {
+//                            e.printStackTrace();
+//                        }
+//                    });
+//                }
+//            }
+//        }
     }
 
     public TextureUtil getRawTextureUtil() {
@@ -705,13 +705,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return setBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
     }
 
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return this.setBiome(position.getBlockX(), position.getBlockZ(), biome);
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, int combined) {
+    private boolean setBlock(int x, int y, int z, int combined) {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) return false;
         int height = heights.getByte(index) & 0xFF;
@@ -732,8 +726,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 combined = floorId;
             default:
                 try {
-                    short chunkX = (short) (x >> 4);
-                    short chunkZ = (short) (z >> 4);
                     blocks.set(x, y, z, combined);
                     return true;
                 } catch (IndexOutOfBoundsException ignore) {
@@ -750,79 +742,79 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return true;
     }
 
-    @Override
-    public FaweChunk getFaweChunk(int chunkX, int chunkZ) {
-        return new SimpleIntFaweChunk(this, chunkX, chunkZ);
-    }
-
-    @Override
-    public FaweChunk getSnapshot(int chunkX, int chunkZ) {
-        return getSnapshot(null, chunkX, chunkZ);
-    }
-
-    private FaweChunk getSnapshot(final WritableMCAChunk chunk, int chunkX, int chunkZ) {
-        return new LazyFaweChunk<WritableMCAChunk>(this, chunkX, chunkZ) {
-            @Override
-            public WritableMCAChunk getChunk() {
-                WritableMCAChunk tmp = chunk;
-                if (tmp == null) {
-                    tmp = new WritableMCAChunk();
-                }
-                tmp.setLoc(HeightMapMCAGenerator.this, chunkX, chunkZ);
-                int cbx = chunkX << 4;
-                int cbz = chunkZ << 4;
-                int csx = Math.max(0, cbx);
-                int csz = Math.max(0, cbz);
-                int cex = Math.min(getWidth(), cbx + 15);
-                int cez = Math.min(getLength(), cbz + 15);
-                write(tmp, csx, cex, csz, cez);
-                tmp.setLoc(HeightMapMCAGenerator.this, getX(), getZ());
-                return tmp;
-            }
-
-            @Override
-            public void addToQueue() {
-                WritableMCAChunk cached = getCachedChunk();
-                if (cached != null) setChunk(cached);
-            }
-        };
-    }
-
-    @Override
-    public Collection<FaweChunk> getFaweChunks() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public void setChunk(FaweChunk chunk) {
-        int[][] src = chunk.getCombinedIdArrays();
-        for (int i = 0; i < src.length; i++) {
-            if (src[i] != null) {
-                int bx = chunk.getX() << 4;
-                int bz = chunk.getZ() << 4;
-                int by = i << 4;
-                for (int layer = i; layer < src.length; layer++) {
-                    int[] srcLayer = src[layer];
-                    if (srcLayer != null) {
-                        int index = 0;
-                        for (int y = 0; y < 16; y++) {
-                            int yy = by + y;
-                            for (int z = 0; z < 16; z++) {
-                                int zz = bz + z;
-                                for (int x = 0; x < 16; x++, index++) {
-                                    int combined = srcLayer[index];
-                                    if (combined != 0) {
-                                        setBlock(bx + x, yy, zz, combined);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
+//    @Override TODO NOT IMPLEMENTED
+//    public FaweChunk getFaweChunk(int chunkX, int chunkZ) {
+//        return new SimpleIntFaweChunk(this, chunkX, chunkZ);
+//    }
+//
+//    @Override
+//    public FaweChunk getSnapshot(int chunkX, int chunkZ) {
+//        return getSnapshot(null, chunkX, chunkZ);
+//    }
+//
+//    private FaweChunk getSnapshot(final WritableMCAChunk chunk, int chunkX, int chunkZ) {
+//        return new LazyFaweChunk<WritableMCAChunk>(this, chunkX, chunkZ) {
+//            @Override
+//            public WritableMCAChunk getChunk() {
+//                WritableMCAChunk tmp = chunk;
+//                if (tmp == null) {
+//                    tmp = new WritableMCAChunk();
+//                }
+//                tmp.setLoc(HeightMapMCAGenerator.this, chunkX, chunkZ);
+//                int cbx = chunkX << 4;
+//                int cbz = chunkZ << 4;
+//                int csx = Math.max(0, cbx);
+//                int csz = Math.max(0, cbz);
+//                int cex = Math.min(getWidth(), cbx + 15);
+//                int cez = Math.min(getLength(), cbz + 15);
+//                write(tmp, csx, cex, csz, cez);
+//                tmp.setLoc(HeightMapMCAGenerator.this, getX(), getZ());
+//                return tmp;
+//            }
+//
+//            @Override
+//            public void addToQueue() {
+//                WritableMCAChunk cached = getCachedChunk();
+//                if (cached != null) setChunk(cached);
+//            }
+//        };
+//    }
+//
+//    @Override
+//    public Collection<FaweChunk> getFaweChunks() {
+//        return Collections.emptyList();
+//    }
+//
+//    @Override
+//    public void setChunk(FaweChunk chunk) {
+//        int[][] src = chunk.getCombinedIdArrays();
+//        for (int i = 0; i < src.length; i++) {
+//            if (src[i] != null) {
+//                int bx = chunk.getX() << 4;
+//                int bz = chunk.getZ() << 4;
+//                int by = i << 4;
+//                for (int layer = i; layer < src.length; layer++) {
+//                    int[] srcLayer = src[layer];
+//                    if (srcLayer != null) {
+//                        int index = 0;
+//                        for (int y = 0; y < 16; y++) {
+//                            int yy = by + y;
+//                            for (int z = 0; z < 16; z++) {
+//                                int zz = bz + z;
+//                                for (int x = 0; x < 16; x++, index++) {
+//                                    int combined = srcLayer[index];
+//                                    if (combined != 0) {
+//                                        setBlock(bx + x, yy, zz, combined);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                break;
+//            }
+//        }
+//    }
 
     @Override
     public File getSaveFolder() {
@@ -835,18 +827,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return false;
     }
 
+    @Nullable
     @Override
-    public void sendBlockUpdate(FaweChunk chunk, FawePlayer... players) {
-
-    }
-
-    @Override
-    public void flush(int time) {
-        next(0, time);
-    }
-
-    @Override
-    public boolean next(int amount, long time) {
+    public Operation commit() {
         EditSession curES = editSession;
         if (curES != null && isModified()) {
             try {
@@ -863,15 +846,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             }
         }
         clear();
-        return false;
-    }
-
-    @Override
-    public void sendChunk(FaweChunk chunk) {
-    }
-
-    @Override
-    public void sendChunk(int x, int z, int bitMask) {
+        return null;
     }
 
     @Override
@@ -883,7 +858,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public void close(boolean update) {
         clear();
         if (chunkOffset != null && player != null && update) {
-            FaweQueue packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
+            IQueueExtent packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
 
             int lenCX = (getWidth() + 15) >> 4;
             int lenCZ = (getLength() + 15) >> 4;
@@ -963,41 +938,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
             }
             return main.getInt(index);
         }
-    }
-
-    @Override
-    public int getCombinedId4Data(int x, int y, int z, int def) {
-        return getCombinedId4Data(x, y, z);
-    }
-
-    @Override
-    public int getCachedCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return getCombinedId4Data(x, y, z);
-    }
-
-    @Override
-    public boolean hasSky() {
-        return true;
-    }
-
-    @Override
-    public int getSkyLight(int x, int y, int z) {
-        return getNearestSurfaceTerrainBlock(x, z, y, 0, 255) < y ? 15 : 0;
-    }
-
-    @Override
-    public int getEmmittedLight(int x, int y, int z) {
-        return 0;
-    }
-
-    @Override
-    public CompoundTag getTileEntity(int x, int y, int z) throws FaweException.FaweChunkLoadException {
-        return null;
-    }
-
-    @Override
-    public int size() {
-        return 0;
     }
 
     @Override
@@ -1978,87 +1918,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     @Override
     public int getMaxY() {
         return 255;
-    }
-
-    @Override
-    public void setWorld(String world) {
-
-    }
-
-    @Override
-    public World getWEWorld() {
-        return this;
-    }
-
-    @Override
-    public String getWorldName() {
-        return getName();
-    }
-
-    @Override
-    public long getModified() {
-        return 0;
-    }
-
-    @Override
-    public void setModified(long modified) {
-        // Unsupported
-    }
-
-    @Override
-    public RunnableVal2<ProgressType, Integer> getProgressTask() {
-        return null;
-    }
-
-    @Override
-    public void setProgressTask(RunnableVal2<ProgressType, Integer> progressTask) {
-
-    }
-
-    @Override
-    public void setChangeTask(RunnableVal2<FaweChunk, FaweChunk> changeTask) {
-
-    }
-
-    @Override
-    public RunnableVal2<FaweChunk, FaweChunk> getChangeTask() {
-        return null;
-    }
-
-    @Override
-    public SetQueue.QueueStage getStage() {
-        return SetQueue.QueueStage.NONE;
-    }
-
-    @Override
-    public void setStage(SetQueue.QueueStage stage) {
-        // Not supported
-    }
-
-    @Override
-    public void addNotifyTask(Runnable runnable) {
-        runnable.run();
-    }
-
-    @Override
-    public void runTasks() {
-
-    }
-
-    @Override
-    public void addTask(Runnable whenFree) {
-        whenFree.run();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return !isModified();
-    }
-
-    @Nullable
-    @Override
-    public Operation commit() {
-        return null;
     }
 
     @Override
