@@ -209,7 +209,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean descendLevel() {
         final Location pos = getBlockIn();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY() - 1);
+        int y = Math.max(0, pos.getBlockY());
         final int z = pos.getBlockZ();
         final Extent world = pos.getExtent();
 

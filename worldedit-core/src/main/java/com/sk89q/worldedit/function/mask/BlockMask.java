@@ -129,7 +129,7 @@ public class BlockMask extends ABlockMask {
     }
 
     @Override
-    public Mask and(Mask mask) {
+    public Mask tryCombine(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             for (int i = 0; i < ordinals.length; i++) {
@@ -143,7 +143,7 @@ public class BlockMask extends ABlockMask {
     }
 
     @Override
-    public Mask or(Mask mask) {
+    public Mask tryOr(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             for (int i = 0; i < ordinals.length; i++) {
@@ -157,7 +157,7 @@ public class BlockMask extends ABlockMask {
     }
 
     @Override
-    public Mask optimize() {
+    public Mask tryOptimize() {
         int setStates = 0;
         BlockState setState = null;
         BlockState unsetState = null;

@@ -660,8 +660,7 @@ public class UtilityCommands {
             return;
         }
         WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
-            double result = expression.evaluate(
-                    new double[]{}, WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
+            double result = expression.evaluateTimeout(WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
             String formatted = Double.isNaN(result) ? "NaN" : formatter.format(result);
             return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.LIGHT_PURPLE));
         }, null);

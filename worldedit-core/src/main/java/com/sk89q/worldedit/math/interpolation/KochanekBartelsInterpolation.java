@@ -42,6 +42,7 @@ public class KochanekBartelsInterpolation implements Interpolation {
     private Vector3[] coeffC;
     private Vector3[] coeffD;
     private double scaling;
+    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public KochanekBartelsInterpolation() {
         setNodes(Collections.<Node>emptyList());
@@ -135,8 +136,6 @@ public class KochanekBartelsInterpolation implements Interpolation {
     private Vector3 fastRetrieve(int index) {
         return nodes.get(index).getPosition();
     }
-
-    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
     public Vector3 getPosition(double position) {

@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.Fawe;
 import com.google.common.base.Function;
 
 import com.sk89q.worldedit.math.BlockVector3;
@@ -58,6 +59,30 @@ public class MaskIntersection extends AbstractMask {
         formArray();
     }
 
+    public static Mask of(Mask... masks) {
+        Set<Mask> set = new LinkedHashSet<>();
+        for (Mask mask : masks) {
+            if (mask == Masks.alwaysFalse()) {
+                return mask;
+            }
+            if (mask != null && mask != Masks.alwaysTrue()) {
+                if (mask.getClass() == MaskIntersection.class) {
+                    set.addAll(((MaskIntersection) mask).getMasks());
+                } else {
+                    set.add(mask);
+                }
+            }
+        }
+        switch (set.size()) {
+            case 0:
+                return Masks.alwaysTrue();
+            case 1:
+                return set.iterator().next();
+            default:
+                return new MaskIntersection(masks).optimize();
+        }
+    }
+
     /**
      * Create a new intersection.
      *
@@ -76,47 +101,68 @@ public class MaskIntersection extends AbstractMask {
     }
 
     public Function<Map.Entry<Mask, Mask>, Mask> pairingFunction() {
-        return input -> input.getKey().and(input.getValue());
+        return input -> input.getKey().tryCombine(input.getValue());
     }
 
-    private void optimizeMasks(Set<Mask> ignore) {
-        LinkedHashSet<Mask> newMasks = null;
-        for (Mask mask : masks) {
+    private boolean optimizeMasks(Set<Mask> ignore) {
+        boolean changed = false;
+        // Optimize sub masks
+        for (int i = 0; i < masksArray.length; i++) {
+            Mask mask = masksArray[i];
             if (ignore.contains(mask)) continue;
-            Mask newMask = mask.optimize();
+            Mask newMask = mask.tryOptimize();
             if (newMask != null) {
-                if (newMask != mask) {
-                    if (newMasks == null) newMasks = new LinkedHashSet<>();
-                    newMasks.add(newMask);
-                }
+                changed = true;
+                masksArray[i] = newMask;
             } else {
                 ignore.add(mask);
             }
-            if (newMasks != null) {
-                masks.clear();
-                masks.addAll(newMasks);
+        }
+        if (changed) {
+            masks.clear();
+            for (Mask mask : masksArray) masks.add(mask);
+        }
+        // Optimize this
+        boolean formArray = false;
+        for (int i = 0; i < masksArray.length; i++) {
+            Mask mask = masksArray[i];
+            if (mask.getClass() == this.getClass()) {
+                this.masks.remove(mask);
+                this.masks.addAll(((MaskIntersection) mask).getMasks());
+                formArray = true;
+                changed = true;
             }
         }
+        if (formArray) formArray();
+        return changed;
     }
 
     @Override
-    public Mask optimize() {
+    public Mask tryOptimize() {
+        int maxIteration = 1000;
         Set<Mask> optimized = new HashSet<>();
         Set<Map.Entry<Mask, Mask>> failedCombines = new HashSet<>();
         // Combine the masks
-        while (combine(pairingFunction(), failedCombines)) {
-        }
+        boolean changed = false;
+        while (changed |= combineMasks(pairingFunction(), failedCombines));
         // Optimize / combine
-        do optimizeMasks(optimized);
-        while (combine(pairingFunction(), failedCombines));
+        do changed |= optimizeMasks(optimized);
+        while (changed |= combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
+
+        if (maxIteration == 0) {
+            Fawe.debug("Failed optimize MaskIntersection");
+            for (Mask mask : masks) {
+                System.out.println(mask.getClass() + " / " + mask);
+            }
+        }
         // Return result
         formArray();
         if (masks.size() == 0) return Masks.alwaysTrue();
         if (masks.size() == 1) return masks.iterator().next();
-        return this;
+        return changed ? this : null;
     }
 
-    private boolean combine(Function<Map.Entry<Mask, Mask>, Mask> pairing, Set<Map.Entry<Mask, Mask>> failedCombines) {
+    private boolean combineMasks(Function<Map.Entry<Mask, Mask>, Mask> pairing, Set<Map.Entry<Mask, Mask>> failedCombines) {
         boolean hasOptimized = false;
         while (true) {
             Mask[] result = null;

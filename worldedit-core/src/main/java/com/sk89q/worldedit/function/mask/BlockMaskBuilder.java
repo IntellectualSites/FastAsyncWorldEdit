@@ -248,7 +248,10 @@ public class BlockMaskBuilder {
     private boolean optimizedStates = true;
 
     public boolean isEmpty() {
-        return Arrays.stream(bitSets).noneMatch(Objects::nonNull);
+        for (long[] bitSet : bitSets) {
+            if (bitSet != null) return false;
+        }
+        return true;
     }
 
     public BlockMaskBuilder() {

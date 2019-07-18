@@ -24,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.math.Vector3Impl;
 
 /**
  * Represents a location in a world with has a direction.
@@ -35,7 +36,7 @@ import com.sk89q.worldedit.math.Vector3;
  * {@link #equals(Object)} are subject to minor differences caused by
  * floating point errors.</p>
  */
-public class Location extends Vector3 {
+public class Location extends Vector3Impl {
 
     private final Extent extent;
     private final float pitch;
@@ -294,11 +295,11 @@ public class Location extends Vector3 {
 
     @Override public Location clampY(int min, int max) {
         checkArgument(min <= max, "minimum cannot be greater than maximum");
-        if (y < min) {
-            return new Location(extent, x, min, z);
+        if (getY() < min) {
+            return new Location(extent, getX(), min, getZ());
         }
-        if (y > max) {
-            return new Location(extent, x, max, z);
+        if (getY() > max) {
+            return new Location(extent, getX(), max, getZ());
         }
         return this;
 

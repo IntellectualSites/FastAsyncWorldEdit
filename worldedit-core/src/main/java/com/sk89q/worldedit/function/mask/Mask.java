@@ -75,16 +75,36 @@ public interface Mask {
         return null;
     }
 
-    default Mask optimize() {
+    /**
+     * Returns null if no optimization took place
+     * otherwise a new/same mask
+     * @return
+     */
+    default Mask tryOptimize() {
         return null;
+    }
+
+    default Mask tryCombine(Mask other) {
+        return null;
+    }
+
+    default Mask tryOr(Mask other) {
+        return null;
+    }
+
+    default Mask optimize() {
+        Mask value = tryOptimize();
+        return value == null ? this : value;
     }
 
     default Mask and(Mask other) {
-        return null;
+        Mask value = and(other);
+        return value == null ? new MaskIntersection(this, other) : value;
     }
 
     default Mask or(Mask other) {
-        return null;
+        Mask value = or(other);
+        return value == null ? new MaskUnion(this, other) : value;
     }
 
     default Mask inverse() {

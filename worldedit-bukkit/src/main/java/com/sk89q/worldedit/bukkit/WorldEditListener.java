@@ -21,6 +21,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.bekvon.bukkit.residence.commands.command;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -36,12 +37,15 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.inject.MapBackedValueStore;
 
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Handles all events thrown in relation to a Player
@@ -71,16 +75,22 @@ public class WorldEditListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
-        InjectedValueStore store = MapBackedValueStore.create();
-        store.injectValue(Key.of(Actor.class), context ->
-            Optional.of(plugin.wrapCommandSender(event.getPlayer())));
+        InjectedValueStore store = null;
         CommandManager commandManager = plugin.getWorldEdit().getPlatformManager().getPlatformCommandManager().getCommandManager();
-        event.getCommands().removeIf(name ->
-            // remove if in the manager and not satisfied
-            commandManager.getCommand(name)
-                .filter(command -> !command.getCondition().satisfied(store))
-                .isPresent()
-        );
+        Iterator<String> iter = event.getCommands().iterator();
+        while (iter.hasNext()) {
+            String name = iter.next();
+            Optional<Command> optional = commandManager.getCommand(name);
+            if (optional.isPresent()) {
+                if (store == null) {
+                    store = MapBackedValueStore.create();
+                    store.injectValue(Key.of(Actor.class), context -> Optional.of(plugin.wrapCommandSender(event.getPlayer())));
+                }
+                if (!optional.get().getCondition().satisfied(store)) {
+                    iter.remove();
+                }
+            }
+        }
     }
 
     /**

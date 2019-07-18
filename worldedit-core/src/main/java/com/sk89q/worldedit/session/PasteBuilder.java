@@ -21,7 +21,10 @@ package com.sk89q.worldedit.session;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.boydti.fawe.util.MaskTraverser;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -49,6 +52,7 @@ public class PasteBuilder {
     private boolean ignoreAirBlocks;
     private boolean copyEntities = true; // default because it used to be this way
     private boolean copyBiomes;
+    private RegionFunction canApply;
 
     /**
      * Create a new instance.
@@ -125,6 +129,7 @@ public class PasteBuilder {
         return this;
     }
     public PasteBuilder filter(RegionFunction function) {
+        this.canApply = function;
         return this;
     }
 
@@ -134,13 +139,33 @@ public class PasteBuilder {
      * @return the operation
      */
     public Operation build() {
-        BlockTransformExtent extent = new BlockTransformExtent(clipboard, transform);
+        Extent extent = clipboard;
+        if (!transform.isIdentity()) {
+            extent = new BlockTransformExtent(extent, transform);
+        }
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), targetExtent, to);
         copy.setTransform(transform);
+
+        copy.setCopyingEntities(copyEntities);
+        copy.setCopyingBiomes(copyBiomes && clipboard.hasBiomes());
+        if (this.canApply != null) {
+            copy.setFilterFunction(this.canApply);
+        }
         if (ignoreAirBlocks) {
-            copy.setSourceMask(sourceMask == Masks.alwaysTrue() ? new ExistingBlockMask(clipboard)
-                    : new MaskIntersection(sourceMask, new ExistingBlockMask(clipboard)));
-        } else {
+            sourceMask = MaskIntersection.of(sourceMask, new ExistingBlockMask(clipboard));
+        }
+        if (targetExtent instanceof EditSession) {
+            Mask esSourceMask = ((EditSession) targetExtent).getSourceMask();
+            if (esSourceMask == Masks.alwaysFalse()) {
+                return null;
+            }
+            if (esSourceMask != null) {
+                new MaskTraverser(esSourceMask).reset(extent);
+                ((EditSession) targetExtent).setSourceMask(null);
+                sourceMask = MaskIntersection.of(sourceMask, esSourceMask);
+            }
+        }
+        if (sourceMask != null && sourceMask != Masks.alwaysTrue()) {
             copy.setSourceMask(sourceMask);
         }
         copy.setCopyingEntities(copyEntities);

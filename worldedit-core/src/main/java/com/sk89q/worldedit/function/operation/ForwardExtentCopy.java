@@ -163,6 +163,10 @@ public class ForwardExtentCopy implements Operation {
         this.sourceMask = sourceMask;
     }
 
+    public void setFilterFunction(RegionFunction filterFunction) {
+        this.filterFunction = filterFunction;
+    }
+
     /**
      * Get the function that gets applied to all source blocks <em>after</em>
      * the copy has been made.

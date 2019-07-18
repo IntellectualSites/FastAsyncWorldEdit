@@ -135,12 +135,12 @@ public final class Masks {
         }
 
         @Override
-        public Mask and(Mask other) {
+        public Mask tryCombine(Mask other) {
             return other;
         }
 
         @Override
-        public Mask or(Mask other) {
+        public Mask tryOr(Mask other) {
             return this;
         }
     }
@@ -163,12 +163,12 @@ public final class Masks {
         }
 
         @Override
-        public Mask and(Mask other) {
+        public Mask tryCombine(Mask other) {
             return this;
         }
 
         @Override
-        public Mask or(Mask other) {
+        public Mask tryOr(Mask other) {
             return other;
         }
     }

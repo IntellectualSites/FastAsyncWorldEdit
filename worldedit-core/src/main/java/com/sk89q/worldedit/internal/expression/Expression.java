@@ -127,7 +127,48 @@ public class Expression {
         root = Parser.parse(tokens, this);
     }
 
+    public double evaluate(double x, double y, double z) throws EvaluationException {
+        return evaluateTimeout(WorldEdit.getInstance().getConfiguration().calculationTimeout, x, y, z);
+    }
+
+    public double evaluate() throws EvaluationException {
+        return evaluateFinal(WorldEdit.getInstance().getConfiguration().calculationTimeout);
+    }
+
     public double evaluate(double... values) throws EvaluationException {
+        return evaluateTimeout(WorldEdit.getInstance().getConfiguration().calculationTimeout, values);
+    }
+
+    public double evaluateTimeout(int timeout) throws EvaluationException {
+        if (root instanceof Constant) return root.getValue();
+        return evaluateFinal(timeout);
+    }
+
+    public double evaluateTimeout(int timeout, double x, double y) throws EvaluationException {
+        if (root instanceof Constant) return root.getValue();
+        variableArray[0].value = x;
+        variableArray[1].value = y;
+        return evaluateFinal(timeout);
+    }
+
+    public double evaluateTimeout(int timeout, double x, double y, double z) throws EvaluationException {
+        if (root instanceof Constant) return root.getValue();
+        variableArray[0].value = x;
+        variableArray[1].value = y;
+        variableArray[2].value = z;
+        return evaluateFinal(timeout);
+    }
+
+    public double evaluateTimeout(int timeout, double... values) throws EvaluationException {
+        if (root instanceof Constant) return root.getValue();
+        for (int i = 0; i < values.length; i++) {
+            Variable var = variableArray[i];
+            var.value = values[i];
+        }
+        return evaluateFinal(timeout);
+    }
+
+    public double evaluate(double[] values, int timeout) throws EvaluationException {
         if (root instanceof Constant) {
             return root.getValue();
         }
@@ -135,21 +176,10 @@ public class Expression {
             Variable var = variableArray[i];
             var.value = values[i];
         }
-        pushInstance();
-        return evaluate(values, WorldEdit.getInstance().getConfiguration().calculationTimeout);
+        return evaluateFinal(timeout);
     }
 
-    public double evaluate(double[] values, int timeout) throws EvaluationException {
-        for (int i = 0; i < values.length; ++i) {
-            final String variableName = variableNames[i];
-            final RValue invokable = variables.get(variableName);
-            if (!(invokable instanceof Variable)) {
-                throw new EvaluationException(invokable.getPosition(), "Tried to assign constant " + variableName + ".");
-            }
-
-            ((Variable) invokable).value = values[i];
-        }
-
+    private double evaluateFinal(int timeout) throws EvaluationException {
         try {
             if (timeout < 0) {
                 return evaluateRoot();

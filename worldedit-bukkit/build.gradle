@@ -18,6 +18,7 @@ configurations.all { Configuration it ->
 dependencies {
     compile ('net.milkbowl.vault:VaultAPI:1.7')
     api project(':worldedit-core')
+    api project(':worldedit-libs:core') // TODO remove once core can compile
     api project(':worldedit-libs:bukkit')
     compileOnly 'com.sk89q:dummypermscompat:1.10'
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'

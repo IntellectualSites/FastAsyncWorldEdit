@@ -23,7 +23,7 @@ public class VoxelList {
     }
 
     public void add(BlockMask mask) {
-        this.mask = (BlockMask) mask.and(mask);
+        this.mask = (BlockMask) mask.tryCombine(mask);
     }
 
     /**
@@ -37,7 +37,7 @@ public class VoxelList {
     }
 
     public boolean removeValue(final BlockMask state) {
-        this.mask = (BlockMask) mask.and(state.inverse());
+        this.mask = (BlockMask) mask.tryCombine(state.inverse());
         return true;
     }
 

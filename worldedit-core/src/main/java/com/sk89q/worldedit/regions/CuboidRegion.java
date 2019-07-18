@@ -546,7 +546,12 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public BlockVector2 next() {
-                if (!hasNext()) throw new NoSuchElementException();
+                if (!hasNext()) throw new NoSuchElementException() {
+                    @Override
+                    public synchronized Throwable fillInStackTrace() {
+                        return this;
+                    }
+                };
                 BlockVector2 answer = BlockVector2.at(nextX, nextZ);
                 if (++nextX > max.getBlockX()) {
                     nextX = min.getBlockX();

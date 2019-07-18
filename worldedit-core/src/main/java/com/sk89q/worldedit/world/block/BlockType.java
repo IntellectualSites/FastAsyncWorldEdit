@@ -137,7 +137,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return the properties
      */
     public List<? extends Property<?>> getProperties() {
-        return ImmutableList.copyOf(this.getPropertyMap().values());
+        return this.settings.propertiesList; // stop changing this
     }
 
     @Deprecated

@@ -20,19 +20,8 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.parser.mask.BiomeMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockCategoryMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.BlockStateMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.BlocksMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.DefaultMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ExistingMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.LazyRegionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.NegateMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.OffsetMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.RegionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.SolidMaskParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;

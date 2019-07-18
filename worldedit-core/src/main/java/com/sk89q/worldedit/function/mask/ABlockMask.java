@@ -2,14 +2,12 @@ package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public abstract class ABlockMask extends AbstractExtentMask {
     public ABlockMask(Extent extent) {
@@ -45,7 +43,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask and(Mask mask) {
+    public Mask tryCombine(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             BlockMask newMask = new BlockMask(getExtent());
@@ -56,7 +54,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
                     }
                 }
             }
-            Mask tmp = newMask.optimize();
+            Mask tmp = newMask.tryOptimize();
             if (tmp == null) tmp = newMask;
             return tmp;
         }
@@ -64,7 +62,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
     }
 
     @Override
-    public Mask or(Mask mask) {
+    public Mask tryOr(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             BlockMask newMask = new BlockMask(getExtent());
@@ -75,7 +73,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
                     }
                 }
             }
-            Mask tmp = newMask.optimize();
+            Mask tmp = newMask.tryOptimize();
             if (tmp == null) tmp = newMask;
             return tmp;
         }

@@ -392,7 +392,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 shr(int x, int y, int z) {
-        return at(this.x >> x, this.y >> y, this.z >> z);
+        return at(this.getX() >> x, this.getY() >> y, this.getZ() >> z);
     }
 
     /**
@@ -414,7 +414,7 @@ public abstract class BlockVector3 {
      * @return a new vector
      */
     public BlockVector3 shl(int x, int y, int z) {
-        return at(this.x << x, this.y << y, this.z << z);
+        return at(this.getX() << x, this.getY() << y, this.getZ() << z);
     }
 
     /**
