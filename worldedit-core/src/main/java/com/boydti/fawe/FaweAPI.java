@@ -1,20 +1,18 @@
 package com.boydti.fawe;
 
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.example.NMSMappedFaweQueue;
-import com.boydti.fawe.example.NMSRelighter;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.exception.FaweException;
+import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MemUtil;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
@@ -148,7 +146,7 @@ public class FaweAPI {
      * @param aliases The aliases to give the command (or none)
      */
     public static void registerCommands(Object clazz, String... aliases) {
-        PlatformCommandManager.getInstance().registerCommands(clazz, aliases);
+//        PlatformCommandManager.getInstance().registerCommands(clazz, aliases); TODO NOT IMPLEMENTED
     }
 
     /**
@@ -166,23 +164,23 @@ public class FaweAPI {
         return FawePlayer.wrap(obj);
     }
 
-    public static FaweQueue createQueue(String worldName, boolean autoqueue) {
-        return SetQueue.IMP.getNewQueue(worldName, true, autoqueue);
-    }
-
     /**
-     * You can either use a FaweQueue or an EditSession to change blocks<br>
-     * - The FaweQueue skips a bit of overhead so it's faster<br>
+     * You can either use a IQueueExtent or an EditSession to change blocks<br>
+     * - The IQueueExtent skips a bit of overhead so it's marginally faster<br>
      * - The WorldEdit EditSession can do a lot more<br>
-     * Remember to enqueue it when you're done!<br>
+     * Remember to commit when you're done!<br>
      *
      * @param world     The name of the world
      * @param autoqueue If it should start dispatching before you enqueue it.
      * @return
      * @see FaweQueue#enqueue()
      */
-    public static FaweQueue createQueue(World world, boolean autoqueue) {
-        return SetQueue.IMP.getNewQueue(world, true, autoqueue);
+    public static IQueueExtent createQueue(World world, boolean autoqueue) {
+        IQueueExtent queue = Fawe.get().getQueueHandler().getQueue(world);
+        if (!autoqueue) {
+            queue.disableQueue();
+        }
+        return queue;
     }
 
     public static World getWorld(String worldName) {
@@ -416,19 +414,10 @@ public class FaweAPI {
         return (version[0] > major) || ((version[0] == major) && (version[1] > minor)) || ((version[0] == major) && (version[1] == minor) && (version[2] >= minor2));
     }
 
-    @Deprecated
-    public static int fixLighting(String world, Region selection) {
-        return fixLighting(world, selection, FaweQueue.RelightMode.ALL);
-    }
 
     @Deprecated
-    public static int fixLighting(String world, Region selection, final FaweQueue.RelightMode mode) {
-        return fixLighting(world, selection, null, mode);
-    }
-
-    @Deprecated
-    public static int fixLighting(String world, Region selection, @Nullable FaweQueue queue, final FaweQueue.RelightMode mode) {
-        return fixLighting(getWorld(world), selection, queue, mode);
+    public static int fixLighting(World world, Region selection) {
+        return fixLighting(world, selection, null);
     }
 
     /**
@@ -441,7 +430,7 @@ public class FaweAPI {
      * @param selection (assumes cuboid)
      * @return
      */
-    public static int fixLighting(World world, Region selection, @Nullable FaweQueue queue, final FaweQueue.RelightMode mode) {
+    public static int fixLighting(World world, Region selection, @Nullable IQueueExtent queue) {
         final BlockVector3 bot = selection.getMinimumPoint();
         final BlockVector3 top = selection.getMaximumPoint();
 
@@ -452,40 +441,20 @@ public class FaweAPI {
         final int maxZ = top.getBlockZ() >> 4;
 
         int count = 0;
-        if (queue == null) {
-            queue = SetQueue.IMP.getNewQueue(world, true, false);
-        }
+        if (queue == null) queue = createQueue(world, false);
         // Remove existing lighting first
-        if (queue instanceof NMSMappedFaweQueue) {
-            final NMSMappedFaweQueue nmsQueue = (NMSMappedFaweQueue) queue;
-            NMSRelighter relighter = new NMSRelighter(nmsQueue);
+        if (queue instanceof LightingExtent) {
+            LightingExtent relighter = (LightingExtent) queue;
             for (int x = minX; x <= maxX; x++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    relighter.addChunk(x, z, null, 65535);
+                    relighter.relightChunk(x, z);
                     count++;
                 }
             }
-            if (mode != FaweQueue.RelightMode.NONE) {
-                boolean sky = nmsQueue.hasSky();
-                if (sky) {
-                    relighter.fixSkyLighting();
-                }
-                relighter.fixBlockLighting();
-            } else {
-                relighter.removeLighting();
-            }
-            relighter.sendChunks();
+        } else {
+            throw new UnsupportedOperationException("Queue is not " + LightingExtent.class);
         }
         return count;
-    }
-
-    /**
-     * Set a task to run when the global queue (SetQueue class) is empty
-     *
-     * @param whenDone
-     */
-    public static void addTask(final Runnable whenDone) {
-        SetQueue.IMP.addEmptyTask(whenDone);
     }
 
     /**

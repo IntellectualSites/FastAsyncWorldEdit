@@ -4,7 +4,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.Metadatable;
 import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
@@ -21,7 +20,6 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.Drawable;
@@ -745,22 +743,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public void setTile(int x, int y, int z, CompoundTag tag) {
-        // Not implemented
-    }
-
-    @Override
-    public void setEntity(int x, int y, int z, CompoundTag tag) {
-        // Not implemented
-    }
-
-    @Override
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        // Not implemented
-    }
-
-    @Override
-    public boolean setBiome(int x, int z, BiomeType biome) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         int index = z * getWidth() + x;
         if (index < 0 || index >= getArea()) return false;
         biomes.setByte(index, (byte) biome.getInternalId());

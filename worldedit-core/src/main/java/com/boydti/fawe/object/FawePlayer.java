@@ -119,31 +119,31 @@ public abstract class FawePlayer<T> extends Metadatable {
     }
 
     public int cancel(boolean close) {
-        Collection<FaweQueue> queues = SetQueue.IMP.getAllQueues();
+//        Collection<FaweQueue> queues = SetQueue.IMP.getAllQueues(); TODO NOT IMPLEMENTED
         int cancelled = 0;
-        clearActions();
-        for (FaweQueue queue : queues) {
-            Collection<EditSession> sessions = queue.getEditSessions();
-            for (EditSession session : sessions) {
-                FawePlayer currentPlayer = session.getPlayer();
-                if (currentPlayer == this) {
-                    if (session.cancel()) {
-                        cancelled++;
-                    }
-                }
-            }
-        }
-        VirtualWorld world = getSession().getVirtualWorld();
-        if (world != null) {
-            if (close) {
-                try {
-                    world.close(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            else world.clear();
-        }
+//        clearActions();
+//        for (FaweQueue queue : queues) {
+//            Collection<EditSession> sessions = queue.getEditSessions();
+//            for (EditSession session : sessions) {
+//                FawePlayer currentPlayer = session.getPlayer();
+//                if (currentPlayer == this) {
+//                    if (session.cancel()) {
+//                        cancelled++;
+//                    }
+//                }
+//            }
+//        }
+//        VirtualWorld world = getSession().getVirtualWorld();
+//        if (world != null) {
+//            if (close) {
+//                try {
+//                    world.close(false);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            else world.clear();
+//        }
         return cancelled;
     }
 

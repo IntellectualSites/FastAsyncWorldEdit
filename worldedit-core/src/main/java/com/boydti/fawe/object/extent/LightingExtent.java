@@ -12,4 +12,6 @@ public interface LightingExtent extends Extent {
     int getOpacity(int x, int y, int z);
 
     int getBrightness(int x, int y, int z);
+
+    public void relightChunk(int chunkX, int chunkZ);
 }
