@@ -42,6 +42,8 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.CommandQueued;
+import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.command.util.EntityRemover;
 import com.sk89q.worldedit.command.util.Logging;
@@ -102,7 +104,7 @@ import org.enginehub.piston.annotation.param.Switch;
 /**
  * Utility commands.
  */
-@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class, CommandQueuedConditionGenerator.Registration.class})
 @Command(aliases = {}, desc = "Various utility commands: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Utilities)")
 public class UtilityCommands {
 
@@ -174,9 +176,9 @@ public class UtilityCommands {
             name = "/cancel",
             aliases= {"fcancel"},
             desc = "Cancel your current command"
-            //queued = false
     )
     @CommandPermissions("fawe.cancel")
+    @CommandQueued(false)
     public void cancel(FawePlayer player) {
         int cancelled = player.cancel(false);
         BBC.WORLDEDIT_CANCEL_COUNT.send(player, cancelled);
@@ -213,8 +215,8 @@ public class UtilityCommands {
             " - Use , to OR multiple\n" +
             "e.g. #surfacespread[10][#existing],andesite\n" +
             "More Info: https://git.io/vSPmA"
-        //queued = false
     )
+    @CommandQueued(false)
     @CommandPermissions("worldedit.patterns")
     public void patterns(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, DefaultPatternParser.class, args);
@@ -229,8 +231,8 @@ public class UtilityCommands {
             " - Use & to AND multiple\n" +
             "e.g. >[stone,dirt],#light[0][5],$jungle\n" +
             "More Info: https://git.io/v9r4K"
-        //queued = false
     )
+    @CommandQueued(false)
     @CommandPermissions("worldedit.masks")
     public void masks(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, DefaultMaskParser.class, args);
@@ -244,8 +246,8 @@ public class UtilityCommands {
             " - Use , to OR multiple\n" +
             " - Use & to AND multiple\n" +
             "More Info: https://git.io/v9KHO",
-        queued = false
     )
+    @CommandQueued(false)
     @CommandPermissions("worldedit.transforms")
     public void transforms(Player player, LocalSession session, CommandContext args) throws WorldEditException {
         displayModifierHelp(player, DefaultTransformParser.class, args);

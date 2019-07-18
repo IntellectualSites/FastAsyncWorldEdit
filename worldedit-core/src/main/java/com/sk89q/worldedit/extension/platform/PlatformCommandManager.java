@@ -84,6 +84,8 @@ import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
+import com.sk89q.worldedit.command.util.CommandQueued;
+import com.sk89q.worldedit.command.util.CommandQueuedCondition;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
 import com.sk89q.worldedit.entity.Entity;
@@ -294,121 +296,122 @@ public final class PlatformCommandManager {
 
     private void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
-            registerSubCommands(
-                "schematic",
-                ImmutableList.of("schem", "/schematic", "/schem"),
-                "Schematic commands for saving/loading areas",
-                SchematicCommandsRegistration.builder(),
-                new SchematicCommands(worldEdit)
-            );
-            registerSubCommands(
-                "snapshot",
-                ImmutableList.of("snap"),
-                "Snapshot commands for restoring backups",
-                SnapshotCommandsRegistration.builder(),
-                new SnapshotCommands(worldEdit)
-            );
-            registerSubCommands(
-                "superpickaxe",
-                ImmutableList.of("pickaxe", "sp"),
-                "Super-pickaxe commands",
-                SuperPickaxeCommandsRegistration.builder(),
-                new SuperPickaxeCommands(worldEdit)
-            );
-            registerSubCommands(
-                    "brush",
-                    ImmutableList.of("br", "/brush", "/br"),
-                    "Brushing commands",
-                    BrushCommandsRegistration.builder(),
-                    new BrushCommands(worldEdit),
-                    (Consumer<CommandManager>) manager -> {
-                        PaintBrushCommands.register(commandManagerService, manager, registration);
-                        ApplyBrushCommands.register(commandManagerService, manager, registration);
-                    }
-            );
-            registerSubCommands(
-                "worldedit",
-                ImmutableList.of("we"),
-                "WorldEdit commands",
-                WorldEditCommandsRegistration.builder(),
-                new WorldEditCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                BiomeCommandsRegistration.builder(),
-                new BiomeCommands()
-            );
-            this.registration.register(
-                commandManager,
-                ChunkCommandsRegistration.builder(),
-                new ChunkCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                ClipboardCommandsRegistration.builder(),
-                new ClipboardCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                GeneralCommandsRegistration.builder(),
-                new GeneralCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                GenerationCommandsRegistration.builder(),
-                new GenerationCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                HistoryCommandsRegistration.builder(),
-                new HistoryCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                NavigationCommandsRegistration.builder(),
-                new NavigationCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                RegionCommandsRegistration.builder(),
-                new RegionCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                ScriptingCommandsRegistration.builder(),
-                new ScriptingCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                SelectionCommandsRegistration.builder(),
-                new SelectionCommands(worldEdit)
-            );
-            ExpandCommands.register(registration, commandManager, commandManagerService);
-            this.registration.register(
-                commandManager,
-                SnapshotUtilCommandsRegistration.builder(),
-                new SnapshotUtilCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                ToolCommandsRegistration.builder(),
-                new ToolCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                ToolUtilCommandsRegistration.builder(),
-                new ToolUtilCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                UtilityCommandsRegistration.builder(),
-                new UtilityCommands(worldEdit)
-            );
-            this.registration.register(
-                commandManager,
-                AnvilCommandsRegistration.builder(),
-                new AnvilCommands(worldEdit)
-            );
+            // TODO NOT IMPLEMENTED dunno why these have issues generating
+//            registerSubCommands(
+//                "schematic",
+//                ImmutableList.of("schem", "/schematic", "/schem"),
+//                "Schematic commands for saving/loading areas",
+//                SchematicCommandsRegistration.builder(),
+//                new SchematicCommands(worldEdit)
+//            );
+//            registerSubCommands(
+//                "snapshot",
+//                ImmutableList.of("snap"),
+//                "Snapshot commands for restoring backups",
+//                SnapshotCommandsRegistration.builder(),
+//                new SnapshotCommands(worldEdit)
+//            );
+//            registerSubCommands(
+//                "superpickaxe",
+//                ImmutableList.of("pickaxe", "sp"),
+//                "Super-pickaxe commands",
+//                SuperPickaxeCommandsRegistration.builder(),
+//                new SuperPickaxeCommands(worldEdit)
+//            );
+//            registerSubCommands(
+//                    "brush",
+//                    ImmutableList.of("br", "/brush", "/br"),
+//                    "Brushing commands",
+//                    BrushCommandsRegistration.builder(),
+//                    new BrushCommands(worldEdit),
+//                    (Consumer<CommandManager>) manager -> {
+//                        PaintBrushCommands.register(commandManagerService, manager, registration);
+//                        ApplyBrushCommands.register(commandManagerService, manager, registration);
+//                    }
+//            );
+//            registerSubCommands(
+//                "worldedit",
+//                ImmutableList.of("we"),
+//                "WorldEdit commands",
+//                WorldEditCommandsRegistration.builder(),
+//                new WorldEditCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                BiomeCommandsRegistration.builder(),
+//                new BiomeCommands()
+//            );
+//            this.registration.register(
+//                commandManager,
+//                ChunkCommandsRegistration.builder(),
+//                new ChunkCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                ClipboardCommandsRegistration.builder(),
+//                new ClipboardCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                GeneralCommandsRegistration.builder(),
+//                new GeneralCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                GenerationCommandsRegistration.builder(),
+//                new GenerationCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                HistoryCommandsRegistration.builder(),
+//                new HistoryCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                NavigationCommandsRegistration.builder(),
+//                new NavigationCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                RegionCommandsRegistration.builder(),
+//                new RegionCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                ScriptingCommandsRegistration.builder(),
+//                new ScriptingCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                SelectionCommandsRegistration.builder(),
+//                new SelectionCommands(worldEdit)
+//            );
+//            ExpandCommands.register(registration, commandManager, commandManagerService);
+//            this.registration.register(
+//                commandManager,
+//                SnapshotUtilCommandsRegistration.builder(),
+//                new SnapshotUtilCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                ToolCommandsRegistration.builder(),
+//                new ToolCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                ToolUtilCommandsRegistration.builder(),
+//                new ToolUtilCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                UtilityCommandsRegistration.builder(),
+//                new UtilityCommands(worldEdit)
+//            );
+//            this.registration.register(
+//                commandManager,
+//                AnvilCommandsRegistration.builder(),
+//                new AnvilCommands(worldEdit)
+//            );
         }
     }
 
@@ -533,12 +536,13 @@ public final class PlatformCommandManager {
         TaskManager.IMP.taskNow(() -> {
             int space0 = args.indexOf(' ');
             String arg0 = space0 == -1 ? args : args.substring(0, space0);
-            Optional<Command> cmd = commandManager.getCommand(arg0);
-            if (cmd.isPresent()) {
-                if (!cmd.queued()) {
-                    handleCommandOnCurrentThread(finalEvent);
-                    return;
-                }
+            Optional<Command> optional = commandManager.getCommand(arg0);
+            if (!optional.isPresent()) return;
+            Command cmd = optional.get();
+            CommandQueuedCondition queued = cmd.getCondition().as(CommandQueuedCondition.class).orElse(null);
+            if (queued != null && !queued.isQueued()) {
+                handleCommandOnCurrentThread(finalEvent);
+                return;
             }
             if (!fp.runAction(
                 () -> PlatformCommandManager.this.handleCommandOnCurrentThread(finalEvent), false, true)) {
