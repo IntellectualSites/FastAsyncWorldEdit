@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.collection;
 
+import com.boydti.fawe.FaweCache;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
@@ -20,7 +21,6 @@ import java.util.Set;
  *  - Grouping / iteration is by chunk section, and the y>z>x order
  */
 public final class MemBlockSet extends BlockSet {
-    private final static int CHUNK_LAYERS = 16;
     private final static int BITS_PER_LAYER = 4096;
     private final static int BITS_PER_WORD = 6;
     private final static int WORDS = BITS_PER_LAYER >> BITS_PER_WORD;
@@ -357,7 +357,7 @@ public final class MemBlockSet extends BlockSet {
                                     maxy = y + 1;
                                 }
                                 by = (Y << 4) + y;
-                                if (by == 255) return 255;
+                                if (by == FaweCache.WORLD_MAX_Y) return FaweCache.WORLD_MAX_Y;
                                 break outer;
                             }
                         }
@@ -825,8 +825,8 @@ public final class MemBlockSet extends BlockSet {
         private final IRow[] rows;
 
         public RowZ() {
-            this.rows = new IRow[CHUNK_LAYERS];
-            for (int i = 0; i < CHUNK_LAYERS; i++) rows[i] = NULL_ROW_Y;
+            this.rows = new IRow[FaweCache.CHUNK_LAYERS];
+            for (int i = 0; i < FaweCache.CHUNK_LAYERS; i++) rows[i] = NULL_ROW_Y;
         }
 
         @Override

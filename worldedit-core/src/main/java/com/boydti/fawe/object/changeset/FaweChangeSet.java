@@ -2,12 +2,11 @@ package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
-import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.FaweQueue;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
@@ -56,7 +55,7 @@ public abstract class FaweChangeSet implements ChangeSet {
     public FaweChangeSet(String world) {
         this.worldName = world;
         this.mainThread = (Fawe.get() == null) || Fawe.isMainThread();
-        this.layers = FaweChunk.HEIGHT >> 4;
+        this.layers = FaweCache.CHUNK_LAYERS;
     }
 
     public FaweChangeSet(World world) {
