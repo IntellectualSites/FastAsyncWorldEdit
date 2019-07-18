@@ -28,7 +28,7 @@ import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.TextureUtil;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -298,7 +298,7 @@ public class GeneralCommands {
             desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-texture")
-    public void gtexture(FawePlayer player, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "CommandContext", def = "") CommandContext context) throws WorldEditException, FileNotFoundException, ParameterException {
+    public void gtexture(FawePlayer player, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") InjectedValueAccess context) throws WorldEditException, FileNotFoundException, ParameterException {
         if (context == null || context.argsLength() == 0) {
             session.setTextureUtil(null);
             BBC.TEXTURE_DISABLED.send(player);
@@ -373,7 +373,7 @@ public class GeneralCommands {
             desc = "Set the global transform"
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
-    public void gtransform(Player player, EditSession editSession, LocalSession session, @Arg(name = "context", desc = "CommandContext", def = "") CommandContext context) throws WorldEditException {
+    public void gtransform(Player player, EditSession editSession, LocalSession session, @Arg(name = "context", desc = "InjectedValueAccess", def = "") InjectedValueAccess context) throws WorldEditException {
         if (context == null || context.argsLength() == 0) {
             session.setTransform(null);
             BBC.TRANSFORM_DISABLED.send(player);

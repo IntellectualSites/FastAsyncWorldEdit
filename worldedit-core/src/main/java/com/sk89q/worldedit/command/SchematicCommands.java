@@ -34,7 +34,7 @@ import com.boydti.fawe.object.schematic.StructureFormat;
 
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.chat.Message;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -566,7 +566,7 @@ public class SchematicCommands {
                     " -f <format> restricts by format\n"
     )
     @CommandPermissions("worldedit.schematic.show")
-    public void show(Player player, CommandContext args, @Switch(name='f', desc = "TODO") String formatName) {
+    public void show(Player player, InjectedValueAccess args, @Switch(name='f', desc = "TODO") String formatName) {
         FawePlayer fp = FawePlayer.wrap(player);
         if (args.argsLength() == 0) {
             if (fp.getSession().getVirtualWorld() != null) fp.setVirtualWorld(null);
@@ -627,7 +627,7 @@ public class SchematicCommands {
         descFooter = "Note: Format is not fully verified until loading."
     )
     @CommandPermissions("worldedit.schematic.list")
-    public void list(FawePlayer fp, Actor actor, CommandContext args,
+    public void list(FawePlayer fp, Actor actor, InjectedValueAccess args,
                      @ArgFlag(name = 'p', desc = "Page to view.", def = "1")
                          int page,
         @Switch(name = 'f', desc = "Restricts by format.")

@@ -489,7 +489,7 @@ public abstract class CommandsManager<T> {
                 newFlags.add(flags[i]);
             }
 
-            CommandContext context = new CommandContext(newArgs, valueFlags);
+            InjectedValueAccess context = new InjectedValueAccess(newArgs, valueFlags);
 
             if (context.argsLength() < cmd.min()) {
                 throw new CommandUsageException("Too few arguments.", getUsage(args, level, cmd));

@@ -1,7 +1,6 @@
 package com.boydti.fawe.object;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
@@ -11,12 +10,11 @@ import com.boydti.fawe.object.task.SimpleAsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -53,9 +51,7 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.jetbrains.annotations.NotNull;
 
@@ -151,19 +147,20 @@ public abstract class FawePlayer<T> extends Metadatable {
         return cancelled;
     }
 
-    private void setConfirmTask(@NotNull Runnable task, CommandContext context, String command) {
+    private void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context, String command) {
+        CommandEvent event = new CommandEvent(getPlayer(), command);
         if (task != null) {
             Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
                 task.run();
                 return null;
-            }, context.getLocals());
+            }, context, getPlayer(), getSession(), event);
             setMeta("cmdConfirm", newTask);
         } else {
-            setMeta("cmdConfirm", new CommandEvent(getPlayer(), command));
+            setMeta("cmdConfirm", event);
         }
     }
 
-    public void checkConfirmation(@NotNull Runnable task, String command, int times, int limit, CommandContext context) throws RegionOperationException {
+    public void checkConfirmation(@NotNull Runnable task, String command, int times, int limit, InjectedValueAccess context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (times > limit) {
                 setConfirmTask(task, context, command);
@@ -174,7 +171,7 @@ public abstract class FawePlayer<T> extends Metadatable {
         task.run();
     }
 
-    public void checkConfirmationRadius(@NotNull Runnable task, String command, int radius, CommandContext context) throws RegionOperationException {
+    public void checkConfirmationRadius(@NotNull Runnable task, String command, int radius, InjectedValueAccess context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (radius > 0) {
                 if (radius > 448) {
@@ -187,7 +184,7 @@ public abstract class FawePlayer<T> extends Metadatable {
         task.run();
     }
 
-    public void checkConfirmationStack(@NotNull Runnable task, String command, Region region, int times, CommandContext context) throws RegionOperationException {
+    public void checkConfirmationStack(@NotNull Runnable task, String command, Region region, int times, InjectedValueAccess context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
             	BlockVector3 min = region.getMinimumPoint();
@@ -204,7 +201,7 @@ public abstract class FawePlayer<T> extends Metadatable {
         task.run();
     }
 
-    public void checkConfirmationRegion(@NotNull Runnable task, String command, Region region, CommandContext context) throws RegionOperationException {
+    public void checkConfirmationRegion(@NotNull Runnable task, String command, Region region, InjectedValueAccess context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
             	BlockVector3 min = region.getMinimumPoint();
@@ -359,28 +356,6 @@ public abstract class FawePlayer<T> extends Metadatable {
      */
     public World getWorld() {
         return getPlayer().getWorld();
-    }
-
-    public FaweQueue getFaweQueue(boolean autoQueue) {
-        return getFaweQueue(true, autoQueue);
-    }
-
-    public FaweQueue getFaweQueue(boolean fast, boolean autoQueue) {
-        CFICommands.CFISettings settings = this.getMeta("CFISettings");
-        if (settings != null && settings.hasGenerator()) {
-            return settings.getGenerator();
-        } else {
-            return SetQueue.IMP.getNewQueue(getWorld(), true, autoQueue);
-        }
-    }
-
-    public FaweQueue getMaskedFaweQueue(boolean autoQueue) {
-        FaweQueue queue = getFaweQueue(autoQueue);
-        Region[] allowedRegions = getCurrentRegions();
-        if (allowedRegions.length == 1 && allowedRegions[0].isGlobal()) {
-            return queue;
-        }
-        return new MaskedFaweQueue(queue, allowedRegions);
     }
 
     /**

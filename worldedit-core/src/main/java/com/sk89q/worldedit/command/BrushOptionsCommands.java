@@ -13,7 +13,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -29,7 +29,7 @@ import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.command.binding.Range;
+import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
@@ -136,7 +136,7 @@ public class BrushOptionsCommands extends MethodCommands {
                     " -p <page> prints the requested page\n"
     )
     @CommandPermissions("worldedit.brush.list")
-    public void list(Actor actor, CommandContext args, @Switch(name='p', desc = "TODO") @Arg(name = "page", desc = "int", def = "1") int page) throws WorldEditException {
+    public void list(Actor actor, InjectedValueAccess args, @Switch(name='p', desc = "TODO") @Arg(name = "page", desc = "int", def = "1") int page) throws WorldEditException {
         String baseCmd = Commands.getAlias(BrushCommands.class, "brush") + " " + Commands.getAlias(BrushOptionsCommands.class, "loadbrush");
         File dir = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
         UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
@@ -153,7 +153,7 @@ public class BrushOptionsCommands extends MethodCommands {
             aliases = {"/none"},
             desc = "Unbind a bound tool from your current item"
 )
-    public void none(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void none(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         session.setTool(player, null);
         BBC.TOOL_NONE.send(player);
     }
@@ -164,7 +164,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Toggle the super pickaxe function"
     )
     @CommandPermissions("worldedit.superpickaxe")
-    public void togglePickaxe(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void togglePickaxe(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         String newState = args.getString(0, null);
         if (session.hasSuperPickAxe()) {
             if ("on".equals(newState)) {
@@ -191,7 +191,7 @@ public class BrushOptionsCommands extends MethodCommands {
             descFooter = "Set the right click brush"
 )
     @CommandPermissions("worldedit.brush.primary")
-    public void primary(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void primary(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         BrushTool tool = session.getBrushTool(player, false);
         session.setTool(item, null, player);
@@ -210,7 +210,7 @@ public class BrushOptionsCommands extends MethodCommands {
             descFooter = "Set the left click brush"
 )
     @CommandPermissions("worldedit.brush.secondary")
-    public void secondary(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void secondary(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         BrushTool tool = session.getBrushTool(player, false);
         session.setTool(item, null, player);
@@ -269,7 +269,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Set the targeting mask"
     )
     @CommandPermissions("worldedit.brush.targetmask")
-    public void targetMask(Player player, EditSession editSession, LocalSession session, CommandContext context) throws WorldEditException {
+    public void targetMask(Player player, EditSession editSession, LocalSession session, InjectedValueAccess context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             BBC.BRUSH_NONE.send(player);
@@ -306,7 +306,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Toggle between different target modes"
     )
     @CommandPermissions("worldedit.brush.scroll")
-    public void scroll(Player player, EditSession editSession, LocalSession session, @Optional @Switch(name='h', desc = "TODO") boolean offHand, CommandContext args) throws WorldEditException {
+    public void scroll(Player player, EditSession editSession, LocalSession session, @Optional @Switch(name='h', desc = "TODO") boolean offHand, InjectedValueAccess args) throws WorldEditException {
         BrushTool bt = session.getBrushTool(player, false);
         if (bt == null) {
             BBC.BRUSH_NONE.send(player);
@@ -331,7 +331,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Set the brush destination mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
-    public void mask(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, CommandContext context) throws WorldEditException {
+    public void mask(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, InjectedValueAccess context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(BBC.BRUSH_NONE.f());
@@ -362,7 +362,7 @@ public class BrushOptionsCommands extends MethodCommands {
             descFooter = "Set the brush source mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
-    public void smask(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, CommandContext context) throws WorldEditException {
+    public void smask(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, InjectedValueAccess context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(BBC.BRUSH_NONE.f());
@@ -391,7 +391,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Set the brush transform"
     )
     @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
-    public void transform(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, CommandContext context) throws WorldEditException {
+    public void transform(Player player, LocalSession session, EditSession editSession, @Optional @Switch(name='h', desc = "TODO") boolean offHand, InjectedValueAccess context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(BBC.BRUSH_NONE.f());
@@ -421,7 +421,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Set the brush material"
 )
     @CommandPermissions("worldedit.brush.options.material")
-    public void material(Player player, EditSession editSession, LocalSession session, Pattern pattern, @Switch(name='h', desc = "TODO") boolean offHand, CommandContext context) throws WorldEditException {
+    public void material(Player player, EditSession editSession, LocalSession session, Pattern pattern, @Switch(name='h', desc = "TODO") boolean offHand, InjectedValueAccess context) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(BBC.BRUSH_NONE.f());
@@ -444,7 +444,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Set the brush range"
 )
     @CommandPermissions("worldedit.brush.options.range")
-    public void range(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void range(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         int range = Math.max(0, Math.min(256, args.getInteger(0)));
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
@@ -460,7 +460,7 @@ public class BrushOptionsCommands extends MethodCommands {
             desc = "Set the brush size"
 )
     @CommandPermissions("worldedit.brush.options.size")
-    public void size(Player player, LocalSession session, CommandContext args, @Switch(name='h', desc = "TODO") boolean offHand) throws WorldEditException {
+    public void size(Player player, LocalSession session, InjectedValueAccess args, @Switch(name='h', desc = "TODO") boolean offHand) throws WorldEditException {
         int radius = args.getInteger(0);
         worldEdit.checkMaxBrushRadius(radius);
         BrushTool tool = session.getBrushTool(player, false);

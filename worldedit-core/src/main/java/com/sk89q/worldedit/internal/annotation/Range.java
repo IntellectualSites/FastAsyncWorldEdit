@@ -17,9 +17,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.util.command.binding;
+package com.sk89q.worldedit.internal.annotation;
 
-import com.sk89q.worldedit.util.command.parametric.ArgumentStack;
+import com.sk89q.worldedit.util.command.binding.PrimitiveBindings;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -27,15 +27,26 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates a {@link String} parameter will call {@link ArgumentStack#remaining()} and
- * therefore consume all remaining arguments.
+ * Specifies a range of values for numbers.
  * 
- * <p>This should only be used at the end of a list of parameters (of parameters that
- * need to consume from the stack of arguments), otherwise following parameters will
- * have no values left to consume.</p>
+ * @see PrimitiveBindings a user of this annotation as a modifier
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface Text {
+public @interface Range {
+    
+    /**
+     * The minimum value that the number can be at, inclusive.
+     * 
+     * @return the minimum value
+     */
+    double min() default Double.MIN_VALUE;
+
+    /**
+     * The maximum value that the number can be at, inclusive.
+     * 
+     * @return the maximum value
+     */
+    double max() default Double.MAX_VALUE;
 
 }

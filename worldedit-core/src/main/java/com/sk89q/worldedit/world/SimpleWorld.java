@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.world;
 
-import com.boydti.fawe.util.SetQueue;
+import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -105,7 +105,7 @@ public interface SimpleWorld extends World {
 
     @Override
     default boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
-        SetQueue.IMP.addTask(() -> playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4));
+        Fawe.get().getQueueHandler().sync(() -> playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4));
         return true;
     }
 

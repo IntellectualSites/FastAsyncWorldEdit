@@ -42,36 +42,36 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.ApplyBrushCommands;
 import com.sk89q.worldedit.command.BiomeCommands;
-import com.sk89q.worldedit.command.BiomeCommandsRegistration;
+//import com.sk89q.worldedit.command.BiomeCommandsRegistration;
 import com.sk89q.worldedit.command.BrushCommands;
 import com.sk89q.worldedit.command.ChunkCommands;
-import com.sk89q.worldedit.command.ChunkCommandsRegistration;
+//import com.sk89q.worldedit.command.ChunkCommandsRegistration;
 import com.sk89q.worldedit.command.ClipboardCommands;
-import com.sk89q.worldedit.command.ClipboardCommandsRegistration;
+//import com.sk89q.worldedit.command.ClipboardCommandsRegistration;
 import com.sk89q.worldedit.command.ExpandCommands;
 import com.sk89q.worldedit.command.GeneralCommands;
-import com.sk89q.worldedit.command.GeneralCommandsRegistration;
+//import com.sk89q.worldedit.command.GeneralCommandsRegistration;
 import com.sk89q.worldedit.command.GenerationCommands;
 import com.sk89q.worldedit.command.HistoryCommands;
-import com.sk89q.worldedit.command.HistoryCommandsRegistration;
+//import com.sk89q.worldedit.command.HistoryCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
-import com.sk89q.worldedit.command.NavigationCommandsRegistration;
+//import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
 import com.sk89q.worldedit.command.RegionCommands;
 import com.sk89q.worldedit.command.SchematicCommands;
-import com.sk89q.worldedit.command.SchematicCommandsRegistration;
+//import com.sk89q.worldedit.command.SchematicCommandsRegistration;
 import com.sk89q.worldedit.command.ScriptingCommands;
 import com.sk89q.worldedit.command.SelectionCommands;
 import com.sk89q.worldedit.command.SnapshotCommands;
-import com.sk89q.worldedit.command.SnapshotCommandsRegistration;
+//import com.sk89q.worldedit.command.SnapshotCommandsRegistration;
 import com.sk89q.worldedit.command.SnapshotUtilCommands;
 import com.sk89q.worldedit.command.SuperPickaxeCommands;
-import com.sk89q.worldedit.command.SuperPickaxeCommandsRegistration;
+//import com.sk89q.worldedit.command.SuperPickaxeCommandsRegistration;
 import com.sk89q.worldedit.command.ToolCommands;
 import com.sk89q.worldedit.command.ToolUtilCommands;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.command.WorldEditCommands;
-import com.sk89q.worldedit.command.WorldEditCommandsRegistration;
+//import com.sk89q.worldedit.command.WorldEditCommandsRegistration;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.argument.BooleanConverter;
 import com.sk89q.worldedit.command.argument.CommaSeparatedValuesConverter;
@@ -104,8 +104,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.scripting.CommandScriptLoader;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
-import com.sk89q.worldedit.util.command.CommandMapping;
-import com.sk89q.worldedit.util.command.parametric.AParametricCallable;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -137,6 +135,7 @@ import org.enginehub.piston.exception.ConditionFailedException;
 import org.enginehub.piston.exception.UsageException;
 import org.enginehub.piston.gen.CommandRegistration;
 import org.enginehub.piston.impl.CommandManagerServiceImpl;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.inject.MapBackedValueStore;
@@ -250,16 +249,17 @@ public final class PlatformCommandManager {
                     });
             });
         globalInjectedValues.injectValue(Key.of(EditSession.class),
-            context -> {
-                LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
-                    .orElseThrow(() -> new IllegalStateException("No LocalSession"));
-                return context.injectedValue(Key.of(Player.class))
-                    .map(player -> {
-                        EditSession editSession = localSession.createEditSession(player);
-                        editSession.enableStandardMode();
-                        return editSession;
-                    });
-            });
+                context -> {
+                    LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
+                            .orElseThrow(() -> new IllegalStateException("No LocalSession"));
+                    return context.injectedValue(Key.of(Player.class))
+                            .map(player -> {
+                                EditSession editSession = localSession.createEditSession(player);
+                                editSession.enableStandardMode();
+                                return editSession;
+                            });
+                });
+        globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), context -> Optional.of(context));
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
@@ -581,14 +581,12 @@ public final class PlatformCommandManager {
         }
 
         ThrowableSupplier<Throwable> task =
-            () -> commandManager.execute(context,Lists.newArrayList(split));
+                () -> commandManager.execute(context,Lists.newArrayList(split));
 
         handleCommandTask(task, context, actor, session, event);
     }
 
-    public  Object handleCommandTask(ThrowableSupplier<Throwable> task,
-        MemoizingValueAccess context, @NotNull
-        Actor actor, @Nullable LocalSession session, CommandEvent event) {
+    public Object handleCommandTask(ThrowableSupplier<Throwable> task, InjectedValueAccess context, @NotNull Actor actor, @Nullable LocalSession session, CommandEvent event) {
         String[] split = parseArgs(event.getArguments())
             .map(Substring::getSubstring)
             .toArray(String[]::new);
@@ -602,7 +600,7 @@ public final class PlatformCommandManager {
             // exceptions without writing a hook into every dispatcher, we need to unwrap these
             // exceptions and rethrow their converted form, if their is one.
             try {
-                commandManager.execute(context, ImmutableList.copyOf(split));
+                return task.get();
             } catch (Throwable t) {
                 // Use the exception converter to convert the exception if any of its causes
                 // can be converted, otherwise throw the original exception
@@ -642,8 +640,13 @@ public final class PlatformCommandManager {
         } catch (Throwable t) {
             handleUnknownException(actor, t);
         } finally {
+            if (context instanceof MemoizingValueAccess) {
+                context = ((MemoizingValueAccess) context).snapshotMemory();
+            } else {
+                System.out.println("Invalid context " + context);
+            }
             Optional<EditSession> editSessionOpt =
-                context.snapshotMemory().injectedValue(Key.of(EditSession.class));
+                context.injectedValue(Key.of(EditSession.class));
 
             if (editSessionOpt.isPresent()) {
                 EditSession editSession = editSessionOpt.get();

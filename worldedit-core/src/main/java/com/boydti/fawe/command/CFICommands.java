@@ -23,7 +23,7 @@ import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import java.util.stream.IntStream;
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -839,7 +839,7 @@ public class CFICommands extends MethodCommands {
             desc = "Select a mask"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void mask(FawePlayer fp, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly, CommandContext context) throws ParameterException{
+    public void mask(FawePlayer fp, @Optional FawePrimitiveBinding.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name='w', desc = "TODO") boolean disableWhiteOnly, InjectedValueAccess context) throws ParameterException{
         CFISettings settings = assertSettings(fp);
         String[] split = getArguments(context).split(" ");
         int index = 2;
@@ -864,7 +864,7 @@ public class CFICommands extends MethodCommands {
             desc = "Select a pattern"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void pattern(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern", def = "") Pattern pattern, CommandContext context) throws ParameterException, CommandException {
+    public void pattern(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern", def = "") Pattern pattern, InjectedValueAccess context) throws ParameterException, CommandException {
         CFISettings settings = assertSettings(fp);
         String[] split = getArguments(context).split(" ");
         int index = 2;
@@ -904,7 +904,7 @@ public class CFICommands extends MethodCommands {
             desc = "Select an image"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void image(FawePlayer fp, @Optional FawePrimitiveBinding.ImageUri image, CommandContext context) throws ParameterException, CommandException {
+    public void image(FawePlayer fp, @Optional FawePrimitiveBinding.ImageUri image, InjectedValueAccess context) throws ParameterException, CommandException {
         CFISettings settings = getSettings(fp);
         String[] split = getArguments(context).split(" ");
         int index = 2;

@@ -13,7 +13,7 @@ import com.sk89q.worldedit.util.command.Description;
 import com.sk89q.worldedit.util.command.Dispatcher;
 import com.sk89q.worldedit.util.command.Parameter;
 import com.sk89q.worldedit.util.command.PrimaryAliasComparator;
-import com.sk89q.worldedit.util.command.binding.Range;
+import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.util.command.parametric.ParameterData;
 import java.lang.reflect.Type;
 import java.util.ArrayList;

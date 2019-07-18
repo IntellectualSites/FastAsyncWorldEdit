@@ -5,7 +5,7 @@ import com.boydti.fawe.jnbt.anvil.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.LocalSession;
@@ -34,7 +34,7 @@ public class CFICommand extends MethodCommands {
         desc = "Start CreateFromImage"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void cfi(FawePlayer fp, CommandContext context) throws CommandException, IOException {
+    public void cfi(FawePlayer fp, InjectedValueAccess context) throws CommandException, IOException {
         CFICommands.CFISettings settings = child.getSettings(fp);
         settings.popMessages(fp);
         dispatch(fp, settings, context);
@@ -47,7 +47,7 @@ public class CFICommand extends MethodCommands {
         }
     }
 
-    private void dispatch(FawePlayer fp, CFICommands.CFISettings settings, CommandContext context) throws CommandException {
+    private void dispatch(FawePlayer fp, CFICommands.CFISettings settings, InjectedValueAccess context) throws CommandException {
         if (!settings.hasGenerator()) {
             if (context.argsLength() == 0) {
                 String hmCmd = child.alias() + " ";

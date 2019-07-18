@@ -32,7 +32,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -72,8 +72,7 @@ import com.sk89q.worldedit.regions.CylinderRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.command.CommandMapping;
 import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.binding.Range;
-import com.sk89q.worldedit.util.command.parametric.Optional;
+import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -218,7 +217,7 @@ public class UtilityCommands {
     )
     @CommandQueued(false)
     @CommandPermissions("worldedit.patterns")
-    public void patterns(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void patterns(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         displayModifierHelp(player, DefaultPatternParser.class, args);
     }
 
@@ -234,7 +233,7 @@ public class UtilityCommands {
     )
     @CommandQueued(false)
     @CommandPermissions("worldedit.masks")
-    public void masks(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void masks(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         displayModifierHelp(player, DefaultMaskParser.class, args);
     }
 
@@ -249,11 +248,11 @@ public class UtilityCommands {
     )
     @CommandQueued(false)
     @CommandPermissions("worldedit.transforms")
-    public void transforms(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void transforms(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         displayModifierHelp(player, DefaultTransformParser.class, args);
     }
 
-    private void displayModifierHelp(Player player, Class<? extends FaweParser> clazz, CommandContext args) {
+    private void displayModifierHelp(Player player, Class<? extends FaweParser> clazz, InjectedValueAccess args) {
         FaweParser parser = FaweAPI.getParser(clazz);
         if (args.argsLength() == 0) {
             String base = getCommand().aliases()[0];
@@ -722,7 +721,7 @@ public class UtilityCommands {
         return null;
     }
 
-    public static void list(File dir, Actor actor, CommandContext args, @Range(min = 0) int page, String formatName, boolean playerFolder, String onClickCmd) {
+    public static void list(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, String formatName, boolean playerFolder, String onClickCmd) {
         list(dir, actor, args, page, -1, formatName, playerFolder, new RunnableVal3<Message, URI, String>() {
             @Override
             public void run(Message m, URI uri, String fileName) {
@@ -732,7 +731,7 @@ public class UtilityCommands {
         });
     }
 
-    public static void list(File dir, Actor actor, CommandContext args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, RunnableVal3<Message, URI, String> eachMsg) {
+    public static void list(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, RunnableVal3<Message, URI, String> eachMsg) {
         AtomicInteger pageInt = new AtomicInteger(page);
         List<File> fileList = new ArrayList<>();
         if (perPage == -1) perPage = actor instanceof Player ? 12 : 20; // More pages for console
@@ -799,7 +798,7 @@ public class UtilityCommands {
         m.send(actor);
     }
 
-    public static int getFiles(File dir, Actor actor, CommandContext args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
+    public static int getFiles(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
         Consumer<File> rootFunction = forEachFile;
 
         int len = args.argsLength();

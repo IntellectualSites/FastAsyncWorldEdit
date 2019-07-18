@@ -24,7 +24,7 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -80,7 +80,7 @@ public class ScriptingCommands {
         desc = ""
     )
     @CommandPermissions("fawe.setupdispatcher")
-    public void setupdispatcher(Player player, LocalSession session, final CommandContext args) throws WorldEditException {
+    public void setupdispatcher(Player player, LocalSession session, final InjectedValueAccess args) throws WorldEditException {
         PlatformCommandManager.getInstance().setupDispatcher();
     }
 
@@ -182,7 +182,7 @@ public class ScriptingCommands {
     )
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void execute(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void execute(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
         final String[] scriptArgs = args.getSlice(1);
         final String filename = args.getString(0);
 

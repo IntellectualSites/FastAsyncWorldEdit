@@ -37,7 +37,7 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -122,7 +122,7 @@ public class ClipboardCommands {
                      @Switch(name = 'b', desc = "Also copy biomes")
                              boolean copyBiomes,
                      @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                        Mask mask, CommandContext context) throws WorldEditException {
+                        Mask mask, InjectedValueAccess context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
@@ -242,7 +242,7 @@ public class ClipboardCommands {
                         boolean copyBiomes,
                     @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
                         Mask mask,
-                    CommandContext context) throws WorldEditException {
+                    InjectedValueAccess context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 

@@ -2,7 +2,7 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.Commands;
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.WorldEdit;
@@ -71,7 +71,7 @@ public class MethodCommands {
         return null;
     }
 
-    public String getArguments(CommandContext context) {
+    public String getArguments(InjectedValueAccess context) {
         if (context == null) return null;
         CommandLocals locals = context.getLocals();
         if (locals != null) {

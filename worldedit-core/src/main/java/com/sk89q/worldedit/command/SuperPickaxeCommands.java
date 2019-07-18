@@ -21,7 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
 import org.enginehub.piston.annotation.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -56,7 +56,7 @@ public class SuperPickaxeCommands {
             desc = "Enable the area super pickaxe pickaxe mode"
 )
     @CommandPermissions("worldedit.superpickaxe.area")
-    public void area(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void area(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
         int range = args.getInteger(0);
@@ -77,7 +77,7 @@ public class SuperPickaxeCommands {
             desc = "Enable the recursive super pickaxe pickaxe mode"
 )
     @CommandPermissions("worldedit.superpickaxe.recursive")
-    public void recursive(Player player, LocalSession session, CommandContext args) throws WorldEditException {
+    public void recursive(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
         double range = args.getDouble(0);

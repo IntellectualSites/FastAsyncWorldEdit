@@ -33,7 +33,7 @@ import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.minecraft.util.commands.CommandContext;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -44,7 +44,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.command.binding.Range;
+import com.sk89q.worldedit.internal.annotation.Range;
 import org.enginehub.piston.annotation.param.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.World;
@@ -220,7 +220,7 @@ public class HistoryCommands extends MethodCommands {
             int times,
         @Arg(name = "player", desc = "Undo this player's operations", def = "")
             String playerName,
-        CommandContext context) throws WorldEditException {
+        InjectedValueAccess context) throws WorldEditException {
         if (session.hasFastMode()) {
             BBC.COMMAND_UNDO_DISABLED.send(player);
             return;

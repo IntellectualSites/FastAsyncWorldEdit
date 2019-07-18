@@ -17,39 +17,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.util.command;
+package com.sk89q.worldedit.internal.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.regex.Pattern;
 
 /**
- * Provides information about a mapping between a command and its aliases.
+ * Used to validate a string.
+ * 
+ * @see PrimitiveBindings where this validation is used
  */
-public interface CommandMapping {
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface Validate {
+    
     /**
-     * Get the primary alias.
-     *
-     * @return the primary alias
+     * An optional regular expression that must match the string.
+     * 
+     * @see Pattern regular expression class
+     * @return the pattern
      */
-    String getPrimaryAlias();
-
-    /**
-     * Get a list of all aliases.
-     *
-     * @return aliases
-     */
-    String[] getAllAliases();
-
-    /**
-     * Get the callable
-     *
-     * @return the callable
-     */
-    CommandCallable getCallable();
-
-    /**
-     * Get the {@link Description} form the callable.
-     *
-     * @return the description
-     */
-    Description getDescription();
+    String regex() default "";
 
 }
