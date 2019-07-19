@@ -19,36 +19,25 @@
 
 package com.sk89q.worldedit.extent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.jnbt.anvil.generator.GenBase;
-import com.boydti.fawe.jnbt.anvil.generator.Resource;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
-import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import java.util.List;
 
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
@@ -206,11 +195,21 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         return 0;
     }
 
+    @Override
     public int getBrightness(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getBrightness(x, y, z);
         }
         return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
+    }
+
+    @Override
+    public void relightChunk(int chunkX, int chunkZ) {
+        if (extent instanceof LightingExtent) {
+            ((LightingExtent) extent).relightChunk(chunkX, chunkZ);
+        } else {
+            throw new UnsupportedOperationException("Cannot relight");
+        }
     }
 
     /*

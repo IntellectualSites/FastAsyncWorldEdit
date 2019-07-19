@@ -84,6 +84,7 @@ import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
+import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.command.util.CommandQueued;
 import com.sk89q.worldedit.command.util.CommandQueuedCondition;
 import com.sk89q.worldedit.command.util.PermissionCondition;
@@ -114,6 +115,8 @@ import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -128,7 +131,9 @@ import javax.annotation.Nullable;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.TextConfig;
+import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ArgumentConverters;
+import org.enginehub.piston.converter.ConversionResult;
 import org.enginehub.piston.exception.CommandException;
 import org.enginehub.piston.exception.CommandExecutionException;
 import org.enginehub.piston.exception.ConditionFailedException;
@@ -174,6 +179,11 @@ public final class PlatformCommandManager {
     private final WorldEditExceptionConverter exceptionConverter;
     private final CommandRegistrationHandler registration;
     private static PlatformCommandManager INSTANCE;
+
+    /*
+    Command types
+     */
+
 
     /**
      * Create a new instance.
@@ -523,6 +533,18 @@ public final class PlatformCommandManager {
         return new CommandArgParser(CommandArgParser.spaceSplit(input.substring(1))).parseArgs();
     }
 
+    public <T> Collection<T> parse(Class<T> clazz, String arguments, @Nullable Actor actor) {
+        List<T> def = Collections.emptyList();
+        Optional<ArgumentConverter<T>> converterOptional = commandManager.getConverter(Key.of(clazz));
+        if (converterOptional.isPresent()) {
+            ArgumentConverter<T> converter = converterOptional.get();
+            MemoizingValueAccess injectedValues = initializeInjectedValues(() -> arguments, actor);
+            ConversionResult<T> result = converter.convert(arguments, injectedValues);
+            return result.orElse(def);
+        }
+        return def;
+    }
+
     @Subscribe
     public void handleCommand(CommandEvent event) {
         Request.reset();
@@ -571,8 +593,6 @@ public final class PlatformCommandManager {
                 Request.request().setWorld(((World) extent));
             }
         }
-        LocalConfiguration config = worldEdit.getConfiguration();
-
         MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor);
 
         final FawePlayer fp = FawePlayer.wrap(actor);

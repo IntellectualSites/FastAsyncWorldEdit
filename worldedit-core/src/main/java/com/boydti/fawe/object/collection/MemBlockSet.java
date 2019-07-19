@@ -21,14 +21,13 @@ import java.util.Set;
  *  - Grouping / iteration is by chunk section, and the y>z>x order
  */
 public final class MemBlockSet extends BlockSet {
-    private final static int BITS_PER_LAYER = 4096;
-    private final static int BITS_PER_WORD = 6;
-    private final static int WORDS = BITS_PER_LAYER >> BITS_PER_WORD;
-    private final static IRow NULL_ROW_X = new NullRowX();
-    private final static IRow NULL_ROW_Z = new NullRowZ();
-    private final static IRow NULL_ROW_Y = new NullRowY();
-    private final IRow[] rows;
-    private final MutableBlockVector3 mutable;
+    public final static int BITS_PER_WORD = 6;
+    public final static int WORDS = FaweCache.BLOCKS_PER_LAYER >> BITS_PER_WORD;
+    public final static IRow NULL_ROW_X = new NullRowX();
+    public final static IRow NULL_ROW_Z = new NullRowZ();
+    public final static IRow NULL_ROW_Y = new NullRowY();
+    public final IRow[] rows;
+    public final MutableBlockVector3 mutable;
 
     public MemBlockSet() {
         this(16, 0, 0);
@@ -746,7 +745,7 @@ public final class MemBlockSet extends BlockSet {
         void apply(int x, int y, int z);
     }
 
-    private interface IRow {
+    public interface IRow {
         default boolean get(IRow[] rows, int x, int y, int z) { return false; }
         void set(IRow[] rows, int x, int y, int z);
         default boolean add(IRow[] rows, int x, int y, int z) {
@@ -760,7 +759,7 @@ public final class MemBlockSet extends BlockSet {
         default void clear(IRow[] rows, int x, int y, int z) { return; }
     }
 
-    private static final class NullRowX implements IRow {
+    public static final class NullRowX implements IRow {
         @Override
         public void set(IRow[] parent, int x, int y, int z) {
             IRow row = new RowX(parent.length);
@@ -769,7 +768,7 @@ public final class MemBlockSet extends BlockSet {
         }
     }
 
-    private static final class NullRowZ implements IRow {
+    public static final class NullRowZ implements IRow {
         @Override
         public void set(IRow[] parent, int x, int y, int z) {
             IRow row = new RowZ();
@@ -778,7 +777,7 @@ public final class MemBlockSet extends BlockSet {
         }
     }
 
-    private static final class NullRowY implements IRow {
+    public static final class NullRowY implements IRow {
         @Override
         public void set(IRow[] parent, int x, int y, int z) {
             IRow row = new RowY();
@@ -787,7 +786,7 @@ public final class MemBlockSet extends BlockSet {
         }
     }
 
-    private static final class RowX implements IRow {
+    public static final class RowX implements IRow {
         private final IRow[] rows;
 
         public RowX(int size) {
@@ -821,12 +820,12 @@ public final class MemBlockSet extends BlockSet {
         }
     }
 
-    private static final class RowZ implements IRow {
+    public static final class RowZ implements IRow {
         private final IRow[] rows;
 
         public RowZ() {
             this.rows = new IRow[FaweCache.CHUNK_LAYERS];
-            for (int i = 0; i < FaweCache.CHUNK_LAYERS; i++) rows[i] = NULL_ROW_Y;
+            reset();
         }
 
         @Override
@@ -853,9 +852,22 @@ public final class MemBlockSet extends BlockSet {
         public boolean remove(IRow[] parent, int x, int y, int z) {
             return this.rows[y >> 4].remove(this.rows, x, y, z);
         }
+
+        public boolean isEmpty() {
+            for (IRow row :rows) {
+                if (row instanceof RowY) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void reset() {
+            for (int i = 0; i < FaweCache.CHUNK_LAYERS; i++) rows[i] = NULL_ROW_Y;
+        }
     }
 
-    private static final class RowY implements IRow {
+    public static final class RowY implements IRow {
         private final long[] bits;
 
         public RowY() {

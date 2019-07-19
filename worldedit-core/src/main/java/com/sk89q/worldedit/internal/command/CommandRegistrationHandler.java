@@ -21,6 +21,7 @@ package com.sk89q.worldedit.internal.command;
 
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.gen.CommandCallListener;
 import org.enginehub.piston.gen.CommandRegistration;
@@ -30,6 +31,8 @@ import java.util.List;
 public class CommandRegistrationHandler {
 
     private static final CommandPermissionsConditionGenerator PERM_GEN = new CommandPermissionsConditionGenerator();
+    private static final CommandQueuedConditionGenerator QUEUED_GEN = new CommandQueuedConditionGenerator();
+
 
     private final List<CommandCallListener> callListeners;
 
@@ -43,7 +46,12 @@ public class CommandRegistrationHandler {
             .listeners(callListeners);
         if (registration instanceof CommandPermissionsConditionGenerator.Registration) {
             ((CommandPermissionsConditionGenerator.Registration) registration).commandPermissionsConditionGenerator(
-                PERM_GEN
+                    PERM_GEN
+            );
+        }
+        if (registration instanceof CommandQueuedConditionGenerator.Registration) {
+            ((CommandQueuedConditionGenerator.Registration) registration).commandQueuedConditionGenerator(
+                    QUEUED_GEN
             );
         }
         registration.build();

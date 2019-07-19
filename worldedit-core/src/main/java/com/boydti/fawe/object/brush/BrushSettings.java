@@ -4,7 +4,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.brush.scroll.ScrollAction;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BrushTool;
@@ -20,9 +19,7 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.Constant;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
-import com.sk89q.worldedit.util.command.CommandCallable;
-import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.ProcessedCallable;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -62,23 +59,15 @@ public class BrushSettings {
     }
 
     public static BrushSettings get(BrushTool tool, Player player, LocalSession session, Map<String, Object> settings) throws CommandException, InputParseException {
-        Dispatcher dispatcher = PlatformCommandManager.getInstance().getCommandManager();
-        Dispatcher brushDispatcher = (Dispatcher) (dispatcher.get("brush").getCallable());
-        if (brushDispatcher == null) {
-            return null;
-        }
+        PlatformCommandManager manager = PlatformCommandManager.getInstance();
         String constructor = (String) settings.get(SettingType.BRUSH.name());
         if (constructor == null) {
             return new BrushSettings();
         }
         String[] split = constructor.split(" ");
 
-        CommandCallable sphereCommand = ((ProcessedCallable) brushDispatcher.get(split[0]).getCallable()).getParent();
-        CommandLocals locals = new CommandLocals();
-        locals.put(Actor.class, player);
         String args = constructor.replaceAll(split[0] + "[ ]?", "");
-        String[] parentArgs = new String[]{"brush", split[0]};
-        BrushSettings bs = (BrushSettings) sphereCommand.call(args, locals, parentArgs);
+        BrushSettings bs = (BrushSettings) manager.parse(Brush.class, args, player);
         bs.constructor.put(SettingType.BRUSH, constructor);
         if (settings.containsKey(SettingType.PERMISSIONS.name())) {
             bs.permissions.addAll((Collection<? extends String>) settings.get(SettingType.PERMISSIONS.name()));

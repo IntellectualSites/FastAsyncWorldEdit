@@ -12,7 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public final class CommandQueuedConditionGenerator implements CommandConditionGenerator {
 
     public interface Registration {
-        Registration commandQueuedConditionGenerator(CommandPermissionsConditionGenerator generator);
+        Registration commandQueuedConditionGenerator(CommandQueuedConditionGenerator generator);
     }
 
     @Override

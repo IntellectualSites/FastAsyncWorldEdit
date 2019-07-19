@@ -1,27 +1,52 @@
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.object.mask.*;
-import org.enginehub.piston.annotation.Command;
+import com.boydti.fawe.object.mask.AdjacentAnyMask;
+import com.boydti.fawe.object.mask.AdjacentMask;
+import com.boydti.fawe.object.mask.AngleMask;
+import com.boydti.fawe.object.mask.BiomeMask;
+import com.boydti.fawe.object.mask.BlockLightMask;
+import com.boydti.fawe.object.mask.BrightnessMask;
+import com.boydti.fawe.object.mask.DataMask;
+import com.boydti.fawe.object.mask.ExtremaMask;
+import com.boydti.fawe.object.mask.IdDataMask;
+import com.boydti.fawe.object.mask.IdMask;
+import com.boydti.fawe.object.mask.LightMask;
+import com.boydti.fawe.object.mask.OpacityMask;
+import com.boydti.fawe.object.mask.ROCAngleMask;
+import com.boydti.fawe.object.mask.RadiusMask;
+import com.boydti.fawe.object.mask.RandomMask;
+import com.boydti.fawe.object.mask.SimplexMask;
+import com.boydti.fawe.object.mask.SkyLightMask;
+import com.boydti.fawe.object.mask.SurfaceMask;
+import com.boydti.fawe.object.mask.WallMask;
+import com.boydti.fawe.object.mask.XAxisMask;
+import com.boydti.fawe.object.mask.YAxisMask;
+import com.boydti.fawe.object.mask.ZAxisMask;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.*;
+import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
+import com.sk89q.worldedit.function.mask.ExpressionMask;
+import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.MaskUnion;
+import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.OffsetMask;
+import com.sk89q.worldedit.function.mask.RegionMask;
+import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.request.RequestSelection;
-import org.enginehub.piston.annotation.param.Switch;
-import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockType;
-
-import java.util.function.Predicate;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
 
 @Command(aliases = {"masks"},
         desc = "Help for the various masks. [More Info](https://git.io/v9r4K)",
@@ -77,7 +102,7 @@ public class MaskCommands extends MethodCommands {
     @Command(
             name = "#skylight",
             desc = "Restrict to specific sky light levels"
-)
+    )
     public Mask skylight(Extent extent, double min, double max) {
         return new SkyLightMask(extent, (int) min, (int) max);
     }

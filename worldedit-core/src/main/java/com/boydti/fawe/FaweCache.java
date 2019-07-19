@@ -36,10 +36,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class FaweCache implements Trimable {
-    public static int CHUNK_LAYERS = 16;
-    public static int WORLD_HEIGHT = CHUNK_LAYERS << 4;
-    public static int WORLD_MAX_Y = WORLD_HEIGHT - 1;
+public final class FaweCache implements Trimable {
+    public final static int BLOCKS_PER_LAYER = 4096;
+    public final static int CHUNK_LAYERS = 16;
+    public final static int WORLD_HEIGHT = CHUNK_LAYERS << 4;
+    public final static int WORLD_MAX_Y = WORLD_HEIGHT - 1;
 
 
     public static final char[] EMPTY_CHAR_4096 = new char[4096];
