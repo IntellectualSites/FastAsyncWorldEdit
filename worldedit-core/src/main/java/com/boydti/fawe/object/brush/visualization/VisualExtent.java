@@ -14,6 +14,8 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
+import java.util.concurrent.Future;
+
 public class VisualExtent extends AbstractDelegateExtent {
 
     private final IQueueExtent queue;
@@ -94,5 +96,9 @@ public class VisualExtent extends AbstractDelegateExtent {
         for (VisualChunk chunk : chunks.values()) {
             queue.sendBlockUpdate(chunk, players);
         }
+    }
+
+    public Future sendChunkUpdate(VisualChunk visualChunk) {
+        return null; // TODO NOT IMPLEMENTED
     }
 }

@@ -9,10 +9,8 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.SingleThreadQueueExtent;
-import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
-import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -43,6 +41,16 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     @Override
     public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
 //        block.flood(get, set, mask, block, );
+    }
+
+    @Override
+    public CompoundTag getTag(int x, int y, int z) {
+        return delegate.getFullBlock(this, x, y, z).getNbtData(); // TODO NOT IMPLEMENTED (add getTag delegate)
+    }
+
+    @Override
+    public boolean hasSection(int layer) {
+        return get != null && get.hasSection(layer);
     }
 
     @Override
@@ -157,7 +165,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     }
 
     @Override
-    public BiomeType getBiome(final int x, final int z) {
+    public BiomeType getBiomeType(final int x, final int z) {
         return delegate.getBiome(this, x, z);
     }
 
@@ -202,7 +210,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
         public BiomeType getBiome(final ChunkHolder chunk, final int x, final int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
-            return chunk.getBiome(x, z);
+            return chunk.getBiomeType(x, z);
         }
 
         @Override
@@ -266,7 +274,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
         public BiomeType getBiome(final ChunkHolder chunk, final int x, final int z) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
-            return chunk.getBiome(x, z);
+            return chunk.getBiomeType(x, z);
         }
 
         @Override

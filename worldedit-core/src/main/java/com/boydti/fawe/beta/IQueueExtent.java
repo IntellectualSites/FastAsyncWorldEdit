@@ -1,7 +1,7 @@
 package com.boydti.fawe.beta;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
-import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -82,18 +82,19 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
 
     default BiomeType getBiome(final int x, final int z) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
-        return chunk.getBiome(x & 15, z & 15);
+        return chunk.getBiomeType(x & 15, z & 15);
     }
 
     @Override
     default BlockVector3 getMinimumPoint() {
-        return getWorld().getMinimumPoint();
+        return BlockVector3.at(-30000000, 0, -30000000);
     }
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return getWorld().getMaximumPoint();
+        return BlockVector3.at(30000000, FaweCache.WORLD_MAX_Y, 30000000);
     }
+
     /**
      * Create a new root IChunk object<br>
      *  - Full chunks will be reused, so a more optimized chunk can be returned in that case<br>

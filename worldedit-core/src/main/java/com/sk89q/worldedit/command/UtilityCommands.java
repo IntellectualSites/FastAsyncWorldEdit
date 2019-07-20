@@ -104,7 +104,7 @@ import org.enginehub.piston.annotation.param.Switch;
  * Utility commands.
  */
 @CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class, CommandQueuedConditionGenerator.Registration.class})
-@Command(aliases = {}, desc = "Various utility commands: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Utilities)")
+//@Command(aliases = {}, desc = "Various utility commands: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Utilities)")
 public class UtilityCommands {
 
     private final WorldEdit we;
@@ -693,34 +693,6 @@ public class UtilityCommands {
         PrintCommandHelp.help(command, page, listSubCommands, we, actor);
     }
 
-    protected static CommandMapping detectCommand(Dispatcher dispatcher, String command, boolean isRootLevel) {
-        CommandMapping mapping;
-
-        // First try the command as entered
-        mapping = dispatcher.get(command);
-        if (mapping != null) {
-            return mapping;
-        }
-
-        // Then if we're looking at root commands and the user didn't use
-        // any slashes, let's try double slashes and then single slashes.
-        // However, be aware that there exists different single slash
-        // and double slash commands in WorldEdit
-        if (isRootLevel && !command.contains("/")) {
-            mapping = dispatcher.get("//" + command);
-            if (mapping != null) {
-                return mapping;
-            }
-
-            mapping = dispatcher.get("/" + command);
-            if (mapping != null) {
-                return mapping;
-            }
-        }
-
-        return null;
-    }
-
     public static void list(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, String formatName, boolean playerFolder, String onClickCmd) {
         list(dir, actor, args, page, -1, formatName, playerFolder, new RunnableVal3<Message, URI, String>() {
             @Override
@@ -800,6 +772,7 @@ public class UtilityCommands {
 
     public static int getFiles(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
         Consumer<File> rootFunction = forEachFile;
+        //schem list all <path>
 
         int len = args.argsLength();
         List<String> filters = new ArrayList<>();

@@ -6,5 +6,5 @@ package com.boydti.fawe.beta;
 public interface IBlocks extends Trimable {
     boolean hasSection(int layer);
 
-    IChunkSet reset();
+    IBlocks reset();
 }

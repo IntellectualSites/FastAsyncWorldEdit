@@ -45,6 +45,27 @@ public class StringMan {
         return false;
     }
 
+    public static boolean containsIgnoreCase(String haystack, String needle) {
+        final int length = needle.length();
+        if (length == 0)
+            return true; // Empty string is contained
+
+        final char firstLo = Character.toLowerCase(needle.charAt(0));
+        final char firstUp = Character.toUpperCase(needle.charAt(0));
+
+        for (int i = haystack.length() - length; i >= 0; i--) {
+            // Quick check before calling the more expensive regionMatches() method:
+            final char ch = haystack.charAt(i);
+            if (ch != firstLo && ch != firstUp)
+                continue;
+
+            if (haystack.regionMatches(true, i, needle, 0, length))
+                return true;
+        }
+
+        return false;
+    }
+
     public static int findMatchingBracket(CharSequence sequence, int index) {
         char startC = sequence.charAt(index);
         char lookC = getMatchingBracket(startC);

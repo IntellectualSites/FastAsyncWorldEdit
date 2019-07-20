@@ -30,6 +30,7 @@ import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
+import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.object.schematic.StructureFormat;
 
 import com.boydti.fawe.util.MainUtil;

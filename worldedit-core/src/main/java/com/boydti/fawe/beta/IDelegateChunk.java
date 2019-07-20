@@ -1,6 +1,5 @@
 package com.boydti.fawe.beta;
 
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -42,8 +41,8 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default BiomeType getBiome(final int x, final int z) {
-        return getParent().getBiome(x, z);
+    default BiomeType getBiomeType(final int x, final int z) {
+        return getParent().getBiomeType(x, z);
     }
 
     @Override
