@@ -85,6 +85,7 @@ import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandQueued;
 import com.sk89q.worldedit.command.util.CommandQueuedCondition;
 import com.sk89q.worldedit.command.util.PermissionCondition;
@@ -114,6 +115,7 @@ import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -545,13 +547,48 @@ public final class PlatformCommandManager {
         return def;
     }
 
+    private Actor wrapActor(Actor actor, InjectedValueStore context) {
+        if (actor instanceof Player) {
+            final Set<String> failedPermissions = new LinkedHashSet<>();
+            Player player = (Player) actor;
+            Player unwrapped = LocationMaskedPlayerWrapper.unwrap(player);
+            actor = new LocationMaskedPlayerWrapper(unwrapped, player.getLocation(), true) {
+                @Override
+                public boolean hasPermission(String permission) {
+                    if (!super.hasPermission(permission)) {
+                        failedPermissions.add(permission);
+                        return false;
+                    }
+                    return true;
+                }
+                @Override
+                public void checkPermission(String permission) throws AuthorizationException {
+                    try {
+                        super.checkPermission(permission);
+                    } catch (AuthorizationException e) {
+                        failedPermissions.add(permission);
+                        throw e;
+                    }
+                }
+            };
+            context.injectValue(Key.of(CommandPermissions.class), i -> Optional.of(new CommandPermissions() {
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return CommandPermissions.class;
+                }
+                @Override
+                public String[] value() {
+                    return failedPermissions.toArray(new String[0]);
+                }
+            }));
+        }
+        return actor;
+    }
+
     @Subscribe
     public void handleCommand(CommandEvent event) {
         Request.reset();
         Actor actor = event.getActor();
-        if (actor instanceof Player) {
-            actor = LocationMaskedPlayerWrapper.wrap((Player) actor);
-        }
         String args = event.getArguments();
         CommandEvent finalEvent = new CommandEvent(actor, args);
         final FawePlayer<Object> fp = FawePlayer.wrap(actor);
@@ -595,22 +632,14 @@ public final class PlatformCommandManager {
         }
         MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor);
 
-        final FawePlayer fp = FawePlayer.wrap(actor);
-        if (fp == null) {
-            throw new IllegalArgumentException("FAWE doesn't support: " + actor);
-        }
-
         ThrowableSupplier<Throwable> task =
                 () -> commandManager.execute(context,Lists.newArrayList(split));
 
-        handleCommandTask(task, context, actor, session, event);
+        handleCommandTask(task, context, session, event);
     }
 
-    public Object handleCommandTask(ThrowableSupplier<Throwable> task, InjectedValueAccess context, @NotNull Actor actor, @Nullable LocalSession session, CommandEvent event) {
-        String[] split = parseArgs(event.getArguments())
-            .map(Substring::getSubstring)
-            .toArray(String[]::new);
-
+    public Object handleCommandTask(ThrowableSupplier<Throwable> task, InjectedValueAccess context, @Nullable LocalSession session, CommandEvent event) {
+        Actor actor = context.injectedValue(Key.of(Actor.class)).orElseThrow(() -> new IllegalStateException("No player"));
         Request.reset();
         long start = System.currentTimeMillis();
 
@@ -689,9 +718,10 @@ public final class PlatformCommandManager {
 
     private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor) {
         InjectedValueStore store = MapBackedValueStore.create();
-        store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
-        if (actor instanceof Player) {
-            store.injectValue(Key.of(Player.class), ValueProvider.constant((Player) actor));
+        Actor finalActor = wrapActor(actor, store);
+        store.injectValue(Key.of(Actor.class), ValueProvider.constant(finalActor));
+        if (finalActor instanceof Player) {
+            store.injectValue(Key.of(Player.class), ValueProvider.constant((Player) finalActor));
         } else {
             store.injectValue(Key.of(Player.class), context -> {
                 throw new CommandException(TextComponent.of("This command must be used with a player."), ImmutableList.of());
@@ -700,8 +730,8 @@ public final class PlatformCommandManager {
         store.injectValue(Key.of(Arguments.class), ValueProvider.constant(arguments));
         store.injectValue(Key.of(LocalSession.class),
             context -> {
-                LocalSession localSession = worldEdit.getSessionManager().get(actor);
-                localSession.tellVersion(actor);
+                LocalSession localSession = worldEdit.getSessionManager().get(finalActor);
+                localSession.tellVersion(finalActor);
                 return Optional.of(localSession);
             });
 

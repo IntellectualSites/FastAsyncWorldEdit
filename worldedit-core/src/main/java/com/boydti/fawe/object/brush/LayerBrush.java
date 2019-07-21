@@ -18,6 +18,7 @@ import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -25,11 +26,11 @@ import java.util.Arrays;
 
 public class LayerBrush implements Brush {
 
-    private final BlockStateHolder[] layers;
+    private final BlockState[] layers;
     private RecursiveVisitor visitor;
     private MutableBlockVector3 mutable = new MutableBlockVector3();
 
-    public LayerBrush(BlockStateHolder[] layers) {
+    public LayerBrush(BlockState[] layers) {
         this.layers = layers;
     }
 

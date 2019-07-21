@@ -704,7 +704,6 @@ public class UtilityCommands {
     }
 
     public static void list(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, RunnableVal3<Message, URI, String> eachMsg) {
-        AtomicInteger pageInt = new AtomicInteger(page);
         List<File> fileList = new ArrayList<>();
         if (perPage == -1) perPage = actor instanceof Player ? 12 : 20; // More pages for console
         page = getFiles(dir, actor, args, page, perPage, formatName, playerFolder, fileList::add);
@@ -768,6 +767,11 @@ public class UtilityCommands {
             m.newline().paginate(baseCmd, page, pageCount);
         }
         m.send(actor);
+    }
+
+    public static int getFiles(File root, Actor actor, InjectedValueAccess args, int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile, ListFilters... filters) {
+        // TODO NOT IMPLEMENTED replace getFiles
+        return page;
     }
 
     public static int getFiles(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
@@ -890,7 +894,6 @@ public class UtilityCommands {
     }
 
     private static List<File> filter(List<File> fileList, List<String> filters) {
-
         String[] normalizedNames = new String[fileList.size()];
         for (int i = 0; i < fileList.size(); i++) {
             String normalized = fileList.get(i).getName().toLowerCase();

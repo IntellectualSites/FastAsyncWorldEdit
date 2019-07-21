@@ -6,9 +6,11 @@ import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.exception.StopExecutionException;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +20,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 @CommandContainer
-public class SchemListFilters {
+public class ListFilters {
     public class Filter {
         public boolean listPrivate() {
             return true;
@@ -29,7 +31,7 @@ public class SchemListFilters {
         }
 
         public File getPath(File root) {
-            return root;
+            return null;
         }
 
         public boolean applies(File file) {
@@ -82,13 +84,27 @@ public class SchemListFilters {
             name = "",
             desc = "wildcard"
     )
-    public Filter wildcard(Actor actor, String arg) {
+    public Filter wildcard(Actor actor, File root, String arg) {
         arg = arg.replace("/", File.separator);
         String argLower = arg.toLowerCase(Locale.ROOT);
-        if (arg.endsWith("/") || arg.endsWith(File.separator)) {
-            if (arg.length() > 3 && arg.length() <= 16) {
-                // possible player name
-            }
+        if (arg.endsWith(File.separator)) {
+            String finalArg = arg;
+            return new Filter() {
+                @Override
+                public File getPath(File root) {
+                    File newRoot = new File(root, finalArg);
+                    if (newRoot.exists()) return newRoot;
+                    String firstArg = finalArg.substring(0, finalArg.length() - File.separator.length());
+                    if (firstArg.length() > 3 && firstArg.length() <= 16) {
+                        UUID fromName = Fawe.imp().getUUID(finalArg);
+                        if (fromName != null) {
+                            newRoot = new File(root, finalArg);
+                            if (newRoot.exists()) return newRoot;
+                        }
+                    }
+                    throw new StopExecutionException(TextComponent.of("Cannot find path: " + finalArg));
+                }
+            };
         } else {
             if (StringMan.containsAny(arg, "\\^$.|?+(){}<>~$!%^&*+-/")) {
                 Pattern pattern;
@@ -112,25 +128,6 @@ public class SchemListFilters {
                     return StringMan.containsIgnoreCase(file.getPath(), argLower);
                 }
             };
-        }
-        if (arg.endsWith("/") || arg.endsWith(File.separator)) {
-            arg = arg.replace("/", File.separator);
-            String newDirFilter = dirFilter + arg;
-            boolean exists = new File(dir, newDirFilter).exists() || playerFolder && MainUtil.resolveRelative(new File(dir, actor.getUniqueId() + newDirFilter)).exists();
-            if (!exists) {
-                arg = arg.substring(0, arg.length() - File.separator.length());
-                if (arg.length() > 3 && arg.length() <= 16) {
-                    UUID fromName = Fawe.imp().getUUID(arg);
-                    if (fromName != null) {
-                        newDirFilter = dirFilter + fromName + File.separator;
-                        listGlobal = true;
-                    }
-                }
-            }
-            dirFilter = newDirFilter;
-        }
-        else {
-            filters.add(arg);
         }
     }
 }

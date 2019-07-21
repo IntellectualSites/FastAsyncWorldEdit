@@ -2,27 +2,20 @@ package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.ChunkFilterBlock;
-import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MemUtil;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;

@@ -20,8 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.ALL;
-import static com.sk89q.minecraft.util.commands.Logging.LogMode.REGION;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
@@ -30,12 +29,12 @@ import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
 import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.beta.filters.SetFilter;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.filters.DistrFilter;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.example.NMSMappedIQueueExtent;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.beta.IQueueExtent;
@@ -99,9 +98,9 @@ import org.enginehub.piston.annotation.param.Switch;
 /**
  * Commands that operate on regions.
  */
-@Command(aliases = {}, desc = "Commands that operate on regions: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Region_operations)")
+//@Command(aliases = {}, desc = "Commands that operate on regions: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Region_operations)")
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-public class RegionCommands {
+public class RegionCommands extends MethodCommands {
 
     private final WorldEdit worldEdit;
 
@@ -114,43 +113,6 @@ public class RegionCommands {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
     }
-
-
-    @Command(
-            aliases = {"debugtest"},
-            usage = "",
-            desc = "debugtest",
-            help = "debugtest"
-    )
-    @CommandPermissions("fawe.admin.debug")
-    public void debugtest(Player player, @Selection Region region) throws WorldEditException {
-        QueueHandler queueHandler = Fawe.get().getQueueHandler();
-        World world = player.getWorld();
-        DistrFilter filter = new DistrFilter();
-        long start = System.currentTimeMillis();
-        queueHandler.apply(world, region, filter);
-        long diff = System.currentTimeMillis() - start;
-        System.out.println(diff);
-    }
-
-    @Command(
-            aliases = {"db2"},
-            usage = "",
-            desc = "db2",
-            help = "db2"
-    )
-    @CommandPermissions("fawe.admin.debug")
-    public void db2(Player player, @Selection Region region, String blockStr) throws WorldEditException {
-        QueueHandler queueHandler = Fawe.get().getQueueHandler();
-        World world = player.getWorld();
-        BlockState block = BlockState.get(blockStr);
-        SetFilter filter = new SetFilter(block);
-        long start = System.currentTimeMillis();
-        queueHandler.apply(world, region, filter);
-        long diff = System.currentTimeMillis() - start;
-        System.out.println(diff);
-    }
-
 
     @Command(
             name = "/fixlighting",
@@ -166,7 +128,7 @@ public class RegionCommands {
             final int cz = loc.getBlockZ() >> 4;
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection,null, IQueueExtent.RelightMode.ALL);
+        int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
         BBC.LIGHTING_PROPOGATE_SELECTION.send(fp, count);
     }
 
@@ -175,11 +137,12 @@ public class RegionCommands {
             desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
-    public void getlighting(Player player) throws WorldEditException {
+    public void getlighting(Player player, EditSession editSession) throws WorldEditException {
         FawePlayer fp = FawePlayer.wrap(player);
         final Location loc = player.getLocation();
-        IQueueExtent queue = fp.getIQueueExtent(false);
-        fp.sendMessage("Light: " + queue.getEmmittedLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()) + " | " + queue.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+        int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+        fp.sendMessage("Light: " + block + " | " + sky);
     }
 
     @Command(
@@ -195,7 +158,7 @@ public class RegionCommands {
             final int cz = player.getLocation().getBlockZ() >> 4;
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection, null, IQueueExtent.RelightMode.NONE);
+        int count = FaweAPI.fixLighting(player.getWorld(), selection, null);
         BBC.UPDATED_LIGHTING_SELECTION.send(fp, count);
     }
 
@@ -223,18 +186,8 @@ public class RegionCommands {
             desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
-    public void setlighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
-        FawePlayer fp = FawePlayer.wrap(player);
-        final NMSMappedIQueueExtent queue = (NMSMappedIQueueExtent) fp.getIQueueExtent(false);
-        for (BlockVector3 pt : region) {
-            queue.setBlockLight(pt.getX(), pt.getY(), pt.getZ(), value);
-        }
-        int count = 0;
-        for (BlockVector2 chunk : region.getChunks()) {
-            queue.sendChunk(queue.getFaweChunk(chunk.getBlockX(), chunk.getBlockZ()));
-            count++;
-        }
-        BBC.UPDATED_LIGHTING_SELECTION.send(fp, count);
+    public void setlighting(Player player, EditSession editSession, @Selection Region region, @Range(min = 0, max = 15) int value) {
+        // TODO NOT IMPLEMENTED
     }
 
     @Command(
@@ -243,17 +196,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region, @Range(min = 0, max = 15) int value) {
-        FawePlayer fp = FawePlayer.wrap(player);
-        final NMSMappedIQueueExtent queue = (NMSMappedIQueueExtent) fp.getIQueueExtent(false);
-        for (BlockVector3 pt : region) {
-            queue.setSkyLight(pt.getX(), pt.getY(), pt.getZ(), value);
-        }
-        int count = 0;
-        for (BlockVector2 chunk : region.getChunks()) {
-            queue.sendChunk(queue.getFaweChunk(chunk.getBlockX(), chunk.getBlockZ()));
-            count++;
-        }
-        BBC.UPDATED_LIGHTING_SELECTION.send(fp, count);
+        // TODO NOT IMPLEMENTED
     }
 
     @Command(
@@ -338,7 +281,8 @@ public class RegionCommands {
     }
 
     @Command(
-            aliases = { "/set", "/s" },
+            name = "/set",
+            aliases = { "/s" },
             desc = "Set all blocks within selection"
 )
     @CommandPermissions("worldedit.region.set")
@@ -628,7 +572,7 @@ public class RegionCommands {
 )
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
-    public void deform(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
+    public void deform(FawePlayer fp, Player player, LocalSession session, EditSession editSession, InjectedValueAccess context,
                        @Selection Region region,
         @Arg(desc = "The expression to use", variable = true)
             List<String> expression,
@@ -660,7 +604,7 @@ public class RegionCommands {
         final Vector3 unit1 = unit;
         fp.checkConfirmationRegion(() -> {
             try {
-                final int affected = editSession.deformRegion(region, zero, unit1, expression);
+                final int affected = editSession.deformRegion(region, zero, unit1, String.join(" ", expression), session.getTimeout());
                 player.findFreePosition();
                 BBC.VISITOR_BLOCK.send(fp, affected);
             } catch (ExpressionException e) {
@@ -679,18 +623,14 @@ public class RegionCommands {
 )
     @CommandPermissions("worldedit.regen")
     @Logging(REGION)
-    public void regenerateChunk(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, InjectedValueAccess context) throws WorldEditException {
+    public void regenerateChunk(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region,
+                                @Arg(def = "", desc = "Regenerate with biome") BiomeType biome,
+                                @Arg(def = "", desc = "Regenerate with seed") Long seed,
+                                InjectedValueAccess context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             Mask mask = session.getMask();
             session.setMask((Mask) null);
             session.setSourceMask((Mask) null);
-            BiomeType biome = null;
-            if (context.argsLength() >= 1) {
-                BiomeRegistry biomeRegistry = worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
-                Collection<BiomeType> knownBiomes = BiomeTypes.values();
-                biome = Biomes.findBiomeByName(knownBiomes, context.getString(0), biomeRegistry);
-            }
-            Long seed = context.argsLength() != 2 || !MathMan.isInteger(context.getString(1)) ? null : Long.parseLong(context.getString(1));
             editSession.regenerate(region, biome, seed);
             session.setMask(mask);
             session.setSourceMask(mask);
@@ -726,7 +666,7 @@ public class RegionCommands {
             int thickness,
         @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
             Pattern pattern,
-
+        @Switch(name='m', desc = "Mask to hollow with") Mask mask,
                        InjectedValueAccess context) throws WorldEditException {
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
         player.checkConfirmationRegion(() -> {

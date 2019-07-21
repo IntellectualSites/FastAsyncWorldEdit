@@ -46,7 +46,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.internal.annotation.Range;
 import org.enginehub.piston.annotation.param.Switch;
-import com.sk89q.worldedit.util.command.parametric.Optional;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.util.UUID;
@@ -55,12 +54,16 @@ import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Commands to undo, redo, and clear history.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-@Command(aliases = {}, desc = "Commands to undo, redo, and clear history: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Features#History)")
+//@Command(aliases = {}, desc = "Commands to undo, redo, and clear history: [More Info](http://wiki.sk89q.com/wiki/WorldEdit/Features#History)")
 public class HistoryCommands extends MethodCommands {
+
+    private final WorldEdit worldEdit;
 
     /**
      * Create a new instance.
@@ -68,7 +71,8 @@ public class HistoryCommands extends MethodCommands {
      * @param worldEdit reference to WorldEdit
      */
     public HistoryCommands(WorldEdit worldEdit) {
-        super(worldEdit);
+        checkNotNull(worldEdit);
+        this.worldEdit = worldEdit;
     }
 
     @Command(
@@ -79,7 +83,7 @@ public class HistoryCommands extends MethodCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void faweRollback(final Player player, LocalSession session, final String user, @Optional("0") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name='r', desc = "TODO") boolean restore) throws WorldEditException {
+    public void faweRollback(final Player player, LocalSession session, final String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time, @Switch(name='r', desc = "TODO") boolean restore) throws WorldEditException {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
             return;
@@ -205,7 +209,7 @@ public class HistoryCommands extends MethodCommands {
                    " - Import from disk: /frb #import"
     )
     @CommandPermissions("worldedit.history.rollback")
-    public void restore(final Player player, LocalSession session, final String user, @Optional("0") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time) throws WorldEditException {
+    public void restore(final Player player, LocalSession session, final String user, @Arg(def = "0", desc = "radius") @Range(min = 0) int radius, @Arg(name = "time", desc = "String", def = "0") String time) throws WorldEditException {
         faweRollback(player, session, user, radius, time, true);
     }
 
@@ -226,7 +230,7 @@ public class HistoryCommands extends MethodCommands {
             return;
         }
         LocalSession undoSession;
-        if (context.argsLength() == 2) {
+        if (playerName != null && !playerName.isEmpty()) {
             player.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);
             if (undoSession == null) {

@@ -43,7 +43,6 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.util.command.parametric.ParameterException;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -69,7 +68,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * General WorldEdit commands.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-@Command(aliases = {}, desc = "Player toggles, settings and item info")
+//@Command(aliases = {}, desc = "Player toggles, settings and item info")
 public class GeneralCommands {
 
     private final WorldEdit worldEdit;
@@ -373,18 +372,11 @@ public class GeneralCommands {
             desc = "Set the global transform"
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
-    public void gtransform(Player player, EditSession editSession, LocalSession session, @Arg(name = "context", desc = "InjectedValueAccess", def = "") InjectedValueAccess context) throws WorldEditException {
-        if (context == null || context.argsLength() == 0) {
-            session.setTransform(null);
+    public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws WorldEditException {
+        session.setTransform(transform);
+        if (transform == null) {
             BBC.TRANSFORM_DISABLED.send(player);
         } else {
-            ParserContext parserContext = new ParserContext();
-            parserContext.setActor(player);
-            parserContext.setWorld(player.getWorld());
-            parserContext.setSession(session);
-            parserContext.setExtent(editSession);
-            ResettableExtent transform = Fawe.get().getTransformParser().parseFromInput(context.getJoinedStrings(0), parserContext);
-            session.setTransform(transform);
             BBC.TRANSFORM.send(player);
         }
     }
