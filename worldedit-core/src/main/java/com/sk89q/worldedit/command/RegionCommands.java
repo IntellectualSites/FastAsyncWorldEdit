@@ -243,7 +243,7 @@ public class RegionCommands extends MethodCommands {
                     @Arg(desc = "The pattern of blocks to place")
                         Pattern pattern,
                     @Arg(desc = "The thickness of the line", def = "0")
-                        int thickness,
+                        @Range(min = 0) int thickness,
                     @Switch(name = 'h', desc = "Generate only a shell")
                         boolean shell) throws WorldEditException {
         if (!(region instanceof CuboidRegion)) {
@@ -273,7 +273,7 @@ public class RegionCommands extends MethodCommands {
                      @Arg(desc = "The pattern of blocks to place")
                          Pattern pattern,
                      @Arg(desc = "The thickness of the curve", def = "0")
-                         int thickness,
+                         @Range(min = 0) int thickness,
                      @Switch(name = 'h', desc = "Generate only a shell")
                          boolean shell, InjectedValueAccess context) throws WorldEditException {
         if (!(region instanceof ConvexPolyhedralRegion)) {
@@ -718,7 +718,7 @@ public class RegionCommands extends MethodCommands {
     public void hollow(FawePlayer player, EditSession editSession,
                       @Selection Region region,
                       @Arg(desc = "Thickness of the shell to leave", def = "0")
-                          int thickness,
+                          @Range(min = 0) int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
         @Switch(name='m', desc = "Mask to hollow with") Mask mask,

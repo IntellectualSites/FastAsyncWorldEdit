@@ -769,7 +769,7 @@ public class UtilityCommands {
         return page;
     }
 
-    public static int getFiles(File dir, Actor actor, InjectedValueAccess args, @org.jetbrains.annotations.Range(from = 0, to = ) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
+    public static int getFiles(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
         Consumer<File> rootFunction = forEachFile;
         //schem list all <path>
 
