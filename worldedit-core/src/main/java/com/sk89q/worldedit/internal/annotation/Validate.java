@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * @see PrimitiveBindings where this validation is used
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.METHOD})
 public @interface Validate {
     
     /**
@@ -40,6 +40,6 @@ public @interface Validate {
      * @see Pattern regular expression class
      * @return the pattern
      */
-    String regex() default "";
+    String value() default "";
 
 }

@@ -46,7 +46,7 @@ import java.util.List;
  * Snapshot commands.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-@Command(aliases = {"snapshot", "snap"}, desc = "List, load and view information related to snapshots")
+//@Command(aliases = {"snapshot", "snap"}, desc = "List, load and view information related to snapshots")
 public class SnapshotCommands {
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
@@ -205,7 +205,7 @@ public class SnapshotCommands {
 
                 if (snapshot == null) {
                     player.printError("Couldn't find a snapshot before "
-                    + dateFormat.withZone(session.getTimeZone().toZoneId()).format(date) + ".");
+                    + dateFormat.withZone(session.getTimeZone()).format(date) + ".");
                 } else {
                     session.setSnapshot(snapshot);
                     BBC.SNAPSHOT_SET.send(player, snapshot.getName());
@@ -235,7 +235,7 @@ public class SnapshotCommands {
                 Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, player.getWorld().getName());
                 if (snapshot == null) {
                     player.printError("Couldn't find a snapshot after "
-                    + dateFormat.withZone(session.getTimeZone().toZoneId()).format(date) + ".");
+                    + dateFormat.withZone(session.getTimeZone()).format(date) + ".");
                 } else {
                     session.setSnapshot(snapshot);
                     BBC.SNAPSHOT_SET.send(player, snapshot.getName());

@@ -30,7 +30,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.internal.annotation.Range;
-import com.sk89q.worldedit.util.command.parametric.Optional;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 
@@ -48,7 +47,7 @@ import java.util.zip.GZIPInputStream;
  * Tool commands.
  */
 
-@Command(aliases = {"brush", "br", "/b"}, desc = "Tool commands")
+//@Command(aliases = {"brush", "br", "/b"}, desc = "Tool commands")
 public class BrushOptionsCommands extends MethodCommands {
 
     public BrushOptionsCommands(WorldEdit we) {

@@ -1,102 +1,90 @@
 package com.boydti.fawe.command;
 
 import com.boydti.fawe.config.Commands;
-import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.MethodCommands;
-import com.sk89q.worldedit.util.command.SimpleDispatcher;
-import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import org.enginehub.piston.CommandManager;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.enginehub.piston.inject.InjectedValueAccess;
+import org.enginehub.piston.inject.Key;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CFICommand extends MethodCommands {
+public class CFICommand extends CommandProcessor<Object, Object> {
 
-    private final CFICommands child;
-    private final SimpleDispatcher dispatcher;
-
-    public CFICommand(WorldEdit worldEdit, ParametricBuilder builder) {
-        super(worldEdit);
-        this.dispatcher = new SimpleDispatcher();
-        this.child = new CFICommands(worldEdit, dispatcher);
-        builder.registerMethodsAsCommands(dispatcher, child);
+    public CFICommand(CommandManager manager) {
+        super(manager);
     }
 
-    @Command(
-        name = "cfi",
-        aliases = {"cfi", "createfromimage"},
-        desc = "Start CreateFromImage"
-    )
-    @CommandPermissions("worldedit.anvil.cfi")
-    public void cfi(FawePlayer fp, InjectedValueAccess context) throws CommandException, IOException {
-        CFICommands.CFISettings settings = child.getSettings(fp);
+    @Override
+    public List<String> preprocess(InjectedValueAccess context, List<String> args) {
+        FawePlayer fp = context.injectedValue(Key.of(FawePlayer.class)).orElseThrow(() -> new IllegalStateException("No player"));
+        CFICommands.CFISettings settings = CFICommands.getSettings(fp);
         settings.popMessages(fp);
-        dispatch(fp, settings, context);
+        args = dispatch(fp, settings, args, context);
         HeightMapMCAGenerator gen = settings.getGenerator();
         if (gen != null && gen.isModified()) {
-            gen.update();
-            CFIChangeSet set = new CFIChangeSet(gen, fp.getUUID());
-            LocalSession session = fp.getSession();
-            session.remember(fp.getPlayer(), gen, set, fp.getLimit());
+            try {
+                gen.update();
+                CFIChangeSet set = new CFIChangeSet(gen, fp.getUUID());
+                LocalSession session = fp.getSession();
+                session.remember(fp.getPlayer(), gen, set, fp.getLimit());
+            } catch (IOException e) {
+                throw new StopExecutionException(TextComponent.of(e.getMessage()));
+            }
         }
+        return args;
     }
 
-    private void dispatch(FawePlayer fp, CFICommands.CFISettings settings, InjectedValueAccess context) throws CommandException {
+    @Override
+    public Object process(InjectedValueAccess context, List<String> args, Object result) {
+        return result;
+    }
+
+    private List<String> dispatch(FawePlayer fp, CFICommands.CFISettings settings, List<String> args, InjectedValueAccess context) {
         if (!settings.hasGenerator()) {
-            if (context.argsLength() == 0) {
-                String hmCmd = child.alias() + " ";
+            if (args.size() == 0) {
+                String hmCmd = CFICommands.alias() + " ";
                 if (settings.image == null) {
                     hmCmd += "image";
                 } else {
                     hmCmd =
                         Commands.getAlias(CFICommands.class, "heightmap") + " " + settings.imageArg;
                 }
-                child.msg("What do you want to use as the base?").newline()
+                CFICommands.msg("What do you want to use as the base?").newline()
                     .text("[HeightMap]").cmdTip(hmCmd).text(" - A heightmap like ")
                     .text("[this]").linkTip("http://i.imgur.com/qCd30MR.jpg")
                     .newline()
-                    .text("[Empty]").cmdTip(child.alias() + " empty")
+                    .text("[Empty]").cmdTip(CFICommands.alias() + " empty")
                     .text("- An empty map of a specific size")
                     .send(fp);
             } else {
-                String remaining = context.getJoinedStrings(0);
-                if (!dispatcher.contains(context.getString(0))) {
-                    switch (context.argsLength()) {
-                        case 1: {
-                            String cmd =
-                                Commands.getAlias(CFICommands.class, "heightmap") + " " + context
-                                    .getJoinedStrings(0);
-                            dispatcher.call(cmd, context.getLocals(), new String[0]);
-                            return;
-                        }
-                        case 2: {
-                            String cmd =
-                                Commands.getAlias(CFICommands.class, "empty") + " " + context
-                                    .getJoinedStrings(0);
-                            dispatcher.call(cmd, context.getLocals(), new String[0]);
-                            return;
-                        }
-                        case 2:
-                            String cmd = Commands.getAlias(CFICommands.class, "empty") + " " + context.getJoinedStrings(0);
-                            dispatcher.call(cmd, context.getLocals(), new String[0]);
-                            return;
+                args = new ArrayList<>(args);
+                switch (args.size()) {
+                    case 1: {
+                        args.add(0, "heightmap");
+                        break;
+                    }
+                    case 2: {
+                        args.add(0, "empty");
+                        break;
                     }
                 }
-                dispatcher.call(remaining, context.getLocals(), new String[0]);
+                return args;
             }
         } else {
-            if (context.argsLength() == 0) {
-                settings.setCategory("");
-                child.mainMenu(fp);
-            } else {
-                dispatcher.call(context.getJoinedStrings(0), context.getLocals(), new String[0]);
+            if (args.isEmpty()) {
+                settings.setCategory(null);
+                CFICommands.mainMenu(fp);
+                return null;
             }
         }
+        return args;
     }
 }

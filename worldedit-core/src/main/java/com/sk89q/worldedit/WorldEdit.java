@@ -80,6 +80,8 @@ import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
+
+import org.mozilla.javascript.NativeJavaObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -633,14 +635,14 @@ public final class WorldEdit {
      * @param args arguments for the script
      * @throws WorldEditException
      */
-    public void runScript(Player player, File f, String[] args) throws WorldEditException {
+    public Object runScript(Player player, File f, String[] args) throws WorldEditException {
         String filename = f.getPath();
         int index = filename.lastIndexOf('.');
         String ext = filename.substring(index + 1);
 
         if (!ext.equalsIgnoreCase("js")) {
             player.printError("Only .js scripts are currently supported");
-            return;
+            return null;
         }
 
         String script;
@@ -653,7 +655,7 @@ public final class WorldEdit {
 
                 if (file == null) {
                     player.printError("Script does not exist: " + filename);
-                    return;
+                    return null;
                 }
             } else {
                 file = new FileInputStream(f);
@@ -666,7 +668,7 @@ public final class WorldEdit {
             script = new String(data, 0, data.length, StandardCharsets.UTF_8);
         } catch (IOException e) {
             player.printError("Script read error: " + e.getMessage());
-            return;
+            return null;
         }
 
         LocalSession session = getSessionManager().get(player);
@@ -680,7 +682,7 @@ public final class WorldEdit {
         } catch (NoClassDefFoundError ignored) {
             player.printError("Failed to find an installed script engine.");
             player.printError("Please see https://worldedit.readthedocs.io/en/latest/usage/other/craftscripts/");
-            return;
+            return null;
         }
 
         engine.setTimeLimit(getConfiguration().scriptTimeout);
@@ -691,7 +693,11 @@ public final class WorldEdit {
         vars.put("player", player);
 
         try {
-            engine.evaluate(script, filename, vars);
+            Object result = engine.evaluate(script, filename, vars);
+            if (result instanceof NativeJavaObject) {
+                result = ((NativeJavaObject) result).unwrap();
+            }
+            return result;
         } catch (ScriptException e) {
             player.printError("Failed to execute:");
             player.printRaw(e.getMessage());
@@ -708,6 +714,7 @@ public final class WorldEdit {
                 session.remember(editSession);
             }
         }
+        return null;
     }
 
     /**

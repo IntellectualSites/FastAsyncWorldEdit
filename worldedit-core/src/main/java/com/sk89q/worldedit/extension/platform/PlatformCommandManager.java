@@ -22,55 +22,29 @@ package com.sk89q.worldedit.extension.platform;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
-import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.ApplyBrushCommands;
-import com.sk89q.worldedit.command.BiomeCommands;
 //import com.sk89q.worldedit.command.BiomeCommandsRegistration;
-import com.sk89q.worldedit.command.BrushCommands;
-import com.sk89q.worldedit.command.ChunkCommands;
 //import com.sk89q.worldedit.command.ChunkCommandsRegistration;
-import com.sk89q.worldedit.command.ClipboardCommands;
 //import com.sk89q.worldedit.command.ClipboardCommandsRegistration;
-import com.sk89q.worldedit.command.ExpandCommands;
-import com.sk89q.worldedit.command.GeneralCommands;
 //import com.sk89q.worldedit.command.GeneralCommandsRegistration;
-import com.sk89q.worldedit.command.GenerationCommands;
-import com.sk89q.worldedit.command.HistoryCommands;
 //import com.sk89q.worldedit.command.HistoryCommandsRegistration;
-import com.sk89q.worldedit.command.NavigationCommands;
 //import com.sk89q.worldedit.command.NavigationCommandsRegistration;
-import com.sk89q.worldedit.command.PaintBrushCommands;
-import com.sk89q.worldedit.command.RegionCommands;
-import com.sk89q.worldedit.command.SchematicCommands;
 //import com.sk89q.worldedit.command.SchematicCommandsRegistration;
-import com.sk89q.worldedit.command.ScriptingCommands;
-import com.sk89q.worldedit.command.SelectionCommands;
-import com.sk89q.worldedit.command.SnapshotCommands;
 //import com.sk89q.worldedit.command.SnapshotCommandsRegistration;
-import com.sk89q.worldedit.command.SnapshotUtilCommands;
-import com.sk89q.worldedit.command.SuperPickaxeCommands;
 //import com.sk89q.worldedit.command.SuperPickaxeCommandsRegistration;
-import com.sk89q.worldedit.command.ToolCommands;
-import com.sk89q.worldedit.command.ToolUtilCommands;
-import com.sk89q.worldedit.command.UtilityCommands;
-import com.sk89q.worldedit.command.WorldEditCommands;
 //import com.sk89q.worldedit.command.WorldEditCommandsRegistration;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.argument.BooleanConverter;
@@ -84,9 +58,7 @@ import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
-import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.command.util.CommandPermissions;
-import com.sk89q.worldedit.command.util.CommandQueued;
 import com.sk89q.worldedit.command.util.CommandQueuedCondition;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
@@ -94,15 +66,17 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
+import com.sk89q.worldedit.extension.platform.binding.AnnotatedBindings;
+import com.sk89q.worldedit.extension.platform.binding.CommandBindings;
+import com.sk89q.worldedit.extension.platform.binding.ConsumeBindings;
+import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
 import com.sk89q.worldedit.internal.util.Substring;
-import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.scripting.CommandScriptLoader;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
@@ -152,7 +126,6 @@ import org.enginehub.piston.part.SubCommandPart;
 import org.enginehub.piston.suggestion.Suggestion;
 import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -246,32 +219,16 @@ public final class PlatformCommandManager {
     }
 
     private void registerAlwaysInjectedValues() {
-        globalInjectedValues.injectValue(Key.of(Region.class, Selection.class),
-            context -> {
-                LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
-                    .orElseThrow(() -> new IllegalStateException("No LocalSession"));
-                return context.injectedValue(Key.of(Player.class))
-                    .map(player -> {
-                        try {
-                            return localSession.getSelection(player.getWorld());
-                        } catch (IncompleteRegionException e) {
-                            exceptionConverter.convert(e);
-                            throw new AssertionError("Should have thrown a new exception.");
-                        }
-                    });
-            });
-        globalInjectedValues.injectValue(Key.of(EditSession.class),
-                context -> {
-                    LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
-                            .orElseThrow(() -> new IllegalStateException("No LocalSession"));
-                    return context.injectedValue(Key.of(Player.class))
-                            .map(player -> {
-                                EditSession editSession = localSession.createEditSession(player);
-                                editSession.enableStandardMode();
-                                return editSession;
-                            });
-                });
         globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), context -> Optional.of(context));
+        register(new AnnotatedBindings(worldEdit));
+        register(new CommandBindings(worldEdit));
+        register(new ConsumeBindings(worldEdit));
+        register(new ProvideBindings(worldEdit));
+        register(new ProvideBindings(worldEdit));
+    }
+
+    public void register(Object classWithMethods) {
+        // TODO NOT IMPLEMENTED - register the following using a custom processor / annotations
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
@@ -306,7 +263,7 @@ public final class PlatformCommandManager {
         });
     }
 
-    private void registerAllCommands() {
+    public void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
             // TODO NOT IMPLEMENTED dunno why these have issues generating
 //            registerSubCommands(

@@ -35,24 +35,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-@Command(aliases = {"patterns"},
-        desc = "Help for the various patterns. [More Info](https://git.io/vSPmA)",
-        descFooter = "Patterns determine what blocks are placed\n" +
-        " - Use [brackets] for arguments\n" +
-        " - Use , to OR multiple\n" +
-        "e.g. #surfacespread[10][#existing],andesite\n" +
-        "More Info: https://git.io/vSPmA"
-)
+//@Command(aliases = {"patterns"},
+//        desc = "Help for the various patterns. [More Info](https://git.io/vSPmA)",
+//        descFooter = "Patterns determine what blocks are placed\n" +
+//        " - Use [brackets] for arguments\n" +
+//        " - Use , to OR multiple\n" +
+//        "e.g. #surfacespread[10][#existing],andesite\n" +
+//        "More Info: https://git.io/vSPmA"
+//)
 public class PatternCommands extends MethodCommands {
+    private final WorldEdit worldEdit;
+
     public PatternCommands(WorldEdit worldEdit) {
-        super(worldEdit);
+        this.worldEdit = worldEdit;
     }
 
     @Command(
             name = "#existing",
             aliases = {"#*", "*", ".*"},
             desc = "Use the block that is already there",
-            usage = "[properties]"
+            descFooter = "[properties]"
     )
     public Pattern existing(Extent extent, @Arg(name = "properties", desc = "String", def = "") String properties) { // TODO FIXME , @Arg(name = "properties", desc = "String", def = "") String properties
         if (properties == null) return new ExistingPattern(extent);
@@ -73,7 +75,7 @@ public class PatternCommands extends MethodCommands {
             name = "#simplex",
             desc = "Use simplex noise to randomize blocks. Tutorial: https://imgur.com/a/rwVAE"
 )
-    public Pattern simplex(@Arg() double scale, Pattern other) {
+    public Pattern simplex(@Arg(desc = "scale factor") double scale, Pattern other) {
         if (other instanceof RandomPattern) {
             scale = (1d / Math.max(1, scale));
             RandomCollection<Pattern> collection = ((RandomPattern) other).getCollection();
@@ -282,8 +284,7 @@ public class PatternCommands extends MethodCommands {
             desc = "Apply a pattern depending on a mask"
 )
     public Pattern mask(Actor actor, LocalSession session, Mask mask, Pattern pass, Pattern fail) {
-        PatternExtent extent = new PatternExtent(pass);
-        return new MaskedPattern(mask, extent, fail);
+        return new MaskedPattern(mask, pass, fail);
     }
 
     @Command(

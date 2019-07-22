@@ -216,6 +216,7 @@ public class Fawe {
     }
 
     public TextureUtil getCachedTextureUtil(boolean randomize, int min, int max) {
+        // TODO NOT IMPLEMENTED - optimize this by caching the default true/0/100 texture util
         TextureUtil tu = getTextureUtil();
         try {
             tu = min == 0 && max == 100 ? tu : new CleanTextureUtil(tu, min, max);

@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class CommandProcessor implements CommandManager {
+public abstract class CommandProcessor<I, O> implements CommandManager {
     private final CommandManager parent;
 
     public CommandProcessor(CommandManager parent) {
@@ -22,62 +22,72 @@ public class CommandProcessor implements CommandManager {
     }
 
     @Override
-    public Command.Builder newCommand(String s) {
+    public final Command.Builder newCommand(String s) {
         return parent.newCommand(s);
     }
 
     @Override
-    public void register(Command command) {
+    public final void register(Command command) {
         parent.register(command);
     }
 
     @Override
-    public void register(String name, Consumer<Command.Builder> registrationProcess) {
+    public final void register(String name, Consumer<Command.Builder> registrationProcess) {
         parent.register(name, registrationProcess);
     }
 
     @Override
-    public void registerManager(CommandManager manager) {
+    public final void registerManager(CommandManager manager) {
         parent.registerManager(manager);
     }
 
     @Override
-    public Stream<Command> getAllCommands() {
+    public final Stream<Command> getAllCommands() {
         return parent.getAllCommands();
     }
 
     @Override
-    public boolean containsCommand(String name) {
+    public final boolean containsCommand(String name) {
         return parent.containsCommand(name);
     }
 
     @Override
-    public Optional<Command> getCommand(String s) {
+    public final Optional<Command> getCommand(String s) {
         return parent.getCommand(s);
     }
 
     @Override
-    public ImmutableSet<Suggestion> getSuggestions(InjectedValueAccess injectedValueAccess, List<String> list) {
+    public final ImmutableSet<Suggestion> getSuggestions(InjectedValueAccess injectedValueAccess, List<String> list) {
         return parent.getSuggestions(injectedValueAccess, list);
     }
 
     @Override
-    public CommandParseResult parse(InjectedValueAccess injectedValueAccess, List<String> list) {
+    public final CommandParseResult parse(InjectedValueAccess injectedValueAccess, List<String> list) {
         return parent.parse(injectedValueAccess, list);
     }
 
     @Override
-    public int execute(InjectedValueAccess context, List<String> args) {
-        return parent.execute(context, args);
+    public final O /* Need to recompile with FAWE-piston */ execute(InjectedValueAccess context, List<String> args) {
+        args = preprocess(context, args);
+        if (args != null) {
+            I result = (I) (Object) parent.execute(context, args);
+            return process(context, args, result); // TODO NOT IMPLEMENTED (recompile piston)
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public <T> void registerConverter(Key<T> key, ArgumentConverter<T> argumentConverter) {
+    public final <T> void registerConverter(Key<T> key, ArgumentConverter<T> argumentConverter) {
         parent.registerConverter(key, argumentConverter);
     }
 
     @Override
-    public <T> Optional<ArgumentConverter<T>> getConverter(Key<T> key) {
+    public final <T> Optional<ArgumentConverter<T>> getConverter(Key<T> key) {
         return parent.getConverter(key);
     }
+
+    public abstract List<String> preprocess(InjectedValueAccess context, List<String> args);
+
+    public abstract O process(InjectedValueAccess context, List<String> args, I result);
 }

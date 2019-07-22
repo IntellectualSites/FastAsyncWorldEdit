@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  * Indicates that this value should come from the current selection.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.METHOD})
 @InjectAnnotation
 public @interface Selection {
 }

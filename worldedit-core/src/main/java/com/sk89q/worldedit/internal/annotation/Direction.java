@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  * Annotates a {@link BlockVector3} parameter to inject a direction.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.METHOD})
 @InjectAnnotation
 public @interface Direction {
 

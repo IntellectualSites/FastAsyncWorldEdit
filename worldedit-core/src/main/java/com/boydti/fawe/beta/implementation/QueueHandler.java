@@ -10,6 +10,7 @@ import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
+import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.world.World;
 
 import java.lang.ref.WeakReference;
@@ -24,6 +25,7 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Supplier;
 
 /**
  * Class which handles all the queues {@link IQueueExtent}
@@ -136,6 +138,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     public <T> Future<T> sync(final Runnable run, final T value) {
+        if (Fawe.isMainThread()) {
+            run.run();
+            return Futures.immediateFuture(value);
+        }
         final FutureTask<T> result = new FutureTask<>(run, value);
         syncTasks.add(result);
         notifySync();
@@ -143,14 +149,31 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     public <T> Future<T> sync(final Runnable run) {
+        if (Fawe.isMainThread()) {
+            run.run();
+            return Futures.immediateCancelledFuture();
+        }
         final FutureTask<T> result = new FutureTask<>(run, null);
         syncTasks.add(result);
         notifySync();
         return result;
     }
 
-    public <T> Future<T> sync(final Callable<T> call) {
+    public <T> Future<T> sync(final Callable<T> call) throws Exception {
+        if (Fawe.isMainThread()) {
+            return Futures.immediateFuture(call.call());
+        }
         final FutureTask<T> result = new FutureTask<>(call);
+        syncTasks.add(result);
+        notifySync();
+        return result;
+    }
+
+    public <T> Future<T> sync(final Supplier<T> call) {
+        if (Fawe.isMainThread()) {
+            return Futures.immediateFuture(call.get());
+        }
+        final FutureTask<T> result = new FutureTask<>(call::get);
         syncTasks.add(result);
         notifySync();
         return result;
@@ -163,9 +186,9 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     public <T extends Future<T>> T submit(final IChunk<T> chunk) {
-        if (MemUtil.isMemoryFree()) {
+//        if (MemUtil.isMemoryFree()) { TODO NOT IMPLEMENTED - optimize this
 //            return (T) forkJoinPoolSecondary.submit(chunk);
-        }
+//        }
         return (T) blockingExecutor.submit(chunk);
     }
 
@@ -192,6 +215,10 @@ public abstract class QueueHandler implements Trimable, Runnable {
     }
 
     public abstract IQueueExtent create();
+
+    public abstract void startSet(boolean value);
+
+    public abstract void endSet(boolean value);
 
     public IQueueExtent getQueue(final World world) {
         final IQueueExtent queue = queuePool.get();

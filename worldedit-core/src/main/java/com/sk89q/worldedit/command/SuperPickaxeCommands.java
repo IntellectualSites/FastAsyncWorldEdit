@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
 import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -32,7 +33,7 @@ import com.sk89q.worldedit.command.tool.RecursivePickaxe;
 import com.sk89q.worldedit.command.tool.SinglePickaxe;
 import com.sk89q.worldedit.entity.Player;
 
-@Command(aliases = {"superpickaxe", "pickaxe", "sp"}, desc = "Super-pickaxe commands: [More Info](https://goo.gl/aBtGHo)")
+//@Command(aliases = {"superpickaxe", "pickaxe", "sp"}, desc = "Super-pickaxe commands: [More Info](https://goo.gl/aBtGHo)")
 public class SuperPickaxeCommands {
     private final WorldEdit we;
 
@@ -56,10 +57,11 @@ public class SuperPickaxeCommands {
             desc = "Enable the area super pickaxe pickaxe mode"
 )
     @CommandPermissions("worldedit.superpickaxe.area")
-    public void area(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
+    public void area(Player player, LocalSession session,
+                     @Arg(desc = "The range of the area pickaxe")
+                             int range) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
-        int range = args.getInteger(0);
 
         if (range > config.maxSuperPickaxeSize) {
             BBC.TOOL_RANGE_ERROR.send(player, config.maxSuperPickaxeSize);
@@ -77,10 +79,11 @@ public class SuperPickaxeCommands {
             desc = "Enable the recursive super pickaxe pickaxe mode"
 )
     @CommandPermissions("worldedit.superpickaxe.recursive")
-    public void recursive(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
+    public void recursive(Player player, LocalSession session,
+                          @Arg(desc = "The range of the recursive pickaxe")
+                                  double range) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
-        double range = args.getDouble(0);
 
         if (range > config.maxSuperPickaxeSize) {
             BBC.TOOL_RANGE_ERROR.send(player, config.maxSuperPickaxeSize);
