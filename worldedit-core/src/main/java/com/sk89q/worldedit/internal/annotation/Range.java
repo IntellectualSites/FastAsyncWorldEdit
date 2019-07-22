@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.internal.annotation;
 
-import com.sk89q.worldedit.util.command.binding.PrimitiveBindings;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

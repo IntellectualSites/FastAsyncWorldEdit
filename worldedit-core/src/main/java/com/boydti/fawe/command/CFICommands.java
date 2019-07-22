@@ -1,10 +1,7 @@
 package com.boydti.fawe.command;
 
-import static com.boydti.fawe.util.image.ImageUtil.load;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.SingleFilterBlock;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Commands;
@@ -21,23 +18,11 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.image.ImageUtil;
-import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-
-import java.nio.file.Path;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
-
-import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.exception.StopExecutionException;
-import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.command.MethodCommands;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
@@ -45,6 +30,7 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -55,11 +41,20 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.enginehub.piston.inject.InjectedValueAccess;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
@@ -67,6 +62,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
@@ -74,17 +70,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-import javax.imageio.ImageIO;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.inject.InjectedValueAccess;
+
+import static com.boydti.fawe.util.image.ImageUtil.load;
+import static com.sk89q.worldedit.command.MethodCommands.*;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-public class CFICommands extends MethodCommands {
+public class CFICommands {
 
     private final WorldEdit worldEdit;
 
@@ -102,18 +96,6 @@ public class CFICommands extends MethodCommands {
         List<? extends World> worlds = platform.getWorlds();
         Path path = worlds.get(0).getStoragePath();
         return new File(path.toFile().getParentFile().getParentFile(), worldName + File.separator + "region");
-    }
-
-    @Command(
-            name = "",
-            desc = "CFI command"
-    )
-    @CommandPermissions("worldedit.anvil.cfi")
-    public void cfi(FawePlayer fp, List<String> args) {
-        CFISettings settings = getSettings(fp);
-        if (!settings.hasGenerator()) {
-
-        }
     }
 
     @Command(
@@ -1045,7 +1027,6 @@ public class CFICommands extends MethodCommands {
                 .text("< [Back]").cmdTip(alias())
                 .send(fp);
     }
-
 
     private static CFISettings assertSettings(FawePlayer fp) {
         CFISettings settings = getSettings(fp);

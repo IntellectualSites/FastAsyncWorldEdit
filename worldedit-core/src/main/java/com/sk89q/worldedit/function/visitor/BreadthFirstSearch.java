@@ -22,7 +22,6 @@ package com.sk89q.worldedit.function.visitor;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.example.MappedIQueueExtent;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -36,8 +35,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Performs a breadth-first search starting from points added with

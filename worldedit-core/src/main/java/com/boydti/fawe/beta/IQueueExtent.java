@@ -126,5 +126,5 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
 
     boolean isEmpty();
 
-    void sendChunk(int chunkX, int chunkZ);
+    void sendChunk(int chunkX, int chunkZ, int bitMask);
 }

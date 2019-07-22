@@ -2,7 +2,6 @@ package com.boydti.fawe.object.change;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.object.HasIQueueExtent;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;

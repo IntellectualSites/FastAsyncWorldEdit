@@ -124,11 +124,13 @@ import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 
+import static com.sk89q.worldedit.command.MethodCommands.*;
+
 /**
  * Commands to set brush shape.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-public class BrushCommands extends MethodCommands {
+public class BrushCommands {
 
     private final WorldEdit worldEdit;
 
@@ -298,8 +300,8 @@ public class BrushCommands extends MethodCommands {
     }
 
     @Command(
-            name = "sspl",
-            aliases = {"sspline", "surfacespline"},
+            name = "surfacespline",
+            aliases = {"sspline", "sspl"},
             desc = "Draws a spline (curved line) on the surface",
             descFooter = "Create a spline on the surface\n" +
                    "Video: https://www.youtube.com/watch?v=zSN-2jJxXlM"
@@ -549,8 +551,8 @@ public class BrushCommands extends MethodCommands {
     }
 
     @Command(
-            name = "scmd",
-            aliases = {"scattercmd", "scattercommand", "scommand"},
+            name = "scattercommand",
+            aliases = {"scattercmd", "scmd", "scommand"},
             desc = "Run commands at random points on a surface",
             descFooter =
                     "Run commands at random points on a surface\n" +

@@ -1,13 +1,9 @@
 package com.boydti.fawe.object.visitor;
 
-import com.boydti.fawe.object.HasIQueueExtent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,11 +27,11 @@ public class AboveVisitor extends RecursiveVisitor {
      * @param baseY    the base Y
      */
     public AboveVisitor(Mask mask, RegionFunction function, int baseY) {
-        this(mask, function, baseY, Integer.MAX_VALUE, null);
+        this(mask, function, baseY, Integer.MAX_VALUE);
     }
 
-    public AboveVisitor(Mask mask, RegionFunction function, int baseY, int depth, HasIQueueExtent hasIQueueExtent) {
-        super(mask, function, depth, hasIQueueExtent);
+    public AboveVisitor(Mask mask, RegionFunction function, int baseY, int depth) {
+        super(mask, function, depth);
         checkNotNull(mask);
 
         this.baseY = baseY;

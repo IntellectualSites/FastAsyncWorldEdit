@@ -5,7 +5,6 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.exception.StopExecutionException;

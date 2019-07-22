@@ -11,6 +11,7 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
@@ -75,7 +76,7 @@ public class HeightBrush implements Brush {
         HeightMap map = getHeightMap();
         map.setSize(size);
 
-        IQueueExtent queue = editSession.getQueue();
+        Extent queue = editSession.getExtent();
         // Optimized application of height map
         if (queue instanceof HeightMapMCAGenerator) {
             HeightMapMCAGenerator hmmg = (HeightMapMCAGenerator) queue;
@@ -84,8 +85,6 @@ public class HeightBrush implements Brush {
             if (metaHeight == null) {
                 hmmg.getMetaData().setMeta("PRECISION_HEIGHT", metaHeight = new byte[hmmg.getArea()]);
             }
-
-            Vector3 origin = hmmg.getOrigin();
 
             int bx = position.getBlockX();
             int bz = position.getBlockZ();

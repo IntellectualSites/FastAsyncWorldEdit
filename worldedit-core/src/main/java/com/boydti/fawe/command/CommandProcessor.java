@@ -70,7 +70,7 @@ public abstract class CommandProcessor<I, O> implements CommandManager {
     public final O /* Need to recompile with FAWE-piston */ execute(InjectedValueAccess context, List<String> args) {
         args = preprocess(context, args);
         if (args != null) {
-            I result = (I) (Object) parent.execute(context, args);
+            I result = (I) parent.execute(context, args);
             return process(context, args, result); // TODO NOT IMPLEMENTED (recompile piston)
         } else {
             return null;
