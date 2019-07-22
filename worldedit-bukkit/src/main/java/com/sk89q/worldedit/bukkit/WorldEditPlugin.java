@@ -217,7 +217,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     public void setupRegistries() {
         // Biome
         for (Biome biome : Biome.values()) {
-            BiomeType.REGISTRY.register("minecraft:" + biome.name().toLowerCase(Locale.ROOT), new BiomeType("minecraft:" + biome.name().toLowerCase(Locale.ROOT)));
+            String lowerCaseBiomeName = biome.name().toLowerCase(Locale.ROOT);
+            BiomeType.REGISTRY.register("minecraft:" + lowerCaseBiomeName, new BiomeType("minecraft:" + lowerCaseBiomeName));
         }
         // Block & Item
         for (Material material : Material.values()) {
@@ -254,7 +255,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         for (org.bukkit.entity.EntityType entityType : org.bukkit.entity.EntityType.values()) {
             String mcid = entityType.getName();
             if (mcid != null) {
-                EntityType.REGISTRY.register("minecraft:" + mcid.toLowerCase(Locale.ROOT), new EntityType("minecraft:" + mcid.toLowerCase(Locale.ROOT)));
+                String lowerCaseMcId = mcid.toLowerCase(Locale.ROOT);
+                EntityType.REGISTRY.register("minecraft:" + lowerCaseMcId, new EntityType("minecraft:" + lowerCaseMcId));
             }
         }
     }
@@ -426,7 +428,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = cmd.getName();
+        split[0] = "/" + cmd.getName();
 
         CommandEvent event = new CommandEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
         getWorldEdit().getEventBus().post(event);
@@ -441,11 +443,12 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = cmd.getName();
+        split[0] = "/" + cmd.getName();
 
-        CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
+        String arguments = Joiner.on(" ").join(split);
+        CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), arguments);
         getWorldEdit().getEventBus().post(event);
-        return event.getSuggestions();
+        return CommandUtil.fixSuggestions(arguments, event.getSuggestions());
     }
 */
 
@@ -581,13 +584,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
             CommandSuggestionEvent suggestEvent = new CommandSuggestionEvent(wrapCommandSender(event.getSender()), event.getBuffer());
             getWorldEdit().getEventBus().post(suggestEvent);
-            List<String> suggestions = suggestEvent.getSuggestions();
-            if (suggestions != null && !suggestions.isEmpty()) {
-                event.setCompletions(suggestions);
-                event.setHandled(true);
-            }
-            //event.setCompletions(CommandUtil.fixSuggestions(event.getBuffer(), suggestEvent.getSuggestions()));
-            //event.setHandled(true);
+
+            event.setCompletions(CommandUtil.fixSuggestions(event.getBuffer(), suggestEvent.getSuggestions()));
+            event.setHandled(true);
         }
     }
 }

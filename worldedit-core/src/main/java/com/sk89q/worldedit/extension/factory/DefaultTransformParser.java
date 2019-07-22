@@ -31,7 +31,7 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
     public DefaultTransformParser(WorldEdit worldEdit) {
         super(worldEdit);
         this.dispatcher = new SimpleDispatcher();
-        this.register(new TransformCommands(worldEdit));
+        this.register(new TransformCommands());
     }
 
     @Override

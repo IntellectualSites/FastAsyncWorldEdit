@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.brush;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.brush.scroll.ScrollAction;
 import com.boydti.fawe.object.extent.ResettableExtent;
@@ -19,15 +21,12 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.Constant;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BrushSettings {
     public enum SettingType {
@@ -64,10 +63,7 @@ public class BrushSettings {
         if (constructor == null) {
             return new BrushSettings();
         }
-        String[] split = constructor.split(" ");
-
-        String args = constructor.replaceAll(split[0] + "[ ]?", "");
-        BrushSettings bs = (BrushSettings) manager.parse(Brush.class, args, player);
+        BrushSettings bs = (BrushSettings) manager.parseArgs(constructor);
         bs.constructor.put(SettingType.BRUSH, constructor);
         if (settings.containsKey(SettingType.PERMISSIONS.name())) {
             bs.permissions.addAll((Collection<? extends String>) settings.get(SettingType.PERMISSIONS.name()));

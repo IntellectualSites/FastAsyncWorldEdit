@@ -174,7 +174,7 @@ public class ErodeBrush extends Brush {
         vm.brushName(this.getName());
         vm.size();
         vm.custom(ChatColor.AQUA + "Erosion minimum exposed faces set to " + this.currentPreset.getErosionFaces());
-        vm.custom(ChatColor.BLUE + "Fill minumum touching faces set to " + this.currentPreset.getFillFaces());
+        vm.custom(ChatColor.BLUE + "Fill minimum touching faces set to " + this.currentPreset.getFillFaces());
         vm.custom(ChatColor.DARK_BLUE + "Erosion recursion amount set to " + this.currentPreset.getErosionRecursion());
         vm.custom(ChatColor.DARK_GREEN + "Fill recursion amount set to " + this.currentPreset.getFillRecursion());
     }
@@ -252,9 +252,9 @@ public class ErodeBrush extends Brush {
         /**
          * Generates a concat string of all options.
          *
-         * @param seperator Seperator for delimiting entries.
+         * @param separator Separator for delimiting entries.
          */
-        public static String getValuesString(String seperator) {
+        public static String getValuesString(String separator) {
             StringBuilder valuesString = new StringBuilder();
 
             boolean delimiterHelper = true;
@@ -262,7 +262,7 @@ public class ErodeBrush extends Brush {
                 if (delimiterHelper) {
                     delimiterHelper = false;
                 } else {
-                    valuesString.append(seperator);
+                    valuesString.append(separator);
                 }
                 valuesString.append(preset.name());
             }

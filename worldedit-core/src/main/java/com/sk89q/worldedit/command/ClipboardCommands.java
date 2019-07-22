@@ -99,14 +99,16 @@ import java.util.zip.ZipOutputStream;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ClipboardCommands {
 
+    private WorldEdit worldEdit;
+
     /**
      * Create a new instance.
      *
      * @param worldEdit reference to WorldEdit
      */
     public ClipboardCommands(WorldEdit worldEdit) {
-        super(worldEdit);
         checkNotNull(worldEdit);
+        this.worldEdit = worldEdit;
     }
 
 
@@ -262,7 +264,7 @@ public class ClipboardCommands {
 
             ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
             copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
-            copy.setCopyingEntities(copyEntities);
+            copy.setCopyingEntities(!skipEntities);
             copy.setRemovingEntities(true);
             copy.setCopyingBiomes(copyBiomes);
             Mask sourceMask = editSession.getSourceMask();

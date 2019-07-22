@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
+import static com.sk89q.worldedit.internal.command.CommandUtil.requireIV;
+
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -34,6 +37,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import java.util.List;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
@@ -42,11 +46,6 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.part.SubCommandPart;
 
-import java.util.List;
-
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-import static com.sk89q.worldedit.internal.command.CommandUtil.requireIV;
-
 /**
  * Extracted from {@link SelectionCommands} to allow importing of {@link Command}.
  */
@@ -54,8 +53,8 @@ import static com.sk89q.worldedit.internal.command.CommandUtil.requireIV;
 public class ExpandCommands {
 
     public static void register(CommandRegistrationHandler registration,
-        CommandManager commandManager,
-        CommandManagerService commandManagerService) {
+                                CommandManager commandManager,
+                                CommandManagerService commandManagerService) {
         // Collect the general expand command
         CommandManager collect = commandManagerService.newCommandManager();
 
@@ -121,13 +120,13 @@ public class ExpandCommands {
     )
     @Logging(REGION)
     public void expand(Player player, LocalSession session,
-        @Arg(desc = "Amount to expand the selection by, can be `vert` to expand to the whole vertical column")
-            int amount,
-        @Arg(desc = "Amount to expand the selection by in the other direction", def = "0")
-            int reverseAmount,
-        @Arg(desc = "Direction to expand", def = Direction.AIM)
-        @MultiDirection
-            List<BlockVector3> direction) throws WorldEditException {
+                       @Arg(desc = "Amount to expand the selection by, can be `vert` to expand to the whole vertical column")
+                           int amount,
+                       @Arg(desc = "Amount to expand the selection by in the other direction", def = "0")
+                           int reverseAmount,
+                       @Arg(desc = "Direction to expand", def = Direction.AIM)
+                       @MultiDirection
+                           List<BlockVector3> direction) throws WorldEditException {
         Region region = session.getSelection(player.getWorld());
         int oldSize = region.getArea();
 

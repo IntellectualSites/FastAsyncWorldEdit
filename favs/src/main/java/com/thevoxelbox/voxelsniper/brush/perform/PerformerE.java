@@ -22,11 +22,11 @@ import java.util.logging.Logger;
  *
  * new extra: n = no undo
  *
- * The main benefit of this system is that it provides the least possible number of characters in the paramaters
+ * The main benefit of this system is that it provides the least possible number of characters in the parameters
  * while guaranteeing that all sensible combinations will be made.  Additionally, the names will be VERY consistent
  *
  * EX Old System: /b b isrcup (use /v, /vi, /vr and /vir, update graphics and no physics)
- * EX New System: /b b ccup   (two characters shorter, good because snipers have been complaing about keystrokes)
+ * EX New System: /b b ccup   (two characters shorter, good because snipers have been complaining about keystrokes)
  *
  */
 

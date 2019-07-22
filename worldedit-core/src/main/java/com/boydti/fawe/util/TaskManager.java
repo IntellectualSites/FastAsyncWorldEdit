@@ -271,12 +271,12 @@ public abstract class TaskManager {
         return sync(function, Integer.MAX_VALUE);
     }
 
-    public void wait(AtomicBoolean running, int timout) {
+    public void wait(AtomicBoolean running, int timeout) {
         try {
             long start = System.currentTimeMillis();
             synchronized (running) {
                 while (running.get()) {
-                    running.wait(timout);
+                    running.wait(timeout);
                     if (running.get() && System.currentTimeMillis() - start > Settings.IMP.QUEUE.DISCARD_AFTER_MS) {
                         new RuntimeException("FAWE is taking a long time to execute a task (might just be a symptom): ").printStackTrace();
                         Fawe.debug("For full debug information use: /fawe threads");

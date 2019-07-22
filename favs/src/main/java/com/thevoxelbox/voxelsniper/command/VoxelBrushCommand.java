@@ -43,12 +43,12 @@ public class VoxelBrushCommand extends VoxelCommand {
                 Bukkit.getPluginManager().callEvent(event);
                 snipeData.getVoxelMessage().size();
                 return true;
-            } catch (NumberFormatException ingored) {
+            } catch (NumberFormatException ignored) {
             }
 
             Class<? extends IBrush> brush = plugin.getBrushManager().getBrushForHandle(args[0]);
             if (brush != null) {
-                IBrush orignalBrush = sniper.getBrush(currentToolId);
+                IBrush originalBrush = sniper.getBrush(currentToolId);
                 sniper.setBrush(currentToolId, brush);
 
                 if (args.length > 1) {
@@ -63,7 +63,7 @@ public class VoxelBrushCommand extends VoxelCommand {
                         return true;
                     }
                 }
-                SniperBrushChangedEvent event = new SniperBrushChangedEvent(sniper, currentToolId, orignalBrush, sniper.getBrush(currentToolId));
+                SniperBrushChangedEvent event = new SniperBrushChangedEvent(sniper, currentToolId, originalBrush, sniper.getBrush(currentToolId));
                 sniper.displayInfo();
                 return true;
             } else {

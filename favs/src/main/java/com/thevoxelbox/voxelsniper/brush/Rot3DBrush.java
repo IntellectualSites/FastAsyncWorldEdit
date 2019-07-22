@@ -102,10 +102,10 @@ public class Rot3DBrush extends Brush {
 
     private void rotate(final SnipeData v) {
         // basically 1) make it a sphere we are rotating in, not a cylinder
-        // 2) do three rotations in a row, one in each dimension, unless some dimensions are set to zero or udnefined or whatever, then skip those.
-        // --> Why not utilize Sniper'world new oportunities and have arrow rotate all 3, powder rotate x, goldsisc y, otherdisc z. Or something like that. Or
+        // 2) do three rotations in a row, one in each dimension, unless some dimensions are set to zero or undefined or whatever, then skip those.
+        // --> Why not utilize Sniper'world new opportunities and have arrow rotate all 3, powder rotate x, goldsisc y, otherdisc z. Or something like that. Or
         // we
-        // could just use arrow and powder and just differenciate between left and right click that gis 4 different situations
+        // could just use arrow and powder and just differentiate between left and right click that gis 4 different situations
         // --> Well, there would be 7 different possibilities... X, Y, Z, XY, XZ, YZ, XYZ, and different numbers of parameters for each, so I think each having
         // and item is too confusing. How about this: arrow = rotate one dimension, based on the face you click, and takes 1 param... powder: rotates all three
         // at once, and takes 3 params.

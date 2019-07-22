@@ -29,24 +29,29 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.util.formatting.component.PaginationBox;
+import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.snapshot.InvalidSnapshotException;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
 
 /**
  * Snapshot commands.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-@Command(aliases = {"snapshot", "snap"}, desc = "List, load and view information related to snapshots")
 public class SnapshotCommands {
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
@@ -63,8 +68,8 @@ public class SnapshotCommands {
     )
     @CommandPermissions("worldedit.snapshots.list")
     public void list(Player player,
-                     @Arg(desc = "# of snapshots to list", def = "5")
-                         int num) throws WorldEditException {
+                     @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
+                         int page) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
@@ -77,15 +82,7 @@ public class SnapshotCommands {
             List<Snapshot> snapshots = config.snapshotRepo.getSnapshots(true, player.getWorld().getName());
 
             if (!snapshots.isEmpty()) {
-
-                num = Math.min(40, Math.max(5, num));
-
-                BBC.SNAPSHOT_LIST_HEADER.send(player, player.getWorld().getName());
-                for (byte i = 0; i < Math.min(num, snapshots.size()); i++) {
-                    player.print((i + 1) + ". " + snapshots.get(i).getName());
-                }
-
-                BBC.SNAPSHOT_LIST_FOOTER.send(player);
+                player.print(new SnapshotListBox(player.getWorld().getName(), snapshots).create(page));
             } else {
                 BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
 
@@ -200,19 +197,19 @@ public class SnapshotCommands {
             return;
         }
 
-            try {
-                Snapshot snapshot = config.snapshotRepo.getSnapshotBefore(date, player.getWorld().getName());
+        try {
+            Snapshot snapshot = config.snapshotRepo.getSnapshotBefore(date, player.getWorld().getName());
 
-                if (snapshot == null) {
-                    player.printError("Couldn't find a snapshot before "
-                    + dateFormat.withZone(session.getTimeZone().toZoneId()).format(date) + ".");
-                } else {
-                    session.setSnapshot(snapshot);
-                    BBC.SNAPSHOT_SET.send(player, snapshot.getName());
-                }
-            } catch (MissingWorldException ex) {
-                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+            if (snapshot == null) {
+                player.printError("Couldn't find a snapshot before "
+                    + dateFormat.withZone(session.getTimeZone()).format(date) + ".");
+            } else {
+                session.setSnapshot(snapshot);
+                BBC.SNAPSHOT_SET.send(player, snapshot.getName());
             }
+        } catch (MissingWorldException ex) {
+            BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+        }
     }
 
     @Command(
@@ -231,18 +228,40 @@ public class SnapshotCommands {
             return;
         }
 
-            try {
-                Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, player.getWorld().getName());
-                if (snapshot == null) {
-                    player.printError("Couldn't find a snapshot after "
-                    + dateFormat.withZone(session.getTimeZone().toZoneId()).format(date) + ".");
-                } else {
-                    session.setSnapshot(snapshot);
-                    BBC.SNAPSHOT_SET.send(player, snapshot.getName());
-                }
-            } catch (MissingWorldException ex) {
-                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+        try {
+            Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, player.getWorld().getName());
+            if (snapshot == null) {
+                player.printError("Couldn't find a snapshot after "
+                    + dateFormat.withZone(session.getTimeZone()).format(date) + ".");
+            } else {
+                session.setSnapshot(snapshot);
+                BBC.SNAPSHOT_SET.send(player, snapshot.getName());
+            }
+        } catch (MissingWorldException ex) {
+            BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
         }
     }
 
+    private static class SnapshotListBox extends PaginationBox {
+        private final List<Snapshot> snapshots;
+
+        SnapshotListBox(String world, List<Snapshot> snapshots) {
+            super("Snapshots for: " + world, "/snap list -p %page%");
+            this.snapshots = snapshots;
+        }
+
+        @Override
+        public Component getComponent(int number) {
+            final Snapshot snapshot = snapshots.get(number);
+            return TextComponent.of(number + 1 + ". ", TextColor.GOLD)
+                    .append(TextComponent.of(snapshot.getName(), TextColor.LIGHT_PURPLE)
+                            .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to use")))
+                            .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/snap use " + snapshot.getName())));
+        }
+
+        @Override
+        public int getComponentsSize() {
+            return snapshots.size();
+        }
+    }
 }

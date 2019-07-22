@@ -199,9 +199,9 @@ public class BukkitWorld extends AbstractWorld {
 
                         // We have to restore the block if it was outside
                         if (!region.contains(pt)) {
-                            editSession.setBlock(pt, history[index]);
+                            editSession.smartSetBlock(pt, history[index]);
                         } else { // Otherwise fool with history
-                            editSession.setBlock().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
+                            editSession.getChangeSet().add(new BlockChange(pt, history[index], editSession.getFullBlock(pt)));
                         }
                     }
                 }
@@ -318,14 +318,13 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean equals(Object other) {
-        World ref = worldRef.get();
-        if (ref == null) {
+        if (worldRef.get() == null) {
             return false;
         } else if (other == null) {
             return false;
         } else if ((other instanceof BukkitWorld)) {
             World otherWorld = ((BukkitWorld) other).worldRef.get();
-            return ref.equals(otherWorld);
+            return otherWorld != null && otherWorld.equals(getWorld());
         } else if (other instanceof com.sk89q.worldedit.world.World) {
             return ((com.sk89q.worldedit.world.World) other).getName().equals(getName());
         } else {
@@ -420,8 +419,21 @@ public class BukkitWorld extends AbstractWorld {
         getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
     }
 
+    private static volatile boolean hasWarnedImplError = false;
+
     @Override
     public com.sk89q.worldedit.world.block.BlockState getBlock(BlockVector3 position) {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            try {
+                return adapter.getBlock(BukkitAdapter.adapt(getWorld(), position)).toImmutableState();
+            } catch (Exception e) {
+                if (!hasWarnedImplError) {
+                    hasWarnedImplError = true;
+                    logger.warn("Unable to retrieve block via impl adapter", e);
+                }
+            }
+        }
         Block bukkitBlock = getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
         return BukkitAdapter.adapt(bukkitBlock.getBlockData());
     }

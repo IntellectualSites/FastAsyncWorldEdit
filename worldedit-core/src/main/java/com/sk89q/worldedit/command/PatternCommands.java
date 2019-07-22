@@ -51,8 +51,7 @@ public class PatternCommands extends MethodCommands {
     @Command(
             name = "#existing",
             aliases = {"#*", "*", ".*"},
-            desc = "Use the block that is already there",
-            usage = "[properties]"
+            desc = "Use the block that is already there"
     )
     public Pattern existing(Extent extent, @Arg(name = "properties", desc = "String", def = "") String properties) { // TODO FIXME , @Arg(name = "properties", desc = "String", def = "") String properties
         if (properties == null) return new ExistingPattern(extent);

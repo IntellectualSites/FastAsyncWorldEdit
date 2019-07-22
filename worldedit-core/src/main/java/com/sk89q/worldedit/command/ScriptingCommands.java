@@ -114,10 +114,11 @@ public class ScriptingCommands {
                 file = new FileInputStream(f);
             }
 
-            DataInputStream in = new DataInputStream(file);
-            byte[] data = new byte[in.available()];
-            in.readFully(data);
-            in.close();
+            byte[] data;
+            try (DataInputStream in = new DataInputStream(file)) {
+                data = new byte[in.available()];
+                in.readFully(data);
+            }
             script = new String(data, 0, data.length, StandardCharsets.UTF_8);
         } catch (IOException e) {
             actor.printError("Script read error: " + e.getMessage());
@@ -131,11 +132,10 @@ public class ScriptingCommands {
         WorldEdit worldEdit = WorldEdit.getInstance();
         LocalSession session = worldEdit.getSessionManager().get(actor);
 
-        CraftScriptEngine engine = null;
+        CraftScriptEngine engine;
 
         Object result = null;
         try {
-
             engine = new RhinoCraftScriptEngine();
         } catch (NoClassDefFoundError e) {
             actor.printError("Failed to find an installed script engine.");
@@ -182,10 +182,11 @@ public class ScriptingCommands {
     )
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void execute(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
-        final String[] scriptArgs = args.getSlice(1);
-        final String filename = args.getString(0);
-
+    public void execute(Player player, LocalSession session,
+                        @Arg(desc = "Filename of the CraftScript to load")
+                            String filename,
+                        @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
+                            List<String> args) throws WorldEditException {
         if (!player.hasPermission("worldedit.scripting.execute." + filename)) {
             BBC.SCRIPTING_NO_PERM.send(player);
             return;
@@ -204,7 +205,8 @@ public class ScriptingCommands {
             player.printError("More info: https://github.com/boy0001/CraftScripts/");
             return;
         }
-        runScript(LocationMaskedPlayerWrapper.unwrap(player), f, scriptArgs);
+        worldEdit.runScript(LocationMaskedPlayerWrapper.unwrap(player), f, Stream.concat(Stream.of(filename), args.stream())
+            .toArray(String[]::new));
     }
 
     @Command(

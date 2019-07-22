@@ -82,10 +82,6 @@ public class CFICommand extends MethodCommands {
                             dispatcher.call(cmd, context.getLocals(), new String[0]);
                             return;
                         }
-                        case 2:
-                            String cmd = Commands.getAlias(CFICommands.class, "empty") + " " + context.getJoinedStrings(0);
-                            dispatcher.call(cmd, context.getLocals(), new String[0]);
-                            return;
                     }
                 }
                 dispatcher.call(remaining, context.getLocals(), new String[0]);

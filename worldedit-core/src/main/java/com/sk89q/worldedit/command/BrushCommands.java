@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.FawePrimitiveBinding;
 import com.boydti.fawe.config.BBC;
@@ -65,6 +67,7 @@ import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.command.factory.TreeGeneratorFactory;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -74,6 +77,7 @@ import com.sk89q.worldedit.command.tool.brush.CylinderBrush;
 import com.sk89q.worldedit.command.tool.brush.GravityBrush;
 import com.sk89q.worldedit.command.tool.brush.HollowCylinderBrush;
 import com.sk89q.worldedit.command.tool.brush.HollowSphereBrush;
+import com.sk89q.worldedit.command.tool.brush.OperationFactoryBrush;
 import com.sk89q.worldedit.command.tool.brush.SmoothBrush;
 import com.sk89q.worldedit.command.tool.brush.SphereBrush;
 import com.sk89q.worldedit.command.util.CommandPermissions;
@@ -83,28 +87,27 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.function.Contextual;
+import com.sk89q.worldedit.function.factory.Deform;
+import com.sk89q.worldedit.function.factory.Paint;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.factory.RegionFactory;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import org.enginehub.piston.inject.Key;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -113,9 +116,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.inject.InjectedValueAccess;
+import org.enginehub.piston.inject.Key;
 
 /**
  * Commands to set brush shape.
@@ -191,13 +198,15 @@ public class BrushCommands extends MethodCommands {
             aliases = {"recurse", "r"},
             desc = "Set all connected blocks",
             descFooter = "Set all connected blocks\n" +
-                    "The -d flag Will apply in depth first order\n" +
                     "Note: Set a mask to recurse along specific blocks"
     )
     @CommandPermissions("worldedit.brush.recursive")
     public BrushSettings recursiveBrush(Player player, LocalSession session, EditSession editSession, Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "5")
-            Expression radius, @Switch(name='d', desc = "TODO") boolean depthFirst, InjectedValueAccess context) throws WorldEditException {
+            Expression radius,
+        @Switch(name='d', desc = "Apply in depth first order")
+            boolean depthFirst,
+        InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         return set(session, context,
                 new RecurseBrush(depthFirst))
@@ -210,15 +219,17 @@ public class BrushCommands extends MethodCommands {
             name = "line",
             aliases = {"l"},
             desc = "Create lines",
-            descFooter = "Create lines.\n" +
-                   "The -h flag creates only a shell\n" +
-                   "The -s flag selects the clicked point after drawing\n" +
-                   "The -f flag creates a flat line"
     )
     @CommandPermissions("worldedit.brush.line")
     public BrushSettings lineBrush(Player player, LocalSession session, Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "0")
-        Expression radius, @Switch(name='h', desc = "TODO") boolean shell, @Switch(name='s', desc = "TODO") boolean select, @Switch(name='f', desc = "TODO") boolean flat, InjectedValueAccess context) throws WorldEditException {
+            Expression radius,
+        @Switch(name='h', desc = "Create only a shell")
+            boolean shell,
+        @Switch(name='s', desc = "Selects the clicked point after drawing")
+            boolean select,
+        @Switch(name='f', desc = "Create a flat line")
+            boolean flat, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         return set(session, context,
                 new LineBrush(shell, select, flat))
@@ -265,17 +276,19 @@ public class BrushCommands extends MethodCommands {
     @Command(
             name = "catenary",
             aliases = {"cat", "gravityline", "saggedline"},
-            desc = "Create a hanging line between two points",
-            descFooter = "Create a hanging line between two points.\n" +
-                    "The lengthFactor controls how long the line is\n" +
-                    "The -h flag creates only a shell\n" +
-                    "The -s flag selects the clicked point after drawing\n" +
-                    "The -d flag sags the catenary toward the facing direction\n"
+            desc = "Create a hanging line between two points"
     )
     @CommandPermissions("worldedit.brush.spline")
     public BrushSettings catenaryBrush(LocalSession session, Pattern fill, @Arg(def = "1.2", desc = "Length of wire compared to distance between points") @Range(min=1) double lengthFactor,
         @Arg(desc = "The radius to sample for blending", def = "0")
-        Expression radius, @Switch(name='h', desc = "TODO") boolean shell, @Switch(name='s', desc = "TODO") boolean select, @Switch(name='d', desc = "TODO") boolean facingDirection, InjectedValueAccess context) throws WorldEditException {
+            Expression radius,
+        @Switch(name='h', desc = "Create only a shell")
+            boolean shell,
+        @Switch(name='s', desc = "Select the clicked point after drawing")
+            boolean select,
+        @Switch(name='d', desc = "sags the catenary toward the facing direction")
+            boolean facingDirection,
+        InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         Brush brush = new CatenaryBrush(shell, select, facingDirection, lengthFactor);
         return set(session, context,
@@ -384,18 +397,16 @@ public class BrushCommands extends MethodCommands {
     @Command(
             name = "stencil",
             desc = "Use a height map to paint a surface",
-            descFooter = "Use a height map to paint any surface.\n" +
-                   "The -w flag will only apply at maximum saturation\n" +
-                   "The -r flag will apply random rotation"
+            descFooter = "Use a height map to paint any surface.\n"
 )
     @CommandPermissions("worldedit.brush.stencil")
     public BrushSettings stencilBrush(Player player, LocalSession session, Pattern fill,
                                       @Arg(name = "radius", desc = "Expression", def = "5") Expression radius,
                                       @Arg(name = "image", desc = "String", def = "") String image,
-                                      @Arg(def = "0", desc = "rotation") @Step(90) @Range(min=0, max=360) final int rotation,
-                                      @Arg(name = "yscale", desc = "double", def = "1") final double yscale,
-                                      @Switch(name='w', desc = "TODO") boolean onlyWhite,
-                                      @Switch(name='r', desc = "TODO") boolean randomRotate,
+                                      @Arg(def = "0", desc = "rotation") @Range(min=0, max=360) int rotation,
+                                      @Arg(name = "yscale", desc = "double", def = "1") double yscale,
+                                      @Switch(name='w', desc = "Apply at maximum saturation") boolean onlyWhite,
+                                      @Switch(name='r', desc = "Apply random rotation") boolean randomRotate,
                                       InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
         worldEdit.checkMaxBrushRadius(radius);
         InputStream stream = getHeightmapStream(image);
@@ -418,16 +429,13 @@ public class BrushCommands extends MethodCommands {
             name = "image",
             aliases = {"color"},
             desc = "Use a height map to paint a surface",
-            descFooter = "Use a height map to paint any surface.\n" +
-                   "The -a flag will use image alpha\n" +
-                   "The -f blends the image with the existing terrain"
-)
+            descFooter = "Use a height map to paint any surface.\n")
     @CommandPermissions("worldedit.brush.stencil")
     public BrushSettings imageBrush(LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius,
             FawePrimitiveBinding.ImageUri imageUri,
-            @Arg(def = "1", desc = "scale height") @Range(min=Double.MIN_NORMAL) final double yscale,
-            @Switch(name='a', desc = "TODO") boolean alpha,
-            @Switch(name='f', desc = "TODO") boolean fadeOut,
+            @Arg(def = "1", desc = "scale height") @Range(min=Double.MIN_NORMAL) double yscale,
+            @Switch(name='a', desc = "Use image Alpha") boolean alpha,
+            @Switch(name='f', desc = "Blend the image with existing terrain") boolean fadeOut,
             InjectedValueAccess context) throws WorldEditException, IOException {
         BufferedImage image = imageUri.load();
         worldEdit.checkMaxBrushRadius(radius);
@@ -454,7 +462,10 @@ public class BrushCommands extends MethodCommands {
                    "The -r flag will apply random rotation"
 )
     @CommandPermissions("worldedit.brush.surface")
-    public BrushSettings surfaceBrush(LocalSession session, Pattern fill, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, InjectedValueAccess context) throws WorldEditException {
+    public BrushSettings surfaceBrush(LocalSession session, Pattern fill,
+        @Arg(name = "radius", desc = "Expression", def = "5")
+            Expression radius,
+        InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         return set(session, context, new SurfaceSphereBrush()).setFill(fill).setSize(radius);
     }
@@ -504,8 +515,7 @@ public class BrushCommands extends MethodCommands {
             }
 
             return set(session, context,
-                    new PopulateSchem(mask, holders, (int) density, rotate))
-                    .setSize(radius);
+                    new PopulateSchem(mask, holders, (int) density, rotate)).setSize(radius);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -521,9 +531,7 @@ public class BrushCommands extends MethodCommands {
     @CommandPermissions("worldedit.brush.layer")
     public BrushSettings surfaceLayer(LocalSession session, Expression radius, List<BlockState> layers, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        return set(session, context,
-                new LayerBrush(layers.toArray(new BlockState[0])))
-                .setSize(radius);
+        return set(session, context, new LayerBrush(layers.toArray(new BlockState[0]))).setSize(radius);
     }
 
     @Command(
@@ -537,10 +545,7 @@ public class BrushCommands extends MethodCommands {
     @CommandPermissions("worldedit.brush.splatter")
     public BrushSettings splatterBrush(LocalSession session, Pattern fill, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "points", desc = "double", def = "1") double points, @Arg(name = "recursion", desc = "double", def = "5") double recursion, @Arg(name = "solid", desc = "boolean", def = "true") boolean solid, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        return set(session, context,
-                new SplatterBrush((int) points, (int) recursion, solid))
-                .setSize(radius)
-                .setFill(fill);
+        return set(session, context, new SplatterBrush((int) points, (int) recursion, solid)).setSize(radius).setFill(fill);
     }
 
     @Command(
@@ -596,7 +601,6 @@ public class BrushCommands extends MethodCommands {
             aliases = { "copy" },
             desc = "Choose the clipboard brush (Recommended: `/br copypaste`)",
             descFooter = "Chooses the clipboard brush.\n" +
-                   "The -a flag makes it not paste air.\n" +
                    "Without the -p flag, the paste will appear centered at the target location. " +
                    "With the flag, then the paste will appear relative to where you had " +
                    "stood relative to the copied area when you copied it."
@@ -700,7 +704,7 @@ public class BrushCommands extends MethodCommands {
                    "Snow Pic: https://i.imgur.com/Hrzn0I4.png"
     )
     @CommandPermissions("worldedit.brush.height")
-    public BrushSettings heightBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") final String image, @Arg(def = "0", desc = "rotation") @Step(90) @Range(min=0, max=360) final int rotation, @Arg(name = "yscale", desc = "double", def = "1") final double yscale, @Switch(name='r', desc = "TODO") boolean randomRotate, @Switch(name='l', desc = "TODO") boolean layers, @Switch(name='s', desc = "TODO") boolean dontSmooth, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
+    public BrushSettings heightBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") String image, @Arg(def = "0", desc = "rotation") @Range(min=0, max=360) int rotation, @Arg(name = "yscale", desc = "double", def = "1") double yscale, @Switch(name='r', desc = "TODO") boolean randomRotate, @Switch(name='l', desc = "TODO") boolean layers, @Switch(name='s', desc = "TODO") boolean dontSmooth, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
         return terrainBrush(player, session, radius, image, rotation, yscale, false, randomRotate, layers, !dontSmooth, ScalableHeightMap.Shape.CONE, context);
     }
 
@@ -714,21 +718,23 @@ public class BrushCommands extends MethodCommands {
                    " - The `-s` flag disables smoothing"
     )
     @CommandPermissions("worldedit.brush.height")
-    public BrushSettings cliffBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") String image, @Arg(def = "0", desc = "rotation") @Step(90) @Range(min=0, max=360) final int rotation, @Arg(name = "yscale", desc = "double", def = "1") final double yscale, @Switch(name='r', desc = "TODO") boolean randomRotate, @Switch(name='l', desc = "TODO") boolean layers, @Switch(name='s', desc = "TODO") boolean dontSmooth, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
+    public BrushSettings cliffBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") String image, @Arg(def = "0", desc = "rotation") @Step(90) @Range(min=0, max=360) int rotation, @Arg(name = "yscale", desc = "double", def = "1") double yscale, @Switch(name='r', desc = "TODO") boolean randomRotate, @Switch(name='l', desc = "TODO") boolean layers, @Switch(name='s', desc = "TODO") boolean dontSmooth, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
         return terrainBrush(player, session, radius, image, rotation, yscale, true, randomRotate, layers, !dontSmooth, ScalableHeightMap.Shape.CYLINDER, context);
     }
 
     @Command(
             name = "flatten",
             aliases = {"flatmap", "flat"},
-            descFooter = "Flatten brush flattens terrain\n" +
-                   " - The `-r` flag enables random off-axis rotation\n" +
-                   " - The `-l` flag will work on snow layers\n" +
-                   " - The `-s` flag disables smoothing",
             desc = "This brush raises or lowers land towards the clicked point"
     )
     @CommandPermissions("worldedit.brush.height")
-    public BrushSettings flattenBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") final String image, @Arg(def = "0", desc = "rotation") @Step(90) @Range(min=0, max=360) final int rotation, @Arg(name = "yscale", desc = "double", def = "1") final double yscale, @Switch(name='r', desc = "TODO") boolean randomRotate, @Switch(name='l', desc = "TODO") boolean layers, @Switch(name='s', desc = "TODO") boolean dontSmooth, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
+    public BrushSettings flattenBrush(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Arg(name = "image", desc = "String", def = "") String image, @Arg(def = "0", desc = "rotation") @Step(90) @Range(min=0, max=360) int rotation, @Arg(name = "yscale", desc = "double", def = "1") double yscale,
+        @Switch(name='r', desc = "Enables random off-axis rotation")
+            boolean randomRotate,
+        @Switch(name='l', desc = "Will work on snow layers")
+            boolean layers,
+        @Switch(name='s', desc = "Disables smoothing")
+            boolean dontSmooth, InjectedValueAccess context) throws WorldEditException, FileNotFoundException {
         return terrainBrush(player, session, radius, image, rotation, yscale, true, randomRotate, layers, !dontSmooth, ScalableHeightMap.Shape.CONE, context);
     }
 
@@ -759,7 +765,7 @@ public class BrushCommands extends MethodCommands {
 
     private InputStream getHeightmapStream(String filename) throws FileNotFoundException {
         if (filename == null) return null;
-        String filenamePng = (filename.endsWith(".png") ? filename : filename + ".png");
+        String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
         File file = new File(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP + File.separator + filenamePng);
         if (file.exists()) return new FileInputStream(file);
         URI uri = ImageUtil.getImageURI(filename);
@@ -773,13 +779,11 @@ public class BrushCommands extends MethodCommands {
             desc = "Copy Paste brush",
             descFooter = "Left click the base of an object to copy.\n" +
                    "Right click to paste\n" +
-                   "The -r flag Will apply random rotation on paste\n" +
-                   "The -a flag Will apply auto view based rotation on paste\n" +
                    "Note: Works well with the clipboard scroll action\n" +
                    "Video: https://www.youtube.com/watch?v=RPZIaTbqoZw"
     )
     @CommandPermissions("worldedit.brush.copy")
-    public BrushSettings copy(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Switch(name='r', desc = "TODO") boolean randomRotate, @Switch(name='a', desc = "TODO") boolean autoRotate, InjectedValueAccess context) throws WorldEditException {
+    public BrushSettings copy(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Switch(name='r', desc = "Apply random rotation on paste") boolean randomRotate, @Switch(name='a', desc = "Apply auto view based rotation on paste") boolean autoRotate, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         player.print(BBC.BRUSH_COPY.f(radius));
 
@@ -861,7 +865,8 @@ public class BrushCommands extends MethodCommands {
     }
 
     public BrushSettings set(LocalSession session, InjectedValueAccess context, Brush brush) throws InvalidToolBindException {
-        Player plr = context.injectedValue(Key.of(Player.class)).orElseThrow(() -> new IllegalStateException("No player"));
+        Player plr = context.injectedValue(Key.of(Player.class))
+            .orElseThrow(() -> new IllegalStateException("No player"));
         BrushSettings bs = new BrushSettings();
         BrushTool tool = session.getBrushTool(plr, false);
         if (tool != null) {
@@ -873,11 +878,65 @@ public class BrushCommands extends MethodCommands {
                 }
             }
         }
-        String[] perms = getPermissions(context);
-        bs.addPermissions(perms);
-        String args = getArguments(context);
-        bs.addSetting(BrushSettings.SettingType.BRUSH, args.substring(args.indexOf(' ') + 1));
-        return bs.setBrush(brush);
+        return bs;
     }
 
+    @Command(
+        name = "forest",
+        desc = "Forest brush, creates a forest in the area"
+    )
+    @CommandPermissions("worldedit.brush.forest")
+    public void forest(Player player, LocalSession localSession,
+        @Arg(desc = "The shape of the region")
+            RegionFactory shape,
+        @Arg(desc = "The size of the brush", def = "5")
+            double radius,
+        @Arg(desc = "The density of the brush", def = "20")
+            double density,
+        @Arg(desc = "The type of tree to use")
+            TreeGenerator.TreeType type) throws WorldEditException {
+        setOperationBasedBrush(player, localSession, radius,
+            new Paint(new TreeGeneratorFactory(type), density / 100), shape, "worldedit.brush.forest");
+    }
+
+    @Command(
+        name = "raise",
+        desc = "Raise brush, raise all blocks by one"
+    )
+    @CommandPermissions("worldedit.brush.raise")
+    public void raise(Player player, LocalSession localSession,
+                      @Arg(desc = "The shape of the region")
+                          RegionFactory shape,
+                      @Arg(desc = "The size of the brush", def = "5")
+                          double radius) throws WorldEditException {
+        setOperationBasedBrush(player, localSession, radius,
+            new Deform("y-=1"), shape, "worldedit.brush.raise");
+    }
+
+    @Command(
+        name = "lower",
+        desc = "Lower brush, lower all blocks by one"
+    )
+    @CommandPermissions("worldedit.brush.lower")
+    public void lower(Player player, LocalSession localSession,
+                      @Arg(desc = "The shape of the region")
+                          RegionFactory shape,
+                      @Arg(desc = "The size of the brush", def = "5")
+                          double radius) throws WorldEditException {
+        setOperationBasedBrush(player, localSession, radius,
+            new Deform("y+=1"), shape, "worldedit.brush.lower");
+    }
+
+    static void setOperationBasedBrush(Player player, LocalSession session, double radius,
+                                        Contextual<? extends Operation> factory,
+                                        RegionFactory shape,
+                                        String permission) throws WorldEditException {
+        WorldEdit.getInstance().checkMaxBrushRadius(radius);
+        BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+        tool.setSize(radius);
+        tool.setFill(null);
+        tool.setBrush(new OperationFactoryBrush(factory, shape, session), permission);
+
+        player.print("Set brush to " + factory);
+    }
 }

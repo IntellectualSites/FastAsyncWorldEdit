@@ -20,9 +20,6 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -30,9 +27,14 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.AreaPickaxe;
 import com.sk89q.worldedit.command.tool.RecursivePickaxe;
 import com.sk89q.worldedit.command.tool.SinglePickaxe;
+import com.sk89q.worldedit.command.util.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
 
-@Command(aliases = {"superpickaxe", "pickaxe", "sp"}, desc = "Super-pickaxe commands: [More Info](https://goo.gl/aBtGHo)")
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class SuperPickaxeCommands {
     private final WorldEdit we;
 
@@ -41,9 +43,9 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-            name = "single",
-            desc = "Enable the single block super pickaxe mode"
-)
+        name = "single",
+        desc = "Enable the single block super pickaxe mode"
+    )
     @CommandPermissions("worldedit.superpickaxe")
     public void single(Player player, LocalSession session) throws WorldEditException {
         session.setSuperPickaxe(new SinglePickaxe());
@@ -52,14 +54,15 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-            name = "area",
-            desc = "Enable the area super pickaxe pickaxe mode"
-)
+        name = "area",
+        desc = "Enable the area super pickaxe pickaxe mode"
+    )
     @CommandPermissions("worldedit.superpickaxe.area")
-    public void area(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
+    public void area(Player player, LocalSession session,
+                     @Arg(desc = "The range of the area pickaxe")
+                         int range) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
-        int range = args.getInteger(0);
 
         if (range > config.maxSuperPickaxeSize) {
             BBC.TOOL_RANGE_ERROR.send(player, config.maxSuperPickaxeSize);
@@ -72,15 +75,16 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-            name = "recur",
-            aliases = {"recursive"},
-            desc = "Enable the recursive super pickaxe pickaxe mode"
-)
+        name = "recursive",
+        aliases = { "recur" },
+        desc = "Enable the recursive super pickaxe pickaxe mode"
+    )
     @CommandPermissions("worldedit.superpickaxe.recursive")
-    public void recursive(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
+    public void recursive(Player player, LocalSession session,
+                          @Arg(desc = "The range of the recursive pickaxe")
+                              double range) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
-        double range = args.getDouble(0);
 
         if (range > config.maxSuperPickaxeSize) {
             BBC.TOOL_RANGE_ERROR.send(player, config.maxSuperPickaxeSize);

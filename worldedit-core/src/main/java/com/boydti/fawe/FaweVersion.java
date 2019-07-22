@@ -24,8 +24,8 @@ public class FaweVersion {
     public static FaweVersion tryParse(String version, String commit, String date) {
         try {
             return new FaweVersion(version, commit, date);
-        } catch (Exception ignore) {
-            ignore.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
             return new FaweVersion(0, 0, 0, 0, 0);
         }
     }

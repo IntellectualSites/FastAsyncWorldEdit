@@ -27,7 +27,7 @@ import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
 import com.boydti.fawe.object.regions.selector.PolyhedralRegionSelector;
-
+import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -38,7 +38,6 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -470,7 +469,7 @@ public class SelectionCommands {
     public void count(Player player, LocalSession session, EditSession editSession,
                       @Arg(desc = "The mask of blocks to match")
                           Mask mask) throws WorldEditException {
-        int count = editSession.countBlock(session.getSelection(player.getWorld()), mask);
+        int count = editSession.countBlocks(session.getSelection(player.getWorld()), mask);
         BBC.SELECTION_COUNT.send(player, count);
     }
 

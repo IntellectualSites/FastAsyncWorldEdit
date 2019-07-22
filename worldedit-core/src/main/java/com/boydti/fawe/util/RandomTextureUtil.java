@@ -32,7 +32,7 @@ public class RandomTextureUtil extends CachedTextureUtil {
 
     private int random(int i) {
         if (i < 0) {
-            int i1 = (-i);
+            int i1 = -i;
             return -ThreadLocalRandom.current().nextInt(i1);
         } else {
             return ThreadLocalRandom.current().nextInt(i);

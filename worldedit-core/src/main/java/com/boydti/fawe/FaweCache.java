@@ -112,11 +112,11 @@ public final class FaweCache implements Trimable {
          */
         public int[] paletteToBlock;
 
-        public int blockstatesLength;
+        public int blockStatesLength;
         /**
-         * Reusable buffer array, MUST check blockstatesLength for actual length
+         * Reusable buffer array, MUST check blockStatesLength for actual length
          */
-        public long[] blockstates;
+        public long[] blockStates;
     }
 
     private static final IterableThreadLocal<Palette> PALETTE_CACHE = new IterableThreadLocal<Palette>() {
@@ -149,7 +149,7 @@ public final class FaweCache implements Trimable {
     private static Palette toPalette(int layerOffset, int[] blocksInts, char[] blocksChars) {
         int[] blockToPalette = BLOCK_TO_PALETTE.get();
         int[] paletteToBlock = PALETTE_TO_BLOCK.get();
-        long[] blockstates = BLOCK_STATES.get();
+        long[] blockStates = BLOCK_STATES.get();
         int[] blocksCopy = SECTION_BLOCKS.get();
 
         int blockIndexStart = layerOffset << 12;
@@ -193,10 +193,10 @@ public final class FaweCache implements Trimable {
             int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
             if (num_palette == 1) {
                 // Set a value, because minecraft needs it for some  reason
-                blockstates[0] = 0;
+                blockStates[0] = 0;
                 blockBitArrayEnd = 1;
             } else {
-                BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
                 bitArray.fromRaw(blocksCopy);
             }
 
@@ -205,8 +205,8 @@ public final class FaweCache implements Trimable {
             palette.paletteToBlockLength = num_palette;
             palette.paletteToBlock = paletteToBlock;
 
-            palette.blockstatesLength = blockBitArrayEnd;
-            palette.blockstates = blockstates;
+            palette.blockStatesLength = blockBitArrayEnd;
+            palette.blockStates = blockStates;
 
             return palette;
         } catch (Throwable e) {
