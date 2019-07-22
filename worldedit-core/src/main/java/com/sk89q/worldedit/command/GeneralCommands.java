@@ -27,7 +27,9 @@ import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.RandomTextureUtil;
+import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TextureUtil;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -297,26 +299,28 @@ public class GeneralCommands {
             desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-texture")
-    public void gtexture(FawePlayer player, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") InjectedValueAccess context) throws WorldEditException, FileNotFoundException, ParameterException {
-        if (context == null || context.argsLength() == 0) {
+    public void gtexture(FawePlayer player, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") List<String> arguments) throws WorldEditException, FileNotFoundException {
+        // gtexture <randomize> <min=0> <max=100>
+        // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
+        if (arguments.isEmpty()) {
             session.setTextureUtil(null);
             BBC.TEXTURE_DISABLED.send(player);
         } else {
-            String arg = context.getString(0);
+            String arg = arguments.get(0);
             String argLower = arg.toLowerCase();
 
             TextureUtil util = Fawe.get().getTextureUtil();
             int randomIndex = 1;
             boolean checkRandomization = true;
-            if (context.argsLength() >= 2 && MathMan.isInteger(context.getString(0)) && MathMan.isInteger(context.getString(1))) {
+            if (arguments.size() >= 2 && MathMan.isInteger(arguments.get(0)) && MathMan.isInteger(arguments.get(1))) {
                 // complexity
-                int min = Integer.parseInt(context.getString(0));
-                int max = Integer.parseInt(context.getString(1));
-                if (min < 0 || max > 100) throw new ParameterException("Complexity must be in the range 0-100");
+                int min = Integer.parseInt(arguments.get(0));
+                int max = Integer.parseInt(arguments.get(1));
+                if (min < 0 || max > 100) throw new InputParseException("Complexity must be in the range 0-100");
                 if (min != 0 || max != 100) util = new CleanTextureUtil(util, min, max);
 
                 randomIndex = 2;
-            } else if (context.argsLength() == 1 && argLower.equals("true") || argLower.equals("false")) {
+            } else if (arguments.size() == 1 && argLower.equals("true") || argLower.equals("false")) {
                 if (argLower.equals("true")) util = new RandomTextureUtil(util);
                 checkRandomization = false;
             } else {
@@ -337,14 +341,14 @@ public class GeneralCommands {
                 }
             }
             if (checkRandomization) {
-                if (context.argsLength() > randomIndex) {
-                    boolean random = Boolean.parseBoolean(context.getString(randomIndex));
+                if (arguments.size() > randomIndex) {
+                    boolean random = Boolean.parseBoolean(arguments.get(randomIndex));
                     if (random) util = new RandomTextureUtil(util);
                 }
             }
             if (!(util instanceof CachedTextureUtil)) util = new CachedTextureUtil(util);
             session.setTextureUtil(util);
-            BBC.TEXTURE_SET.send(player, context.getJoinedStrings(0));
+            BBC.TEXTURE_SET.send(player, StringMan.join(arguments, " "));
         }
     }
 

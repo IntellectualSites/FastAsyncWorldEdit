@@ -86,6 +86,16 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
+    public int size() {
+        return chunks.size() + submissions.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return chunks.isEmpty() && submissions.isEmpty();
+    }
+
+    @Override
     public <T extends Future<T>> T submit(final IChunk<T> chunk) {
         if (lastChunk == chunk) {
             lastPair = Long.MAX_VALUE;

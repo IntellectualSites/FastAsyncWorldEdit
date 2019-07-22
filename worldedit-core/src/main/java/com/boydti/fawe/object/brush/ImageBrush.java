@@ -127,7 +127,7 @@ public class ImageBrush implements Brush {
                 }
                 return false;
             }
-        }, vector -> true, Integer.MAX_VALUE, editSession);
+        }, vector -> true, Integer.MAX_VALUE);
         visitor.setDirections(Arrays.asList(visitor.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);

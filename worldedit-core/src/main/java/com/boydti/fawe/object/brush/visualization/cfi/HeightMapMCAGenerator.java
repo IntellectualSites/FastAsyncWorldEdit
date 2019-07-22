@@ -6,7 +6,6 @@ import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.Metadatable;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.change.StreamChange;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
@@ -20,17 +19,14 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.ReflectionUtils;
-import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -47,7 +43,6 @@ import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
@@ -62,9 +57,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -816,9 +810,10 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 //        }
 //    }
 
+    @Nullable
     @Override
-    public File getSaveFolder() {
-        return getFolder();
+    public Path getStoragePath() {
+        return getFolder().toPath();
     }
 
     @Override
@@ -845,20 +840,13 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 e.printStackTrace();
             }
         }
-        clear();
         return null;
     }
 
     @Override
-    public void clear() {
-        this.editSession = null;
-    }
-
-    @Override
     public void close(boolean update) {
-        clear();
         if (chunkOffset != null && player != null && update) {
-            IQueueExtent packetQueue = SetQueue.IMP.getNewQueue(player.getWorld(), true, false);
+            IQueueExtent packetQueue = Fawe.get().getQueueHandler().getQueue(player.getWorld());
 
             int lenCX = (getWidth() + 15) >> 4;
             int lenCZ = (getLength() + 15) >> 4;
@@ -897,7 +885,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         return BiomeTypes.get(biomes.getByte(index));
     }
 
-    @Override
+//    @Override
     public int getCombinedId4Data(int x, int y, int z) throws FaweException.FaweChunkLoadException {
         int index = z * getWidth() + x;
         if (y < 0) return 0;
@@ -1023,7 +1011,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     public BufferedImage draw() {
-        return new HeightMapMCADrawer(this).draw();
+        // TODO NOT IMPLEMENTED
+//        return new HeightMapMCADrawer(this).draw();
+        return null;
     }
 
     public void setBiomePriority(int value) {

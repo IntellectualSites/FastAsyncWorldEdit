@@ -216,9 +216,9 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     public abstract IQueueExtent create();
 
-    public abstract void startSet(boolean value);
+    public abstract void startSet(boolean parallel);
 
-    public abstract void endSet(boolean value);
+    public abstract void endSet(boolean parallel);
 
     public IQueueExtent getQueue(final World world) {
         final IQueueExtent queue = queuePool.get();

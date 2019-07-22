@@ -92,7 +92,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                     }
                     task.run(x, y, z, block);
                     return true;
-                }, extent instanceof EditSession ? (EditSession) extent : null);
+                });
                 Operations.completeBlindly(visitor);
             } else {
                 CuboidRegion cuboidEquivalent = new CuboidRegion(region.getMinimumPoint(), region.getMaximumPoint());
@@ -118,7 +118,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
                         return true;
                     }
-                }, extent instanceof EditSession ? (EditSession) extent : null);
+                });
                 Operations.completeBlindly(visitor);
             }
         } else {

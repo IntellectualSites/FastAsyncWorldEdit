@@ -61,7 +61,11 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     }
 
     // Don't delete
-    public NBTOutputStream(DataOutput os) throws IOException {
+    public NBTOutputStream(DataOutput os) {
+        this.os = os;
+    }
+
+    public NBTOutputStream(DataOutputStream os) {
         this.os = os;
     }
 

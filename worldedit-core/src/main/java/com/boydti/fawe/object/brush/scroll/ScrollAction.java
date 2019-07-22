@@ -23,7 +23,6 @@ public abstract class ScrollAction implements ScrollTool {
         parserContext.setActor(player);
         parserContext.setWorld(player.getWorld());
         parserContext.setSession(session);
-        final LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
         String[] split = arguments.split(" ");
         switch (split[0].toLowerCase()) {
             case "none":

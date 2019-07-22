@@ -1,5 +1,6 @@
 package com.boydti.fawe.regions.general.plot;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueExtent;
@@ -9,10 +10,12 @@ import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
@@ -24,45 +27,47 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     public final IQueueExtent IMP;
     private final LegacyMapper legacyMapper;
 
-    public FaweLocalBlockQueue(String world) {
-        super(world);
-        IMP = SetQueue.IMP.getNewQueue(FaweAPI.getWorld(world), true, false);
+    public FaweLocalBlockQueue(String worldName) {
+        super(worldName);
+        World world = FaweAPI.getWorld(worldName);
+        IMP = Fawe.get().getQueueHandler().getQueue(world);
         legacyMapper = LegacyMapper.getInstance();
     }
 
     @Override
     public boolean next() {
-        return IMP.size() > 0;
+        if (!IMP.isEmpty()) {
+            IMP.flush();
+        }
+        return false;
     }
 
     @Override
     public void startSet(boolean parallel) {
-        IMP.startSet(parallel);
+        Fawe.get().getQueueHandler().startSet(parallel);
     }
 
     @Override
     public void endSet(boolean parallel) {
-        IMP.endSet(parallel);
+        Fawe.get().getQueueHandler().endSet(parallel);
     }
 
     @Override
     public int size() {
-        return IMP.size();
+        return IMP.isEmpty() ? 0 : 1;
     }
 
     @Override
     public void optimize() {
-        IMP.optimize();
     }
 
     @Override
     public void setModified(long l) {
-        IMP.setModified(l);
     }
 
     @Override
     public long getModified() {
-        return IMP.getModified();
+        return IMP.size();
     }
     
     @Override
@@ -77,9 +82,8 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public PlotBlock getBlock(int x, int y, int z) {
-        int combined = IMP.getCombinedId4Data(x, y, z);
-        com.sk89q.worldedit.world.block.BlockState state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combined);
-        return PlotBlock.get(state.getInternalBlockTypeId(), state.getInternalPropertiesId());
+        BlockState block = IMP.getBlock(x, y, z);
+        return PlotBlock.get(block.toBaseBlock());
     }
 
     private BiomeType biome;
@@ -96,12 +100,12 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
             lastBiome = biome;
             this.biome = Biomes.findBiomeByName(biomes, biome, reg);
         }
-        return IMP.setBiome(x, z, this.biome);
+        return IMP.setBiome(x, 0, z, this.biome);
     }
 
     @Override
     public String getWorld() {
-        return IMP.getWorldName();
+        return IMP.getWorld().getName();
     }
 
     @Override
@@ -112,12 +116,12 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
     @Override
     public void enqueue() {
         super.enqueue();
-        IMP.enqueue();
+        IMP.enableQueue();
     }
 
     @Override
     public void refreshChunk(int x, int z) {
-        IMP.sendChunk(IMP.getFaweChunk(x, z));
+        IMP.sendChunk(x, z);
     }
 
     @Override
@@ -126,7 +130,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public void regenChunk(int x, int z) {
-        IMP.regenerateChunk(x, z);
+        IMP.regenerateChunk(x, z, null, null);
     }
 
     @Override

@@ -22,7 +22,6 @@ package com.sk89q.worldedit.function.operation;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.example.MappedIQueueExtent;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.extent.BlockTranslateExtent;
 import com.boydti.fawe.object.extent.PositionTransformExtent;
@@ -277,14 +276,6 @@ public class ForwardExtentCopy implements Operation {
         if (currentTransform == null) {
             currentTransform = transform;
         }
-        IQueueExtent queue;
-        if (source instanceof EditSession) {
-            queue = ((EditSession) source).getQueue();
-        } else if (destination instanceof EditSession) {
-            queue = ((EditSession) destination).getQueue();
-        } else {
-            queue = null;
-        }
 
         Extent finalDest = destination;
         BlockVector3 translation = to.subtract(from);
@@ -368,7 +359,7 @@ public class ForwardExtentCopy implements Operation {
             if (copyingBiomes && (!(source instanceof BlockArrayClipboard) || ((BlockArrayClipboard) source).IMP.hasBiomes())) {
                 copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
             }
-            blockCopy = new RegionVisitor(region, copy, queue instanceof MappedIQueueExtent ? (MappedIQueueExtent) queue : null);
+            blockCopy = new RegionVisitor(region, copy);
         }
 
         List<? extends Entity> entities;

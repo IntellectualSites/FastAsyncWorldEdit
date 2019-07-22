@@ -1,12 +1,10 @@
 package com.boydti.fawe.regions.general.plot;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.IOUtil;
-import com.boydti.fawe.util.SetQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
@@ -29,7 +27,6 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import net.jpountz.lz4.LZ4BlockInputStream;
 
 import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -47,9 +44,6 @@ public class FaweSchematicHandler extends SchematicHandler {
             queue.setTile(x, y, z, compoundTag);
             return true;
         }
-        IQueueExtent IQueueExtent = SetQueue.IMP.getNewQueue(((FaweLocalBlockQueue) queue).IMP.getWEWorld(), true, false);
-        IQueueExtent.setTile(x, y, z, (CompoundTag) FaweCache.asTag(compoundTag));
-        IQueueExtent.flush();
         return false;
     }
 

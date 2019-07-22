@@ -93,7 +93,7 @@ public class StencilBrush extends HeightBrush {
                 }
                 return false;
             }
-        }, vector -> true, Integer.MAX_VALUE, editSession);
+        }, vector -> true, Integer.MAX_VALUE);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);

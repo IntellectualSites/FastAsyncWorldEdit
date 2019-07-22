@@ -19,28 +19,11 @@
 
 package com.sk89q.worldedit.command;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
-
-
-import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.filters.DistrFilter;
-import com.boydti.fawe.beta.filters.SetFilter;
-import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.visitor.Fast2DIterator;
-import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -50,7 +33,6 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -78,22 +60,26 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.biome.Biomes;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.registry.BiomeRegistry;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 /**
  * Commands that operate on regions.
@@ -112,39 +98,6 @@ public class RegionCommands extends MethodCommands {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
     }
-
-
-    @Command(
-            name = "debugtest",
-            desc = "debugtest"
-    )
-    @CommandPermissions("fawe.admin.debug")
-    public void debugtest(Player player, @Selection Region region) throws WorldEditException {
-        QueueHandler queueHandler = Fawe.get().getQueueHandler();
-        World world = player.getWorld();
-        DistrFilter filter = new DistrFilter();
-        long start = System.currentTimeMillis();
-        queueHandler.apply(world, region, filter);
-        long diff = System.currentTimeMillis() - start;
-        System.out.println(diff);
-    }
-
-    @Command(
-            name = "db2",
-            desc = "db2"
-    )
-    @CommandPermissions("fawe.admin.debug")
-    public void db2(Player player, @Selection Region region, String blockStr) throws WorldEditException {
-        QueueHandler queueHandler = Fawe.get().getQueueHandler();
-        World world = player.getWorld();
-        BlockState block = BlockState.get(blockStr);
-        SetFilter filter = new SetFilter(block);
-        long start = System.currentTimeMillis();
-        queueHandler.apply(world, region, filter);
-        long diff = System.currentTimeMillis() - start;
-        System.out.println(diff);
-    }
-
 
     @Command(
             name = "/fixlighting",
@@ -366,7 +319,7 @@ public class RegionCommands extends MethodCommands {
             BlockVector3 max = region.getMaximumPoint();
             int maxY = max.getBlockY();
             Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
-            Iterator<BlockVector2> iter = new Fast2DIterator(flat, editSession).iterator();
+            Iterator<BlockVector2> iter = flat.iterator();
             int y = 0;
             int affected = 0;
             while (iter.hasNext()) {

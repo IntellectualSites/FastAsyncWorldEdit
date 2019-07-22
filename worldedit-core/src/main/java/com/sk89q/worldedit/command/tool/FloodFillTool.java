@@ -76,7 +76,7 @@ public class FloodFillTool implements BlockTool {
             try {
                 Mask mask = initialType.toMask(editSession);
                 BlockReplace function = new BlockReplace(editSession, pattern);
-                RecursiveVisitor visitor = new RecursiveVisitor(mask, function, range, editSession.getQueue());
+                RecursiveVisitor visitor = new RecursiveVisitor(mask, function, range);
                 visitor.visit(origin);
                 Operations.completeLegacy(visitor);
             } catch (MaxChangedBlocksException e) {

@@ -20,12 +20,6 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.example.MappedIQueueExtent;
-import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.object.HasIQueueExtent;
-import com.boydti.fawe.object.visitor.Fast2DIterator;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -35,13 +29,14 @@ import com.sk89q.worldedit.regions.FlatRegion;
 
 import java.util.List;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Applies region functions to columns in a {@link FlatRegion}.
  */
 public class FlatRegionVisitor implements Operation {
 
     private final FlatRegionFunction function;
-    private MappedIQueueExtent queue;
     private int affected = 0;
     private final Iterable<BlockVector2> iterator;
 
@@ -59,15 +54,6 @@ public class FlatRegionVisitor implements Operation {
         this.iterator = flatRegion.asFlatRegion();
     }
 
-    public FlatRegionVisitor(final FlatRegion flatRegion, final FlatRegionFunction function, HasIQueueExtent hasIQueueExtent) {
-        checkNotNull(flatRegion);
-        checkNotNull(function);
-        this.function = function;
-        this.iterator = flatRegion.asFlatRegion();
-        IQueueExtent queue = hasIQueueExtent.getQueue();
-        this.queue = (MappedIQueueExtent) (queue instanceof MappedIQueueExtent ? queue : null);
-    }
-
     /**
      * Get the number of affected objects.
      *
@@ -79,20 +65,11 @@ public class FlatRegionVisitor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        if (queue != null) {
-            for (BlockVector2 pt : new Fast2DIterator(iterator, queue)) {
-                if (function.apply(pt)) {
-                    affected++;
-                }
-            }
-        } else {
-            for (BlockVector2 pt : this.iterator) {
-                if (function.apply(pt)) {
-                    affected++;
-                }
+        for (BlockVector2 pt : this.iterator) {
+            if (function.apply(pt)) {
+                affected++;
             }
         }
-
         return null;
     }
 

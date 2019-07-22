@@ -8,6 +8,7 @@ import com.boydti.fawe.object.*;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
+import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
@@ -17,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 public class Rollback extends FaweCommand {
 
@@ -106,22 +109,14 @@ public class Rollback extends FaweCommand {
                     BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
                     return false;
                 }
-                final Runnable task = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (edits.size() == 0) {
-                            player.sendMessage("Rollback complete!");
-                            return;
-                        }
-                        DiskStorageHistory edit = edits.remove(0);
-                        player.sendMessage("&d" + edit.getBDFile());
-                        EditSession session = edit.toEditSession(null);
-                        session.undo(session);
-                        edit.deleteFiles();
-                        session.getQueue().addNotifyTask(this);
-                    }
-                };
-                task.run();
+                for (DiskStorageHistory edit : edits) {
+                    player.sendMessage("&d" + edit.getBDFile());
+                    EditSession session = edit.toEditSession(null);
+                    session.undo(session);
+                    edit.deleteFiles();
+                    session.flushQueue();
+                }
+                player.sendMessage("Rollback complete!");
         }
         return true;
     }

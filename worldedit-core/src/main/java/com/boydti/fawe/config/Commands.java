@@ -50,10 +50,10 @@ public class Commands {
     }
 
     public static class TranslatedCommand implements Command {
+        private final String name;
         private final String[] aliases;
-        private final String usage;
         private final String desc;
-        private final String help;
+        private final String descFooter;
         private final Command command;
 
         public TranslatedCommand(String clazz, Command command) {
@@ -70,10 +70,10 @@ public class Commands {
             }
 
             HashMap<String, Object> options = new HashMap<>();
+            options.put("name", command.name());
             options.put("aliases", new ArrayList<>(Arrays.asList(command.aliases())));
-            options.put("usage", command.usage());
-            options.put("desc", command.desc());
-            options.put("help", command.help());
+            options.put("help", command.desc());
+            options.put("desc", command.descFooter());
             for (Map.Entry<String, Object> entry : options.entrySet()) {
                 String key = entry.getKey();
                 if (!commands.contains(key)) {
@@ -88,10 +88,10 @@ public class Commands {
                     e.printStackTrace();
                 }
             }
+            this.name = commands.getString("name");
             this.aliases = commands.getStringList("aliases").toArray(new String[0]);
-            this.usage = commands.getString("usage");
-            this.desc = commands.getString("desc");
-            this.help = commands.getString("help");
+            this.desc = commands.getString("help");
+            this.descFooter = commands.getString("desc");
             this.command = command;
         }
 
@@ -101,13 +101,13 @@ public class Commands {
         }
 
         @Override
-        public String[] aliases() {
-            return aliases;
+        public String name() {
+            return name;
         }
 
         @Override
-        public String usage() {
-            return usage;
+        public String[] aliases() {
+            return aliases;
         }
 
         @Override
@@ -116,33 +116,8 @@ public class Commands {
         }
 
         @Override
-        public int min() {
-            return this.command.min();
-        }
-
-        @Override
-        public int max() {
-            return this.command.max();
-        }
-
-        @Override
-        public String flags() {
-            return this.command.flags();
-        }
-
-        @Override
-        public String help() {
-            return help;
-        }
-
-        @Override
-        public boolean anyFlags() {
-            return this.command.anyFlags();
-        }
-
-        @Override
-        public boolean queued() {
-            return this.command.queued();
+        public String descFooter() {
+            return descFooter;
         }
     }
 }

@@ -36,7 +36,6 @@ public class LayerBrush implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern ignore, double size) throws MaxChangedBlocksException {
-        final IQueueExtent queue = editSession.getQueue();
         final AdjacentAnyMask adjacent = new AdjacentAnyMask(new BlockMask(editSession).add(BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR));
         final SolidBlockMask solid = new SolidBlockMask(editSession);
         final RadiusMask radius = new RadiusMask(0, (int) size);
@@ -51,13 +50,13 @@ public class LayerBrush implements Brush {
                 int depth = visitor.getDepth() + 1;
                 if (depth > 1) {
                     boolean found = false;
-                    int previous = layers[depth - 1].getInternalId();
-                    int previous2 = layers[depth - 2].getInternalId();
+                    BlockState previous = layers[depth - 1];
+                    BlockState previous2 = layers[depth - 2];
                     for (BlockVector3 dir : BreadthFirstSearch.DEFAULT_DIRECTIONS) {
                         mutable.setComponents(pos.getBlockX() + dir.getBlockX(), pos.getBlockY() + dir.getBlockY(), pos.getBlockZ() + dir.getBlockZ());
-                        if (visitor.isVisited(mutable) && queue.getCachedCombinedId4Data(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous) {
+                        if (visitor.isVisited(mutable) && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous) {
                             mutable.setComponents(pos.getBlockX() + dir.getBlockX() * 2, pos.getBlockY() + dir.getBlockY() * 2, pos.getBlockZ() + dir.getBlockZ() * 2);
-                            if (visitor.isVisited(mutable) && queue.getCachedCombinedId4Data(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
+                            if (visitor.isVisited(mutable) && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
                                 found = true;
                                 break;
                             } else {
@@ -74,8 +73,8 @@ public class LayerBrush implements Brush {
         }, pos -> {
             int depth = visitor.getDepth();
             BlockStateHolder currentPattern = layers[depth];
-            return editSession.setBlock(pos, currentPattern);
-        }, layers.length - 1, editSession);
+            return currentPattern.apply(editSession, pos, pos);
+        }, layers.length - 1);
         for (BlockVector3 pos : visited) {
             visitor.visit(pos);
         }

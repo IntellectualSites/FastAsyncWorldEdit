@@ -52,6 +52,7 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -496,23 +497,11 @@ public interface Extent extends InputExtent, OutputExtent {
         checkNotNull(block);
         boolean hasNbt = block instanceof BaseBlock && ((BaseBlock)block).hasNbtData();
 
-        if (canBypassAll(region, false, true) && !hasNbt) {
-            return changes = queue.setBlocks((CuboidRegion) region, block.getInternalId());
-        }
-        try {
-            if (hasExtraExtents()) {
-                RegionVisitor visitor = new RegionVisitor(region, new BlockReplace(getExtent(), (block)), this);
-                Operations.completeBlindly(visitor);
-                this.changes += visitor.getAffected();
-            } else {
-                for (BlockVector3 blockVector3 : region) {
-                    if (getExtent().setBlock(blockVector3, block)) {
-                        changes++;
-                    }
-                }
+        int changes = 0;
+        for (BlockVector3 pos : region) {
+            if (setBlock(pos, block)) {
+                changes++;
             }
-        } catch (final WorldEditException e) {
-            throw new RuntimeException("Unexpected exception", e);
         }
         return changes;
     }
@@ -534,10 +523,13 @@ public interface Extent extends InputExtent, OutputExtent {
         if (pattern instanceof BlockStateHolder) {
             return setBlocks(region, (BlockStateHolder) pattern);
         }
-        BlockReplace replace = new BlockReplace(this, pattern);
-        RegionVisitor visitor = new RegionVisitor(region, replace, queue instanceof MappedIQueueExtent ? (MappedIQueueExtent) queue : null);
-        Operations.completeBlindly(visitor);
-        return this.changes = visitor.getAffected();
+        int count = 0;
+        for (BlockVector3 pos : region) {
+            if (pattern.apply(this, pos, pos)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -616,9 +608,20 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
-        RegionVisitor visitor = new RegionVisitor(vset, new BlockReplace(getExtent(), pattern));
-        Operations.completeBlindly(visitor);
-        return 0;
+        if (vset instanceof Region) {
+            return setBlocks((Region) vset, pattern);
+        }
+        int count = 0;
+        for (BlockVector3 pos : vset) {
+            if (pattern.apply(this, pos, pos)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    default World getWorld() {
+        return null;
     }
 
 }

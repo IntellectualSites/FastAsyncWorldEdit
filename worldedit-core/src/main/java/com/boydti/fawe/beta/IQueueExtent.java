@@ -121,4 +121,10 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
     void flush();
 
     ChunkFilterBlock initFilterBlock();
+
+    int size();
+
+    boolean isEmpty();
+
+    void sendChunk(int chunkX, int chunkZ);
 }

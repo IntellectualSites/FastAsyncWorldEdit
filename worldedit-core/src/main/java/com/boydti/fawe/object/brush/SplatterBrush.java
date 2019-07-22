@@ -51,7 +51,7 @@ public class SplatterBrush extends ScatterBrush {
                 return true;
             }
             return false;
-        }, vector -> editSession.setBlock(vector, finalPattern), recursion, editSession);
+        }, vector -> editSession.setBlock(vector, finalPattern), recursion);
         visitor.setMaxBranch(2);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);

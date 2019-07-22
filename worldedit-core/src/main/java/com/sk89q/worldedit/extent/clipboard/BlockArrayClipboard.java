@@ -53,7 +53,7 @@ import java.util.UUID;
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
  * other data as lists or maps.
  */
-public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable {
+public class BlockArrayClipboard implements Clipboard, Closeable {
 
 	private Region region;
     private BlockVector3 origin;
@@ -259,30 +259,5 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
     @Override
     public Operation commit() {
         return null;
-    }
-
-    @Override
-    public int getLight(int x, int y, int z) {
-        return getBlockLight(x, y, z);
-    }
-
-    @Override
-    public int getSkyLight(int x, int y, int z) {
-        return 0;
-    }
-
-    @Override
-    public int getBlockLight(int x, int y, int z) {
-        return getBrightness(x, y, z);
-    }
-
-    @Override
-    public int getOpacity(int x, int y, int z) {
-        return getBlock(x, y, z).getBlockType().getMaterial().getLightOpacity();
-    }
-
-    @Override
-    public int getBrightness(int x, int y, int z) {
-        return getBlock(x, y, z).getBlockType().getMaterial().getLightValue();
     }
 }

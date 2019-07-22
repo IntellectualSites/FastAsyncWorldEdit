@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -23,6 +24,22 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
             root = ((IDelegateChunk) root).getParent();
         }
         return root;
+    }
+
+
+    @Override
+    default IQueueExtent getQueue() {
+        return getParent().getQueue();
+    }
+
+    @Override
+    default CompoundTag getTag(int x, int y, int z) {
+        return getParent().getTag(x, y, z);
+    }
+
+    @Override
+    default boolean hasSection(int layer) {
+        return getParent().hasSection(layer);
     }
 
     @Override

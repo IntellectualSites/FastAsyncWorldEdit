@@ -150,7 +150,7 @@ public abstract class FawePlayer<T> extends Metadatable {
         Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
             task.run();
             return null;
-        }, context, getPlayer(), getSession(), event);
+        }, context, getSession(), event);
         setMeta("cmdConfirm", newTask);
     }
 

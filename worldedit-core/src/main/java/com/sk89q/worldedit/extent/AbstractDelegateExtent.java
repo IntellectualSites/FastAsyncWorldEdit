@@ -30,6 +30,7 @@ import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -116,9 +117,14 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         }
     }
 
+    @Override
+    public World getWorld() {
+        return getExtent().getWorld();
+    }
+
     /*
-    Bounds
-     */
+        Bounds
+         */
     @Override
     public BlockVector3 getMinimumPoint() {
         return extent.getMinimumPoint();
