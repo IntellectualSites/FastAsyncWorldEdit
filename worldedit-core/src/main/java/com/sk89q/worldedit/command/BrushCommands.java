@@ -22,7 +22,6 @@ package com.sk89q.worldedit.command;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.command.FawePrimitiveBinding;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -85,6 +84,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.Contextual;
@@ -218,7 +218,7 @@ public class BrushCommands extends MethodCommands {
     @Command(
             name = "line",
             aliases = {"l"},
-            desc = "Create lines",
+            desc = "Create lines"
     )
     @CommandPermissions("worldedit.brush.line")
     public BrushSettings lineBrush(Player player, LocalSession session, Pattern fill,
@@ -432,7 +432,7 @@ public class BrushCommands extends MethodCommands {
             descFooter = "Use a height map to paint any surface.\n")
     @CommandPermissions("worldedit.brush.stencil")
     public BrushSettings imageBrush(LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius,
-            FawePrimitiveBinding.ImageUri imageUri,
+            ProvideBindings.ImageUri imageUri,
             @Arg(def = "1", desc = "scale height") @Range(min=Double.MIN_NORMAL) double yscale,
             @Switch(name='a', desc = "Use image Alpha") boolean alpha,
             @Switch(name='f', desc = "Blend the image with existing terrain") boolean fadeOut,
