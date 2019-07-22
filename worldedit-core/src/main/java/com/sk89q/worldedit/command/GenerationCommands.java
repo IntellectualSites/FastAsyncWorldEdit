@@ -21,7 +21,6 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.jnbt.anvil.generator.CavesGen;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
@@ -29,6 +28,8 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.sk89q.worldedit.function.generator.CavesGen;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -72,8 +73,8 @@ import java.net.URL;
  * Commands for the generation of shapes and other objects.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-@Command(aliases = {}, desc = "Create structures and features: [More Info](https://goo.gl/KuLFRW)")
-public class GenerationCommands {
+//@Command(aliases = {}, desc = "Create structures and features: [More Info](https://goo.gl/KuLFRW)")
+public class GenerationCommands extends MethodCommands {
 
     private final WorldEdit worldEdit;
 
@@ -161,7 +162,7 @@ public class GenerationCommands {
                 e.printStackTrace();
             }
             return false;
-        }, editSession);
+        });
         Operations.completeBlindly(visitor);
         BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
     }
@@ -255,6 +256,8 @@ public class GenerationCommands {
             boolean raised,
         @Switch(name = 'h', desc = "Make a hollow sphere")
             boolean hollow, InjectedValueAccess context) throws WorldEditException {
+        double max = MathMan.max(radii.getBlockX(), radii.getBlockY(), radii.getBlockZ());
+        worldEdit.checkMaxRadius(max);
         BlockVector3 pos = session.getPlacementPosition(player);
         BlockVector3 finalPos = raised ? pos.add(0, radii.getY(), 0) : pos;
         fp.checkConfirmationRadius(() -> {
@@ -359,7 +362,8 @@ public class GenerationCommands {
                         @Switch(name = 'o', desc = "Use the placement's coordinate origin")
                             boolean offset,
                         @Switch(name = 'c', desc = "Use the selection's center as origin")
-                            boolean offsetCenter) throws WorldEditException {
+                            boolean offsetCenter,
+                         InjectedValueAccess context) throws WorldEditException {
 
         final Vector3 zero;
         Vector3 unit;
@@ -412,7 +416,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
-    public int generateBiome(FawePlayer fp, LocalSession session, EditSession editSession,
+    public void generateBiome(FawePlayer fp, LocalSession session, EditSession editSession,
                              @Selection Region region,
                              @Arg(desc = "The biome type to set")
                                  BiomeType target,
@@ -425,7 +429,8 @@ public class GenerationCommands {
                              @Switch(name = 'o', desc = "Use the placement's coordinate origin")
                                  boolean offset,
                              @Switch(name = 'c', desc = "Use the selection's center as origin")
-                                 boolean offsetCenter) throws WorldEditException {
+                                 boolean offsetCenter,
+                             InjectedValueAccess context) throws WorldEditException {
         final Vector3 zero;
         Vector3 unit;
 
@@ -457,10 +462,9 @@ public class GenerationCommands {
         fp.checkConfirmationRegion(() -> {
             try {
                 final int affected = editSession.makeBiomeShape(region, zero, unit1, target, String.join(" ", expression), hollow, session.getTimeout());
-                player.findFreePosition();
                 BBC.VISITOR_FLAT.send(fp, affected);
             } catch (ExpressionException e) {
-                player.printError(e.getMessage());
+                fp.printError(e.getMessage());
             }
         }, getArguments(context), region, context);
     }
