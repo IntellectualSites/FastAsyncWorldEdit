@@ -626,7 +626,6 @@ public enum BBC {
                 return "DARK_PURPLE";
             case '6':
                 return "GOLD";
-            default:
             case '7':
                 return "GRAY";
             case '8':
@@ -657,6 +656,8 @@ public enum BBC {
                 return "ITALIC";
             case 'r':
                 return "RESET";
+            default:
+                return "GRAY";
         }
     }
 

@@ -3052,8 +3052,8 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         final FaweRegionExtent fe = this.getRegionExtent();
         final boolean cuboid = region instanceof CuboidRegion;
         if (fe != null && cuboid) {
-        	BlockVector3 max = region.getMaximumPoint();
-        	BlockVector3 min = region.getMinimumPoint();
+            BlockVector3 max = region.getMaximumPoint();
+            BlockVector3 min = region.getMinimumPoint();
             if (!fe.contains(max.getBlockX(), max.getBlockY(), max.getBlockZ()) && !fe.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ())) {
                 throw FaweException.OUTSIDE_REGION;
             }
@@ -3190,24 +3190,24 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         world.setWeather(weatherType, duration);
     }
 
-	@Override
-	public void dropItem(Vector3 position, BaseItemStack item) {
-		world.dropItem(position, item);
-	}
+    @Override
+    public void dropItem(Vector3 position, BaseItemStack item) {
+        world.dropItem(position, item);
+    }
 
-	@Override
-	public boolean playEffect(Vector3 position, int type, int data) {
-		return world.playEffect(position, type, data);
-	}
+    @Override
+    public boolean playEffect(Vector3 position, int type, int data) {
+        return world.playEffect(position, type, data);
+    }
 
-	@Override
-	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-		return world.notifyAndLightBlock(position, previousType);
-	}
+    @Override
+    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+        return world.notifyAndLightBlock(position, previousType);
+    }
 
-	@Override
-	public BlockVector3 getSpawnPosition() {
-		return world.getSpawnPosition();
-	}
+    @Override
+    public BlockVector3 getSpawnPosition() {
+        return world.getSpawnPosition();
+    }
 
 }

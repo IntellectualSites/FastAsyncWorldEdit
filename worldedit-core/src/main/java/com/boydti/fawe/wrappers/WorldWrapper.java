@@ -252,13 +252,13 @@ public class WorldWrapper extends AbstractWorld {
         return parent.setBiome(position, biome);
     }
 
-	@Override
-	public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-		return parent.notifyAndLightBlock(position, previousType);
-	}
+    @Override
+    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
+        return parent.notifyAndLightBlock(position, previousType);
+    }
 
-	@Override
-	public BlockVector3 getSpawnPosition() {
-		return parent.getSpawnPosition();
-	}
+    @Override
+    public BlockVector3 getSpawnPosition() {
+        return parent.getSpawnPosition();
+    }
 }

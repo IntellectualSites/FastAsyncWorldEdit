@@ -78,12 +78,12 @@ public class SummedAreaTable {
         if (index == 0) {
             return curr;
         }
-		/* top row */
+        /* top row */
         else if (row == 0 && col != 0) {
             leftSum = summed[index - 1];
             return curr + leftSum;
         }
-		/* left-most column */
+        /* left-most column */
         else if (row != 0 && col == 0) {
             topSum = summed[index - width];
             return curr + topSum;

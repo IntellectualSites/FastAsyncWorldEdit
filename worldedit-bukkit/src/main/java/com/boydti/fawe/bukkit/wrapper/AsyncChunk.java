@@ -172,15 +172,15 @@ public class AsyncChunk implements Chunk {
         return false;
     }
 
-	@Override
-	public boolean isForceLoaded() {
-		return world.isChunkForceLoaded(x, z);
-	}
+    @Override
+    public boolean isForceLoaded() {
+        return world.isChunkForceLoaded(x, z);
+    }
 
-	@Override
-	public void setForceLoaded(boolean arg0) {
-		world.getChunkAt(x, z).setForceLoaded(arg0);
-	}
+    @Override
+    public void setForceLoaded(boolean arg0) {
+        world.getChunkAt(x, z).setForceLoaded(arg0);
+    }
 
     @Override
     public boolean addPluginChunkTicket(final Plugin plugin) {

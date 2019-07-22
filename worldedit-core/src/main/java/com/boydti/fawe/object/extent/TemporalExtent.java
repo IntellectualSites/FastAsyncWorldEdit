@@ -68,9 +68,9 @@ public class TemporalExtent extends AbstractDelegateExtent {
     public BaseBlock getFullBlock(BlockVector3 position) {
         if (position.getX() == x && position.getY() == y && position.getZ() == z) {
             if(block instanceof BaseBlock) {
-            	return (BaseBlock)block;
+                return (BaseBlock)block;
             }else {
-            	return block.toBaseBlock();
+                return block.toBaseBlock();
             }
         }
         return super.getFullBlock(position);

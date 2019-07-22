@@ -68,7 +68,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
                 @Override
                 public boolean test(BlockVector3 vector) {
                     if (super.test(vector) && vector.getBlockY() >= minY) {
-                    	BaseBlock block = editSession.getFullBlock(vector);
+                        BaseBlock block = editSession.getFullBlock(vector);
                         if (!block.getBlockType().getMaterial().isAir()) {
                             builder.add(vector, BlockTypes.AIR.getDefaultState().toBaseBlock(), block);
                             return true;

@@ -114,7 +114,7 @@ public class AnvilCommands {
             descFooter = "The -d flag disabled wildcard data matching\n"
 )
     @CommandPermissions("worldedit.anvil.replaceall")
-    public void replaceAll(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, String to, @Switch(name='d', desc = "TODO") boolean useData) throws WorldEditException {
+    public void replaceAll(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, String to, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;  TODO NOT IMPLEMENTED
 //        if (from == null) {
 //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -178,7 +178,7 @@ public class AnvilCommands {
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
 )
     @CommandPermissions("worldedit.anvil.deleteallunclaimed")
-    public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch(name='d', desc = "TODO") boolean debug) throws WorldEditException {
+    public void deleteAllUnclaimed(Player player, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
 //        String folder = player.getWorld().getName();  TODO NOT IMPLEMENTED
 //        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);
 //        if (debug) {
@@ -201,7 +201,7 @@ public class AnvilCommands {
                     "The auto-save interval is the recommended value for `file-duration` and `chunk-inactivity`"
 )
     @CommandPermissions("worldedit.anvil.deleteunclaimed")
-    public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch(name='d', desc = "TODO") boolean debug) throws WorldEditException {
+    public void deleteUnclaimed(Player player, EditSession editSession, @Selection Region selection, int inhabitedTicks, @Arg(name = "filedurationmillis", desc = "int", def = "60000") int fileDurationMillis, @Switch(name = 'd', desc = "TODO") boolean debug) throws WorldEditException {
 //        DeleteUnclaimedFilter filter = new DeleteUnclaimedFilter(player.getWorld(), fileDurationMillis, inhabitedTicks, fileDurationMillis);  TODO NOT IMPLEMENTED
 //        if (debug) {
 //            filter.enableDebug();
@@ -238,7 +238,7 @@ public class AnvilCommands {
                     "Unmodified chunks will be deleted\n"
     )
     @CommandPermissions("worldedit.anvil.trimallplots")
-    public void trimAllPlots(Player player, @Switch(name='v', desc = "Delete unvisited chunks") boolean deleteUnvisited) throws WorldEditException {
+    public void trimAllPlots(Player player, @Switch(name = 'v', desc = "Delete unvisited chunks") boolean deleteUnvisited) throws WorldEditException {
 //        String folder = player.getWorld().getName();  TODO NOT IMPLEMENTED
 //        int visitTime = deleteUnvisited ? 1 : -1;
 //        PlotTrimFilter filter = new PlotTrimFilter(player.getWorld(), 0, visitTime, 600000);
@@ -256,7 +256,7 @@ public class AnvilCommands {
             desc = "Delete chunks matching a specific biome"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
-    public void deleteBiome(Player player, String folder, BiomeType biome, @Switch(name='u', desc = "TODO") boolean unsafe) {
+    public void deleteBiome(Player player, String folder, BiomeType biome, @Switch(name = 'u', desc = "TODO") boolean unsafe) {
 //        DeleteBiomeFilterSimple filter = new DeleteBiomeFilterSimple(biome);  TODO NOT IMPLEMENTED
 //        DeleteBiomeFilterSimple result = runWithWorld(player, folder, filter, true, unsafe);
 //        if (result != null) {
@@ -269,7 +269,7 @@ public class AnvilCommands {
             desc = "Trim all air in the world"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
-    public void trimAllAir(Player player, String folder, @Switch(name='u', desc = "TODO") boolean unsafe) throws WorldEditException {
+    public void trimAllAir(Player player, String folder, @Switch(name = 'u', desc = "TODO") boolean unsafe) throws WorldEditException {
 //        TrimAirFilter filter = new TrimAirFilter();  TODO NOT IMPLEMENTED
 //        TrimAirFilter result = runWithWorld(player, folder, filter, true, unsafe);
 //        if (result != null) {
@@ -297,7 +297,7 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.replaceall")
-    public void replaceAllPattern(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name='d', desc = "TODO") boolean useData, @Switch(name='m', desc = "TODO") boolean useMap) throws WorldEditException {
+    public void replaceAllPattern(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;  TODO NOT IMPLEMENTED
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
@@ -326,7 +326,7 @@ public class AnvilCommands {
             desc = "Count all blocks in a world"
     )
     @CommandPermissions("worldedit.anvil.countall")
-    public void countAll(Player player, EditSession editSession, String folder, String arg, @Switch(name='d', desc = "TODO") boolean useData) throws WorldEditException {
+    public void countAll(Player player, EditSession editSession, String folder, String arg, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
 //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);
 //        MCAFilterCounter filter;
 //        if (useData || arg.contains(":")) { // Optimize for both cases
@@ -400,7 +400,7 @@ public class AnvilCommands {
             desc = "Count blocks in a selection"
     )
     @CommandPermissions("worldedit.anvil.count")
-    public void count(Player player, EditSession editSession, @Selection Region selection, String arg, @Switch(name='d', desc = "TODO") boolean useData) throws WorldEditException {
+    public void count(Player player, EditSession editSession, @Selection Region selection, String arg, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
 //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);  TODO NOT IMPLEMENTED
 //        MCAFilterCounter filter;
 //        if (useData || arg.contains(":")) { // Optimize for both cases
@@ -422,7 +422,7 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.distr")
-    public void distr(Player player, EditSession editSession, @Selection Region selection, @Switch(name='d', desc = "TODO") boolean useData) throws WorldEditException {
+    public void distr(Player player, EditSession editSession, @Selection Region selection, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
 //        long total = 0;  TODO NOT IMPLEMENTED
 //        long[] count;
 //        MCAFilter<long[]> counts;
@@ -501,7 +501,7 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.replace")
-    public void replace(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, String to, @Switch(name='d', desc = "TODO") boolean useData) throws WorldEditException {
+    public void replace(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, String to, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;  TODO NOT IMPLEMENTED
 //        if (from == null) {
 //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -523,8 +523,8 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.replace")
-    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name='d', desc = "TODO") boolean useData, @Switch(name='m', desc = "TODO") boolean useMap
-    public void replacePattern(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name='d', desc = "TODO") boolean useData, @Switch(name='m', desc = "TODO") boolean useMap) throws WorldEditException {
+    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap
+    public void replacePattern(Player player, EditSession editSession, @Selection Region selection, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;  TODO NOT IMPLEMENTED
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
@@ -554,7 +554,7 @@ public class AnvilCommands {
             desc = "Set all blocks in the selection with a pattern"
     )
     @CommandPermissions("worldedit.anvil.set")
-    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name='d', desc = "TODO") boolean useData, @Switch(name='m', desc = "TODO") boolean useMap
+    // Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap
     public void set(Player player, EditSession editSession, @Selection Region selection, final Pattern to) throws WorldEditException {
 //        MCAFilterCounter filter = new SetPatternFilter(to);  TODO NOT IMPLEMENTED
 //        MCAFilterCounter result = runWithSelection(player, editSession, selection, filter);
@@ -610,7 +610,7 @@ public class AnvilCommands {
                             "The -c flag will align the paste to the chunks."
     )
     @CommandPermissions("worldedit.anvil.pastechunks")
-    public void paste(Player player, LocalSession session, EditSession editSession, @Switch(name='c', desc = "TODO") boolean alignChunk) throws WorldEditException, IOException {
+    public void paste(Player player, LocalSession session, EditSession editSession, @Switch(name = 'c', desc = "TODO") boolean alignChunk) throws WorldEditException, IOException {
 //        FawePlayer fp = FawePlayer.wrap(player);  TODO NOT IMPLEMENTED
 //        MCAClipboard clipboard = fp.getMeta(FawePlayer.METADATA_KEYS.ANVIL_CLIPBOARD);
 //        if (clipboard == null) {

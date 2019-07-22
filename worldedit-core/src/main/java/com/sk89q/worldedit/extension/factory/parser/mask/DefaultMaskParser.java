@@ -183,9 +183,9 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                         }
                     }
                 } else {
-                	List<String> args = entry.getValue();
-                	String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
-                	try {
+                    List<String> args = entry.getValue();
+                    String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
+                    try {
                         mask = (Mask) dispatcher.call(command + cmdArgs, locals, new String[0]);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
@@ -239,6 +239,6 @@ public class DefaultMaskParser extends FaweParser<Mask> {
         } else {
             return null;
         }
-        
+
     }
 }

@@ -245,26 +245,26 @@ public final class LegacyMapper {
     }
 
     public BaseBlock getBaseBlockFromPlotBlock(PlotBlock plotBlock) {
-    	if(plotBlock instanceof StringPlotBlock) {
-    		try {
-    			return BlockTypes.get(plotBlock.toString()).getDefaultState().toBaseBlock();
-    		} catch (Throwable failed) {
-    			log.error("Unable to convert StringPlotBlock " + plotBlock + " to BaseBlock!");
-    			failed.printStackTrace();
-    			return null;
-    		}
-    	}else if(plotBlock instanceof LegacyPlotBlock) {
-    		try {
-    			return BaseBlock.getState(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData()).toBaseBlock();
-    		} catch (Throwable failed) {
-    			log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
-    			failed.printStackTrace();
-    			return null;
-    		}
-    	}else {
-			log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
-			return null;
-    	}
+        if(plotBlock instanceof StringPlotBlock) {
+            try {
+                return BlockTypes.get(plotBlock.toString()).getDefaultState().toBaseBlock();
+            } catch (Throwable failed) {
+                log.error("Unable to convert StringPlotBlock " + plotBlock + " to BaseBlock!");
+                failed.printStackTrace();
+                return null;
+            }
+        }else if(plotBlock instanceof LegacyPlotBlock) {
+            try {
+                return BaseBlock.getState(((LegacyPlotBlock)plotBlock).getId(), ((LegacyPlotBlock)plotBlock).getData()).toBaseBlock();
+            } catch (Throwable failed) {
+                log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
+                failed.printStackTrace();
+                return null;
+            }
+        }else {
+            log.error("Unable to convert LegacyPlotBlock " + plotBlock + " to BaseBlock!");
+            return null;
+        }
     }
 
     public static LegacyMapper getInstance() {

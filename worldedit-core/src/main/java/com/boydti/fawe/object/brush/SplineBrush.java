@@ -7,7 +7,6 @@ import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
@@ -23,7 +22,6 @@ import com.sk89q.worldedit.math.interpolation.Node;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class SplineBrush implements Brush, ResettableTool {
@@ -84,7 +82,7 @@ public class SplineBrush implements Brush, ResettableTool {
                     for (int y = -1; y <= 1; y++) {
                         for (int z = -1; z <= 1; z++) {
                             if (x != 0 || y != 0 || z != 0) {
-                            	BlockVector3 pos = BlockVector3.at(x, y, z);
+                                BlockVector3 pos = BlockVector3.at(x, y, z);
                                 if (!directions.contains(pos)) {
                                     directions.add(pos);
                                 }
@@ -151,7 +149,7 @@ public class SplineBrush implements Brush, ResettableTool {
     }
 
     private Vector3 getCentroid(Collection<BlockVector3> points) {
-    	MutableVector3 sum = new MutableVector3();
+        MutableVector3 sum = new MutableVector3();
         for (BlockVector3 p : points) {
             sum.mutX(sum.getX() + p.getX());
             sum.mutY(sum.getY() + p.getY());

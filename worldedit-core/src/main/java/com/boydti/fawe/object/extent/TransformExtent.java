@@ -1,16 +1,15 @@
 package com.boydti.fawe.object.extent;
 
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class TransformExtent extends BlockTransformExtent {
@@ -31,15 +30,15 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public BlockVector3 getMinimumPoint() {
-    	BlockVector3 pos1 = getPos(super.getMinimumPoint());
-    	BlockVector3 pos2 = getPos(super.getMaximumPoint());
+        BlockVector3 pos1 = getPos(super.getMinimumPoint());
+        BlockVector3 pos2 = getPos(super.getMaximumPoint());
         return pos1.getMinimum(pos2);
     }
 
     @Override
     public BlockVector3 getMaximumPoint() {
-    	BlockVector3 pos1 = getPos(super.getMinimumPoint());
-    	BlockVector3 pos2 = getPos(super.getMaximumPoint());
+        BlockVector3 pos1 = getPos(super.getMinimumPoint());
+        BlockVector3 pos2 = getPos(super.getMaximumPoint());
         return pos1.getMaximum(pos2);
     }
 
@@ -84,7 +83,7 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-    	return transform(super.getFullBlock(getPos(position)));
+        return transform(super.getFullBlock(getPos(position)));
     }
 
     @Override

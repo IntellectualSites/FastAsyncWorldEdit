@@ -89,7 +89,7 @@ public class HeightMap {
         invalid = new boolean[data.length];
 
         if (layers) {
-        	BlockVector3 min = region.getMinimumPoint();
+            BlockVector3 min = region.getMinimumPoint();
             int bx = min.getBlockX();
             int bz = min.getBlockZ();
             Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();

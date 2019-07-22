@@ -19,7 +19,8 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.google.common.collect.ImmutableList;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -35,19 +36,16 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static com.google.common.base.Preconditions.checkArgument;
+import javax.annotation.Nullable;
 
 public class BlockType implements FawePattern, Keyed {
-	private final String id;
+    private final String id;
     private final BlockTypes.Settings settings;
 
     private boolean initItemType;
@@ -61,7 +59,7 @@ public class BlockType implements FawePattern, Keyed {
 
     @Deprecated
     public int getMaxStateId() {
-    	return settings.permutations;
+        return settings.permutations;
     }
 
     /**
@@ -248,7 +246,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return The material
      */
     public BlockMaterial getMaterial() {
-    	return this.settings.blockMaterial;
+        return this.settings.blockMaterial;
     }
 
     /**
@@ -272,7 +270,7 @@ public class BlockType implements FawePattern, Keyed {
      * @return internal id
      */
     public int getInternalId() {
-    	return this.settings.internalId;
+        return this.settings.internalId;
     }
 
     @Override

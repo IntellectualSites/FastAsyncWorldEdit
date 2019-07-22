@@ -237,15 +237,15 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         return tileR == null ? null : new NBTInputStream(MainUtil.getCompressedIS(new FastByteArraysInputStream(tileR)));
     }
 
-	@Override
-	public boolean isRecordingChanges() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean isRecordingChanges() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	@Override
-	public void setRecordChanges(boolean recordChanges) {
-		// TODO Auto-generated method stub
+    @Override
+    public void setRecordChanges(boolean recordChanges) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 }

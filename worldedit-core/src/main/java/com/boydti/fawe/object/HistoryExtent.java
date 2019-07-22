@@ -1,8 +1,9 @@
 package com.boydti.fawe.object;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.object.changeset.FaweChangeSet;
-import com.sk89q.worldedit.*;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -13,14 +14,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores changes to a {@link ChangeSet}.
@@ -156,9 +154,9 @@ public class HistoryExtent extends AbstractDelegateExtent {
             return this.entity.getFacet(cls);
         }
 
-		@Override
-		public boolean setLocation(Location location) {
-			return this.entity.setLocation(location);
-		}
+        @Override
+        public boolean setLocation(Location location) {
+            return this.entity.setLocation(location);
+        }
     }
 }

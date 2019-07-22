@@ -3,22 +3,20 @@ package com.boydti.fawe.object.clipboard;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +71,8 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
 
     @Override
     public void forEach(BlockReader task, boolean air) {
-    	BlockVector3 min = region.getMinimumPoint();
-    	BlockVector3 max = region.getMaximumPoint();
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
         MutableBlockVector3 pos = new MutableBlockVector3();
         if (region instanceof CuboidRegion) {
             if (air) {
@@ -104,7 +102,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                         int y = pos.getBlockY() - my;
                         int z = pos.getBlockZ() - mz;
                         if (region.contains(pos)) {
-                        	BaseBlock block = extent.getFullBlock(pos);
+                            BaseBlock block = extent.getFullBlock(pos);
                             if (block.hasNbtData()) {
                                 Map<String, Tag> values = ReflectionUtils.getMap(block.getNbtData().getValue());
                                 values.put("x", new IntTag(x));
@@ -133,7 +131,7 @@ public class WorldCopyClipboard extends ReadOnlyClipboard {
                         int xx = pos.getBlockX() - mx;
                         if (region.contains(pos)) {
 //                            BlockState block = getBlockAbs(x, y, z);
-                        	BaseBlock block = extent.getFullBlock(pos);
+                            BaseBlock block = extent.getFullBlock(pos);
                             if (!air && block.getBlockType().getMaterial().isAir()) {
                                 continue;
                             }

@@ -79,15 +79,15 @@ public class CFIChangeSet extends FaweChangeSet {
         return 1;
     }
 
-	@Override
-	public boolean isRecordingChanges() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean isRecordingChanges() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	@Override
-	public void setRecordChanges(boolean recordChanges) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void setRecordChanges(boolean recordChanges) {
+        // TODO Auto-generated method stub
+
+    }
 }

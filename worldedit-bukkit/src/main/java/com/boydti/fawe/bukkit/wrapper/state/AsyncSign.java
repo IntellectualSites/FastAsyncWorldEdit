@@ -20,7 +20,7 @@ public class AsyncSign extends AsyncBlockState implements Sign {
     public AsyncSign(AsyncBlock block, int combined) {
         super(block, combined);
     }
-    
+
     private boolean isEditable = false;
 
     @Override
@@ -60,15 +60,15 @@ public class AsyncSign extends AsyncBlockState implements Sign {
         }
     }
 
-	@Override
-	public boolean isEditable() {
-		return this.isEditable;
-	}
+    @Override
+    public boolean isEditable() {
+        return this.isEditable;
+    }
 
-	@Override
-	public void setEditable(boolean arg0) {
-		this.isEditable = arg0;
-	}
+    @Override
+    public void setEditable(boolean arg0) {
+        this.isEditable = arg0;
+    }
 
     @Override
     public @NotNull PersistentDataContainer getPersistentDataContainer() {

@@ -52,21 +52,21 @@ public final class IncendoPaste implements Paster{
         this.pasteApplication = pasteApplication;
     }
 
-	@Override
-	public Callable<URL> paste(String content) {
-		return new PasteTask(content);
-	}
+    @Override
+    public Callable<URL> paste(String content) {
+        return new PasteTask(content);
+    }
 
-	private final class PasteTask implements Callable<URL>{
+    private final class PasteTask implements Callable<URL>{
 
-		private PasteTask(String content) {}
+        private PasteTask(String content) {}
 
-		@Override
-		public URL call() throws Exception {
-			return new URL(debugPaste());
-		}
+        @Override
+        public URL call() throws Exception {
+            return new URL(debugPaste());
+        }
 
-	}
+    }
 
     /**
      * Get an immutable collection containing all the files that have been added to this paster

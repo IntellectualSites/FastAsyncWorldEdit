@@ -9,9 +9,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-
 import java.util.List;
-import java.util.Vector;
 
 public class BackwardsExtentBlockCopy implements Operation {
     private final Region region;
@@ -34,7 +32,7 @@ public class BackwardsExtentBlockCopy implements Operation {
         CuboidRegion destRegion = transform(this.transform, this.region);
         Transform inverse = this.transform.inverse();
         for (BlockVector3 pt : destRegion) {
-        	BlockVector3 copyFrom = transform(inverse, pt);
+            BlockVector3 copyFrom = transform(inverse, pt);
             if (region.contains(copyFrom)) {
                 function.apply(pt);
             }
@@ -43,14 +41,14 @@ public class BackwardsExtentBlockCopy implements Operation {
     }
 
     private CuboidRegion transform(Transform transform, Region region) {
-    	BlockVector3 min = BlockVector3.at(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-    	BlockVector3 max = BlockVector3.at(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-    	BlockVector3 pos1 = region.getMinimumPoint();
-    	BlockVector3 pos2 = region.getMaximumPoint();
+        BlockVector3 min = BlockVector3.at(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        BlockVector3 max = BlockVector3.at(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        BlockVector3 pos1 = region.getMinimumPoint();
+        BlockVector3 pos2 = region.getMaximumPoint();
         for (int x : new int[] { pos1.getBlockX(), pos2.getBlockX() }) {
             for (int y : new int[] { pos1.getBlockY(), pos2.getBlockY() }) {
                 for (int z : new int[] { pos1.getBlockZ(), pos2.getBlockZ() }) {
-                	BlockVector3 pt = transform(transform, BlockVector3.at(x, y, z));
+                    BlockVector3 pt = transform(transform, BlockVector3.at(x, y, z));
                     min = min.getMinimum(pt);
                     max = max.getMaximum(pt);
                 }

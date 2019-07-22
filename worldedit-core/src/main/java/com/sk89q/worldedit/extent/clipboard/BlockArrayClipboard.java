@@ -19,14 +19,13 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.FaweClipboard.ClipboardEntity;
 import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
-import com.boydti.fawe.object.extent.LightingExtent;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -41,13 +40,12 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
@@ -55,7 +53,7 @@ import java.util.UUID;
  */
 public class BlockArrayClipboard implements Clipboard, Closeable {
 
-	private Region region;
+    private Region region;
     private BlockVector3 origin;
     public FaweClipboard IMP;
     private BlockVector3 size;
@@ -204,7 +202,7 @@ public class BlockArrayClipboard implements Clipboard, Closeable {
             int z = position.getBlockZ() - mz;
             return IMP.getBlock(x, y, z);
         }
-    	return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
 
     @Override

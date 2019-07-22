@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extent;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.changeset.FaweChangeSet;
@@ -35,10 +37,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
@@ -79,7 +78,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
             if (!(extent instanceof ForgetfulExtentBuffer)) { // placeholder
                 extent.disableQueue();
             }
-        } catch (FaweException disableQueue) {}
+        } catch (FaweException ignored) {}
         if (extent instanceof AbstractDelegateExtent) {
             Extent next = ((AbstractDelegateExtent) extent).getExtent();
             new ExtentTraverser(this).setNext(next);

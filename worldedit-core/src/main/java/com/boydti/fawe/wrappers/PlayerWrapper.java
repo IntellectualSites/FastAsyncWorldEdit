@@ -417,8 +417,8 @@ public class PlayerWrapper extends AbstractPlayerActor {
         return parent.openFileSaveDialog(extensions);
     }
 
-	@Override
-	public boolean setLocation(Location location) {
-		return parent.setLocation(location);
-	}
+    @Override
+    public boolean setLocation(Location location) {
+        return parent.setLocation(location);
+    }
 }

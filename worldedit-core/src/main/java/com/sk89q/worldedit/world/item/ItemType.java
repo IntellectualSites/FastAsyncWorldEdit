@@ -107,14 +107,14 @@ public class ItemType implements RegistryItem, Keyed {
     }
 
     public void setBlockType(BlockType blockType) {
-    	this.blockType = blockType;
+        this.blockType = blockType;
     }
 
     public BaseItem getDefaultState() {
         if (defaultState == null) {
             this.defaultState = new BaseItemStack(this);
         }
-    	return this.defaultState;
+        return this.defaultState;
     }
 
     @Override

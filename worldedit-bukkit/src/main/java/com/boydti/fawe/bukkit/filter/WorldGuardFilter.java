@@ -1,5 +1,7 @@
 package com.boydti.fawe.bukkit.filter;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.object.RunnableVal;
@@ -12,9 +14,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.World;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class WorldGuardFilter extends CuboidRegionFilter {
     private final World world;
@@ -32,8 +31,8 @@ public class WorldGuardFilter extends CuboidRegionFilter {
             public void run(Object value) {
                 WorldGuardFilter.this.manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(FaweAPI.getWorld(world.getName()));
                 for (ProtectedRegion region : manager.getRegions().values()) {
-                	BlockVector3 min = region.getMinimumPoint();
-                	BlockVector3 max = region.getMaximumPoint();
+                    BlockVector3 min = region.getMinimumPoint();
+                    BlockVector3 max = region.getMaximumPoint();
                     if (max.getBlockX() - min.getBlockX() > 1024 || max.getBlockZ() - min.getBlockZ() > 1024) {
                         Fawe.debug("Large or complex region shapes cannot be optimized. Filtering will be slower");
                         large = true;

@@ -65,7 +65,7 @@ public abstract class ReadOnlyClipboard extends FaweClipboard {
 
     @Override
     public void streamBiomes(NBTStreamer.ByteReader task) {
-    	BlockVector3 dim = getDimensions();
+        BlockVector3 dim = getDimensions();
         int index = 0;
         for (int z = 0; z <= dim.getBlockZ(); z++) {
             for (int x = 0; x <= dim.getBlockX(); x++, index++) {

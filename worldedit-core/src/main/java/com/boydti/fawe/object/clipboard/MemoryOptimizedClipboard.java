@@ -203,7 +203,7 @@ public class MemoryOptimizedClipboard extends FaweClipboard {
             }
         }
         if (lastCombinedIds == null) {
-        	BlockType bt = BlockTypes.getFromStateId(v);
+            BlockType bt = BlockTypes.getFromStateId(v);
             if (bt.getMaterial().isAir()) {
                 return;
             }

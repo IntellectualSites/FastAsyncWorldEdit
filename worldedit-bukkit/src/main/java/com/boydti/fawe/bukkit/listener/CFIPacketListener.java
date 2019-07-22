@@ -125,7 +125,7 @@ public class CFIPacketListener implements Listener {
 
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
-                	BlockVector3 origin = gen.getOrigin().toBlockPoint();
+                    BlockVector3 origin = gen.getOrigin().toBlockPoint();
                     PacketContainer packet = event.getPacket();
                     StructureModifier<Integer> ints = packet.getIntegers();
                     int cx = ints.read(0);
@@ -160,8 +160,8 @@ public class CFIPacketListener implements Listener {
                 Location pos = player.getLocation();
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
-                	BlockVector3 origin = gen.getOrigin().toBlockPoint();
-                	BlockVector3 pt = BlockVector3.at(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                    BlockVector3 origin = gen.getOrigin().toBlockPoint();
+                    BlockVector3 pt = BlockVector3.at(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
 
                     StructureModifier<Integer> ints = event.getPacket().getIntegers();
                     int id = ints.read(0);
@@ -185,8 +185,8 @@ public class CFIPacketListener implements Listener {
                 Location pos = player.getLocation();
                 VirtualWorld gen = getGenerator(event);
                 if (gen != null) {
-                	BlockVector3 origin = gen.getOrigin().toBlockPoint();
-                	BlockVector3 from = BlockVector3.at(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+                    BlockVector3 origin = gen.getOrigin().toBlockPoint();
+                    BlockVector3 from = BlockVector3.at(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
 
                     PacketContainer packet = event.getPacket();
                     StructureModifier<Double> doubles = packet.getDoubles();
@@ -248,7 +248,7 @@ public class CFIPacketListener implements Listener {
         BlockInteractEvent toCall = new BlockInteractEvent(actor, location, action);
         platform.handleBlockInteract(toCall);
         if (toCall.isCancelled() || action == Interaction.OPEN) {
-        	BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
+            BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
             BlockStateHolder block = gen.getBlock(pt);
             sendBlockChange(plr, realPos, block);
             return true;
@@ -287,7 +287,7 @@ public class CFIPacketListener implements Listener {
     private void handleBlockEvent(PacketEvent event, boolean relative, RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> task) {
         VirtualWorld gen = getGenerator(event);
         if (gen != null) {
-        	BlockVector3 pt = getRelPos(event, gen);
+            BlockVector3 pt = getRelPos(event, gen);
             if (pt != null) {
                 if (relative) pt = getRelative(event, pt);
                 if (gen.contains(pt)) {

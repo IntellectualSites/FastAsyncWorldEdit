@@ -59,9 +59,9 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     public BlockState getBlock(int x, int y, int z) {
         return super.getBlock(x + dx, y + dy, z + dz);
     }
-    
+
     @Override
     public BaseBlock getFullBlock(BlockVector3 pos) {
-    	return super.getFullBlock(pos.add(dx, dy, dz));
+        return super.getFullBlock(pos.add(dx, dy, dz));
     }
 }

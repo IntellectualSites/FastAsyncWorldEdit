@@ -60,8 +60,8 @@ public class ResizableClipboardBuilder extends MemoryOptimizedHistory {
     }
 
     public Clipboard build() {
-    	BlockVector3 pos1 = BlockVector3.at(minX, minY, minZ);
-    	BlockVector3 pos2 = BlockVector3.at(maxX, maxY, maxZ);
+        BlockVector3 pos1 = BlockVector3.at(minX, minY, minZ);
+        BlockVector3 pos2 = BlockVector3.at(maxX, maxY, maxZ);
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
         Iterator<Change> iter = getIterator(true);

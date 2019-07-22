@@ -601,29 +601,29 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
         return material.getCraftBlockData();
     }
 
-	@Override
-	public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
+    @Override
+    public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutTileEntityData(
                 new BlockPosition(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()),
                 7,
                 (NBTTagCompound) fromNative(nbtData)
         ));
-	}
+    }
 
-	@Override
-	public void notifyAndLightBlock(Location position, BlockState previousType) {
-		this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
-	}
+    @Override
+    public void notifyAndLightBlock(Location position, BlockState previousType) {
+        this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
+    }
 
-	@Override
-	public boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
-		return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
-	}
+    @Override
+    public boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
+        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
+    }
 
-	@Override
-	public void sendFakeOP(Player player) {
+    @Override
+    public void sendFakeOP(Player player) {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityStatus(
                 ((CraftPlayer) player).getHandle(), (byte) 28
         ));
-	}
+    }
 }

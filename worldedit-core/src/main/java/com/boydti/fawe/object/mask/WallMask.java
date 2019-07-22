@@ -19,7 +19,7 @@ public class WallMask extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 bv) {
-    	v.setComponents(bv);
+        v.setComponents(bv);
         int count = 0;
         double x = v.getX();
         double y = v.getY();

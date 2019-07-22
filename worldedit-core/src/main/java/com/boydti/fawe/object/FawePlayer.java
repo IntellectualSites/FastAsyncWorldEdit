@@ -181,8 +181,8 @@ public abstract class FawePlayer<T> extends Metadatable {
     public void checkConfirmationStack(@NotNull Runnable task, String command, Region region, int times, InjectedValueAccess context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
-            	BlockVector3 min = region.getMinimumPoint();
-            	BlockVector3 max = region.getMaximumPoint();
+                BlockVector3 min = region.getMinimumPoint();
+                BlockVector3 max = region.getMaximumPoint();
                 long area = (long) ((max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1)) * times;
                 if (area > 2 << 18) {
                     setConfirmTask(task, context, command);
@@ -198,8 +198,8 @@ public abstract class FawePlayer<T> extends Metadatable {
     public void checkConfirmationRegion(@NotNull Runnable task, String command, Region region, InjectedValueAccess context) throws RegionOperationException {
         if (command != null && !getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
-            	BlockVector3 min = region.getMinimumPoint();
-            	BlockVector3 max = region.getMaximumPoint();
+                BlockVector3 min = region.getMinimumPoint();
+                BlockVector3 max = region.getMaximumPoint();
                 long area = (max.getX() - min.getX()) * (max.getZ() - min.getZ() + 1);
                 if (area > 2 << 18) {
                     setConfirmTask(task, context, command);

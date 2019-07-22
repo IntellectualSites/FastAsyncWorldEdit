@@ -15,7 +15,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 public interface VirtualWorld extends SimpleWorld, Closeable {
-	Vector3 getOrigin();
+    Vector3 getOrigin();
 
     @Override
     default BaseBlock getFullBlock(BlockVector3 position) {

@@ -26,8 +26,7 @@ public class AnnotatedBindings extends Bindings {
      * @param modifiers the list of modifiers to scan
      * @throws InputParseException on a validation error
      */
-    private static String validate(String string, Annotation... modifiers)
-    {
+    private static String validate(String string, Annotation... modifiers) {
         if (string != null) {
             for (Annotation modifier : modifiers) {
                 if (modifier instanceof Validate) {

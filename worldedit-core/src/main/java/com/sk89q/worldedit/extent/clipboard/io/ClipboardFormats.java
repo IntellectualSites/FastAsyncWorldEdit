@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.clipboard.LazyClipboardHolder;
@@ -26,8 +28,6 @@ import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.io.FastByteArrayOutputStream;
 import com.boydti.fawe.util.MainUtil;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -36,8 +36,6 @@ import com.google.common.io.Files;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,6 +57,7 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.annotation.Nullable;
 
 public class ClipboardFormats {
 
@@ -130,15 +129,15 @@ public class ClipboardFormats {
      */
     @Nullable
     public static ClipboardFormat findByExtension(String extension) {
-    	checkNotNull(extension);
+        checkNotNull(extension);
 
-    	Collection<Entry<String, ClipboardFormat>> entries = getFileExtensionMap().entries();
-    	for(Map.Entry<String, ClipboardFormat> entry : entries) {
-    		if(entry.getKey().equalsIgnoreCase(extension)) {
-    			return entry.getValue();
-    		}
-    	}
-    	return null;
+        Collection<Entry<String, ClipboardFormat>> entries = getFileExtensionMap().entries();
+        for(Map.Entry<String, ClipboardFormat> entry : entries) {
+            if(entry.getKey().equalsIgnoreCase(extension)) {
+                return entry.getValue();
+            }
+        }
+        return null;
 
     }
 

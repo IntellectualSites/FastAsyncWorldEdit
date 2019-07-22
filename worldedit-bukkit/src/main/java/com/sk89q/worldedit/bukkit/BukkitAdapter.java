@@ -327,7 +327,7 @@ public enum BukkitAdapter {
      * @return The Bukkit BlockData
      */
     public static BlockData adapt(@NotNull BlockStateHolder block) {
-		return getAdapter().adapt(block);
+        return getAdapter().adapt(block);
     }
 
     public static BlockData getBlockData(int combinedId) {
@@ -341,11 +341,11 @@ public enum BukkitAdapter {
      * @return The WorldEdit BlockState
      */
     public static BlockState asBlockState(ItemStack itemStack) throws WorldEditException {
-	    checkNotNull(itemStack);
-	    if (itemStack.getType().isBlock()) {
+        checkNotNull(itemStack);
+        if (itemStack.getType().isBlock()) {
             return getAdapter().asBlockState(itemStack);
         } else {
-	        throw new NotABlockException();
+            throw new NotABlockException();
         }
     }
 

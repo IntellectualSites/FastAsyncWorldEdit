@@ -323,7 +323,7 @@ public class RegionCommands extends MethodCommands {
             int y = 0;
             int affected = 0;
             while (iter.hasNext()) {
-            	BlockVector2 pos = iter.next();
+                BlockVector2 pos = iter.next();
                 int x = pos.getBlockX();
                 int z = pos.getBlockZ();
                 y = editSession.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
@@ -405,8 +405,8 @@ public class RegionCommands extends MethodCommands {
                       @Arg(desc = "The mask of blocks to use as the height map", def = "")
                           Mask mask,
         @Switch(name='s', desc = "TODO") boolean snow, InjectedValueAccess context) throws WorldEditException {
-    	BlockVector3 min = region.getMinimumPoint();
-    	BlockVector3 max = region.getMaximumPoint();
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {

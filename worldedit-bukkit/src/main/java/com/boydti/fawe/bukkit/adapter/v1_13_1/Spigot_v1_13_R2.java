@@ -277,7 +277,7 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
                 sections[y4] = section = new ChunkSection(y4 << 4, nmsWorld.worldProvider.g());
             }
             if (existing.e() != blockData.e() || existing.getMaterial().f() != blockData.getMaterial().f()) {
-            	nmsChunk.setType(pos = new BlockPosition(x, y, z), blockData, false);
+                nmsChunk.setType(pos = new BlockPosition(x, y, z), blockData, false);
             } else {
                 section.setType(x & 15, y & 15, z & 15, blockData);
             }
@@ -555,25 +555,25 @@ public final class Spigot_v1_13_R2 extends CachedBukkitAdapter implements Bukkit
         return material.getCraftBlockData();
     }
 
-	@Override
-	public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
-		// TODO Auto-generated method stub
+    @Override
+    public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void notifyAndLightBlock(Location position, BlockState previousType) {
-		this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
-	}
+    @Override
+    public void notifyAndLightBlock(Location position, BlockState previousType) {
+        this.setBlock(position.getChunk(), position.getBlockX(), position.getBlockY(), position.getBlockZ(), previousType, true);
+    }
 
-	@Override
-	public boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
-		return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
-	}
+    @Override
+    public boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
+        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
+    }
 
-	@Override
-	public void sendFakeOP(Player player) {
-		// TODO Auto-generated method stub
+    @Override
+    public void sendFakeOP(Player player) {
+        // TODO Auto-generated method stub
 
-	}
+    }
 }

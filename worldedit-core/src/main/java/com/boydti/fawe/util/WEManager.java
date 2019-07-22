@@ -155,10 +155,10 @@ public class WEManager {
 
 
     public boolean intersects(final Region region1, final Region region2) {
-    	BlockVector3 rg1P1 = region1.getMinimumPoint();
-    	BlockVector3 rg1P2 = region1.getMaximumPoint();
-    	BlockVector3 rg2P1 = region2.getMinimumPoint();
-    	BlockVector3 rg2P2 = region2.getMaximumPoint();
+        BlockVector3 rg1P1 = region1.getMinimumPoint();
+        BlockVector3 rg1P2 = region1.getMaximumPoint();
+        BlockVector3 rg2P1 = region2.getMinimumPoint();
+        BlockVector3 rg2P2 = region2.getMaximumPoint();
 
         return (rg1P1.getBlockX() <= rg2P2.getBlockX()) && (rg1P2.getBlockX() >= rg2P1.getBlockX()) && (rg1P1.getBlockZ() <= rg2P2.getBlockZ()) && (rg1P2.getBlockZ() >= rg2P1.getBlockZ());
     }

@@ -22,9 +22,9 @@ import java.util.Map;
 
 public class WorldguardFlag extends BukkitMaskManager implements Listener {
     private WorldGuardPlugin worldguard;
-    FaweBukkit plugin;
+    private FaweBukkit plugin;
 
-    public WorldguardFlag(final Plugin p2, final FaweBukkit p3) {
+    public WorldguardFlag(Plugin p2, FaweBukkit p3) {
         super("worldguardflag");
         this.worldguard = (WorldGuardPlugin) p2; // this.getWorldGuard();
         this.plugin = p3;
@@ -66,9 +66,9 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
 
         @Override
         public BlockVector3 getMinimumPoint() {
-        	BlockVector3 point = null;
+            BlockVector3 point = null;
             for (Map.Entry<String, ProtectedRegion> entry : manager.getRegions().entrySet()) {
-            	BlockVector3 p = entry.getValue().getMinimumPoint();
+                BlockVector3 p = entry.getValue().getMinimumPoint();
                 if (point == null) {
                     point = p;
                     continue;
@@ -80,9 +80,9 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
 
         @Override
         public BlockVector3 getMaximumPoint() {
-        	BlockVector3 point = null;
+            BlockVector3 point = null;
             for (Map.Entry<String, ProtectedRegion> entry : manager.getRegions().entrySet()) {
-            	BlockVector3 p = entry.getValue().getMaximumPoint();
+                BlockVector3 p = entry.getValue().getMaximumPoint();
                 if (point == null) {
                     point = p;
                     continue;

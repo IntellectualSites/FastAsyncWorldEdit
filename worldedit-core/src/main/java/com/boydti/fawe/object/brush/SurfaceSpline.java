@@ -61,7 +61,7 @@ public class SurfaceSpline implements Brush {
             tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, 0, maxY);
             if (tipy == -1) continue;
             if (radius == 0) {
-            	BlockVector3 set = mutable.setComponents(tipx, tipy, tipz);
+                BlockVector3 set = mutable.setComponents(tipx, tipy, tipz);
                 try {
                     pattern.apply(editSession, set, set);
                 } catch (WorldEditException e) {

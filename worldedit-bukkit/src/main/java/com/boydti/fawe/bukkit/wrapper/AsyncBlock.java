@@ -366,20 +366,20 @@ public class AsyncBlock implements Block {
         this.getUnsafeBlock().removeMetadata(metadataKey, owningPlugin);
     }
 
-	@Override
-	public boolean isPassable() {
-		return this.getUnsafeBlock().isPassable();
-	}
+    @Override
+    public boolean isPassable() {
+        return this.getUnsafeBlock().isPassable();
+    }
 
-	@Override
-	public RayTraceResult rayTrace(@NotNull Location arg0, @NotNull Vector arg1, double arg2, @NotNull FluidCollisionMode arg3) {
-		return this.getUnsafeBlock().rayTrace(arg0, arg1, arg2, arg3);
-	}
+    @Override
+    public RayTraceResult rayTrace(@NotNull Location arg0, @NotNull Vector arg1, double arg2, @NotNull FluidCollisionMode arg3) {
+        return this.getUnsafeBlock().rayTrace(arg0, arg1, arg2, arg3);
+    }
 
-	@NotNull @Override
-	public BoundingBox getBoundingBox() {
-		return this.getUnsafeBlock().getBoundingBox();
-	}
+    @NotNull @Override
+    public BoundingBox getBoundingBox() {
+        return this.getUnsafeBlock().getBoundingBox();
+    }
 
     @Override
     public @NotNull BlockSoundGroup getSoundGroup() {

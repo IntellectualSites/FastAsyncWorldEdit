@@ -24,7 +24,7 @@ public interface HeightMap {
     }
 
     default void applyHeightMapData(int[][] data, EditSession session, BlockVector3 pos, int size, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
-    	BlockVector3 top = session.getMaximumPoint();
+        BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
         Location min = new Location(session.getWorld(), pos.subtract(size, maxY, size).toVector3());
         BlockVector3 max = pos.add(size, maxY, size);
@@ -47,7 +47,7 @@ public interface HeightMap {
     }
 
     default int[][] generateHeightData(EditSession session, Mask mask, BlockVector3 pos, int size, final int rotationMode, double yscale, boolean smooth, boolean towards, final boolean layers) {
-    	BlockVector3 top = session.getMaximumPoint();
+        BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
         int diameter = 2 * size + 1;
         int centerX = pos.getBlockX();

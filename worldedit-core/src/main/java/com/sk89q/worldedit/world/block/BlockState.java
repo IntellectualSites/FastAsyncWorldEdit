@@ -338,13 +338,13 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
         return new BaseBlock(this, compoundTag);
     }
 
-	@Override
-	public int getInternalId() {
-		return internalId;
-	}
+    @Override
+    public int getInternalId() {
+        return internalId;
+    }
 
-	@Override
-	public BlockMaterial getMaterial() {
+    @Override
+    public BlockMaterial getMaterial() {
         if (this.material == null) {
             if (blockType == BlockTypes.__RESERVED__) {
                 return this.material = blockType.getMaterial();
@@ -352,7 +352,7 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
             this.material = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
         }
         return material;
-	}
+    }
 
     @Override
     public final int getOrdinal() {

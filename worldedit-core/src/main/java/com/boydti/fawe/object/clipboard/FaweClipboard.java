@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.clipboard;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.jnbt.NBTStreamer;
 import com.boydti.fawe.util.ReflectionUtils;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
@@ -15,11 +15,10 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 public abstract class FaweClipboard {
     public abstract BaseBlock getBlock(int x, int y, int z);
@@ -86,8 +85,8 @@ public abstract class FaweClipboard {
 
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
-            	if(!(block instanceof BaseBlock)) return;
-            	BaseBlock base = (BaseBlock)block;
+                if(!(block instanceof BaseBlock)) return;
+                BaseBlock base = (BaseBlock)block;
                 CompoundTag tag = base.getNbtData();
                 if (tag != null) {
                     Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
@@ -161,10 +160,10 @@ public abstract class FaweClipboard {
             return world;
         }
 
-		@Override
-		public boolean setLocation(Location location) {
-			//Should not be teleporting this entity
-			return false;
-		}
+        @Override
+        public boolean setLocation(Location location) {
+            //Should not be teleporting this entity
+            return false;
+        }
     }
 }
