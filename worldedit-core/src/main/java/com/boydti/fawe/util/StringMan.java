@@ -1,7 +1,5 @@
 package com.boydti.fawe.util;
 
-import com.sk89q.util.StringUtil;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,17 +8,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class StringMan {
-    public static String replaceFromMap(final String string, final Map<String, String> replacements) {
+    public static String replaceFromMap(String string, Map<String, String> replacements) {
         final StringBuilder sb = new StringBuilder(string);
         int size = string.length();
-        for (final Entry<String, String> entry : replacements.entrySet()) {
+        for (Entry<String, String> entry : replacements.entrySet()) {
             if (size == 0) {
                 break;
             }
@@ -122,7 +120,6 @@ public class StringMan {
         boolean neg = false;
         int numIndex = 1;
         int len = string.length();
-        outer:
         for (int i = len - 1; i >= 0; i--) {
             char c = string.charAt(i);
             switch (c) {
@@ -138,10 +135,10 @@ public class StringMan {
         return val;
     }
 
-    public static String removeFromSet(final String string, final Collection<String> replacements) {
+    public static String removeFromSet(String string, Collection<String> replacements) {
         final StringBuilder sb = new StringBuilder(string);
         int size = string.length();
-        for (final String key : replacements) {
+        for (String key : replacements) {
             if (size == 0) {
                 break;
             }
@@ -178,8 +175,9 @@ public class StringMan {
         boolean inQuotes = false;
         for (int current = 0; current < input.length(); current++) {
             char currentChar = input.charAt(current);
-            boolean atLastChar = (current == input.length() - 1);
-            if (!atLastChar && (bracket > 0 || (currentChar == '{' && ++bracket > 0) || (current == '}' && --bracket <= 0)))
+            boolean atLastChar = current == input.length() - 1;
+            if (!atLastChar && (bracket > 0 || currentChar == '{' && ++bracket > 0
+                || current == '}' && --bracket <= 0))
                 continue;
             if (currentChar == '\"') inQuotes = !inQuotes; // toggle state
             if (atLastChar) result.add(input.substring(start));
@@ -195,9 +193,9 @@ public class StringMan {
         return result;
     }
 
-    public static int intersection(final Set<String> options, final String[] toCheck) {
+    public static int intersection(Set<String> options, String[] toCheck) {
         int count = 0;
-        for (final String check : toCheck) {
+        for (String check : toCheck) {
             if (options.contains(check)) {
                 count++;
             }
@@ -213,7 +211,7 @@ public class StringMan {
         return String.format("%1$" + n + "s", s);
     }
 
-    public static String getString(final Object obj) {
+    public static String getString(Object obj) {
         if (obj == null) {
             return "null";
         }
@@ -221,18 +219,18 @@ public class StringMan {
             return (String) obj;
         }
         if (obj.getClass().isArray()) {
-            String result = "";
+            StringBuilder result = new StringBuilder();
             String prefix = "";
 
             for (int i = 0; i < Array.getLength(obj); i++) {
-                result += prefix + getString(Array.get(obj, i));
+                result.append(prefix).append(getString(Array.get(obj, i)));
                 prefix = ",";
             }
             return "{ " + result + " }";
         } else if (obj instanceof Collection<?>) {
             StringBuilder result = new StringBuilder();
             String prefix = "";
-            for (final Object element : (Collection<?>) obj) {
+            for (Object element : (Collection<?>) obj) {
                 result.append(prefix).append(getString(element));
                 prefix = ",";
             }
@@ -242,7 +240,7 @@ public class StringMan {
         }
     }
 
-    public static String replaceFirst(final char c, final String s) {
+    public static String replaceFirst(char c, String s) {
         if (s == null) {
             return "";
         }
@@ -253,8 +251,8 @@ public class StringMan {
         final char[] newChars = new char[chars.length];
         int used = 0;
         boolean found = false;
-        for (final char cc : chars) {
-            if (!found && (c == cc)) {
+        for (char cc : chars) {
+            if (!found && c == cc) {
                 found = true;
             } else {
                 newChars[used++] = cc;
@@ -268,7 +266,7 @@ public class StringMan {
         return s;
     }
 
-    public static String replaceAll(final String string, final Object... pairs) {
+    public static String replaceAll(String string, Object... pairs) {
         final StringBuilder sb = new StringBuilder(string);
         for (int i = 0; i < pairs.length; i += 2) {
             final String key = pairs[i] + "";
@@ -284,56 +282,57 @@ public class StringMan {
         return sb.toString();
     }
 
-    public static boolean isAlphanumeric(final String str) {
+    public static boolean isAlphanumeric(String str) {
         for (int i = 0; i < str.length(); i++) {
             final char c = str.charAt(i);
-            if ((c < 0x30) || ((c >= 0x3a) && (c <= 0x40)) || ((c > 0x5a) && (c <= 0x60)) || (c > 0x7a)) {
+            if (c < 0x30 || c >= 0x3a && c <= 0x40 || c > 0x5a && c <= 0x60 ||
+                c > 0x7a) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean isAlphanumericUnd(final CharSequence str) {
+    public static boolean isAlphanumericUnd(CharSequence str) {
         for (int i = 0; i < str.length(); i++) {
             final char c = str.charAt(i);
-            if ((c < 0x30) || ((c >= 0x3a) && (c <= 0x40)) || ((c > 0x5a) && (c <= 0x60)) || (c > 0x7a) || (c == '_')) {
+            if (c < 0x30 || c >= 0x3a && c <= 0x40 || c > 0x5a && c <= 0x60 || c > 0x7a) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean isAlpha(final String str) {
+    public static boolean isAlpha(String str) {
         for (int i = 0; i < str.length(); i++) {
             final char c = str.charAt(i);
-            if ((c <= 0x40) || ((c > 0x5a) && (c <= 0x60)) || (c > 0x7a)) {
+            if (c <= 0x40 || c > 0x5a && c <= 0x60 || c > 0x7a) {
                 return false;
             }
         }
         return true;
     }
 
-    public static String join(final Collection<?> collection, final String delimiter) {
+    public static String join(Collection<?> collection, String delimiter) {
         return join(collection.toArray(), delimiter);
     }
 
-    public static String joinOrdered(final Collection<?> collection, final String delimiter) {
+    public static String joinOrdered(Collection<?> collection, String delimiter) {
         final Object[] array = collection.toArray();
         Arrays.sort(array, Comparator.comparingInt(Object::hashCode));
         return join(array, delimiter);
     }
 
-    public static String join(final Collection<?> collection, final char delimiter) {
+    public static String join(Collection<?> collection, char delimiter) {
         return join(collection.toArray(), delimiter + "");
     }
 
-    public static boolean isAsciiPrintable(final char c) {
-        return (c >= ' ') && (c < '');
+    public static boolean isAsciiPrintable(char c) {
+        return c >= ' ' && c < '';
     }
 
-    public static boolean isAsciiPrintable(final String s) {
-        for (final char c : s.toCharArray()) {
+    public static boolean isAsciiPrintable(String s) {
+        for (char c : s.toCharArray()) {
             if (!isAsciiPrintable(c)) {
                 return false;
             }
@@ -427,7 +426,7 @@ public class StringMan {
         return p[n];
     }
 
-    public static <T> String join(Collection<T> arr, final String delimiter, Function<T, String> funx) {
+    public static <T> String join(Collection<T> arr, String delimiter, Function<T, String> funx) {
         final StringBuilder result = new StringBuilder();
         int i = 0;
         for (T obj : arr) {
@@ -440,7 +439,7 @@ public class StringMan {
         return result.toString();
     }
 
-    public static String join(final Object[] array, final String delimiter) {
+    public static String join(Object[] array, String delimiter) {
         switch (array.length) {
             case 0:
                 return "";
@@ -489,16 +488,13 @@ public class StringMan {
         return negative ? -value : value;
     }
 
-    public static String join(final int[] array, final String delimiter) {
-        final Integer[] wrapped = new Integer[array.length];
-        for (int i = 0; i < array.length; i++) {
-            wrapped[i] = array[i];
-        }
+    public static String join(int[] array, String delimiter) {
+        final Integer[] wrapped = Arrays.stream(array).boxed().toArray(Integer[]::new);
         return join(wrapped, delimiter);
     }
 
-    public static boolean isEqualToAny(final String a, final String... args) {
-        for (final String arg : args) {
+    public static boolean isEqualToAny(String a, String... args) {
+        for (String arg : args) {
             if (StringMan.isEqual(a, arg)) {
                 return true;
             }
@@ -506,8 +502,8 @@ public class StringMan {
         return false;
     }
 
-    public static boolean isEqualIgnoreCaseToAny(final String a, final String... args) {
-        for (final String arg : args) {
+    public static boolean isEqualIgnoreCaseToAny(String a, String... args) {
+        for (String arg : args) {
             if (StringMan.isEqualIgnoreCase(a, arg)) {
                 return true;
             }
@@ -515,15 +511,17 @@ public class StringMan {
         return false;
     }
 
-    public static boolean isEqual(final String a, final String b) {
-        return ((a == b) || ((a != null) && (b != null) && (a.length() == b.length()) && (a.hashCode() == b.hashCode()) && a.equals(b)));
+    public static boolean isEqual(String a, String b) {
+        return a == b || a != null && b != null && a.length() == b.length()
+            && a.hashCode() == b.hashCode()
+            && a.equals(b);
     }
 
-    public static boolean isEqualIgnoreCase(final String a, final String b) {
+    public static boolean isEqualIgnoreCase(String a, String b) {
         return ((a == b) || ((a != null) && (b != null) && (a.length() == b.length()) && a.equalsIgnoreCase(b)));
     }
 
-    public static String repeat(final String s, final int n) {
+    public static String repeat(String s, int n) {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) {
             sb.append(s);

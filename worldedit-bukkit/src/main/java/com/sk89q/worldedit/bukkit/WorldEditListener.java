@@ -21,7 +21,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.bekvon.bukkit.residence.commands.command;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -45,7 +44,6 @@ import org.enginehub.piston.inject.MapBackedValueStore;
 
 import java.util.Iterator;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 /**
  * Handles all events thrown in relation to a Player
@@ -75,8 +73,9 @@ public class WorldEditListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
-        InjectedValueStore store = null;
+        // Command processing used to show up in timings
         CommandManager commandManager = plugin.getWorldEdit().getPlatformManager().getPlatformCommandManager().getCommandManager();
+        InjectedValueStore store = null;
         Iterator<String> iter = event.getCommands().iterator();
         while (iter.hasNext()) {
             String name = iter.next();

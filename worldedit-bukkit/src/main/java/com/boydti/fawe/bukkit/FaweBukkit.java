@@ -458,10 +458,10 @@ public class FaweBukkit implements IFawe, Listener {
                 e.printStackTrace();
             }
         }
-        final Plugin preciousstonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("PreciousStones");
-        if (preciousstonesPlugin != null && preciousstonesPlugin.isEnabled()) {
+        final Plugin preciousStonesPlugin = Bukkit.getServer().getPluginManager().getPlugin("PreciousStones");
+        if (preciousStonesPlugin != null && preciousStonesPlugin.isEnabled()) {
             try {
-                managers.add(new PreciousStonesFeature(preciousstonesPlugin, this));
+                managers.add(new PreciousStonesFeature(preciousStonesPlugin, this));
                 Fawe.debug("Plugin 'PreciousStones' found. Using it now.");
             } catch (final Throwable e) {
                 e.printStackTrace();

@@ -284,7 +284,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         }
         final int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
         final int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
-        final long[] blockstates = FaweCache.BLOCK_STATES.get();
+        final long[] blockStates = FaweCache.BLOCK_STATES.get();
         final int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
         try {
             int num_palette = 0;
@@ -317,9 +317,9 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 
             final int blockBitArrayEnd = (bitsPerEntry * 4096) >> 6;
             if (num_palette == 1) {
-                for (int i = 0; i < blockBitArrayEnd; i++) blockstates[i] = 0;
+                for (int i = 0; i < blockBitArrayEnd; i++) blockStates[i] = 0;
             } else {
-                final BitArray4096 bitArray = new BitArray4096(blockstates, bitsPerEntry);
+                final BitArray4096 bitArray = new BitArray4096(blockStates, bitsPerEntry);
                 bitArray.fromRaw(blocksCopy);
             }
 
@@ -327,7 +327,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
             final DataPaletteBlock<IBlockData> dataPaletteBlocks = section.getBlocks();
             // private DataPalette<T> h;
             // protected DataBits a;
-            final long[] bits = Arrays.copyOfRange(blockstates, 0, blockBitArrayEnd);
+            final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             final DataBits nmsBits = new DataBits(bitsPerEntry, 4096, bits);
             final DataPalette<IBlockData> palette;
 //                palette = new DataPaletteHash<>(Block.REGISTRY_ID, bitsPerEntry, dataPaletteBlocks, GameProfileSerializer::d, GameProfileSerializer::a);

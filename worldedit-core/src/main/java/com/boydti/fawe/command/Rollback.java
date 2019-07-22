@@ -25,7 +25,7 @@ public class Rollback extends FaweCommand {
     }
 
     @Override
-    public boolean execute(final FawePlayer player, final String... args) {
+    public boolean execute(FawePlayer player, String... args) {
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             BBC.SETTING_DISABLE.send(player, "history.use-database (Import with /frb #import )");
             return false;
@@ -50,12 +50,11 @@ public class Rollback extends FaweCommand {
         }
         World world = player.getWorld();
         switch (args[0]) {
-            default: {
+            default:
                 BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
                 return false;
-            }
             case "i":
-            case "info": {
+            case "info":
                 if (args.length < 2) {
                     BBC.COMMAND_SYNTAX.send(player, "/frb <info|undo> u:<uuid> r:<radius> t:<time>");
                     return false;
@@ -88,16 +87,15 @@ public class Rollback extends FaweCommand {
                             player.sendMessage("&8 - &7(" + percentString + ")");
                         }
                         player.sendMessage("&d==================================================");
-                        player.sendMessage("&dSize: " + (((double) (total / 1024)) / 1000) + "MB");
+                        player.sendMessage("&dSize: " + (double) (total / 1024) / 1000 + "MB");
                         player.sendMessage("&dTo rollback: /frb undo");
                         player.sendMessage("&d==================================================");
                         player.setMeta(FawePlayer.METADATA_KEYS.ROLLBACK, edits);
                     }
                 });
                 break;
-            }
             case "undo":
-            case "revert": {
+            case "revert":
                 if (!player.hasPermission("fawe.rollback.perform")) {
                     BBC.NO_PERM.send(player, "fawe.rollback.perform");
                     return false;
@@ -124,12 +122,11 @@ public class Rollback extends FaweCommand {
                     }
                 };
                 task.run();
-            }
         }
         return true;
     }
 
-    public void rollback(final FawePlayer player, final boolean shallow, final String[] args, final RunnableVal<List<DiskStorageHistory>> result) {
+    public void rollback(FawePlayer player, boolean shallow, String[] args, RunnableVal<List<DiskStorageHistory>> result) {
         UUID user = null;
         int radius = Integer.MAX_VALUE;
         long time = Long.MAX_VALUE;
@@ -142,7 +139,7 @@ public class Rollback extends FaweCommand {
             switch (split[0].toLowerCase()) {
                 case "username":
                 case "user":
-                case "u": {
+                case "u":
                     try {
                         if (split[1].length() > 16) {
                             user = UUID.fromString(split[1]);
@@ -156,25 +153,21 @@ public class Rollback extends FaweCommand {
                         return;
                     }
                     break;
-                }
                 case "r":
-                case "radius": {
+                case "radius":
                     if (!MathMan.isInteger(split[1])) {
                         player.sendMessage("&dInvalid radius: " + split[1]);
                         return;
                     }
                     radius = Integer.parseInt(split[1]);
                     break;
-                }
                 case "t":
-                case "time": {
+                case "time":
                     time = MainUtil.timeToSec(split[1]) * 1000;
                     break;
-                }
-                default: {
+                default:
                     BBC.COMMAND_SYNTAX.send(player, "/frb <info|undo> u:<uuid> r:<radius> t:<time>");
                     return;
-                }
             }
         }
         Location origin = player.getLocation();

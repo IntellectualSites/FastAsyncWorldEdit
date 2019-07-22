@@ -49,7 +49,6 @@ public class NashornCraftScriptEngine implements CraftScriptEngine {
         synchronized (NashornCraftScriptEngine.class) {
             if (FACTORY == null) FACTORY = new NashornScriptEngineFactory();
         }
-        ;
         ScriptEngine engine = FACTORY.getScriptEngine("--language=es6");
         SimpleBindings bindings = new SimpleBindings();
 

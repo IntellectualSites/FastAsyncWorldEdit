@@ -70,7 +70,7 @@ public class CommandScriptLoader {
                                 BrushCommands processor = new BrushCommands(WorldEdit.getInstance());
                                 for (FunctionParametricCallable cmd : cmds) {
                                     ProcessedCallable processed = new ProcessedCallable(cmd, processor);
-                                    PlatformCommandManager.getInstance().registerCommand(aliases, cmd.getCommand(), processed);
+                                    PlatformCommandManager.getInstance().registration.register(aliases, cmd.getCommand(), processed);
                                 }
                             }
                             return;

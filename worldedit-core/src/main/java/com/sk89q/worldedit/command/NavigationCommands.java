@@ -22,7 +22,6 @@ package com.sk89q.worldedit.command;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
@@ -32,7 +31,6 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -41,7 +39,6 @@ import org.enginehub.piston.annotation.param.Switch;
 /**
  * Commands for moving the player around.
  */
-@Command(aliases = {}, desc = "Commands for moving the player around: [More Info](https://goo.gl/uQTUiT)")
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class NavigationCommands {
 

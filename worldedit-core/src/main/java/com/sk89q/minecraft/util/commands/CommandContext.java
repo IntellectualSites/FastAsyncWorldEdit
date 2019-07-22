@@ -26,9 +26,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class CommandContext {
-    
+
     protected final String command;
     protected final List<String> parsedArgs;
 
@@ -55,7 +57,7 @@ public class CommandContext {
         this(args.split(" ", -1), valueFlags);
     }
 
-    public CommandContext(String args, Set<Character> valueFlags, boolean allowHangingFlag) 
+    public CommandContext(String args, Set<Character> valueFlags, boolean allowHangingFlag)
             throws CommandException {
         this(args.split(" ", -1), valueFlags, allowHangingFlag, new CommandLocals());
     }
@@ -107,7 +109,7 @@ public class CommandContext {
         List<String> argList = new ArrayList<>(args.length);
         for (int i = 1; i < args.length; ++i) {
             isHanging = false;
-            
+
             String arg = args[i];
             if (arg.isEmpty()) {
                 isHanging = true;
@@ -216,7 +218,7 @@ public class CommandContext {
                 parsedArgs.add(arg);
             }
         }
-        
+
         this.suggestionContext = suggestionContext;
     }
 
@@ -248,17 +250,14 @@ public class CommandContext {
         }
         return buffer.toString();
     }
-    
+
     public String getRemainingString(int start) {
         return getString(start, parsedArgs.size() - 1);
     }
 
     public String getString(int start, int end) {
-        StringBuilder buffer = new StringBuilder(parsedArgs.get(start));
-        for (int i = start + 1; i < end + 1; ++i) {
-            buffer.append(" ").append(parsedArgs.get(i));
-        }
-        return buffer.toString();
+        return IntStream.range(start + 1, end + 1).mapToObj(i -> " " + parsedArgs.get(i))
+            .collect(Collectors.joining("", parsedArgs.get(start), ""));
     }
 
     public int getInteger(int index) throws NumberFormatException {

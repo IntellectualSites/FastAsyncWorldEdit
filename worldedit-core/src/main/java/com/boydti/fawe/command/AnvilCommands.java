@@ -1,37 +1,25 @@
 package com.boydti.fawe.command;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.RunnableVal4;
-import com.boydti.fawe.object.changeset.AnvilHistory;
-import com.boydti.fawe.object.clipboard.remap.ClipboardRemapper;
-import com.boydti.fawe.object.mask.FaweBlockMatcher;
-import com.boydti.fawe.util.MainUtil;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Selection;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import java.io.IOException;
 import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@Command(aliases = {"/anvil"}, desc = "Manipulate billions of blocks: [More Info](https://github.com/boy0001/FastAsyncWorldedit/wiki/Anvil-API)")
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class AnvilCommands {
 
     /**
@@ -247,11 +235,10 @@ public class AnvilCommands {
 
             desc = "Trim chunks in a Plot World",
             descFooter = "Unclaimed chunks will be deleted\n" +
-                    "Unmodified chunks will be deleted\n" +
-                    "Use -v to also delete unvisited chunks\n"
+                    "Unmodified chunks will be deleted\n"
     )
     @CommandPermissions("worldedit.anvil.trimallplots")
-    public void trimAllPlots(Player player, @Switch(name='v', desc = "TODO") boolean deleteUnvisited) throws WorldEditException {
+    public void trimAllPlots(Player player, @Switch(name='v', desc = "Delete unvisited chunks") boolean deleteUnvisited) throws WorldEditException {
 //        String folder = player.getWorld().getName();  TODO NOT IMPLEMENTED
 //        int visitTime = deleteUnvisited ? 1 : -1;
 //        PlotTrimFilter filter = new PlotTrimFilter(player.getWorld(), 0, visitTime, 600000);
@@ -266,7 +253,6 @@ public class AnvilCommands {
 
     @Command(
             name = "deletebiomechunks",
-
             desc = "Delete chunks matching a specific biome"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
@@ -280,7 +266,6 @@ public class AnvilCommands {
 
     @Command(
             name = "trimallair",
-
             desc = "Trim all air in the world"
     )
     @CommandPermissions("worldedit.anvil.trimallair")
@@ -310,7 +295,7 @@ public class AnvilCommands {
             name = "replaceallpattern",
             aliases = {"reap", "repallpat"},
             desc = "Replace all blocks in the selection with another"
-)
+    )
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAllPattern(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name='d', desc = "TODO") boolean useData, @Switch(name='m', desc = "TODO") boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;  TODO NOT IMPLEMENTED
@@ -339,7 +324,7 @@ public class AnvilCommands {
     @Command(
             name = "countall",
             desc = "Count all blocks in a world"
-)
+    )
     @CommandPermissions("worldedit.anvil.countall")
     public void countAll(Player player, EditSession editSession, String folder, String arg, @Switch(name='d', desc = "TODO") boolean useData) throws WorldEditException {
 //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);
@@ -413,7 +398,7 @@ public class AnvilCommands {
     @Command(
             name = "count",
             desc = "Count blocks in a selection"
-)
+    )
     @CommandPermissions("worldedit.anvil.count")
     public void count(Player player, EditSession editSession, @Selection Region selection, String arg, @Switch(name='d', desc = "TODO") boolean useData) throws WorldEditException {
 //        Set<BaseBlock> searchBlocks = worldEdit.getBlocks(player, arg, true);  TODO NOT IMPLEMENTED
@@ -621,8 +606,7 @@ public class AnvilCommands {
     @Command(
             name = "paste",
             desc = "Paste chunks from your anvil clipboard",
-            descFooter =
-                    "Paste the chunks from your anvil clipboard.\n" +
+            descFooter = "Paste the chunks from your anvil clipboard.\n" +
                             "The -c flag will align the paste to the chunks."
     )
     @CommandPermissions("worldedit.anvil.pastechunks")

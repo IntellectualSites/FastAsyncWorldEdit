@@ -92,9 +92,9 @@ public class ScriptingCommands {
     @Logging(ALL)
     public void execute(Player player, LocalSession session,
                         @Arg(desc = "Filename of the CraftScript to load")
-                                String filename,
+                            String filename,
                         @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
-                                List<String> args) throws WorldEditException {
+                            List<String> args) throws WorldEditException {
         if (!player.hasPermission("worldedit.scripting.execute." + filename)) {
             BBC.SCRIPTING_NO_PERM.send(player);
             return;

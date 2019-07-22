@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 
-public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap.HeightMap {
+public class ScalableHeightMap implements HeightMap {
     public int size2;
     public int size;
 
@@ -103,10 +103,10 @@ public class ScalableHeightMap implements com.boydti.fawe.object.brush.heightmap
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < length; z++) {
                 int pixel = heightFile.getRGB(x, z);
-                int red = (pixel >> 16) & 0xFF;
-                int green = (pixel >> 8) & 0xFF;
-                int blue = (pixel >> 0) & 0xFF;
-                int alpha = (pixel >> 24) & 0xFF;
+                int red = pixel >> 16 & 0xFF;
+                int green = pixel >> 8 & 0xFF;
+                int blue = pixel >> 0 & 0xFF;
+                int alpha = pixel >> 24 & 0xFF;
                 int intensity = (int) (alpha * ((red + green + blue) * third) * alphaInverse);
                 array[x][z] = (byte) intensity;
             }

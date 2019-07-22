@@ -1,10 +1,10 @@
 package com.boydti.fawe.util.image;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.command.FawePrimitiveBinding;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
-import com.sk89q.worldedit.util.command.parametric.ParameterException;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 
 import javax.annotation.Nullable;
 import java.awt.Graphics2D;
@@ -161,19 +161,19 @@ public class ImageUtil {
         return (alpha << 24) + (red << 16) + (green << 8) + (blue << 0);
     }
 
-    public static BufferedImage load(@Nullable FawePrimitiveBinding.ImageUri uri) throws ParameterException {
+    public static BufferedImage load(@Nullable ProvideBindings.ImageUri uri) throws InputParseException {
         return uri == null ? null : uri.load();
     }
 
-    public static BufferedImage load(URI uri) throws ParameterException {
+    public static BufferedImage load(URI uri) throws InputParseException {
         try {
             return MainUtil.readImage(getInputStream(uri));
         } catch (IOException e) {
-            throw new ParameterException(e);
+            throw new InputParseException(e.getMessage());
         }
     }
 
-    public static InputStream getInputStream(URI uri) throws ParameterException {
+    public static InputStream getInputStream(URI uri) throws InputParseException {
         try {
             String uriStr = uri.toString();
             if (uriStr.startsWith("file:/")) {
@@ -182,11 +182,11 @@ public class ImageUtil {
             }
             return new URL(uriStr).openStream();
         } catch (IOException e) {
-            throw new ParameterException(e);
+            throw new InputParseException(e.getMessage());
         }
     }
 
-    public static BufferedImage getImage(String arg) throws ParameterException {
+    public static BufferedImage getImage(String arg) throws InputParseException {
         try {
             if (arg.startsWith("http")) {
                 if (arg.contains("imgur.com") && !arg.contains("i.imgur.com")) {
@@ -203,14 +203,14 @@ public class ImageUtil {
                 File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(), com.boydti.fawe.config.Settings.IMP.PATHS.HEIGHTMAP), arg);
                 return MainUtil.readImage(file);
             } else {
-                throw new ParameterException("Invalid image " + arg);
+                throw new InputParseException("Invalid image " + arg);
             }
         } catch (IOException e) {
-            throw new ParameterException(e);
+            throw new InputParseException(e.getMessage());
         }
     }
 
-    public static URI getImageURI(String arg) throws ParameterException {
+    public static URI getImageURI(String arg) throws InputParseException {
         try {
             if (arg.startsWith("http")) {
                 if (arg.contains("imgur.com") && !arg.contains("i.imgur.com")) {
@@ -221,17 +221,17 @@ public class ImageUtil {
                 arg = arg.replaceFirst("file:/+", "");
                 File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(), com.boydti.fawe.config.Settings.IMP.PATHS.HEIGHTMAP), arg);
                 if (!file.exists()) {
-                    throw new ParameterException("File not found " + file);
+                    throw new InputParseException("File not found " + file);
                 }
                 if (file.isDirectory()) {
-                    throw new ParameterException("File is a directory " + file);
+                    throw new InputParseException("File is a directory " + file);
                 }
                 return file.toURI();
             } else {
-                throw new ParameterException("Invalid image " + arg);
+                throw new InputParseException("Invalid image " + arg);
             }
         } catch (IOException | URISyntaxException e) {
-            throw new ParameterException(e);
+            throw new InputParseException(e.getMessage());
         }
     }
 }

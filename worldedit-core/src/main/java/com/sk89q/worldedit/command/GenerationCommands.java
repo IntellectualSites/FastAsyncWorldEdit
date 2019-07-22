@@ -247,14 +247,14 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
     public void sphere(FawePlayer fp, Player player, LocalSession session, EditSession editSession,
-                      @Arg(desc = "The pattern of blocks to generate")
-                          Pattern pattern,
-                      @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
-                      BlockVector3 radii,
-                      @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
-                          boolean raised,
-                      @Switch(name = 'h', desc = "Make a hollow sphere")
-                          boolean hollow) throws WorldEditException {
+        @Arg(desc = "The pattern of blocks to generate")
+            Pattern pattern,
+        @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
+            BlockVector3 radii,
+        @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
+            boolean raised,
+        @Switch(name = 'h', desc = "Make a hollow sphere")
+            boolean hollow, InjectedValueAccess context) throws WorldEditException {
         BlockVector3 pos = session.getPlacementPosition(player);
         BlockVector3 finalPos = raised ? pos.add(0, radii.getY(), 0) : pos;
         fp.checkConfirmationRadius(() -> {

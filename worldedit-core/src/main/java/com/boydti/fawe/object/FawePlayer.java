@@ -14,7 +14,6 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.boydti.fawe.wrappers.PlayerWrapper;
-import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -45,14 +44,13 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.enginehub.piston.inject.InjectedValueAccess;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class FawePlayer<T> extends Metadatable {
@@ -149,15 +147,11 @@ public abstract class FawePlayer<T> extends Metadatable {
 
     private void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context, String command) {
         CommandEvent event = new CommandEvent(getPlayer(), command);
-        if (task != null) {
-            Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
-                task.run();
-                return null;
-            }, context, getPlayer(), getSession(), event);
-            setMeta("cmdConfirm", newTask);
-        } else {
-            setMeta("cmdConfirm", event);
-        }
+        Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
+            task.run();
+            return null;
+        }, context, getPlayer(), getSession(), event);
+        setMeta("cmdConfirm", newTask);
     }
 
     public void checkConfirmation(@NotNull Runnable task, String command, int times, int limit, InjectedValueAccess context) throws RegionOperationException {

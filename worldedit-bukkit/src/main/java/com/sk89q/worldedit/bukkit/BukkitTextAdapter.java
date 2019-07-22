@@ -25,24 +25,24 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 public class BukkitTextAdapter {
 
-  public static String reduceToText(Component component) {
-    StringBuilder text = new StringBuilder();
-    appendTextTo(text, component);
-    return text.toString();
-  }
-
-  private static void appendTextTo(StringBuilder builder, Component component) {
-    if (component instanceof TextComponent) {
-      builder.append(((TextComponent) component).content());
-    } else if (component instanceof TranslatableComponent) {
-      builder.append(((TranslatableComponent) component).key());
+    public static String reduceToText(Component component) {
+        StringBuilder text = new StringBuilder();
+        appendTextTo(text, component);
+        return text.toString();
     }
-    for (Component child : component.children()) {
-      appendTextTo(builder, child);
-    }
-  }
 
-  private BukkitTextAdapter() {
-  }
+    private static void appendTextTo(StringBuilder builder, Component component) {
+        if (component instanceof TextComponent) {
+            builder.append(((TextComponent) component).content());
+        } else if (component instanceof TranslatableComponent) {
+            builder.append(((TranslatableComponent) component).key());
+        }
+        for (Component child : component.children()) {
+            appendTextTo(builder, child);
+        }
+    }
+
+    private BukkitTextAdapter() {
+    }
 
 }
