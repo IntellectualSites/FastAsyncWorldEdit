@@ -201,7 +201,7 @@ public class SchematicCommands {
         desc = "Load a schematic into your clipboard"
     )
     @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.asset", "worldedit.schematic.load.web", "worldedit.schematic.load.other"})
-    public void load(Player player, LocalSession session,
+    public void load(Actor actor, LocalSession session,
                      @Arg(desc = "File name.")
                          String filename,
                      @Arg(desc = "Format name.", def = "sponge")
@@ -213,8 +213,8 @@ public class SchematicCommands {
         try {
             URI uri;
             if (filename.startsWith("url:")) {
-                if (!player.hasPermission("worldedit.schematic.load.web")) {
-                    BBC.NO_PERM.send(player, "worldedit.schematic.load.web");
+                if (!actor.hasPermission("worldedit.schematic.load.web")) {
+                    BBC.NO_PERM.send(actor, "worldedit.schematic.load.web");
                     return;
                 }
                 UUID uuid = UUID.fromString(filename.substring(4));
@@ -225,7 +225,7 @@ public class SchematicCommands {
                 uri = url.toURI();
             } else {
                 File saveDir = worldEdit.getWorkingDirectoryFile(config.saveDir);
-                File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(saveDir, player.getUniqueId().toString()) : saveDir;
+                File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(saveDir, actor.getUniqueId().toString()) : saveDir;
                 File file;
                 if (filename.startsWith("#")) {
                     String[] extensions;
@@ -234,14 +234,14 @@ public class SchematicCommands {
                     } else {
                         extensions = ClipboardFormats.getFileExtensionArray();
                     }
-                    file = player.openFileOpenDialog(extensions);
+                    file = actor.openFileOpenDialog(extensions);
                     if (file == null || !file.exists()) {
-                        player.printError("Schematic " + filename + " does not exist! (" + file + ")");
+                        actor.printError("Schematic " + filename + " does not exist! (" + file + ")");
                         return;
                     }
                 } else {
-                    if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !player.hasPermission("worldedit.schematic.load.other") && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(filename).find()) {
-                        BBC.NO_PERM.send(player, "worldedit.schematic.load.other");
+                    if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !actor.hasPermission("worldedit.schematic.load.other") && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(filename).find()) {
+                        BBC.NO_PERM.send(actor, "worldedit.schematic.load.other");
                         return;
                     }
                     if (format == null && filename.matches(".*\\.[\\w].*")) {
@@ -257,25 +257,25 @@ public class SchematicCommands {
                     }
                 }
                 if (file == null || !file.exists() || !MainUtil.isInSubDirectory(saveDir, file)) {
-                    player.printError("Schematic " + filename + " does not exist! (" + (file != null && file.exists()) + "|" + file + "|" + (file != null && !MainUtil.isInSubDirectory(saveDir, file)) + ")");
+                    actor.printError("Schematic " + filename + " does not exist! (" + (file != null && file.exists()) + "|" + file + "|" + (file != null && !MainUtil.isInSubDirectory(saveDir, file)) + ")");
                     return;
                 }
                 if (format == null) {
                     format = ClipboardFormats.findByFile(file);
                     if (format == null) {
-                        BBC.CLIPBOARD_INVALID_FORMAT.send(player, file.getName());
+                        BBC.CLIPBOARD_INVALID_FORMAT.send(actor, file.getName());
                         return;
                     }
                 }
                 in = new FileInputStream(file);
                 uri = file.toURI();
             }
-            format.hold(player, uri, in);
-            BBC.SCHEMATIC_LOADED.send(player, filename);
+            format.hold(actor, uri, in);
+            BBC.SCHEMATIC_LOADED.send(actor, filename);
         } catch (IllegalArgumentException e) {
-            player.printError("Unknown filename: " + filename);
+            actor.printError("Unknown filename: " + filename);
         } catch (URISyntaxException | IOException e) {
-            player.printError("File could not be read or it does not exist: " + e.getMessage());
+            actor.printError("File could not be read or it does not exist: " + e.getMessage());
             log.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {

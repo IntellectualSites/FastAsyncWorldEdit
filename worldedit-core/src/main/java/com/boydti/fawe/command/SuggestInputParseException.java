@@ -1,19 +1,12 @@
 package com.boydti.fawe.command;
 
-import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.StringMan;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.extension.input.InputParseException;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.sk89q.worldedit.extension.input.InputParseException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SuggestInputParseException extends InputParseException {
 
@@ -56,7 +49,7 @@ public class SuggestInputParseException extends InputParseException {
     public static SuggestInputParseException of(String input, List<Object> values) {
         throw new SuggestInputParseException("No value: " + input, input, () ->
                 values.stream()
-                        .map(v -> v.toString())
+                        .map(Object::toString)
                         .filter(v -> v.startsWith(input))
                         .collect(Collectors.toList()));
     }

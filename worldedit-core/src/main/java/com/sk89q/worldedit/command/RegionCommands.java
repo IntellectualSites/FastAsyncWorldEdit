@@ -42,6 +42,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
@@ -69,6 +70,7 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.ArrayList;
@@ -84,7 +86,7 @@ import org.enginehub.piston.inject.InjectedValueAccess;
  * Commands that operate on regions.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-public class RegionCommands extends MethodCommands {
+public class RegionCommands {
 
     private final WorldEdit worldEdit;
 
@@ -103,7 +105,7 @@ public class RegionCommands extends MethodCommands {
             desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
-    public void fixlighting(Player player) throws WorldEditException {
+    public void fixLighting(Player player) throws WorldEditException {
         FawePlayer fp = FawePlayer.wrap(player);
         final Location loc = player.getLocation();
         Region selection = fp.getSelection();
@@ -121,7 +123,7 @@ public class RegionCommands extends MethodCommands {
             desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
-    public void getlighting(Player player, EditSession editSession) throws WorldEditException {
+    public void getLighting(Player player, EditSession editSession) throws WorldEditException {
         FawePlayer fp = FawePlayer.wrap(player);
         final Location loc = player.getLocation();
         int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
@@ -134,7 +136,7 @@ public class RegionCommands extends MethodCommands {
             desc = "Removing lighting in a selection"
     )
     @CommandPermissions("worldedit.light.remove")
-    public void removelighting(Player player) {
+    public void removeLighting(Player player) {
         FawePlayer fp = FawePlayer.wrap(player);
         Region selection = fp.getSelection();
         if (selection == null) {
@@ -190,7 +192,7 @@ public class RegionCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.region.line")
     @Logging(REGION)
-    public int line(Player player, EditSession editSession,
+    public int line(Actor actor, EditSession editSession,
                     @Selection Region region,
                     @Arg(desc = "The pattern of blocks to place")
                         Pattern pattern,
@@ -199,7 +201,7 @@ public class RegionCommands extends MethodCommands {
                     @Switch(name = 'h', desc = "Generate only a shell")
                         boolean shell) throws WorldEditException {
         if (!(region instanceof CuboidRegion)) {
-            player.printError("//line only works with cuboid selections");
+            actor.printError("//line only works with cuboid selections");
             return 0;
         }
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
@@ -209,7 +211,7 @@ public class RegionCommands extends MethodCommands {
         BlockVector3 pos2 = cuboidregion.getPos2();
         int blocksChanged = editSession.drawLine(pattern, pos1, pos2, thickness, !shell);
 
-        BBC.VISITOR_BLOCK.send(player, blocksChanged);
+        BBC.VISITOR_BLOCK.send(actor, blocksChanged);
         return blocksChanged;
     }
 
@@ -340,11 +342,11 @@ public class RegionCommands extends MethodCommands {
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.region.center")
-    public void center(Player player, EditSession editSession, @Selection Region region,
+    public void center(Actor actor, EditSession editSession, @Selection Region region,
                       @Arg(desc = "The pattern of blocks to set")
                           Pattern pattern) throws WorldEditException {
         int affected = editSession.center(region, pattern);
-        BBC.VISITOR_BLOCK.send(player, affected);
+        BBC.VISITOR_BLOCK.send(actor, affected);
     }
 
     @Command(
@@ -458,18 +460,11 @@ public class RegionCommands extends MethodCommands {
 
     @Command(
             name = "/move",
-            desc = "Move the contents of the selection",
-            descFooter =
-                    "Moves the contents of the selection.\n" +
-                            "The -s flag shifts the selection to the target location.\n" +
-                            "The -b also copies biomes\n" +
-                            "The -e ignores entities\n" +
-                            "The -a ignores air blocks.\n" +
-                            "Optionally fills the old location with <leave-id>."
-)
+            desc = "Move the contents of the selection"
+    )
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
-    public void move(FawePlayer player, EditSession editSession, LocalSession session,
+    public void move(FawePlayer player, World world, EditSession editSession, LocalSession session,
                      @Selection Region region,
                     @Arg(desc = "# of blocks to move", def = "1")
                         int count,
@@ -482,23 +477,21 @@ public class RegionCommands extends MethodCommands {
                         boolean moveSelection,
                     @Switch(name = 'a', desc = "Ignore air blocks")
                         boolean ignoreAirBlocks,
-                    @Switch(name = 'b', desc = "TODO")
+                    @Switch(name = 'b', desc = "Copy Biomes")
                         boolean copyBiomes,
-                    @Switch(name = 'e', desc = "TODO")
+                    @Switch(name = 'e', desc = "Ignore entities")
                         boolean skipEntities,
-                    @Switch(name = 'a', desc = "TODO")
-                        boolean skipAir,
                     InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
         player.checkConfirmationRegion(() -> {
-            int affected = editSession.moveRegion(region, direction, count, !skipAir, !skipEntities, copyBiomes, replace);
+            int affected = editSession.moveRegion(region, direction, count, !ignoreAirBlocks, !skipEntities, copyBiomes, replace);
 
             if (moveSelection) {
                 try {
                     region.shift(direction.multiply(count));
 
-                    session.getRegionSelector(player.getWorld()).learnChanges();
-                    session.getRegionSelector(player.getWorld()).explainRegionAdjust(player.getPlayer(), session);
+                    session.getRegionSelector(world).learnChanges();
+                    session.getRegionSelector(world).explainRegionAdjust(player.getPlayer(), session);
                 } catch (RegionOperationException e) {
                     player.printError(e.getMessage());
                 }
@@ -533,7 +526,7 @@ public class RegionCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.region.stack")
     @Logging(ORIENTATION_REGION)
-    public void stack(FawePlayer player, EditSession editSession, LocalSession session,
+    public void stack(FawePlayer player, World world, EditSession editSession, LocalSession session,
                      @Selection Region region,
                      @Arg(desc = "# of copies to stack", def = "1")
                          int count,
@@ -542,11 +535,15 @@ public class RegionCommands extends MethodCommands {
                          BlockVector3 direction,
                      @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
                          boolean moveSelection,
-                     @Switch(name = 'b', desc = "//TODO") boolean copyBiomes,
-                     @Switch(name = 'e', desc = "//TODO") boolean skipEntities,
+                     @Switch(name = 'b', desc = "Copy Biomes")
+                         boolean copyBiomes,
+                     @Switch(name = 'e', desc = "Skip entities")
+                         boolean skipEntities,
                      @Switch(name = 'a', desc = "Ignore air blocks")
                          boolean ignoreAirBlocks,
-                     @Switch(name = 'm', desc = "TODO") Mask sourceMask, InjectedValueAccess context) throws WorldEditException {
+                     @Switch(name = 'm', desc = "TODO")
+                         Mask sourceMask,
+                    InjectedValueAccess context) throws WorldEditException {
         player.checkConfirmationStack(() -> {
             if (sourceMask != null) {
                 editSession.addSourceMask(sourceMask);
@@ -555,14 +552,15 @@ public class RegionCommands extends MethodCommands {
 
             if (moveSelection) {
                 try {
-                    final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-                    final BlockVector3 shiftVector = BlockVector3.at(direction.getX() * size.getX() * count, direction.getY() * size.getY() * count, direction.getZ() * size.getZ() * count);
+                final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint());
+
+                final BlockVector3 shiftVector = direction.toVector3().multiply(count * (Math.abs(direction.dot(size)) + 1)).toBlockPoint();
                     region.shift(shiftVector);
 
-                    session.getRegionSelector(player.getWorld()).learnChanges();
-                    session.getRegionSelector(player.getWorld()).explainRegionAdjust(player.getPlayer(), session);
+                    session.getRegionSelector(world).learnChanges();
+                    session.getRegionSelector(world).explainRegionAdjust(player.getPlayer(), session);
                 } catch (RegionOperationException e) {
-                    player.sendMessage(e.getMessage());
+                    player.toWorldEditPlayer().printError(e.getMessage());
                 }
             }
 
@@ -670,11 +668,12 @@ public class RegionCommands extends MethodCommands {
     public void hollow(FawePlayer player, EditSession editSession,
                       @Selection Region region,
                       @Arg(desc = "Thickness of the shell to leave", def = "0")
-                          @Range(min = 0) int thickness,
+                          int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
         @Switch(name = 'm', desc = "Mask to hollow with") Mask mask,
                        InjectedValueAccess context) throws WorldEditException {
+        checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
         player.checkConfirmationRegion(() -> {
             int affected = editSession.hollowOutRegion(region, thickness, pattern, finalMask);
@@ -688,14 +687,15 @@ public class RegionCommands extends MethodCommands {
     )
     @CommandPermissions("worldedit.region.forest")
     @Logging(REGION)
-    public void forest(Player player, EditSession editSession, @Selection Region region,
+    public int forest(Actor actor, EditSession editSession, @Selection Region region,
                       @Arg(desc = "The type of tree to place", def = "tree")
                           TreeType type,
                       @Arg(desc = "The density of the forest", def = "5")
                           double density) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be in [0, 100]");
         int affected = editSession.makeForest(region, density / 100, type);
-        BBC.COMMAND_TREE.send(player, affected);
+        BBC.COMMAND_TREE.send(actor, affected);
+        return affected;
     }
 
     @Command(

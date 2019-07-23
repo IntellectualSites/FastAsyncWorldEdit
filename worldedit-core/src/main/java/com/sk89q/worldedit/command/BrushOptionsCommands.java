@@ -63,12 +63,11 @@ public class BrushOptionsCommands {
     @Command(
         name = "savebrush",
         aliases = {"save"},
-        desc = "Save your current brush",
-        descFooter = "Save your current brush use the -g flag to save globally"
+        desc = "Save your current brush"
     )
     @CommandPermissions("worldedit.brush.save")
     public void saveBrush(Player player, LocalSession session, String name,
-        @Switch(name = 'g', desc = "TODO") boolean root) throws WorldEditException, IOException {
+        @Switch(name = 'g', desc = "Save the brush globally") boolean root) throws WorldEditException, IOException {
         BrushTool tool = session.getBrushTool(player);
         if (tool != null) {
             root |= name.startsWith("../");
@@ -134,8 +133,7 @@ public class BrushOptionsCommands {
     @Command(
         name = "/listbrush",
         desc = "List saved brushes",
-        descFooter = "List all brushes in the brush directory\n" +
-            " -p <page> prints the requested page\n"
+        descFooter = "List all brushes in the brush directory"
     )
     @CommandPermissions("worldedit.brush.list")
     public void list(Actor actor, InjectedValueAccess args,

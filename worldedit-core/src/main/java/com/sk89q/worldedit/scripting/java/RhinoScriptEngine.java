@@ -120,13 +120,15 @@ public class RhinoScriptEngine extends AbstractScriptEngine {
     public ScriptEngineFactory getFactory() {
         if (factory != null) {
             return factory;
+        } else {
+            return new RhinoScriptEngineFactory();
         }
-        return new RhinoScriptEngineFactory();
     }
 
     private Scriptable setupScope(Context cx, ScriptContext context) {
         ScriptableObject scriptable = new ImporterTopLevel(cx);
+        Scriptable scope = cx.initStandardObjects(scriptable);
         //ScriptableObject.putProperty(scope, "argv", Context.javaToJS(args, scope));
-        return cx.initStandardObjects(scriptable);
+        return scope;
     }
 }

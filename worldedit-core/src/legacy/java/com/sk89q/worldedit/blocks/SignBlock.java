@@ -40,7 +40,7 @@ public class SignBlock extends BaseBlock {
 
     /**
      * Construct the sign with text.
-     * 
+     *
      * @param blockState The block state
      * @param text lines of text
      */
@@ -62,7 +62,7 @@ public class SignBlock extends BaseBlock {
 
     /**
      * Get the text.
-     * 
+     *
      * @return the text
      */
     public String[] getText() {
@@ -71,7 +71,7 @@ public class SignBlock extends BaseBlock {
 
     /**
      * Set the text.
-     * 
+     *
      * @param text the text to set
      */
     public void setText(String[] text) {
@@ -80,7 +80,7 @@ public class SignBlock extends BaseBlock {
         }
         this.text = text;
     }
-    
+
     @Override
     public boolean hasNbtData() {
         return true;
@@ -88,7 +88,7 @@ public class SignBlock extends BaseBlock {
 
     @Override
     public String getNbtId() {
-        return "Sign";
+        return "minecraft:sign";
     }
 
     @Override
@@ -114,8 +114,8 @@ public class SignBlock extends BaseBlock {
         text = new String[] { EMPTY, EMPTY, EMPTY, EMPTY };
 
         t = values.get("id");
-        if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals("Sign")) {
-            throw new RuntimeException("'Sign' tile entity expected");
+        if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals(getNbtId())) {
+            throw new RuntimeException(String.format("'%s' tile entity expected", getNbtId()));
         }
 
         t = values.get("Text1");

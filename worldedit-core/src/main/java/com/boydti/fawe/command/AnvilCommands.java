@@ -111,10 +111,14 @@ public class AnvilCommands {
             name = "replaceall",
             aliases = {"rea", "repall"},
             desc = "Replace all blocks in the selection with another",
-            descFooter = "The -d flag disabled wildcard data matching\n"
 )
     @CommandPermissions("worldedit.anvil.replaceall")
-    public void replaceAll(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, String to, @Switch(name = 'd', desc = "TODO") boolean useData) throws WorldEditException {
+    public void replaceAll(Player player, String folder,
+        @Arg(name = "from", desc = "String", def = "")
+            String from,
+        String to,
+        @Switch(name = 'd', desc = "Disable wildcard data matching")
+            boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;  TODO NOT IMPLEMENTED
 //        if (from == null) {
 //            matchFrom = FaweBlockMatcher.NOT_AIR;
@@ -234,8 +238,7 @@ public class AnvilCommands {
             name = "trimallplots",
 
             desc = "Trim chunks in a Plot World",
-            descFooter = "Unclaimed chunks will be deleted\n" +
-                    "Unmodified chunks will be deleted\n"
+            descFooter = "Unclaimed chunks will be deleted\nUnmodified chunks will be deleted\n"
     )
     @CommandPermissions("worldedit.anvil.trimallplots")
     public void trimAllPlots(Player player, @Switch(name = 'v', desc = "Delete unvisited chunks") boolean deleteUnvisited) throws WorldEditException {

@@ -19,21 +19,20 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.clipboard.URIClipboardHolder;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.MainUtil;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.gson.Gson;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -111,8 +110,8 @@ public interface ClipboardFormat {
      * @param in
      * @throws IOException
      */
-    default URIClipboardHolder hold(Player player, URI uri, InputStream in) throws IOException {
-        checkNotNull(player);
+    default URIClipboardHolder hold(Actor actor, URI uri, InputStream in) throws IOException {
+        checkNotNull(actor);
         checkNotNull(uri);
         checkNotNull(in);
 
@@ -120,9 +119,9 @@ public interface ClipboardFormat {
 
         final Clipboard clipboard;
 
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(actor);
         session.setClipboard(null);
-        clipboard = reader.read(player.getUniqueId());
+        clipboard = reader.read(actor.getUniqueId());
         URIClipboardHolder holder = new URIClipboardHolder(uri, clipboard);
         session.setClipboard(holder);
         return holder;

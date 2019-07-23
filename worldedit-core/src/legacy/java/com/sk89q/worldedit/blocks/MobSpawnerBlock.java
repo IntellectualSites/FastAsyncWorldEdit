@@ -19,7 +19,10 @@
 
 package com.sk89q.worldedit.blocks;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.ShortTag;
@@ -28,7 +31,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,17 +40,17 @@ import java.util.Map;
 public class MobSpawnerBlock extends BaseBlock {
 
     private String mobType;
-    private short delay;
+    private short delay = -1;
 
     // advanced mob spawner features
-    private short spawnCount;
-    private short spawnRange;
+    private short spawnCount = 4;
+    private short spawnRange = 4;
     private CompoundTag spawnData;
     private ListTag spawnPotentials;
-    private short minSpawnDelay;
-    private short maxSpawnDelay;
-    private short maxNearbyEntities;
-    private short requiredPlayerRange;
+    private short minSpawnDelay = 200;
+    private short maxSpawnDelay = 800;
+    private short maxNearbyEntities = 6;
+    private short requiredPlayerRange = 16;
 
     /**
      * Construct the mob spawner block with a specified data value.
@@ -113,7 +115,7 @@ public class MobSpawnerBlock extends BaseBlock {
 
     @Override
     public String getNbtId() {
-        return "MobSpawner";
+        return "minecraft:mob_spawner";
     }
 
     @Override
@@ -127,10 +129,16 @@ public class MobSpawnerBlock extends BaseBlock {
         values.put("MaxSpawnDelay", new ShortTag(maxSpawnDelay));
         values.put("MaxNearbyEntities", new ShortTag(maxNearbyEntities));
         values.put("RequiredPlayerRange", new ShortTag(requiredPlayerRange));
-        if (spawnData != null) {
+        if (spawnData == null) {
+            values.put("SpawnData", new CompoundTag(ImmutableMap.of("id", new StringTag(mobType))));
+        } else {
             values.put("SpawnData", new CompoundTag(spawnData.getValue()));
         }
-        if (spawnPotentials != null) {
+        if (spawnPotentials == null) {
+            values.put("SpawnPotentials", new ListTag(CompoundTag.class, ImmutableList.of(
+                    new CompoundTag(ImmutableMap.of("Weight", new IntTag(1), "Entity",
+                            new CompoundTag(ImmutableMap.of("id", new StringTag(mobType))))))));
+        } else {
             values.put("SpawnPotentials", new ListTag(CompoundTag.class, spawnPotentials.getValue()));
         }
 
@@ -146,22 +154,32 @@ public class MobSpawnerBlock extends BaseBlock {
         Map<String, Tag> values = rootTag.getValue();
 
         Tag t = values.get("id");
-        if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals("MobSpawner")) {
-            throw new RuntimeException("'MobSpawner' tile entity expected");
+        if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals(getNbtId())) {
+            throw new RuntimeException(String.format("'%s' tile entity expected", getNbtId()));
         }
 
-        StringTag mobTypeTag;
+        CompoundTag spawnDataTag;
+        String mobType;
         ShortTag delayTag;
 
         try {
-            mobTypeTag = NBTUtils.getChildTag(values, "EntityId", StringTag.class);
-            delayTag = NBTUtils.getChildTag(values, "Delay", ShortTag.class);
+            spawnDataTag = NBTUtils.getChildTag(values, "SpawnData", CompoundTag.class);
+            mobType = spawnDataTag.getString("id");
+            if (mobType.equals("")) {
+                throw new InvalidFormatException("No spawn id.");
+            }
+            this.mobType = mobType;
+            this.spawnData = spawnDataTag;
         } catch (InvalidFormatException ignored) {
-            throw new RuntimeException("Invalid mob spawner data: no EntityId and/or no Delay");
+            throw new RuntimeException("Invalid mob spawner data: no SpawnData and/or no Delay");
+        }
+        try {
+            delayTag = NBTUtils.getChildTag(values, "Delay", ShortTag.class);
+            this.delay = delayTag.getValue();
+        } catch (InvalidFormatException ignored) {
+            this.delay = -1;
         }
 
-        this.mobType = mobTypeTag.getValue();
-        this.delay = delayTag.getValue();
 
         ShortTag spawnCountTag = null;
         ShortTag spawnRangeTag = null;
@@ -170,7 +188,6 @@ public class MobSpawnerBlock extends BaseBlock {
         ShortTag maxNearbyEntitiesTag = null;
         ShortTag requiredPlayerRangeTag = null;
         ListTag spawnPotentialsTag = null;
-        CompoundTag spawnDataTag = null;
         try {
             spawnCountTag = NBTUtils.getChildTag(values, "SpawnCount", ShortTag.class);
         } catch (InvalidFormatException ignored) {
@@ -199,10 +216,6 @@ public class MobSpawnerBlock extends BaseBlock {
             spawnPotentialsTag = NBTUtils.getChildTag(values, "SpawnPotentials", ListTag.class);
         } catch (InvalidFormatException ignored) {
         }
-        try {
-            spawnDataTag = NBTUtils.getChildTag(values, "SpawnData", CompoundTag.class);
-        } catch (InvalidFormatException ignored) {
-        }
 
         if (spawnCountTag != null) {
             this.spawnCount = spawnCountTag.getValue();
@@ -224,9 +237,6 @@ public class MobSpawnerBlock extends BaseBlock {
         }
         if (spawnPotentialsTag != null) {
             this.spawnPotentials = new ListTag(CompoundTag.class, spawnPotentialsTag.getValue());
-        }
-        if (spawnDataTag != null) {
-            this.spawnData = new CompoundTag(spawnDataTag.getValue());
         }
     }
 

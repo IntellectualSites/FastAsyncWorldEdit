@@ -1,5 +1,7 @@
 package com.boydti.fawe.command;
 
+import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
+
 import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
@@ -56,13 +58,14 @@ public class CFICommand extends CommandProcessor<Object, Object> {
                     hmCmd =
                         Commands.getAlias(CFICommands.class, "heightmap") + " " + settings.imageArg;
                 }
-                TextComponent.of("What do you want to use as the base?").newline()
-                    .text("[HeightMap]").cmdTip(hmCmd).text(" - A heightmap like ")
-                    .text("[this]").linkTip("http://i.imgur.com/qCd30MR.jpg")
-                    .newline()
-                    .text("[Empty]").cmdTip(CFICommands.alias() + " empty")
-                    .text("- An empty map of a specific size")
-                    .send(fp);
+                TextComponent build = TextComponent.builder("What do you want to use as the base?")
+                    .append(newline())
+                    .append("[HeightMap]")/* TODO .cmdTip(hmCmd).*/.append(" - A heightmap like ")
+                    .append("[this]")//TODO .linkTip("http://i.imgur.com/qCd30MR.jpg")
+                    .append(newline())
+                    .append("[Empty]")//TODO .cmdTip(CFICommands.alias() + " empty")
+                    .append("- An empty map of a specific size").build();
+                fp.toWorldEditPlayer().print(build);
             } else {
                 args = new ArrayList<>(args);
                 switch (args.size()) {

@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.command;
 
+import static java.util.Objects.requireNonNull;
+import static org.enginehub.piston.part.CommandParts.arg;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.LocalSession;
@@ -29,8 +32,6 @@ import com.sk89q.worldedit.command.factory.ReplaceFactory;
 import com.sk89q.worldedit.command.factory.TreeGeneratorFactory;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.CommandQueued;
-import com.sk89q.worldedit.command.util.CommandQueuedConditionGenerator;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.Contextual;
@@ -45,6 +46,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
+import java.util.stream.Collectors;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
 import org.enginehub.piston.CommandParameters;
@@ -54,11 +56,6 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.part.CommandArgument;
 import org.enginehub.piston.part.SubCommandPart;
-
-import java.util.stream.Collectors;
-
-import static java.util.Objects.requireNonNull;
-import static org.enginehub.piston.part.CommandParts.arg;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ApplyBrushCommands {

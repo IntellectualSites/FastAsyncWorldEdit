@@ -47,7 +47,7 @@ public class RhinoCraftScriptEngine implements CraftScriptEngine {
 
     @Override
     public Object evaluate(String script, String filename, Map<String, Object> args)
-            throws Throwable {
+            throws ScriptException, Throwable {
         RhinoContextFactory factory = new RhinoContextFactory(timeLimit);
         Context cx = factory.enterContext();
         ScriptableObject scriptable = new ImporterTopLevel(cx);
