@@ -124,8 +124,6 @@ import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 
-import static com.sk89q.worldedit.command.MethodCommands.*;
-
 /**
  * Commands to set brush shape.
  */
@@ -254,7 +252,7 @@ public class BrushCommands {
         @Arg(desc = "The radius to sample for blending", def = "25")
         Expression radius, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        player.print(BBC.BRUSH_SPLINE.f(radius));
+        player.print(BBC.BRUSH_SPLINE.format(radius));
         return set(session, context,
                 new SplineBrush(player, session))
                 .setSize(radius)
@@ -310,7 +308,7 @@ public class BrushCommands {
     public BrushSettings surfaceSpline(Player player, LocalSession session, Pattern fill,
         @Arg(desc = "The radius to sample for blending", def = "0")
             Expression radius, @Arg(name = "tension", desc = "double", def = "0") double tension, @Arg(name = "bias", desc = "double", def = "0") double bias, @Arg(name = "continuity", desc = "double", def = "0") double continuity, @Arg(name = "quality", desc = "double", def = "10") double quality, InjectedValueAccess context) throws WorldEditException {
-        player.print(BBC.BRUSH_SPLINE.f(radius));
+        player.print(BBC.BRUSH_SPLINE.format(radius));
         worldEdit.checkMaxBrushRadius(radius);
         return set(session, context,
                 new SurfaceSpline(tension, bias, continuity, quality))
@@ -795,7 +793,7 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.copy")
     public BrushSettings copy(Player player, LocalSession session, @Arg(name = "radius", desc = "Expression", def = "5") Expression radius, @Switch(name = 'r', desc = "Apply random rotation on paste") boolean randomRotate, @Switch(name = 'a', desc = "Apply auto view based rotation on paste") boolean autoRotate, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        player.print(BBC.BRUSH_COPY.f(radius));
+        player.print(BBC.BRUSH_COPY.format(radius));
 
         return set(session, context,
                 new CopyPastaBrush(player, session, randomRotate, autoRotate))

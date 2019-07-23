@@ -159,7 +159,8 @@ public abstract class FawePlayer<T> extends Metadatable {
             if (times > limit) {
                 setConfirmTask(task, context, command);
                 String volume = "<unspecified>";
-                throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(0, times, command, volume));
+                throw new RegionOperationException(
+                    BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.format(0, times, command, volume));
             }
         }
         task.run();
@@ -171,7 +172,9 @@ public abstract class FawePlayer<T> extends Metadatable {
                 if (radius > 448) {
                     setConfirmTask(task, context, command);
                     long volume = (long) (Math.PI * ((double) radius * radius));
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(0, radius, command, NumberFormat.getNumberInstance().format(volume)));
+                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
+                        .format(0, radius, command,
+                            NumberFormat.getNumberInstance().format(volume)));
                 }
             }
         }
@@ -188,7 +191,8 @@ public abstract class FawePlayer<T> extends Metadatable {
                     setConfirmTask(task, context, command);
                     BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
                     long volume = (long) base.getX() * base.getZ() * base.getY() * times;
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(min, max, command, NumberFormat.getNumberInstance().format(volume)));
+                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
+                        .format(min, max, command, NumberFormat.getNumberInstance().format(volume)));
                 }
             }
         }
@@ -205,7 +209,8 @@ public abstract class FawePlayer<T> extends Metadatable {
                     setConfirmTask(task, context, command);
                     BlockVector3 base = max.subtract(min).add(BlockVector3.ONE);
                     long volume = (long) base.getX() * base.getZ() * base.getY();
-                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM.f(min, max, command, NumberFormat.getNumberInstance().format(volume)));
+                    throw new RegionOperationException(BBC.WORLDEDIT_CANCEL_REASON_CONFIRM
+                        .format(min, max, command, NumberFormat.getNumberInstance().format(volume)));
                 }
             }
         }

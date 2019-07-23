@@ -554,7 +554,7 @@ public class SelectionCommands {
                 newSelector = new Polygonal2DRegionSelector(oldSelector);
                 player.print(BBC.SEL_2D_POLYGON.s());
                 Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolygonVertexLimit();
-                limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+                limit.ifPresent(integer -> player.print(BBC.SEL_MAX.format(integer)));
                 break;
             }
             case ELLIPSOID:
@@ -575,14 +575,14 @@ public class SelectionCommands {
                 newSelector = new ConvexPolyhedralRegionSelector(oldSelector);
                 player.print(BBC.SEL_CONVEX_POLYHEDRAL.s());
                 Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolyhedronVertexLimit();
-                limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+                limit.ifPresent(integer -> player.print(BBC.SEL_MAX.format(integer)));
                 break;
             }
             case POLYHEDRAL:
                 newSelector = new PolyhedralRegionSelector(player.getWorld());
                 player.print(BBC.SEL_CONVEX_POLYHEDRAL.s());
                 Optional<Integer> limit = ActorSelectorLimits.forActor(player).getPolyhedronVertexLimit();
-                limit.ifPresent(integer -> player.print(BBC.SEL_MAX.f(integer)));
+                limit.ifPresent(integer -> player.print(BBC.SEL_MAX.format(integer)));
                 player.print(BBC.SEL_LIST.s());
                 break;
             case FUZZY:
@@ -591,8 +591,8 @@ public class SelectionCommands {
                     mask = new IdMask(world);
                 }
                 newSelector = new FuzzyRegionSelector(player, editSession, mask);
-                player.print(BBC.SEL_FUZZY.f());
-                player.print(BBC.SEL_LIST.f());
+                player.print(BBC.SEL_FUZZY.s());
+                player.print(BBC.SEL_LIST.s());
                 break;
             case LIST:
             default:

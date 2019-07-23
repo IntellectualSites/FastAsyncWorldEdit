@@ -54,7 +54,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
     }
 
     private List<MessagePart> messageParts;
-    private int index = 0;
+    private int index;
     private String jsonString;
     private boolean dirty;
 
@@ -78,11 +78,11 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      *
      * @param firstPartText The existing text in the message.
      */
-    public FancyMessage(final String firstPartText) {
+    public FancyMessage(String firstPartText) {
         this(rawText(firstPartText));
     }
 
-    private FancyMessage(final TextualComponent firstPartText) {
+    private FancyMessage(TextualComponent firstPartText) {
         messageParts = new ArrayList<>();
         messageParts.add(new MessagePart(firstPartText));
         index = messageParts.size();
@@ -165,7 +165,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
             }
         }
         if (text.length() - last > 0) {
-            append(text.substring(last, text.length()));
+            append(text.substring(last));
             colors.forEach(this::color);
         }
         index++;
@@ -206,7 +206,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      *                                  represent formatters.
      */
     public FancyMessage style(ChatColor... styles) {
-        for (final ChatColor style : styles) {
+        for (ChatColor style : styles) {
             if (!style.isFormat()) {
                 color(style);
             }
@@ -224,7 +224,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param path The path of the file on the client filesystem.
      * @return This builder instance.
      */
-    public FancyMessage file(final String path) {
+    public FancyMessage file(String path) {
         onClick("open_file", path);
         return this;
     }
@@ -237,7 +237,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param url The URL of the page to open when the link is clicked.
      * @return This builder instance.
      */
-    public FancyMessage link(final String url) {
+    public FancyMessage link(String url) {
         onClick("open_url", url);
         return this;
     }
@@ -252,7 +252,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param command The text to display in the chat bar of the client.
      * @return This builder instance.
      */
-    public FancyMessage suggest(final String command) {
+    public FancyMessage suggest(String command) {
         onClick("suggest_command", command);
         return this;
     }
@@ -267,7 +267,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param command The text to append to the chat bar of the client.
      * @return This builder instance.
      */
-    public FancyMessage insert(final String command) {
+    public FancyMessage insert(String command) {
         onCurrent(m -> m.insertionData = command);
         dirty = true;
         return this;
@@ -282,7 +282,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param command The text to display in the chat bar of the client.
      * @return This builder instance.
      */
-    public FancyMessage command(final String command) {
+    public FancyMessage command(String command) {
         onClick("run_command", command);
         return this;
     }
@@ -297,7 +297,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      *             hovering.
      * @return This builder instance.
      */
-    public FancyMessage tooltip(final String text) {
+    public FancyMessage tooltip(String text) {
         onHover("show_text", new JsonString(text));
         return this;
     }
@@ -313,8 +313,8 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      *              tooltip are created.
      * @return This builder instance.
      */
-    public FancyMessage tooltip(final Iterable<String> lines) {
-        tooltip(com.boydti.fawe.bukkit.chat.ArrayWrapper.toArray(lines, String.class));
+    public FancyMessage tooltip(Iterable<String> lines) {
+        tooltip(ArrayWrapper.toArray(lines, String.class));
         return this;
     }
 
@@ -327,7 +327,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param lines The lines of text which will be displayed to the client upon hovering.
      * @return This builder instance.
      */
-    public FancyMessage tooltip(final String... lines) {
+    public FancyMessage tooltip(String... lines) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < lines.length; i++) {
             builder.append(lines[i]);
@@ -420,9 +420,8 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      *              tooltip are created.
      * @return This builder instance.
      */
-    public FancyMessage formattedTooltip(final Iterable<FancyMessage> lines) {
-        return formattedTooltip(
-            com.boydti.fawe.bukkit.chat.ArrayWrapper.toArray(lines, FancyMessage.class));
+    public FancyMessage formattedTooltip(Iterable<FancyMessage> lines) {
+        return formattedTooltip(ArrayWrapper.toArray(lines, FancyMessage.class));
     }
 
     /**
@@ -433,7 +432,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      *                     message.
      * @return This builder instance.
      */
-    public FancyMessage translationReplacements(final String... replacements) {
+    public FancyMessage translationReplacements(String... replacements) {
         for (String str : replacements) {
             latest().translationReplacements.add(new JsonString(str));
         }
@@ -466,7 +465,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      *                     message.
      * @return This builder instance.
      */
-    public FancyMessage translationReplacements(final FancyMessage... replacements) {
+    public FancyMessage translationReplacements(FancyMessage... replacements) {
         Collections.addAll(latest().translationReplacements, replacements);
 
         dirty = true;
@@ -482,9 +481,9 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      *                     message.
      * @return This builder instance.
      */
-    public FancyMessage translationReplacements(final Iterable<FancyMessage> replacements) {
+    public FancyMessage translationReplacements(Iterable<FancyMessage> replacements) {
         return translationReplacements(
-            com.boydti.fawe.bukkit.chat.ArrayWrapper.toArray(replacements, FancyMessage.class));
+            ArrayWrapper.toArray(replacements, FancyMessage.class));
     }
 
     /**
@@ -495,11 +494,11 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param text The text which will populate the new message component.
      * @return This builder instance.
      */
-    public FancyMessage then(final String text) {
+    public FancyMessage then(String text) {
         return then(rawText(text));
     }
 
-    private FancyMessage append(final String text) {
+    private FancyMessage append(String text) {
         if (!latest().hasText()) {
             throw new IllegalStateException("previous message part has no text");
         }
@@ -519,7 +518,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param text The text which will populate the new message component.
      * @return This builder instance.
      */
-    public FancyMessage then(final TextualComponent text) {
+    public FancyMessage then(TextualComponent text) {
         if (!latest().hasText()) {
             throw new IllegalStateException("previous message part has no text");
         }
@@ -552,7 +551,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
             latest().writeJson(writer);
         } else {
             writer.beginObject().name("text").value("").name("extra").beginArray();
-            for (final MessagePart part : this) {
+            for (MessagePart part : this) {
                 part.writeJson(writer);
             }
             writer.endArray().endObject();
@@ -644,7 +643,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
             int minorVersion = Integer.parseInt(split[1]);
             int revisionVersion = Integer.parseInt(split[2].substring(1)); // Substring to ignore R
 
-            if (minorVersion < 8 || (minorVersion == 8 && revisionVersion == 1)) {
+            if (minorVersion < 8 || minorVersion == 8 && revisionVersion == 1) {
                 chatSerializerClazz = Reflection.getNMSClass("ChatSerializer");
             } else {
                 chatSerializerClazz = Reflection.getNMSClass("IChatBaseComponent$ChatSerializer");
@@ -694,9 +693,9 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      * @param senders The command senders who will receive the message.
      * @see #send(CommandSender)
      */
-    public void send(final Iterable<? extends CommandSender> senders) {
+    public void send(Iterable<? extends CommandSender> senders) {
         String string = toJSONString();
-        for (final CommandSender sender : senders) {
+        for (CommandSender sender : senders) {
             send(sender, string);
         }
     }
@@ -742,7 +741,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
         return messageParts.get(messageParts.size() - 1);
     }
 
-    private void onClick(final String name, final String data) {
+    private void onClick(String name, String data) {
         onCurrent(m -> {
             m.clickActionName = name;
             m.clickActionData = data;
@@ -750,7 +749,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
         dirty = true;
     }
 
-    private void onHover(final String name, final JsonRepresentedObject data) {
+    private void onHover(String name, JsonRepresentedObject data) {
         onCurrent(m -> {
             m.hoverActionName = name;
             m.hoverActionData = data;
@@ -759,6 +758,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
     }
 
     // Doc copied from interface
+    @Override
     public Map<String, Object> serialize() {
         HashMap<String, Object> map = new HashMap<>();
         map.put("messageParts", messageParts);
@@ -784,6 +784,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
     /**
      * <b>Internally called method. Not for API consumption.</b>
      */
+    @Override
     @NotNull
     public Iterator<MessagePart> iterator() {
         return messageParts.iterator();
@@ -830,8 +831,7 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
                             .add(MessagePart.stylesToNames.inverse().get(entry.getKey()));
                     }
                 } else if (entry.getKey().equals("color")) {
-                    component.color = ChatColor
-                        .valueOf(entry.getValue().getAsString().toUpperCase());
+                    component.color = ChatColor.valueOf(entry.getValue().getAsString().toUpperCase());
                 } else if (entry.getKey().equals("clickEvent")) {
                     JsonObject object = entry.getValue().getAsJsonObject();
                     component.clickActionName = object.get("action").getAsString();

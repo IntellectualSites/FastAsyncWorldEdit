@@ -43,6 +43,7 @@ import java.util.zip.GZIPInputStream;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
 
@@ -138,7 +139,7 @@ public class BrushOptionsCommands {
     )
     @CommandPermissions("worldedit.brush.list")
     public void list(Actor actor, InjectedValueAccess args,
-        @Switch(name = 'p', desc = "Prints the requested page")
+        @ArgFlag(name = 'p', desc = "Prints the requested page", def = "0")
             int page) throws WorldEditException {
         String baseCmd = Commands.getAlias(BrushCommands.class, "brush") + " " + Commands.getAlias(BrushOptionsCommands.class, "loadbrush");
         File dir = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
@@ -349,7 +350,7 @@ public class BrushOptionsCommands {
         throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         if (mask == null) {
@@ -381,7 +382,7 @@ public class BrushOptionsCommands {
     Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         if (mask == null) {
@@ -409,7 +410,7 @@ public class BrushOptionsCommands {
     Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         if (transform == null) {
@@ -438,7 +439,7 @@ public class BrushOptionsCommands {
                          Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         if (pattern == null) {
@@ -465,7 +466,7 @@ public class BrushOptionsCommands {
         range = Math.max(0, Math.min(256, range));
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         tool.setRange(range);
@@ -485,7 +486,7 @@ public class BrushOptionsCommands {
         worldEdit.checkMaxBrushRadius(radius);
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(BBC.BRUSH_NONE.f());
+            player.print(BBC.BRUSH_NONE.s());
             return;
         }
         BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();

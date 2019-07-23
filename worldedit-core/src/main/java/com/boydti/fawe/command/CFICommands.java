@@ -1,6 +1,8 @@
 package com.boydti.fawe.command;
 
 import static com.boydti.fawe.util.image.ImageUtil.load;
+import static com.sk89q.worldedit.command.MethodCommands.getArguments;
+import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
@@ -18,7 +20,6 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.TextureUtil;
-import com.boydti.fawe.util.chat.Message;
 import com.boydti.fawe.util.image.ImageUtil;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -44,19 +45,13 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TextComponent.Builder;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.exception.StopExecutionException;
-import org.enginehub.piston.inject.InjectedValueAccess;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
@@ -76,15 +71,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
-
-import static com.boydti.fawe.util.image.ImageUtil.load;
-import static com.sk89q.worldedit.command.MethodCommands.*;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class CFICommands {
@@ -161,16 +154,17 @@ public class CFICommands {
     public void brush(FawePlayer fp) {
         CFISettings settings = assertSettings(fp);
         settings.popMessages(fp);
-        Message msg;
+        @NonNull Builder msg;
         if (settings.getGenerator().getImageViewer() != null) {
-            msg = msg("CFI supports using brushes during creation").newline()
-                    .text(" - Place the map on a wall of item frames").newline()
-                    .text(" - Use any WorldEdit brush on the item frames").newline()
-                    .text(" - Example: ").text("Video").linkTip("https://goo.gl/PK4DMG").newline();
+            msg = TextComponent.builder("CFI supports using brushes during creation").append(newline())
+                    .append(" - Place the map on a wall of item frames").append(newline())
+                    .append(" - Use any WorldEdit brush on the item frames").append(newline())
+                    .append(" - Example: ").append(TextComponent.of("Video").clickEvent(ClickEvent.openUrl("https://goo.gl/PK4DMG"))).append(newline());
         } else {
-            msg = msg("This is not supported with your platform/version").newline();
+            msg = TextComponent.builder("This is not supported with your platform/version").append(newline());
         }
-        msg.text("< [Back]").cmdTip(alias()).send(fp);
+        //TODO msg.text("< [Back]").cmdTip(alias()).send(fp);
+        fp.toWorldEditPlayer().print(msg.build());
     }
 
     @Command(
@@ -360,7 +354,7 @@ public class CFICommands {
         floor(fp, BlockTypes.SNOW.getDefaultState().with(PropertyKey.LAYERS, 7), image, mask, disableWhiteOnly);
         main(fp, BlockTypes.SNOW_BLOCK, image, mask, disableWhiteOnly);
         smooth(fp, 1, 8, image, mask, disableWhiteOnly);
-        msg("Added snow!").send(fp);
+        TextComponent.of("Added snow!").send(fp);
         assertSettings(fp).resetComponent();
         component(fp);
     }
@@ -389,15 +383,15 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void paletteblocks(FawePlayer fp, Player player, LocalSession session, @Arg(name = "arg", desc = "String", def = "") String arg) throws EmptyClipboardException, InputParseException, FileNotFoundException {
         if (arg == null) {
-            msg("What blocks do you want to color with?").newline()
+            TextComponent.of("What blocks do you want to color with?").append(newline())
                     .text("[All]").cmdTip(alias() + " PaletteBlocks *").text(" - All available blocks")
-                    .newline()
+                    .append(newline())
                     .text("[Clipboard]").cmdTip(alias() + " PaletteBlocks #clipboard").text(" - The blocks in your clipboard")
-                    .newline()
+                    .append(newline())
                     .text("[List]").suggestTip(alias() + " PaletteBlocks stone,gravel").text(" - A comma separated list of blocks")
-                    .newline()
+                    .append(newline())
                     .text("[Complexity]").cmdTip(alias() + " Complexity").text(" - Block textures within a complexity range")
-                    .newline()
+                    .append(newline())
                     .text("< [Back]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "coloring"))
                     .send(fp);
             return;
@@ -511,7 +505,7 @@ public class CFICommands {
         } else {
             gen.addSchems(load(imageMask), mask, multi.getHolders(), rarity, distance, rotate);
         }
-        msg("Added schematics!").send(fp);
+        TextComponent.of("Added schematics!").send(fp);
         populate(fp);
     }
 
@@ -533,7 +527,7 @@ public class CFICommands {
         } else {
             gen.setBiome(biome);
         }
-        msg("Set biome!").send(fp);
+        TextComponent.of("Set biome!").send(fp);
         assertSettings(fp).resetComponent();
         component(fp);
     }
@@ -545,7 +539,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void caves(FawePlayer fp) throws WorldEditException {
         assertSettings(fp).getGenerator().addCaves();
-        msg("Added caves!").send(fp);
+        TextComponent.of("Added caves!").send(fp);
         populate(fp);
     }
 
@@ -557,7 +551,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void ore(FawePlayer fp, Mask mask, Pattern pattern, int size, int frequency, int rariry, int minY, int maxY) throws WorldEditException {
         assertSettings(fp).getGenerator().addOre(mask, pattern, size, frequency, rariry, minY, maxY);
-        msg("Added ore!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Added ore!"));
         populate(fp);
     }
 
@@ -568,7 +562,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void ores(FawePlayer fp, Mask mask) throws WorldEditException {
         assertSettings(fp).getGenerator().addDefaultOres(mask);
-        msg("Added ores!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Added ores!"));
         populate(fp);
     }
 
@@ -585,7 +579,8 @@ public class CFICommands {
         } else {
             gen.setHeights(Integer.parseInt(arg));
         }
-        msg("Set height!").send(fp);
+        fp.toWorldEditPlayer().print("Set Height!");
+        TextComponent.of("Set height!").send(fp);
         component(fp);
     }
 
@@ -597,7 +592,7 @@ public class CFICommands {
     public void waterId(FawePlayer fp, BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setWaterId(block.getBlockType().getInternalId());
-        msg("Set water id!").send(fp);
+        TextComponent.of("Set water id!").send(fp);
         settings.resetComponent();
         component(fp);
     }
@@ -611,7 +606,7 @@ public class CFICommands {
     public void baseId(FawePlayer fp, BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setBedrockId(block.getBlockType().getInternalId());
-        msg("Set base id!").send(fp);
+        TextComponent.of("Set base id!").send(fp);
         settings.resetComponent();
         component(fp);
     }
@@ -625,7 +620,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void worldthickness(FawePlayer fp, int height) throws WorldEditException {
         assertSettings(fp).getGenerator().setWorldThickness(height);
-        msg("Set world thickness!").send(fp);
+        TextComponent.of("Set world thickness!").send(fp);
         component(fp);
     }
 
@@ -638,7 +633,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void floorthickness(FawePlayer fp, int height) throws WorldEditException {
         assertSettings(fp).getGenerator().setFloorThickness(height);
-        msg("Set floor thickness!").send(fp);
+        TextComponent.of("Set floor thickness!").send(fp);
         component(fp);
     }
 
@@ -650,7 +645,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void update(FawePlayer fp) throws WorldEditException {
         assertSettings(fp).getGenerator().update();
-        msg("Chunks refreshed!").send(fp);
+        TextComponent.of("Chunks refreshed!").send(fp);
         mainMenu(fp);
     }
 
@@ -662,7 +657,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void tp(FawePlayer fp) throws WorldEditException {
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
-        msg("Teleporting...").send(fp);
+        TextComponent.of("Teleporting...").send(fp);
         Vector3 origin = gen.getOrigin();
         Player player = fp.getPlayer();
         player.setPosition(origin.subtract(16, 0, 16));
@@ -680,7 +675,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void waterheight(FawePlayer fp, int height) throws WorldEditException {
         assertSettings(fp).getGenerator().setWaterHeight(height);
-        msg("Set water height!").send(fp);
+        TextComponent.of("Set water height!").send(fp);
         component(fp);
     }
 
@@ -694,7 +689,7 @@ public class CFICommands {
     public void glass(FawePlayer fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setColorWithGlass(load(image));
-        msg("Set color with glass!").send(fp);
+        TextComponent.of("Set color with glass!").send(fp);
         settings.resetColoring();
         mainMenu(fp);
     }
@@ -719,7 +714,7 @@ public class CFICommands {
             gen.setColor(load(image));
         }
         settings.resetColoring();
-        msg("Set color with blocks!").send(fp);
+        TextComponent.of("Set color with blocks!").send(fp);
         mainMenu(fp);
     }
 
@@ -735,7 +730,7 @@ public class CFICommands {
     public void blockbiome(FawePlayer fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setBlockAndBiomeColor(load(image), mask, load(imageMask), !disableWhiteOnly);
-        msg("Set color with blocks and biomes!").send(fp);
+        TextComponent.of("Set color with blocks and biomes!").send(fp);
         settings.resetColoring();
         mainMenu(fp);
     }
@@ -751,7 +746,7 @@ public class CFICommands {
     public void biomecolor(FawePlayer fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setBiomeColor(load(image));
-        msg("Set color with biomes!").send(fp);
+        TextComponent.of("Set color with biomes!").send(fp);
         settings.resetColoring();
         mainMenu(fp);
     }
@@ -804,15 +799,16 @@ public class CFICommands {
 
         int biomePriority = gen.getBiomePriority();
 
-        Message msg = msg(">> Current Settings <<").newline()
-                .text("Randomization ").text("[" + (Boolean.toString(rand).toUpperCase()) + "]").cmdTip(alias() + " randomization " + (!rand))
-                .newline()
-                .text("Mask ").text("[" + mask + "]").cmdTip(alias() + " mask")
-                .newline()
-                .text("Blocks ").text("[" + blocks + "]").tooltip(blockList).command(alias() + " paletteBlocks")
-                .newline()
-                .text("BiomePriority ").text("[" + biomePriority + "]").cmdTip(alias() + " biomepriority")
-                .newline();
+        //TODO fix this so it can execute commands and show tooltips.
+        @NonNull Builder builder = TextComponent.builder(">> Current Settings <<").append(newline())
+                .append("Randomization ").append("[" + Boolean.toString(rand).toUpperCase() + "]")//.cmdTip(alias() + " randomization " + (!rand))
+                .append(newline())
+                .append("Mask ").append("[" + mask + "]")//.cmdTip(alias() + " mask")
+                .append(newline())
+                .append("Blocks ").append("[" + blocks + "]")//.tooltip(blockList).command(alias() + " paletteBlocks")
+                .append(newline())
+                .append("BiomePriority ").append("[" + biomePriority + "]")//.cmdTip(alias() + " biomepriority")
+                .append(newline());
 
         if (settings.image != null) {
             StringBuilder colorArgs = new StringBuilder();
@@ -827,19 +823,20 @@ public class CFICommands {
                 colorArgs.append(" -w");
             }
 
-            msg.text("Image: ")
-                    .text("[" + settings.imageArg + "]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "image"))
-                    .newline().newline()
-                    .text("&cLet's Color: ")
-                    .cmdOptions(alias() + " ", colorArgs.toString(), "Biomes", "Blocks", "BlockAndBiome", "Glass")
-                    .newline();
+            builder.append("Image: ")
+                    .append("[" + settings.imageArg + "]")//.cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "image"))
+                    .append(newline()).append(newline())
+                    .append("Let's Color: ")
+                    //.cmdOptions(alias() + " ", colorArgs.toString(), "Biomes", "Blocks", "BlockAndBiome", "Glass")
+                    .append(newline());
         } else {
-            msg.newline().text("You can color a world using an image like ")
-                    .text("[This]").linkTip("http://i.imgur.com/vJYinIU.jpg").newline()
-                    .text("&cYou MUST provide an image: ")
-                    .text("[None]").cmdTip(alias() + " " + Commands.getAlias(Command.class, "image")).newline();
+            builder.append(newline()).append("You can color a world using an image like ")
+                    .append(TextComponent.of("[This]").clickEvent(ClickEvent.openUrl("http://i.imgur.com/vJYinIU.jpg"))).append(newline())
+                    .append("You MUST provide an image: ")
+                    .append("[None]");//.cmdTip(alias() + " " + Commands.getAlias(Command.class, "image")).append(newline());
         }
-        msg.text("< [Back]").cmdTip(alias()).send(fp);
+        builder.append("< [Back]");//.cmdTip(alias()).send(fp);
+        fp.toWorldEditPlayer().print(builder.build());
     }
 
     @Command(
@@ -859,12 +856,12 @@ public class CFICommands {
 
         StringBuilder cmd = new StringBuilder(alias() + " mask ");
 
-        msg(">> Current Settings <<").newline()
-                .text("Image Mask ").text("[" + settings.imageMaskArg + "]").suggestTip(cmd + "http://")
-                .newline()
-                .text("WorldEdit Mask ").text("[" + settings.maskArg + "]").suggestTip(cmd + "<mask>")
-                .newline()
-                .text("< [Back]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
+        TextComponent.of(">> Current Settings <<").append(newline())
+            .text("Image Mask ").text("[" + settings.imageMaskArg + "]").suggestTip(cmd + "http://")
+            .append(newline())
+            .text("WorldEdit Mask ").text("[" + settings.maskArg + "]").suggestTip(cmd + "<mask>")
+            .append(newline())
+            .text("< [Back]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
     }
 
     @Command(
@@ -884,9 +881,9 @@ public class CFICommands {
         if (pattern != null) {
             settings.getCategory().accept(fp);
         } else {
-            msg(">> Current Settings <<").newline()
+            TextComponent.of(">> Current Settings <<").append(newline())
                     .text("Pattern ").text("[Click Here]").suggestTip(cmd + " stone")
-                    .newline()
+                    .append(newline())
                     .text("< [Back]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
         }
     }
@@ -922,11 +919,13 @@ public class CFICommands {
 
         StringBuilder cmd = new StringBuilder(alias() + " image ");
         if (image == null) {
-            msg("Please provide an image:").newline()
-                    .text("From a URL: ").text("[Click Here]").suggestTip(cmd + "http://")
-                    .newline()
-                    .text("From a file: ").text("[Click Here]").suggestTip(cmd + "file://")
-                    .send(fp);
+            TextComponent build = TextComponent.builder("Please provide an image:")
+                .append(newline())
+                .append("From a URL: ").append("[Click Here]")//TODO .suggestTip(cmd + "http://")
+                .append(newline())
+                .append("From a file: ").append("[Click Here]")//TODO .suggestTip(cmd + "file://")
+                .build();
+            fp.toWorldEditPlayer().print(build);
         } else {
             if (settings.hasGenerator()) {
                 coloring(fp);
@@ -947,11 +946,14 @@ public class CFICommands {
         CFISettings settings = assertSettings(fp);
         settings.popMessages(fp);
         settings.setCategory(this::populate);
-        msg("What would you like to populate?").newline()
-                .text("(You will need to type these commands)").newline()
-                .cmdOptions(alias() + " ", "", "Ores", "Ore", "Caves", "Schematics", "Smooth")
-                .newline().text("< [Back]").cmdTip(alias())
-                .send(fp);
+        TextComponent build = TextComponent.builder("What would you like to populate?")
+            .append(newline())
+            .append("(You will need to type these commands)").append(newline())
+            //TODO .cmdOptions(alias() + " ", "", "Ores", "Ore", "Caves", "Schematics", "Smooth")
+            .append(newline())
+            .append(TextComponent.of("< [Back]").clickEvent(ClickEvent.runCommand(alias())))
+            .build();
+        fp.toWorldEditPlayer().print(build);
     }
 
     @Command(
@@ -991,50 +993,51 @@ public class CFICommands {
         String waterHeight = Commands.getAlias(CFICommands.class, "waterheight");
         String snow = Commands.getAlias(CFICommands.class, "snow");
 
-        Message msg = msg(">> Current Settings <<").newline()
-                .text("Mask ").text("[" + mask + "]").cmdTip(alias() + " mask")
-                .newline()
-                .text("Pattern ").text("[" + pattern + "]").cmdTip(alias() + " pattern")
-                .newline()
-                .newline()
-                .text(">> Components <<")
-                .newline()
-                .text("[Height]").suggestTip(alias() + " " + alias("height") + " 120").text(" - Terrain height for whole map")
-                .newline()
-                .text("[WaterHeight]").suggestTip(alias() + " " + alias("waterheight") + " 60").text(" - Sea level for whole map")
-                .newline()
-                .text("[FloorThickness]").suggestTip(alias() + " " + alias("floorthickness") + " 60").text(" - Floor thickness of entire map")
-                .newline()
-                .text("[WorldThickness]").suggestTip(alias() + " " + alias("worldthickness") + " 60").text(" - World thickness of entire map")
-                .newline()
-                .text("[Snow]").suggestTip(alias() + " " + alias("snow") + maskArgs).text(" - Set snow in the masked areas")
-                .newline();
-
-        if (pattern != null) {
-            String disabled = "You must specify a pattern";
-            msg
-                    .text("[&cWaterId]").tooltip(disabled).newline()
-                    .text("[&cBedrockId]").tooltip(disabled).newline()
-                    .text("[&cFloor]").tooltip(disabled).newline()
-                    .text("[&cMain]").tooltip(disabled).newline()
-                    .text("[&cColumn]").tooltip(disabled).newline()
-                    .text("[&cOverlay]").tooltip(disabled).newline();
-        } else {
-            StringBuilder compArgs = new StringBuilder();
-            compArgs.append(" " + settings.patternArg + maskArgs);
-
-            msg
-                    .text("[WaterId]").cmdTip(alias() + " waterId " + pattern).text(" - Water id for whole map").newline()
-                    .text("[BedrockId]").cmdTip(alias() + " baseId " + pattern).text(" - Bedrock id for whole map").newline()
-                    .text("[Floor]").cmdTip(alias() + " floor" + compArgs).text(" - Set the floor in the masked areas").newline()
-                    .text("[Main]").cmdTip(alias() + " main" + compArgs).text(" - Set the main block in the masked areas").newline()
-                    .text("[Column]").cmdTip(alias() + " column" + compArgs).text(" - Set the columns in the masked areas").newline()
-                    .text("[Overlay]").cmdTip(alias() + " overlay" + compArgs).text(" - Set the overlay in the masked areas").newline();
-        }
-
-        msg.newline()
-                .text("< [Back]").cmdTip(alias())
-                .send(fp);
+        //TODO
+//        Message msg = TextComponent.builder(">> Current Settings <<").append(newline())
+//                .append("Mask ").append("[" + mask + "]").cmdTip(alias() + " mask")
+//                .append(newline())
+//                .append("Pattern ").append("[" + pattern + "]").cmdTip(alias() + " pattern")
+//                .append(newline())
+//                .append(newline())
+//                .append(">> Components <<")
+//                .append(newline())
+//                .append("[Height]").suggestTip(alias() + " " + alias("height") + " 120").text(" - Terrain height for whole map")
+//                .append(newline())
+//                .text("[WaterHeight]").suggestTip(alias() + " " + alias("waterheight") + " 60").text(" - Sea level for whole map")
+//                .append(newline())
+//                .text("[FloorThickness]").suggestTip(alias() + " " + alias("floorthickness") + " 60").text(" - Floor thickness of entire map")
+//                .append(newline())
+//                .text("[WorldThickness]").suggestTip(alias() + " " + alias("worldthickness") + " 60").text(" - World thickness of entire map")
+//                .append(newline())
+//                .text("[Snow]").suggestTip(alias() + " " + alias("snow") + maskArgs).text(" - Set snow in the masked areas")
+//                .append(newline());
+//
+//        if (pattern != null) {
+//            String disabled = "You must specify a pattern";
+//            msg
+//                    .text("[&cWaterId]").tooltip(disabled).append(newline())
+//                    .text("[&cBedrockId]").tooltip(disabled).append(newline())
+//                    .text("[&cFloor]").tooltip(disabled).append(newline())
+//                    .text("[&cMain]").tooltip(disabled).append(newline())
+//                    .text("[&cColumn]").tooltip(disabled).append(newline())
+//                    .text("[&cOverlay]").tooltip(disabled).append(newline());
+//        } else {
+//            StringBuilder compArgs = new StringBuilder();
+//            compArgs.append(" " + settings.patternArg + maskArgs);
+//
+//            msg
+//                    .text("[WaterId]").cmdTip(alias() + " waterId " + pattern).text(" - Water id for whole map").append(newline())
+//                    .text("[BedrockId]").cmdTip(alias() + " baseId " + pattern).text(" - Bedrock id for whole map").append(newline())
+//                    .text("[Floor]").cmdTip(alias() + " floor" + compArgs).text(" - Set the floor in the masked areas").append(newline())
+//                    .text("[Main]").cmdTip(alias() + " main" + compArgs).text(" - Set the main block in the masked areas").append(newline())
+//                    .text("[Column]").cmdTip(alias() + " column" + compArgs).text(" - Set the columns in the masked areas").append(newline())
+//                    .text("[Overlay]").cmdTip(alias() + " overlay" + compArgs).text(" - Set the overlay in the masked areas").append(newline());
+//        }
+//
+//        msg.append(newline())
+//                .text("< [Back]").cmdTip(alias())
+//                .send(fp);
     }
 
     private static CFISettings assertSettings(FawePlayer fp) {
@@ -1180,18 +1183,14 @@ public class CFICommands {
         return Commands.getAlias(CFICommands.class, command);
     }
 
-    protected static Message msg(String text) {
-        return new Message().newline()
-                .text(BBC.getPrefix())
-                .text(text);
-    }
-
+    @SuppressWarnings("unused")
     protected static void mainMenu(FawePlayer fp) {
-        msg("What do you want to do now?").newline()
-                .cmdOptions(alias() + " ", "", "Coloring", "Component", "Populate", "Brush")
-                .newline().text("<> [View]").command(alias() + " " + Commands.getAlias(CFICommands.class, "download")).tooltip("View full resolution image")
-                .newline().text(">< [Cancel]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "cancel"))
-                .newline().text("&2>> [Done]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "done"))
-                .send(fp);
+        //TODO
+//        msg("What do you want to do now?").append(newline())
+//                .cmdOptions(alias() + " ", "", "Coloring", "Component", "Populate", "Brush")
+//                .append(newline()).text("<> [View]").command(alias() + " " + Commands.getAlias(CFICommands.class, "download")).tooltip("View full resolution image")
+//                .append(newline()).text(">< [Cancel]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "cancel"))
+//                .append(newline()).text("&2>> [Done]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "done"))
+//                .send(fp);
     }
 }

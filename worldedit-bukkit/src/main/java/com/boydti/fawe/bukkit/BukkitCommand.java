@@ -13,12 +13,12 @@ public class BukkitCommand implements CommandExecutor {
 
     private final FaweCommand cmd;
 
-    public BukkitCommand(final FaweCommand cmd) {
+    public BukkitCommand(FaweCommand cmd) {
         this.cmd = cmd;
     }
 
     @Override
-    public boolean onCommand(@NotNull final CommandSender sender, final Command cmd, final String label, final String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command cmd, String label, String[] args) {
         final FawePlayer plr = Fawe.imp().wrap(sender);
         if (!sender.hasPermission(this.cmd.getPerm()) && !sender.isOp()) {
             BBC.NO_PERM.send(plr, this.cmd.getPerm());

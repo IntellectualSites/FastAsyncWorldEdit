@@ -6,11 +6,9 @@ import com.boydti.fawe.configuration.file.YamlConfiguration;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.util.StringMan;
-import com.boydti.fawe.util.chat.Message;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.extension.platform.Actor;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -369,7 +367,7 @@ public enum BBC {
 
     private static final HashMap<String, String> replacements = new HashMap<>();
     static {
-        for (final char letter : "1234567890abcdefklmnor".toCharArray()) {
+        for (char letter : "1234567890abcdefklmnor".toCharArray()) {
             replacements.put("&" + letter, "\u00a7" + letter);
         }
         replacements.put("\\\\n", "\n");
@@ -394,17 +392,13 @@ public enum BBC {
      *
      * @param defaultMessage default
      */
-    BBC(final String defaultMessage, final String category) {
+    BBC(String defaultMessage, String category) {
         this.defaultMessage = defaultMessage;
         this.translatedMessage = defaultMessage;
         this.category = category.toLowerCase();
     }
 
-    public String f(final Object... args) {
-        return format(args);
-    }
-
-    public String format(final Object... args) {
+    public String format(Object... args) {
         String m = this.translatedMessage;
         for (int i = args.length - 1; i >= 0; i--) {
             if (args[i] == null) {
@@ -418,7 +412,7 @@ public enum BBC {
         return m;
     }
 
-    public static void load(final File file) {
+    public static void load(File file) {
         try {
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
@@ -430,13 +424,13 @@ public enum BBC {
             final HashSet<String> allNames = new HashSet<>();
             final HashSet<String> allCats = new HashSet<>();
             final HashSet<String> toRemove = new HashSet<>();
-            for (final BBC c : all) {
+            for (BBC c : all) {
                 allNames.add(c.name());
                 allCats.add(c.category.toLowerCase());
             }
             final EnumSet<BBC> captions = EnumSet.noneOf(BBC.class);
             boolean changed = false;
-            for (final String key : keys) {
+            for (String key : keys) {
                 final Object value = yml.get(key);
                 if (value instanceof MemorySection) {
                     continue;
@@ -456,11 +450,11 @@ public enum BBC {
                     toRemove.add(key);
                 }
             }
-            for (final String remove : toRemove) {
+            for (String remove : toRemove) {
                 changed = true;
                 yml.set(remove, null);
             }
-            for (final BBC caption : all) {
+            for (BBC caption : all) {
                 if (!captions.contains(caption)) {
                     changed = true;
                     yml.set(caption.category + "." + caption.name().toLowerCase(), caption.defaultMessage);
@@ -470,7 +464,7 @@ public enum BBC {
             if (changed) {
                 yml.save(file);
             }
-        } catch (final Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -501,10 +495,6 @@ public enum BBC {
         return this.translatedMessage;
     }
 
-    public Message m(Object... args) {
-        return new Message(this, args);
-    }
-
     public String original() {
         return defaultMessage;
     }
@@ -518,7 +508,7 @@ public enum BBC {
         return index == 0 ? this : others[index - 1];
     }
 
-    public void send(Object actor, final Object... args) {
+    public void send(Object actor, Object... args) {
         if (isEmpty()) {
             return;
         }
@@ -536,10 +526,10 @@ public enum BBC {
     }
 
     public static String getPrefix() {
-        return (PREFIX.isEmpty() ? "" : PREFIX.s() + " ");
+        return PREFIX.isEmpty() ? "" : PREFIX.s() + " ";
     }
 
-    public void send(final FawePlayer<?> player, final Object... args) {
+    public void send(FawePlayer<?> player, Object... args) {
         if (isEmpty()) {
             return;
         }
@@ -549,7 +539,7 @@ public enum BBC {
             player.sendMessage((PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
         }
     }
-    public void send(final Actor player, final Object... args) {
+    public void send(Actor player, Object... args) {
         if (isEmpty()) {
             return;
         }

@@ -56,7 +56,7 @@ public class CFICommand extends CommandProcessor<Object, Object> {
                     hmCmd =
                         Commands.getAlias(CFICommands.class, "heightmap") + " " + settings.imageArg;
                 }
-                CFICommands.msg("What do you want to use as the base?").newline()
+                TextComponent.of("What do you want to use as the base?").newline()
                     .text("[HeightMap]").cmdTip(hmCmd).text(" - A heightmap like ")
                     .text("[this]").linkTip("http://i.imgur.com/qCd30MR.jpg")
                     .newline()
