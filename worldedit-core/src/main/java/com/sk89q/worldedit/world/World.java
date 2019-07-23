@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world;
 
+import com.boydti.fawe.object.extent.LightingExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -127,7 +128,13 @@ public interface World extends Extent {
      * @param position the position
      * @return the light level (0-15)
      */
-    int getBlockLightLevel(BlockVector3 position);
+    default int getBlockLightLevel(BlockVector3 position) {
+        if (this instanceof LightingExtent) {
+            LightingExtent extent = (LightingExtent) this;
+            return extent.getBlockLight(position.getX(), position.getY(), position.getZ());
+        }
+        return getBlock(position).getMaterial().getLightValue();
+    }
 
     /**
      * Clear a chest's contents.

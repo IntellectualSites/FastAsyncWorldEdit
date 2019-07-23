@@ -25,7 +25,6 @@ import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.command.MethodCommands;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
@@ -50,6 +49,14 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.exception.StopExecutionException;
+import org.enginehub.piston.inject.InjectedValueAccess;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
@@ -76,8 +83,11 @@ import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
 
+import static com.boydti.fawe.util.image.ImageUtil.load;
+import static com.sk89q.worldedit.command.MethodCommands.*;
+
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-public class CFICommands extends MethodCommands {
+public class CFICommands {
 
     private final WorldEdit worldEdit;
 
@@ -95,18 +105,6 @@ public class CFICommands extends MethodCommands {
         List<? extends World> worlds = platform.getWorlds();
         Path path = worlds.get(0).getStoragePath();
         return new File(path.toFile().getParentFile().getParentFile(), worldName + File.separator + "region");
-    }
-
-    @Command(
-            name = "",
-            desc = "CFI command"
-    )
-    @CommandPermissions("worldedit.anvil.cfi")
-    public void cfi(FawePlayer fp, List<String> args) {
-        CFISettings settings = getSettings(fp);
-        if (!settings.hasGenerator()) {
-
-        }
     }
 
     @Command(
@@ -1038,7 +1036,6 @@ public class CFICommands extends MethodCommands {
                 .text("< [Back]").cmdTip(alias())
                 .send(fp);
     }
-
 
     private static CFISettings assertSettings(FawePlayer fp) {
         CFISettings settings = getSettings(fp);

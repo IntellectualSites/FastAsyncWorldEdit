@@ -41,6 +41,7 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 /**
  * An abstract implementation of {@link World}.
@@ -105,7 +106,7 @@ public interface SimpleWorld extends World {
 
     @Override
     default boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
-        Fawe.get().getQueueHandler().sync(() -> playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4));
+        Fawe.get().getQueueHandler().sync((Supplier<Boolean>) () -> playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4));
         return true;
     }
 

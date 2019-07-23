@@ -32,7 +32,7 @@ public class ScatterCommand extends ScatterBrush {
         String replaced = command.replace("{x}", position.getBlockX() + "")
                 .replace("{y}", Integer.toString(position.getBlockY()))
                 .replace("{z}", Integer.toString(position.getBlockZ()))
-                .replace("{world}", editSession.getQueue().getWorldName())
+                .replace("{world}", editSession.getWorld().getName())
                 .replace("{size}", Integer.toString(radius));
 
         FawePlayer fp = editSession.getPlayer();

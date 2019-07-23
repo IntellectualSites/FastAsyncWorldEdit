@@ -48,18 +48,20 @@ import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 
-@Command(aliases = {"masks"},
-        desc = "Help for the various masks. [More Info](https://git.io/v9r4K)",
-        descFooter = "Masks determine if a block can be placed\n" +
-                " - Use [brackets] for arguments\n" +
-                " - Use , to OR multiple\n" +
-                " - Use & to AND multiple\n" +
-                "e.g. >[stone,dirt],#light[0][5],$jungle\n" +
-                "More Info: https://git.io/v9r4K"
-)
+//@Command(aliases = {"masks"},
+//        desc = "Help for the various masks. [More Info](https://git.io/v9r4K)",
+//        descFooter = "Masks determine if a block can be placed\n" +
+//                " - Use [brackets] for arguments\n" +
+//                " - Use , to OR multiple\n" +
+//                " - Use & to AND multiple\n" +
+//                "e.g. >[stone,dirt],#light[0][5],$jungle\n" +
+//                "More Info: https://git.io/v9r4K"
+//)
 public class MaskCommands extends MethodCommands {
+    private final WorldEdit worldEdit;
+
     public MaskCommands(WorldEdit worldEdit) {
-        super(worldEdit);
+        this.worldEdit = worldEdit;
     }
 
     @Command(

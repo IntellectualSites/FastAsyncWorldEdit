@@ -15,7 +15,7 @@ import java.util.Optional;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MethodCommands {
-    public Command getCommand() {
+    public static Command getCommand() {
         try {
             StackTraceElement[] stack = new Exception().getStackTrace();
             for (StackTraceElement elem : stack) {
@@ -33,7 +33,7 @@ public class MethodCommands {
         return null;
     }
 
-    public String getArguments(InjectedValueAccess context) {
+    public static String getArguments(InjectedValueAccess context) {
         if (context == null) return null;
         Optional<Arguments> arguments = context.injectedValue(Key.of(Arguments.class));
         if (arguments.isPresent()) {
@@ -42,7 +42,7 @@ public class MethodCommands {
         return null;
     }
 
-    public String[] getPermissions(InjectedValueAccess context) {
+    public static String[] getPermissions(InjectedValueAccess context) {
         CommandPermissions cmdPerms = context.injectedValue(Key.of(CommandPermissions.class)).orElse(null);
         if (cmdPerms != null) {
             return cmdPerms.value();

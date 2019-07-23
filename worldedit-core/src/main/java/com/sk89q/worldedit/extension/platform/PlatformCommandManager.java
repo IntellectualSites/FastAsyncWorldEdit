@@ -23,6 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.AnvilCommands;
+import com.boydti.fawe.command.AnvilCommandsRegistration;
+import com.boydti.fawe.command.CFICommand;
+import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
@@ -33,7 +36,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -105,7 +107,6 @@ import com.sk89q.worldedit.extension.platform.binding.CommandBindings;
 import com.sk89q.worldedit.extension.platform.binding.ConsumeBindings;
 import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
@@ -161,7 +162,6 @@ import org.enginehub.piston.part.SubCommandPart;
 import org.enginehub.piston.suggestion.Suggestion;
 import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,14 +250,17 @@ public final class PlatformCommandManager {
         RegionFactoryConverter.register(commandManager);
     }
 
-    public void register(Object classWithMethods) {
+    public void registerAlwaysInjectedValues() {
         globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), Optional::of);
-        // TODO NOT IMPLEMENTED - register the following using a custom processor / annotations
         register(new AnnotatedBindings(worldEdit));
         register(new CommandBindings(worldEdit));
         register(new ConsumeBindings(worldEdit));
         register(new ProvideBindings(worldEdit));
         register(new ProvideBindings(worldEdit));
+    }
+
+    public void register(Object classWithMethods) {
+        // TODO NOT IMPLEMENTED - register the following using a custom processor / annotations
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
@@ -380,9 +383,14 @@ public final class PlatformCommandManager {
                 new GeneralCommands(worldEdit)
             );
             this.registration.register(
-                commandManager,
-                GenerationCommandsRegistration.builder(),
-                new GenerationCommands(worldEdit)
+                    commandManager,
+                    GenerationCommandsRegistration.builder(),
+                    new GenerationCommands(worldEdit)
+            );
+            this.registration.register(
+                    new CFICommand(commandManager),
+                    CFICommands.builder(),
+                    new CFICommands(worldEdit)
             );
             this.registration.register(
                 commandManager,
