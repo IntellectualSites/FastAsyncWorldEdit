@@ -41,7 +41,7 @@ public final class IncendoPaste implements Paster{
      *
      * @param pasteApplication The application that is sending the paste
      */
-    public IncendoPaste(final String pasteApplication) {
+    public IncendoPaste(String pasteApplication) {
         if (pasteApplication == null || pasteApplication.isEmpty()) {
             throw new IllegalArgumentException("paste application cannot be null, nor empty");
         }
@@ -57,7 +57,7 @@ public final class IncendoPaste implements Paster{
         return new PasteTask(content);
     }
 
-    private final class PasteTask implements Callable<URL>{
+    private final class PasteTask implements Callable<URL> {
 
         private PasteTask(String content) {}
 
@@ -82,12 +82,12 @@ public final class IncendoPaste implements Paster{
      *
      * @param file File to paste
      */
-    public void addFile(final PasteFile file) {
+    public void addFile(PasteFile file) {
         if (file == null) {
             throw new IllegalArgumentException("File cannot be null");
         }
         // Check to see that no duplicate files are submitted
-        for (final PasteFile pasteFile : this.files) {
+        for (PasteFile pasteFile : this.files) {
             if (pasteFile.fileName.equalsIgnoreCase(file.getFileName())) {
                 throw new IllegalArgumentException(String.format("Found duplicate file with name %s",
                     file.getFileName()));
@@ -143,7 +143,7 @@ public final class IncendoPaste implements Paster{
         httpURLConnection.setRequestProperty("Content-Type", "application/json");
         httpURLConnection.setRequestProperty("Accept", "*/*");
         httpURLConnection.connect();
-        try (final OutputStream stream = httpURLConnection.getOutputStream()) {
+        try (OutputStream stream = httpURLConnection.getOutputStream()) {
             stream.write(content);
         }
         if (!httpURLConnection.getResponseMessage().contains("OK")) {
@@ -151,7 +151,7 @@ public final class IncendoPaste implements Paster{
                 httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
         }
         final String input;
-        try (final BufferedReader inputStream = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()))) {
+        try (BufferedReader inputStream = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()))) {
             input = inputStream.lines().map(line -> line + "\n").collect(Collectors.joining());
         }
         return input;
@@ -171,7 +171,7 @@ public final class IncendoPaste implements Paster{
          * @param fileName File name, cannot be empty, nor null
          * @param content File content, cannot be empty, nor null
          */
-        public PasteFile(final String fileName, final String content) {
+        public PasteFile(String fileName, String content) {
             if (fileName == null || fileName.isEmpty()) {
                 throw new IllegalArgumentException("file name cannot be null, nor empty");
             }
@@ -260,10 +260,10 @@ public final class IncendoPaste implements Paster{
         }
     }
 
-    private static String readFile(final File file) throws IOException {
+    private static String readFile(File file) throws IOException {
         final StringBuilder content = new StringBuilder();
         final List<String> lines;
-        try (final BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             lines = reader.lines().collect(Collectors.toList());
         }
         for (int i = Math.max(0, lines.size() - 1000); i < lines.size(); i++) {

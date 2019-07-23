@@ -188,11 +188,14 @@ public class UtilityCommands {
                     @Arg(desc = "The blocks to fill with")
                         Pattern pattern,
                     @Arg(desc = "The radius to fill in")
-                        @Range(min=1) double radius,
+                        double radius,
                     @Arg(desc = "The depth to fill", def = "1")
-                        @Range(min=1) int depth,
-                    @Arg(desc = "Direction to fill", def = "down") BlockVector3 direction) throws WorldEditException {
+                        int depth,
+                    @Arg(desc = "Direction to fill", def = "down")
+                        BlockVector3 direction) throws WorldEditException {
+        radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
+        depth = Math.max(1, depth);
 
         BlockVector3 pos = session.getPlacementPosition(player);
         int affected = editSession.fillDirection(pos, pattern, radius, depth, direction);
@@ -281,9 +284,10 @@ public class UtilityCommands {
                      @Arg(desc = "The blocks to fill with")
                          Pattern pattern,
                      @Arg(desc = "The radius to fill in")
-                         @Range(min=1) double radius,
+                         double radius,
                      @Arg(desc = "The depth to fill", def = "")
-                         @Range(min=1) Integer depth) throws WorldEditException {
+                         Integer depth) throws WorldEditException {
+        radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
         depth = depth == null ? Integer.MAX_VALUE : Math.max(1, depth);
         we.checkMaxRadius(radius);
@@ -302,9 +306,10 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int drain(Player player, LocalSession session, EditSession editSession,
                      @Arg(desc = "The radius to drain")
-                     @Range(min=0) double radius,
+                         double radius,
                      @Switch(name = 'w', desc = "Also un-waterlog blocks")
                          boolean waterlogged) throws WorldEditException {
+        radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
         int affected = editSession.drainArea(
             session.getPlacementPosition(player), radius, waterlogged);
@@ -321,7 +326,8 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int fixLava(Player player, LocalSession session, EditSession editSession,
                        @Arg(desc = "The radius to fix in")
-                       @Range(min=0) double radius) throws WorldEditException {
+                           double radius) throws WorldEditException {
+        radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(session.getPlacementPosition(player), radius, BlockTypes.LAVA);
         player.print(affected + " block(s) have been changed.");
@@ -337,7 +343,8 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int fixWater(Player player, LocalSession session, EditSession editSession,
                         @Arg(desc = "The radius to fix in")
-                        @Range(min=0) double radius) throws WorldEditException {
+                            double radius) throws WorldEditException {
+        radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(session.getPlacementPosition(player), radius, BlockTypes.WATER);
         BBC.VISITOR_BLOCK.send(player, affected);
@@ -353,10 +360,14 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int removeAbove(Player player, LocalSession session, EditSession editSession,
                            @Arg(desc = "The apothem of the square to remove from", def = "1")
-                           @Range(min=1) int size,
+                               int size,
                            @Arg(desc = "The maximum height above you to remove from", def = "")
                                Integer height) throws WorldEditException {
+        size = Math.max(1, size);
         we.checkMaxRadius(size);
+        World world = player.getWorld();
+        height = height != null ? Math.min((world.getMaxY() + 1), height + 1) : (world.getMaxY() + 1);
+
         int affected = editSession.removeAbove(session.getPlacementPosition(player), size, height);
         BBC.VISITOR_BLOCK.send(player, affected);
         return affected;
@@ -371,9 +382,10 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int removeBelow(Player player, LocalSession session, EditSession editSession,
                            @Arg(desc = "The apothem of the square to remove from", def = "1")
-                           @Range(min=1) int size,
+                               int size,
                            @Arg(desc = "The maximum height below you to remove from", def = "")
                                Integer height) throws WorldEditException {
+        size = Math.max(1, size);
         we.checkMaxRadius(size);
         World world = player.getWorld();
         height = height != null ? Math.min((world.getMaxY() + 1), height + 1) : (world.getMaxY() + 1);
@@ -394,7 +406,8 @@ public class UtilityCommands {
                           @Arg(desc = "The mask of blocks to remove")
                               Mask mask,
                           @Arg(desc = "The radius of the square to remove from", def = "50")
-                              @Range(min=1) int radius) throws WorldEditException {
+                              int radius) throws WorldEditException {
+        radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
 
         int affected = editSession.removeNear(session.getPlacementPosition(player), mask, radius);
@@ -411,11 +424,12 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int replaceNear(Player player, LocalSession session, EditSession editSession,
                            @Arg(desc = "The radius of the square to remove in")
-                           @Range(min=1) int radius,
+                               int radius,
                            @Arg(desc = "The mask matching blocks to remove", def = "")
                                Mask from,
                            @Arg(desc = "The pattern of blocks to replace with")
                                Pattern to) throws WorldEditException {
+        radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
 
         BlockVector3 base = session.getPlacementPosition(player);
@@ -441,7 +455,8 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int snow(Player player, LocalSession session, EditSession editSession,
                     @Arg(desc = "The radius of the circle to snow in", def = "10")
-                    @Range(min=1) double size) throws WorldEditException {
+                        double size) throws WorldEditException {
+        size = Math.max(1, size);
         we.checkMaxRadius(size);
 
         int affected = editSession.simulateSnow(session.getPlacementPosition(player), size);
@@ -458,11 +473,12 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int thaw(Player player, LocalSession session, EditSession editSession,
                     @Arg(desc = "The radius of the circle to thaw in", def = "10")
-                    @Range(min=1) double size) throws WorldEditException {
+                        double size) throws WorldEditException {
+        size = Math.max(1, size);
         we.checkMaxRadius(size);
 
         int affected = editSession.thaw(session.getPlacementPosition(player), size);
-        player.print(affected + " surfaces thawed.");
+        player.print(affected + " surface(s) thawed.");
         return affected;
     }
 
@@ -475,9 +491,10 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int green(Player player, LocalSession session, EditSession editSession,
                      @Arg(desc = "The radius of the circle to convert in", def = "10")
-                     @Range(min=1) double size,
+                         double size,
                      @Switch(name = 'f', desc = "Also convert coarse dirt")
                          boolean convertCoarse) throws WorldEditException {
+        size = Math.max(1, size);
         we.checkMaxRadius(size);
         final boolean onlyNormalDirt = !convertCoarse;
 
@@ -495,12 +512,12 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public void extinguish(Player player, LocalSession session, EditSession editSession,
                            @Arg(desc = "The radius of the square to remove in", def = "")
-                           @Range(min=1) Integer radius) throws WorldEditException {
+                               Integer radius) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
         int defaultRadius = config.maxRadius != -1 ? Math.min(40, config.maxRadius) : 40;
-        int size = radius != null ? radius : defaultRadius;
+        int size = radius != null ? Math.max(1, radius) : defaultRadius;
         we.checkMaxRadius(size);
 
         Mask mask = new BlockTypeMask(editSession, BlockTypes.FIRE);
@@ -656,7 +673,8 @@ public class UtilityCommands {
             return;
         }
         WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
-            double result = expression.evaluateTimeout(WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
+            double result = expression.evaluate(
+                    new double[]{}, WorldEdit.getInstance().getSessionManager().get(actor).getTimeout());
             String formatted = Double.isNaN(result) ? "NaN" : formatter.format(result);
             return SubtleFormat.wrap(input + " = ").append(TextComponent.of(formatted, TextColor.LIGHT_PURPLE));
         }, null);

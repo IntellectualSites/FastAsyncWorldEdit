@@ -374,8 +374,7 @@ public class PrimitiveBindings extends Bindings {
      * @param modifiers the list of modifiers to scan
      * @throws InputParseException on a validation error
      */
-    private static void validate(int number, Annotation[] modifiers)
-            {
+    private static void validate(int number, Annotation[] modifiers) {
         for (Annotation modifier : modifiers) {
             if (modifier instanceof Range) {
                 Range range = (Range) modifier;

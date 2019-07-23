@@ -13,43 +13,38 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.Iterables;
-import com.sk89q.worldedit.command.argument.Arguments;
-import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.internal.command.CommandArgParser;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.inject.InjectedValueAccess;
-import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
-
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.tool.BrushTool;
+import com.sk89q.worldedit.command.util.CommandPermissions;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.internal.annotation.Range;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.Switch;
-
+import com.sk89q.worldedit.internal.command.CommandArgParser;
+import com.sk89q.worldedit.util.HandSide;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.inject.InjectedValueAccess;
 
 /**
  * Tool commands.
@@ -317,7 +312,7 @@ public class BrushOptionsCommands {
     public void scroll(Player player, EditSession editSession, LocalSession session,
     @Switch(name = 'h', desc = "TODO")
         boolean offHand,
-    @Arg(desc="Target Modes")
+    @Arg(desc = "Target Modes")
         String modes,
     @Arg(desc = "The scroll action", variable = true)
            List<String> command) throws WorldEditException {

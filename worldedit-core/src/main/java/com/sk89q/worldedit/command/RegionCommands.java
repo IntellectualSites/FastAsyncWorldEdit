@@ -19,6 +19,15 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
+import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
+import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
+import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
+
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FaweLimit;
@@ -62,24 +71,14 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.inject.InjectedValueAccess;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
-import static com.sk89q.worldedit.regions.Regions.asFlatRegion;
-import static com.sk89q.worldedit.regions.Regions.maximumBlockY;
-import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 
 /**
  * Commands that operate on regions.
@@ -404,7 +403,7 @@ public class RegionCommands extends MethodCommands {
                           int iterations,
                       @Arg(desc = "The mask of blocks to use as the height map", def = "")
                           Mask mask,
-        @Switch(name='s', desc = "TODO") boolean snow, InjectedValueAccess context) throws WorldEditException {
+        @Switch(name = 's', desc = "TODO") boolean snow, InjectedValueAccess context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
@@ -483,11 +482,11 @@ public class RegionCommands extends MethodCommands {
                         boolean moveSelection,
                     @Switch(name = 'a', desc = "Ignore air blocks")
                         boolean ignoreAirBlocks,
-                    @Switch(name='b', desc = "TODO")
+                    @Switch(name = 'b', desc = "TODO")
                         boolean copyBiomes,
-                    @Switch(name='e', desc = "TODO")
+                    @Switch(name = 'e', desc = "TODO")
                         boolean skipEntities,
-                    @Switch(name='a', desc = "TODO")
+                    @Switch(name = 'a', desc = "TODO")
                         boolean skipAir,
                     InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
@@ -520,7 +519,7 @@ public class RegionCommands extends MethodCommands {
     public void fall(FawePlayer player, EditSession editSession, LocalSession session,
                      @Selection Region region,
                      @Arg(name = "replace", desc = "BlockStateHolder", def = "air") BlockStateHolder replace,
-                     @Switch(name='m', desc = "TODO") boolean notFullHeight,
+                     @Switch(name = 'm', desc = "TODO") boolean notFullHeight,
                      InjectedValueAccess context) throws WorldEditException {
         player.checkConfirmationRegion(() -> {
             int affected = editSession.fall(region, !notFullHeight, replace);
@@ -547,7 +546,7 @@ public class RegionCommands extends MethodCommands {
                      @Switch(name = 'e', desc = "//TODO") boolean skipEntities,
                      @Switch(name = 'a', desc = "Ignore air blocks")
                          boolean ignoreAirBlocks,
-                     @Switch(name='m', desc = "TODO") Mask sourceMask, InjectedValueAccess context) throws WorldEditException {
+                     @Switch(name = 'm', desc = "TODO") Mask sourceMask, InjectedValueAccess context) throws WorldEditException {
         player.checkConfirmationStack(() -> {
             if (sourceMask != null) {
                 editSession.addSourceMask(sourceMask);
@@ -674,7 +673,7 @@ public class RegionCommands extends MethodCommands {
                           @Range(min = 0) int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
-        @Switch(name='m', desc = "Mask to hollow with") Mask mask,
+        @Switch(name = 'm', desc = "Mask to hollow with") Mask mask,
                        InjectedValueAccess context) throws WorldEditException {
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
         player.checkConfirmationRegion(() -> {

@@ -30,7 +30,7 @@ public class HelpJSAP extends JSAP {
      * @param explanation
      * @param screenWidth
      */
-    public HelpJSAP(final String name, final String explanation, final int screenWidth) {
+    public HelpJSAP(String name, String explanation, int screenWidth) {
         super();
 
         this.name = name;
@@ -39,7 +39,7 @@ public class HelpJSAP extends JSAP {
 
         try {
             this.registerParameter(new Switch("help", JSAP.NO_SHORTFLAG, "help", "Displays this help page."));
-        } catch (final JSAPException e) {
+        } catch (JSAPException ignored) {
         }
     }
 
@@ -48,10 +48,10 @@ public class HelpJSAP extends JSAP {
      * @param explanation
      * @param screenWidth
      * @param resourceName
-     * @throws java.io.IOException                    if an I/O error occurs
-     * @throws com.martiansoftware.jsap.JSAPException if the configuration is not valid
+     * @throws IOException                    if an I/O error occurs
+     * @throws JSAPException if the configuration is not valid
      */
-    public HelpJSAP(final String name, final String explanation, final int screenWidth, final String resourceName) throws IOException, JSAPException {
+    public HelpJSAP(String name, String explanation, int screenWidth, String resourceName) throws IOException, JSAPException {
         super(resourceName);
 
         this.name = name;
@@ -60,7 +60,7 @@ public class HelpJSAP extends JSAP {
 
         try {
             this.registerParameter(new Switch("help", JSAP.NO_SHORTFLAG, "help", "Displays this help page."));
-        } catch (final JSAPException e) {
+        } catch (JSAPException ignored) {
         }
     }
 
@@ -69,10 +69,10 @@ public class HelpJSAP extends JSAP {
      * @param explanation
      * @param screenWidth
      * @param jsapXML
-     * @throws java.io.IOException                    if an I/O error occurs
-     * @throws com.martiansoftware.jsap.JSAPException if the configuration is not valid
+     * @throws IOException                    if an I/O error occurs
+     * @throws JSAPException if the configuration is not valid
      */
-    public HelpJSAP(final String name, final String explanation, final int screenWidth, final URL jsapXML) throws IOException, JSAPException {
+    public HelpJSAP(String name, String explanation, int screenWidth, URL jsapXML) throws IOException, JSAPException {
         super(jsapXML);
 
         this.name = name;
@@ -81,7 +81,7 @@ public class HelpJSAP extends JSAP {
 
         try {
             this.registerParameter(new Switch("help", JSAP.NO_SHORTFLAG, "help", "Displays this help page."));
-        } catch (final JSAPException e) {
+        } catch (JSAPException ignored) {
         }
     }
 
@@ -95,7 +95,7 @@ public class HelpJSAP extends JSAP {
     /**
      * @param explanation the explanation to set
      */
-    public final void setExplanation(final String explanation) {
+    public final void setExplanation(String explanation) {
         this.explanation = explanation;
     }
 
@@ -109,7 +109,7 @@ public class HelpJSAP extends JSAP {
     /**
      * @param name the name to set
      */
-    public final void setName(final String name) {
+    public final void setName(String name) {
         this.name = name;
     }
 
@@ -123,7 +123,7 @@ public class HelpJSAP extends JSAP {
     /**
      * @param screenWidth the screenWidth to set
      */
-    public final void setScreenWidth(final int screenWidth) {
+    public final void setScreenWidth(int screenWidth) {
         this.screenWidth = screenWidth;
     }
 
@@ -131,8 +131,8 @@ public class HelpJSAP extends JSAP {
      * @param jsapResult
      * @return if something has been written on writer.
      */
-    public final List<String> writeHelpOrErrorMessageIfRequired(final JSAPResult jsapResult) {
-        if (!(jsapResult.success()) || jsapResult.getBoolean("help")) {
+    public final List<String> writeHelpOrErrorMessageIfRequired(JSAPResult jsapResult) {
+        if (!jsapResult.success() || jsapResult.getBoolean("help")) {
             List<String> returnValue = new LinkedList<>();
             // To avoid spurious missing argument errors we never print errors if help is required.
             if (!jsapResult.getBoolean("help")) {
@@ -145,14 +145,14 @@ public class HelpJSAP extends JSAP {
             returnValue.add(ChatColor.GOLD + "Usage:");
 
             List<?> l = StringUtils.wrapToList(this.name + " " + this.getUsage(), this.screenWidth);
-            for (final Object aL : l) {
+            for (Object aL : l) {
                 returnValue.add("  " + aL.toString());
             }
 
             if (this.explanation != null) {
                 returnValue.add("");
                 l = StringUtils.wrapToList(this.explanation, this.screenWidth);
-                for (final Object aL : l) {
+                for (Object aL : l) {
                     final String next = (String) aL;
                     returnValue.add(ChatColor.AQUA + next);
                 }

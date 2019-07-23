@@ -35,19 +35,23 @@ import com.boydti.fawe.object.schematic.StructureFormat;
 
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.chat.Message;
+import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PlayerSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
@@ -55,6 +59,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.formatting.component.CodeFormat;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.SchematicPaginationBox;
@@ -116,17 +121,15 @@ public class SchematicCommands {
 
     @Command(
             name = "loadall",
-            desc = "Load multiple clipboards (paste will randomly choose one)",
-        descFooter = "Load multiple clipboards (paste will randomly choose one)\n" +
-        "The -r flag will apply random rotation"
+            desc = "Load multiple clipboards (paste will randomly choose one)"
     )
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.web", "worldedit.schematic.load.asset"})
-    public void loadall(final Player player, final LocalSession session,
+    public void loadall(Player player, LocalSession session,
                     @Arg(desc = "Format name.", def = "schematic")
-                        final String formatName,
+                        String formatName,
                     @Arg(desc = "File name.")
-                        final String filename,
+                        String filename,
                     @Switch(name = 'r', desc = "Apply random rotation")
                         boolean randomRotate) throws FilenameException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
@@ -195,7 +198,7 @@ public class SchematicCommands {
     )
     @Deprecated
     @CommandPermissions({"worldedit.schematic.remap"})
-    public void remap(final Player player, final LocalSession session) throws WorldEditException {
+    public void remap(Player player, LocalSession session) throws WorldEditException {
         ClipboardRemapper remapper = new ClipboardRemapper(ClipboardRemapper.RemapPlatform.PE, ClipboardRemapper.RemapPlatform.PC);
 
         for (Clipboard clip : session.getClipboard().getClipboards()) {
@@ -251,7 +254,7 @@ public class SchematicCommands {
                         return;
                     }
                 } else {
-                    if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(filename).find() && !player.hasPermission("worldedit.schematic.load.other")) {
+                    if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !player.hasPermission("worldedit.schematic.load.other") && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(filename).find()) {
                         BBC.NO_PERM.send(player, "worldedit.schematic.load.other");
                         return;
                     }
@@ -359,16 +362,6 @@ public class SchematicCommands {
             }
         }
 
-        if (f.getName().replaceAll("." + format.getPrimaryFileExtension(), "").isEmpty()) {
-            File directory = f.getParentFile();
-            if (directory.exists()) {
-                int max = MainUtil.getMaxFileId(directory);
-                f = new File(directory, max + "." + format.getPrimaryFileExtension());
-            } else {
-                f = new File(directory, "1." + format.getPrimaryFileExtension());
-            }
-        }
-
         // Create parent directories
         File parent = f.getParentFile();
         if (parent != null && !parent.exists()) {
@@ -377,55 +370,16 @@ public class SchematicCommands {
                         "Could not create folder for schematics!"));
             }
         }
-        try {
-            if (!f.exists()) {
-                f.createNewFile();
-            } else if (!allowOverwrite) {
-                BBC.SCHEMATIC_MOVE_EXISTS.send(player, f.getName());
-            }
 
-            try (FileOutputStream fos = new FileOutputStream(f)) {
-                ClipboardHolder holder = session.getClipboard();
-                Clipboard clipboard = holder.getClipboard();
-                Transform transform = holder.getTransform();
-                Clipboard target;
+        ClipboardHolder holder = session.getClipboard();
 
-                // If we have a transform, bake it into the copy
-                if (!transform.isIdentity()) {
-                    FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
-                    target = new BlockArrayClipboard(result.getTransformedRegion(), UUID.randomUUID());
-                    target.setOrigin(clipboard.getOrigin());
-                    Operations.completeLegacy(result.copyTo(target));
-                } else {
-                    target = clipboard;
-                }
-
-                URI uri = null;
-                if (holder instanceof URIClipboardHolder) {
-                    uri = ((URIClipboardHolder) holder).getURI(clipboard);
-                }
-                if (new PlayerSaveClipboardEvent(player, clipboard, uri, f.toURI()).call()) {
-                    try (ClipboardWriter writer = format.getWriter(fos)) {
-                        if (writer instanceof MinecraftStructure) {
-                            ((MinecraftStructure) writer).write(target, player.getName());
-                        } else {
-                            writer.write(target);
-                        }
-                        log.info(player.getName() + " saved " + f.getCanonicalPath());
-                        BBC.SCHEMATIC_SAVED.send(player, filename);
-                    }
-                } else {
-                    BBC.WORLDEDIT_CANCEL_REASON_MANUAL.send(player);
-                }
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            player.printError("Unknown filename: " + filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-            player.printError("Schematic could not written: " + e.getMessage());
-            log.warn("Failed to write a saved clipboard", e);
-        }
+        SchematicSaveTask task = new SchematicSaveTask(player, f, format, holder, overwrite);
+        AsyncCommandBuilder.wrap(task, player)
+                .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
+                .sendMessageAfterDelay("(Please wait... saving schematic.)")
+                .onSuccess(filename + " saved" + (overwrite ? " (overwriting previous file)." : "."), null)
+                .onFailure("Failed to load schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
+                .buildAndExec(worldEdit.getExecutorService());
     }
 
     @Command(
@@ -505,7 +459,8 @@ public class SchematicCommands {
         }
         for (File f : files) {
             if (!MainUtil.isInSubDirectory(working, f) || !f.exists()) {
-                actor.printError("Schematic " + filename + " does not exist! (" + f.exists() + "|" + f + "|" + (!MainUtil.isInSubDirectory(working, f)) + ")");
+                actor.printError("Schematic " + filename + " does not exist! (" + f.exists() + "|" + f + "|" + !MainUtil.isInSubDirectory(working, f)
+                    + ")");
                 continue;
             }
             if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, f) && !actor.hasPermission("worldedit.schematic.delete.other")) {
@@ -753,9 +708,21 @@ public class SchematicCommands {
                 FileOutputStream fos = closer.register(new FileOutputStream(file));
                 BufferedOutputStream bos = closer.register(new BufferedOutputStream(fos));
                 ClipboardWriter writer = closer.register(format.getWriter(bos));
-                writer.write(target);
-
-                log.info(player.getName() + " saved " + file.getCanonicalPath() + (overwrite ? " (overwriting previous file)" : ""));
+                URI uri = null;
+                if (holder instanceof URIClipboardHolder) {
+                    uri = ((URIClipboardHolder) holder).getURI(clipboard);
+                }
+                if (new PlayerSaveClipboardEvent(player, clipboard, uri, file.toURI()).call()) {
+                    if (writer instanceof MinecraftStructure) {
+                        ((MinecraftStructure) writer).write(target, player.getName());
+                    } else {
+                        writer.write(target);
+                    }
+                    log.info(player.getName() + " saved " + file.getCanonicalPath());
+                    BBC.SCHEMATIC_SAVED.send(player, file.getName());
+                } else {
+                    BBC.WORLDEDIT_CANCEL_REASON_MANUAL.send(player);
+                }
             }
             return null;
         }

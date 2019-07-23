@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 public interface IFawe {
+
     void debug(final String s);
 
     File getDirectory();
@@ -31,7 +32,9 @@ public interface IFawe {
 
     void startMetrics();
 
-    default ImageViewer getImageViewer(FawePlayer player) { return null; }
+    default ImageViewer getImageViewer(FawePlayer player) {
+        return null;
+    }
 
     default int getPlayerCount() {
         return Fawe.get().getCachedPlayers().size();

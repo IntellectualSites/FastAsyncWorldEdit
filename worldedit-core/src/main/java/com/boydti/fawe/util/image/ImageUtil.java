@@ -1,6 +1,7 @@
 package com.boydti.fawe.util.image;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -21,17 +22,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class ImageUtil {
+
     public static BufferedImage getScaledInstance(BufferedImage img,
-                                                  int targetWidth,
-                                                  int targetHeight,
-                                                  Object hint,
-                                                  boolean higherQuality)
-    {
+        int targetWidth,
+        int targetHeight,
+        Object hint,
+        boolean higherQuality) {
         if (img.getHeight() == targetHeight && img.getWidth() == targetWidth) {
             return img;
         }
-        int type = (img.getTransparency() == Transparency.OPAQUE) ?
-                BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+        int type = img.getTransparency() == Transparency.OPAQUE ?
+            BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
         BufferedImage ret = img;
         int w, h;
         if (higherQuality) {
@@ -53,21 +54,27 @@ public class ImageUtil {
                 if (w < targetWidth) {
                     w = targetWidth;
                 }
-            } else if (w < targetWidth) w = targetWidth;
+            } else if (w < targetWidth) {
+                w = targetWidth;
+            }
 
             if (higherQuality && h > targetHeight) {
                 h /= 2;
                 if (h < targetHeight) {
                     h = targetHeight;
                 }
-            } else if (h < targetHeight) h = targetHeight;
+            } else if (h < targetHeight) {
+                h = targetHeight;
+            }
 
             BufferedImage tmp = new BufferedImage(w, h, type);
             Graphics2D g2 = tmp.createGraphics();
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
-            g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
-            g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+            g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+                RenderingHints.VALUE_COLOR_RENDER_SPEED);
+            g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
+                RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
             g2.drawImage(ret, 0, 0, w, h, null);
             g2.dispose();
 
@@ -103,12 +110,13 @@ public class ImageUtil {
             float dz2 = sqrZ[z];
             for (int x = 0; x < width; x++, index++) {
                 int color = raw[index];
-                int alpha = (color >> 24) & 0xFF;
+                int alpha = color >> 24 & 0xFF;
                 if (alpha != 0) {
                     float dx2 = sqrX[x];
                     float distSqr = dz2 + dx2;
-                    if (distSqr > 1) raw[index] = 0;
-                    else {
+                    if (distSqr > 1) {
+                        raw[index] = 0;
+                    } else {
                         alpha = (int) (alpha * (1 - distSqr));
                         raw[index] = (color & 0x00FFFFFF) + (alpha << 24);
                     }
@@ -119,10 +127,10 @@ public class ImageUtil {
 
     public static void scaleAlpha(BufferedImage image, double alphaScale) {
         int[] raw = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-        int defined = (MathMan.clamp((int) (255 * alphaScale), 0, 255)) << 24;
+        int defined = MathMan.clamp((int) (255 * alphaScale), 0, 255) << 24;
         for (int i = 0; i < raw.length; i++) {
             int color = raw[i];
-            int alpha = ((color >> 24) & 0xFF);
+            int alpha = color >> 24 & 0xFF;
             switch (alpha) {
                 case 0:
                     continue;
@@ -147,10 +155,10 @@ public class ImageUtil {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int color = image.getRGB(x, y);
-                totalRed += (color >> 16) & 0xFF;
-                totalGreen += (color >> 8) & 0xFF;
-                totalBlue += (color >> 0) & 0xFF;
-                totalAlpha += (color >> 24) & 0xFF;
+                totalRed += color >> 16 & 0xFF;
+                totalGreen += color >> 8 & 0xFF;
+                totalBlue += color >> 0 & 0xFF;
+                totalAlpha += color >> 24 & 0xFF;
             }
         }
         int a = width * height;
@@ -161,7 +169,8 @@ public class ImageUtil {
         return (alpha << 24) + (red << 16) + (green << 8) + (blue << 0);
     }
 
-    public static BufferedImage load(@Nullable ProvideBindings.ImageUri uri) throws InputParseException {
+    public static BufferedImage load(@Nullable ProvideBindings.ImageUri uri)
+        throws InputParseException {
         return uri == null ? null : uri.load();
     }
 
@@ -200,7 +209,8 @@ public class ImageUtil {
                 return img;
             } else if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
-                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(), com.boydti.fawe.config.Settings.IMP.PATHS.HEIGHTMAP), arg);
+                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(),
+                    Settings.IMP.PATHS.HEIGHTMAP), arg);
                 return MainUtil.readImage(file);
             } else {
                 throw new InputParseException("Invalid image " + arg);
@@ -219,7 +229,8 @@ public class ImageUtil {
                 return new URL(arg).toURI();
             } else if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
-                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(), com.boydti.fawe.config.Settings.IMP.PATHS.HEIGHTMAP), arg);
+                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(),
+                    Settings.IMP.PATHS.HEIGHTMAP), arg);
                 if (!file.exists()) {
                     throw new InputParseException("File not found " + file);
                 }

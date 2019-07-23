@@ -66,60 +66,57 @@ public class SchemSync implements Runnable {
             byte[] header = new byte[32];
             try (ServerSocket serverSocket = this.serverSocket = new ServerSocket(PORT)) {
                 while (!Thread.interrupted()) {
-                    try {
-                        try (Socket clientSocket = this.clientSocket = serverSocket.accept()) {
-                            try (InputStream in = clientSocket.getInputStream()) {
-                                int read = in.read(header);
-                                if (read != header.length) {
-                                    close(Error.INVALID_HEADER_LENGTH);
-                                }
+                    try (Socket clientSocket = this.clientSocket = serverSocket
+                        .accept(); InputStream in = clientSocket.getInputStream()) {
+                        int read = in.read(header);
+                        if (read != header.length) {
+                            close(Error.INVALID_HEADER_LENGTH);
+                        }
 
-                                ByteBuffer buf = ByteBuffer.wrap(header);
-                                UUID uuid = new UUID(buf.getLong(), buf.getLong());
-                                UUID expectedToken = tokens.get(uuid);
-                                if (expectedToken == null) {
-                                    close(Error.TOKEN_REJECTED);
-                                }
+                        ByteBuffer buf = ByteBuffer.wrap(header);
+                        UUID uuid = new UUID(buf.getLong(), buf.getLong());
+                        UUID expectedToken = tokens.get(uuid);
+                        if (expectedToken == null) {
+                            close(Error.TOKEN_REJECTED);
+                        }
 
-                                UUID receivedToken = new UUID(buf.getLong(), buf.getLong());
-                                if (!receivedToken.equals(expectedToken)) {
-                                    continue;
-                                }
+                        UUID receivedToken = new UUID(buf.getLong(), buf.getLong());
+                        if (!receivedToken.equals(expectedToken)) {
+                            continue;
+                        }
 
-                                try (DataInputStream dis = new DataInputStream(in)) {
-                                    File dir = new File(working, uuid.toString());
+                        try (DataInputStream dis = new DataInputStream(in)) {
+                            File dir = new File(working, uuid.toString());
 
-                                    int data = dis.readByte() & 0xFF;
-                                    switch (data) {
-                                        case 0: // list
-                                            try (DataOutputStream out = new DataOutputStream(
-                                                clientSocket.getOutputStream())) {
-                                                out.write(1);
-                                                UtilityCommands.allFiles(dir.listFiles(), true,
-                                                    file -> {
-                                                        try {
-                                                            String path = dir.toURI()
-                                                                .relativize(file.toURI()).getPath();
-                                                            out.writeUTF(path);
-                                                        } catch (IOException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                    });
-                                            }
-                                            break;
-                                        case 1: // get
-                                            String input = dis.readUTF();
-                                            File file = new File(dir, input);
-                                            if (!MainUtil.isInSubDirectory(dir, file)) {
-                                                close(Error.NO_FILE_PERMISSIONS);
-                                            }
-                                            if (!file.exists()) {
-                                                close(Error.FILE_NOT_EXIST);
-                                            }
-
-                                            // todo send file
+                            int data = dis.readByte() & 0xFF;
+                            switch (data) {
+                                case 0: // list
+                                    try (DataOutputStream out = new DataOutputStream(
+                                        clientSocket.getOutputStream())) {
+                                        out.write(1);
+                                        UtilityCommands.allFiles(dir.listFiles(), true,
+                                            file -> {
+                                                try {
+                                                    String path = dir.toURI()
+                                                        .relativize(file.toURI()).getPath();
+                                                    out.writeUTF(path);
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            });
                                     }
-                                }
+                                    break;
+                                case 1: // get
+                                    String input = dis.readUTF();
+                                    File file = new File(dir, input);
+                                    if (!MainUtil.isInSubDirectory(dir, file)) {
+                                        close(Error.NO_FILE_PERMISSIONS);
+                                    }
+                                    if (!file.exists()) {
+                                        close(Error.FILE_NOT_EXIST);
+                                    }
+
+                                    // todo send file
                             }
                         }
                     } catch (FaweException ignore) {

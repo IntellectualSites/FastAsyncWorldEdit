@@ -30,14 +30,14 @@ public class MaskTraverser {
                 Field field = current.getDeclaredField("extent");
                 field.setAccessible(true);
                 field.set(mask, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
             try {
                 Field field = current.getDeclaredField("mask");
                 field.setAccessible(true);
                 Mask next = (Mask) field.get(mask);
                 reset(next, newExtent);
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
             try {
                 Field field = current.getDeclaredField("masks");
@@ -46,7 +46,7 @@ public class MaskTraverser {
                 for (Mask next : masks) {
                     reset(next, newExtent);
                 }
-            } catch (NoSuchFieldException | IllegalAccessException ignore) {
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
             }
             current = current.getSuperclass();
         }

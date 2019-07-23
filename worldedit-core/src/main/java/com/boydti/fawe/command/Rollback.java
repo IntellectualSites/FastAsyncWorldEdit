@@ -4,22 +4,21 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.*;
+import com.boydti.fawe.object.FaweCommand;
+import com.boydti.fawe.object.FawePlayer;
+import com.boydti.fawe.object.RegionWrapper;
+import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 public class Rollback extends FaweCommand {
 
@@ -53,9 +52,6 @@ public class Rollback extends FaweCommand {
         }
         World world = player.getWorld();
         switch (args[0]) {
-            default:
-                BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
-                return false;
             case "i":
             case "info":
                 if (args.length < 2) {
@@ -117,6 +113,9 @@ public class Rollback extends FaweCommand {
                     session.flushQueue();
                 }
                 player.sendMessage("Rollback complete!");
+            default:
+                BBC.COMMAND_SYNTAX.send(player, "/frb info u:<uuid> r:<radius> t:<time>");
+                return false;
         }
         return true;
     }

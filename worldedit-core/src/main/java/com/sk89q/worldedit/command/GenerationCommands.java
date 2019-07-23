@@ -19,6 +19,11 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
@@ -26,11 +31,6 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.ImageUtil;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.function.generator.CavesGen;
-import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -38,16 +38,14 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.function.generator.CavesGen;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.annotation.Selection;
-import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -55,19 +53,18 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
-import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.Switch;
-
-import java.util.List;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.inject.InjectedValueAccess;
 
 /**
  * Commands for the generation of shapes and other objects.
@@ -278,7 +275,7 @@ public class GenerationCommands extends MethodCommands {
                              int size,
                          @Arg(desc = "The type of forest", def = "tree")
                              TreeType type,
-                         @Range(min=0, max = 100) @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
+                         @Range(min = 0, max = 100) @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                              double density) throws WorldEditException {
         density = density / 100;
         int affected = editSession.makeForest(session.getPlacementPosition(player), size, density, type);
@@ -297,7 +294,7 @@ public class GenerationCommands extends MethodCommands {
                             int size,
                         @Arg(desc = "//TODO", def = "10")
                             int apothem,
-                        @Range(min=0, max = 100) @Arg(desc = "//TODO ", def = "0.02")
+                        @Range(min = 0, max = 100) @Arg(desc = "//TODO ", def = "0.02")
                             double density) throws WorldEditException {
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
         BBC.COMMAND_PUMPKIN.send(player, affected);
@@ -409,7 +406,6 @@ public class GenerationCommands extends MethodCommands {
         name = "/generatebiome",
         aliases = { "/genbiome", "/gb" },
         desc = "Sets biome according to a formula.",
-
         descFooter = "Formula must return positive numbers (true) if the point is inside the shape\n" +
                 "Sets the biome of blocks in that shape.\n"
                 +"See also https://tinyurl.com/weexpr."
