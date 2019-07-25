@@ -4,9 +4,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
-import com.sk89q.worldedit.world.World;
-
-import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -34,6 +31,7 @@ public abstract class BlockSet extends AbstractRegion {
         }
     }
 
+    @Override
     public boolean contains(BlockVector3 obj) {
         return contains(obj.getX(), obj.getY(), obj.getZ());
     }
@@ -94,10 +92,15 @@ public abstract class BlockSet extends AbstractRegion {
     public abstract void set(int x, int y, int z);
     public abstract void clear(int x, int y, int z);
     public abstract boolean remove(int x, int y, int z);
+    @Override
     public abstract Iterator<BlockVector3> iterator();
+    @Override
     public abstract Set<BlockVector2> getChunks();
+    @Override
     public abstract Set<BlockVector3> getChunkCubes();
+    @Override
     public abstract BlockVector3 getMaximumPoint();
+    @Override
     public abstract BlockVector3 getMinimumPoint();
 
     @Override

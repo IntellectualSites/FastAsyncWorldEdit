@@ -41,14 +41,10 @@ import com.sk89q.worldedit.command.tool.TraceTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
-import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.event.platform.PlatformInitializeEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
 import com.sk89q.worldedit.event.platform.PlayerInputEvent;
-import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
@@ -321,6 +317,8 @@ public class PlatformManager {
         LocalSession session = worldEdit.getSessionManager().get(actor);
 
         Request.reset();
+        Request.request().setSession(session);
+        Request.request().setWorld(player.getWorld());
 
         try {
             Vector3 vector = location.toVector();
@@ -335,7 +333,7 @@ public class PlatformManager {
                 case HIT: {
                     // superpickaxe is special because its primary interaction is a left click, not a right click
                     // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
-                    if (session.hasSuperPickAxe()) {
+                if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
                         final BlockTool superPickaxe = session.getSuperPickaxe();
                         if (superPickaxe != null && superPickaxe.canUse(player) && player.isHoldingPickAxe()) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);

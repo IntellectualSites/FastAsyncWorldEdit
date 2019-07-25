@@ -108,7 +108,7 @@ public abstract class FawePlayer<T> extends Metadatable {
     }
 
     @Deprecated
-    public FawePlayer(final T parent) {
+    public FawePlayer(T parent) {
         this.parent = parent;
         Fawe.get().register(this);
         if (Settings.IMP.CLIPBOARD.USE_DISK) {
@@ -247,7 +247,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      * Queue an action to run async
      * @param run
      */
-    public void queueAction(final Runnable run) {
+    public void queueAction(Runnable run) {
         runAction(run, false, true);
     }
 
@@ -288,7 +288,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @param async
      * @return false if the task was ran or queued
      */
-    public boolean runAction(final Runnable ifFree, boolean checkFree, boolean async) {
+    public boolean runAction(Runnable ifFree, boolean checkFree, boolean async) {
         if (checkFree) {
             if (runningCount.get() != 0) return false;
         }
@@ -363,7 +363,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      *
      * @param world
      */
-    public void loadSessionsFromDisk(final World world) {
+    public void loadSessionsFromDisk(World world) {
         if (world == null) {
             return;
         }
@@ -417,14 +417,14 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @param perm
      * @return
      */
-    public abstract boolean hasPermission(final String perm);
+    public abstract boolean hasPermission(String perm);
 
     /**
      * Send a message to the player
      *
      * @param message
      */
-    public abstract void sendMessage(final String message);
+    public abstract void sendMessage(String message);
 
     /**
      * Print a WorldEdit error.
@@ -438,7 +438,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      *
      * @param substring
      */
-    public abstract void executeCommand(final String substring);
+    public abstract void executeCommand(String substring);
 
     /**
      * Get the player's location
@@ -473,7 +473,7 @@ public abstract class FawePlayer<T> extends Metadatable {
     public Region getSelection() {
         try {
             return this.getSession().getSelection(this.getPlayer().getWorld());
-        } catch (final IncompleteRegionException e) {
+        } catch (IncompleteRegionException e) {
             return null;
         }
     }
@@ -509,7 +509,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @param region
      */
     @Deprecated
-    public void setSelection(final RegionWrapper region) {
+    public void setSelection(RegionWrapper region) {
         final Player player = this.getPlayer();
         BlockVector3 top = region.getMaximumPoint();
         top.withY(getWorld().getMaxY());
@@ -539,7 +539,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      *
      * @param selector
      */
-    public void setSelection(final RegionSelector selector) {
+    public void setSelection(RegionSelector selector) {
         this.getSession().setRegionSelector(toWorldEditPlayer().getWorld(), selector);
     }
 
@@ -551,7 +551,7 @@ public abstract class FawePlayer<T> extends Metadatable {
     public Region getLargestRegion() {
         int area = 0;
         Region max = null;
-        for (final Region region : this.getCurrentRegions()) {
+        for (Region region : this.getCurrentRegions()) {
             final int tmp = region.getArea();
             if (tmp > area) {
                 area = tmp;

@@ -59,11 +59,13 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      */
     <T extends Future<T>> T submit(IChunk<T> chunk);
 
+    @Override
     default boolean setBlock(final int x, final int y, final int z, final BlockStateHolder state) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.setBlock(x & 15, y, z & 15, state);
     }
 
+    @Override
     default boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.setBiome(x & 15, y, z & 15, biome);

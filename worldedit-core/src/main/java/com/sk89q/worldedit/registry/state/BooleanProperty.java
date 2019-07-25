@@ -31,7 +31,7 @@ public class BooleanProperty extends AbstractProperty<Boolean> {
         this(name, values, 0);
     }
 
-    public BooleanProperty(final String name, final List<Boolean> values, int bitOffset) {
+    private BooleanProperty(final String name, final List<Boolean> values, int bitOffset) {
         super(name, values, bitOffset);
         defaultIndex = values.get(0).booleanValue() == Boolean.TRUE ? 0 : 1;
     }

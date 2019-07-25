@@ -10,22 +10,25 @@ public class ROCAngleMask extends AngleMask {
 
     @Override
     protected boolean testSlope(int x, int y, int z) {
-        double slope, tmp;
-        boolean aboveMin;
+        double tmp;
         lastY = y;
 
         int base = getHeight(x, y, z);
-        slope = ((getHeight(x + distance, y, z) - base) - (base - getHeight(x - distance, y, z))) * ADJACENT_MOD;
+        double slope =
+            (getHeight(x + distance, y, z) - base - (base - getHeight(x - distance, y, z)))
+                * ADJACENT_MOD;
 
-        tmp = ((getHeight(x, y, z + distance) - base) - (base - getHeight(x, y, z - distance))) * ADJACENT_MOD;
+        tmp = (getHeight(x, y, z + distance) - base - (base - getHeight(x, y, z - distance))) * ADJACENT_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
 
-        tmp = ((getHeight(x + distance, y, z + distance) - base) - (base - getHeight(x - distance, y, z - distance))) * DIAGONAL_MOD;
+        tmp = (getHeight(x + distance, y, z + distance) - base - (base - getHeight(x - distance, y,
+            z - distance))) * DIAGONAL_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
 
-        tmp = ((getHeight(x - distance, y, z + distance) - base) - (base - getHeight(x + distance, y, z - distance))) * DIAGONAL_MOD;
+        tmp = (getHeight(x - distance, y, z + distance) - base - (base - getHeight(x + distance, y,
+            z - distance))) * DIAGONAL_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) slope = tmp;
 
-        return lastValue = (slope >= min && slope <= max);
+        return lastValue = slope >= min && slope <= max;
     }
 }

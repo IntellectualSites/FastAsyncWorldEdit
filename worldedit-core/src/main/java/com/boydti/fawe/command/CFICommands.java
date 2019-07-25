@@ -47,6 +47,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TextComponent.Builder;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -354,7 +355,7 @@ public class CFICommands {
         floor(fp, BlockTypes.SNOW.getDefaultState().with(PropertyKey.LAYERS, 7), image, mask, disableWhiteOnly);
         main(fp, BlockTypes.SNOW_BLOCK, image, mask, disableWhiteOnly);
         smooth(fp, 1, 8, image, mask, disableWhiteOnly);
-        TextComponent.of("Added snow!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Added snow!"));
         assertSettings(fp).resetComponent();
         component(fp);
     }
@@ -383,17 +384,28 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void paletteblocks(FawePlayer fp, Player player, LocalSession session, @Arg(name = "arg", desc = "String", def = "") String arg) throws EmptyClipboardException, InputParseException, FileNotFoundException {
         if (arg == null) {
-            TextComponent.of("What blocks do you want to color with?").append(newline())
-                    .text("[All]").cmdTip(alias() + " PaletteBlocks *").text(" - All available blocks")
-                    .append(newline())
-                    .text("[Clipboard]").cmdTip(alias() + " PaletteBlocks #clipboard").text(" - The blocks in your clipboard")
-                    .append(newline())
-                    .text("[List]").suggestTip(alias() + " PaletteBlocks stone,gravel").text(" - A comma separated list of blocks")
-                    .append(newline())
-                    .text("[Complexity]").cmdTip(alias() + " Complexity").text(" - Block textures within a complexity range")
-                    .append(newline())
-                    .text("< [Back]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "coloring"))
-                    .send(fp);
+            TextComponent build = TextComponent.builder("What blocks do you want to color with?")
+                .append(newline())
+                .append(TextComponent.of("[All]")
+                    .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks *")))
+                .append(" - All available blocks")
+                .append(newline())
+                .append(TextComponent.of("[Clipboard]")
+                    .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks #clipboard")))
+                .append(" - The blocks in your clipboard")
+                .append(newline())
+                .append(TextComponent.of("[List]")
+                    .clickEvent(ClickEvent.runCommand("/cfi PaletteBlocks stone,gravel")))
+                .append(" - A comma separated list of blocks")
+                .append(newline())
+                .append(TextComponent.of("[Complexity]")
+                    .clickEvent(ClickEvent.runCommand("/cfi Complexity")))
+                .append(" - Block textures within a complexity range")
+                .append(newline())
+                .append(TextComponent.of("< [Back]").clickEvent(ClickEvent
+                    .runCommand("/cfi " + Commands.getAlias(CFICommands.class, "coloring"))))
+                .build();
+            fp.toWorldEditPlayer().print(build);
             return;
         }
         HeightMapMCAGenerator generator = assertSettings(fp).getGenerator();
@@ -505,7 +517,7 @@ public class CFICommands {
         } else {
             gen.addSchems(load(imageMask), mask, multi.getHolders(), rarity, distance, rotate);
         }
-        TextComponent.of("Added schematics!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Added schematics!"));
         populate(fp);
     }
 
@@ -527,7 +539,7 @@ public class CFICommands {
         } else {
             gen.setBiome(biome);
         }
-        TextComponent.of("Set biome!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set biome!"));
         assertSettings(fp).resetComponent();
         component(fp);
     }
@@ -539,7 +551,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void caves(FawePlayer fp) throws WorldEditException {
         assertSettings(fp).getGenerator().addCaves();
-        TextComponent.of("Added caves!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Added caves!"));
         populate(fp);
     }
 
@@ -580,7 +592,6 @@ public class CFICommands {
             gen.setHeights(Integer.parseInt(arg));
         }
         fp.toWorldEditPlayer().print("Set Height!");
-        TextComponent.of("Set height!").send(fp);
         component(fp);
     }
 
@@ -592,7 +603,8 @@ public class CFICommands {
     public void waterId(FawePlayer fp, BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setWaterId(block.getBlockType().getInternalId());
-        TextComponent.of("Set water id!").send(fp);
+
+        fp.toWorldEditPlayer().print("Set water id!");
         settings.resetComponent();
         component(fp);
     }
@@ -606,7 +618,7 @@ public class CFICommands {
     public void baseId(FawePlayer fp, BlockStateHolder block) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setBedrockId(block.getBlockType().getInternalId());
-        TextComponent.of("Set base id!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set base id!"));
         settings.resetComponent();
         component(fp);
     }
@@ -620,7 +632,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void worldthickness(FawePlayer fp, int height) throws WorldEditException {
         assertSettings(fp).getGenerator().setWorldThickness(height);
-        TextComponent.of("Set world thickness!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set world thickness!"));
         component(fp);
     }
 
@@ -633,7 +645,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void floorthickness(FawePlayer fp, int height) throws WorldEditException {
         assertSettings(fp).getGenerator().setFloorThickness(height);
-        TextComponent.of("Set floor thickness!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set floor thickness!"));
         component(fp);
     }
 
@@ -645,7 +657,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void update(FawePlayer fp) throws WorldEditException {
         assertSettings(fp).getGenerator().update();
-        TextComponent.of("Chunks refreshed!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Chunks refreshed!"));
         mainMenu(fp);
     }
 
@@ -657,7 +669,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void tp(FawePlayer fp) throws WorldEditException {
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
-        TextComponent.of("Teleporting...").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Teleporting..."));
         Vector3 origin = gen.getOrigin();
         Player player = fp.getPlayer();
         player.setPosition(origin.subtract(16, 0, 16));
@@ -675,7 +687,7 @@ public class CFICommands {
     @CommandPermissions("worldedit.anvil.cfi")
     public void waterheight(FawePlayer fp, int height) throws WorldEditException {
         assertSettings(fp).getGenerator().setWaterHeight(height);
-        TextComponent.of("Set water height!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set water height!"));
         component(fp);
     }
 
@@ -689,7 +701,7 @@ public class CFICommands {
     public void glass(FawePlayer fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setColorWithGlass(load(image));
-        TextComponent.of("Set color with glass!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set color with glass!"));
         settings.resetColoring();
         mainMenu(fp);
     }
@@ -714,7 +726,7 @@ public class CFICommands {
             gen.setColor(load(image));
         }
         settings.resetColoring();
-        TextComponent.of("Set color with blocks!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set color with blocks!"));
         mainMenu(fp);
     }
 
@@ -730,7 +742,7 @@ public class CFICommands {
     public void blockbiome(FawePlayer fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setBlockAndBiomeColor(load(image), mask, load(imageMask), !disableWhiteOnly);
-        TextComponent.of("Set color with blocks and biomes!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set color with blocks and biomes!"));
         settings.resetColoring();
         mainMenu(fp);
     }
@@ -746,7 +758,7 @@ public class CFICommands {
     public void biomecolor(FawePlayer fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri imageMask, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) throws WorldEditException {
         CFISettings settings = assertSettings(fp);
         settings.getGenerator().setBiomeColor(load(image));
-        TextComponent.of("Set color with biomes!").send(fp);
+        fp.toWorldEditPlayer().print(TextComponent.of("Set color with biomes!"));
         settings.resetColoring();
         mainMenu(fp);
     }
@@ -811,13 +823,12 @@ public class CFICommands {
                 .append(newline());
 
         if (settings.image != null) {
-            StringBuilder colorArgs = new StringBuilder();
-            colorArgs.append(" " + settings.imageArg);
+            StringBuilder colorArgs = new StringBuilder(" " + settings.imageArg);
             if (settings.imageMask != null) {
-                colorArgs.append(" " + settings.imageMaskArg);
+                colorArgs.append(" ").append(settings.imageMaskArg);
             }
             if (settings.mask != null) {
-                colorArgs.append(" " + settings.maskArg);
+                colorArgs.append(" ").append(settings.maskArg);
             }
             if (!settings.whiteOnly) {
                 colorArgs.append(" -w");
@@ -854,14 +865,26 @@ public class CFICommands {
         settings.maskArg = mask != null ? split[index++] : null;
         settings.whiteOnly = !disableWhiteOnly;
 
-        StringBuilder cmd = new StringBuilder(alias() + " mask ");
+        StringBuilder cmd = new StringBuilder("/cfi mask ");
 
-        TextComponent.of(">> Current Settings <<").append(newline())
-            .text("Image Mask ").text("[" + settings.imageMaskArg + "]").suggestTip(cmd + "http://")
+        String s = "/cfi mask http://";
+        String s1 = "/cfi mask <mask>";
+        String s2 = alias() + " " + settings.getCategory();
+        TextComponent build = TextComponent.builder(">> Current Settings <<")
             .append(newline())
-            .text("WorldEdit Mask ").text("[" + settings.maskArg + "]").suggestTip(cmd + "<mask>")
+            .append("Image Mask ").append(
+                TextComponent.of("[" + settings.imageMaskArg + "]")
+                    .hoverEvent(HoverEvent.showText(TextComponent.of(s)))
+                    .clickEvent(ClickEvent.suggestCommand("/cfi mask http://")))
             .append(newline())
-            .text("< [Back]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
+            .append("WorldEdit Mask ").append(TextComponent.of("[" + settings.maskArg + "]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of(s1)))
+                .clickEvent(ClickEvent.suggestCommand(s1)))
+            .append(newline())
+            .append(
+                TextComponent.of("< [Back]").hoverEvent(HoverEvent.showText(TextComponent.of(s2)))
+                    .clickEvent(ClickEvent.runCommand(s2))).build();
+        fp.toWorldEditPlayer().print(build);
     }
 
     @Command(
@@ -881,10 +904,17 @@ public class CFICommands {
         if (pattern != null) {
             settings.getCategory().accept(fp);
         } else {
-            TextComponent.of(">> Current Settings <<").append(newline())
-                    .text("Pattern ").text("[Click Here]").suggestTip(cmd + " stone")
-                    .append(newline())
-                    .text("< [Back]").cmdTip(alias() + " " + settings.getCategory()).send(fp);
+            String s = cmd + " stone";
+            String s1 = alias() + " " + settings.getCategory();
+            TextComponent build = TextComponent.builder(">> Current Settings <<").append(newline())
+                .append("Pattern ").append(TextComponent.of("[Click Here]")
+                    .hoverEvent(HoverEvent.showText(TextComponent.of(s)))
+                    .clickEvent(ClickEvent.suggestCommand(s)))
+                .append(newline())
+                .append(TextComponent.of("< [Back]")
+                    .hoverEvent(HoverEvent.showText(TextComponent.of(s1)))
+                    .clickEvent(ClickEvent.runCommand(s1))).build();
+            fp.toWorldEditPlayer().print(build);
         }
     }
 
@@ -917,13 +947,12 @@ public class CFICommands {
         settings.image = image;
         settings.imageArg = image != null ? split[index++] : null;
 
-        StringBuilder cmd = new StringBuilder(alias() + " image ");
         if (image == null) {
             TextComponent build = TextComponent.builder("Please provide an image:")
                 .append(newline())
-                .append("From a URL: ").append("[Click Here]")//TODO .suggestTip(cmd + "http://")
+                .append("From a URL: ").append(TextComponent.of("[Click Here]").clickEvent(ClickEvent.suggestCommand("/cfi image http://")))
                 .append(newline())
-                .append("From a file: ").append("[Click Here]")//TODO .suggestTip(cmd + "file://")
+                .append("From a file: ").append(TextComponent.of("[Click Here]").clickEvent(ClickEvent.suggestCommand("/cfi image file://")))
                 .build();
             fp.toWorldEditPlayer().print(build);
         } else {
@@ -994,50 +1023,76 @@ public class CFICommands {
         String snow = Commands.getAlias(CFICommands.class, "snow");
 
         //TODO
-//        Message msg = TextComponent.builder(">> Current Settings <<").append(newline())
-//                .append("Mask ").append("[" + mask + "]").cmdTip(alias() + " mask")
-//                .append(newline())
-//                .append("Pattern ").append("[" + pattern + "]").cmdTip(alias() + " pattern")
-//                .append(newline())
-//                .append(newline())
-//                .append(">> Components <<")
-//                .append(newline())
-//                .append("[Height]").suggestTip(alias() + " " + alias("height") + " 120").text(" - Terrain height for whole map")
-//                .append(newline())
-//                .text("[WaterHeight]").suggestTip(alias() + " " + alias("waterheight") + " 60").text(" - Sea level for whole map")
-//                .append(newline())
-//                .text("[FloorThickness]").suggestTip(alias() + " " + alias("floorthickness") + " 60").text(" - Floor thickness of entire map")
-//                .append(newline())
-//                .text("[WorldThickness]").suggestTip(alias() + " " + alias("worldthickness") + " 60").text(" - World thickness of entire map")
-//                .append(newline())
-//                .text("[Snow]").suggestTip(alias() + " " + alias("snow") + maskArgs).text(" - Set snow in the masked areas")
-//                .append(newline());
-//
-//        if (pattern != null) {
-//            String disabled = "You must specify a pattern";
-//            msg
-//                    .text("[&cWaterId]").tooltip(disabled).append(newline())
-//                    .text("[&cBedrockId]").tooltip(disabled).append(newline())
-//                    .text("[&cFloor]").tooltip(disabled).append(newline())
-//                    .text("[&cMain]").tooltip(disabled).append(newline())
-//                    .text("[&cColumn]").tooltip(disabled).append(newline())
-//                    .text("[&cOverlay]").tooltip(disabled).append(newline());
-//        } else {
-//            StringBuilder compArgs = new StringBuilder();
-//            compArgs.append(" " + settings.patternArg + maskArgs);
-//
-//            msg
-//                    .text("[WaterId]").cmdTip(alias() + " waterId " + pattern).text(" - Water id for whole map").append(newline())
-//                    .text("[BedrockId]").cmdTip(alias() + " baseId " + pattern).text(" - Bedrock id for whole map").append(newline())
-//                    .text("[Floor]").cmdTip(alias() + " floor" + compArgs).text(" - Set the floor in the masked areas").append(newline())
-//                    .text("[Main]").cmdTip(alias() + " main" + compArgs).text(" - Set the main block in the masked areas").append(newline())
-//                    .text("[Column]").cmdTip(alias() + " column" + compArgs).text(" - Set the columns in the masked areas").append(newline())
-//                    .text("[Overlay]").cmdTip(alias() + " overlay" + compArgs).text(" - Set the overlay in the masked areas").append(newline());
-//        }
-//
-//        msg.append(newline())
-//                .text("< [Back]").cmdTip(alias())
-//                .send(fp);
+        @NonNull Builder msg = TextComponent.builder(">> Current Settings <<").append(newline())
+                .append("Mask ").append(TextComponent.of("[" + mask + "]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " mask")))
+                .clickEvent(ClickEvent.runCommand(alias() + " mask")))
+                .append(newline())
+                .append("Pattern ").append(TextComponent.of("[" + pattern + "]")
+                .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " pattern")))
+                .clickEvent(ClickEvent.runCommand(alias() + " pattern")))
+                .append(newline())
+                .append(newline())
+                .append(">> Components <<")
+                .append(newline())
+                .append(TextComponent.of("[Height]")
+                    .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("height") + " 120")))
+                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("height") + " 120"))).append(" - Terrain height for whole map")
+                .append(newline())
+                .append(TextComponent.of("[WaterHeight]")
+                    .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("waterheight") + " 60")))
+                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("waterheight") + " 60"))).append(" - Sea level for whole map")
+                .append(newline())
+                .append(TextComponent.of("[FloorThickness]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("floorthickness") + " 60")))
+                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("floorthickness") + " 60"))).append(" - Floor thickness of entire map")
+                .append(newline())
+                .append(TextComponent.of("[WorldThickness]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("worldthickness") + " 60")))
+                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("worldthickness") + " 60"))).append(" - World thickness of entire map")
+                .append(newline())
+                .append(TextComponent.of("[Snow]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("snow") + maskArgs)))
+                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("snow") + maskArgs))).append(" - Set snow in the masked areas")
+                .append(newline());
+
+        if (pattern != null) {
+            String disabled = "You must specify a pattern";
+            msg.append(TextComponent.of("[&cWaterId]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline())
+                    .append(TextComponent.of("[&cBedrockId]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
+                    .append(TextComponent.of("[&cFloor]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
+                    .append(TextComponent.of("[&cMain]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
+                    .append(TextComponent.of("[&cColumn]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline())
+                    .append(TextComponent.of("[&cOverlay]").hoverEvent(HoverEvent.showText(TextComponent.of(disabled)))).append(newline()).append(newline());
+        } else {
+            StringBuilder compArgs = new StringBuilder();
+            compArgs.append(" " + settings.patternArg + maskArgs);
+
+            msg
+                    .append(TextComponent.of("[WaterId]")
+                        .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " waterId " + pattern)))
+                        .clickEvent(ClickEvent.runCommand(alias() + " waterId " + pattern)))
+                .append(" - Water id for whole map")
+                .append(newline())
+                    .append(TextComponent.of("[BedrockId]")
+                        .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " baseId " + pattern)))
+                        .clickEvent(ClickEvent.runCommand(alias() + " baseId " + pattern)))
+                .append(TextComponent.of(" - Bedrock id for whole map"))
+                .append(newline())
+                    .append(TextComponent.of("[Floor]")
+                        .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " floor " + compArgs)))
+                        .clickEvent(ClickEvent.runCommand(alias() + " floor " + compArgs)))
+                .append(TextComponent.of(" - Set the floor in the masked areas")).append(newline())
+                    .append(TextComponent.of("[Main]")
+                        .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " main " + compArgs)))
+                        .clickEvent(ClickEvent.runCommand(alias() + " main " + compArgs)))
+                .append(TextComponent.of(" - Set the main block in the masked areas")).append(newline())
+                    .append(TextComponent.of("[Column]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " column" + compArgs)))
+                        .clickEvent(ClickEvent.runCommand(alias() + " column" + compArgs))).append(" - Set the columns in the masked areas").append(newline())
+                    .append(TextComponent.of("[Overlay]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " overlay" + compArgs)))
+                        .clickEvent(ClickEvent.runCommand(alias() + " overlay" + compArgs))).append(" - Set the overlay in the masked areas").append(newline());
+        }
+
+        msg.append(newline())
+                .append(TextComponent.of("< [Back]").hoverEvent(HoverEvent.showText(TextComponent.of(alias()))).clickEvent(ClickEvent.runCommand(alias())));
+        fp.toWorldEditPlayer().print(msg.build());
     }
 
     private static CFISettings assertSettings(FawePlayer fp) {

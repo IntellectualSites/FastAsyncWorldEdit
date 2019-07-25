@@ -70,15 +70,11 @@ public class RegionVisitor implements Operation {
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         for (BlockVector3 pt : iterable) {
-            apply(pt);
+            if (function.apply(pt)) {
+                affected++;
+            }
         }
         return null;
-    }
-
-    private void apply(BlockVector3 pt) throws WorldEditException {
-        if (function.apply(pt)) {
-            affected++;
-        }
     }
 
     @Override

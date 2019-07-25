@@ -101,6 +101,26 @@ public class RegionCommands {
     }
 
     @Command(
+        name = "/set",
+        desc = "Sets all the blocks in the region"
+    )
+    @CommandPermissions("worldedit.region.set")
+    @Logging(REGION)
+    public void set(FawePlayer player, EditSession editSession,
+        @Selection Region region,
+        @Arg(desc = "The pattern of blocks to set")
+            Pattern pattern, InjectedValueAccess context) throws WorldEditException {
+        player.checkConfirmationRegion(() -> {
+            int affected = editSession.setBlocks(region, pattern);
+            if (affected != 0) {
+                BBC.OPERATION.send(player, affected);
+                if (!player.hasPermission("fawe.tips"))
+                    BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(player);
+            }
+        }, getArguments(context), region, context);
+    }
+
+    @Command(
             name = "/fixlighting",
             desc = "Get the light at a position"
     )
@@ -197,7 +217,7 @@ public class RegionCommands {
                     @Arg(desc = "The pattern of blocks to place")
                         Pattern pattern,
                     @Arg(desc = "The thickness of the line", def = "0")
-                        @Range(min = 0) int thickness,
+                        int thickness,
                     @Switch(name = 'h', desc = "Generate only a shell")
                         boolean shell) throws WorldEditException {
         if (!(region instanceof CuboidRegion)) {
@@ -227,7 +247,7 @@ public class RegionCommands {
                      @Arg(desc = "The pattern of blocks to place")
                          Pattern pattern,
                      @Arg(desc = "The thickness of the curve", def = "0")
-                         @Range(min = 0) int thickness,
+                         int thickness,
                      @Switch(name = 'h', desc = "Generate only a shell")
                          boolean shell, InjectedValueAccess context) throws WorldEditException {
         if (!(region instanceof ConvexPolyhedralRegion)) {
@@ -258,6 +278,9 @@ public class RegionCommands {
                            Mask from,
                        @Arg(desc = "The pattern of blocks to replace with")
                            Pattern to, InjectedValueAccess context) throws WorldEditException {
+        if (from == null) {
+            from = new ExistingBlockMask(editSession);
+        }
         player.checkConfirmationRegion(() -> {
             int affected = editSession.replaceBlocks(region, from == null ? new ExistingBlockMask(editSession) : from, to);
             BBC.VISITOR_BLOCK.send(player, affected);
@@ -269,29 +292,11 @@ public class RegionCommands {
             }
         }, getArguments(context), region, context);
     }
-
     // Compatibility for SKCompat
+
     @Deprecated
     public void set(Player player, LocalSession session, EditSession editSession, Pattern pattern) throws WorldEditException {
         set(FawePlayer.wrap(player), session, editSession, session.getSelection(player.getWorld()), pattern, null);
-    }
-
-    @Command(
-            name = "/set",
-            aliases = { "/s" },
-            desc = "Set all blocks within selection"
-)
-    @CommandPermissions("worldedit.region.set")
-    @Logging(REGION)
-    public void set(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region selection, Pattern to, InjectedValueAccess context) throws WorldEditException {
-        player.checkConfirmationRegion(() -> {
-            int affected = editSession.setBlocks(selection, to);
-            if (affected != 0) {
-                BBC.OPERATION.send(player, affected);
-                if (!player.hasPermission("fawe.tips"))
-                    BBC.TIP_FAST.or(BBC.TIP_CANCEL, BBC.TIP_MASK, BBC.TIP_MASK_ANGLE, BBC.TIP_SET_LINEAR, BBC.TIP_SURFACE_SPREAD, BBC.TIP_SET_HAND).send(player);
-            }
-        }, getArguments(context), selection, context);
     }
 
     @Command(
@@ -526,7 +531,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.stack")
     @Logging(ORIENTATION_REGION)
-    public void stack(FawePlayer player, World world, EditSession editSession, LocalSession session,
+    public void stack(FawePlayer player, EditSession editSession, LocalSession session,
                      @Selection Region region,
                      @Arg(desc = "# of copies to stack", def = "1")
                          int count,
@@ -557,8 +562,8 @@ public class RegionCommands {
                 final BlockVector3 shiftVector = direction.toVector3().multiply(count * (Math.abs(direction.dot(size)) + 1)).toBlockPoint();
                     region.shift(shiftVector);
 
-                    session.getRegionSelector(world).learnChanges();
-                    session.getRegionSelector(world).explainRegionAdjust(player.getPlayer(), session);
+                    session.getRegionSelector(player.getWorld()).learnChanges();
+                    session.getRegionSelector(player.getWorld()).explainRegionAdjust(player.getPlayer(), session);
                 } catch (RegionOperationException e) {
                     player.toWorldEditPlayer().printError(e.getMessage());
                 }

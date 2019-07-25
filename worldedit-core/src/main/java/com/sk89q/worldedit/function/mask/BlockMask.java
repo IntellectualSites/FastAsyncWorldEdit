@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -31,8 +33,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 
+/**
+ * A mask that checks whether blocks at the given positions are matched by
+ * a block in a list.
+ *
+ * <p>This mask checks for both an exact block type and state value match,
+ * respecting fuzzy status of the BlockState.</p>
+ */
 public class BlockMask extends ABlockMask {
+
     private final boolean[] ordinals;
 
     public BlockMask() {
@@ -49,6 +60,10 @@ public class BlockMask extends ABlockMask {
     }
 
     /**
+     * Create a new block mask.
+     *
+     * @param extent the extent
+     * @param blocks a list of blocks to match
      * @deprecated NBT not supported by this mask
      */
     @Deprecated
@@ -57,11 +72,23 @@ public class BlockMask extends ABlockMask {
         add(blocks);
     }
 
+    /**
+     * Create a new block mask.
+     *
+     * @param extent the extent
+     * @param block an array of blocks to match
+     */
+    public BlockMask(Extent extent, BaseBlock... block) {
+        this(extent, Arrays.asList(checkNotNull(block)));
+    }
+
     public BlockMask add(Predicate<BlockState> predicate) {
         for (int i = 0; i < ordinals.length; i++) {
             if (!ordinals[i]) {
                 BlockState state = BlockTypes.states[i];
-                if (state != null) ordinals[i] = predicate.test(state);
+                if (state != null) {
+                    ordinals[i] = predicate.test(state);
+                }
             }
         }
         return this;
@@ -73,7 +100,9 @@ public class BlockMask extends ABlockMask {
     }
 
     public BlockMask remove(BlockState... states) {
-        for (BlockState state : states) ordinals[state.getOrdinal()] = false;
+        for (BlockState state : states) {
+            ordinals[state.getOrdinal()] = false;
+        }
         return this;
     }
 
@@ -84,13 +113,17 @@ public class BlockMask extends ABlockMask {
 
     public boolean isEmpty() {
         for (boolean value : ordinals) {
-            if (value) return false;
+            if (value) {
+                return false;
+            }
         }
         return true;
     }
 
-    public BlockMask addStates(Collection<BlockState> states) {
-        for (BlockState state : states) ordinals[state.getOrdinal()] = true;
+    private BlockMask addStates(Collection<BlockState> states) {
+        for (BlockState state : states) {
+            ordinals[state.getOrdinal()] = true;
+        }
         return this;
     }
 
@@ -99,7 +132,7 @@ public class BlockMask extends ABlockMask {
         return this;
     }
 
-    public BlockMask addTypes(Collection<BlockType> types) {
+    private BlockMask addTypes(Collection<BlockType> types) {
         for (BlockType type : types) {
             for (BlockState state : type.getAllStates()) {
                 ordinals[state.getOrdinal()] = true;
@@ -109,6 +142,9 @@ public class BlockMask extends ABlockMask {
     }
 
     /**
+     * Add the given blocks to the list of criteria.
+     *
+     * @param blocks a list of blocks
      * @deprecated NBT not supported by this mask
      */
     @Deprecated
@@ -116,6 +152,15 @@ public class BlockMask extends ABlockMask {
         for (BaseBlock block : blocks) {
             add(block.toBlockState());
         }
+    }
+
+    /**
+     * Add the given blocks to the list of criteria.
+     *
+     * @param block an array of blocks
+     */
+    public void add(BaseBlock... block) {
+        add(Arrays.asList(checkNotNull(block)));
     }
 
     @Override
@@ -153,6 +198,12 @@ public class BlockMask extends ABlockMask {
             }
             return this;
         }
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public Mask2D toMask2D() {
         return null;
     }
 
@@ -218,7 +269,11 @@ public class BlockMask extends ABlockMask {
         }
 
         if (setTypes == totalTypes - 1) {
-            return new InverseSingleBlockTypeMask(getExtent(), unsetType);
+            if (unsetType != null) {
+                return new InverseSingleBlockTypeMask(getExtent(), unsetType);
+            } else {
+                throw new IllegalArgumentException("unsetType cannot be null when passed to InverseSingleBlockTypeMask");
+            }
         }
 
         return null;
@@ -227,7 +282,9 @@ public class BlockMask extends ABlockMask {
     @Override
     public Mask inverse() {
         boolean[] cloned = ordinals.clone();
-        for (int i = 0; i < cloned.length; i++) cloned[i] = !cloned[i];
+        for (int i = 0; i < cloned.length; i++) {
+            cloned[i] = !cloned[i];
+        }
         return new BlockMask(getExtent(), cloned);
     }
 }

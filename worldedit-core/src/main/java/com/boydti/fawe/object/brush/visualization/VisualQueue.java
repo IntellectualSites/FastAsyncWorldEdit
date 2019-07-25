@@ -6,7 +6,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.Tool;
-import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
 
 public class VisualQueue extends SingleThreadIntervalQueue<FawePlayer> {
@@ -17,7 +16,8 @@ public class VisualQueue extends SingleThreadIntervalQueue<FawePlayer> {
 
     @Override
     public void operate(FawePlayer fp) {
-        LocalSession session = fp.getSession();
+        LocalSession session = WorldEdit.getInstance().getSessionManager()
+            .get(fp.toWorldEditPlayer());
         Player player = fp.getPlayer();
         Tool tool = session.getTool(player);
         if (tool instanceof BrushTool) {

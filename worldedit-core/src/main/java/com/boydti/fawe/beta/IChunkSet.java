@@ -16,8 +16,10 @@ import java.util.UUID;
  * Interface for setting blocks
  */
 public interface IChunkSet extends IBlocks, OutputExtent {
+    @Override
     boolean setBiome(int x, int y, int z, BiomeType biome);
 
+    @Override
     boolean setBlock(int x, int y, int z, BlockStateHolder holder);
 
     boolean isEmpty();

@@ -101,7 +101,7 @@ public class WorldEditCommands {
             Platform platform = pm.queryCapability(capability);
             actor.printDebug(String.format("%s: %s", capability.name(), platform != null ? platform.getPlatformName() : "NONE"));
         }
-        actor.printDebug("------------------------------------");
+        actor.printDebug("");
         actor.printDebug("Wiki: " + "https://github.com/boy0001/FastAsyncWorldedit/wiki");
     }
 

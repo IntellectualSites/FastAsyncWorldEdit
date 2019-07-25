@@ -147,17 +147,33 @@ public class ExtentEntityCopy implements EntityFunction {
         CompoundTag tag = state.getNbtData();
 
         if (tag != null) {
+            // Handle leashed entities
+            Tag leashTag = tag.getValue().get("Leash");
+            if (leashTag instanceof CompoundTag) {
+                CompoundTag leashCompound = (CompoundTag) leashTag;
+                if (leashCompound.containsKey("X")) { // leashed to a fence
+                    Vector3 tilePosition = Vector3.at(leashCompound.asInt("X"), leashCompound.asInt("Y"), leashCompound.asInt("Z"));
+                    BlockVector3 newLeash = transform.apply(tilePosition.subtract(from)).add(to).toBlockPoint();
+                    return new BaseEntity(state.getType(), tag.createBuilder()
+                            .put("Leash", leashCompound.createBuilder()
+                                .putInt("X", newLeash.getBlockX())
+                                .putInt("Y", newLeash.getBlockY())
+                                .putInt("Z", newLeash.getBlockZ())
+                                .build()
+                            ).build());
+                }
+            }
+
             boolean changed = false;
             // Handle hanging entities (paintings, item frames, etc.)
-
+            boolean hasTilePosition = tag.containsKey("TileX") && tag.containsKey("TileY") && tag.containsKey("TileZ");
+            boolean hasFacing = tag.containsKey("Facing");
             tag = tag.createBuilder().build();
 
             Map<String, Tag> values = ReflectionUtils.getMap(tag.getValue());
 
-            boolean hasTilePosition = tag.containsKey("TileX") && tag.containsKey("TileY") && tag.containsKey("TileZ");
             boolean hasDirection = tag.containsKey("Direction");
             boolean hasLegacyDirection = tag.containsKey("Dir");
-            boolean hasFacing = tag.containsKey("Facing");
 
             if (hasTilePosition) {
                 changed = true;

@@ -33,6 +33,6 @@ public class MaskedTargetBlock extends TargetBlock {
             }
         }
         Location currentBlock = getCurrentBlock();
-        return (currentBlock != null || !useLastBlock ? currentBlock : lastBlock);
+        return currentBlock != null || !useLastBlock ? currentBlock : lastBlock;
     }
 }

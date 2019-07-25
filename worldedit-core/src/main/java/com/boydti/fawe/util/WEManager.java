@@ -32,7 +32,7 @@ public class WEManager {
             if (!(currentExtent instanceof NullExtent)) {
                 field.set(parent, new NullExtent((Extent) field.get(parent), reason));
             }
-        } catch (final Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         throw reason;
@@ -42,41 +42,33 @@ public class WEManager {
         cancelEditSafe(parent, reason);
     }
 
-    public boolean maskContains(final HashSet<RegionWrapper> mask, final int x, final int z) {
-        for (final RegionWrapper region : mask) {
-            if ((x >= region.minX) && (x <= region.maxX) && (z >= region.minZ) && (z <= region.maxZ)) {
+    public boolean maskContains(HashSet<RegionWrapper> mask, int x, int z) {
+        for (RegionWrapper region : mask) {
+            if (x >= region.minX && x <= region.maxX && z >= region.minZ && z <= region.maxZ) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean maskContains(RegionWrapper[] mask, final int x, final int z) {
+    public boolean maskContains(RegionWrapper[] mask, int x, int z) {
         switch (mask.length) {
             case 0:
                 return false;
             case 1:
                 return mask[0].isIn(x, z);
             default:
-                for (final RegionWrapper region : mask) {
-                    if (region.isIn(x, z)) {
-                        return true;
-                    }
-                }
-                return false;
+                return Arrays.stream(mask).anyMatch(region -> region.isIn(x, z));
         }
     }
 
     @Deprecated
-    public Region[] getMask(final FawePlayer<?> player) {
+    public Region[] getMask(FawePlayer<?> player) {
         return getMask(player, FaweMaskManager.MaskType.getDefaultMaskType());
     }
 
     public boolean isIn(int x, int y, int z, Region region) {
-        if (region.contains(x, y, z)) {
-            return true;
-        }
-        return false;
+        return region.contains(x, y, z);
     }
 
     /**
@@ -85,7 +77,7 @@ public class WEManager {
      * @param player
      * @return
      */
-    public Region[] getMask(final FawePlayer<?> player, FaweMaskManager.MaskType type) {
+    public Region[] getMask(FawePlayer<?> player, FaweMaskManager.MaskType type) {
         if (!Settings.IMP.REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
@@ -129,7 +121,7 @@ public class WEManager {
             }
         }
         Set<FaweMask> tmpMasks = new HashSet<>();
-        for (final FaweMaskManager manager : managers) {
+        for (FaweMaskManager manager : managers) {
             if (player.hasPermission("fawe." + manager.getKey())) {
                 try {
                     if (manager.isExclusive() && !masks.isEmpty()) continue;
@@ -154,17 +146,19 @@ public class WEManager {
     }
 
 
-    public boolean intersects(final Region region1, final Region region2) {
+    public boolean intersects(Region region1, Region region2) {
         BlockVector3 rg1P1 = region1.getMinimumPoint();
         BlockVector3 rg1P2 = region1.getMaximumPoint();
         BlockVector3 rg2P1 = region2.getMinimumPoint();
         BlockVector3 rg2P2 = region2.getMaximumPoint();
 
-        return (rg1P1.getBlockX() <= rg2P2.getBlockX()) && (rg1P2.getBlockX() >= rg2P1.getBlockX()) && (rg1P1.getBlockZ() <= rg2P2.getBlockZ()) && (rg1P2.getBlockZ() >= rg2P1.getBlockZ());
+        return rg1P1.getBlockX() <= rg2P2.getBlockX() && rg1P2.getBlockX() >= rg2P1.getBlockX() &&
+            rg1P1.getBlockZ() <= rg2P2.getBlockZ() &&
+            rg1P2.getBlockZ() >= rg2P1.getBlockZ();
     }
 
-    public boolean regionContains(final Region selection, final HashSet<Region> mask) {
-        for (final Region region : mask) {
+    public boolean regionContains(Region selection, HashSet<Region> mask) {
+        for (Region region : mask) {
             if (this.intersects(region, selection)) {
                 return true;
             }
@@ -172,29 +166,29 @@ public class WEManager {
         return false;
     }
 
-    public boolean delay(final FawePlayer<?> player, final String command) {
+    public boolean delay(FawePlayer<?> player, String command) {
         final long start = System.currentTimeMillis();
         return this.delay(player, () -> {
             try {
-                if ((System.currentTimeMillis() - start) > 1000) {
+                if (System.currentTimeMillis() - start > 1000) {
                     BBC.WORLDEDIT_RUN.send(FawePlayer.wrap(player));
                 }
                 TaskManager.IMP.task(() -> {
                     final long start1 = System.currentTimeMillis();
                     player.executeCommand(command.substring(1));
                     TaskManager.IMP.later(() -> SetQueue.IMP.addEmptyTask(() -> {
-                        if ((System.currentTimeMillis() - start1) > 1000) {
+                        if (System.currentTimeMillis() - start1 > 1000) {
                             BBC.WORLDEDIT_COMPLETE.send(FawePlayer.wrap(player));
                         }
                     }), 2);
                 });
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }, false, false);
     }
 
-    public boolean delay(final FawePlayer<?> player, final Runnable whenDone, final boolean delayed, final boolean onlyDelayedExecution) {
+    public boolean delay(FawePlayer<?> player, Runnable whenDone, boolean delayed, boolean onlyDelayedExecution) {
         final boolean free = SetQueue.IMP.addEmptyTask(null);
         if (free) {
             if (delayed) {
@@ -202,14 +196,14 @@ public class WEManager {
                     whenDone.run();
                 }
             } else {
-                if ((whenDone != null) && !onlyDelayedExecution) {
+                if (whenDone != null && !onlyDelayedExecution) {
                     whenDone.run();
                 } else {
                     return false;
                 }
             }
         } else {
-            if (!delayed && (player != null)) {
+            if (!delayed && player != null) {
                 BBC.WORLDEDIT_DELAYED.send(player);
             }
             SetQueue.IMP.addEmptyTask(whenDone);

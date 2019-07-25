@@ -17,12 +17,12 @@ public class ImgurUtility {
         return uploadImage(new FileInputStream(file));
     }
 
-    public static URL uploadImage(InputStream is) throws IOException {
-        is = new BufferedInputStream(is);
+    public static URL uploadImage(InputStream inputStream) throws IOException {
+        inputStream = new BufferedInputStream(inputStream);
         FastByteArrayOutputStream baos = new FastByteArrayOutputStream(Short.MAX_VALUE);
-        int d;
-        while ((d = is.read()) != -1) {
-            baos.write(d);
+        int i;
+        while ((i = inputStream.read()) != -1) {
+            baos.write(i);
         }
         baos.flush();
         return uploadImage(baos.toByteArray());

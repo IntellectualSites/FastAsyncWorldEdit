@@ -8,10 +8,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class StringMan {
@@ -37,10 +35,8 @@ public class StringMan {
     }
 
     public static boolean containsAny(CharSequence sequence, String any) {
-        for (int i = 0; i < sequence.length(); i++) {
-            if (any.indexOf(sequence.charAt(i)) != -1) return true;
-        }
-        return false;
+        return IntStream.range(0, sequence.length())
+            .anyMatch(i -> any.indexOf(sequence.charAt(i)) != -1);
     }
 
     public static boolean containsIgnoreCase(String haystack, String needle) {
@@ -122,14 +118,11 @@ public class StringMan {
         int len = string.length();
         for (int i = len - 1; i >= 0; i--) {
             char c = string.charAt(i);
-            switch (c) {
-                case '-':
-                    val = -val;
-                    break;
-                default:
-                    val = val + (c - 48) * numIndex;
-                    numIndex *= 10;
-                    break;
+            if (c == '-') {
+                val = -val;
+            } else {
+                val = val + (c - 48) * numIndex;
+                numIndex *= 10;
             }
         }
         return val;
@@ -518,7 +511,8 @@ public class StringMan {
     }
 
     public static boolean isEqualIgnoreCase(String a, String b) {
-        return ((a == b) || ((a != null) && (b != null) && (a.length() == b.length()) && a.equalsIgnoreCase(b)));
+        return a == b ||
+            a != null && b != null && a.length() == b.length() && a.equalsIgnoreCase(b);
     }
 
     public static String repeat(String s, int n) {

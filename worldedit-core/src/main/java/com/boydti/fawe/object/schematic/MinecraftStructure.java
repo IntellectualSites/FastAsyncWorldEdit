@@ -3,8 +3,14 @@ package com.boydti.fawe.object.schematic;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.util.ReflectionUtils;
-
-import com.sk89q.jnbt.*;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.NamedTag;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -26,8 +32,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
     private static final int WARN_SIZE = 32;
@@ -73,7 +78,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         // Init clipboard
         BlockVector3 origin = BlockVector3.at(0, 0, 0);
         CuboidRegion region = new CuboidRegion(origin, origin.add(width, height, length).subtract(BlockVector3.ONE));
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region, clipboardId);
+        Clipboard clipboard = new BlockArrayClipboard(region, clipboardId);
         // Blocks
         ListTag blocks = (ListTag) tags.get("blocks");
         if (blocks != null) {
@@ -86,10 +91,6 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 String name = ((StringTag) map.get("Name")).getValue();
                 BlockType type = BlockTypes.get(name);
                 BlockState state = type.getDefaultState();
-                if (type == null) {
-                    Fawe.debug("Unknown block: " + name);
-                    continue;
-                }
                 CompoundTag properties = (CompoundTag) map.get("Properties");
                 if (properties != null) {
                     for (Map.Entry<String, Tag> entry : properties.getValue().entrySet()) {
@@ -167,84 +168,78 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         // Size
         structure.put("size", Arrays.asList(width, height, length));
         // Palette
-        {
-            ArrayList<HashMap<String, Object>> palette = new ArrayList<>();
-            for (BlockVector3 point : region) {
-                BlockStateHolder block = clipboard.getBlock(point);
-                int combined = block.getInternalId();
-                BlockType type = block.getBlockType();
+        ArrayList<HashMap<String, Object>> palette = new ArrayList<>();
+        for (BlockVector3 point : region) {
+            BlockStateHolder block = clipboard.getBlock(point);
+            int combined = block.getInternalId();
+            BlockType type = block.getBlockType();
 
-                if (type == BlockTypes.STRUCTURE_VOID || indexes.containsKey(combined)) {
-                    continue;
-                }
+            if (type == BlockTypes.STRUCTURE_VOID || indexes.containsKey(combined)) {
+                continue;
+            }
 
-                indexes.put(combined, (Integer) palette.size());
-                HashMap<String, Object> paletteEntry = new HashMap<>();
-                paletteEntry.put("Name", type.getId());
-                if (block.getInternalId() != type.getInternalId()) {
-                    Map<String, Object> properties = null;
-                    for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
-                        int propIndex = property.getIndex(block.getInternalId());
-                        if (propIndex != 0) {
-                            if (properties == null) properties = new HashMap<>();
-                            Object value = property.getValues().get(propIndex);
-                            properties.put(property.getName(), value.toString());
-                        }
-                    }
-                    if (properties != null) {
-                        paletteEntry.put("Properties", properties);
+            indexes.put(combined, (Integer) palette.size());
+            HashMap<String, Object> paletteEntry = new HashMap<>();
+            paletteEntry.put("Name", type.getId());
+            if (block.getInternalId() != type.getInternalId()) {
+                Map<String, Object> properties = null;
+                for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
+                    int propIndex = property.getIndex(block.getInternalId());
+                    if (propIndex != 0) {
+                        if (properties == null) properties = new HashMap<>();
+                        Object value = property.getValues().get(propIndex);
+                        properties.put(property.getName(), value.toString());
                     }
                 }
-                palette.add(paletteEntry);
+                if (properties != null) {
+                    paletteEntry.put("Properties", properties);
+                }
             }
-            if (!palette.isEmpty()) {
-                structure.put("palette", palette);
-            }
+            palette.add(paletteEntry);
+        }
+        if (!palette.isEmpty()) {
+            structure.put("palette", palette);
         }
         // Blocks
-        {
-            ArrayList<Map<String, Object>> blocks = new ArrayList<>();
-            BlockVector3 min = region.getMinimumPoint();
-            for (BlockVector3 point : region) {
-                BaseBlock block = clipboard.getFullBlock(point);
-                if (block.getBlockType() != BlockTypes.STRUCTURE_VOID) {
-                    int combined = block.getInternalId();
-                    int index = indexes.get(combined);
-                    List<Integer> pos = Arrays.asList(point.getX() - min.getX(),
-                        point.getY() - min.getY(), point.getZ() - min.getZ());
-                    if (!block.hasNbtData()) {
-                        blocks.add(FaweCache.asMap("state", index, "pos", pos));
-                    } else {
-                        blocks.add(
-                            FaweCache.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
-                    }
+        ArrayList<Map<String, Object>> blocks = new ArrayList<>();
+        BlockVector3 min = region.getMinimumPoint();
+        for (BlockVector3 point : region) {
+            BaseBlock block = clipboard.getFullBlock(point);
+            if (block.getBlockType() != BlockTypes.STRUCTURE_VOID) {
+                int combined = block.getInternalId();
+                int index = indexes.get(combined);
+                List<Integer> pos = Arrays.asList(point.getX() - min.getX(),
+                    point.getY() - min.getY(), point.getZ() - min.getZ());
+                if (!block.hasNbtData()) {
+                    blocks.add(FaweCache.asMap("state", index, "pos", pos));
+                } else {
+                    blocks.add(
+                        FaweCache.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
                 }
-            }
-            if (!blocks.isEmpty()) {
-                structure.put("blocks", blocks);
             }
         }
+        if (!blocks.isEmpty()) {
+            structure.put("blocks", blocks);
+        }
         // Entities
-        {
-            ArrayList<Map<String, Object>> entities = new ArrayList<>();
-            for (Entity entity : clipboard.getEntities()) {
-                Location loc = entity.getLocation();
-                List<Double> pos = Arrays.asList(loc.getX(), loc.getY(), loc.getZ());
-                List<Integer> blockPos = Arrays.asList(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-                BaseEntity state = entity.getState();
-                if (state != null) {
-                    CompoundTag nbt = state.getNbtData();
-                    Map<String, Tag> nbtMap = ReflectionUtils.getMap(nbt.getValue());
-                    // Replace rotation data
-                    nbtMap.put("Rotation", writeRotation(entity.getLocation(), "Rotation"));
-                    nbtMap.put("id", new StringTag(state.getType().getId()));
-                    Map<String, Object> entityMap = FaweCache.asMap("pos", pos, "blockPos", blockPos, "nbt", nbt);
-                    entities.add(entityMap);
-                }
+        ArrayList<Map<String, Object>> entities = new ArrayList<>();
+        for (Entity entity : clipboard.getEntities()) {
+            Location loc = entity.getLocation();
+            List<Double> pos = Arrays.asList(loc.getX(), loc.getY(), loc.getZ());
+            List<Integer> blockPos = Arrays.asList(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+            BaseEntity state = entity.getState();
+            if (state != null) {
+                CompoundTag nbt = state.getNbtData();
+                Map<String, Tag> nbtMap = ReflectionUtils.getMap(nbt.getValue());
+                // Replace rotation data
+                nbtMap.put("Rotation", writeRotation(entity.getLocation()));
+                nbtMap.put("id", new StringTag(state.getType().getId()));
+                Map<String, Object> entityMap = FaweCache.asMap("pos", pos, "blockPos", blockPos, "nbt", nbt);
+                entities.add(entityMap);
             }
-            if (!entities.isEmpty()) {
-                structure.put("entities", entities);
-            }
+        }
+        if (!entities.isEmpty()) {
+            structure.put("entities", entities);
         }
         out.writeNamedTag("", FaweCache.asTag(structure));
         close();
@@ -260,18 +255,4 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         }
     }
 
-    private Tag writeVector(BlockVector3 vector, String name) {
-        List<DoubleTag> list = new ArrayList<>();
-        list.add(new DoubleTag(vector.getX()));
-        list.add(new DoubleTag(vector.getY()));
-        list.add(new DoubleTag(vector.getZ()));
-        return new ListTag(DoubleTag.class, list);
-    }
-
-    private Tag writeRotation(Location location, String name) {
-        List<FloatTag> list = new ArrayList<>();
-        list.add(new FloatTag(location.getYaw()));
-        list.add(new FloatTag(location.getPitch()));
-        return new ListTag(FloatTag.class, list);
-    }
 }

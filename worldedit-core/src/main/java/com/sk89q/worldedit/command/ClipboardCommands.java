@@ -238,7 +238,7 @@ public class ClipboardCommands {
                     @Selection Region region,
                     @Arg(desc = "Pattern to leave in place of the selection", def = "air")
                         Pattern leavePattern,
-                    @Switch(name = 'e', desc = "skip cut entities")
+                    @Switch(name = 'e', desc = "Skip cut entities")
                         boolean skipEntities,
                     @Switch(name = 'b', desc = "Also copy biomes, source biomes are unaffected")
                         boolean copyBiomes,
@@ -579,7 +579,7 @@ public class ClipboardCommands {
         desc = "Clear your clipboard"
     )
     @CommandPermissions("worldedit.clipboard.clear")
-    public void clearClipboard(Player player, LocalSession session, EditSession editSession) throws WorldEditException {
+    public void clearClipboard(Player player, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
         BBC.CLIPBOARD_CLEARED.send(player);
     }

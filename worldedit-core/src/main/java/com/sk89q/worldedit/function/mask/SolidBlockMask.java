@@ -21,12 +21,21 @@ package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockState;
 import javax.annotation.Nullable;
 
 public class SolidBlockMask extends BlockMask {
     public SolidBlockMask(Extent extent) {
         super(extent);
         add(state -> state.getMaterial().isMovementBlocker());
+    }
+
+    @Override
+    public boolean test(BlockVector3 vector) {
+        Extent extent = getExtent();
+        BlockState block = extent.getBlock(vector);
+        return block.getBlockType().getMaterial().isMovementBlocker();
     }
 
     @Nullable

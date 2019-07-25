@@ -8,6 +8,7 @@ import com.boydti.fawe.object.pattern.*;
 import com.boydti.fawe.object.random.SimplexRandom;
 import com.boydti.fawe.util.ColorUtil;
 import com.boydti.fawe.util.TextureUtil;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import org.enginehub.piston.annotation.Command;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.entity.Player;
@@ -27,6 +28,7 @@ import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 
 import java.awt.Color;
@@ -43,12 +45,8 @@ import java.util.Set;
 //        "e.g. #surfacespread[10][#existing],andesite\n" +
 //        "More Info: https://git.io/vSPmA"
 //)
-public class PatternCommands extends MethodCommands {
-    private final WorldEdit worldEdit;
-
-    public PatternCommands(WorldEdit worldEdit) {
-        this.worldEdit = worldEdit;
-    }
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+public class PatternCommands {
 
     @Command(
             name = "#existing",

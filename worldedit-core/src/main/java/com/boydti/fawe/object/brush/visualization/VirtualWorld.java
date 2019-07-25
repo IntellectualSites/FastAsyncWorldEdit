@@ -18,11 +18,6 @@ public interface VirtualWorld extends SimpleWorld, Closeable {
     Vector3 getOrigin();
 
     @Override
-    default BaseBlock getFullBlock(BlockVector3 position) {
-        return getBlock(position).toBaseBlock();
-    }
-
-    @Override
     default BaseBlock getFullBlock(int x, int y, int z) {
         return getBlock(x, y, z).toBaseBlock();
     }

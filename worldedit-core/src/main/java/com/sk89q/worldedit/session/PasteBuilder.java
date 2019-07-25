@@ -24,7 +24,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.boydti.fawe.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -152,7 +151,7 @@ public class PasteBuilder {
             copy.setFilterFunction(this.canApply);
         }
         if (ignoreAirBlocks) {
-            sourceMask = MaskIntersection.of(sourceMask, new ExistingBlockMask(clipboard));
+            sourceMask = new MaskIntersection(sourceMask, new ExistingBlockMask(clipboard));
         }
         if (targetExtent instanceof EditSession) {
             Mask esSourceMask = ((EditSession) targetExtent).getSourceMask();

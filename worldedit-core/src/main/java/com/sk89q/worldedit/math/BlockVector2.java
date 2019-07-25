@@ -19,9 +19,7 @@
 
 package com.sk89q.worldedit.math;
 
-import com.google.common.collect.ComparisonChain;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-
 import java.util.Comparator;
 
 /**
@@ -48,24 +46,30 @@ public class BlockVector2 {
      * cdef
      * </pre>
      */
-    public static final Comparator<BlockVector2> COMPARING_GRID_ARRANGEMENT = (a, b) -> {
-        return ComparisonChain.start()
-                .compare(a.getBlockZ(), b.getBlockZ())
-                .compare(a.getBlockX(), b.getBlockX())
-                .result();
-    };
+    public static final Comparator<BlockVector2> COMPARING_GRID_ARRANGEMENT =
+        Comparator.comparingInt(BlockVector2::getZ).thenComparingInt(BlockVector2::getX);
 
     public static BlockVector2 at(double x, double z) {
         return at((int) Math.floor(x), (int) Math.floor(z));
     }
 
     public static BlockVector2 at(int x, int z) {
+        switch (x) {
+            case 0:
+                if (z == 0) {
+                    return ZERO;
+                }
+                break;
+            case 1:
+                if (z == 1) {
+                    return ONE;
+                }
+                break;
+        }
         return new BlockVector2(x, z);
     }
 
     protected int x, z;
-
-    protected BlockVector2(){}
 
     /**
      * Construct an instance.
@@ -342,6 +346,26 @@ public class BlockVector2 {
         return divide(n, n);
     }
 
+    /**
+     * Shift all components right.
+     *
+     * @param x the value to shift x by
+     * @param z the value to shift z by
+     * @return a new vector
+     */
+    public BlockVector2 shr(int x, int z) {
+        return at(this.x >> x, this.z >> z);
+    }
+
+    /**
+     * Shift all components right by {@code n}.
+     *
+     * @param n the value to shift by
+     * @return a new vector
+     */
+    public BlockVector2 shr(int n) {
+        return shr(n, n);
+    }
     /**
      * Get the length of the vector.
      *

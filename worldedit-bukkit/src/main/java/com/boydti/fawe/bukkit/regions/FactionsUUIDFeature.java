@@ -4,7 +4,7 @@ import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
-import com.boydti.fawe.util.Perm;
+import com.boydti.fawe.util.Permission;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.Faction;
@@ -28,7 +28,8 @@ public class FactionsUUIDFeature extends BukkitMaskManager implements Listener {
     public FaweMask getMask(final FawePlayer<Player> fp, MaskType type) {
         final Player player = fp.parent;
         final Chunk chunk = player.getLocation().getChunk();
-        final boolean perm = Perm.hasPermission(FawePlayer.wrap(player), "fawe.factions.wilderness");
+        final boolean perm = Permission
+            .hasPermission(fp.toWorldEditPlayer(), "fawe.factions.wilderness");
         final World world = player.getWorld();
 
         RegionWrapper locs = new RegionWrapper(chunk.getX(), chunk.getX(), chunk.getZ(), chunk.getZ());
@@ -38,7 +39,7 @@ public class FactionsUUIDFeature extends BukkitMaskManager implements Listener {
         if (this.isAdded(locs, world, player, perm, type)) {
             boolean hasPerm = true;
 
-            while (hasPerm && (count > 0)) {
+            while (hasPerm && count > 0) {
                 count--;
 
                 hasPerm = false;

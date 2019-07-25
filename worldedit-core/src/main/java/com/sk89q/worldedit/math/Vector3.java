@@ -39,6 +39,21 @@ public abstract class Vector3 {
     public static final Vector3 ONE = Vector3.at(1, 1, 1);
 
     public static Vector3 at(double x, double y, double z) {
+        // switch for efficiency on typical cases
+        // in MC y is rarely 0/1 on selections
+        int yTrunc = (int) y;
+        switch (yTrunc) {
+            case 0:
+                if (x == 0 && y == 0 && z == 0) {
+                    return ZERO;
+                }
+                break;
+            case 1:
+                if (x == 1 && y == 1 && z == 1) {
+                    return ONE;
+                }
+                break;
+        }
         return new Vector3Impl(x, y, z);
     }
 

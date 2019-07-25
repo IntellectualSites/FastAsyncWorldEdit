@@ -16,7 +16,6 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private final MutableBlockVector3 cur;
     private final MutableBlockVector3[] buffer;
     private final MutableBlockVector3[] allowed;
-    private MutableBlockVector3 next;
 
     public SurfaceRandomOffsetPattern(Pattern pattern, int distance) {
         this.pattern = pattern;

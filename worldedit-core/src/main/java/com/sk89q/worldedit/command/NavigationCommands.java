@@ -159,12 +159,21 @@ public class NavigationCommands {
         desc = "Teleport to a location"
     )
     @CommandPermissions("worldedit.navigation.jumpto.command")
-    public void jumpTo(Player player, @Arg(desc = "Location to jump to", def = "") Location pos, @Switch(name='f', desc = "force teleport") boolean force) throws WorldEditException {
+    public void jumpTo(Player player,
+        @Arg(desc = "Location to jump to", def = "")
+            Location pos,
+        @Switch(name='f', desc = "force teleport")
+            boolean force) throws WorldEditException {
+
         if (pos == null) {
             pos = player.getSolidBlockTrace(300);
         }
         if (pos != null) {
-            if(force) player.setPosition(pos); else player.findFreePosition(pos);
+            if (force) {
+                player.setPosition(pos);
+            } else {
+                player.findFreePosition(pos);
+            }
             BBC.POOF.send(player);
         } else {
             BBC.NO_BLOCK.send(player);

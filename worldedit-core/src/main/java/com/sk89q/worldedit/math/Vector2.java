@@ -33,12 +33,23 @@ public class Vector2 {
     public static final Vector2 ONE = new Vector2(1, 1);
 
     public static Vector2 at(double x, double z) {
+        int xTrunc = (int) x;
+        switch (xTrunc) {
+            case 0:
+                if (x == 0 && z == 0) {
+                    return ZERO;
+                }
+                break;
+            case 1:
+                if (x == 1 && z == 1) {
+                    return ONE;
+                }
+                break;
+        }
         return new Vector2(x, z);
     }
 
     protected double x, z;
-
-    protected Vector2(){}
 
     /**
      * Construct an instance.
@@ -491,7 +502,7 @@ public class Vector2 {
 
     @Override
     public int hashCode() {
-        return ((int) x << 16) ^ ((int) z);
+        return (int) x << 16 ^ (int) z;
     }
 
     @Override

@@ -110,6 +110,7 @@ public class ToolCommands {
     public void inspectBrush(Player player, LocalSession session,
         @Arg(desc = "The radius of the brush", def = "1")
             double radius) throws WorldEditException {
+        radius = Math.max(1,radius);
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new InspectBrush());
         BBC.TOOL_INSPECT.send(player, itemStack.getType().getName());

@@ -10,8 +10,8 @@ public class CleanTextureUtil extends TextureUtil {
         super(parent.getFolder());
         this.min = minPercent;
         this.max = maxPercent;
-        int minIndex = ((parent.distances.length - 1) * minPercent) / 100;
-        int maxIndex = ((parent.distances.length - 1) * maxPercent) / 100;
+        int minIndex = (parent.distances.length - 1) * minPercent / 100;
+        int maxIndex = (parent.distances.length - 1) * maxPercent / 100;
         long min = parent.distances[minIndex];
         long max = parent.distances[maxIndex];
         for (; minIndex > 0 && parent.distances[minIndex - 1] == min; minIndex--) ;

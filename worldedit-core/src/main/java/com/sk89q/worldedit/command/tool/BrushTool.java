@@ -98,7 +98,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     protected int range = -1;
     private VisualMode visualMode = VisualMode.NONE;
     private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
-    private Mask traceMask;
+    private Mask traceMask = null;
     private int targetOffset;
 
     private transient BrushSettings primary = new BrushSettings();

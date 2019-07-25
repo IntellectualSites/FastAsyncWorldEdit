@@ -4,10 +4,9 @@ import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MemUtil;
-import com.boydti.fawe.util.Perm;
+import com.boydti.fawe.util.Permission;
 import com.boydti.fawe.util.WEManager;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -27,7 +26,7 @@ public class MemoryCheckingExtent extends AbstractDelegateExtent {
             if (MemUtil.isMemoryLimited()) {
                 if (this.player != null) {
                     player.sendMessage(BBC.WORLDEDIT_CANCEL_REASON.format(BBC.WORLDEDIT_CANCEL_REASON_LOW_MEMORY.s()));
-                    if (Perm.hasPermission(this.player, "worldedit.fast")) {
+                    if (Permission.hasPermission(this.player.toWorldEditPlayer(), "worldedit.fast")) {
                         BBC.WORLDEDIT_OOM_ADMIN.send(this.player);
                     }
                 }

@@ -1,7 +1,5 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.util.TextureHolder;
 import com.boydti.fawe.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
@@ -11,8 +9,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import java.awt.Color;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 
 public class SaturatePattern extends AbstractPattern {
     private final TextureHolder holder;

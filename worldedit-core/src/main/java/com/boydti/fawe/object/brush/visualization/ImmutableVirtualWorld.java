@@ -4,7 +4,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -14,8 +13,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.weather.WeatherType;
-import com.sk89q.worldedit.world.weather.WeatherTypes;
-
 import javax.annotation.Nullable;
 
 public abstract class ImmutableVirtualWorld implements VirtualWorld {
@@ -32,12 +29,6 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     @Override
     public BiomeType getBiome(BlockVector2 position) {
         return BiomeTypes.FOREST;
-    }
-
-    @Nullable
-    @Override
-    public Operation commit() {
-        return null;
     }
 
     @Override
@@ -88,16 +79,6 @@ public abstract class ImmutableVirtualWorld implements VirtualWorld {
     @Override
     public void simulateBlockMine(BlockVector3 position) {
         unsupported();
-    }
-
-    @Override
-    public WeatherType getWeather() {
-        return WeatherTypes.CLEAR;
-    }
-
-    @Override
-    public long getRemainingWeatherDuration() {
-        return 0;
     }
 
     @Override

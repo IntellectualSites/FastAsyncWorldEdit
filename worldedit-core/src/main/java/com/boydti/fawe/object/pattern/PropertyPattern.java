@@ -1,12 +1,10 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
-
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -17,7 +15,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -173,7 +170,7 @@ public class PropertyPattern extends AbstractExtentPattern {
                         last = i + 1;
                         break;
                     }
-                    default: {
+                    default:
                         Operator tmp = getOp(c);
                         if (tmp != null) {
                             operator = tmp;
@@ -186,7 +183,6 @@ public class PropertyPattern extends AbstractExtentPattern {
                             last = i + 1;
                         }
                         break;
-                    }
                 }
             }
         }

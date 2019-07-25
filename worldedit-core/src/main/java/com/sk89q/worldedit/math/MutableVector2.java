@@ -2,9 +2,6 @@ package com.sk89q.worldedit.math;
 
 public class MutableVector2 extends Vector2 {
 
-    public MutableVector2() {
-    }
-
     /**
      * Construct an instance.
      *

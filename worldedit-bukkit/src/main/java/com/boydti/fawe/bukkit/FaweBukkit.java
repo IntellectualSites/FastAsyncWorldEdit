@@ -5,7 +5,6 @@ import com.boydti.fawe.IFawe;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.bukkit.beta.BukkitQueue;
 import com.boydti.fawe.bukkit.beta.BukkitQueueHandler;
-import com.boydti.fawe.bukkit.chat.BukkitChatManager;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
@@ -96,11 +95,6 @@ public class FaweBukkit implements IFawe, Listener {
             }
             if (Bukkit.getVersion().contains("git-Paper") && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
-            }
-            try {
-                Fawe.get().setChatManager(new BukkitChatManager());
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
             }
         } catch (final Throwable e) {
             e.printStackTrace();

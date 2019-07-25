@@ -293,6 +293,22 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         minY += changeY;
     }
 
+    /**
+     * Checks to see if a point is inside this region.
+     */
+    @Override
+    public boolean contains(BlockVector3 position) {
+        final int blockY = position.getBlockY();
+        if (blockY < minY || blockY > maxY) {
+            return false;
+        }
+
+        return position.toBlockVector2().subtract(center).toVector2().divide(radius).lengthSq() <= 1;
+    }
+
+    /**
+     * Checks to see if a point is inside this region.
+     */
     @Override
     public boolean contains(int x, int y, int z) {
         if (y < minY || y > maxY) {

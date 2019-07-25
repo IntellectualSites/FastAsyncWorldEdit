@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.schematic;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.util.EditSessionBuilder;
@@ -18,6 +20,7 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -29,17 +32,14 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.Nullable;
 
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class Schematic {
+
     private final Clipboard clipboard;
 
     public Schematic(Clipboard clipboard) {
@@ -54,14 +54,15 @@ public class Schematic {
      */
     public Schematic(Region region) {
         checkNotNull(region);
-        checkNotNull(region.getWorld(), "World cannot be null (use the other constructor for the region)");
-        EditSession session = new EditSessionBuilder(region.getWorld()).allowedRegionsEverywhere().autoQueue(false).build();
+        checkNotNull(region.getWorld(),
+            "World cannot be null (use the other constructor for the region)");
+        EditSession session = new EditSessionBuilder(region.getWorld()).allowedRegionsEverywhere()
+            .autoQueue(false).build();
         this.clipboard = new BlockArrayClipboard(region, ReadOnlyClipboard.of(session, region));
     }
 
-    public
     @Nullable
-    Clipboard getClipboard() {
+    public Clipboard getClipboard() {
         return clipboard;
     }
 
@@ -104,7 +105,8 @@ public class Schematic {
         }
     }
 
-    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, @Nullable Transform transform) {
+    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
+        @Nullable Transform transform) {
         return paste(world, to, allowUndo, pasteAir, true, transform);
     }
 
@@ -118,14 +120,16 @@ public class Schematic {
      * @param transform
      * @return
      */
-    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, boolean copyEntities, @Nullable Transform transform) {
+    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
+        boolean copyEntities, @Nullable Transform transform) {
         checkNotNull(world);
         checkNotNull(to);
         EditSession editSession;
         if (world instanceof EditSession) {
             editSession = (EditSession) world;
         } else {
-            EditSessionBuilder builder = new EditSessionBuilder(world).autoQueue(true).checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
+            EditSessionBuilder builder = new EditSessionBuilder(world).autoQueue(true)
+                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
             if (allowUndo) {
                 editSession = builder.build();
             } else {
@@ -141,7 +145,8 @@ public class Schematic {
             editSession.flushQueue();
             return editSession;
         }
-        ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), editSession, to);
+        ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(),
+            clipboard.getOrigin(), editSession, to);
         if (transform != null && !transform.isIdentity()) {
             copy.setTransform(transform);
         }
@@ -165,16 +170,13 @@ public class Schematic {
 
     public void paste(Extent extent, BlockVector3 to, boolean pasteAir, Transform transform) {
         checkNotNull(transform);
-        Region region = clipboard.getRegion();
-        Extent source = clipboard;
-        if (transform != null) {
-            source = new BlockTransformExtent(clipboard, transform);
-        }
-        ForwardExtentCopy copy = new ForwardExtentCopy(source, clipboard.getRegion(), clipboard.getOrigin(), extent, to);
-        if (transform != null) {
-            copy.setTransform(transform);
-        }
-        copy.setCopyingBiomes(!(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP.hasBiomes());
+        Extent source = new BlockTransformExtent(clipboard, transform);
+        ForwardExtentCopy copy = new ForwardExtentCopy(source, clipboard.getRegion(),
+            clipboard.getOrigin(), extent, to);
+        copy.setTransform(transform);
+        copy.setCopyingBiomes(
+            !(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP
+                .hasBiomes());
         if (extent instanceof EditSession) {
             EditSession editSession = (EditSession) extent;
             Mask sourceMask = editSession.getSourceMask();
@@ -190,13 +192,14 @@ public class Schematic {
         Operations.completeBlindly(copy);
     }
 
-    public void paste(Extent extent, BlockVector3 to, final boolean pasteAir) {
+    public void paste(Extent extent, BlockVector3 to, boolean pasteAir) {
         Region region = clipboard.getRegion().clone();
-        final int maxY = extent.getMaximumPoint().getBlockY();
         final BlockVector3 bot = clipboard.getMinimumPoint();
         final BlockVector3 origin = clipboard.getOrigin();
 
-        final boolean copyBiomes = !(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP.hasBiomes();
+        final boolean copyBiomes =
+            !(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP
+                .hasBiomes();
 
         // Optimize for BlockArrayClipboard
         if (clipboard instanceof BlockArrayClipboard && region instanceof CuboidRegion) {
@@ -209,9 +212,11 @@ public class Schematic {
             if (copyBiomes) {
                 bac.IMP.forEach(new FaweClipboard.BlockReader() {
                     MutableBlockVector2 mpos2d = new MutableBlockVector2();
+
                     {
                         mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
                     }
+
                     @Override
                     public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                         try {
@@ -225,7 +230,9 @@ public class Schematic {
                                 return;
                             }
                             extent.setBlock(xx, y + rely, zz, block);
-                        } catch (WorldEditException e) { throw new RuntimeException(e);}
+                        } catch (WorldEditException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }, true);
             } else {
@@ -234,7 +241,9 @@ public class Schematic {
                     public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {
                         try {
                             extent.setBlock(x + relx, y + rely, z + relz, block);
-                        } catch (WorldEditException e) { throw new RuntimeException(e);}
+                        } catch (WorldEditException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }, pasteAir);
             }
@@ -243,12 +252,14 @@ public class Schematic {
             final int relx = to.getBlockX() - origin.getBlockX();
             final int rely = to.getBlockY() - origin.getBlockY();
             final int relz = to.getBlockZ() - origin.getBlockZ();
-            RegionVisitor visitor = new RegionVisitor(region, new RegionFunction() {
-//                MutableBlockVector2 mpos2d_2 = new MutableBlockVector2();
+            Operation visitor = new RegionVisitor(region, new RegionFunction() {
+                //                MutableBlockVector2 mpos2d_2 = new MutableBlockVector2();
                 MutableBlockVector2 mpos2d = new MutableBlockVector2();
+
                 {
                     mpos2d.setComponents(Integer.MIN_VALUE, Integer.MIN_VALUE);
                 }
+
                 @Override
                 public boolean apply(BlockVector3 mutable) throws WorldEditException {
                     BlockStateHolder block = clipboard.getBlock(mutable);
@@ -257,7 +268,8 @@ public class Schematic {
                     if (copyBiomes && xx != mpos2d.getBlockX() && zz != mpos2d.getBlockZ()) {
                         mpos2d.setComponents(xx, zz);
 //                        extent.setBiome(mpos2d, clipboard.getBiome(mpos2d_2.setComponents(mutable.getBlockX(), mutable.getBlockZ())));
-                        extent.setBiome(mpos2d, clipboard.getBiome(BlockVector2.at(mutable.getBlockX(), mutable.getBlockZ())));
+                        extent.setBiome(mpos2d, clipboard
+                            .getBiome(BlockVector2.at(mutable.getBlockX(), mutable.getBlockZ())));
                     }
                     if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                         return false;
@@ -275,11 +287,14 @@ public class Schematic {
         // entities
         for (Entity entity : clipboard.getEntities()) {
             // skip players on pasting schematic
-            if (entity.getState() != null && entity.getState().getType().getId().equals("minecraft:player")) {
+            if (entity.getState() != null && entity.getState().getType().getId()
+                .equals("minecraft:player")) {
                 continue;
             }
             Location pos = entity.getLocation();
-            Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX, pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(), pos.getPitch());
+            Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
+                pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                pos.getPitch());
             extent.createEntity(newPos, entity.getState());
         }
     }

@@ -19,12 +19,9 @@
 
 package com.sk89q.worldedit.registry.state;
 
-import com.sk89q.worldedit.util.Direction;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.annotation.Nullable;
 
 public class EnumProperty extends AbstractProperty<String> {
@@ -35,7 +32,7 @@ public class EnumProperty extends AbstractProperty<String> {
         this(name, values, 0);
     }
 
-    public EnumProperty(final String name, final List<String> values, int bitOffset) {
+    private EnumProperty(final String name, final List<String> values, int bitOffset) {
         super(name, values, bitOffset);
         for (int i = 0; i < values.size(); i++) {
             String value = values.get(i).intern();
@@ -51,7 +48,7 @@ public class EnumProperty extends AbstractProperty<String> {
 
     @Override
     public int getIndexFor(CharSequence string) throws IllegalArgumentException {
-        Integer value = offsets.get(string);
+        Integer value = offsets.get(string.toString());
         return value == null ? -1 : value;
     }
 

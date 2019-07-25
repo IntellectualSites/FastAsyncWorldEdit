@@ -59,6 +59,7 @@ import com.sk89q.worldedit.command.HistoryCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
 import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
+import com.sk89q.worldedit.command.PatternCommands;
 import com.sk89q.worldedit.command.RegionCommands;
 import com.sk89q.worldedit.command.RegionCommandsRegistration;
 import com.sk89q.worldedit.command.SchematicCommands;
@@ -298,6 +299,20 @@ public final class PlatformCommandManager {
     public void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
             // TODO NOT IMPLEMENTED dunno why these have issues generating
+            registerSubCommands(
+                "patterns",
+                ImmutableList.of(),
+                "Patterns determine what blocks are placed",
+                PatternCommandsRegistration.builder(),
+                new PatternCommands()
+            );
+            registerSubCommands(
+                "transforms",
+                ImmutableList.of(),
+                "Transforms modify how a block is placed",
+                TransformCommandsRegistration.builder(),
+                new TransformCommands()
+            );
             registerSubCommands(
                 "schematic",
                 ImmutableList.of("schem", "/schematic", "/schem"),
@@ -654,7 +669,7 @@ public final class PlatformCommandManager {
         handleCommandTask(task, context, session, event);
     }
 
-    public Object handleCommandTask(ThrowableSupplier<Throwable> task, InjectedValueAccess context, @Nullable LocalSession session, CommandEvent event) {
+    public void handleCommandTask(ThrowableSupplier<Throwable> task, InjectedValueAccess context, @Nullable LocalSession session, CommandEvent event) {
         Request.reset();
         Actor actor = context.injectedValue(Key.of(Actor.class)).orElseThrow(() -> new IllegalStateException("No player"));
 
@@ -666,7 +681,7 @@ public final class PlatformCommandManager {
             // exceptions without writing a hook into every dispatcher, we need to unwrap these
             // exceptions and rethrow their converted form, if their is one.
             try {
-                return task.get();
+                task.get();
             } catch (Throwable t) {
                 // Use the exception converter to convert the exception if any of its causes
                 // can be converted, otherwise throw the original exception
@@ -729,7 +744,6 @@ public final class PlatformCommandManager {
         }
 
         event.setCancelled(true);
-        return null;
     }
 
     private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor) {

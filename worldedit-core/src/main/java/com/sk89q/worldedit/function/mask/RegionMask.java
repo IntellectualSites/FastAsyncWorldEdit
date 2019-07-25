@@ -63,4 +63,9 @@ public class RegionMask extends AbstractMask {
         return region.contains(vector);
     }
 
+    @Nullable
+    @Override
+    public Mask2D toMask2D() {
+        return null;
+    }
 }

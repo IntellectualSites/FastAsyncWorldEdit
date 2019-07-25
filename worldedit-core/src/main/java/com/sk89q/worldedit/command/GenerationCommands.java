@@ -70,8 +70,7 @@ import org.enginehub.piston.inject.InjectedValueAccess;
  * Commands for the generation of shapes and other objects.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-//@Command(aliases = {}, desc = "Create structures and features: [More Info](https://goo.gl/KuLFRW)")
-public class GenerationCommands extends MethodCommands {
+public class GenerationCommands {
 
     private final WorldEdit worldEdit;
 
@@ -275,9 +274,10 @@ public class GenerationCommands extends MethodCommands {
                              int size,
                          @Arg(desc = "The type of forest", def = "tree")
                              TreeType type,
-                         @Range(min = 0, max = 100) @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
+                         @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                              double density) throws WorldEditException {
-        density = density / 100;
+        checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
+        density /= 100;
         int affected = editSession.makeForest(session.getPlacementPosition(player), size, density, type);
         player.print(affected + " trees created.");
         return affected;
@@ -393,7 +393,7 @@ public class GenerationCommands extends MethodCommands {
 
         fp.checkConfirmationRegion(() -> {
             try {
-                int affected = editSession.makeShape(region, zero, unit1, pattern, String.join(" ", expression), hollow, session.getTimeout());
+                final int affected = editSession.makeShape(region, zero, unit1, pattern, String.join(" ", expression), hollow, session.getTimeout());
                 player.findFreePosition();
                 BBC.VISITOR_BLOCK.send(fp, affected);
             } catch (ExpressionException e) {

@@ -284,8 +284,4 @@ public interface World extends Extent {
         return true;
     }
 
-    @Override
-    default World getWorld() {
-        return this;
-    }
 }

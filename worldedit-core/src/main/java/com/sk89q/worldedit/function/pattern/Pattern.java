@@ -21,9 +21,7 @@ package com.sk89q.worldedit.function.pattern;
 
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlock;
-import com.sk89q.minecraft.util.commands.Link;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -32,7 +30,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 /**
  * Returns a {@link BlockStateHolder} for a given position.
  */
-@Link(clazz = UtilityCommands.class, value = "patterns")
 public interface Pattern extends Filter {
 
     /**

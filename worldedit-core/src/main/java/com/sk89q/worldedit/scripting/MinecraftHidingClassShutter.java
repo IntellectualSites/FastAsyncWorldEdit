@@ -17,36 +17,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.function.mask;
+package com.sk89q.worldedit.scripting;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockCategory;
-import javax.annotation.Nullable;
+import org.mozilla.javascript.ClassShutter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A mask that tests whether a block matches a given {@link BlockCategory}, or tag.
+ * Hides Minecraft's obfuscated & de-obfuscated names from scripts.
  */
-public class BlockCategoryMask extends AbstractExtentMask {
+class MinecraftHidingClassShutter implements ClassShutter {
 
-    private BlockCategory category;
-
-    public BlockCategoryMask(Extent extent, BlockCategory category) {
-        super(extent);
-        checkNotNull(category);
-        this.category = category;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(MinecraftHidingClassShutter.class);
 
     @Override
-    public boolean test(BlockVector3 vector) {
-        return category.contains(getExtent().getBlock(vector));
-    }
-
-    @Nullable
-    @Override
-    public Mask2D toMask2D() {
-        return null;
+    public boolean visibleToScripts(String fullClassName) {
+        if (!fullClassName.contains(".")) {
+            // Default package -- probably Minecraft
+            return false;
+        }
+        return !fullClassName.startsWith("net.minecraft");
     }
 }

@@ -25,6 +25,7 @@ import com.boydti.fawe.object.mask.ZAxisMask;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
@@ -39,12 +40,14 @@ import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.internal.expression.runtime.ExpressionEnvironment;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.request.RequestSelection;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 
@@ -57,7 +60,8 @@ import org.enginehub.piston.annotation.param.Switch;
 //                "e.g. >[stone,dirt],#light[0][5],$jungle\n" +
 //                "More Info: https://git.io/v9r4K"
 //)
-public class MaskCommands extends MethodCommands {
+@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+public class MaskCommands {
     private final WorldEdit worldEdit;
 
     public MaskCommands(WorldEdit worldEdit) {
@@ -69,7 +73,7 @@ public class MaskCommands extends MethodCommands {
             desc = "Use simplex noise as the mask"
 )
     public Mask simplex(double scale, double min, double max) {
-        scale = (1d / Math.max(1, scale));
+        scale = 1d / Math.max(1, scale);
         min = (min - 50) / 50;
         max = (max - 50) / 50;
         return new SimplexMask(scale, min, max);
@@ -290,11 +294,11 @@ public class MaskCommands extends MethodCommands {
         if (max.endsWith("d")) {
             double y1d = Expression.compile(min.substring(0, min.length() - 1)).evaluate();
             double y2d = Expression.compile(max.substring(0, max.length() - 1)).evaluate();
-            y1 = (Math.tan(y1d * (Math.PI / 180)));
-            y2 = (Math.tan(y2d * (Math.PI / 180)));
+            y1 = Math.tan(y1d * (Math.PI / 180));
+            y2 = Math.tan(y2d * (Math.PI / 180));
         } else {
-            y1 = (Expression.compile(min).evaluate());
-            y2 = (Expression.compile(max).evaluate());
+            y1 = Expression.compile(min).evaluate();
+            y2 = Expression.compile(max).evaluate();
         }
         return new AngleMask(extent, y1, y2, overlay, distance);
     }
@@ -315,11 +319,11 @@ public class MaskCommands extends MethodCommands {
         if (max.endsWith("d")) {
             double y1d = Expression.compile(min.substring(0, min.length() - 1)).evaluate();
             double y2d = Expression.compile(max.substring(0, max.length() - 1)).evaluate();
-            y1 = (Math.tan(y1d * (Math.PI / 180)));
-            y2 = (Math.tan(y2d * (Math.PI / 180)));
+            y1 = Math.tan(y1d * (Math.PI / 180));
+            y2 = Math.tan(y2d * (Math.PI / 180));
         } else {
-            y1 = (Expression.compile(min).evaluate());
-            y2 = (Expression.compile(max).evaluate());
+            y1 = Expression.compile(min).evaluate();
+            y2 = Expression.compile(max).evaluate();
         }
         return new ROCAngleMask(extent, y1, y2, overlay, distance);
     }
@@ -340,11 +344,11 @@ public class MaskCommands extends MethodCommands {
         if (max.endsWith("d")) {
             double y1d = Expression.compile(min.substring(0, min.length() - 1)).evaluate();
             double y2d = Expression.compile(max.substring(0, max.length() - 1)).evaluate();
-            y1 = (Math.tan(y1d * (Math.PI / 180)));
-            y2 = (Math.tan(y2d * (Math.PI / 180)));
+            y1 = Math.tan(y1d * (Math.PI / 180));
+            y2 = Math.tan(y2d * (Math.PI / 180));
         } else {
-            y1 = (Expression.compile(min).evaluate());
-            y2 = (Expression.compile(max).evaluate());
+            y1 = Expression.compile(min).evaluate();
+            y2 = Expression.compile(max).evaluate();
         }
         return new ExtremaMask(extent, y1, y2, overlay, distance);
     }
@@ -430,7 +434,7 @@ public class MaskCommands extends MethodCommands {
 )
     public Mask expression(Extent extent, String input) throws ExpressionException {
         Expression exp = Expression.compile(input, "x", "y", "z");
-        WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
+        ExpressionEnvironment env = new WorldEditExpressionEnvironment(extent, Vector3.ONE, Vector3.ZERO);
         exp.setEnvironment(env);
         return new ExpressionMask(exp);
     }

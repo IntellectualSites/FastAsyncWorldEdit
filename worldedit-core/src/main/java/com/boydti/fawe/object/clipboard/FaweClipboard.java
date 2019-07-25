@@ -66,11 +66,11 @@ public abstract class FaweClipboard {
         <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block);
     }
 
-    public abstract void streamBiomes(final NBTStreamer.ByteReader task);
+    public abstract void streamBiomes(NBTStreamer.ByteReader task);
 
-    public void streamCombinedIds(final NBTStreamer.ByteReader task) {
+    public void streamCombinedIds(NBTStreamer.ByteReader task) {
         forEach(new BlockReader() {
-            private int index = 0;
+            private int index;
 
             @Override
             public <B extends BlockStateHolder<B>> void run(int x, int y, int z, B block) {

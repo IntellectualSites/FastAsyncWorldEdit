@@ -54,7 +54,7 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
     public DefaultPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
         this.dispatcher = new SimpleDispatcher();
-        this.register(new PatternCommands(worldEdit));
+        this.register(new PatternCommands());
     }
 
     @Override

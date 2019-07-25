@@ -1,5 +1,7 @@
 package com.boydti.fawe.util;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
@@ -24,12 +26,9 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
-
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.UUID;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class EditSessionBuilder {
     private World world;
@@ -294,7 +293,7 @@ public class EditSessionBuilder {
         }
         if (checkMemory) {
             if (MemUtil.isMemoryLimitedSlow()) {
-                if (Perm.hasPermission(player, "worldedit.fast")) {
+                if (Permission.hasPermission(player.toWorldEditPlayer(), "worldedit.fast")) {
                     BBC.WORLDEDIT_OOM_ADMIN.send(player);
                 }
                 throw FaweException.LOW_MEMORY;

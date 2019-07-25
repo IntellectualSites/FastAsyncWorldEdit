@@ -393,6 +393,14 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
+    public boolean contains(BlockVector3 position) {
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+
+        return position.containedWithin(min, max);
+    }
+
+    @Override
     public boolean contains(int x, int y, int z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ && y >= this.minY && y <= this.maxY;
     }
@@ -511,14 +519,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                     if (++nextZ > max.getBlockZ()) {
                         nextZ = min.getBlockZ();
                         if (++nextY > max.getBlockY()) {
-                            if (!hasNext) {
-                                throw new NoSuchElementException("End of iterator") {
-                                    @Override
-                                    public Throwable fillInStackTrace() {
-                                        return this;
-                                    }
-                                };
-                            }
+                            if (!hasNext()) throw new NoSuchElementException();
                             nextX = max.getBlockX();
                             nextZ = max.getBlockZ();
                             nextY = max.getBlockY();
@@ -546,12 +547,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             @Override
             public BlockVector2 next() {
-                if (!hasNext()) throw new NoSuchElementException() {
-                    @Override
-                    public synchronized Throwable fillInStackTrace() {
-                        return this;
-                    }
-                };
+                if (!hasNext()) throw new NoSuchElementException();
                 BlockVector2 answer = BlockVector2.at(nextX, nextZ);
                 if (++nextX > max.getBlockX()) {
                     nextX = min.getBlockX();

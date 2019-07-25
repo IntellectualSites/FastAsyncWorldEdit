@@ -5,7 +5,6 @@ import com.boydti.fawe.object.mask.SurfaceMask;
 import com.boydti.fawe.object.pattern.BiomePattern;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -52,7 +51,6 @@ public class SplatterBrush extends ScatterBrush {
             }
             return false;
         }, vector -> editSession.setBlock(vector, finalPattern), recursion);
-        visitor.setMaxBranch(2);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);

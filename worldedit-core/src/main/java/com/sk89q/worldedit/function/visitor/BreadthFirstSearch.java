@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.collection.BlockVectorSet;
+import com.google.common.collect.Sets;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -130,7 +131,7 @@ public abstract class BreadthFirstSearch implements Operation {
      * Add the directions along the axes as directions to visit.
      */
     public void addAxes() {
-        HashSet<BlockVector3> set = new HashSet<>(Arrays.asList(directions));
+        HashSet<BlockVector3> set = Sets.newHashSet(directions);
         set.add(BlockVector3.UNIT_MINUS_Y);
         set.add(BlockVector3.UNIT_Y);
         set.add(BlockVector3.UNIT_MINUS_X);
@@ -144,7 +145,7 @@ public abstract class BreadthFirstSearch implements Operation {
      * Add the diagonal directions as directions to visit.
      */
     public void addDiagonal() {
-        HashSet<BlockVector3> set = new HashSet<>(Arrays.asList(directions));
+        HashSet<BlockVector3> set = Sets.newHashSet(directions);
         set.add(Direction.NORTHEAST.toBlockVector());
         set.add(Direction.SOUTHEAST.toBlockVector());
         set.add(Direction.SOUTHWEST.toBlockVector());
@@ -172,6 +173,22 @@ public abstract class BreadthFirstSearch implements Operation {
             isVisitable(position, position); // Ignore this, just to initialize mask on this point
             queue.add(blockVector);
             visited.add(blockVector);
+        }
+    }
+
+    /**
+     * Try to visit the given 'to' location.
+     *
+     * @param from the origin block
+     * @param to the block under question
+     */
+    private void visit(BlockVector3 from, BlockVector3 to) {
+        BlockVector3 blockVector = to;
+        if (!visited.contains(blockVector)) {
+            visited.add(blockVector);
+            if (isVisitable(from, to)) {
+                queue.add(blockVector);
+            }
         }
     }
 
@@ -213,11 +230,8 @@ public abstract class BreadthFirstSearch implements Operation {
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         MutableBlockVector3 mutable = new MutableBlockVector3();
-//        MutableBlockVector3 mutable2 = new MutableBlockVector3();
-        boolean shouldTrim = false;
         BlockVector3[] dirs = directions;
         BlockVectorSet tempQueue = new BlockVectorSet();
-        BlockVectorSet chunkLoadSet = new BlockVectorSet();
         for (currentDepth = 0; !queue.isEmpty() && currentDepth <= maxDepth; currentDepth++) {
             for (BlockVector3 from : queue) {
                 if (function.apply(from)) affected++;
@@ -244,9 +258,7 @@ public abstract class BreadthFirstSearch implements Operation {
             BlockVectorSet tmp = queue;
             queue = tempQueue;
             tmp.clear();
-            chunkLoadSet.clear();
             tempQueue = tmp;
-
         }
         return null;
     }

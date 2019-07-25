@@ -1,19 +1,15 @@
 package com.boydti.fawe.object.pattern;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import java.io.IOException;
 import java.util.SplittableRandom;
 
 public class SolidRandomOffsetPattern extends AbstractPattern {
@@ -47,27 +43,25 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
 
     @Override
     public BaseBlock apply(BlockVector3 position) {
-        mutable.mutX((position.getX() + r.nextInt(dx2) - dx));
-        mutable.mutY((position.getY() + r.nextInt(dy2) - dy));
-        mutable.mutZ((position.getZ() + r.nextInt(dz2) - dz));
+        mutable.mutX(position.getX() + r.nextInt(dx2) - dx);
+        mutable.mutY(position.getY() + r.nextInt(dy2) - dy);
+        mutable.mutZ(position.getZ() + r.nextInt(dz2) - dz);
         BaseBlock block = pattern.apply(mutable);
         if (block.getMaterial().isSolid()) {
             return block;
-        } else {
-            return pattern.apply(position);
         }
+        return pattern.apply(position);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        mutable.mutX((set.getX() + r.nextInt(dx2) - dx));
-        mutable.mutY((set.getY() + r.nextInt(dy2) - dy));
-        mutable.mutZ((set.getZ() + r.nextInt(dz2) - dz));
+        mutable.mutX(set.getX() + r.nextInt(dx2) - dx);
+        mutable.mutY(set.getY() + r.nextInt(dy2) - dy);
+        mutable.mutZ(set.getZ() + r.nextInt(dz2) - dz);
         BlockStateHolder block = pattern.apply(mutable);
         if (block.getMaterial().isSolid()) {
             return pattern.apply(extent, get, mutable);
-        } else {
-            return pattern.apply(extent, get, set);
         }
+        return pattern.apply(extent, get, set);
     }
 }

@@ -34,7 +34,7 @@ public class IntegerProperty extends AbstractProperty<Integer> {
         this(name, values, 0);
     }
 
-    public IntegerProperty(final String name, final List<Integer> values, int bitOffset) {
+    private IntegerProperty(final String name, final List<Integer> values, int bitOffset) {
         super(name, values, bitOffset);
         int max = Collections.max(values);
         this.map = new int[max + 1];
@@ -67,9 +67,10 @@ public class IntegerProperty extends AbstractProperty<Integer> {
     public Integer getValueFor(String string) {
         try {
             int val = Integer.parseInt(string);
-//            if (!getValues().contains(val)) { // This check is slow
-//                throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + getValues().toString());
-//            }
+            //It shouldn't matter if this check is slow. It's an important check
+            if (!getValues().contains(val)) {
+                throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + getValues().toString());
+            }
             return val;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid int value: " + string + ". Not an int.");

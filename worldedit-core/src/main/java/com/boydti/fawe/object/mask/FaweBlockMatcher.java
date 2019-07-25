@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.mask;
 
 import com.sk89q.worldedit.world.block.BaseBlock;
-
 import java.util.Set;
 
 // TODO FIXME

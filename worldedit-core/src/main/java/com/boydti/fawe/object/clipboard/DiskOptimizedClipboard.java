@@ -9,9 +9,6 @@ import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -19,10 +16,12 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -82,7 +81,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
             area = width * length;
             this.volume = length * width * height;
 
-            if ((braf.length() - HEADER_SIZE) == (volume << 2) + area) {
+            if (braf.length() - HEADER_SIZE == (volume << 2) + area) {
                 hasBiomes = true;
             }
             autoCloseTask();
@@ -357,7 +356,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     @Override
-    public void forEach(final BlockReader task, boolean air) {
+    public void forEach(BlockReader task, boolean air) {
         byteBuffer.force();
         int pos = HEADER_SIZE;
         IntegerTrio trio = new IntegerTrio();
@@ -418,7 +417,8 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     }
 
     public int getIndex(int x, int y, int z) {
-        return x + ((ylast == y) ? ylasti : (ylasti = (ylast = y) * area)) + ((zlast == z) ? zlasti : (zlasti = (zlast = z) * width));
+        return x + (ylast == y ? ylasti : (ylasti = (ylast = y) * area)) + (zlast == z
+            ? zlasti : (zlasti = (zlast = z) * width));
     }
 
     @Override
@@ -445,7 +445,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     @Override
     public BaseBlock getBlock(int i) {
         try {
-            int diskIndex = (HEADER_SIZE) + (i << 2);
+            int diskIndex = HEADER_SIZE + (i << 2);
             int combinedId = byteBuffer.getInt(diskIndex);
             BlockType type = BlockTypes.getFromStateId(combinedId);
             BaseBlock base = type.withStateId(combinedId).toBaseBlock();
@@ -464,7 +464,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                 } else {
                     // x + z * width + y * area;
                     int y = i / area;
-                    int newI = (i - (y * area));
+                    int newI = i - y * area;
                     int z = newI / width;
                     int x = newI - z * width;
                     nbt = nbtMap.get(new IntegerTrio(x, y, z));
@@ -494,7 +494,7 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         try {
-            int index = (HEADER_SIZE) + ((getIndex(x, y, z) << 2));
+            int index = HEADER_SIZE + (getIndex(x, y, z) << 2);
             int combined = block.getInternalId();
             byteBuffer.putInt(index, combined);
             boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
@@ -512,12 +512,12 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
     public <B extends BlockStateHolder<B>> boolean setBlock(int i, B block) {
         try {
             int combined = block.getInternalId();
-            int index = (HEADER_SIZE) + (i << 2);
+            int index = HEADER_SIZE + (i << 2);
             byteBuffer.putInt(index, combined);
             boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
             if (hasNbt) {
                 int y = i / area;
-                int newI = (i - (y * area));
+                int newI = i - y * area;
                 int z = newI / width;
                 int x = newI - z * width;
                 setTile(x, y, z, block.getNbtData());

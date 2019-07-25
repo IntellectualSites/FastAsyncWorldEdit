@@ -34,6 +34,8 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.argument.SelectorChoice;
+import com.sk89q.worldedit.command.tool.NavigationWand;
+import com.sk89q.worldedit.command.tool.SelectionWand;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
@@ -66,6 +68,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import java.io.File;
@@ -249,8 +252,23 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.wand")
     public void wand(Player player, LocalSession session,
                      @Switch(name = 'n', desc = "Get a navigation wand") boolean navWand) throws WorldEditException {
-        player.giveItem(new BaseItemStack(ItemTypes.parse(we.getConfiguration().wandItem), 1));
-        BBC.SELECTION_WAND.send(player);
+        String wandId = navWand ? session.getNavWandItem() : session.getWandItem();
+        if (wandId == null) {
+            wandId = navWand ? we.getConfiguration().navigationWand : we.getConfiguration().wandItem;
+        }
+        ItemType itemType = ItemTypes.parse(wandId);
+        if (itemType == null) {
+            player.printError("Wand item is mis-configured or disabled.");
+            return;
+        }
+        player.giveItem(new BaseItemStack(itemType, 1));
+        if (navWand) {
+            session.setTool(itemType, new NavigationWand());
+            player.print("Left click: jump to location; Right click: pass through walls");
+        } else {
+            session.setTool(itemType, new SelectionWand());
+            BBC.SELECTION_WAND.send(player);
+        }
         if (!player.hasPermission("fawe.tips"))
             BBC.TIP_SEL_LIST.or(BBC.TIP_SELECT_CONNECTED, BBC.TIP_SET_POS1, BBC.TIP_FARWAND, BBC.TIP_DISCORD).send(player);
     }
@@ -440,20 +458,22 @@ public class SelectionCommands {
                 index++;
             }
             return;
-        }
+        } else {
 
-        region = session.getSelection(player.getWorld());
+            region = session.getSelection(player.getWorld());
+            player.print("Type: " + session.getRegionSelector(player.getWorld()).getTypeName());
+
+            for (String line : session.getRegionSelector(player.getWorld())
+                .getInformationLines()) {
+                player.print(line);
+            }
+
+        }
         BlockVector3 size = region.getMaximumPoint()
                 .subtract(region.getMinimumPoint())
                 .add(1, 1, 1);
 
-        player.print("Type: " + session.getRegionSelector(player.getWorld())
-                .getTypeName());
 
-        for (String line : session.getRegionSelector(player.getWorld())
-                .getInformationLines()) {
-            player.print(line);
-        }
 
         player.print("Size: " + size);
         player.print("Cuboid distance: " + region.getMaximumPoint().distance(region.getMinimumPoint()));
@@ -463,7 +483,7 @@ public class SelectionCommands {
 
     @Command(
         name = "/count",
-        desc = "Counts the number of a certain type of block"
+        desc = "Counts the number of blocks matching a mask"
     )
     @CommandPermissions("worldedit.analysis.count")
     public void count(Player player, LocalSession session, EditSession editSession,

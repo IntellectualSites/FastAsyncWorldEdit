@@ -35,7 +35,7 @@ public class DirectionalProperty extends AbstractProperty<Direction> {
         this(name, values, 0);
     }
 
-    public DirectionalProperty(final String name, final List<Direction> values, int bitOffset) {
+    private DirectionalProperty(final String name, final List<Direction> values, int bitOffset) {
         super(name, values, bitOffset);
         this.map = new int[Direction.values().length];
         Arrays.fill(this.map, -1);

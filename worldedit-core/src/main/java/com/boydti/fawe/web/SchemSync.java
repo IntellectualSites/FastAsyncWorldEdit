@@ -85,9 +85,8 @@ public class SchemSync implements Runnable {
                             continue;
                         }
 
+                        File dir = new File(working, uuid.toString());
                         try (DataInputStream dis = new DataInputStream(in)) {
-                            File dir = new File(working, uuid.toString());
-
                             int data = dis.readByte() & 0xFF;
                             switch (data) {
                                 case 0: // list

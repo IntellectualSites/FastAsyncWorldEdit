@@ -19,9 +19,10 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
@@ -29,8 +30,6 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.RandomTextureUtil;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TextureUtil;
-import com.sk89q.worldedit.extension.input.InputParseException;
-import org.enginehub.piston.inject.InjectedValueAccess;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -41,36 +40,32 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.DisallowedUsageException;
+import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.item.ItemType;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * General WorldEdit commands.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-//@Command(aliases = {}, desc = "Player toggles, settings and item info")
 public class GeneralCommands {
 
     private final WorldEdit worldEdit;
@@ -141,12 +136,16 @@ public class GeneralCommands {
     @CommandPermissions("worldedit.fast")
     public void fast(Player player, LocalSession session, @Arg(desc = "The new fast mode state", def = "") Boolean fastMode) {
         boolean hasFastMode = session.hasFastMode();
-        if (fastMode == null) fastMode = !hasFastMode;
-        session.setFastMode(fastMode);
-        if (fastMode) {
-            BBC.FAST_ENABLED.send(player);
-        } else {
+        if (fastMode != null && fastMode == hasFastMode) {
+            player.printError("Fast mode already " + (fastMode ? "enabled" : "disabled") + ".");
+            return;
+        }
+        if (hasFastMode) {
+            session.setFastMode(false);
             BBC.FAST_DISABLED.send(player);
+        } else {
+            session.setFastMode(true);
+            BBC.FAST_ENABLED.send(player);
         }
     }
 
@@ -299,7 +298,7 @@ public class GeneralCommands {
             desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-texture")
-    public void gtexture(FawePlayer player, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") List<String> arguments) throws WorldEditException, FileNotFoundException {
+    public void gtexture(Player player, World world, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") List<String> arguments) throws WorldEditException, FileNotFoundException {
         // gtexture <randomize> <min=0> <max=100>
         // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
         if (arguments.isEmpty()) {
@@ -307,7 +306,7 @@ public class GeneralCommands {
             BBC.TEXTURE_DISABLED.send(player);
         } else {
             String arg = arguments.get(0);
-            String argLower = arg.toLowerCase();
+            String argLower = arg.toLowerCase(Locale.ROOT);
 
             TextureUtil util = Fawe.get().getTextureUtil();
             int randomIndex = 1;
@@ -324,16 +323,15 @@ public class GeneralCommands {
                 if (argLower.equals("true")) util = new RandomTextureUtil(util);
                 checkRandomization = false;
             } else {
-                HashSet<BaseBlock> blocks = null;
                 if (argLower.equals("#copy") || argLower.equals("#clipboard")) {
-                    Clipboard clipboard = player.getSession().getClipboard().getClipboard();
+                    Clipboard clipboard = worldEdit.getSessionManager().get(player).getClipboard().getClipboard();
                     util = TextureUtil.fromClipboard(clipboard);
                 } else if (argLower.equals("*") || argLower.equals("true")) {
                     util = Fawe.get().getTextureUtil();
                 } else {
                     ParserContext parserContext = new ParserContext();
-                    parserContext.setActor(player.getPlayer());
-                    parserContext.setWorld(player.getWorld());
+                    parserContext.setActor(player);
+                    parserContext.setWorld(world);
                     parserContext.setSession(session);
                     parserContext.setExtent(editSession);
                     Mask mask = worldEdit.getMaskFactory().parseFromInput(arg, parserContext);
@@ -392,7 +390,6 @@ public class GeneralCommands {
     )
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
-        FawePlayer<Object> fp = FawePlayer.wrap(player);
         if (player.togglePermission("fawe.tips")) {
             BBC.WORLDEDIT_TOGGLE_TIPS_ON.send(player);
         } else {

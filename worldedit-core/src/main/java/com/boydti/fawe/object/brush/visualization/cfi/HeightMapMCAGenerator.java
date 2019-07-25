@@ -1943,11 +1943,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
-        return false;
-    }
-
-    @Override
     public void dropItem(Vector3 position, BaseItemStack item) {
         // TODO Auto-generated method stub
 

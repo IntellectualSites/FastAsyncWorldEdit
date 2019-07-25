@@ -72,7 +72,7 @@ public class TransformCommands {
             aliases = {"#randomoffset"},
             desc = "Random offset transform"
 )
-    public ResettableExtent randomoffset(Actor actor, LocalSession session, double x, double y, double z, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
+    public ResettableExtent randomOffset(Actor actor, LocalSession session, double x, double y, double z, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
         return new RandomOffsetTransform(other, (int) x, (int) y, (int) z);
     }
 
@@ -89,7 +89,7 @@ public class TransformCommands {
             desc = "All changes will be rotate around the initial position"
     )
     public ResettableExtent rotate(Player player, LocalSession session, double x, double y, double z, @Arg(name = "other", desc = "ResettableExtent", def = "#null") ResettableExtent other) {
-        ExtentTraverser<TransformExtent> traverser = new ExtentTraverser(other).find(TransformExtent.class);
+        ExtentTraverser<TransformExtent> traverser = new ExtentTraverser<>(other).find(TransformExtent.class);
         BlockTransformExtent affine = traverser != null ? traverser.get() : null;
         if (affine == null) {
             other = affine = new TransformExtent(other);

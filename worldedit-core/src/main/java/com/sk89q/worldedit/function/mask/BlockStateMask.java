@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.blocks.Blocks;
 import com.sk89q.worldedit.extent.Extent;
@@ -27,8 +26,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-
 import java.util.Map;
+import javax.annotation.Nullable;
 
 @Deprecated
 public class BlockStateMask extends AbstractExtentMask {
@@ -66,4 +65,9 @@ public class BlockStateMask extends AbstractExtentMask {
                 .allMatch(entry -> block.getState(entry.getKey()) == entry.getValue());
     }
 
+    @Nullable
+    @Override
+    public Mask2D toMask2D() {
+        return null;
+    }
 }

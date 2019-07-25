@@ -302,7 +302,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     }
 
     @Override
-    public List<BlockVector3> getVerticies() {
+    public List<BlockVector3> getVertices() {
         return Arrays.asList(position1, position2);
     }
 }

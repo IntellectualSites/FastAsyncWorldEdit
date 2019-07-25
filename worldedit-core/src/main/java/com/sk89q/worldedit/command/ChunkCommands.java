@@ -95,7 +95,7 @@ public class ChunkCommands {
         Set<BlockVector2> chunks = session.getSelection(player.getWorld()).getChunks();
 
         PaginationBox paginationBox = PaginationBox.fromStrings("Selected Chunks", "/listchunks -p %page%",
-                chunks.stream().map(LegacyChunkStore::getFilename).collect(Collectors.toList()));
+                chunks.stream().map(BlockVector2::toString).collect(Collectors.toList()));
         player.print(paginationBox.create(page));
     }
 

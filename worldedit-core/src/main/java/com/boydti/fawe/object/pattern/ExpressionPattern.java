@@ -1,19 +1,16 @@
 package com.boydti.fawe.object.pattern;
 
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import java.io.IOException;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A mask that evaluates an expression.

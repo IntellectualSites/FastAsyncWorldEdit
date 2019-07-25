@@ -69,7 +69,7 @@ public class ClipboardFormats {
         checkNotNull(format);
 
         for (String key : format.getAliases()) {
-            String lowKey = key.toLowerCase(Locale.ROOT);
+            String lowKey = key.toLowerCase(Locale.ENGLISH);
             ClipboardFormat old = aliasMap.put(lowKey, format);
             if (old != null) {
                 aliasMap.put(lowKey, old);
@@ -77,7 +77,7 @@ public class ClipboardFormats {
             }
         }
         for (String ext : format.getFileExtensions()) {
-            String lowExt = ext.toLowerCase(Locale.ROOT);
+            String lowExt = ext.toLowerCase(Locale.ENGLISH);
             fileExtensionMap.put(lowExt, format);
         }
         registeredFormats.add(format);
@@ -99,7 +99,7 @@ public class ClipboardFormats {
     @Nullable
     public static ClipboardFormat findByAlias(String alias) {
         checkNotNull(alias);
-        return aliasMap.get(alias.toLowerCase(Locale.ROOT).trim());
+        return aliasMap.get(alias.toLowerCase(Locale.ENGLISH).trim());
     }
 
     /**
@@ -157,7 +157,7 @@ public class ClipboardFormats {
      * It is not in SchematicCommands because it may rely on internal register calls.
      */
     public static String[] getFileExtensionArray() {
-        return fileExtensionMap.keySet().toArray(new String[0]);
+        return fileExtensionMap.keySet().toArray(new String[fileExtensionMap.keySet().size()]);
     }
 
     private ClipboardFormats() {
@@ -259,7 +259,7 @@ public class ClipboardFormats {
         File[] files = dir.listFiles(pathname -> {
             String input = pathname.getName();
             String extension = input.substring(input.lastIndexOf('.') + 1);
-            return (extensions.contains(extension.toLowerCase()));
+            return (extensions.contains(extension.toLowerCase(Locale.ENGLISH)));
         });
         LazyClipboardHolder[] clipboards = new LazyClipboardHolder[files.length];
         for (int i = 0; i < files.length; i++) {

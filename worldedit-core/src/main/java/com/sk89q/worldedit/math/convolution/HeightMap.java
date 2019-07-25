@@ -36,6 +36,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Iterator;
+import javax.annotation.Nullable;
 
 /**
  * Allows applications of Kernels onto the region's height map.
@@ -63,11 +64,11 @@ public class HeightMap {
         this(session, region, (Mask) null, false);
     }
 
-    public HeightMap(EditSession session, Region region, Mask mask) {
+    public HeightMap(EditSession session, Region region, @Nullable Mask mask) {
         this(session, region, mask, false);
     }
 
-    public HeightMap(EditSession session, Region region, Mask mask, boolean layers) {
+    public HeightMap(EditSession session, Region region, @Nullable Mask mask, boolean layers) {
         checkNotNull(session);
         checkNotNull(region);
 

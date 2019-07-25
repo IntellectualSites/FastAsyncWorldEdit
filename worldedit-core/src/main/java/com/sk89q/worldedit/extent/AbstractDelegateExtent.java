@@ -43,6 +43,7 @@ import javax.annotation.Nullable;
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
 public class AbstractDelegateExtent implements Extent, LightingExtent {
+
     private final Extent extent;
 
     /**
@@ -60,14 +61,19 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
      *
      * @return the extent
      */
-    public final Extent getExtent() {
+    public Extent getExtent() {
         return extent;
     }
 
+    @Override
+    public BlockState getBlock(BlockVector3 position) {
+       return getBlock(position.getX(),position.getY(),position.getZ());
+    }
+
     /*
-    Queue based methods
-    TODO NOT IMPLEMENTED: IQueueExtent and such need to implement these
-     */
+        Queue based methods
+        TODO NOT IMPLEMENTED: IQueueExtent and such need to implement these
+         */
     public boolean isQueueEnabled() {
         return extent.isQueueEnabled();
     }
@@ -78,7 +84,8 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
             if (!(extent instanceof ForgetfulExtentBuffer)) { // placeholder
                 extent.disableQueue();
             }
-        } catch (FaweException ignored) {}
+        } catch (FaweException ignored) {
+        }
         if (extent instanceof AbstractDelegateExtent) {
             Extent next = ((AbstractDelegateExtent) extent).getExtent();
             new ExtentTraverser(this).setNext(next);
@@ -108,8 +115,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
             } else {
                 history.setChangeSet(changeSet);
             }
-        }
-        else if (extent instanceof AbstractDelegateExtent) {
+        } else if (extent instanceof AbstractDelegateExtent) {
             ((AbstractDelegateExtent) extent).setChangeSet(changeSet);
         } else if (changeSet != null) {
             new ExtentTraverser<>(this).setNext(new HistoryExtent(extent, changeSet));
@@ -125,19 +131,10 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         Bounds
          */
     @Override
-    public BlockVector3 getMinimumPoint() {
-        return extent.getMinimumPoint();
-    }
-
-    @Override
-    public BlockVector3 getMaximumPoint() {
-        return extent.getMaximumPoint();
-    }
-
-    @Override
     public int getMaxY() {
         return extent.getMaxY();
     }
+
 
     /*
     Input + Output
@@ -147,7 +144,6 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     public BlockState getBlock(int x, int y, int z) {
         return extent.getBlock(x, y, z);
     }
-
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         return extent.getFullBlock(x, y, z);
@@ -164,9 +160,11 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
         return extent.setBlock(x, y, z, block);
     }
+
 
     /*
     Light
@@ -184,7 +182,6 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         }
         return getBrightness(x, y, z);
     }
-
     public int getOpacity(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getOpacity(x, y, z);
@@ -217,13 +214,19 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         }
     }
 
-    /*
-    Generic
-     */
-
     @Override
     public String toString() {
         return super.toString() + ":" + extent.toString();
+    }
+
+    @Override
+    public BlockVector3 getMinimumPoint() {
+        return extent.getMinimumPoint();
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return extent.getMaximumPoint();
     }
 
     protected Operation commitBefore() {
@@ -234,7 +237,9 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
     public @Nullable Operation commit() {
         Operation ours = commitBefore();
         Operation other = null;
-        if (extent != this) other = extent.commit();
+        if (extent != this) {
+            other = extent.commit();
+        }
         if (ours != null && other != null) {
             return new OperationQueue(ours, other);
         } else if (ours != null) {

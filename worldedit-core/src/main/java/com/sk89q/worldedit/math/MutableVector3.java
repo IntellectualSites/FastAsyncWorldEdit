@@ -3,9 +3,12 @@ package com.sk89q.worldedit.math;
 import com.boydti.fawe.FaweCache;
 
 public class MutableVector3 extends Vector3 {
-    private double x,y,z;
+
+    private double x, y, z;
+
     public MutableVector3() {
     }
+
     public static MutableVector3 get(int x, int y, int z) {
         return FaweCache.MUTABLE_VECTOR3.get().setComponents(x, y, z);
     }

@@ -28,14 +28,10 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 /**
  * Applies a {@link BlockBag} to operations.
@@ -44,7 +40,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
     private final boolean mine;
     private int[] missingBlocks = new int[BlockTypes.size()];
-    private final BlockBag blockBag;
+    private BlockBag blockBag;
 
     /**
      * Create a new instance.
@@ -52,13 +48,12 @@ public class BlockBagExtent extends AbstractDelegateExtent {
      * @param extent the extent
      * @param blockBag the block bag
      */
-    public BlockBagExtent(Extent extent, @Nonnull BlockBag blockBag) {
+    public BlockBagExtent(Extent extent, @Nullable BlockBag blockBag) {
         this(extent, blockBag, false);
     }
 
-    public BlockBagExtent(Extent extent, @Nonnull BlockBag blockBag, boolean mine) {
+    public BlockBagExtent(Extent extent, @Nullable BlockBag blockBag, boolean mine) {
         super(extent);
-        checkNotNull(blockBag);
         this.blockBag = blockBag;
         this.mine = mine;
     }
@@ -72,6 +67,14 @@ public class BlockBagExtent extends AbstractDelegateExtent {
         return blockBag;
     }
 
+    /**
+     * Set the block bag.
+     *
+     * @param blockBag a block bag, which may be null if none is used
+     */
+    public void setBlockBag(@Nullable BlockBag blockBag) {
+        this.blockBag = blockBag;
+    }
     /**
      * Gets the list of missing blocks and clears the list for the next
      * operation.

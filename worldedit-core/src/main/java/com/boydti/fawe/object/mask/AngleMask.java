@@ -4,7 +4,6 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-
 import java.util.Arrays;
 
 public class AngleMask extends SolidBlockMask implements ResettableMask {

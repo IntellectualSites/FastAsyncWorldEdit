@@ -216,7 +216,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 final World world = context.requireWorld();
                 final BlockVector3 primaryPosition;
                 try {
-                    primaryPosition = context.requireSession().getRegionSelector(world).getVerticies().get(index - 1);
+                    primaryPosition = context.requireSession().getRegionSelector(world).getVertices().get(index - 1);
                 } catch (IncompleteRegionException e) {
                     throw new InputParseException("Your selection is not complete.");
                 }

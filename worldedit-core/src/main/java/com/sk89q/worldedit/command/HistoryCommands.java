@@ -60,7 +60,7 @@ import org.enginehub.piston.inject.InjectedValueAccess;
  * Commands to undo, redo, and clear history.
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
-public class HistoryCommands extends MethodCommands {
+public class HistoryCommands {
 
     private final WorldEdit worldEdit;
 
@@ -224,11 +224,12 @@ public class HistoryCommands extends MethodCommands {
         @Arg(name = "player", desc = "Undo this player's operations", def = "")
             String playerName,
         InjectedValueAccess context) throws WorldEditException {
+        times = Math.max(1, times);
+        LocalSession undoSession;
         if (session.hasFastMode()) {
             BBC.COMMAND_UNDO_DISABLED.send(player);
             return;
         }
-        LocalSession undoSession;
         if (playerName != null && !playerName.isEmpty()) {
             player.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);
@@ -239,7 +240,6 @@ public class HistoryCommands extends MethodCommands {
         } else {
             undoSession = session;
         }
-        times = Math.max(1, times);
         int finalTimes = times;
         FawePlayer.wrap(player).checkConfirmation(() -> {
             EditSession undone = null;

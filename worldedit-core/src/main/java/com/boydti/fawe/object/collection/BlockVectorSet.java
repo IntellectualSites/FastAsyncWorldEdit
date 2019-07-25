@@ -19,7 +19,6 @@ import java.util.*;
  */
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements Set<BlockVector3> {
     private Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
-    private MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
     public int size() {

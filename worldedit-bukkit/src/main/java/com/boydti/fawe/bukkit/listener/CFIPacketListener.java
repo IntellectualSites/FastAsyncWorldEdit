@@ -26,7 +26,9 @@ import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.math.BlockVector3;
 
+import com.sk89q.worldedit.util.formatting.text.TextComponent.Builder;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.List;
 
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -59,7 +61,7 @@ public class CFIPacketListener implements Listener {
         // Direct digging to the virtual world
         registerBlockEvent(PacketType.Play.Client.BLOCK_DIG, false, new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
             @Override
-            public void run(PacketEvent event, VirtualWorld gen, BlockVector3 pt) {
+            public void run(Builder event, URI gen, String pt) {
                 try {
                     Player plr = event.getPlayer();
                     BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
@@ -75,7 +77,7 @@ public class CFIPacketListener implements Listener {
         // Direct placing to the virtual world
         RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> placeTask = new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
             @Override
-            public void run(PacketEvent event, VirtualWorld gen, BlockVector3 pt) {
+            public void run(Builder event, URI gen, String pt) {
                 try {
                     Player plr = event.getPlayer();
                     List<EnumWrappers.Hand> hands = event.getPacket().getHands().getValues();
@@ -112,7 +114,7 @@ public class CFIPacketListener implements Listener {
         // Cancel block change packets where the real world overlaps with the virtual one
         registerBlockEvent(PacketType.Play.Server.BLOCK_CHANGE, false, new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
             @Override
-            public void run(PacketEvent event, VirtualWorld gen, BlockVector3 pt) {
+            public void run(Builder event, URI gen, String pt) {
                 // Do nothing
             }
         });

@@ -21,14 +21,12 @@ package com.sk89q.worldedit.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.collect.ComparisonChain;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-
 import java.util.Comparator;
 
 /**
@@ -50,11 +48,26 @@ public abstract class BlockVector3 {
     }
 
     public static BlockVector3 at(int x, int y, int z) {
+        // switch for efficiency on typical cases
+        // in MC y is rarely 0/1 on selections
+        switch (y) {
+            case 0:
+                if (x == 0 && z == 0) {
+                    return ZERO;
+                }
+                break;
+            case 1:
+                if (x == 1 && z == 1) {
+                    return ONE;
+                }
+                break;
+        }
         return new BlockVector3Imp(x, y, z);
     }
 
     // thread-safe initialization idiom
     private static final class YzxOrderComparator {
+
         private static final Comparator<BlockVector3> YZX_ORDER =
             Comparator.comparingInt(BlockVector3::getY)
                 .thenComparingInt(BlockVector3::getZ)
@@ -240,8 +253,7 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Add a list of vectors to this vector and return the
-     * result as a new vector.
+     * Add a list of vectors to this vector and return the result as a new vector.
      *
      * @param others an array of vectors
      * @return a new vector
@@ -259,8 +271,7 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Subtract another vector from this vector and return the result
-     * as a new vector.
+     * Subtract another vector from this vector and return the result as a new vector.
      *
      * @param other the other vector
      * @return a new vector
@@ -270,8 +281,7 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Subtract another vector from this vector and return the result
-     * as a new vector.
+     * Subtract another vector from this vector and return the result as a new vector.
      *
      * @param x the value to subtract
      * @param y the value to subtract
@@ -283,8 +293,7 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Subtract a list of vectors from this vector and return the result
-     * as a new vector.
+     * Subtract a list of vectors from this vector and return the result as a new vector.
      *
      * @param others an array of vectors
      * @return a new vector
@@ -469,8 +478,7 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Get the normalized vector, which is the vector divided by its
-     * length, as a new vector.
+     * Get the normalized vector, which is the vector divided by its length, as a new vector.
      *
      * @return a new vector
      */
@@ -514,7 +522,8 @@ public abstract class BlockVector3 {
      * @return true if the vector is contained
      */
     public boolean containedWithin(BlockVector3 min, BlockVector3 max) {
-        return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max.getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
+        return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max
+            .getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
     }
 
     /**
@@ -568,8 +577,7 @@ public abstract class BlockVector3 {
     }
 
     /**
-     * Returns a vector with the absolute values of the components of
-     * this vector.
+     * Returns a vector with the absolute values of the components of this vector.
      *
      * @return a new vector
      */
@@ -580,15 +588,16 @@ public abstract class BlockVector3 {
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle in degrees
-     * @param aboutX about which x coordinate to rotate
-     * @param aboutZ about which z coordinate to rotate
+     * @param angle      in degrees
+     * @param aboutX     about which x coordinate to rotate
+     * @param aboutZ     about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
      * @see AffineTransform another method to transform vectors
      */
-    public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX, double translateZ) {
+    public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX,
+        double translateZ) {
         angle = Math.toRadians(angle);
         double x = this.getX() - aboutX;
         double z = this.getZ() - aboutZ;
@@ -599,7 +608,7 @@ public abstract class BlockVector3 {
 
         return BlockVector3.at(
             x2 + aboutX + translateX,
-                getY(),
+            getY(),
             z2 + aboutZ + translateZ
         );
     }
@@ -646,9 +655,9 @@ public abstract class BlockVector3 {
      */
     public BlockVector3 getMinimum(BlockVector3 v2) {
         return new BlockVector3Imp(
-                Math.min(getX(), v2.getX()),
-                Math.min(getY(), v2.getY()),
-                Math.min(getZ(), v2.getZ())
+            Math.min(getX(), v2.getX()),
+            Math.min(getY(), v2.getY()),
+            Math.min(getZ(), v2.getZ())
         );
     }
 
@@ -660,9 +669,9 @@ public abstract class BlockVector3 {
      */
     public BlockVector3 getMaximum(BlockVector3 v2) {
         return new BlockVector3Imp(
-                Math.max(getX(), v2.getX()),
-                Math.max(getY(), v2.getY()),
-                Math.max(getZ(), v2.getZ())
+            Math.max(getX(), v2.getX()),
+            Math.max(getY(), v2.getY()),
+            Math.max(getZ(), v2.getZ())
         );
     }
 
@@ -685,7 +694,7 @@ public abstract class BlockVector3 {
     }
 
     public boolean setFullBlock(Extent orDefault, BaseBlock block) {
-        return  orDefault.setBlock(this, block);
+        return orDefault.setBlock(this, block);
     }
 
     public boolean setBiome(Extent orDefault, BiomeType biome) {
@@ -724,11 +733,6 @@ public abstract class BlockVector3 {
         return orDefault.getBlock(getX(), getY() + y, getZ());
     }
 
-
-    /*
-    Adapt
-     */
-
     /**
      * Creates a 2D vector by dropping the Y component from this vector.
      *
@@ -743,7 +747,7 @@ public abstract class BlockVector3 {
     }
 
     @Override
-    public final boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof BlockVector3)) {
             return false;
         }
@@ -752,7 +756,8 @@ public abstract class BlockVector3 {
     }
 
     public final boolean equals(BlockVector3 other) {
-        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
+        return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this
+            .getZ();
     }
 
     @Override

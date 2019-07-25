@@ -10,7 +10,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -21,7 +20,6 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Node;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class SplineBrush implements Brush, ResettableTool {
@@ -50,7 +48,7 @@ public class SplineBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, final BlockVector3 position, Pattern pattern, double size) throws WorldEditException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws WorldEditException {
         Mask mask = editSession.getMask();
         if (mask == null) {
             mask = new IdMask(editSession);
@@ -70,12 +68,9 @@ public class SplineBrush implements Brush, ResettableTool {
             }
             final ArrayList<BlockVector3> points = new ArrayList<>();
             if (size > 0) {
-                DFSRecursiveVisitor visitor = new DFSRecursiveVisitor(mask, new RegionFunction() {
-                    @Override
-                    public boolean apply(BlockVector3 p) {
-                        points.add(p);
-                        return true;
-                    }
+                DFSRecursiveVisitor visitor = new DFSRecursiveVisitor(mask, p -> {
+                    points.add(p);
+                    return true;
                 }, (int) size, 1);
                 List<BlockVector3> directions = visitor.getDirections();
                 for (int x = -1; x <= 1; x++) {
@@ -90,7 +85,7 @@ public class SplineBrush implements Brush, ResettableTool {
                         }
                     }
                 }
-                Collections.sort(directions, (o1, o2) -> (int) Math.signum(o1.lengthSq() - o2.lengthSq()));
+                directions.sort((o1, o2) -> (int) Math.signum(o1.lengthSq() - o2.lengthSq()));
                 visitor.visit(position);
                 Operations.completeBlindly(visitor);
                 if (points.size() > numSplines) {
@@ -121,7 +116,7 @@ public class SplineBrush implements Brush, ResettableTool {
 
         final List<Node> nodes = new ArrayList<>(centroids.size());
 
-        for (final Vector3 nodevector : centroids) {
+        for (Vector3 nodevector : centroids) {
             final Node n = new Node(nodevector);
             n.setTension(tension);
             n.setBias(bias);
@@ -133,7 +128,7 @@ public class SplineBrush implements Brush, ResettableTool {
             List<BlockVector3> currentSpline = new ArrayList<>();
             for (ArrayList<BlockVector3> points : positionSets) {
                 int listSize = points.size();
-                int index = (int) (i * listSize / (double) (numSplines));
+                int index = (int) (i * listSize / (double) numSplines);
                 currentSpline.add(points.get(index));
             }
             editSession.drawSpline(pattern, currentSpline, 0, 0, 0, 10, 0, true);
@@ -161,12 +156,10 @@ public class SplineBrush implements Brush, ResettableTool {
     private BlockVector3 normal(Collection<BlockVector3> points, BlockVector3 centroid) {
         int n = points.size();
         switch (n) {
-            case 1: {
+            case 1:
                 return null;
-            }
-            case 2: {
+            case 2:
                 return null;
-            }
         }
 
         // Calc full 3x3 covariance matrix, excluding symmetries:
@@ -179,9 +172,9 @@ public class SplineBrush implements Brush, ResettableTool {
 
         MutableVector3 r = new MutableVector3();
         for (BlockVector3 p : points) {
-            r.mutX((p.getX() - centroid.getX()));
-            r.mutY((p.getY() - centroid.getY()));
-            r.mutZ((p.getZ() - centroid.getZ()));
+            r.mutX(p.getX() - centroid.getX());
+            r.mutY(p.getY() - centroid.getY());
+            r.mutZ(p.getZ() - centroid.getZ());
             xx += r.getX() * r.getX();
             xy += r.getX() * r.getY();
             xz += r.getX() * r.getZ();
@@ -214,7 +207,6 @@ public class SplineBrush implements Brush, ResettableTool {
             double b = (xz * xy - yz * xx) / det_z;
             dir = BlockVector3.at(a, b, 1.0);
         }
-        ;
         return dir.normalize();
     }
 }

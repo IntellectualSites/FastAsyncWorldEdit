@@ -22,17 +22,12 @@ package com.sk89q.worldedit.function.mask;
 import com.boydti.fawe.beta.DelegateFilter;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlock;
-import com.sk89q.minecraft.util.commands.Link;
-import com.sk89q.worldedit.command.UtilityCommands;
-import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-
 import javax.annotation.Nullable;
 
 /**
  * Tests whether a given vector meets a criteria.
  */
-@Link(clazz = UtilityCommands.class, value = "masks")
 public interface Mask {
 
     /**
