@@ -1,15 +1,13 @@
 package com.boydti.fawe.regions.general.plot;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import com.sk89q.worldedit.math.BlockVector2;
-
 import java.util.ArrayList;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class PlotRegionFilter extends CuboidRegionFilter {
     private final PlotArea area;

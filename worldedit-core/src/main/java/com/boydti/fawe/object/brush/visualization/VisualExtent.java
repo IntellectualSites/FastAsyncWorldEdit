@@ -26,13 +26,13 @@ public class VisualExtent extends AbstractDelegateExtent {
         this.queue = queue;
     }
 
+    public VisualChunk getChunk(int cx, int cz) {
+        return chunks.get(MathMan.pairInt(cx, cz));
+    }
+
     @Override
     public boolean setBlock(BlockVector3 location, BlockStateHolder block) throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
-    }
-
-    public VisualChunk getChunk(int cx, int cz) {
-        return chunks.get(MathMan.pairInt(cx, cz));
     }
 
     @Override

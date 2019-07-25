@@ -6,7 +6,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 
 public abstract class AbstractExtentPattern extends AbstractPattern {
-    private transient final Extent extent;
+
+    private final transient Extent extent;
 
     public AbstractExtentPattern(Extent extent) {
         checkNotNull(extent);

@@ -1,39 +1,8 @@
 package com.boydti.fawe.regions.general.plot;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.example.NullFaweChunk;
-import com.boydti.fawe.jnbt.anvil.MCAChunk;
-import com.boydti.fawe.jnbt.anvil.MCAQueue;
-import com.boydti.fawe.jnbt.anvil.MCAWriter;
-import com.boydti.fawe.object.FaweChunk;
-import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.util.SetQueue;
-import com.github.intellectualsites.plotsquared.commands.Command;
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
-import com.github.intellectualsites.plotsquared.configuration.ConfigurationSection;
-import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;
-import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
 import com.github.intellectualsites.plotsquared.plot.commands.RequiredType;
-import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
-import com.github.intellectualsites.plotsquared.plot.database.SQLManager;
-import com.github.intellectualsites.plotsquared.plot.generator.HybridPlotWorld;
-import com.github.intellectualsites.plotsquared.plot.object.Location;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
-import com.github.intellectualsites.plotsquared.plot.object.PlotId;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
-import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
-import com.github.intellectualsites.plotsquared.plot.object.SetupObject;
-import com.github.intellectualsites.plotsquared.plot.util.SetupUtils;
-import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
 
 @CommandDeclaration(
         command = "moveto512",

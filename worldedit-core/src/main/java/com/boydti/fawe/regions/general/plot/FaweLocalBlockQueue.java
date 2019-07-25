@@ -18,7 +18,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-
 import java.util.Collection;
 
 // TODO FIXME

@@ -110,7 +110,7 @@ public class AnvilCommands {
     @Command(
             name = "replaceall",
             aliases = {"rea", "repall"},
-            desc = "Replace all blocks in the selection with another",
+            desc = "Replace all blocks in the selection with another"
 )
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAll(Player player, String folder,
@@ -221,8 +221,7 @@ public class AnvilCommands {
             aliases = {"deloldreg" },
             desc = "Delete regions which haven't been accessed in a certain amount of time",
             descFooter = "You can use seconds (s), minutes (m), hours (h), days (d), weeks (w), years (y)\n" +
-                    "(months are not a unit of time)\n" +
-                    "E.g. 8h5m12s\n"
+                    "(months are not a unit of time) E.g. 8h5m12s\n"
     )
     @CommandPermissions("worldedit.anvil.deletealloldregions")
     public void deleteAllOldRegions(Player player, String folder, String time) throws WorldEditException {
@@ -300,7 +299,7 @@ public class AnvilCommands {
             desc = "Replace all blocks in the selection with another"
     )
     @CommandPermissions("worldedit.anvil.replaceall")
-    public void replaceAllPattern(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, final Pattern to, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap) throws WorldEditException {
+    public void replaceAllPattern(Player player, String folder, @Arg(name = "from", desc = "String", def = "") String from, Pattern to, @Switch(name = 'd', desc = "TODO") boolean useData, @Switch(name = 'm', desc = "TODO") boolean useMap) throws WorldEditException {
 //        MCAFilterCounter filter;  TODO NOT IMPLEMENTED
 //        if (useMap) {
 //            if (to instanceof RandomPattern) {
