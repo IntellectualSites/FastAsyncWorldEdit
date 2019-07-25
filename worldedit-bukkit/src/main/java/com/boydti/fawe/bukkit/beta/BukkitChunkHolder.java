@@ -41,8 +41,8 @@ import java.util.concurrent.Future;
 
 public class BukkitChunkHolder<T extends Future<T>> extends ChunkHolder {
     @Override
-    public void init(final IQueueExtent extent, final int X, final int Z) {
-        super.init(extent, X, Z);
+    public void init(final IQueueExtent extent, final int x, final int z) {
+        super.init(extent, x, z);
     }
 
     @Override

@@ -34,7 +34,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
     private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
     private ThreadPoolExecutor blockingExecutor = FaweCache.newBlockingExecutor();
-    private ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue();
+    private ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
 
     private Map<World, WeakReference<WorldChunkCache>> chunkCache = new HashMap<>();
     private IterableThreadLocal<IQueueExtent> queuePool = new IterableThreadLocal<IQueueExtent>() {
@@ -114,9 +114,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
             while (task != null) {
                 task = task.get();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }

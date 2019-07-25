@@ -1,8 +1,6 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BaseBlock;
-
 import javax.annotation.Nullable;
 
 /**
@@ -10,13 +8,13 @@ import javax.annotation.Nullable;
  */
 public interface Filter  {
     /**
-     * Check whether a chunk should be read
+     * Checks whether a chunk should be read.
      *
-     * @param cx
-     * @param cz
+     * @param chunkX
+     * @param chunkZ
      * @return
      */
-    default boolean appliesChunk(final int cx, final int cz) {
+    default boolean appliesChunk(final int chunkX, final int chunkZ) {
         return true;
     }
 

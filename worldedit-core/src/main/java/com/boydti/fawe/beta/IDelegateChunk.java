@@ -73,8 +73,8 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     }
 
     @Override
-    default void init(final IQueueExtent extent, final int X, final int Z) {
-        getParent().init(extent, X, Z);
+    default void init(final IQueueExtent extent, final int x, final int z) {
+        getParent().init(extent, x, z);
     }
 
     @Override

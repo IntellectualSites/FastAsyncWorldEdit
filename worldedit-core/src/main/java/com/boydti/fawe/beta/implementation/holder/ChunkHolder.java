@@ -28,7 +28,8 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     private IChunkSet set;
     private IBlockDelegate delegate;
     private IQueueExtent extent;
-    private int X,Z;
+    private int x;
+    private int z;
 
     public ChunkHolder() {
         this.delegate = NULL;
@@ -61,7 +62,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
             if (region != null) {
                 region.filter(this, filter, block, get, set);
             } else {
-                block = block.init(X, Z, get);
+                block = block.init(x, z, get);
                 for (int layer = 0; layer < 16; layer++) {
                     if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) continue;
                     block.init(get, set, layer);
@@ -118,7 +119,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
 
     private IChunkGet newGet() {
         if (extent instanceof SingleThreadQueueExtent) {
-            IChunkGet newGet = extent.getCachedGet(X, Z, this);
+            IChunkGet newGet = extent.getCachedGet(x, z, this);
             if (newGet != null) {
                 return newGet;
             }
@@ -127,10 +128,10 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     }
 
     @Override
-    public void init(final IQueueExtent extent, final int X, final int Z) {
+    public void init(final IQueueExtent extent, final int x, final int z) {
         this.extent = extent;
-        this.X = X;
-        this.Z = Z;
+        this.x = x;
+        this.z = z;
         if (set != null) {
             set.reset();
             delegate = SET;
@@ -146,12 +147,12 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
 
     @Override
     public int getX() {
-        return X;
+        return x;
     }
 
     @Override
     public int getZ() {
-        return Z;
+        return z;
     }
 
     @Override

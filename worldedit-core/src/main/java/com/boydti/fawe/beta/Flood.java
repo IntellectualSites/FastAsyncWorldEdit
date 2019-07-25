@@ -2,12 +2,10 @@ package com.boydti.fawe.beta;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -22,7 +20,9 @@ public class Flood {
     private int[][] queues;
     private long[][] visits;
 
-    private int X, Y, Z;
+    private int x;
+    private int y;
+    private int z;
 
     private ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
     private final Long2ObjectLinkedOpenHashMap<long[][]> chunkVisits;
@@ -45,17 +45,17 @@ public class Flood {
         IQueueExtent fq = queueHandler.getQueue(world);
         while (!chunkQueues.isEmpty()) {
             long firstKey = chunkQueues.firstLongKey();
-            int X = MathMan.unpairIntX(firstKey);
-            int Z = MathMan.unpairIntY(firstKey);
+            int x = MathMan.unpairIntX(firstKey);
+            int z = MathMan.unpairIntY(firstKey);
             int[][] chunkQueue = chunkQueues.get(firstKey);
             // apply
         }
     }
 
-    private void init(int X, int Y, int Z) {
-        this.X = X;
-        this.Y = Y;
-        this.Z = Z;
+    private void init(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     public void start(int x, int y, int z) {
@@ -63,9 +63,9 @@ public class Flood {
     }
 
     private void push(int x, int y, int z, int depth) {
-        int X = x >> 4;
-        int Z = z >> 4;
-        long pair = MathMan.pairInt(X, Z);
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
+        long pair = MathMan.pairInt(chunkX, chunkZ);
         int layer = y >> 4;
         int[] section = getOrCreateQueue(pair, layer);
         int val = (x & 15) + ((z & 15) << 4)  + ((y & 15) << 8) + (depth << 12);
@@ -154,8 +154,8 @@ public class Flood {
                 visit = visits[sectionIndex];
                 queue = queues[sectionIndex];
                 if (visit == null || queue == null) {
-                    long pair = MathMan.pairInt(X + nextX, Z + nextZ);
-                    int layer = Y + nextY;
+                    long pair = MathMan.pairInt(this.x + nextX, this.z + nextZ);
+                    int layer = this.y + nextY;
                     if (layer < 0 || layer > 15) {
                         continue;
                     }

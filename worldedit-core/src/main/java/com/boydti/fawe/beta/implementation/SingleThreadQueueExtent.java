@@ -1,5 +1,7 @@
 package com.boydti.fawe.beta.implementation;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
@@ -10,13 +12,10 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Single threaded implementation for IQueueExtent (still abstract)
@@ -30,7 +29,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     private ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
 
     /**
-     * Safety check to ensure that the thread being used matches the one being initialized on
+     * Safety check to ensure that the thread being used matches the one being initialized on.
      *  - Can be removed later
      */
     private void checkThread() {
@@ -45,7 +44,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     /**
-     * Reset the queue
+     * Resets the queue.
      */
     protected synchronized void reset() {
         checkThread();

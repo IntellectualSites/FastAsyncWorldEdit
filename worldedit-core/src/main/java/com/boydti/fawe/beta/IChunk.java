@@ -1,17 +1,15 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import javax.annotation.Nullable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 
 /**
  * Represents a chunk in the queue {@link IQueueExtent}
@@ -21,10 +19,10 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     /**
      * Initialize at the location
      * @param extent
-     * @param X
-     * @param Z
+     * @param x
+     * @param z
      */
-    void init(IQueueExtent extent, int X, int Z);
+    void init(IQueueExtent extent, int x, int z);
 
     IQueueExtent getQueue();
 
