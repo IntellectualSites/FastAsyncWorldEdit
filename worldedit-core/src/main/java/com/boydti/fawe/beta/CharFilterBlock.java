@@ -1,5 +1,7 @@
 package com.boydti.fawe.beta;
 
+import static com.sk89q.worldedit.world.block.BlockTypes.states;
+
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
@@ -9,10 +11,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-
 import javax.annotation.Nullable;
-
-import static com.sk89q.worldedit.world.block.BlockTypes.states;
 public class CharFilterBlock extends ChunkFilterBlock {
     private CharGetBlocks get;
     private IChunkSet set;
@@ -29,12 +28,12 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final ChunkFilterBlock init(final int X, final int Z, final IChunkGet chunk) {
+    public final ChunkFilterBlock init(final int x, final int z, final IChunkGet chunk) {
         this.get = (CharGetBlocks) chunk;
-        this.X = X;
-        this.Z = Z;
-        this.xx = X << 4;
-        this.zz = Z << 4;
+        this.X = x;
+        this.Z = z;
+        this.xx = x << 4;
+        this.zz = z << 4;
         return this;
     }
 

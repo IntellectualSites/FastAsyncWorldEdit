@@ -620,18 +620,18 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set) {
-        int X = chunk.getX();
-        int Z = chunk.getZ();
-        block = block.init(X, Z, get);
+        int x = chunk.getX();
+        int z = chunk.getZ();
+        block = block.init(x, z, get);
 
-        if ((minX + 15) >> 4 <= X && (maxX - 15) >> 4 >= X && (minZ + 15) >> 4 <= Z && (maxZ - 15) >> 4 >= Z) {
+        if ((minX + 15) >> 4 <= x && (maxX - 15) >> 4 >= x && (minZ + 15) >> 4 <= z && (maxZ - 15) >> 4 >= z) {
             filter(chunk, filter, block, get, set, minY, maxY);
             return;
         }
-        int localMinX = Math.max(minX, X << 4) & 15;
-        int localMaxX = Math.min(maxX, 15 + X << 4) & 15;
-        int localMinZ = Math.max(minZ, Z << 4) & 15;
-        int localMaxZ = Math.min(maxZ, 15 + Z << 4) & 15;
+        int localMinX = Math.max(minX, x << 4) & 15;
+        int localMaxX = Math.min(maxX, 15 + x << 4) & 15;
+        int localMinZ = Math.max(minZ, z << 4) & 15;
+        int localMaxZ = Math.min(maxZ, 15 + z << 4) & 15;
 
         int yStart = (minY & 15);
         int yEnd = (maxY & 15);

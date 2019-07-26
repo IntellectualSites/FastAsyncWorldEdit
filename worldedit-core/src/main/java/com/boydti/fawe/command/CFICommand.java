@@ -2,20 +2,18 @@ package com.boydti.fawe.command;
 
 import static com.sk89q.worldedit.util.formatting.text.TextComponent.newline;
 
-import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CFICommand extends CommandProcessor<Object, Object> {
 
@@ -51,12 +49,11 @@ public class CFICommand extends CommandProcessor<Object, Object> {
     private List<String> dispatch(FawePlayer fp, CFICommands.CFISettings settings, List<String> args, InjectedValueAccess context) {
         if (!settings.hasGenerator()) {
             if (args.size() == 0) {
-                String hmCmd = CFICommands.alias() + " ";
+                String hmCmd = "/cfi ";
                 if (settings.image == null) {
                     hmCmd += "image";
                 } else {
-                    hmCmd =
-                        Commands.getAlias(CFICommands.class, "heightmap") + " " + settings.imageArg;
+                    hmCmd = "heightmap" + " " + settings.imageArg;
                 }
                 TextComponent build = TextComponent.builder("What do you want to use as the base?")
                     .append(newline())

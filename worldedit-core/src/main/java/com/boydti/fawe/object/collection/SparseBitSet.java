@@ -51,6 +51,7 @@ import java.io.Serializable;
  * @version     1.0, 2009-03-17
  * @since       1.6
  */
+@SuppressWarnings("ALL")
 public class SparseBitSet implements Cloneable, Serializable
 {
     /*  My apologies for listing all the additional authors, but concepts, code,

@@ -16,6 +16,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -395,7 +396,7 @@ public enum BBC {
     BBC(String defaultMessage, String category) {
         this.defaultMessage = defaultMessage;
         this.translatedMessage = defaultMessage;
-        this.category = category.toLowerCase();
+        this.category = category.toLowerCase(Locale.ROOT);
     }
 
     public String format(Object... args) {
@@ -436,13 +437,13 @@ public enum BBC {
                     continue;
                 }
                 final String[] split = key.split("\\.");
-                final String node = split[split.length - 1].toUpperCase();
+                final String node = split[split.length - 1].toUpperCase(Locale.ROOT);
                 final BBC caption = allNames.contains(node) ? valueOf(node) : null;
                 if (caption != null) {
                     if (!split[0].equalsIgnoreCase(caption.category)) {
                         changed = true;
                         yml.set(key, null);
-                        yml.set(caption.category + "." + caption.name().toLowerCase(), value);
+                        yml.set(caption.category + "." + caption.name().toLowerCase(Locale.ROOT), value);
                     }
                     captions.add(caption);
                     caption.translatedMessage = (String) value;
@@ -457,7 +458,7 @@ public enum BBC {
             for (BBC caption : all) {
                 if (!captions.contains(caption)) {
                     changed = true;
-                    yml.set(caption.category + "." + caption.name().toLowerCase(), caption.defaultMessage);
+                    yml.set(caption.category + "." + caption.name().toLowerCase(Locale.ROOT), caption.defaultMessage);
                 }
                 caption.translatedMessage = StringMan.replaceFromMap(caption.translatedMessage, replacements);
             }
@@ -662,7 +663,7 @@ public enum BBC {
                     int index = builder.length();
                     if (!Objects.equals(color, newColor)) {
                         style[0] = newColor;
-                        char code = BBC.getCode(newColor.toUpperCase());
+                        char code = BBC.getCode(newColor.toUpperCase(Locale.ROOT));
                         builder.append('\u00A7').append(code);
                     }
                     for (Map.Entry<String, Object> entry2 : obj.entrySet()) {
@@ -670,12 +671,12 @@ public enum BBC {
                             boolean newValue = Boolean.parseBoolean((String) entry2.getValue());
                             if (properties.put(entry2.getKey(), newValue) != newValue) {
                                 if (newValue) {
-                                    char code = BBC.getCode(entry2.getKey().toUpperCase());
+                                    char code = BBC.getCode(entry2.getKey().toUpperCase(Locale.ROOT));
                                     builder.append('\u00A7').append(code);
                                 } else {
                                     builder.insert(index, '\u00A7').append('r');
                                     if (Objects.equals(color, newColor) && newColor != null) {
-                                        builder.append('\u00A7').append(BBC.getCode(newColor.toUpperCase()));
+                                        builder.append('\u00A7').append(BBC.getCode(newColor.toUpperCase(Locale.ROOT)));
                                     }
                                 }
                             }

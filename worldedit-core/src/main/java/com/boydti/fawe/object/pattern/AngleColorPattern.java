@@ -19,7 +19,7 @@ public class AngleColorPattern extends DataAnglePattern {
 
     public int getColor(int color, int slope) {
         if (slope == 0) return color;
-        double newFactor = (1 - Math.min(1, slope * FACTOR));
+        double newFactor = (1 - Math.min(1, slope * factor));
         int newRed = (int) (((color >> 16) & 0xFF) * newFactor);
         int newGreen = (int) (((color >> 8) & 0xFF) * newFactor);
         int newBlue = (int) (((color >> 0) & 0xFF) * newFactor);

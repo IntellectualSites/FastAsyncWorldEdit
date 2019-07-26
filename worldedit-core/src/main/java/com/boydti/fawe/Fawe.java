@@ -2,7 +2,6 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VisualQueue;
@@ -311,7 +310,6 @@ public class Fawe {
             // Setting up message.yml
             String lang = Objects.toString(Settings.IMP.LANGUAGE);
             BBC.load(new File(this.IMP.getDirectory(), (lang.isEmpty() ? "" : lang + File.separator) + "message.yml"));
-            Commands.load(new File(INSTANCE.IMP.getDirectory(), "commands.yml"));
         } catch (Throwable e) {
             debug("====== Failed to load config ======");
             debug("Please validate your yaml files:");

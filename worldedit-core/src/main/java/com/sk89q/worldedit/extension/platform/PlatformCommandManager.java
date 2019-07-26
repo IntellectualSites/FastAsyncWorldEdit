@@ -26,6 +26,7 @@ import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.AnvilCommandsRegistration;
 import com.boydti.fawe.command.CFICommand;
 import com.boydti.fawe.command.CFICommands;
+import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
@@ -45,6 +46,7 @@ import com.sk89q.worldedit.command.BiomeCommandsRegistration;
 import com.sk89q.worldedit.command.BrushCommands;
 import com.sk89q.worldedit.command.BrushCommandsRegistration;
 import com.sk89q.worldedit.command.BrushOptionsCommands;
+import com.sk89q.worldedit.command.BrushOptionsCommandsRegistration;
 import com.sk89q.worldedit.command.ChunkCommands;
 import com.sk89q.worldedit.command.ChunkCommandsRegistration;
 import com.sk89q.worldedit.command.ClipboardCommands;
@@ -360,6 +362,13 @@ public final class PlatformCommandManager {
                 new WorldEditCommands(worldEdit)
             );
             registerSubCommands(
+                "cfi",
+                ImmutableList.of(),
+                "CFI commands",
+                CFICommandsRegistration.builder(),
+                new CFICommands(worldEdit)
+            );
+            registerSubCommands(
                 "/anvil",
                 ImmutableList.of(),
                 "Manipulate billions of blocks https://github.com/boy0001/FastAsyncWorldedit/wiki/Anvil-API",
@@ -404,7 +413,7 @@ public final class PlatformCommandManager {
             );
             this.registration.register(
                     new CFICommand(commandManager),
-                    CFICommands.builder(),
+                    CFICommandsRegistration.builder(),
                     new CFICommands(worldEdit)
             );
             this.registration.register(

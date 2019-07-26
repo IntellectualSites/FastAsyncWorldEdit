@@ -162,7 +162,7 @@ public class NavigationCommands {
     public void jumpTo(Player player,
         @Arg(desc = "Location to jump to", def = "")
             Location pos,
-        @Switch(name='f', desc = "force teleport")
+        @Switch(name = 'f', desc = "force teleport")
             boolean force) throws WorldEditException {
 
         if (pos == null) {

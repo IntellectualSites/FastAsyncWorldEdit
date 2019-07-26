@@ -8,7 +8,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.beta.SingleFilterBlock;
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.config.Commands;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
@@ -403,7 +402,7 @@ public class CFICommands {
                 .append(" - Block textures within a complexity range")
                 .append(newline())
                 .append(TextComponent.of("< [Back]").clickEvent(ClickEvent
-                    .runCommand("/cfi " + Commands.getAlias(CFICommands.class, "coloring"))))
+                    .runCommand("/cfi coloring")))
                 .build();
             fp.toWorldEditPlayer().print(build);
             return;
@@ -813,13 +812,13 @@ public class CFICommands {
 
         //TODO fix this so it can execute commands and show tooltips.
         @NonNull Builder builder = TextComponent.builder(">> Current Settings <<").append(newline())
-                .append("Randomization ").append("[" + Boolean.toString(rand).toUpperCase() + "]")//.cmdTip(alias() + " randomization " + (!rand))
+                .append("Randomization ").append("[" + Boolean.toString(rand).toUpperCase() + "]")//.cmdTip("/cfi randomization " + (!rand))
                 .append(newline())
-                .append("Mask ").append("[" + mask + "]")//.cmdTip(alias() + " mask")
+                .append("Mask ").append("[" + mask + "]")//.cmdTip("/cfi mask")
                 .append(newline())
-                .append("Blocks ").append("[" + blocks + "]")//.tooltip(blockList).command(alias() + " paletteBlocks")
+                .append("Blocks ").append("[" + blocks + "]")//.tooltip(blockList).command("/cfi paletteBlocks")
                 .append(newline())
-                .append("BiomePriority ").append("[" + biomePriority + "]")//.cmdTip(alias() + " biomepriority")
+                .append("BiomePriority ").append("[" + biomePriority + "]")//.cmdTip("/cfi biomepriority")
                 .append(newline());
 
         if (settings.image != null) {
@@ -835,16 +834,16 @@ public class CFICommands {
             }
 
             builder.append("Image: ")
-                    .append("[" + settings.imageArg + "]")//.cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "image"))
+                    .append("[" + settings.imageArg + "]")//.cmdTip("/cfi " + Commands.getAlias(CFICommands.class, "image"))
                     .append(newline()).append(newline())
                     .append("Let's Color: ")
-                    //.cmdOptions(alias() + " ", colorArgs.toString(), "Biomes", "Blocks", "BlockAndBiome", "Glass")
+                    //.cmdOptions("/cfi ", colorArgs.toString(), "Biomes", "Blocks", "BlockAndBiome", "Glass")
                     .append(newline());
         } else {
             builder.append(newline()).append("You can color a world using an image like ")
                     .append(TextComponent.of("[This]").clickEvent(ClickEvent.openUrl("http://i.imgur.com/vJYinIU.jpg"))).append(newline())
                     .append("You MUST provide an image: ")
-                    .append("[None]");//.cmdTip(alias() + " " + Commands.getAlias(Command.class, "image")).append(newline());
+                    .append("[None]");//.cmdTip("/cfi " + Commands.getAlias(Command.class, "image")).append(newline());
         }
         builder.append("< [Back]");//.cmdTip(alias()).send(fp);
         fp.toWorldEditPlayer().print(builder.build());
@@ -865,11 +864,9 @@ public class CFICommands {
         settings.maskArg = mask != null ? split[index++] : null;
         settings.whiteOnly = !disableWhiteOnly;
 
-        StringBuilder cmd = new StringBuilder("/cfi mask ");
-
         String s = "/cfi mask http://";
         String s1 = "/cfi mask <mask>";
-        String s2 = alias() + " " + settings.getCategory();
+        String s2 = "/cfi " + settings.getCategory();
         TextComponent build = TextComponent.builder(">> Current Settings <<")
             .append(newline())
             .append("Image Mask ").append(
@@ -899,13 +896,13 @@ public class CFICommands {
         settings.pattern = pattern;
         settings.patternArg = pattern == null ? null : split[index++];
 
-        StringBuilder cmd = new StringBuilder(alias() + " pattern ");
+        StringBuilder cmd = new StringBuilder("/cfi pattern ");
 
         if (pattern != null) {
             settings.getCategory().accept(fp);
         } else {
             String s = cmd + " stone";
-            String s1 = alias() + " " + settings.getCategory();
+            String s1 = "/cfi " + settings.getCategory();
             TextComponent build = TextComponent.builder(">> Current Settings <<").append(newline())
                 .append("Pattern ").append(TextComponent.of("[Click Here]")
                     .hoverEvent(HoverEvent.showText(TextComponent.of(s)))
@@ -939,7 +936,7 @@ public class CFICommands {
             desc = "Select an image"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void image(FawePlayer fp, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, InjectedValueAccess context)throws CommandException {
+    public void image(FawePlayer fp, @Arg(desc = "image url or filename", def = "") ProvideBindings.ImageUri image, InjectedValueAccess context)throws CommandException {
         CFISettings settings = getSettings(fp);
         String[] split = getArguments(context).split(" ");
         int index = 2;
@@ -978,9 +975,9 @@ public class CFICommands {
         TextComponent build = TextComponent.builder("What would you like to populate?")
             .append(newline())
             .append("(You will need to type these commands)").append(newline())
-            //TODO .cmdOptions(alias() + " ", "", "Ores", "Ore", "Caves", "Schematics", "Smooth")
+            //TODO .cmdOptions("/cfi ", "", "Ores", "Ore", "Caves", "Schematics", "Smooth")
             .append(newline())
-            .append(TextComponent.of("< [Back]").clickEvent(ClickEvent.runCommand(alias())))
+            .append(TextComponent.of("< [Back]").clickEvent(ClickEvent.runCommand("/cfi")))
             .build();
         fp.toWorldEditPlayer().print(build);
     }
@@ -1018,39 +1015,39 @@ public class CFICommands {
             maskArgs.append(" -w");
         }
 
-        String height = Commands.getAlias(CFICommands.class, "height");
-        String waterHeight = Commands.getAlias(CFICommands.class, "waterheight");
-        String snow = Commands.getAlias(CFICommands.class, "snow");
+        String height = "/cfi height";
+        String waterHeight = "/cfi waterheight";
+        String snow = "/cfi snow";
 
         //TODO
         @NonNull Builder msg = TextComponent.builder(">> Current Settings <<").append(newline())
                 .append("Mask ").append(TextComponent.of("[" + mask + "]")
-                .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " mask")))
-                .clickEvent(ClickEvent.runCommand(alias() + " mask")))
+                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi mask")))
+                .clickEvent(ClickEvent.runCommand("/cfi mask")))
                 .append(newline())
                 .append("Pattern ").append(TextComponent.of("[" + pattern + "]")
-                .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " pattern")))
-                .clickEvent(ClickEvent.runCommand(alias() + " pattern")))
+                .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi pattern")))
+                .clickEvent(ClickEvent.runCommand("/cfi pattern")))
                 .append(newline())
                 .append(newline())
                 .append(">> Components <<")
                 .append(newline())
                 .append(TextComponent.of("[Height]")
-                    .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("height") + " 120")))
-                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("height") + " 120"))).append(" - Terrain height for whole map")
+                    .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi height 120")))
+                    .clickEvent(ClickEvent.suggestCommand("/cfi height 120"))).append(" - Terrain height for whole map")
                 .append(newline())
                 .append(TextComponent.of("[WaterHeight]")
-                    .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("waterheight") + " 60")))
-                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("waterheight") + " 60"))).append(" - Sea level for whole map")
+                    .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi waterheight 60")))
+                    .clickEvent(ClickEvent.suggestCommand("/cfi waterheight 60"))).append(" - Sea level for whole map")
                 .append(newline())
-                .append(TextComponent.of("[FloorThickness]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("floorthickness") + " 60")))
-                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("floorthickness") + " 60"))).append(" - Floor thickness of entire map")
+                .append(TextComponent.of("[FloorThickness]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi floorthickness 60")))
+                    .clickEvent(ClickEvent.suggestCommand("/cfi floorthickness 60"))).append(" - Floor thickness of entire map")
                 .append(newline())
-                .append(TextComponent.of("[WorldThickness]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("worldthickness") + " 60")))
-                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("worldthickness") + " 60"))).append(" - World thickness of entire map")
+                .append(TextComponent.of("[WorldThickness]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi worldthickness 60")))
+                    .clickEvent(ClickEvent.suggestCommand("/cfi worldthickness 60"))).append(" - World thickness of entire map")
                 .append(newline())
-                .append(TextComponent.of("[Snow]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " " + alias("snow") + maskArgs)))
-                    .clickEvent(ClickEvent.suggestCommand(alias() + " " + alias("snow") + maskArgs))).append(" - Set snow in the masked areas")
+                .append(TextComponent.of("[Snow]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi snow" + maskArgs)))
+                    .clickEvent(ClickEvent.suggestCommand("/cfi snow" + maskArgs))).append(" - Set snow in the masked areas")
                 .append(newline());
 
         if (pattern != null) {
@@ -1067,38 +1064,38 @@ public class CFICommands {
 
             msg
                     .append(TextComponent.of("[WaterId]")
-                        .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " waterId " + pattern)))
-                        .clickEvent(ClickEvent.runCommand(alias() + " waterId " + pattern)))
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi waterId " + pattern)))
+                        .clickEvent(ClickEvent.runCommand("/cfi waterId " + pattern)))
                 .append(" - Water id for whole map")
                 .append(newline())
                     .append(TextComponent.of("[BedrockId]")
-                        .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " baseId " + pattern)))
-                        .clickEvent(ClickEvent.runCommand(alias() + " baseId " + pattern)))
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi baseId " + pattern)))
+                        .clickEvent(ClickEvent.runCommand("/cfi baseId " + pattern)))
                 .append(TextComponent.of(" - Bedrock id for whole map"))
                 .append(newline())
                     .append(TextComponent.of("[Floor]")
-                        .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " floor " + compArgs)))
-                        .clickEvent(ClickEvent.runCommand(alias() + " floor " + compArgs)))
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi floor " + compArgs)))
+                        .clickEvent(ClickEvent.runCommand("/cfi floor " + compArgs)))
                 .append(TextComponent.of(" - Set the floor in the masked areas")).append(newline())
                     .append(TextComponent.of("[Main]")
-                        .hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " main " + compArgs)))
-                        .clickEvent(ClickEvent.runCommand(alias() + " main " + compArgs)))
+                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi main " + compArgs)))
+                        .clickEvent(ClickEvent.runCommand("/cfi main " + compArgs)))
                 .append(TextComponent.of(" - Set the main block in the masked areas")).append(newline())
-                    .append(TextComponent.of("[Column]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " column" + compArgs)))
-                        .clickEvent(ClickEvent.runCommand(alias() + " column" + compArgs))).append(" - Set the columns in the masked areas").append(newline())
-                    .append(TextComponent.of("[Overlay]").hoverEvent(HoverEvent.showText(TextComponent.of(alias() + " overlay" + compArgs)))
-                        .clickEvent(ClickEvent.runCommand(alias() + " overlay" + compArgs))).append(" - Set the overlay in the masked areas").append(newline());
+                    .append(TextComponent.of("[Column]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi column" + compArgs)))
+                        .clickEvent(ClickEvent.runCommand("/cfi column" + compArgs))).append(" - Set the columns in the masked areas").append(newline())
+                    .append(TextComponent.of("[Overlay]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi overlay" + compArgs)))
+                        .clickEvent(ClickEvent.runCommand("/cfi overlay" + compArgs))).append(" - Set the overlay in the masked areas").append(newline());
         }
 
         msg.append(newline())
-                .append(TextComponent.of("< [Back]").hoverEvent(HoverEvent.showText(TextComponent.of(alias()))).clickEvent(ClickEvent.runCommand(alias())));
+                .append(TextComponent.of("< [Back]").hoverEvent(HoverEvent.showText(TextComponent.of("/cfi"))).clickEvent(ClickEvent.runCommand("/cfi")));
         fp.toWorldEditPlayer().print(msg.build());
     }
 
     private static CFISettings assertSettings(FawePlayer fp) {
         CFISettings settings = getSettings(fp);
         if (!settings.hasGenerator()) {
-            throw new StopExecutionException(TextComponent.of("Please use /" + alias()));
+            throw new StopExecutionException(TextComponent.of("Please use /cfi"));
         }
         return settings;
     }
@@ -1230,22 +1227,14 @@ public class CFICommands {
         }
     }
 
-    protected static String alias() {
-        return Commands.getAlias(CFICommand.class, "/cfi");
-    }
-
-    protected static String alias(String command) {
-        return Commands.getAlias(CFICommands.class, command);
-    }
-
     @SuppressWarnings("unused")
     protected static void mainMenu(FawePlayer fp) {
         //TODO
 //        msg("What do you want to do now?").append(newline())
-//                .cmdOptions(alias() + " ", "", "Coloring", "Component", "Populate", "Brush")
-//                .append(newline()).text("<> [View]").command(alias() + " " + Commands.getAlias(CFICommands.class, "download")).tooltip("View full resolution image")
-//                .append(newline()).text(">< [Cancel]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "cancel"))
-//                .append(newline()).text("&2>> [Done]").cmdTip(alias() + " " + Commands.getAlias(CFICommands.class, "done"))
+//                .cmdOptions("/cfi ", "", "Coloring", "Component", "Populate", "Brush")
+//                .append(newline()).text("<> [View]").command("/cfi " + Commands.getAlias(CFICommands.class, "download")).tooltip("View full resolution image")
+//                .append(newline()).text(">< [Cancel]").cmdTip("/cfi " + Commands.getAlias(CFICommands.class, "cancel"))
+//                .append(newline()).text("&2>> [Done]").cmdTip("/cfi " + Commands.getAlias(CFICommands.class, "done"))
 //                .send(fp);
     }
 }

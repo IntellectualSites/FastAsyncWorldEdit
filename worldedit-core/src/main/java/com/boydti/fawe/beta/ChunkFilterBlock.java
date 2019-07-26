@@ -1,17 +1,14 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-
-import javax.annotation.Nullable;
 
 public abstract class ChunkFilterBlock extends SimpleFilterBlock {
     public ChunkFilterBlock(Extent extent) {
         super(extent);
     }
 
-    public abstract ChunkFilterBlock init(int X, int Z, IChunkGet chunk);
+    public abstract ChunkFilterBlock init(int x, int z, IChunkGet chunk);
 
     public abstract ChunkFilterBlock init(final IChunkGet iget, final IChunkSet iset, final int layer);
 

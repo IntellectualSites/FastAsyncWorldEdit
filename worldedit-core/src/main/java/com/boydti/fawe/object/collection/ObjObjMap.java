@@ -69,8 +69,7 @@ public class ObjObjMap<K, V> {
 
 //        if ( k == FREE_KEY )
 //            return null;  //end of chain already
-        if (k == key) //we check FREE and REMOVED prior to this call
-        {
+        if (k == key) {//we check FREE and REMOVED prior to this call
             return (V) m_data[ptr + 1];
         }
         while (true) {

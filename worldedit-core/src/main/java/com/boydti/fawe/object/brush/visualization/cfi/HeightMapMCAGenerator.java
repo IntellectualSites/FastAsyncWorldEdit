@@ -24,7 +24,6 @@ import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -42,7 +41,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockID;
@@ -50,8 +48,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
-import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,6 +58,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.annotation.Nullable;
 
 // TODO FIXME
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
@@ -139,7 +136,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
             }
             resetPrimtives();
-        } catch (Throwable neverHappens) { neverHappens.printStackTrace(); }
+        } catch (Throwable neverHappens) {
+            neverHappens.printStackTrace();
+        }
 
         blocks.flushChanges(out);
     }
@@ -171,7 +170,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
             }
             resetPrimtives();
-        } catch (Throwable neverHappens) { neverHappens.printStackTrace(); }
+        } catch (Throwable neverHappens) {
+            neverHappens.printStackTrace();
+        }
         blocks.undoChanges(in);
     }
 
@@ -191,7 +192,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
                 }
             }
             resetPrimtives();
-        } catch (Throwable neverHappens) { neverHappens.printStackTrace(); }
+        } catch (Throwable neverHappens) {
+            neverHappens.printStackTrace();
+        }
 
         blocks.clearChanges(); // blocks.redoChanges(in); Unsupported
     }
