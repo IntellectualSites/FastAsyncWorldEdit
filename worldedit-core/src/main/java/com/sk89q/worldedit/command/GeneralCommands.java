@@ -324,7 +324,7 @@ public class GeneralCommands {
                 checkRandomization = false;
             } else {
                 if (argLower.equals("#copy") || argLower.equals("#clipboard")) {
-                    Clipboard clipboard = worldEdit.getSessionManager().get(player).getClipboard().getClipboard();
+                    Clipboard clipboard = session.getClipboard().getClipboard();
                     util = TextureUtil.fromClipboard(clipboard);
                 } else if (argLower.equals("*") || argLower.equals("true")) {
                     util = Fawe.get().getTextureUtil();

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.MethodCommands.getArguments;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
@@ -216,7 +217,7 @@ public class RegionCommands {
                     @Selection Region region,
                     @Arg(desc = "The pattern of blocks to place")
                         Pattern pattern,
-                    @Arg(desc = "The thickness of the line", def = "0")
+                    @Range(min = 1) @Arg(desc = "The thickness of the line", def = "0")
                         int thickness,
                     @Switch(name = 'h', desc = "Generate only a shell")
                         boolean shell) throws WorldEditException {
@@ -546,7 +547,7 @@ public class RegionCommands {
                          boolean skipEntities,
                      @Switch(name = 'a', desc = "Ignore air blocks")
                          boolean ignoreAirBlocks,
-                     @Switch(name = 'm', desc = "TODO")
+                     @Switch(name = 'm', desc = "Source mask")
                          Mask sourceMask,
                     InjectedValueAccess context) throws WorldEditException {
         player.checkConfirmationStack(() -> {
@@ -672,7 +673,7 @@ public class RegionCommands {
     @Logging(REGION)
     public void hollow(FawePlayer player, EditSession editSession,
                       @Selection Region region,
-                      @Arg(desc = "Thickness of the shell to leave", def = "0")
+                       @Range(min = 0) @Arg(desc = "Thickness of the shell to leave", def = "0")
                           int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
