@@ -26,6 +26,9 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public abstract class PaginationBox extends MessageBox {
@@ -128,21 +131,44 @@ public abstract class PaginationBox extends MessageBox {
         throw new IllegalStateException("Pagination components must be created with a page");
     }
 
+    public static PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection lines) {
+        return new ListPaginationBox(header, pageCommand, lines);
+    }
+
     public static PaginationBox fromStrings(String header, @Nullable String pageCommand, List<String> lines) {
         return new ListPaginationBox(header, pageCommand, lines);
     }
 
     private static class ListPaginationBox extends PaginationBox {
-        private final List<String> lines;
+        private final Collection lines;
+        private int iterIndex;
+        private Iterator iterator;
 
         ListPaginationBox(String header, String pageCommand, List<String> lines) {
+            this(header, pageCommand, (Collection) lines);
+        }
+
+        ListPaginationBox(String header, String pageCommand, Collection lines) {
             super(header, pageCommand);
             this.lines = lines;
         }
 
         @Override
         public Component getComponent(int number) {
-            return TextComponent.of(lines.get(number));
+            Object obj;
+            if (lines instanceof List) {
+                obj = ((List) lines).get(number);
+            } else {
+                if (iterator == null || iterIndex > number) {
+                    iterator = lines.iterator();
+                    iterIndex = 0;
+                }
+                do {
+                    obj = iterator.next();
+                    iterIndex++;
+                } while (iterIndex < number);
+            }
+            return TextComponent.of(obj.toString());
         }
 
         @Override
