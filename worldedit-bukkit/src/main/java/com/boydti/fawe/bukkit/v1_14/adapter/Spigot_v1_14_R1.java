@@ -409,15 +409,15 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
         for (IBlockState state : blockStateList.d()) {
             Property property;
             if (state instanceof BlockStateBoolean) {
-                property = new BooleanProperty(state.a(), ImmutableList.copyOf(state.d()));
+                property = new BooleanProperty(state.a(), ImmutableList.copyOf(state.getValues()));
             } else if (state instanceof BlockStateDirection) {
                 property = new DirectionalProperty(state.a(),
-                        (List<Direction>) state.d().stream().map(e -> Direction.valueOf(((INamable) e).getName().toUpperCase())).collect(Collectors.toList()));
+                        (List<Direction>) state.getValues().stream().map(e -> Direction.valueOf(((INamable) e).getName().toUpperCase())).collect(Collectors.toList()));
             } else if (state instanceof BlockStateEnum) {
                 property = new EnumProperty(state.a(),
-                        (List<String>) state.d().stream().map(e -> ((INamable) e).getName()).collect(Collectors.toList()));
+                        (List<String>) state.getValues().stream().map(e -> ((INamable) e).getName()).collect(Collectors.toList()));
             } else if (state instanceof BlockStateInteger) {
-                property = new IntegerProperty(state.a(), ImmutableList.copyOf(state.d()));
+                property = new IntegerProperty(state.a(), ImmutableList.copyOf(state.getValues()));
             } else {
                 throw new IllegalArgumentException("WorldEdit needs an update to support " + state.getClass().getSimpleName());
             }
