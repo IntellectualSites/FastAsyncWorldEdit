@@ -8,7 +8,7 @@ public abstract class ChunkFilterBlock extends SimpleFilterBlock {
         super(extent);
     }
 
-    public abstract ChunkFilterBlock init(int x, int z, IChunkGet chunk);
+    public abstract ChunkFilterBlock init(int chunkX, int chunkZ, IChunkGet chunk);
 
     public abstract ChunkFilterBlock init(final IChunkGet iget, final IChunkSet iset, final int layer);
 
