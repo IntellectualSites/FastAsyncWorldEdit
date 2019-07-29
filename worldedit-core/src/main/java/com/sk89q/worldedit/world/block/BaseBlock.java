@@ -182,7 +182,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public void setNbtData(@Nullable CompoundTag nbtData) {
-        throw new UnsupportedOperationException("Immutable");
+        throw new UnsupportedOperationException("This class is immutable.");
     }
 
     /**
@@ -239,7 +239,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Override
-    public final BaseBlock toBaseBlock() {
+    public BaseBlock toBaseBlock() {
         return this;
     }
 

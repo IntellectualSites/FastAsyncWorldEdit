@@ -301,15 +301,15 @@ public class BlockState implements BlockStateHolder<BlockState>, FawePattern {
 
     @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
+        if (null == o) {
+            return false;
+        }
         if (this == o) {
             // Added a reference equality check for speediness
             return true;
         }
         if (o.getClass() == BlockState.class) {
             return o.getOrdinal() == this.getOrdinal();
-        }
-        if (null == o) {
-            return false;
         }
         return o.equalsFuzzy(this);
     }

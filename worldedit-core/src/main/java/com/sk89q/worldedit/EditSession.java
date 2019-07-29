@@ -150,12 +150,8 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -169,6 +165,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class EditSession extends AbstractDelegateExtent implements SimpleWorld, AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(EditSession.class);
+
+    //TODO
+    @Override
+    public String getId() {
+        return null;
+    }
 
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
@@ -1193,10 +1195,10 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     /**
      * Fills an area recursively in the X/Z directions.
      *
-     * @param origin    the location to start from
-     * @param pattern     the block to fill with
-     * @param radius    the radius of the spherical area to fill
-     * @param depth     the maximum depth, starting from the origin
+     * @param origin the location to start from
+     * @param pattern the block to fill with
+     * @param radius the radius of the spherical area to fill
+     * @param depth the maximum depth, starting from the origin
      * @param direction the direction to fill
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -2971,7 +2973,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 double scaledZ = (z - zero2D.getZ()) / unit2D.getZ();
 
                 try {
-                    if (expression.evaluateTimeout(timeout, scaledX, scaledZ, timeout) <= 0) {
+                    if (expression.evaluate(new double[]{scaledX, scaledZ}, timeout) <= 0) {
                         return null;
                     }
 
