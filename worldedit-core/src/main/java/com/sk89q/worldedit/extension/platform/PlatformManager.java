@@ -333,7 +333,7 @@ public class PlatformManager {
                 case HIT: {
                     // superpickaxe is special because its primary interaction is a left click, not a right click
                     // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
-                if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
+                if (session.hasSuperPickAxe()) {
                         final BlockTool superPickaxe = session.getSuperPickaxe();
                         if (superPickaxe != null && superPickaxe.canUse(player) && player.isHoldingPickAxe()) {
                             FawePlayer<?> fp = FawePlayer.wrap(player);

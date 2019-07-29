@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.MethodCommands.getArguments;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweAPI;
@@ -219,7 +220,7 @@ public class HistoryCommands {
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
     public void undo(Player player, LocalSession session,
-        @Arg(desc = "Number of undoes to perform", def = "1")
+        @Range(min = 1) @Arg(desc = "Number of undoes to perform", def = "1")
             int times,
         @Arg(name = "player", desc = "Undo this player's operations", def = "")
             String playerName,
@@ -266,7 +267,7 @@ public class HistoryCommands {
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})
     public void redo(Player player, LocalSession session,
-                     @Arg(desc = "Number of redoes to perform", def = "1")
+                     @Range(min = 1) @Arg(desc = "Number of redoes to perform", def = "1")
                          int times,
                      @Arg(name = "player", desc = "Redo this player's operations", def = "")
                          String playerName) throws WorldEditException {

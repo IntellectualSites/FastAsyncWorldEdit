@@ -80,7 +80,7 @@ public class AsyncSign extends AsyncBlockState implements Sign {
         CompoundTag nbt = getNbtData();
         if (nbt != null) {
             String color = nbt.getString("Color").toUpperCase();
-            return DyeColor.valueOf(color);
+            if (!color.isEmpty()) return DyeColor.valueOf(color);
         }
         return DyeColor.BLACK;
     }

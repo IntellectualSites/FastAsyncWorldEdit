@@ -91,13 +91,13 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.imageio.ImageIO;
-import org.checkerframework.checker.nullness.qual.NonNull;
+
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.inject.InjectedValueAccess;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility commands.
@@ -190,9 +190,9 @@ public class UtilityCommands {
     public int fill(Player player, LocalSession session, EditSession editSession,
                     @Arg(desc = "The blocks to fill with")
                         Pattern pattern,
-                    @Arg(desc = "The radius to fill in")
+                    @Range(min=1) @Arg(desc = "The radius to fill in")
                         double radius,
-                    @Arg(desc = "The depth to fill", def = "1")
+                    @Range(min=1) @Arg(desc = "The depth to fill", def = "1")
                         int depth,
                     @Arg(desc = "Direction to fill", def = "down") BlockVector3 direction) throws WorldEditException {
         radius = Math.max(1, radius);
@@ -285,7 +285,7 @@ public class UtilityCommands {
     public int fillr(Player player, LocalSession session, EditSession editSession,
                      @Arg(desc = "The blocks to fill with")
                          Pattern pattern,
-                     @Arg(desc = "The radius to fill in")
+                     @Range(min=1) @Arg(desc = "The radius to fill in")
                          double radius,
                      @Arg(desc = "The depth to fill", def = "")
                          Integer depth) throws WorldEditException {
@@ -307,7 +307,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.drain")
     @Logging(PLACEMENT)
     public int drain(Player player, LocalSession session, EditSession editSession,
-                     @Arg(desc = "The radius to drain")
+                     @Range(min=0) @Arg(desc = "The radius to drain")
                          double radius,
                      @Switch(name = 'w', desc = "Also un-waterlog blocks")
                          boolean waterlogged) throws WorldEditException {
@@ -327,7 +327,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.fixlava")
     @Logging(PLACEMENT)
     public int fixLava(Player player, LocalSession session, EditSession editSession,
-                       @Arg(desc = "The radius to fix in")
+                       @Range(min=0) @Arg(desc = "The radius to fix in")
                            double radius) throws WorldEditException {
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
@@ -344,7 +344,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.fixwater")
     @Logging(PLACEMENT)
     public int fixWater(Player player, LocalSession session, EditSession editSession,
-                        @Arg(desc = "The radius to fix in")
+                        @Range(min=0) @Arg(desc = "The radius to fix in")
                             double radius) throws WorldEditException {
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
@@ -361,7 +361,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.removeabove")
     @Logging(PLACEMENT)
     public int removeAbove(Player player, LocalSession session, EditSession editSession,
-                           @Arg(desc = "The apothem of the square to remove from", def = "1")
+                           @Range(min=1) @Arg(desc = "The apothem of the square to remove from", def = "1")
                                int size,
                            @Arg(desc = "The maximum height above you to remove from", def = "")
                                Integer height) throws WorldEditException {
@@ -406,7 +406,7 @@ public class UtilityCommands {
     public int removeNear(Player player, LocalSession session, EditSession editSession,
                           @Arg(desc = "The mask of blocks to remove")
                               Mask mask,
-                          @Arg(desc = "The radius of the square to remove from", def = "50")
+                          @Range(min=1) @Arg(desc = "The radius of the square to remove from", def = "50")
                               int radius) throws WorldEditException {
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
@@ -424,7 +424,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.replacenear")
     @Logging(PLACEMENT)
     public int replaceNear(Player player, LocalSession session, EditSession editSession,
-                           @Arg(desc = "The radius of the square to remove in")
+                           @Range(min=1) @Arg(desc = "The radius of the square to remove in")
                                int radius,
                            @Arg(desc = "The mask matching blocks to remove", def = "")
                                Mask from,
@@ -455,7 +455,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.snow")
     @Logging(PLACEMENT)
     public int snow(Player player, LocalSession session, EditSession editSession,
-                    @Arg(desc = "The radius of the circle to snow in", def = "10")
+                    @Range(min=1) @Arg(desc = "The radius of the circle to snow in", def = "10")
                         double size) throws WorldEditException {
         size = Math.max(1, size);
         we.checkMaxRadius(size);
@@ -473,7 +473,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.thaw")
     @Logging(PLACEMENT)
     public int thaw(Player player, LocalSession session, EditSession editSession,
-                    @Arg(desc = "The radius of the circle to thaw in", def = "10")
+                    @Range(min=1) @Arg(desc = "The radius of the circle to thaw in", def = "10")
                         double size) throws WorldEditException {
         size = Math.max(1, size);
         we.checkMaxRadius(size);
@@ -491,7 +491,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.green")
     @Logging(PLACEMENT)
     public int green(Player player, LocalSession session, EditSession editSession,
-                     @Arg(desc = "The radius of the circle to convert in", def = "10")
+                     @Range(min=1) @Arg(desc = "The radius of the circle to convert in", def = "10")
                          double size,
                      @Switch(name = 'f', desc = "Also convert coarse dirt")
                          boolean convertCoarse) throws WorldEditException {
@@ -512,7 +512,7 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.extinguish")
     @Logging(PLACEMENT)
     public void extinguish(Player player, LocalSession session, EditSession editSession,
-                           @Arg(desc = "The radius of the square to remove in", def = "")
+                           @Range(min=1) @Arg(desc = "The radius of the square to remove in", def = "")
                                Integer radius) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
@@ -595,7 +595,7 @@ public class UtilityCommands {
     public int remove(Actor actor,
                       @Arg(desc = "The type of entity to remove")
                           EntityRemover remover,
-                      @Arg(desc = "The radius of the cuboid to remove from")
+                      @Range(min=-1) @Arg(desc = "The radius of the cuboid to remove from")
                           int radius) throws WorldEditException {
         Player player = actor instanceof Player ? (Player) actor : null;
 
@@ -707,8 +707,8 @@ public class UtilityCommands {
         PrintCommandHelp.help(command, page, listSubCommands, we, actor);
     }
 
-    public static void list(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, String formatName, boolean playerFolder, String onClickCmd) {
-        list(dir, actor, args, page, -1, formatName, playerFolder, new RunnableVal3<Builder, URI, String>() {
+    public static void list(File dir, Actor actor, List<String> args, @Range(min = 0) int page, String formatName, boolean playerFolder, String onClickCmd) {
+        list(dir, actor, args, page, -1, formatName, playerFolder, false, false, new RunnableVal3<Builder, URI, String>() {
             @Override
             public void run(Builder m, URI uri, String fileName) {
                 m.append(BBC.SCHEMATIC_LIST_ELEM.format(fileName, ""));
@@ -719,7 +719,7 @@ public class UtilityCommands {
         });
     }
 
-    public static void list(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, RunnableVal3<Builder, URI, String> eachMsg) {
+    public static void list(File dir, Actor actor, List<String> args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, boolean oldFirst, boolean newFirst, RunnableVal3<Builder, URI, String> eachMsg) {
         List<File> fileList = new ArrayList<>();
         if (perPage == -1) perPage = actor instanceof Player ? 12 : 20; // More pages for console
         page = getFiles(dir, actor, args, page, perPage, formatName, playerFolder, fileList::add);
@@ -739,7 +739,7 @@ public class UtilityCommands {
             return;
         }
 
-        final int sortType = 0; //args.hasFlag('d') ? -1 : args.hasFlag('n') ? 1 : 0;
+        final int sortType = oldFirst ? -1 : newFirst ? 1 : 0;
         // cleanup file list
         fileList.sort((f1, f2) -> {
             boolean dir1 = f1.isDirectory();
@@ -766,12 +766,12 @@ public class UtilityCommands {
 
         int limit = Math.min(offset + perPage, fileList.size());
 
-        String fullArgs = (String) args.getLocals().get("arguments");
-        String baseCmd = null;
-        if (fullArgs != null) {
-            baseCmd = fullArgs.endsWith(" " + page) ? fullArgs.substring(0, fullArgs.length() - (" " + page).length()) : fullArgs;
-        }
-        @NonNull Builder m = TextComponent.builder(BBC.SCHEMATIC_LIST.format(page, pageCount));
+//        String fullArgs = (String) args.getLocals().get("arguments");
+//        String baseCmd = null;
+//        if (fullArgs != null) {
+//            baseCmd = fullArgs.endsWith(" " + page) ? fullArgs.substring(0, fullArgs.length() - (" " + page).length()) : fullArgs;
+//        }
+        @NotNull Builder m = TextComponent.builder(BBC.SCHEMATIC_LIST.format(page, pageCount));
 
         UUID uuid = playerFolder ? actor.getUniqueId() : null;
         for (int i = offset; i < limit; i++) {
@@ -779,22 +779,17 @@ public class UtilityCommands {
             File file = fileList.get(i);
             eachMsg.run(m, file.toURI(), getPath(dir, file, uuid));
         }
-        if (baseCmd != null) {
-            //TODO m.newline().paginate(baseCmd, page, pageCount);
-        }
+//        if (baseCmd != null) {
+//            //TODO m.newline().paginate(baseCmd, page, pageCount);
+//        }
         actor.print(m.build());
     }
 
-//    public static int getFiles(File root, Actor actor, InjectedValueAccess args, int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile, ListFilters... filters) {
-//        // TODO NOT IMPLEMENTED replace getFiles
-//        return page;
-//    }
-
-    public static int getFiles(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
+    public static int getFiles(File dir, Actor actor, List<String> args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
         Consumer<File> rootFunction = forEachFile;
         //schem list all <path>
 
-        int len = args.argsLength();
+        int len = args.size();
         List<String> filters = new ArrayList<>();
 
         String dirFilter = File.separator;
@@ -803,8 +798,8 @@ public class UtilityCommands {
         boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
             int max = len;
-            if (MathMan.isInteger(args.getString(len - 1))) {
-                page = args.getInteger(--len);
+            if (MathMan.isInteger(args.get(len - 1))) {
+                page = Integer.parseInt(args.get(--len));
             }
             for (int i = 0; i < len; i++) {
                 String arg = "";
