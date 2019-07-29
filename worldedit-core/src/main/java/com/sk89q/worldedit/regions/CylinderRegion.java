@@ -296,6 +296,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     /**
      * Checks to see if a point is inside this region.
      */
+    /* Slow and unnecessary
     @Override
     public boolean contains(BlockVector3 position) {
         final int blockY = position.getBlockY();
@@ -305,6 +306,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
         return position.toBlockVector2().subtract(center).toVector2().divide(radius).lengthSq() <= 1;
     }
+    */
 
     /**
      * Checks to see if a point is inside this region.

@@ -67,8 +67,14 @@ public class IntegerProperty extends AbstractProperty<Integer> {
     public Integer getValueFor(String string) {
         try {
             int val = Integer.parseInt(string);
+            /*
             //It shouldn't matter if this check is slow. It's an important check
             if (!getValues().contains(val)) {
+                throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + getValues().toString());
+            }
+            */
+            // An exception will get thrown anyway if the property doesn't exist, so it's not really that important. Anyway, we can check the array instead of the string list
+            if (val > 0 && val >= map.length) {
                 throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + getValues().toString());
             }
             return val;

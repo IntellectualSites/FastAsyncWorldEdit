@@ -88,8 +88,8 @@ public class MaskCommands {
     }
 
     @Command(
-            name = "false",
-            aliases = {"#false"},
+            name = "#false",
+            aliases = {"false"},
             desc = "Always false"
     )
     public Mask falseMask(Extent extent) {
@@ -97,8 +97,8 @@ public class MaskCommands {
     }
 
     @Command(
-            name = "true",
-            aliases = {"#true"},
+            name = "#true",
+            aliases = {"true"},
             desc = "Always true"
     )
     public Mask trueMask(Extent extent) {

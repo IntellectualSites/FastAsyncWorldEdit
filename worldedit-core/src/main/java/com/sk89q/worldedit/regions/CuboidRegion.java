@@ -392,6 +392,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return chunks;
     }
 
+    /* Slow and unnecessary
     @Override
     public boolean contains(BlockVector3 position) {
         BlockVector3 min = getMinimumPoint();
@@ -399,6 +400,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
         return position.containedWithin(min, max);
     }
+    */
 
     @Override
     public boolean contains(int x, int y, int z) {

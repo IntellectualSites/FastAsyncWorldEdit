@@ -48,6 +48,7 @@ public abstract class BlockVector3 {
     }
 
     public static BlockVector3 at(int x, int y, int z) {
+        /* unnecessary
         // switch for efficiency on typical cases
         // in MC y is rarely 0/1 on selections
         switch (y) {
@@ -62,6 +63,7 @@ public abstract class BlockVector3 {
                 }
                 break;
         }
+        */
         return new BlockVector3Imp(x, y, z);
     }
 

@@ -168,15 +168,17 @@ public class Schematic {
         return editSession;
     }
 
-    public void paste(Extent extent, BlockVector3 to, boolean pasteAir, Transform transform) {
-        checkNotNull(transform);
-        Extent source = new BlockTransformExtent(clipboard, transform);
-        ForwardExtentCopy copy = new ForwardExtentCopy(source, clipboard.getRegion(),
-            clipboard.getOrigin(), extent, to);
-        copy.setTransform(transform);
-        copy.setCopyingBiomes(
-            !(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP
-                .hasBiomes());
+    public void paste(Extent extent, BlockVector3 to, boolean pasteAir, @Nullable Transform transform) {
+        Extent source = clipboard;
+        if (transform != null && !transform.isIdentity()) {
+            source = new BlockTransformExtent(clipboard, transform);
+        }
+        ForwardExtentCopy copy = new ForwardExtentCopy(source, clipboard.getRegion(), clipboard.getOrigin(), extent, to);
+        if (transform != null) {
+            copy.setTransform(transform);
+        }
+        copy.setCopyingBiomes(!(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP
+                        .hasBiomes());
         if (extent instanceof EditSession) {
             EditSession editSession = (EditSession) extent;
             Mask sourceMask = editSession.getSourceMask();

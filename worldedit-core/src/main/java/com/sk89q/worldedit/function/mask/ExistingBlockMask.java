@@ -40,7 +40,7 @@ public class ExistingBlockMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return !getExtent().getBlock(vector).getBlockType().getMaterial().isAir();
+        return !vector.getBlock(getExtent()).getMaterial().isAir();
     }
 
     @Nullable

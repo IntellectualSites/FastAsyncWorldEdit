@@ -33,6 +33,7 @@ public class Vector2 {
     public static final Vector2 ONE = new Vector2(1, 1);
 
     public static Vector2 at(double x, double z) {
+        /* Unnecessary
         int xTrunc = (int) x;
         switch (xTrunc) {
             case 0:
@@ -46,6 +47,7 @@ public class Vector2 {
                 }
                 break;
         }
+        */
         return new Vector2(x, z);
     }
 

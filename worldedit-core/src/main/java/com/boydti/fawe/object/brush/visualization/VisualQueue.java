@@ -16,7 +16,7 @@ public class VisualQueue extends SingleThreadIntervalQueue<FawePlayer> {
 
     @Override
     public void operate(FawePlayer fp) {
-        LocalSession session = WorldEdit.getInstance().getSessionManager().get(fp.toWorldEditPlayer());
+        LocalSession session = fp.getSession();
         Player player = fp.getPlayer();
         Tool tool = session.getTool(player);
         if (tool instanceof BrushTool) {

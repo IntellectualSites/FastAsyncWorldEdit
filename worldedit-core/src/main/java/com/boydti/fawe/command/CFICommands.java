@@ -71,13 +71,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import javax.imageio.ImageIO;
-import org.checkerframework.checker.nullness.qual.NonNull;
+
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
+import org.jetbrains.annotations.NotNull;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class CFICommands {
@@ -154,7 +155,7 @@ public class CFICommands {
     public void brush(FawePlayer fp) {
         CFISettings settings = assertSettings(fp);
         settings.popMessages(fp);
-        @NonNull Builder msg;
+        @NotNull Builder msg;
         if (settings.getGenerator().getImageViewer() != null) {
             msg = TextComponent.builder("CFI supports using brushes during creation").append(newline())
                     .append(" - Place the map on a wall of item frames").append(newline())
@@ -811,7 +812,7 @@ public class CFICommands {
         int biomePriority = gen.getBiomePriority();
 
         //TODO fix this so it can execute commands and show tooltips.
-        @NonNull Builder builder = TextComponent.builder(">> Current Settings <<").append(newline())
+        @NotNull Builder builder = TextComponent.builder(">> Current Settings <<").append(newline())
                 .append("Randomization ").append("[" + Boolean.toString(rand).toUpperCase() + "]")//.cmdTip("/cfi randomization " + (!rand))
                 .append(newline())
                 .append("Mask ").append("[" + mask + "]")//.cmdTip("/cfi mask")
@@ -1020,7 +1021,7 @@ public class CFICommands {
         String snow = "/cfi snow";
 
         //TODO
-        @NonNull Builder msg = TextComponent.builder(">> Current Settings <<").append(newline())
+        @NotNull Builder msg = TextComponent.builder(">> Current Settings <<").append(newline())
                 .append("Mask ").append(TextComponent.of("[" + mask + "]")
                 .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi mask")))
                 .clickEvent(ClickEvent.runCommand("/cfi mask")))
