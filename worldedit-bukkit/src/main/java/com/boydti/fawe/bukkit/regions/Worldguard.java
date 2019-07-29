@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.regions;
 
-import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.filter.WorldGuardFilter;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
@@ -30,7 +29,6 @@ import org.bukkit.plugin.Plugin;
 
 public class Worldguard extends BukkitMaskManager implements Listener {
     private WorldGuardPlugin worldguard;
-    FaweBukkit plugin;
 
     private WorldGuardPlugin getWorldGuard() {
         final Plugin plugin = Bukkit.getPluginManager().getPlugin("WorldGuard");
@@ -43,13 +41,12 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         return (WorldGuardPlugin) plugin;
     }
 
-    public Worldguard(final Plugin p2, final FaweBukkit p3) {
+    public Worldguard(Plugin p2) {
         super(p2.getName());
         this.worldguard = this.getWorldGuard();
-        this.plugin = p3;
     }
 
-    public ProtectedRegion getRegion(final LocalPlayer player, final Location location) {
+    public ProtectedRegion getRegion(LocalPlayer player, Location location) {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         if (container == null) {
             System.out.println("Region capability is not enabled for WorldGuard.");
@@ -65,7 +62,7 @@ public class Worldguard extends BukkitMaskManager implements Listener {
             return global;
         }
         final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(location.getX(), location.getY(), location.getZ()));
-        for (final ProtectedRegion region : regions) {
+        for (ProtectedRegion region : regions) {
             if (isAllowed(player, region)) {
                 return region;
             }
@@ -86,43 +83,42 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         if (localplayer.hasPermission("fawe.worldguard.member")) {
             if (region.isMember(localplayer) || region.isMember(localplayer.getName())) {
                 return true;
-            } else if (region.isMember("*")) {
-                return true;
-            }
+            } else
+                return region.isMember("*");
         }
         return false;
     }
 
     @Override
     public FaweMask getMask(FawePlayer<Player> fp, MaskType type) {
-        final Player player = fp.parent;
+        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
         final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
         final Location location = player.getLocation();
         final ProtectedRegion myregion = this.getRegion(localplayer, location);
         if (myregion != null) {
-            final Location pos1;
-            final Location pos2;
+            final BlockVector3 pos1;
+            final BlockVector3 pos2;
             if (myregion.getId().equals("__global__")) {
-                pos1 = new Location(location.getWorld(), Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
-                pos2 = new Location(location.getWorld(), Integer.MAX_VALUE, 255, Integer.MAX_VALUE);
+                pos1 = BlockVector3.at(Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
+                pos2 = BlockVector3.at(Integer.MAX_VALUE, 255, Integer.MAX_VALUE);
             } else {
                 if (myregion instanceof ProtectedCuboidRegion) {
-                    pos1 = new Location(location.getWorld(), myregion.getMinimumPoint().getBlockX(), myregion.getMinimumPoint().getBlockY(), myregion.getMinimumPoint().getBlockZ());
-                    pos2 = new Location(location.getWorld(), myregion.getMaximumPoint().getBlockX(), myregion.getMaximumPoint().getBlockY(), myregion.getMaximumPoint().getBlockZ());
+                    pos1 = BlockVector3.at(myregion.getMinimumPoint().getBlockX(), myregion.getMinimumPoint().getBlockY(), myregion.getMinimumPoint().getBlockZ());
+                    pos2 = BlockVector3.at(myregion.getMaximumPoint().getBlockX(), myregion.getMaximumPoint().getBlockY(), myregion.getMaximumPoint().getBlockZ());
                 } else {
                     return new FaweMask(adapt(myregion)) {
                         @Override
                         public boolean isValid(FawePlayer player, MaskType type) {
-                            return isAllowed(worldguard.wrapPlayer((Player) player.parent), myregion);
+                            return isAllowed(worldguard.wrapPlayer(BukkitAdapter.adapt(player.toWorldEditPlayer())), myregion);
                         }
                     };
                 }
             }
-            return new FaweMask(BukkitAdapter.adapt(pos1).toBlockPoint(), BukkitAdapter.adapt(pos2).toBlockPoint()) {
+            return new FaweMask(pos1, pos2) {
 
             @Override
                 public boolean isValid(FawePlayer player, MaskType type) {
-                    return isAllowed(worldguard.wrapPlayer((Player) player.parent), myregion);
+                    return isAllowed(worldguard.wrapPlayer(BukkitAdapter.adapt(player.toWorldEditPlayer())), myregion);
                 }
             };
         }

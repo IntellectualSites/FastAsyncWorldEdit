@@ -5,13 +5,11 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.AbstractSet;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Memory optimized BlockVector3 Set using a sparsely populated bitset and grouped by chunk section
@@ -706,25 +704,26 @@ public final class MemBlockSet extends BlockSet {
         long total = 0;
         long lastBit = 0;
         int lastCount = 0;
-        for (int X = 0; X < rows.length; X++) {
-            IRow nullRowX = rows[X];
+        for (int x = 0; x < rows.length; x++) {
+            IRow nullRowX = rows[x];
             if (!(nullRowX instanceof RowX)) continue;
             RowX rowx = (RowX) nullRowX;
-            for (int Z = 0; Z < rowx.rows.length; Z++) {
-                IRow nullRowZ = rowx.rows[Z];
+            for (int z = 0; z < rowx.rows.length; z++) {
+                IRow nullRowZ = rowx.rows[z];
                 if (!(nullRowZ instanceof RowZ)) continue;
                 RowZ rowz = (RowZ) nullRowZ;
-                outer:
-                for (int Y = 0; Y < 16; Y++) {
-                    IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) continue;
+                for (int y = 0; y < 16; y++) {
+                    IRow nullRowY = rowz.rows[y];
+                    if (!(nullRowY instanceof RowY)) {
+                        continue;
+                    }
                     RowY rowY = (RowY) nullRowY;
                     for (long bit : rowY.bits) {
-                        if (bit == 0) continue;
-                        else if (bit == -1L) {
+                        if (bit == 0) {
+                            continue;
+                        } else if (bit == -1L) {
                             total += 64;
-                        }
-                        else if (bit == lastBit) {
+                        } else if (bit == lastBit) {
                             total += lastCount;
                         } else {
                             lastBit = bit;

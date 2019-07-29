@@ -198,7 +198,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                                         String suggestion = suggestions.get(i);
                                         if (suggestion.indexOf(' ') != 0) {
                                             String[] split = suggestion.split(" ");
-                                            suggestion = BBC.color("[" + StringMan.join(split, "][") + "]");
+                                            suggestion = "[" + StringMan.join(split, "][") + "]";
                                             suggestions.set(i, suggestion);
                                         }
                                     }

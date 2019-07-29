@@ -145,7 +145,7 @@ public abstract class FawePlayer<T> extends Metadatable {
         return cancelled;
     }
 
-    private void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context, String command) {
+    private void setConfirmTask(@NotNull Runnable task, InjectedValueAccess context, @NotNull String command) {
         CommandEvent event = new CommandEvent(getPlayer(), command);
         Runnable newTask = () -> PlatformCommandManager.getInstance().handleCommandTask(() -> {
             task.run();
@@ -154,8 +154,8 @@ public abstract class FawePlayer<T> extends Metadatable {
         setMeta("cmdConfirm", newTask);
     }
 
-    public void checkConfirmation(@NotNull Runnable task, String command, int times, int limit, InjectedValueAccess context) throws RegionOperationException {
-        if (command != null && !getMeta("cmdConfirmRunning", false)) {
+    public void checkConfirmation(@NotNull Runnable task, @NotNull String command, int times, int limit, InjectedValueAccess context) throws RegionOperationException {
+        if (!getMeta("cmdConfirmRunning", false)) {
             if (times > limit) {
                 setConfirmTask(task, context, command);
                 String volume = "<unspecified>";
@@ -181,8 +181,8 @@ public abstract class FawePlayer<T> extends Metadatable {
         task.run();
     }
 
-    public void checkConfirmationStack(@NotNull Runnable task, String command, Region region, int times, InjectedValueAccess context) throws RegionOperationException {
-        if (command != null && !getMeta("cmdConfirmRunning", false)) {
+    public void checkConfirmationStack(@NotNull Runnable task, @NotNull String command, Region region, int times, InjectedValueAccess context) throws RegionOperationException {
+        if (!getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
                 BlockVector3 min = region.getMinimumPoint();
                 BlockVector3 max = region.getMaximumPoint();
@@ -199,8 +199,8 @@ public abstract class FawePlayer<T> extends Metadatable {
         task.run();
     }
 
-    public void checkConfirmationRegion(@NotNull Runnable task, String command, Region region, InjectedValueAccess context) throws RegionOperationException {
-        if (command != null && !getMeta("cmdConfirmRunning", false)) {
+    public void checkConfirmationRegion(@NotNull Runnable task, @NotNull String command, Region region, InjectedValueAccess context) throws RegionOperationException {
+        if (!getMeta("cmdConfirmRunning", false)) {
             if (region != null) {
                 BlockVector3 min = region.getMinimumPoint();
                 BlockVector3 max = region.getMaximumPoint();
@@ -576,7 +576,7 @@ public abstract class FawePlayer<T> extends Metadatable {
     }
 
     /**
-     * Unregister this player (delets all metadata etc)
+     * Unregister this player (deletes all metadata etc)
      * - Usually called on logout
      */
     public void unregister() {

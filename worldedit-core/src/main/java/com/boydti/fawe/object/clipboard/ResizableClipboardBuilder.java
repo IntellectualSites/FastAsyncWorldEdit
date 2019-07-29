@@ -11,7 +11,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.Iterator;
 
 public class ResizableClipboardBuilder extends MemoryOptimizedHistory {
@@ -63,13 +62,13 @@ public class ResizableClipboardBuilder extends MemoryOptimizedHistory {
         BlockVector3 pos2 = BlockVector3.at(maxX, maxY, maxZ);
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
-        Iterator<Change> iter = getIterator(true);
+        Iterator<Change> iterator = getIterator(true);
         try {
-            while (iter.hasNext()) {
-                Change change = iter.next();
+            while (iterator.hasNext()) {
+                Change change = iterator.next();
                 if (change instanceof MutableBlockChange) {
                     MutableBlockChange blockChange = (MutableBlockChange) change;
-                    BlockStateHolder block = BlockState.getFromInternalId(blockChange.combinedId);
+                    BlockState block = BlockState.getFromInternalId(blockChange.combinedId);
                     clipboard.setBlock(blockChange.x, blockChange.y, blockChange.z, block);
                 } else if (change instanceof MutableTileChange) {
                     MutableTileChange tileChange = (MutableTileChange) change;

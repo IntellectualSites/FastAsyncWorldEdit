@@ -18,9 +18,8 @@ public class JaggedLineBrush extends PerformBrush {
     private static final int RECURSION_DEFAULT = 3;
     private static final int RECURSION_MAX = 10;
     private static final int SPREAD_DEFAULT = 3;
-    private static int timesUsed = 0;
     private Random random = new Random();
-    private Vector originCoords = null;
+    private Vector originCoords;
     private Vector targetCoords = new Vector();
     private int recursion = RECURSION_DEFAULT;
     private int spread = SPREAD_DEFAULT;
@@ -29,7 +28,7 @@ public class JaggedLineBrush extends PerformBrush {
         this.setName("Jagged Line");
     }
 
-    private void jaggedP(final SnipeData v) {
+    private void jaggedP(SnipeData v) {
         final Vector originClone = this.originCoords.clone().add(JaggedLineBrush.HALF_BLOCK_OFFSET);
         final Vector targetClone = this.targetCoords.clone().add(JaggedLineBrush.HALF_BLOCK_OFFSET);
 
@@ -51,7 +50,7 @@ public class JaggedLineBrush extends PerformBrush {
     }
 
     @Override
-    public final void arrow(final SnipeData v) {
+    public final void arrow(SnipeData v) {
         if (originCoords == null) {
             originCoords = new Vector();
         }
@@ -60,7 +59,7 @@ public class JaggedLineBrush extends PerformBrush {
     }
 
     @Override
-    public final void powder(final SnipeData v) {
+    public final void powder(SnipeData v) {
         if (originCoords == null) {
             v.sendMessage(ChatColor.RED + "Warning: You did not select a first coordinate with the arrow");
         } else {
@@ -71,15 +70,15 @@ public class JaggedLineBrush extends PerformBrush {
     }
 
     @Override
-    public final void info(final Message vm) {
+    public final void info(Message vm) {
         vm.brushName(this.getName());
         vm.custom(ChatColor.GRAY + String.format("Recursion set to: %d", this.recursion));
         vm.custom(ChatColor.GRAY + String.format("Spread set to: %d", this.spread));
     }
 
     @Override
-    public final void parameters(final String[] par, final SnipeData v) {
-        for (final String parameter : par) {
+    public final void parameters(String[] par, SnipeData v) {
+        for (String parameter : par) {
             try {
                 if (parameter.equalsIgnoreCase("info")) {
                     v.sendMessage(ChatColor.GOLD + "Jagged Line Brush instructions: Right click first point with the arrow. Right click with powder to draw a jagged line to set the second point.");
@@ -97,9 +96,9 @@ public class JaggedLineBrush extends PerformBrush {
                     }
 
                     return;
-                } else if (parameter.startsWith("s")) {
-                    final int temp = Integer.parseInt(parameter.substring(1));
-                    this.spread = temp;
+                }
+                if (parameter.startsWith("s")) {
+                    this.spread = Integer.parseInt(parameter.substring(1));
                     v.sendMessage(ChatColor.GREEN + "Spread set to: " + this.spread);
                 }
             } catch (Exception exception) {

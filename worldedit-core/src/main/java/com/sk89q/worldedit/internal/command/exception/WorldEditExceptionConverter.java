@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.internal.command.exception;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.DisallowedItemException;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -40,11 +41,11 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
 import com.sk89q.worldedit.util.io.file.FilenameResolutionException;
 import com.sk89q.worldedit.util.io.file.InvalidFilenameException;
-import org.enginehub.piston.exception.CommandException;
-import org.enginehub.piston.exception.UsageException;
-
+import com.sk89q.worldedit.world.storage.MissingWorldException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.enginehub.piston.exception.CommandException;
+import org.enginehub.piston.exception.UsageException;
 
 /**
  * converts WorldEdit exceptions and converts them into {@link CommandException}s.
@@ -80,6 +81,10 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
         throw newCommandException("Make a region selection first.", e);
     }
 
+    @ExceptionMatch
+    public void convert(MissingWorldException e) throws CommandException {
+        throw newCommandException("You need to provide a world (Try //world)", e);
+    }
     @ExceptionMatch
     public void convert(UnknownItemException e) throws CommandException {
         throw newCommandException("Block name '" + e.getID() + "' was not recognized.", e);

@@ -29,7 +29,7 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
 
     @Override
     public FaweMask getMask(final FawePlayer<Player> fp, final MaskType type) {
-        final Player player = fp.parent;
+        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
         final Location location = player.getLocation();
         ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
         if (residence != null) {
@@ -42,10 +42,10 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
                 final Location pos1 = area.getLowLoc();
                 final Location pos2 = area.getHighLoc();
                 final ClaimedResidence finalResidence = residence;
-                return new FaweMask(BukkitAdapter.adapt(pos1).toBlockPoint(), BukkitAdapter.adapt(pos2).toBlockPoint()) {
+                return new FaweMask(BukkitAdapter.asBlockVector(pos1), BukkitAdapter.asBlockVector(pos2)) {
                 @Override
                     public boolean isValid(FawePlayer player, MaskType type) {
-                        return isAllowed((Player) player.parent, finalResidence, type);
+                        return isAllowed((Player) BukkitAdapter.adapt(player.toWorldEditPlayer()), finalResidence, type);
                     }
                 };
             }

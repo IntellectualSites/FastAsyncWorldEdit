@@ -36,6 +36,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.NoCapablePlatformException;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.PlatformManager;
 import java.io.IOException;
@@ -98,8 +99,13 @@ public class WorldEditCommands {
 
         actor.printDebug("----------- Capabilities -----------");
         for (Capability capability : Capability.values()) {
-            Platform platform = pm.queryCapability(capability);
-            actor.printDebug(String.format("%s: %s", capability.name(), platform != null ? platform.getPlatformName() : "NONE"));
+            try {
+                Platform platform = pm.queryCapability(capability);
+                actor.printDebug(String.format("%s: %s", capability.name(),
+                    platform != null ? platform.getPlatformName() : "NONE"));
+            } catch (NoCapablePlatformException e) {
+                actor.printDebug(String.format("%s: %s", capability.name(), "NONE"));
+            }
         }
         actor.printDebug("");
         actor.printDebug("Wiki: " + "https://github.com/boy0001/FastAsyncWorldedit/wiki");
@@ -120,7 +126,7 @@ public class WorldEditCommands {
     @Command(
         name = "report",
         aliases = { "debugpaste" },
-        desc = "Writes a report of latest.log, config.yml, message.yml and your commands.yml to https://athion.net/ISPaster/paste"
+        desc = "Writes a report of latest.log, config.yml, message.yml https://athion.net/ISPaster/paste"
     )
     @CommandQueued(false)
     @CommandPermissions({"worldedit.report", "worldedit.debugpaste"})
@@ -162,19 +168,19 @@ public class WorldEditCommands {
         name = "tz",
         desc = "Set your timezone for snapshots"
     )
-    public void tz(Player player, LocalSession session,
+    public void tz(Actor actor, LocalSession session,
                    @Arg(desc = "The timezone to set")
                        String timezone) {
         try {
             ZoneId tz = ZoneId.of(timezone);
             session.setTimezone(tz);
-            BBC.TIMEZONE_SET.send(player, tz.getDisplayName(
+            BBC.TIMEZONE_SET.send(actor, tz.getDisplayName(
                 TextStyle.FULL, Locale.ENGLISH
             ));
             BBC.TIMEZONE_DISPLAY
-                .send(player, dateFormat.format(ZonedDateTime.now(tz)));
+                .send(actor, dateFormat.format(ZonedDateTime.now(tz)));
         } catch (ZoneRulesException e) {
-            player.printError("Invalid timezone");
+            actor.printError("Invalid timezone");
         }
     }
 

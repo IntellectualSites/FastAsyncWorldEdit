@@ -785,10 +785,10 @@ public class UtilityCommands {
         actor.print(m.build());
     }
 
-    public static int getFiles(File root, Actor actor, InjectedValueAccess args, int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile, ListFilters... filters) {
-        // TODO NOT IMPLEMENTED replace getFiles
-        return page;
-    }
+//    public static int getFiles(File root, Actor actor, InjectedValueAccess args, int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile, ListFilters... filters) {
+//        // TODO NOT IMPLEMENTED replace getFiles
+//        return page;
+//    }
 
     public static int getFiles(File dir, Actor actor, InjectedValueAccess args, @Range(min = 0) int page, int perPage, String formatName, boolean playerFolder, Consumer<File> forEachFile) {
         Consumer<File> rootFunction = forEachFile;

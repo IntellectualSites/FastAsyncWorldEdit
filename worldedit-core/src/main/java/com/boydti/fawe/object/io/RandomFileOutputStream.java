@@ -23,7 +23,7 @@ public class RandomFileOutputStream extends OutputStream {
     protected boolean closeParent;
 
 // *****************************************************************************
-// INSTANCE CONSTRUCTION/INITIALIZATON/FINALIZATION, OPEN/CLOSE
+// INSTANCE CONSTRUCTION/INITIALIZATION/FINALIZATION, OPEN/CLOSE
 // *****************************************************************************
 
     public RandomFileOutputStream(String fnm) throws IOException {

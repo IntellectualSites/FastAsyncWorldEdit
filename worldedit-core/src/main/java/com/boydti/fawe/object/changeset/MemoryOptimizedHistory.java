@@ -155,8 +155,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         if (biomes == null) {
             return null;
         }
-        FaweInputStream result = MainUtil.getCompressedIS(new FastByteArraysInputStream(biomes));
-        return result;
+        return MainUtil.getCompressedIS(new FastByteArraysInputStream(biomes));
     }
 
     @Override

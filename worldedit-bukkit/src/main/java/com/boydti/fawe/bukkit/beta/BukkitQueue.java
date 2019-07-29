@@ -234,6 +234,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         return playerChunk;
     }
 
+    @Override
     public boolean sendChunk(final int X, final int Z, final int mask) {
         PlayerChunk playerChunk = getPlayerChunk(X, Z);
         if (playerChunk == null) {

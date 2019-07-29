@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.BukkitCommand;
 import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.object.FawePlayer;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.thevoxelbox.voxelsniper.brush.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -127,7 +128,7 @@ public class VoxelSniper extends JavaPlugin {
             setupCommand("/p", new FaweCommand("voxelsniper.sniper") {
                 @Override
                 public boolean execute(FawePlayer fp, String... args) {
-                    Player player = (Player) fp.parent;
+                    Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
                     return onCommand(player, new Command("p") {
                         @Override
                         public boolean execute(@NotNull CommandSender sender, String commandLabel, @NotNull String[] args) {
@@ -140,7 +141,7 @@ public class VoxelSniper extends JavaPlugin {
             setupCommand("/d", new FaweCommand("voxelsniper.sniper") {
                 @Override
                 public boolean execute(FawePlayer fp, String... args) {
-                    Player player = (Player) fp.parent;
+                    Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
                     return onCommand(player, new Command("d") {
                         @Override
                         public boolean execute(@NotNull CommandSender sender, String commandLabel, @NotNull String[] args) {

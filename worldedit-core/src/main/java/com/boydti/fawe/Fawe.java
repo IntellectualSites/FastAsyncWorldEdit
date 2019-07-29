@@ -133,7 +133,7 @@ public class Fawe {
         if (INSTANCE != null) {
             INSTANCE.IMP.debug(s);
         } else {
-            System.out.println(BBC.stripColor(BBC.color(s)));
+            System.out.println(s);
         }
     }
 
@@ -145,10 +145,10 @@ public class Fawe {
     public static void debug(Object s) {
         Actor actor = Request.request().getActor();
         if (actor != null && actor.isPlayer()) {
-            actor.print(BBC.color(BBC.PREFIX.original() + " " + s));
+            actor.print((String)s);
             return;
         }
-        debugPlain(BBC.PREFIX.original() + " " + s);
+        debugPlain((String) s);
     }
 
     /**

@@ -26,8 +26,6 @@ package com.thevoxelbox.voxelsniper;
 
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -41,7 +39,6 @@ public class RangeBlockHelper {
     private Location playerLoc;
     private double rotX;
     private double rotY;
-    private double viewHeight;
     private double rotXSin;
     private double rotXCos;
     private double rotYSin;
@@ -70,14 +67,14 @@ public class RangeBlockHelper {
 
     public RangeBlockHelper(Location location, int range, double step) {
         this.world = (AsyncWorld) location.getWorld();
-        this.init(location, (double)range, step, 0.0D);
+        this.init(location, range, step, 0.0D);
     }
 
     public RangeBlockHelper(Player player, int range, double step) {
         if (player != null) {
             this.world = VoxelSniper.getInstance().getSniperManager().getSniperForPlayer(player).getWorld();
         }
-        this.init(player.getLocation(), (double)range, step, 1.65D);
+        this.init(player.getLocation(), range, step, 1.65D);
     }
 
     public RangeBlockHelper(Player player, AsyncWorld world) {
@@ -163,7 +160,6 @@ public class RangeBlockHelper {
 
     public final AsyncBlock getFaceBlock() {
         while(this.getNextBlock() != null && isAir(this.getCurBlock().getType())) {
-            ;
         }
 
         if(this.getCurBlock() != null) {
@@ -205,7 +201,6 @@ public class RangeBlockHelper {
         this.fromOffworld();
 
         while(this.getNextBlock() != null && isAir(this.getCurBlock().getType())) {
-            ;
         }
 
         return this.getCurBlock();
@@ -229,26 +224,26 @@ public class RangeBlockHelper {
 
         AsyncBlock block = world.getBlockAt(this.targetX, this.targetY, this.targetZ);
         Material type = block.getType();
-        return !isAir(type) ? block : (this.length <= this.range && this.targetY <= 255 && this.targetY >= 0?this.getRange():this.world.getBlockAt(this.lastX, this.lastY, this.lastZ));
+        return !isAir(type) ? block :
+            this.length <= this.range && this.targetY <= 255 && this.targetY >= 0?this.getRange():this.world.getBlockAt(this.lastX, this.lastY, this.lastZ);
     }
 
     private void init(Location location, double range, double step, double viewHeight) {
         this.playerLoc = location;
-        this.viewHeight = viewHeight;
         this.playerX = this.playerLoc.getX();
-        this.playerY = this.playerLoc.getY() + this.viewHeight;
+        this.playerY = this.playerLoc.getY() + viewHeight;
         this.playerZ = this.playerLoc.getZ();
         this.range = range;
         this.step = step;
         this.length = 0.0D;
         this.rotX = (this.playerLoc.getYaw() + 90.0F) % 360.0F;
-        this.rotY = this.playerLoc.getPitch() * -1.0F;
+        this.rotY = this.playerLoc.getPitch() * -1.0f;
         this.rotYCos = Math.cos(Math.toRadians(this.rotY));
         this.rotYSin = Math.sin(Math.toRadians(this.rotY));
         this.rotXCos = Math.cos(Math.toRadians(this.rotX));
         this.rotXSin = Math.sin(Math.toRadians(this.rotX));
         this.targetX = (int)Math.floor(this.playerLoc.getX());
-        this.targetY = (int)Math.floor(this.playerLoc.getY() + this.viewHeight);
+        this.targetY = (int)Math.floor(this.playerLoc.getY() + viewHeight);
         this.targetZ = (int)Math.floor(this.playerLoc.getZ());
         this.lastX = this.targetX;
         this.lastY = this.targetY;

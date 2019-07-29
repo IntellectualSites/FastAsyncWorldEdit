@@ -30,9 +30,10 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
-import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.DataException;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.snapshot.InvalidSnapshotException;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.snapshot.SnapshotRestore;
@@ -60,25 +61,25 @@ public class SnapshotUtilCommands {
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.snapshots.restore")
-    public void restore(Player player, LocalSession session, EditSession editSession,
+    public void restore(Actor actor, World world, LocalSession session, EditSession editSession,
                         @Arg(name = "snapshot", desc = "The snapshot to restore", def = "")
                             String snapshotName) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
+            BBC.SNAPSHOT_NOT_CONFIGURED.send(actor);
             return;
         }
 
-        Region region = session.getSelection(player.getWorld());
+        Region region = session.getSelection(world);
         Snapshot snapshot;
 
         if (snapshotName != null) {
             try {
                 snapshot = config.snapshotRepo.getSnapshot(snapshotName);
             } catch (InvalidSnapshotException e) {
-                BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
+                BBC.SNAPSHOT_NOT_AVAILABLE.send(actor);
                 return;
             }
         } else {
@@ -88,10 +89,10 @@ public class SnapshotUtilCommands {
         // No snapshot set?
         if (snapshot == null) {
             try {
-                snapshot = config.snapshotRepo.getDefaultSnapshot(player.getWorld().getName());
+                snapshot = config.snapshotRepo.getDefaultSnapshot(world.getName());
 
                 if (snapshot == null) {
-                    BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
+                    BBC.SNAPSHOT_NOT_AVAILABLE.send(actor);
 
                     // Okay, let's toss some debugging information!
                     File dir = config.snapshotRepo.getDirectory();
@@ -108,7 +109,7 @@ public class SnapshotUtilCommands {
                     return;
                 }
             } catch (MissingWorldException ex) {
-                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(actor);
                 return;
             }
         }
@@ -116,7 +117,7 @@ public class SnapshotUtilCommands {
 
         // Load chunk store
         try (ChunkStore chunkStore = snapshot.getChunkStore()) {
-            BBC.SNAPSHOT_LOADED.send(player, snapshot.getName());
+            BBC.SNAPSHOT_LOADED.send(actor, snapshot.getName());
 
             // Restore snapshot
             SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region);
@@ -127,21 +128,20 @@ public class SnapshotUtilCommands {
             if (restore.hadTotalFailure()) {
                 String error = restore.getLastErrorMessage();
                 if (!restore.getMissingChunks().isEmpty()) {
-                    BBC.SNAPSHOT_ERROR_RESTORE.send(player);
+                    BBC.SNAPSHOT_ERROR_RESTORE.send(actor);
                 } else if (error != null) {
-                    player.printError("Errors prevented any blocks from being restored.");
-                    player.printError("Last error: " + error);
+                    actor.printError("Errors prevented any blocks from being restored.");
+                    actor.printError("Last error: " + error);
                 } else {
-                    BBC.SNAPSHOT_ERROR_RESTORE_CHUNKS.send(player);
+                    BBC.SNAPSHOT_ERROR_RESTORE_CHUNKS.send(actor);
                 }
             } else {
-                player.print(String.format("Restored; %d "
-                        + "missing chunks and %d other errors.",
+                actor.print(String.format("Restored; %d missing chunks and %d other errors.",
                         restore.getMissingChunks().size(),
                         restore.getErrorChunks().size()));
             }
         } catch (DataException | IOException e) {
-            player.printError("Failed to load snapshot: " + e.getMessage());
+            actor.printError("Failed to load snapshot: " + e.getMessage());
         }
     }
 }

@@ -191,8 +191,12 @@ public interface Player extends Entity, Actor {
      * Get the point of the block that is being stood in.
      *
      * @return point
+     * @deprecated Use Locatable#getBlockLocation
      */
-    Location getBlockIn();
+    @Deprecated
+    default Location getBlockIn() {
+        return getBlockLocation();
+    }
 
     /**
      * Get the point of the block that is being stood upon.

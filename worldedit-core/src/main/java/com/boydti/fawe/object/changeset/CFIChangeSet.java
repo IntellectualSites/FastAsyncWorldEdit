@@ -22,7 +22,7 @@ public class CFIChangeSet extends FaweChangeSet {
         super(hmmg);
         File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + uuid + File.separator + "CFI" + File.separator + hmmg.getWorldName());
         int max = MainUtil.getMaxFileId(folder);
-        this.file = new File(folder, Integer.toString(max) + ".cfi");
+        this.file = new File(folder, max + ".cfi");
         File parent = this.file.getParentFile();
         if (!parent.exists()) this.file.getParentFile().mkdirs();
         if (!this.file.exists()) this.file.createNewFile();

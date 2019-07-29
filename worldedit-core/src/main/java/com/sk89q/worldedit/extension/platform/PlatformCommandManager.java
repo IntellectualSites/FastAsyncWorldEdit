@@ -412,11 +412,6 @@ public final class PlatformCommandManager {
                     new GenerationCommands(worldEdit)
             );
             this.registration.register(
-                    new CFICommand(commandManager),
-                    CFICommandsRegistration.builder(),
-                    new CFICommands(worldEdit)
-            );
-            this.registration.register(
                 commandManager,
                 HistoryCommandsRegistration.builder(),
                 new HistoryCommands(worldEdit)

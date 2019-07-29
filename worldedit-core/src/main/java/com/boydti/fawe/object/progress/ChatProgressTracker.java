@@ -1,6 +1,5 @@
 package com.boydti.fawe.object.progress;
 
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 
 public class ChatProgressTracker extends DefaultProgressTracker {
@@ -11,6 +10,6 @@ public class ChatProgressTracker extends DefaultProgressTracker {
 
     @Override
     public void sendTile(String title, String sub) {
-        getPlayer().sendMessage(BBC.getPrefix() + title + sub);
+        getPlayer().sendMessage(title + sub);
     }
 }

@@ -292,7 +292,7 @@ public class SchematicCommands {
         desc = "Save a schematic into your clipboard"
     )
     @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other"})
-    public void save(Player player, LocalSession session,
+    public void save(Actor actor, LocalSession session,
                      @Arg(desc = "File name.")
                          String filename,
                      @Arg(desc = "Format name.", def = "sponge")
@@ -307,20 +307,20 @@ public class SchematicCommands {
         File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
 
         if (!global && Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS) {
-            dir = new File(dir, player.getUniqueId().toString());
+            dir = new File(dir, actor.getUniqueId().toString());
         }
 
         ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
-            player.printError("Unknown schematic format: " + formatName);
+            actor.printError("Unknown schematic format: " + formatName);
             return;
         }
 
         boolean other = false;
         if (filename.contains("../")) {
             other = true;
-            if (!player.hasPermission("worldedit.schematic.save.other")) {
-                BBC.NO_PERM.send(player, "worldedit.schematic.save.other");
+            if (!actor.hasPermission("worldedit.schematic.save.other")) {
+                BBC.NO_PERM.send(actor, "worldedit.schematic.save.other");
                 return;
             }
             if (filename.startsWith("../")) {
@@ -329,21 +329,21 @@ public class SchematicCommands {
             }
         }
 
-        File f = worldEdit.getSafeSaveFile(player, dir, filename, format.getPrimaryFileExtension());
+        File f = worldEdit.getSafeSaveFile(actor, dir, filename, format.getPrimaryFileExtension());
 
         boolean overwrite = f.exists();
         if (overwrite) {
-            if (!player.hasPermission("worldedit.schematic.delete")) {
+            if (!actor.hasPermission("worldedit.schematic.delete")) {
                 throw new StopExecutionException(TextComponent.of("That schematic already exists!"));
             }
             if (other) {
-                if (!player.hasPermission("worldedit.schematic.delete.other")) {
+                if (!actor.hasPermission("worldedit.schematic.delete.other")) {
                     BBC.NO_PERM.send(player, "worldedit.schematic.delete.other");
                     return;
                 }
             }
             if (!allowOverwrite) {
-                player.printError("That schematic already exists. Use the -f flag to overwrite it.");
+                actor.printError("That schematic already exists. Use the -f flag to overwrite it.");
                 return;
             }
         }
@@ -359,8 +359,8 @@ public class SchematicCommands {
 
         ClipboardHolder holder = session.getClipboard();
 
-        SchematicSaveTask task = new SchematicSaveTask(player, f, format, holder, overwrite);
-        AsyncCommandBuilder.wrap(task, player)
+        SchematicSaveTask task = new SchematicSaveTask(actor, f, format, holder, overwrite);
+        AsyncCommandBuilder.wrap(task, actor)
                 .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
                 .sendMessageAfterDelay("(Please wait... saving schematic.)")
                 .onSuccess(filename + " saved" + (overwrite ? " (overwriting previous file)." : "."), null)
@@ -635,12 +635,12 @@ public class SchematicCommands {
     }
 
     private static class SchematicLoadTask implements Callable<ClipboardHolder> {
-        private final Player player;
+        private final Actor actor;
         private final File file;
         private final ClipboardFormat format;
 
-        SchematicLoadTask(Player player, File file, ClipboardFormat format) {
-            this.player = player;
+        SchematicLoadTask(Actor actor, File file, ClipboardFormat format) {
+            this.actor = actor;
             this.file = file;
             this.format = format;
         }
@@ -653,21 +653,21 @@ public class SchematicCommands {
                 ClipboardReader reader = closer.register(format.getReader(bis));
 
                 Clipboard clipboard = reader.read();
-                log.info(player.getName() + " loaded " + file.getCanonicalPath());
+                log.info(actor.getName() + " loaded " + file.getCanonicalPath());
                 return new ClipboardHolder(clipboard);
             }
         }
     }
 
     private static class SchematicSaveTask implements Callable<Void> {
-        private final Player player;
+        private final Actor actor;
         private final File file;
         private final ClipboardFormat format;
         private final ClipboardHolder holder;
         private final boolean overwrite;
 
-        SchematicSaveTask(Player player, File file, ClipboardFormat format, ClipboardHolder holder, boolean overwrite) {
-            this.player = player;
+        SchematicSaveTask(Actor actor, File file, ClipboardFormat format, ClipboardHolder holder, boolean overwrite) {
+            this.actor = actor;
             this.file = file;
             this.format = format;
             this.holder = holder;
@@ -700,14 +700,14 @@ public class SchematicCommands {
                 }
                 if (new PlayerSaveClipboardEvent(player, clipboard, uri, file.toURI()).call()) {
                     if (writer instanceof MinecraftStructure) {
-                        ((MinecraftStructure) writer).write(target, player.getName());
+                        ((MinecraftStructure) writer).write(target, actor.getName());
                     } else {
                         writer.write(target);
                     }
-                    log.info(player.getName() + " saved " + file.getCanonicalPath());
-                    BBC.SCHEMATIC_SAVED.send(player, file.getName());
+                    log.info(actor.getName() + " saved " + file.getCanonicalPath());
+                    BBC.SCHEMATIC_SAVED.send(actor, file.getName());
                 } else {
-                    BBC.WORLDEDIT_CANCEL_REASON_MANUAL.send(player);
+                    BBC.WORLDEDIT_CANCEL_REASON_MANUAL.send(actor);
                 }
             }
             return null;

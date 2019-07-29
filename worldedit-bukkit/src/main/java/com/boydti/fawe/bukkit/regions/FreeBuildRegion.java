@@ -10,6 +10,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import jdk.nashorn.internal.ir.Block;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,6 +21,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.RegisteredListener;
 
 import java.util.ArrayList;
+import org.bukkit.util.BlockVector;
 
 public class FreeBuildRegion extends BukkitMaskManager {
     private final ArrayList<RegisteredListener> listeners;
@@ -52,20 +54,20 @@ public class FreeBuildRegion extends BukkitMaskManager {
         if (currRegList.isEmpty()) return null;
         RegisteredListener[] listeners = currRegList.toArray(new RegisteredListener[0]);
 
-        World bukkitWorld = player.parent.getWorld();
+        World bukkitWorld = BukkitAdapter.adapt(player.toWorldEditPlayer().getWorld());
         AsyncWorld asyncWorld = AsyncWorld.wrap(bukkitWorld);
 
-        Location pos1 = BukkitAdapter.adapt(bukkitWorld, BlockVector3.ZERO);
-        Location pos2 = BukkitAdapter.adapt(bukkitWorld, BlockVector3.ZERO);
+        BlockVector3 pos1 = BlockVector3.ZERO;
+        BlockVector3 pos2 = BlockVector3.ZERO;
 
         AsyncBlock block = new AsyncBlock(asyncWorld, new NullFaweQueue(asyncWorld.getWorldName(), BlockTypes.STONE.getDefaultState()), 0, 0, 0);
-        BlockBreakEvent event = new BlockBreakEvent(block, player.parent);
+        BlockBreakEvent event = new BlockBreakEvent(block, BukkitAdapter.adapt(player.toWorldEditPlayer()));
 
-        return new FaweMask(BukkitAdapter.adapt(pos1).toBlockPoint(), BukkitAdapter.adapt(pos2).toBlockPoint()) {
+        return new FaweMask(pos1, pos2) {
 
         @Override
             public boolean isValid(FawePlayer player, MaskType type) {
-                return bukkitWorld == ((FawePlayer<Player>)player).parent.getWorld() && type == MaskType.MEMBER;
+                return bukkitWorld == BukkitAdapter.adapt(player.toWorldEditPlayer().getWorld()) && type == MaskType.MEMBER;
             }
 
             @Override

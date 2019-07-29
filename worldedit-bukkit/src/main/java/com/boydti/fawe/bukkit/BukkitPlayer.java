@@ -1,15 +1,12 @@
 package com.boydti.fawe.bukkit;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.FawePlayer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class BukkitPlayer extends FawePlayer<Player> {
 
@@ -40,26 +37,6 @@ public class BukkitPlayer extends FawePlayer<Player> {
     }
 
     @Override
-    public void setPermission(final String perm, final boolean flag) {
-        /*
-         *  Permissions are used to managing WorldEdit region restrictions
-         *   - The `/wea` command will give/remove the required bypass permission
-         */
-        if (Fawe.<FaweBukkit>imp().getVault() == null || Fawe.<FaweBukkit>imp().getVault().permission == null) {
-            this.parent.addAttachment(Fawe.<FaweBukkit>imp().getPlugin()).setPermission(perm, flag);
-        } else if (flag) {
-            if (!Fawe.<FaweBukkit>imp().getVault().permission.playerAdd(this.parent, perm)) {
-                this.parent.addAttachment(Fawe.<FaweBukkit>imp().getPlugin()).setPermission(perm, flag);
-            }
-        } else {
-            if (!Fawe.<FaweBukkit>imp().getVault().permission.playerRemove(this.parent, perm)) {
-                this.parent.addAttachment(Fawe.<FaweBukkit>imp().getPlugin()).setPermission(perm, flag);
-            }
-        }
-    }
-
-
-    @Override
     public void resetTitle() {
         parent.resetTitle();
     }
@@ -77,7 +54,7 @@ public class BukkitPlayer extends FawePlayer<Player> {
 
     @Override
     public void sendMessage(final String message) {
-        this.parent.sendMessage(BBC.color(message));
+        this.parent.sendMessage(message);
     }
 
     @Override public void printError(String msg) {

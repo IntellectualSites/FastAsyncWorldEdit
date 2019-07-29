@@ -8,14 +8,14 @@ import org.bukkit.ChatColor;
 
 
 public class RingBrush extends PerformBrush {
-    private double trueCircle = 0;
-    private double innerSize = 0;
+    private double trueCircle;
+    private double innerSize;
 
     public RingBrush() {
         this.setName("Ring");
     }
 
-    private void ring(final SnipeData v, AsyncBlock targetBlock) {
+    private void ring(SnipeData v, AsyncBlock targetBlock) {
         final int brushSize = v.getBrushSize();
         final double outerSquared = Math.pow(brushSize + this.trueCircle, 2);
         final double innerSquared = Math.pow(this.innerSize, 2);
@@ -24,7 +24,7 @@ public class RingBrush extends PerformBrush {
             final double xSquared = Math.pow(x, 2);
             for (int z = brushSize; z >= 0; z--) {
                 final double ySquared = Math.pow(z, 2);
-                if ((xSquared + ySquared) <= outerSquared && (xSquared + ySquared) >= innerSquared) {
+                if (xSquared + ySquared <= outerSquared && xSquared + ySquared >= innerSquared) {
                     current.perform(targetBlock.getRelative(x, 0, z));
                     current.perform(targetBlock.getRelative(x, 0, -z));
                     current.perform(targetBlock.getRelative(-x, 0, z));
@@ -37,24 +37,24 @@ public class RingBrush extends PerformBrush {
     }
 
     @Override
-    protected final void arrow(final SnipeData v) {
+    protected final void arrow(SnipeData v) {
         this.ring(v, this.getTargetBlock());
     }
 
     @Override
-    protected final void powder(final SnipeData v) {
+    protected final void powder(SnipeData v) {
         this.ring(v, this.getLastBlock());
     }
 
     @Override
-    public final void info(final Message vm) {
+    public final void info(Message vm) {
         vm.brushName(this.getName());
         vm.size();
         vm.custom(ChatColor.AQUA + "The inner radius is " + ChatColor.RED + this.innerSize);
     }
 
     @Override
-    public final void parameters(final String[] par, final SnipeData v) {
+    public final void parameters(String[] par, SnipeData v) {
         for (int i = 1; i < par.length; i++) {
             if (par[i].equalsIgnoreCase("info")) {
                 v.sendMessage(ChatColor.GOLD + "Ring Brush Parameters:");
@@ -69,10 +69,9 @@ public class RingBrush extends PerformBrush {
                 v.sendMessage(ChatColor.AQUA + "True circle mode OFF.");
             } else if (par[i].startsWith("ir")) {
                 try {
-                    final double d = Double.parseDouble(par[i].replace("ir", ""));
-                    this.innerSize = d;
+                    this.innerSize = Double.parseDouble(par[i].replace("ir", ""));
                     v.sendMessage(ChatColor.AQUA + "The inner radius has been set to " + ChatColor.RED + this.innerSize);
-                } catch (final Exception exception) {
+                } catch (Exception exception) {
                     v.sendMessage(ChatColor.RED + "The parameters included are invalid.");
                 }
             } else {

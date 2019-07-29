@@ -42,15 +42,15 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      * Get the {@link WorldChunkCache}
      * @return
      */
-    IChunkGet getCachedGet(int X, int Z, Supplier<IChunkGet> supplier);
+    IChunkGet getCachedGet(int x, int z, Supplier<IChunkGet> supplier);
 
     /**
      * Get the IChunk at a position (and cache it if it's not already)
-     * @param X
-     * @param Z
+     * @param x
+     * @param z
      * @return IChunk
      */
-    IChunk getCachedChunk(int X, int Z);
+    IChunk getCachedChunk(int x, int z);
 
     /**
      * Submit the chunk so that it's changes are applied to the world

@@ -135,7 +135,7 @@ public final class StringUtil {
         }
         StringBuilder buffer = new StringBuilder(Integer.toString(str[initialIndex]));
         for (int i = initialIndex + 1; i < str.length; ++i) {
-            buffer.append(delimiter).append(Integer.toString(str[i]));
+            buffer.append(delimiter).append(str[i]);
         }
         return buffer.toString();
     }

@@ -9,6 +9,7 @@ import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.Faction;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,7 +27,7 @@ public class FactionsUUIDFeature extends BukkitMaskManager implements Listener {
 
     @Override
     public FaweMask getMask(final FawePlayer<Player> fp, MaskType type) {
-        final Player player = fp.parent;
+        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
         final Chunk chunk = player.getLocation().getChunk();
         final boolean perm = Permission
             .hasPermission(fp.toWorldEditPlayer(), "fawe.factions.wilderness");
@@ -73,9 +74,9 @@ public class FactionsUUIDFeature extends BukkitMaskManager implements Listener {
                 }
             }
 
-            final Location pos1 = new Location(world, locs.minX << 4, 1, locs.minZ << 4);
-            final Location pos2 = new Location(world, 15 + (locs.maxX << 4), 256, 15 + (locs.maxZ << 4));
-            return new FaweMask(BukkitAdapter.adapt(pos1).toBlockPoint(), BukkitAdapter.adapt(pos2).toBlockPoint());
+            final BlockVector3 pos1 = BlockVector3.at(locs.minX << 4, 1, locs.minZ << 4);
+            final BlockVector3 pos2 = BlockVector3.at(15 + (locs.maxX << 4), 256, 15 + (locs.maxZ << 4));
+            return new FaweMask(pos1,pos2);
         }
         return null;
     }

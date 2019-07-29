@@ -39,8 +39,8 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public IChunkGet getCachedGet(int X, int Z, Supplier<IChunkGet> supplier) {
-        return cache.get(MathMan.pairInt(X, Z), supplier);
+    public IChunkGet getCachedGet(int x, int z, Supplier<IChunkGet> supplier) {
+        return cache.get(MathMan.pairInt(x, z), supplier);
     }
 
     /**
@@ -162,8 +162,8 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public final IChunk getCachedChunk(final int X, final int Z) {
-        final long pair = (((long) X) << 32) | (Z & 0xffffffffL);
+    public final IChunk getCachedChunk(final int x, final int z) {
+        final long pair = (((long) x) << 32) | (z & 0xffffffffL);
         if (pair == lastPair) {
             return lastChunk;
         }
@@ -195,7 +195,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
                 submissions.add(future);
             }
         }
-        chunk = poolOrCreate(X, Z);
+        chunk = poolOrCreate(x, z);
         chunk = wrap(chunk);
 
         chunks.put(pair, chunk);

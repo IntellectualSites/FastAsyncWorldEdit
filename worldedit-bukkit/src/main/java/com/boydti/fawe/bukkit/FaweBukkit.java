@@ -3,11 +3,9 @@ package com.boydti.fawe.bukkit;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.bukkit.beta.BukkitQueue;
 import com.boydti.fawe.bukkit.beta.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
-import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.RenderListener;
 import com.boydti.fawe.bukkit.regions.*;
 import com.boydti.fawe.bukkit.util.BukkitReflectionUtils;
@@ -21,7 +19,6 @@ import com.boydti.fawe.bukkit.v0.ChunkListener_8;
 import com.boydti.fawe.bukkit.v0.ChunkListener_9;
 import com.boydti.fawe.bukkit.v1_13.BukkitQueue_1_13;
 import com.boydti.fawe.bukkit.v1_14.BukkitQueue_1_14;
-import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweCommand;
 import com.boydti.fawe.object.FawePlayer;
@@ -32,10 +29,10 @@ import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.image.ImageViewer;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.World;
 import org.bstats.bukkit.MetricsLite;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -43,11 +40,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -155,7 +150,7 @@ public class FaweBukkit implements IFawe, Listener {
                     fos.write(jarData);
                 }
             }
-            BukkitImageViewer viewer = new BukkitImageViewer((Player) fp.parent);
+            BukkitImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(fp.toWorldEditPlayer()));
             if (imageListener == null) {
                 this.imageListener = new BukkitImageListener(plugin);
             }
@@ -184,7 +179,7 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public void debug(final String message) {
         ConsoleCommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(BBC.color(message));
+        console.sendMessage(message);
     }
 
     @Override
@@ -398,19 +393,19 @@ public class FaweBukkit implements IFawe, Listener {
         final ArrayList<FaweMaskManager> managers = new ArrayList<>();
         if (worldguardPlugin != null && worldguardPlugin.isEnabled()) {
             try {
-                managers.add(new Worldguard(worldguardPlugin, this));
-                managers.add(new WorldguardFlag(worldguardPlugin, this));
+                managers.add(new Worldguard(worldguardPlugin));
+                managers.add(new WorldguardFlag(worldguardPlugin));
                 Fawe.debug("Plugin 'WorldGuard' found. Using it now.");
-            } catch (final Throwable e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
         final Plugin townyPlugin = Bukkit.getServer().getPluginManager().getPlugin("Towny");
         if (townyPlugin != null && townyPlugin.isEnabled()) {
             try {
-                managers.add(new TownyFeature(townyPlugin, this));
+                managers.add(new TownyFeature(townyPlugin));
                 Fawe.debug("Plugin 'Towny' found. Using it now.");
-            } catch (final Throwable e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
@@ -419,7 +414,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new FactionsFeature(factionsPlugin));
                 Fawe.debug("Plugin 'Factions' found. Using it now.");
-            } catch (final Throwable e) {
+            } catch (Throwable e) {
                 try {
                     managers.add(new FactionsUUIDFeature(factionsPlugin, this));
                     Fawe.debug("Plugin 'FactionsUUID' found. Using it now.");
@@ -439,7 +434,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new ResidenceFeature(residencePlugin, this));
                 Fawe.debug("Plugin 'Residence' found. Using it now.");
-            } catch (final Throwable e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
@@ -448,7 +443,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
                 Fawe.debug("Plugin 'GriefPrevention' found. Using it now.");
-            } catch (final Throwable e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
@@ -457,7 +452,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new PreciousStonesFeature(preciousStonesPlugin, this));
                 Fawe.debug("Plugin 'PreciousStones' found. Using it now.");
-            } catch (final Throwable e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
@@ -468,7 +463,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new ASkyBlockHook(aSkyBlock));
                 Fawe.debug("Plugin 'ASkyBlock' found. Using it now.");
-            } catch (final Throwable e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
@@ -476,7 +471,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new FreeBuildRegion());
                 Fawe.debug("Plugin '<internal.freebuild>' found. Using it now.");
-            } catch (final Throwable e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }

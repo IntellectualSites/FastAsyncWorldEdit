@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.POSITION;
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.BBC;
@@ -105,7 +106,7 @@ public class GenerationCommands {
             CavesGen gen = new CavesGen(size, frequency, rarity, minY, maxY, systemFrequency, individualRarity, pocketChance, pocketMin, pocketMax);
             editSession.generate(region, gen);
             BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());
-        }, getArguments(context), region, context);
+        }, "/caves", region, context);
     }
 
 
@@ -119,7 +120,7 @@ public class GenerationCommands {
         player.checkConfirmationRegion(() -> {
             editSession.addOres(region, mask);
             BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
-        }, getArguments(context), region, context);
+        }, "/ores", region, context);
     }
 
     @Command(
@@ -173,7 +174,7 @@ public class GenerationCommands {
         player.checkConfirmationRegion(() -> {
             editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
             BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
-        }, getArguments(context), region, context);
+        }, "/ore", region, context);
     }
 
     @Command(
@@ -195,7 +196,7 @@ public class GenerationCommands {
         fp.checkConfirmationRadius(() -> {
             int affected = editSession.makeHollowCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), thickness - 1);
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max, context);
+        }, "/hcyl", (int) max, context);
     }
 
     @Command(
@@ -218,7 +219,7 @@ public class GenerationCommands {
         fp.checkConfirmationRadius(() -> {
             int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max, context);
+        }, "/cyl", (int) max, context);
     }
 
     @Command(
@@ -260,7 +261,7 @@ public class GenerationCommands {
             int affected = editSession.makeSphere(finalPos, pattern, radii.getX(), radii.getY(), radii.getZ(), !hollow);
             player.findFreePosition();
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max, context);
+        }, "sphere", (int) max, context);
     }
 
     @Command(
@@ -294,8 +295,9 @@ public class GenerationCommands {
                             int size,
                         @Arg(desc = "//TODO", def = "10")
                             int apothem,
-                        @Range(min = 0, max = 100) @Arg(desc = "//TODO ", def = "0.02")
+                        @Arg(desc = "//TODO ", def = "0.02")
                             double density) throws WorldEditException {
+        checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
         BBC.COMMAND_PUMPKIN.send(player, affected);
         return affected;
@@ -335,7 +337,7 @@ public class GenerationCommands {
             int affected = editSession.makePyramid(pos, pattern, size, !hollow);
             player.findFreePosition();
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), size, context);
+        }, "/pyramid", size, player, editSession);
     }
 
     @Command(
@@ -399,7 +401,7 @@ public class GenerationCommands {
             } catch (ExpressionException e) {
                 player.printError(e.getMessage());
             }
-        }, getArguments(context), region, context);
+        }, "/generate", region, context);
     }
 
     @Command(
@@ -462,7 +464,7 @@ public class GenerationCommands {
             } catch (ExpressionException e) {
                 fp.printError(e.getMessage());
             }
-        }, getArguments(context), region, context);
+        }, "/generatebiome", region, context);
     }
 
 }

@@ -20,6 +20,8 @@ import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
 public class FuzzyRegionSelector extends AbstractDelegateExtent implements RegionSelector {
@@ -147,11 +149,8 @@ public class FuzzyRegionSelector extends AbstractDelegateExtent implements Regio
 
     @Override
     public List<String> getInformationLines() {
-        final List<String> lines = new ArrayList<>();
-        for (int i = 0; i < positions.size(); i++) {
-            lines.add("Position " + i + ": " + positions.get(i));
-        }
-        return lines;
+        return IntStream.range(0, positions.size())
+            .mapToObj(i -> "Position " + i + ": " + positions.get(i)).collect(Collectors.toList());
     }
 
     @Override

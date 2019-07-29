@@ -95,13 +95,13 @@ public class SplineBrush implements Brush, ResettableTool {
                 points.add(position);
             }
             this.positionSets.add(points);
-            player.print(BBC.getPrefix() + BBC.BRUSH_SPLINE_PRIMARY_2.s());
+            player.print(BBC.BRUSH_SPLINE_PRIMARY_2.s());
             if (!visualization) {
                 return;
             }
         }
         if (positionSets.size() < 2) {
-            player.print(BBC.getPrefix() + BBC.BRUSH_SPLINE_SECONDARY_ERROR.s());
+            player.print(BBC.BRUSH_SPLINE_SECONDARY_ERROR.s());
             return;
         }
         List<Vector3> centroids = new ArrayList<>();
@@ -133,7 +133,7 @@ public class SplineBrush implements Brush, ResettableTool {
             }
             editSession.drawSpline(pattern, currentSpline, 0, 0, 0, 10, 0, true);
         }
-        player.print(BBC.getPrefix() + BBC.BRUSH_SPLINE_SECONDARY.s());
+        player.print(BBC.BRUSH_SPLINE_SECONDARY.s());
         if (visualization) {
             numSplines = originalSize;
             positionSets.remove(positionSets.size() - 1);

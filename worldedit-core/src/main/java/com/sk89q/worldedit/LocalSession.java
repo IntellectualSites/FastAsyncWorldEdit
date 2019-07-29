@@ -56,6 +56,7 @@ import com.sk89q.worldedit.command.tool.SinglePickaxe;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
@@ -70,7 +71,6 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.selector.RegionSelectorType;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.world.World;
@@ -313,10 +313,6 @@ public class LocalSession implements TextureHolder {
         return (historyNegativeIndex == null ? historyNegativeIndex = 0 : historyNegativeIndex);
     }
 
-    public void setHistoryIndex(int value) {
-        historyNegativeIndex = history.size() - value - 1;
-    }
-
     public boolean save() {
         saveHistoryNegativeIndex(uuid, currentWorld);
         if (defaultSelector == RegionSelectorType.CUBOID) {
@@ -505,13 +501,14 @@ public class LocalSession implements TextureHolder {
      * Performs an undo.
      *
      * @param newBlockBag a new block bag
-     * @param player the player
+     * @param actor the actor
      * @return whether anything was undone
      */
-    public EditSession undo(@Nullable BlockBag newBlockBag, Player player) {
-        checkNotNull(player);
-        FawePlayer fp = FawePlayer.wrap(player);
-        loadSessionHistoryFromDisk(player.getUniqueId(), fp.getWorldForEditing());
+    public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
+        checkNotNull(actor);
+        //TODO This method needs to be modified to use actors instead of FAWEPlayer
+        FawePlayer fp = FawePlayer.wrap((Player)actor);
+        loadSessionHistoryFromDisk(actor.getUniqueId(), fp.getWorldForEditing());
         if (getHistoryNegativeIndex() < history.size()) {
             FaweChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
             try (EditSession newEditSession = new EditSessionBuilder(changeSet.getWorld())
@@ -521,7 +518,7 @@ public class LocalSession implements TextureHolder {
                     .fastmode(false)
                     .limitUnprocessed(fp)
                     .player(fp)
-                    .blockBag(getBlockBag(player))
+                    .blockBag(getBlockBag((Player)actor))
                     .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.UNDO);
                 setDirty();
@@ -542,13 +539,14 @@ public class LocalSession implements TextureHolder {
      * Performs a redo
      *
      * @param newBlockBag a new block bag
-     * @param player the player
+     * @param actor the actor
      * @return whether anything was redone
      */
-    public EditSession redo(@Nullable BlockBag newBlockBag, Player player) {
-        checkNotNull(player);
-        FawePlayer fp = FawePlayer.wrap(player);
-        loadSessionHistoryFromDisk(player.getUniqueId(), fp.getWorldForEditing());
+    public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
+        checkNotNull(actor);
+        //TODO This method needs to be modified to use actors instead of FAWEPlayer
+        FawePlayer fp = FawePlayer.wrap((Player)actor);
+        loadSessionHistoryFromDisk(actor.getUniqueId(), fp.getWorldForEditing());
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
             historyNegativeIndex--;
@@ -560,7 +558,7 @@ public class LocalSession implements TextureHolder {
                     .fastmode(false)
                     .limitUnprocessed(fp)
                     .player(fp)
-                    .blockBag(getBlockBag(player))
+                    .blockBag(getBlockBag((Player)actor))
                     .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
                 return newEditSession;
@@ -849,14 +847,18 @@ public class LocalSession implements TextureHolder {
      * Get the position use for commands that take a center point
      * (i.e. //forestgen, etc.).
      *
-     * @param player the player
+     * @param actor the actor
      * @return the position to use
      * @throws IncompleteRegionException thrown if a region is not fully selected
      */
-    public BlockVector3 getPlacementPosition(Player player) throws IncompleteRegionException {
-        checkNotNull(player);
+    public BlockVector3 getPlacementPosition(Actor actor) throws IncompleteRegionException {
+        checkNotNull(actor);
         if (!placeAtPos1) {
-            return player.getBlockIn().toVector().toBlockPoint();
+            if (actor instanceof Locatable) {
+                return ((Locatable) actor).getBlockLocation().toVector().toBlockPoint();
+            } else {
+                throw new IncompleteRegionException();
+            }
         }
 
         return selector.getPrimaryPosition();
@@ -1093,9 +1095,9 @@ public class LocalSession implements TextureHolder {
     /**
      * Tell the player the WorldEdit version.
      *
-     * @param player the player
+     * @param actor the actor
      */
-    public void tellVersion(Actor player) {
+    public void tellVersion(Actor actor) {
     }
 
     public boolean shouldUseServerCUI() {
@@ -1325,7 +1327,7 @@ public class LocalSession implements TextureHolder {
     /**
      * Construct a new edit session.
      *
-     * @param player the player
+     * @param player the actor
      * @return an edit session
      */
     public EditSession createEditSession(Player player) {
@@ -1334,12 +1336,12 @@ public class LocalSession implements TextureHolder {
         BlockBag blockBag = getBlockBag(player);
 
         World world = player.getWorld();
-        boolean isPlayer = player.isPlayer();
         EditSessionBuilder builder = new EditSessionBuilder(world);
         if (player.isPlayer()) builder.player(FawePlayer.wrap(player));
         builder.blockBag(blockBag);
         builder.fastmode(fastMode);
 
+        // Create an edit session
         EditSession editSession = builder.build();
 
         if (mask != null) {

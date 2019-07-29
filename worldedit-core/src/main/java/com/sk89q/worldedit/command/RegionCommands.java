@@ -135,7 +135,7 @@ public class RegionCommands {
             selection = new CuboidRegion(BlockVector3.at(cx - 8, 0, cz - 8).multiply(16), BlockVector3.at(cx + 8, 0, cz + 8).multiply(16));
         }
         int count = FaweAPI.fixLighting(player.getWorld(), selection,null);
-        BBC.LIGHTING_PROPOGATE_SELECTION.send(fp, count);
+        BBC.LIGHTING_PROPAGATE_SELECTION.send(fp, count);
     }
 
     @Command(
@@ -721,7 +721,7 @@ public class RegionCommands {
             Operations.completeLegacy(visitor);
 
             BBC.COMMAND_FLORA.send(player, ground.getAffected());
-        }, getArguments(context), region, context);
+        }, "/flora", region, context);
     }
 
 }
