@@ -24,7 +24,7 @@ dependencies {
     implementation('org.apache.logging.log4j:log4j-slf4j-impl:2.8.1'){transitive = false}
     compile 'com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT'
     implementation('io.papermc:paperlib:1.0.2'){transitive = false}
-    compile 'org.spigotmc:spigot:1.14.4-R0.1-SNAPSHOT'
+    compile 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
     compile 'BuildTools:lastSuccessfulBuild:spigot-1.14.4@jar'
     implementation('com.sk89q.worldguard:worldguard-core:7.0.0-20190215.210421-39'){transitive = false}
     implementation('com.sk89q.worldguard:worldguard-legacy:7.0.0-20190215.210421-39'){transitive = false}
