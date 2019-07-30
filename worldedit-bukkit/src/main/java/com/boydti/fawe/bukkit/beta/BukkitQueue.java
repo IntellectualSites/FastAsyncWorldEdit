@@ -249,7 +249,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 //                sections[layer] = new ChunkSection(layer << 4);
 //            }
 //        }
-        if (playerChunk.k()) {
+        if (playerChunk.chunkSave()) {
             TaskManager.IMP.sync(new Supplier<Object>() {
                 @Override
                 public Object get() {
