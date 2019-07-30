@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.math.convolution;
 
-import com.boydti.fawe.object.visitor.Fast2DIterator;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.worldedit.EditSession;
@@ -34,7 +32,6 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.Iterator;
 import javax.annotation.Nullable;
 
@@ -93,11 +90,10 @@ public class HeightMap {
             BlockVector3 min = region.getMinimumPoint();
             int bx = min.getBlockX();
             int bz = min.getBlockZ();
-            Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
-            Iterator<BlockVector2> iter = new Fast2DIterator(flat, session).iterator();
+            Iterator<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion().iterator();
             int layer = 0;
-            while (iter.hasNext()) {
-                BlockVector2 pos = iter.next();
+            while (flat.hasNext()) {
+                BlockVector2 pos = flat.next();
                 int x = pos.getBlockX();
                 int z = pos.getBlockZ();
                 layer = session.getNearestSurfaceLayer(x, z, (layer + 7) >> 3, 0, maxY);
