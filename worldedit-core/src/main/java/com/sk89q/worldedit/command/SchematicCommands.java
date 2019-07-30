@@ -577,7 +577,7 @@ public class SchematicCommands {
                          boolean oldFirst,
                      @Switch(name = 'n', desc = "Sort by date, newest first")
                          boolean newFirst,
-                     @Switch(name = 'f', desc = "Restricts by format.")
+                     @ArgFlag(name = 'f', desc = "Restricts by format.")
                          String formatName,
                     @Arg(name = "filter", desc = "Filter for schematics", def = "all")
                         String filter) throws WorldEditException {

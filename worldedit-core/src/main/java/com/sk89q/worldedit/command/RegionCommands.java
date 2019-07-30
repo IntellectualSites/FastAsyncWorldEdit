@@ -547,7 +547,7 @@ public class RegionCommands {
                          boolean skipEntities,
                      @Switch(name = 'a', desc = "Ignore air blocks")
                          boolean ignoreAirBlocks,
-                     @Switch(name = 'm', desc = "Source mask")
+                     @ArgFlag(name = "m", desc = "Source mask")
                          Mask sourceMask,
                     InjectedValueAccess context) throws WorldEditException {
         player.checkConfirmationStack(() -> {
@@ -677,7 +677,7 @@ public class RegionCommands {
                           int thickness,
                       @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
                           Pattern pattern,
-        @Switch(name = 'm', desc = "Mask to hollow with") Mask mask,
+        @ArgFlag(name = "m", desc = "Mask to hollow with") Mask mask,
                        InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;

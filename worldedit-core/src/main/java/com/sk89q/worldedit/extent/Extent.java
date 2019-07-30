@@ -52,7 +52,6 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -618,10 +617,6 @@ public interface Extent extends InputExtent, OutputExtent {
             }
         }
         return count;
-    }
-
-    default World getWorld() {
-        return null;
     }
 
 }
