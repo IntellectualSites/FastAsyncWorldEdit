@@ -5,7 +5,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.internal.registry.InputParser;
-import com.sk89q.worldedit.util.command.Dispatcher;
 
 import java.util.*;
 
@@ -22,8 +21,6 @@ public abstract class FaweParser<T> extends InputParser<T> {
             throw e;
         }
     }
-
-    public abstract Dispatcher getDispatcher();
 
     protected static class ParseEntry {
         public boolean and;

@@ -41,7 +41,6 @@ public class SplatterBrush extends ScatterBrush {
         }
         final int size2 = (int) (size * size);
         SurfaceMask surface = new SurfaceMask(editSession);
-        final SolidBlockMask solid = new SolidBlockMask(editSession);
 
         RecursiveVisitor visitor = new RecursiveVisitor(vector -> {
             double dist = vector.distanceSq(position);
@@ -51,6 +50,7 @@ public class SplatterBrush extends ScatterBrush {
             }
             return false;
         }, vector -> editSession.setBlock(vector, finalPattern), recursion);
+        visitor.setMaxBranch(2);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);

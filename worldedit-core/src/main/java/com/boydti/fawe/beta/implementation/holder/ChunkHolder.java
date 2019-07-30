@@ -28,8 +28,8 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     private IChunkSet set;
     private IBlockDelegate delegate;
     private IQueueExtent extent;
-    private int x;
-    private int z;
+    private int chunkX;
+    private int chunkZ;
 
     public ChunkHolder() {
         this.delegate = NULL;
@@ -62,7 +62,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
             if (region != null) {
                 region.filter(this, filter, block, get, set);
             } else {
-                block = block.init(x, z, get);
+                block = block.init(chunkX, chunkZ, get);
                 for (int layer = 0; layer < 16; layer++) {
                     if (!get.hasSection(layer) || !filter.appliesLayer(this, layer)) continue;
                     block.init(get, set, layer);
@@ -119,7 +119,7 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
 
     private IChunkGet newGet() {
         if (extent instanceof SingleThreadQueueExtent) {
-            IChunkGet newGet = extent.getCachedGet(x, z, this);
+            IChunkGet newGet = extent.getCachedGet(chunkX, chunkZ, this);
             if (newGet != null) {
                 return newGet;
             }
@@ -128,10 +128,10 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
     }
 
     @Override
-    public void init(final IQueueExtent extent, final int x, final int z) {
+    public void init(final IQueueExtent extent, final int chunkX, final int chunkZ) {
         this.extent = extent;
-        this.x = x;
-        this.z = z;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
         if (set != null) {
             set.reset();
             delegate = SET;
@@ -147,12 +147,12 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
 
     @Override
     public int getX() {
-        return x;
+        return chunkX;
     }
 
     @Override
     public int getZ() {
-        return z;
+        return chunkZ;
     }
 
     @Override

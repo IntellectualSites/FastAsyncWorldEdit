@@ -1,6 +1,7 @@
 package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.QueueHandler;
+import com.boydti.fawe.command.CFICommand;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
@@ -18,6 +19,7 @@ import com.boydti.fawe.util.WEManager;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.DefaultTransformParser;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.session.request.Request;
 import java.io.BufferedReader;
 import java.io.File;

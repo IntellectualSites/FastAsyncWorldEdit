@@ -454,7 +454,10 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         if (typeId.hasBlockType()) {
             return typeId.getBlockType().getDefaultState().toBaseBlock();
         } else {
+            return BlockTypes.AIR.getDefaultState().toBaseBlock(); // FAWE returns air here
+            /*
             throw new NotABlockException();
+            */
         }
     }
 

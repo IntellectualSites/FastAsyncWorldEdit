@@ -54,6 +54,7 @@ public class BlockVector2 {
     }
 
     public static BlockVector2 at(int x, int z) {
+        /* unnecessary
         switch (x) {
             case 0:
                 if (z == 0) {
@@ -66,10 +67,13 @@ public class BlockVector2 {
                 }
                 break;
         }
+        */
         return new BlockVector2(x, z);
     }
 
     protected int x, z;
+
+    protected BlockVector2(){}
 
     /**
      * Construct an instance.

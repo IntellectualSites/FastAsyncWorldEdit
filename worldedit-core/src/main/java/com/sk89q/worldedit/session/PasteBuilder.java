@@ -151,7 +151,7 @@ public class PasteBuilder {
             copy.setFilterFunction(this.canApply);
         }
         if (ignoreAirBlocks) {
-            sourceMask = new MaskIntersection(sourceMask, new ExistingBlockMask(clipboard));
+            sourceMask = MaskIntersection.of(sourceMask, new ExistingBlockMask(clipboard));
         }
         if (targetExtent instanceof EditSession) {
             Mask esSourceMask = ((EditSession) targetExtent).getSourceMask();

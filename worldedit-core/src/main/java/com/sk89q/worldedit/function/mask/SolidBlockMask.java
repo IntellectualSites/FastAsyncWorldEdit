@@ -31,13 +31,6 @@ public class SolidBlockMask extends BlockMask {
         add(state -> state.getMaterial().isMovementBlocker());
     }
 
-    @Override
-    public boolean test(BlockVector3 vector) {
-        Extent extent = getExtent();
-        BlockState block = extent.getBlock(vector);
-        return block.getBlockType().getMaterial().isMovementBlocker();
-    }
-
     @Nullable
     @Override
     public Mask2D toMask2D() {

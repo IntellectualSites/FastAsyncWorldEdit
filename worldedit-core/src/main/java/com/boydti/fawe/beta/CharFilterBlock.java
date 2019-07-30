@@ -28,12 +28,12 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final ChunkFilterBlock init(final int x, final int z, final IChunkGet chunk) {
+    public final ChunkFilterBlock init(final int chunkX, final int chunkZ, final IChunkGet chunk) {
         this.get = (CharGetBlocks) chunk;
-        this.X = x;
-        this.Z = z;
-        this.xx = x << 4;
-        this.zz = z << 4;
+        this.X = chunkX;
+        this.Z = chunkZ;
+        this.xx = chunkX << 4;
+        this.zz = chunkZ << 4;
         return this;
     }
 

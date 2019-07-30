@@ -47,8 +47,8 @@ public class ListFilters {
     }
 
     @Command(
-            name = "private",
-            aliases = {"me", "mine", "local"},
+            name = "local",
+            aliases = {"me", "mine", "private"},
             desc = "List your personal schematics"
     )
     public Filter local() {
@@ -56,8 +56,8 @@ public class ListFilters {
     }
 
     @Command(
-            name = "public",
-            aliases = {"global"},
+            name = "global",
+            aliases = {"public"},
             desc = "List public schematics"
     )
     public Filter global() {
@@ -75,7 +75,7 @@ public class ListFilters {
     }
 
     @Command(
-            name = "*", //TODO originally this was left blank but doing so causes a major compilation error
+            name = "*", //TODO NOT IMPLEMENTED originally this was left blank but doing so causes a major compilation error
             desc = "wildcard"
     )
     public Filter wildcard(Actor actor, File root, String arg) {

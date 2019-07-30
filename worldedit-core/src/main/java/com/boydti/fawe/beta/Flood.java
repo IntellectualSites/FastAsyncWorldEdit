@@ -20,9 +20,9 @@ public class Flood {
     private int[][] queues;
     private long[][] visits;
 
-    private int x;
-    private int y;
-    private int z;
+    private int chunkX;
+    private int chunkYLayer;
+    private int chunkZ;
 
     private ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
     private final Long2ObjectLinkedOpenHashMap<long[][]> chunkVisits;
@@ -52,10 +52,10 @@ public class Flood {
         }
     }
 
-    private void init(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    private void init(int chunkX, int chunkYLayer, int chunkZ) {
+        this.chunkX = chunkX;
+        this.chunkYLayer = chunkYLayer;
+        this.chunkZ = chunkZ;
     }
 
     public void start(int x, int y, int z) {
@@ -154,8 +154,8 @@ public class Flood {
                 visit = visits[sectionIndex];
                 queue = queues[sectionIndex];
                 if (visit == null || queue == null) {
-                    long pair = MathMan.pairInt(this.x + nextX, this.z + nextZ);
-                    int layer = this.y + nextY;
+                    long pair = MathMan.pairInt(this.chunkX + nextX, this.chunkZ + nextZ);
+                    int layer = this.chunkYLayer + nextY;
                     if (layer < 0 || layer > 15) {
                         continue;
                     }

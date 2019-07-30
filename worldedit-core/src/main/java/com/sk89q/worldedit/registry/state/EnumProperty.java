@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 
 public class EnumProperty extends AbstractProperty<String> {
 
-    private Map<String, Integer> offsets = new HashMap<>();
+    private Map<CharSequence, Integer> offsets = new HashMap<>();
 
     public EnumProperty(final String name, final List<String> values) {
         this(name, values, 0);
@@ -48,7 +48,7 @@ public class EnumProperty extends AbstractProperty<String> {
 
     @Override
     public int getIndexFor(CharSequence string) throws IllegalArgumentException {
-        Integer value = offsets.get(string.toString());
+        Integer value = offsets.get(string);
         return value == null ? -1 : value;
     }
 

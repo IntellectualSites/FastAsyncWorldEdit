@@ -280,6 +280,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         return clipboard;
     }
 
+    /*
     private Clipboard readVersion2(BlockArrayClipboard version1, CompoundTag schematicTag) throws IOException {
         Map<String, Tag> schematic = schematicTag.getValue();
         if (schematic.containsKey("BiomeData")) {
@@ -290,6 +291,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         }
         return version1;
     }
+    */
 
     private void readBiomes(BlockArrayClipboard clipboard, Map<String, Tag> schematic) throws IOException {
         ByteArrayTag dataTag = requireTag(schematic, "BiomeData", ByteArrayTag.class);
@@ -349,6 +351,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         }
     }
 
+    /*
     private void readEntities(BlockArrayClipboard clipboard, Map<String, Tag> schematic) throws IOException {
         List<Tag> entList = requireTag(schematic, "Entities", ListTag.class).getValue();
         if (entList.isEmpty()) {
@@ -379,6 +382,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             }
         }
     }
+    */
     @Override
     public void close() throws IOException {
         inputStream.close();
