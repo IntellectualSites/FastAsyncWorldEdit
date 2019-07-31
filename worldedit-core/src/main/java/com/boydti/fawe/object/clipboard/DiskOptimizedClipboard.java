@@ -1,5 +1,7 @@
 package com.boydti.fawe.object.clipboard;
 
+import static com.boydti.fawe.Fawe.debug;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.NBTStreamer;
@@ -304,6 +306,10 @@ public class DiskOptimizedClipboard extends FaweClipboard implements Closeable {
                 file.setWritable(true);
                 closeDirectBuffer(byteBuffer);
                 byteBuffer = null;
+                debug("FAWE DEBUG MESSAGE FOLLOWS. THIS IS NOT AN ERROR OR A CRASH.");
+                for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
+                        debug(stackTraceElement.toString());
+                }
                 fileChannel = null;
                 braf = null;
             }

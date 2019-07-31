@@ -55,7 +55,7 @@ import java.util.UUID;
  */
 public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable {
 
-	private Region region;
+    private Region region;
     private BlockVector3 origin;
     public FaweClipboard IMP;
     private BlockVector3 size;
@@ -204,7 +204,7 @@ public class BlockArrayClipboard implements Clipboard, LightingExtent, Closeable
             int z = position.getBlockZ() - mz;
             return IMP.getBlock(x, y, z);
         }
-    	return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
 
     @Override
