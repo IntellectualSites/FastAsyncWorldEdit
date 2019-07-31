@@ -7,7 +7,7 @@ import com.boydti.fawe.beta.implementation.SimpleCharQueueExtent;
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.boydti.fawe.bukkit.v1_14.adapter.BlockMaterial_1_14;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.jnbt.anvil.BitArray4096;
+import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -19,19 +19,15 @@ import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.Chunk;
 import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_14_R1.ChunkProviderServer;
 import net.minecraft.server.v1_14_R1.ChunkSection;
-import net.minecraft.server.v1_14_R1.ChunkStatus;
 import net.minecraft.server.v1_14_R1.DataBits;
 import net.minecraft.server.v1_14_R1.DataPalette;
 import net.minecraft.server.v1_14_R1.DataPaletteBlock;
 import net.minecraft.server.v1_14_R1.DataPaletteLinear;
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
-import net.minecraft.server.v1_14_R1.IChunkAccess;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
-import net.minecraft.server.v1_14_R1.ProtoChunkExtension;
 import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
@@ -52,6 +48,16 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 
     private org.bukkit.World bukkitWorld;
     private WorldServer nmsWorld;
+
+    @Override
+    public void enableQueue() {
+
+    }
+
+    @Override
+    public void disableQueue() {
+
+    }
 
     @Override
     public synchronized void init(WorldChunkCache cache) {
@@ -235,10 +241,10 @@ public class BukkitQueue extends SimpleCharQueueExtent {
     }
 
     @Override
-    public boolean sendChunk(final int X, final int Z, final int mask) {
+    public void sendChunk(final int X, final int Z, final int mask) {
         PlayerChunk playerChunk = getPlayerChunk(X, Z);
         if (playerChunk == null) {
-            return false;
+            return;
         }
 //        ChunkSection[] sections = nmsChunk.getSections();
 //        for (int layer = 0; layer < 16; layer++) {
@@ -269,9 +275,9 @@ public class BukkitQueue extends SimpleCharQueueExtent {
                     return null;
                 }
             });
-            return true;
+            return;
         }
-        return false;
+        return;
     }
 
     /*
