@@ -100,7 +100,7 @@ subprojects {
     }
 }
 
-configure(['worldedit-core', 'worldedit-bukkit', 'favs'].collect { project("$it") }) {
+configure(['worldedit-core', 'worldedit-bukkit'].collect { project("$it") }) {
     apply plugin: 'java'
     apply plugin: 'maven'
 //    apply plugin: 'checkstyle'
