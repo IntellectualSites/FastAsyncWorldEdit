@@ -20,7 +20,6 @@ buildscript {
 }
 
 plugins {
-    id 'net.minecrell.licenser' version '0.4.1' apply false
     id "org.ajoberstar.grgit" version "3.1.1"
 }
 
@@ -98,7 +97,7 @@ subprojects {
     }
 }
 
-configure(['worldedit-core', 'worldedit-bukkit', 'favs'].collect { project("$it") }) {
+configure(['worldedit-core', 'worldedit-bukkit'].collect { project("$it") }) {
     apply plugin: 'java'
     apply plugin: 'maven'
 //    apply plugin: 'checkstyle'

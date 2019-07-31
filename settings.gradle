@@ -7,5 +7,3 @@ include 'worldedit-libs'
     include "worldedit-$it"
 }
 include "worldedit-libs:core:ap"
-
-include 'favs'
