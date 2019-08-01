@@ -14,10 +14,16 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 * [Report Issue](https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/issues)
 
 ## Downloads
-### 1.13+
+### FastAsyncWorldEdit 1.13+
 * [Download](https://empcraft.com/fawe/download/)
 * [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-Breaking/)
+* [Repository](https://github.com/IntellectualSites/FastAsyncVoxelSniper)
 * [JavaDoc](https://ci.athion.net/job/FastAsyncWorldEdit-1.13/javadoc/)
+
+### FastAsyncVoxelSniper 1.13+
+* [Download](https://ci.athion.net/job/FastAsyncVoxelSniper-1.13+/)
+* [Jenkins](https://ci.athion.net/job/FastAsyncVoxelSniper-1.13+/)
+* [JavaDoc] - Later
 
 ### < 1.12.2
 * [Download](https://empcraft.com/fawe/download/?bukkit)
