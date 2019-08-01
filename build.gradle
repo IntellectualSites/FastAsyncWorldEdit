@@ -59,7 +59,7 @@ ext {
     }
 }
 
-version = String.format("%s.%s", rootVersion, buildNumber)
+version = String.format("%s-%s", rootVersion, buildNumber)
 
 description = rootProject.name
 
