@@ -12,7 +12,7 @@ public class FaweVersion {
     }
 
     public FaweVersion(String version, String commit, String date) {
-        String[] split = version.substring(version.indexOf('=') + 1).split("\\.");
+        String[] split = version.substring(version.indexOf('=') + 1).split("-");
         this.build = Integer.parseInt(split[1]);
         this.hash = Integer.parseInt(commit.substring(commit.indexOf('=') + 1), 16);
         String[] split1 = date.substring(date.indexOf('=') + 1).split("\\.");
