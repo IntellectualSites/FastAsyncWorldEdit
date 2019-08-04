@@ -18,23 +18,32 @@ import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 /**
- * Single threaded implementation for IQueueExtent (still abstract)
- *  - Does not implement creation of chunks (that has to implemented by the platform e.g. Bukkit)
- *
- *  This queue is reusable {@link #init(WorldChunkCache)}
+ * Single threaded implementation for IQueueExtent (still abstract) - Does not implement creation of
+ * chunks (that has to implemented by the platform e.g. Bukkit)
+ * <p>
+ * This queue is reusable {@link #init(WorldChunkCache)}
  */
 public abstract class SingleThreadQueueExtent implements IQueueExtent {
+
+    // Pool discarded chunks for reuse (can safely be cleared by another thread)
+    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
+    // Chunks currently being queued / worked on
+    private final Long2ObjectLinkedOpenHashMap<IChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
     private WorldChunkCache cache;
     private Thread currentThread;
     private ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
+    // Last access pointers
+    private IChunk lastChunk;
+    private long lastPair = Long.MAX_VALUE;
 
     /**
-     * Safety check to ensure that the thread being used matches the one being initialized on.
-     *  - Can be removed later
+     * Safety check to ensure that the thread being used matches the one being initialized on. - Can
+     * be removed later
      */
     private void checkThread() {
         if (Thread.currentThread() != currentThread && currentThread != null) {
-            throw new UnsupportedOperationException("This class must be used from a single thread. Use multiple queues for concurrent operations");
+            throw new UnsupportedOperationException(
+                "This class must be used from a single thread. Use multiple queues for concurrent operations");
         }
     }
 
@@ -60,10 +69,11 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
 
     /**
      * Initialize the queue
+     *
      * @param cache
      */
     @Override
-    public synchronized void init(final WorldChunkCache cache) {
+    public synchronized void init(WorldChunkCache cache) {
         if (this.cache != null) {
             reset();
         }
@@ -72,15 +82,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         this.cache = cache;
     }
 
-    // Last access pointers
-    private IChunk lastChunk;
-    private long lastPair = Long.MAX_VALUE;
-    // Chunks currently being queued / worked on
-    private final Long2ObjectLinkedOpenHashMap<IChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
-    // Pool discarded chunks for reuse (can safely be cleared by another thread)
-    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
-
-    public void returnToPool(final IChunk chunk) {
+    public void returnToPool(IChunk chunk) {
         CHUNK_POOL.add(chunk);
     }
 
@@ -95,7 +97,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public <T extends Future<T>> T submit(final IChunk<T> chunk) {
+    public <T extends Future<T>> T submit(IChunk<T> chunk) {
         if (lastChunk == chunk) {
             lastPair = Long.MAX_VALUE;
             lastChunk = null;
@@ -107,11 +109,12 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
 
     /**
      * Submit without first checking that it has been removed from the chunk map
+     *
      * @param chunk
      * @param <T>
      * @return
      */
-    private <T extends Future<T>> T submitUnchecked(final IChunk<T> chunk) {
+    private <T extends Future<T>> T submitUnchecked(IChunk<T> chunk) {
         if (chunk.isEmpty()) {
             CHUNK_POOL.add(chunk);
             return (T) (Future) Futures.immediateFuture(null);
@@ -125,7 +128,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public synchronized boolean trim(final boolean aggressive) {
+    public synchronized boolean trim(boolean aggressive) {
         // TODO trim individial chunk sections
         CHUNK_POOL.clear();
         if (Thread.currentThread() == currentThread) {
@@ -146,13 +149,14 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     /**
-     * Get a new IChunk from either the pool, or create a new one<br>
-     *     + Initialize it at the coordinates
+     * Get a new IChunk from either the pool, or create a new one<br> + Initialize it at the
+     * coordinates
+     *
      * @param X
      * @param Z
      * @return IChunk
      */
-    private IChunk poolOrCreate(final int X, final int Z) {
+    private IChunk poolOrCreate(int X, int Z) {
         IChunk next = CHUNK_POOL.poll();
         if (next == null) {
             next = create(false);
@@ -162,21 +166,23 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public final IChunk getCachedChunk(final int x, final int z) {
-        final long pair = (((long) x) << 32) | (z & 0xffffffffL);
+    public final IChunk getCachedChunk(int x, int z) {
+        final long pair = (long) x << 32 | z & 0xffffffffL;
         if (pair == lastPair) {
             return lastChunk;
         }
 
         IChunk chunk = chunks.get(pair);
         if (chunk instanceof ReferenceChunk) {
-            chunk = ((ReferenceChunk) (chunk)).getParent();
+            chunk = ((ReferenceChunk) chunk).getParent();
         }
         if (chunk != null) {
             lastPair = pair;
             lastChunk = chunk;
         }
-        if (chunk != null) return chunk;
+        if (chunk != null) {
+            return chunk;
+        }
 
         checkThread();
         final int size = chunks.size();
@@ -205,14 +211,15 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         return chunk;
     }
 
-    private void pollSubmissions(final int targetSize, final boolean aggressive) {
+    private void pollSubmissions(int targetSize, boolean aggressive) {
         final int overflow = submissions.size() - targetSize;
         if (aggressive) {
             for (int i = 0; i < overflow; i++) {
                 Future first = submissions.poll();
                 try {
-                    while ((first = (Future) first.get()) != null) ;
-                } catch (final InterruptedException | ExecutionException e) {
+                    while ((first = (Future) first.get()) != null) {
+                    }
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
@@ -223,7 +230,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
                     if (next.isDone()) {
                         try {
                             next = (Future) next.get();
-                        } catch (final InterruptedException | ExecutionException e) {
+                        } catch (InterruptedException | ExecutionException e) {
                             e.printStackTrace();
                         }
                     } else {
@@ -240,7 +247,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         checkThread();
         if (!chunks.isEmpty()) {
             if (MemUtil.isMemoryLimited()) {
-                for (final IChunk chunk : chunks.values()) {
+                for (IChunk chunk : chunks.values()) {
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         pollSubmissions(Settings.IMP.QUEUE.PARALLEL_THREADS, true);
@@ -248,7 +255,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
                     }
                 }
             } else {
-                for (final IChunk chunk : chunks.values()) {
+                for (IChunk chunk : chunks.values()) {
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         submissions.add(future);

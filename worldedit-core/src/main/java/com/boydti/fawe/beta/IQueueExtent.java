@@ -8,14 +8,13 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
 import java.io.Flushable;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 /**
- * TODO: implement Extent (need to refactor Extent first)
- * Interface for a queue based extent which uses chunks
+ * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
+ * uses chunks
  */
 public interface IQueueExtent extends Flushable, Trimable, Extent {
 
@@ -40,12 +39,14 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
 
     /**
      * Get the {@link WorldChunkCache}
+     *
      * @return
      */
     IChunkGet getCachedGet(int x, int z, Supplier<IChunkGet> supplier);
 
     /**
      * Get the IChunk at a position (and cache it if it's not already)
+     *
      * @param x
      * @param z
      * @return IChunk
@@ -54,24 +55,26 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
 
     /**
      * Submit the chunk so that it's changes are applied to the world
+     *
      * @param chunk
      * @return result
      */
     <T extends Future<T>> T submit(IChunk<T> chunk);
 
     @Override
-    default boolean setBlock(final int x, final int y, final int z, final BlockStateHolder state) {
+    default boolean setBlock(int x, int y, int z, BlockStateHolder state) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.setBlock(x & 15, y, z & 15, state);
     }
 
     @Override
-    default boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
+    default boolean setBiome(int x, int y, int z, BiomeType biome) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.setBiome(x & 15, y, z & 15, biome);
     }
 
-    default BlockState getBlock(final int x, final int y, final int z) {
+    @Override
+    default BlockState getBlock(int x, int y, int z) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.getBlock(x & 15, y, z & 15);
     }
@@ -82,7 +85,7 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
         return chunk.getFullBlock(x & 15, y, z & 15);
     }
 
-    default BiomeType getBiome(final int x, final int z) {
+    default BiomeType getBiome(int x, int z) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.getBiomeType(x & 15, z & 15);
     }
@@ -98,26 +101,27 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
     }
 
     /**
-     * Create a new root IChunk object<br>
-     *  - Full chunks will be reused, so a more optimized chunk can be returned in that case<br>
-     *  - Don't wrap the chunk, that should be done in {@link #wrap(IChunk)}
-     * @param full
+     * Create a new root IChunk object<br> - Full chunks will be reused, so a more optimized chunk
+     * can be returned in that case<br> - Don't wrap the chunk, that should be done in {@link
+     * #wrap(IChunk)}
+     *
+     * @param isFull true if a more optimized chunk should be returned
      * @return
      */
-    IChunk create(boolean full);
+    IChunk create(boolean isFull);
 
     /**
      * Wrap the chunk object (i.e. for region restrictions / limits etc.)
+     *
      * @param root
      * @return wrapped chunk
      */
-    default IChunk wrap(final IChunk root) {
+    default IChunk wrap(IChunk root) {
         return root;
     }
 
     /**
-     * Flush all changes to the world
-     *  - Best to call this async so it doesn't hang the server
+     * Flush all changes to the world - Best to call this async so it doesn't hang the server
      */
     @Override
     void flush();

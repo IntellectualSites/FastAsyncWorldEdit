@@ -5,18 +5,19 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import javax.annotation.Nullable;
 
 public class ArrayFilterBlock extends SimpleFilterBlock {
+
     private final char[] blocks;
     private final byte[] heights;
     private final int yOffset;
+    private final int width, length;
     private int x, z, index;
     private char ordinal;
-    private final int width, length;
 
-    public ArrayFilterBlock(Extent extent, char[] blocks, byte[] heights, int width, int length, int yOffset) {
+    public ArrayFilterBlock(Extent extent, char[] blocks, byte[] heights, int width, int length,
+        int yOffset) {
         super(extent);
         this.blocks = blocks;
         this.width = width;
@@ -35,23 +36,13 @@ public class ArrayFilterBlock extends SimpleFilterBlock {
     }
 
     @Override
-    public void setOrdinal(int ordinal) {
-        blocks[index] = (char) ordinal;
-    }
-
-    @Override
-    public void setBlock(BlockState state) {
-        blocks[index] = state.getOrdinalChar();
-    }
-
-    @Override
-    public void setFullBlock(BaseBlock block) {
-        blocks[index] = block.getOrdinalChar();
-    }
-
-    @Override
     public int getOrdinal() {
         return ordinal;
+    }
+
+    @Override
+    public void setOrdinal(int ordinal) {
+        blocks[index] = (char) ordinal;
     }
 
     @Override
@@ -60,8 +51,18 @@ public class ArrayFilterBlock extends SimpleFilterBlock {
     }
 
     @Override
+    public void setBlock(BlockState state) {
+        blocks[index] = state.getOrdinalChar();
+    }
+
+    @Override
     public BaseBlock getFullBlock() {
         return getBlock().toBaseBlock();
+    }
+
+    @Override
+    public void setFullBlock(BaseBlock block) {
+        blocks[index] = block.getOrdinalChar();
     }
 
     @Override
@@ -70,7 +71,8 @@ public class ArrayFilterBlock extends SimpleFilterBlock {
     }
 
     @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {}
+    public void setNbtData(@Nullable CompoundTag nbtData) {
+    }
 
     @Override
     public int getX() {

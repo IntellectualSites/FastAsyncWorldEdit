@@ -12,7 +12,6 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.world.World;
-
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,6 +30,7 @@ import java.util.function.Supplier;
  * Class which handles all the queues {@link IQueueExtent}
  */
 public abstract class QueueHandler implements Trimable, Runnable {
+
     private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
     private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
     private ThreadPoolExecutor blockingExecutor = FaweCache.newBlockingExecutor();
@@ -43,17 +43,16 @@ public abstract class QueueHandler implements Trimable, Runnable {
             return create();
         }
     };
-
-    public QueueHandler() {
-        TaskManager.IMP.repeat(this, 1);
-    }
-
     /**
-     * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the server
+     * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the
+     * server
      */
     private long last;
     private long allocate = 50;
     private double targetTPS = 18;
+    public QueueHandler() {
+        TaskManager.IMP.repeat(this, 1);
+    }
 
     @Override
     public void run() {
@@ -63,7 +62,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
         if (!syncTasks.isEmpty()) {
             long now = System.currentTimeMillis();
             targetTPS = 18 - Math.max(Settings.IMP.QUEUE.EXTRA_TIME_MS * 0.05, 0);
-            long diff = (50 + this.last) - (this.last = now);
+            long diff = 50 + this.last - (this.last = now);
             long absDiff = Math.abs(diff);
             if (diff == 0) {
                 allocate = Math.min(50, allocate + 1);
@@ -105,7 +104,9 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
         while (!syncTasks.isEmpty()) {
             final FutureTask task = syncTasks.poll();
-            if (task != null) task.run();
+            if (task != null) {
+                task.run();
+            }
         }
     }
 
@@ -119,23 +120,23 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
     }
 
-    public <T> Future<T> async(final Runnable run, final T value) {
+    public <T> Future<T> async(Runnable run, T value) {
         return forkJoinPoolSecondary.submit(run, value);
     }
 
-    public Future<?> async(final Runnable run) {
+    public Future<?> async(Runnable run) {
         return forkJoinPoolSecondary.submit(run);
     }
 
-    public <T> Future<T> async(final Callable<T> call) {
+    public <T> Future<T> async(Callable<T> call) {
         return forkJoinPoolSecondary.submit(call);
     }
 
-    public ForkJoinTask submit(final Runnable call) {
+    public ForkJoinTask submit(Runnable call) {
         return forkJoinPoolPrimary.submit(call);
     }
 
-    public <T> Future<T> sync(final Runnable run, final T value) {
+    public <T> Future<T> sync(Runnable run, T value) {
         if (Fawe.isMainThread()) {
             run.run();
             return Futures.immediateFuture(value);
@@ -146,7 +147,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
         return result;
     }
 
-    public <T> Future<T> sync(final Runnable run) {
+    public <T> Future<T> sync(Runnable run) {
         if (Fawe.isMainThread()) {
             run.run();
             return Futures.immediateCancelledFuture();
@@ -157,7 +158,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
         return result;
     }
 
-    public <T> Future<T> sync(final Callable<T> call) throws Exception {
+    public <T> Future<T> sync(Callable<T> call) throws Exception {
         if (Fawe.isMainThread()) {
             return Futures.immediateFuture(call.call());
         }
@@ -167,7 +168,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
         return result;
     }
 
-    public <T> Future<T> sync(final Supplier<T> call) {
+    public <T> Future<T> sync(Supplier<T> call) {
         if (Fawe.isMainThread()) {
             return Futures.immediateFuture(call.get());
         }
@@ -183,7 +184,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
     }
 
-    public <T extends Future<T>> T submit(final IChunk<T> chunk) {
+    public <T extends Future<T>> T submit(IChunk<T> chunk) {
 //        if (MemUtil.isMemoryFree()) { TODO NOT IMPLEMENTED - optimize this
 //            return (T) forkJoinPoolSecondary.submit(chunk);
 //        }
@@ -192,6 +193,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     /**
      * Get or create the WorldChunkCache for a world
+     *
      * @param world
      * @return
      */
@@ -218,17 +220,18 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     public abstract void endSet(boolean parallel);
 
-    public IQueueExtent getQueue(final World world) {
+    public IQueueExtent getQueue(World world) {
         final IQueueExtent queue = queuePool.get();
         queue.init(getOrCreate(world));
         return queue;
     }
 
     @Override
-    public boolean trim(final boolean aggressive) {
+    public boolean trim(boolean aggressive) {
         boolean result = true;
         synchronized (chunkCache) {
-            final Iterator<Map.Entry<World, WeakReference<WorldChunkCache>>> iter = chunkCache.entrySet().iterator();
+            final Iterator<Map.Entry<World, WeakReference<WorldChunkCache>>> iter = chunkCache
+                .entrySet().iterator();
             while (iter.hasNext()) {
                 final Map.Entry<World, WeakReference<WorldChunkCache>> entry = iter.next();
                 final WeakReference<WorldChunkCache> value = entry.getValue();

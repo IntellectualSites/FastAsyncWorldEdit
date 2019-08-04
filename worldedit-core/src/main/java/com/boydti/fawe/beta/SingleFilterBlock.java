@@ -5,7 +5,6 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-
 import javax.annotation.Nullable;
 
 public class SingleFilterBlock extends FilterBlock {
@@ -27,8 +26,18 @@ public class SingleFilterBlock extends FilterBlock {
     }
 
     @Override
+    public int getOrdinal() {
+        return block.getOrdinal();
+    }
+
+    @Override
     public void setOrdinal(int ordinal) {
         setBlock(BlockState.getFromOrdinal(ordinal));
+    }
+
+    @Override
+    public BlockState getBlock() {
+        return block.toBlockState();
     }
 
     @Override
@@ -37,18 +46,8 @@ public class SingleFilterBlock extends FilterBlock {
     }
 
     @Override
-    public void setFullBlock(BaseBlock block) {
-        this.block = block;
-    }
-
-    @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {
-        block = block.toBaseBlock(nbtData);
-    }
-
-    @Override
-    public int getOrdinal() {
-        return block.getOrdinal();
+    public BaseBlock getFullBlock() {
+        return block;
     }
 
 //    @Override
@@ -57,18 +56,18 @@ public class SingleFilterBlock extends FilterBlock {
 //    }
 
     @Override
-    public BlockState getBlock() {
-        return block.toBlockState();
-    }
-
-    @Override
-    public BaseBlock getFullBlock() {
-        return block;
+    public void setFullBlock(BaseBlock block) {
+        this.block = block;
     }
 
     @Override
     public CompoundTag getNbtData() {
         return block.getNbtData();
+    }
+
+    @Override
+    public void setNbtData(@Nullable CompoundTag nbtData) {
+        block = block.toBaseBlock(nbtData);
     }
 
     @Override

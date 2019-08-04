@@ -3,6 +3,7 @@ package com.boydti.fawe.beta.filters;
 import com.boydti.fawe.beta.FilterBlock;
 
 public class CountFilter extends ForkedFilter<CountFilter> {
+
     private int total;
 
     public CountFilter() {
@@ -23,12 +24,8 @@ public class CountFilter extends ForkedFilter<CountFilter> {
         this.total += filter.getTotal();
     }
 
-    /*
-    Implementation
-     */
-
     @Override
-    public final void applyBlock(final FilterBlock block) {
+    public final void applyBlock(FilterBlock block) {
         total++;
     }
 

@@ -24,41 +24,33 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
+import javax.annotation.Nullable;
 
 public class DelegateFilterBlock extends FilterBlock {
+
     private final FilterBlock parent;
 
     public DelegateFilterBlock(FilterBlock parent) {
         this.parent = parent;
     }
 
+    public static BlockVector3 at(double x, double y, double z) {
+        return BlockVector3.at(x, y, z);
+    }
+
+    public static BlockVector3 at(int x, int y, int z) {
+        return BlockVector3.at(x, y, z);
+    }
+
+    public static Comparator<BlockVector3> sortByCoordsYzx() {
+        return BlockVector3.sortByCoordsYzx();
+    }
+
     @Override
     public Extent getExtent() {
         return parent.getExtent();
-    }
-
-    @Override
-    public void setOrdinal(int ordinal) {
-        parent.setOrdinal(ordinal);
-    }
-
-    @Override
-    public void setBlock(BlockState state) {
-        parent.setBlock(state);
-    }
-
-    @Override
-    public void setFullBlock(BaseBlock block) {
-        parent.setFullBlock(block);
-    }
-
-    @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {
-        parent.setNbtData(nbtData);
     }
 
     @Override
@@ -77,8 +69,18 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
+    public void setOrdinal(int ordinal) {
+        parent.setOrdinal(ordinal);
+    }
+
+    @Override
     public BlockState getBlock() {
         return parent.getBlock();
+    }
+
+    @Override
+    public void setBlock(BlockState state) {
+        parent.setBlock(state);
     }
 
     @Override
@@ -87,8 +89,18 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
+    public void setFullBlock(BaseBlock block) {
+        parent.setFullBlock(block);
+    }
+
+    @Override
     public CompoundTag getNbtData() {
         return parent.getNbtData();
+    }
+
+    @Override
+    public void setNbtData(@Nullable CompoundTag nbtData) {
+        parent.setNbtData(nbtData);
     }
 
     @Override
@@ -239,18 +251,6 @@ public class DelegateFilterBlock extends FilterBlock {
     @Override
     public BlockState getStateRelativeY(Extent orDefault, int y) {
         return parent.getStateRelativeY(orDefault, y);
-    }
-
-    public static BlockVector3 at(double x, double y, double z) {
-        return BlockVector3.at(x, y, z);
-    }
-
-    public static BlockVector3 at(int x, int y, int z) {
-        return BlockVector3.at(x, y, z);
-    }
-
-    public static Comparator<BlockVector3> sortByCoordsYzx() {
-        return BlockVector3.sortByCoordsYzx();
     }
 
     @Override
@@ -479,7 +479,8 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX, double translateZ) {
+    public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX,
+        double translateZ) {
         return parent.transform2D(angle, aboutX, aboutZ, translateX, translateZ);
     }
 
@@ -560,7 +561,8 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY,
+        boolean ignoreAir) {
         return parent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
     }
 
@@ -570,18 +572,23 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin,
+        int failedMax) {
         return parent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
-        return parent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin,
+        int failedMax, Mask mask) {
+        return parent
+            .getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
-        return parent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
+    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin,
+        int failedMax, boolean ignoreAir) {
+        return parent
+            .getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
     }
 
     @Override
@@ -595,12 +602,14 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity,
+        boolean rotate) throws WorldEditException {
         parent.addSchems(region, mask, clipboards, rarity, rotate);
     }
 
     @Override
-    public void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
+    public void spawnResource(Region region, Resource gen, int rarity, int frequency)
+        throws WorldEditException {
         parent.spawnResource(region, gen, rarity, frequency);
     }
 
@@ -610,7 +619,8 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency,
+        int rarity, int minY, int maxY) throws WorldEditException {
         parent.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
     }
 
@@ -671,12 +681,14 @@ public class DelegateFilterBlock extends FilterBlock {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
+        throws WorldEditException {
         return parent.setBlock(position, block);
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+        throws WorldEditException {
         return parent.setBlock(x, y, z, block);
     }
 

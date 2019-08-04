@@ -43,6 +43,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BukkitQueue extends SimpleCharQueueExtent {
 
@@ -94,7 +98,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 //    };
 
     @Override
-    public IChunk create(boolean full) {
+    public IChunk create(boolean isFull) {
 //        if (full) {
 //            //TODO implement
 //            return FULL_CHUNKS.get();

@@ -7,9 +7,10 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
 /**
- * Interface for getting blocks
+ * An interface for getting blocks.
  */
 public interface IChunkGet extends IBlocks, Trimable, InputExtent {
+
     @Override
     BaseBlock getFullBlock(int x, int y, int z);
 

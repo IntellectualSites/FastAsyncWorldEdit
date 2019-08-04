@@ -1,20 +1,11 @@
 package com.boydti.fawe.beta.filters;
 
 import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.FilterBlock;
-import com.boydti.fawe.config.BBC;
-import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.util.Countable;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockTypes;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ForkedFilter<T extends ForkedFilter<T>> implements Filter {
+
     protected final Map<Thread, T> children;
 
     public ForkedFilter(T root) {
