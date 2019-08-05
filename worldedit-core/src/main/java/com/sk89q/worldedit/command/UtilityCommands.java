@@ -402,6 +402,7 @@ public class UtilityCommands extends MethodCommands {
     @Logging(PLACEMENT)
     public void replaceNear(Player player, LocalSession session, EditSession editSession, double size, @Optional Mask from, Pattern to) throws WorldEditException {
 
+        we.checkMaxRadius(size);
         if (from == null) {
             from = new ExistingBlockMask(editSession);
         }
