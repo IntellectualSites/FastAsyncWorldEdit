@@ -287,6 +287,7 @@ public class GenerationCommands extends MethodCommands {
     @Logging(POSITION)
     public void forestGen(Player player, LocalSession session, EditSession editSession, @Optional("10") int size,
                           @Optional("tree") TreeType type, @Optional("5") @Range(min = 0, max = 100) double density) throws WorldEditException {
+        worldEdit.checkMaxRadius(size);
         density = density / 100;
         int affected = editSession.makeForest(session.getPlacementPosition(player), size, density, type);
         player.print(affected + " trees created.");
@@ -302,6 +303,7 @@ public class GenerationCommands extends MethodCommands {
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
     public void pumpkins(Player player, LocalSession session, EditSession editSession, @Optional("10") int apothem, @Optional("0.02") double density) throws WorldEditException, ParameterException {
+        worldEdit.checkMaxRadius(apothem);
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
         BBC.COMMAND_PUMPKIN.send(player, affected);
     }
