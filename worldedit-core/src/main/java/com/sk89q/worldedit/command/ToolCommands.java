@@ -40,6 +40,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.item.ItemType;
@@ -107,10 +108,7 @@ public class ToolCommands {
             desc = "Inspect edits within a radius"
     )
     @CommandPermissions("worldedit.tool.inspect")
-    public void inspectBrush(Player player, LocalSession session,
-        @Arg(desc = "The radius of the brush", def = "1")
-            double radius) throws WorldEditException {
-        radius = Math.max(1,radius);
+    public void inspectBrush(Player player, LocalSession session) throws WorldEditException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(player, new InspectBrush());
         BBC.TOOL_INSPECT.send(player, itemStack.getType().getName());

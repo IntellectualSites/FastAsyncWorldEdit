@@ -217,7 +217,7 @@ public class RegionCommands {
     public int line(Actor actor, EditSession editSession,
                     @Selection Region region,
                     @Arg(desc = "The pattern of blocks to place")
-                        Pattern patternArg,
+                        Pattern patternArgOpt,
                     @Range(min = 1) @Arg(desc = "The thickness of the line", def = "0")
                         int thickness,
                     @Switch(name = 'h', desc = "Generate only a shell")
@@ -231,7 +231,7 @@ public class RegionCommands {
         CuboidRegion cuboidregion = (CuboidRegion) region;
         BlockVector3 pos1 = cuboidregion.getPos1();
         BlockVector3 pos2 = cuboidregion.getPos2();
-        int blocksChanged = editSession.drawLine(patternArg, pos1, pos2, thickness, !shell);
+        int blocksChanged = editSession.drawLine(patternArgOpt, pos1, pos2, thickness, !shell);
 
         BBC.VISITOR_BLOCK.send(actor, blocksChanged);
         return blocksChanged;
@@ -317,7 +317,7 @@ public class RegionCommands {
 )
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
-    public void lay(FawePlayer fp, EditSession editSession, @Selection Region region, Pattern patternArg, InjectedValueAccess context) throws WorldEditException {
+    public void lay(FawePlayer fp, EditSession editSession, @Selection Region region, @Arg(name = "pattern", desc = "The pattern of blocks to lay") Pattern patternArg, InjectedValueAccess context) throws WorldEditException {
         fp.checkConfirmationRegion(() -> {
             BlockVector3 max = region.getMaximumPoint();
             int maxY = max.getBlockY();
@@ -406,7 +406,7 @@ public class RegionCommands {
                       @Arg(desc = "# of iterations to perform", def = "1")
                           int iterations,
                       @Arg(desc = "The mask of blocks to use as the height map", def = "")
-                          Mask mask,
+                          Mask maskOpt,
         @Switch(name = 's', desc = "TODO") boolean snow, InjectedValueAccess context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
@@ -417,7 +417,7 @@ public class RegionCommands {
         }
         fp.checkConfirmationRegion(() -> {
             try {
-                HeightMap heightMap = new HeightMap(editSession, region, mask, snow);
+                HeightMap heightMap = new HeightMap(editSession, region, maskOpt, snow);
                 HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
                 int affected = heightMap.applyFilter(filter, iterations);
                 BBC.VISITOR_BLOCK.send(fp, affected);
@@ -671,14 +671,14 @@ public class RegionCommands {
                       @Selection Region region,
                        @Range(min = 0) @Arg(desc = "Thickness of the shell to leave", def = "0")
                           int thickness,
-                      @Arg(desc = "The pattern of blocks to replace the hollowed area with", def = "air")
-                          Pattern patternArg,
+                      @Arg(name = "pattern", desc = "The pattern of blocks to replace the hollowed area with", def = "air")
+                          Pattern patternArgOpt,
         @ArgFlag(name = 'm', desc = "Mask to hollow with") Mask mask,
                        InjectedValueAccess context) throws WorldEditException {
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
         Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
         fp.checkConfirmationRegion(() -> {
-            int affected = editSession.hollowOutRegion(region, thickness, patternArg, finalMask);
+            int affected = editSession.hollowOutRegion(region, thickness, patternArgOpt, finalMask);
             BBC.VISITOR_BLOCK.send(fp, affected);
         }, getArguments(context), region, context);
     }

@@ -122,7 +122,7 @@ public class ClipboardCommands {
                      @Switch(name = 'b', desc = "Also copy biomes")
                              boolean copyBiomes,
                      @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                        Mask mask, InjectedValueAccess context) throws WorldEditException {
+                        Mask maskOpt, InjectedValueAccess context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
@@ -150,8 +150,8 @@ public class ClipboardCommands {
                 copy.setSourceMask(sourceMask);
                 editSession.setSourceMask(null);
             }
-            if (mask != null && mask != Masks.alwaysTrue()) {
-                copy.setSourceMask(mask);
+            if (maskOpt != null && maskOpt != Masks.alwaysTrue()) {
+                copy.setSourceMask(maskOpt);
             }
             Operations.completeLegacy(copy);
             BBC.COMMAND_COPY.send(player, region.getArea());
@@ -171,7 +171,7 @@ public class ClipboardCommands {
                          @Switch(name = 'e', desc = "Skip copy entities")
                                  boolean skipEntities,
                          @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                                 Mask mask,
+                                 Mask maskOpt,
                          @Switch(name = 'b', desc = "Also copy biomes")
                                  boolean copyBiomes) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
@@ -203,7 +203,7 @@ public class ClipboardCommands {
                         @Switch(name = 'e', desc = "Skip copy entities")
                                 boolean skipEntities,
                         @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                                Mask mask,
+                                Mask maskOpt,
                         @Switch(name = 'b', desc = "Also copy biomes")
                                 boolean copyBiomes) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
@@ -242,7 +242,7 @@ public class ClipboardCommands {
                     @Switch(name = 'b', desc = "Also copy biomes, source biomes are unaffected")
                         boolean copyBiomes,
                     @ArgFlag(name = 'm', desc = "Set the exclude mask, matching blocks become air", def = "")
-                        Mask mask,
+                        Mask maskOpt,
                     InjectedValueAccess context) throws WorldEditException {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
@@ -272,8 +272,8 @@ public class ClipboardCommands {
                 copy.setSourceMask(sourceMask);
                 editSession.setSourceMask(null);
             }
-            if (mask != null) {
-                copy.setSourceMask(mask);
+            if (maskOpt != null) {
+                copy.setSourceMask(maskOpt);
             }
             Operations.completeLegacy(copy);
             session.setClipboard(new ClipboardHolder(clipboard));

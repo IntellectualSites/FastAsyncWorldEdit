@@ -196,7 +196,7 @@ public class WorldEditCommands {
                      @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
                          int page,
                      @Arg(desc = "The command to retrieve help for", def = "", variable = true)
-                         List<String> command) throws WorldEditException {
-        PrintCommandHelp.help(command, page, listSubCommands, we, actor);
+                         List<String> commandStr) throws WorldEditException {
+        PrintCommandHelp.help(commandStr, page, listSubCommands, we, actor);
     }
 }

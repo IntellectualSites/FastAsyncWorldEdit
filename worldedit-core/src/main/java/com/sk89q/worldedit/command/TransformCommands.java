@@ -22,7 +22,7 @@ import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 
-@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+@CommandContainer//(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class TransformCommands {
 
     @Command(

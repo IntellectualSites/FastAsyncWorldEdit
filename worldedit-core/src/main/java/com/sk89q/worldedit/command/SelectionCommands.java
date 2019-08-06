@@ -555,7 +555,7 @@ public class SelectionCommands {
     public void select(Actor actor, World world, LocalSession session, EditSession editSession,
                        @Arg(desc = "Selector to switch to", def = "")
                            SelectorChoice selector,
-                       @Arg(desc = "Selector mask", def = "") Mask mask,
+                       @Arg(desc = "Selector mask", def = "") Mask maskOpt,
                        @Switch(name = 'd', desc = "Set default selector")
                            boolean setDefaultSelector) throws WorldEditException {
         if (selector == null) {
@@ -614,11 +614,11 @@ public class SelectionCommands {
                 break;
             case FUZZY:
             case MAGIC:
-                if (mask == null) {
-                    mask = new IdMask(world);
+                if (maskOpt == null) {
+                    maskOpt = new IdMask(world);
                 }
                 //TODO Make FuzzyRegionSelector accept actors
-                newSelector = new FuzzyRegionSelector((Player) actor, editSession, mask);
+                newSelector = new FuzzyRegionSelector((Player) actor, editSession, maskOpt);
                 actor.print(BBC.SEL_FUZZY.s());
                 actor.print(BBC.SEL_LIST.s());
                 break;

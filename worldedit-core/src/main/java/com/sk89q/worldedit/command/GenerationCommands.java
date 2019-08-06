@@ -94,17 +94,17 @@ public class GenerationCommands {
     @Logging(PLACEMENT)
     public void caves(FawePlayer fp, LocalSession session, EditSession editSession, @Selection Region region,
                       @Arg(name = "size", desc = "TODO", def = "8") int sizeOpt,
-                      @Arg(desc = "TODO", def = "40") int frequency,
-                      @Arg(desc = "TODO", def = "7") int rarity,
-                      @Arg(desc = "TODO", def = "8") int minY,
-                      @Arg(desc = "TODO", def = "127") int maxY,
-                      @Arg(desc = "TODO", def = "1") int systemFrequency,
-                      @Arg(desc = "TODO", def = "25") int individualRarity,
-                      @Arg(desc = "TODO", def = "0") int pocketChance,
-                      @Arg(desc = "TODO", def = "0") int pocketMin,
-                      @Arg(desc = "TODO", def = "3") int pocketMax, InjectedValueAccess context) throws WorldEditException {
+                      @Arg(name = "frequency", desc = "TODO", def = "40") int frequencyOpt,
+                      @Arg(name = "rarity", desc = "TODO", def = "7") int rarityOpt,
+                      @Arg(name = "minY", desc = "TODO", def = "8") int minYOpt,
+                      @Arg(name = "maxY", desc = "TODO", def = "127") int maxYOpt,
+                      @Arg(name = "systemFrequency", desc = "TODO", def = "1") int systemFrequencyOpt,
+                      @Arg(name = "individualRarity", desc = "TODO", def = "25") int individualRarityOpt,
+                      @Arg(name = "pocketChance", desc = "TODO", def = "0") int pocketChanceOpt,
+                      @Arg(name = "pocketMin", desc = "TODO", def = "0") int pocketMinOpt,
+                      @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt, InjectedValueAccess context) throws WorldEditException {
         fp.checkConfirmationRegion(() -> {
-            CavesGen gen = new CavesGen(sizeOpt, frequency, rarity, minY, maxY, systemFrequency, individualRarity, pocketChance, pocketMin, pocketMax);
+            CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
             editSession.generate(region, gen);
             BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());
         }, "/caves", region, context);
@@ -130,10 +130,10 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.image")
     @Logging(PLACEMENT)
-    public void image(Player player, LocalSession session, EditSession editSession, String arg, @Arg(name = "randomize", desc = "boolean", def = "true") boolean randomize,
+    public void image(Player player, LocalSession session, EditSession editSession, String argStr, @Arg(name = "randomize", desc = "boolean", def = "true") boolean randomize,
                       @Arg(desc = "TODO", def = "100") int threshold, @Arg(name = "dimensions", desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
         TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
-        URL url = new URL(arg);
+        URL url = new URL(argStr);
         if (!url.getHost().equalsIgnoreCase("i.imgur.com") && !url.getHost().equalsIgnoreCase("empcraft.com")) {
             throw new IOException("Only i.imgur.com or empcraft.com/ui links are allowed!");
         }
@@ -171,7 +171,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
-    public void ore(FawePlayer fp, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, Pattern material, @Range(min = 0) int size, int freq, @Range(min = 0, max = 100) int rarity, @Range(min = 0, max = 255) int minY, @Range(min = 0, max = 255) int maxY, InjectedValueAccess context) throws WorldEditException {
+    public void ore(FawePlayer fp, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, Pattern material, @Arg(name="size", desc="Ore vein size") @Range(min = 0) int size, int freq, @Range(min = 0, max = 100) int rarity, @Range(min = 0, max = 255) int minY, @Range(min = 0, max = 255) int maxY, InjectedValueAccess context) throws WorldEditException {
         fp.checkConfirmationRegion(() -> {
             editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
             BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());

@@ -18,7 +18,9 @@ public final class CommandQueuedConditionGenerator implements CommandConditionGe
     @Override
     public Command.Condition generateCondition(Method commandMethod) {
         CommandQueued annotation = commandMethod.getAnnotation(CommandQueued.class);
-        checkNotNull(annotation, "Annotation is missing from commandMethod");
+        if (annotation == null) {
+            return Command.Condition.TRUE;
+        }
         return new CommandQueuedCondition(annotation.value());
     }
 }

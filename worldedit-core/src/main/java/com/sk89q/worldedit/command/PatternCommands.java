@@ -45,7 +45,7 @@ import java.util.Set;
 //        "e.g. #surfacespread[10][#existing],andesite\n" +
 //        "More Info: https://git.io/vSPmA"
 //)
-@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+@CommandContainer//(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class PatternCommands {
 
     @Command(
@@ -94,24 +94,24 @@ public class PatternCommands {
             name = "#anglecolor",
             desc = "A darker block based on the existing terrain angle"
 )
-    public Pattern anglecolor(Extent extent, LocalSession session, @Arg(name = "randomize", desc = "boolean", def = "true") boolean randomize, @Arg(name = "maxcomplexity", desc = "double", def = "100") double maxComplexity, @Arg(name = "distance", desc = "int", def = "1") int distance) {
-        return new AngleColorPattern(extent, session, distance);
+    public Pattern anglecolor(Extent extent, LocalSession session, @Arg(name = "randomize", desc = "boolean", def = "true") boolean randomize, @Arg(name = "maxcomplexity", desc = "double", def = "100") double maxComplexity, @Arg(name = "distance", desc = "int", def = "1") int distanceOpt) {
+        return new AngleColorPattern(extent, session, distanceOpt);
     }
 
     @Command(
             name = "#angledata",
             desc = "Block data based on the existing terrain angle"
     )
-    public Pattern angledata(Extent extent, @Arg(name = "distance", desc = "int", def = "1") int distance) {
-        return new DataAnglePattern(extent, distance);
+    public Pattern angledata(Extent extent, @Arg(name = "distance", desc = "int", def = "1") int distanceOpt) {
+        return new DataAnglePattern(extent, distanceOpt);
     }
 
     @Command(
             name = "#saturate",
             desc = "Saturate the existing block with a color"
 )
-    public Pattern saturate(Extent extent, LocalSession session, String arg) {
-        Color color = ColorUtil.parseColor(arg);
+    public Pattern saturate(Extent extent, LocalSession session, String colorStr) {
+        Color color = ColorUtil.parseColor(colorStr);
         return new SaturatePattern(extent, color.getRGB(), session);
     }
 
@@ -119,8 +119,8 @@ public class PatternCommands {
             name = "#averagecolor",
             desc = "Average between the existing block and a color"
 )
-    public Pattern averagecolor(Extent extent, LocalSession session, String arg) {
-        Color color = ColorUtil.parseColor(arg);
+    public Pattern averagecolor(Extent extent, LocalSession session, String colorStr) {
+        Color color = ColorUtil.parseColor(colorStr);
         return new AverageColorPattern(extent, color.getRGB(), session);
     }
 

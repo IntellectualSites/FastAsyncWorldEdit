@@ -74,9 +74,9 @@ public class ToolUtilCommands {
     @CommandPermissions("worldedit.brush.options.mask")
     public void mask(Player player, LocalSession session,
                      @Arg(desc = "The mask to set", def = "")
-                         Mask mask) throws WorldEditException {
-        session.getBrushTool(player).setMask(mask);
-        if (mask == null) {
+                         Mask maskOpt) throws WorldEditException {
+        session.getBrushTool(player).setMask(maskOpt);
+        if (maskOpt == null) {
             player.print("Brush mask disabled.");
         } else {
             player.print("Brush mask set.");
@@ -129,9 +129,9 @@ public class ToolUtilCommands {
     @CommandPermissions("worldedit.brush.options.tracemask")
     public void traceMask(Player player, LocalSession session,
                           @Arg(desc = "The trace mask to set", def = "")
-                             Mask mask) throws WorldEditException {
-        session.getBrushTool(player).setTraceMask(mask);
-        if (mask == null) {
+                             Mask maskOpt) throws WorldEditException {
+        session.getBrushTool(player).setTraceMask(maskOpt);
+        if (maskOpt == null) {
             player.print("Trace mask disabled.");
         } else {
             player.print("Trace mask set.");

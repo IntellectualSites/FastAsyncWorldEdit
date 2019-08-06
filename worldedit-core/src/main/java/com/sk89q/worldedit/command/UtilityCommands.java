@@ -64,6 +64,7 @@ import com.sk89q.worldedit.function.visitor.EntityVisitor;
 import com.sk89q.worldedit.internal.annotation.Range;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
+import com.sk89q.worldedit.internal.expression.runtime.EvaluationException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
@@ -102,7 +103,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Utility commands.
  */
-@CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class, CommandQueuedConditionGenerator.Registration.class})
+@CommandContainer(superTypes = {CommandQueuedConditionGenerator.Registration.class, CommandPermissionsConditionGenerator.Registration.class})
 public class UtilityCommands {
 
     private final WorldEdit we;
@@ -191,10 +192,11 @@ public class UtilityCommands {
                     @Arg(desc = "The blocks to fill with")
                         Pattern pattern,
                     @Range(min=1) @Arg(desc = "The radius to fill in")
-                        double radius,
+                        Expression radiusExp,
                     @Range(min=1) @Arg(desc = "The depth to fill", def = "1")
                         int depth,
-                    @Arg(desc = "Direction to fill", def = "down") BlockVector3 direction) throws WorldEditException {
+                    @Arg(desc = "Direction to fill", def = "down") BlockVector3 direction) throws WorldEditException, EvaluationException {
+        double radius = radiusExp.evaluate();
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
         depth = Math.max(1, depth);
@@ -286,9 +288,10 @@ public class UtilityCommands {
                      @Arg(desc = "The blocks to fill with")
                          Pattern pattern,
                      @Range(min=1) @Arg(desc = "The radius to fill in")
-                         double radius,
+                         Expression radiusExp,
                      @Arg(desc = "The depth to fill", def = "")
-                         Integer depth) throws WorldEditException {
+                         Integer depth) throws WorldEditException, EvaluationException {
+        double radius = radiusExp.evaluate();
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
         depth = depth == null ? Integer.MAX_VALUE : Math.max(1, depth);
@@ -308,9 +311,10 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int drain(Player player, LocalSession session, EditSession editSession,
                      @Range(min=0) @Arg(desc = "The radius to drain")
-                         double radius,
+                         Expression radiusExp,
                      @Switch(name = 'w', desc = "Also un-waterlog blocks")
-                         boolean waterlogged) throws WorldEditException {
+                         boolean waterlogged) throws WorldEditException, EvaluationException {
+        double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
         int affected = editSession.drainArea(
@@ -328,7 +332,8 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int fixLava(Player player, LocalSession session, EditSession editSession,
                        @Range(min=0) @Arg(desc = "The radius to fix in")
-                           double radius) throws WorldEditException {
+                           Expression radiusExp) throws WorldEditException, EvaluationException {
+        double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(session.getPlacementPosition(player), radius, BlockTypes.LAVA);
@@ -345,7 +350,8 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int fixWater(Player player, LocalSession session, EditSession editSession,
                         @Range(min=0) @Arg(desc = "The radius to fix in")
-                            double radius) throws WorldEditException {
+                            Expression radiusExp) throws WorldEditException, EvaluationException {
+        double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
         int affected = editSession.fixLiquid(session.getPlacementPosition(player), radius, BlockTypes.WATER);
@@ -456,11 +462,11 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int snow(Player player, LocalSession session, EditSession editSession,
                     @Range(min=1) @Arg(desc = "The radius of the circle to snow in", def = "10")
-                        double size) throws WorldEditException {
-        size = Math.max(1, size);
-        we.checkMaxRadius(size);
+                        double sizeOpt) throws WorldEditException {
+        sizeOpt = Math.max(1, sizeOpt);
+        we.checkMaxRadius(sizeOpt);
 
-        int affected = editSession.simulateSnow(session.getPlacementPosition(player), size);
+        int affected = editSession.simulateSnow(session.getPlacementPosition(player), sizeOpt);
         player.print(affected + " surface(s) covered. Let it snow~");
         return affected;
     }
@@ -474,11 +480,11 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int thaw(Player player, LocalSession session, EditSession editSession,
                     @Range(min=1) @Arg(desc = "The radius of the circle to thaw in", def = "10")
-                        double size) throws WorldEditException {
-        size = Math.max(1, size);
-        we.checkMaxRadius(size);
+                        double sizeOpt) throws WorldEditException {
+        sizeOpt = Math.max(1, sizeOpt);
+        we.checkMaxRadius(sizeOpt);
 
-        int affected = editSession.thaw(session.getPlacementPosition(player), size);
+        int affected = editSession.thaw(session.getPlacementPosition(player), sizeOpt);
         player.print(affected + " surface(s) thawed.");
         return affected;
     }
@@ -492,14 +498,14 @@ public class UtilityCommands {
     @Logging(PLACEMENT)
     public int green(Player player, LocalSession session, EditSession editSession,
                      @Range(min=1) @Arg(desc = "The radius of the circle to convert in", def = "10")
-                         double size,
+                         double sizeOpt,
                      @Switch(name = 'f', desc = "Also convert coarse dirt")
                          boolean convertCoarse) throws WorldEditException {
-        size = Math.max(1, size);
-        we.checkMaxRadius(size);
+        sizeOpt = Math.max(1, sizeOpt);
+        we.checkMaxRadius(sizeOpt);
         final boolean onlyNormalDirt = !convertCoarse;
 
-        final int affected = editSession.green(session.getPlacementPosition(player), size, onlyNormalDirt);
+        final int affected = editSession.green(session.getPlacementPosition(player), sizeOpt, onlyNormalDirt);
         BBC.VISITOR_BLOCK.send(player, affected);
         return affected;
     }
@@ -703,8 +709,8 @@ public class UtilityCommands {
                      @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
                          int page,
                      @Arg(desc = "The command to retrieve help for", def = "", variable = true)
-                         List<String> command) throws WorldEditException {
-        PrintCommandHelp.help(command, page, listSubCommands, we, actor);
+                         List<String> commandStr) throws WorldEditException {
+        PrintCommandHelp.help(commandStr, page, listSubCommands, we, actor);
     }
 
     public static void list(File dir, Actor actor, List<String> args, @Range(min = 0) int page, String formatName, boolean playerFolder, String onClickCmd) {

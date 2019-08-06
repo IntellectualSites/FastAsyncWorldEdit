@@ -188,11 +188,11 @@ public class BrushOptionsCommands {
     )
     @CommandPermissions("worldedit.brush.primary")
     public void primary(Player player, LocalSession session,
-                        @Arg(desc = "The brush command", variable = true) List<String> command) throws WorldEditException {
+                        @Arg(desc = "The brush command", variable = true) List<String> commandStr) throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         BrushTool tool = session.getBrushTool(player, false);
         session.setTool(item, null, player);
-        String cmd = "brush " + StringMan.join(command, " ");
+        String cmd = "brush " + StringMan.join(commandStr, " ");
         CommandEvent event = new CommandEvent(player, cmd);
         PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         BrushTool newTool = session.getBrushTool(item, player, false);
@@ -208,12 +208,12 @@ public class BrushOptionsCommands {
     )
     @CommandPermissions("worldedit.brush.secondary")
     public void secondary(Player player, LocalSession session,
-                          @Arg(desc = "The brush command", variable = true) List<String> command)
+                          @Arg(desc = "The brush command", variable = true) List<String> commandStr)
         throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         BrushTool tool = session.getBrushTool(player, false);
         session.setTool(item, null, player);
-        String cmd = "brush " + StringMan.join(command, " ");
+        String cmd = "brush " + StringMan.join(commandStr, " ");
         CommandEvent event = new CommandEvent(player, cmd);
         PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         BrushTool newTool = session.getBrushTool(item, player, false);
@@ -232,7 +232,7 @@ public class BrushOptionsCommands {
             "2 = Glass showing what blocks will be changed"
     )
     @CommandPermissions("worldedit.brush.visualize")
-    public void visual(Player player, LocalSession session, @Range(min = 0, max = 2) int mode)
+    public void visual(Player player, LocalSession session, @Arg(name = "mode", desc = "int", def = "0") @Range(min = 0, max = 2) int mode)
         throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
@@ -270,14 +270,14 @@ public class BrushOptionsCommands {
         desc = "Set the targeting mask"
     )
     @CommandPermissions("worldedit.brush.targetmask")
-    public void targetMask(Player player, EditSession editSession, LocalSession session, @Arg(desc = "The destination mask", def = "") Mask maskArg) throws WorldEditException {
+    public void targetMask(Player player, EditSession editSession, LocalSession session, @Arg(desc = "The destination mask", def = "") Mask maskOpt) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             BBC.BRUSH_NONE.send(player);
             return;
         }
-        tool.setTraceMask(maskArg);
-        BBC.BRUSH_TARGET_MASK_SET.send(player, maskArg.toString());
+        tool.setTraceMask(maskOpt);
+        BBC.BRUSH_TARGET_MASK_SET.send(player, maskOpt.toString());
     }
 
     @Command(
@@ -308,7 +308,7 @@ public class BrushOptionsCommands {
     @Arg(desc = "Target Modes")
         String modes,
     @Arg(desc = "The scroll action", variable = true)
-           List<String> command) throws WorldEditException {
+           List<String> commandStr) throws WorldEditException {
         // TODO NOT IMPLEMENTED Convert ScrollAction to an argument converter
         BrushTool bt = session.getBrushTool(player, false);
         if (bt == null) {
@@ -316,7 +316,7 @@ public class BrushOptionsCommands {
             return;
         }
         BrushSettings settings = offHand ? bt.getOffHand() : bt.getContext();
-        ScrollAction action = ScrollAction.fromArguments(bt, player, session, StringMan.join(command, " "), true);
+        ScrollAction action = ScrollAction.fromArguments(bt, player, session, StringMan.join(commandStr, " "), true);
         settings.setScrollAction(action);
         if (modes.equalsIgnoreCase("none")) {
             BBC.BRUSH_SCROLL_ACTION_UNSET.send(player);
@@ -425,7 +425,7 @@ public class BrushOptionsCommands {
     )
     @CommandPermissions("worldedit.brush.options.material")
     public void material(Player player, EditSession editSession, LocalSession session,
-        @Arg(desc = "brush material pattern", def = "") Pattern pattern,
+        @Arg(desc = "brush material pattern", def = "") Pattern patternOpt,
         @Switch(name = 'h', desc = "TODO")
             boolean offHand,
                          Arguments arguments) throws WorldEditException {
@@ -434,13 +434,13 @@ public class BrushOptionsCommands {
             player.print(BBC.BRUSH_NONE.s());
             return;
         }
-        if (pattern == null) {
+        if (patternOpt == null) {
             BBC.BRUSH_MATERIAL.send(player);
             tool.setFill(null);
             return;
         }
         BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-        settings.setFill(pattern);
+        settings.setFill(patternOpt);
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
         tool.update();

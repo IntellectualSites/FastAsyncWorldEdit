@@ -60,7 +60,7 @@ import org.enginehub.piston.annotation.param.Switch;
 //                "e.g. >[stone,dirt],#light[0][5],$jungle\n" +
 //                "More Info: https://git.io/v9r4K"
 //)
-@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
+@CommandContainer//(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class MaskCommands {
     private final WorldEdit worldEdit;
 
@@ -74,9 +74,9 @@ public class MaskCommands {
 )
     public Mask simplex(double scale, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
         scale = 1d / Math.max(1, scale);
-        min = (min - 50) / 50;
-        max = (max - 50) / 50;
-        return new SimplexMask(scale, min, max);
+        minInt = (minInt - 50) / 50;
+        maxInt = (maxInt - 50) / 50;
+        return new SimplexMask(scale, minInt, maxInt);
     }
 
     @Command(
@@ -84,7 +84,7 @@ public class MaskCommands {
             desc = "Restrict to specific light levels"
 )
     public Mask light(Extent extent, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
-        return new LightMask(extent, (int) min, (int) max);
+        return new LightMask(extent, (int) minInt, (int) maxInt);
     }
 
     @Command(
@@ -286,7 +286,7 @@ public class MaskCommands {
                     "Example: /[3][20]\n" +
                     "Explanation: Allows any block where the adjacent block is between 3 and 20 blocks below"
 )
-    public Mask angle(Extent extent, String minStr, String maxStr, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "1") int distance) throws ExpressionException {
+    public Mask angle(Extent extent, @Arg(name="min", desc = "min angle") String minStr, @Arg(name="max", desc = "max angle") String maxStr, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "1") int distanceOpt) throws ExpressionException {
         double y1, y2;
         boolean override;
         if (maxStr.endsWith("d")) {
@@ -298,7 +298,7 @@ public class MaskCommands {
             y1 = Expression.compile(minStr).evaluate();
             y2 = Expression.compile(maxStr).evaluate();
         }
-        return new AngleMask(extent, y1, y2, overlay, distance);
+        return new AngleMask(extent, y1, y2, overlay, distanceOpt);
     }
 
     @Command(
@@ -311,7 +311,7 @@ public class MaskCommands {
                     "Explanation: Restrict near where the angle changes between 0-45 degrees within 5 blocks\n" +
                     "Note: Use negatives for decreasing slope"
 )
-    public Mask roc(Extent extent, String minStr, String maxStr, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distance) throws ExpressionException {
+    public Mask roc(Extent extent, @Arg(name="min", desc = "min angle") String minStr, @Arg(name="max", desc = "max angle") String maxStr, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distanceOpt) throws ExpressionException {
         double y1, y2;
         boolean override;
         if (maxStr.endsWith("d")) {
@@ -323,7 +323,7 @@ public class MaskCommands {
             y1 = Expression.compile(minStr).evaluate();
             y2 = Expression.compile(maxStr).evaluate();
         }
-        return new ROCAngleMask(extent, y1, y2, overlay, distance);
+        return new ROCAngleMask(extent, y1, y2, overlay, distanceOpt);
     }
 
     @Command(
@@ -336,19 +336,19 @@ public class MaskCommands {
                     "Explanation: Restrict to near 45 degrees of local maxima\n" +
                     "Note: Use negatives for local minima"
 )
-    public Mask extrema(Extent extent, String min, String max, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distance) throws ExpressionException {
+    public Mask extrema(Extent extent, @Arg(name="min", desc = "min angle") String minStr, @Arg(name="max", desc = "max angle") String maxStr, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distanceOpt) throws ExpressionException {
         double y1, y2;
         boolean override;
-        if (max.endsWith("d")) {
-            double y1d = Expression.compile(min.substring(0, min.length() - 1)).evaluate();
-            double y2d = Expression.compile(max.substring(0, max.length() - 1)).evaluate();
+        if (maxStr.endsWith("d")) {
+            double y1d = Expression.compile(minStr.substring(0, minStr.length() - 1)).evaluate();
+            double y2d = Expression.compile(maxStr.substring(0, maxStr.length() - 1)).evaluate();
             y1 = Math.tan(y1d * (Math.PI / 180));
             y2 = Math.tan(y2d * (Math.PI / 180));
         } else {
-            y1 = Expression.compile(min).evaluate();
-            y2 = Expression.compile(max).evaluate();
+            y1 = Expression.compile(minStr).evaluate();
+            y2 = Expression.compile(maxStr).evaluate();
         }
-        return new ExtremaMask(extent, y1, y2, overlay, distance);
+        return new ExtremaMask(extent, y1, y2, overlay, distanceOpt);
     }
 
     @Command(

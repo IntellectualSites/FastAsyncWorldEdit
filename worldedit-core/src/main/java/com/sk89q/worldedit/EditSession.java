@@ -167,12 +167,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
 
     private static final Logger log = LoggerFactory.getLogger(EditSession.class);
 
-    //TODO
-    @Override
-    public String getId() {
-        return null;
-    }
-
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
      * determine which {@link Extent}s should be bypassed.
@@ -240,7 +234,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
         this.world = builder.getWorld();
         this.worldName = builder.getWorldName();
         this.wrapped = builder.isWrapped();
-        this.fastMode = builder.hasFastMode();
+//        this.fastMode = builder.hasFastMode(); Not used
         this.history = builder.getHistory();
         this.bypassHistory = builder.getBypassHistory();
         this.bypassAll = builder.getBypassAll();
@@ -610,7 +604,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
      * @param enabled true to enable
      */
     public void setFastMode(boolean enabled) {
-        this.fastMode = enabled;
         disableHistory(enabled);
     }
 

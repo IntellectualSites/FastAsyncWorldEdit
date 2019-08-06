@@ -199,12 +199,11 @@ public class GeneralCommands {
             desc = "Set the global mask"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gmask(Player player, LocalSession session, @Arg(desc = "The mask to set", def = "") Mask mask) {
-        if (mask == null) {
-            session.setMask(null);
+    public void gmask(Player player, LocalSession session, @Arg(desc = "The mask to set", def = "") Mask maskOpt) {
+        session.setMask(maskOpt);
+        if (maskOpt == null) {
             BBC.MASK_DISABLED.send(player);
         } else {
-            session.setMask(mask);
             BBC.MASK.send(player);
         }
     }
@@ -357,12 +356,11 @@ public class GeneralCommands {
             descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g. the blocks in your clipboard)"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask mask) throws WorldEditException {
-        if (mask == null) {
-            session.setSourceMask((Mask) null);
+    public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
+        session.setSourceMask(maskOpt);
+        if (maskOpt == null) {
             BBC.SOURCE_MASK_DISABLED.send(player);
         } else {
-            session.setSourceMask(mask);
             BBC.SOURCE_MASK.send(player);
         }
     }

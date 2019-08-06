@@ -422,7 +422,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
      */
     public void setRange(int range) {
         if (range == DEFAULT_RANGE) {
-            range = -1;
+            this.range = -1;
         } else {
             this.range = range;
         }
