@@ -20,17 +20,11 @@ import com.sk89q.worldedit.history.change.EntityRemove;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.task.LinkedFuture;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockID;
-
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,7 +51,7 @@ public abstract class FaweChangeSet implements ChangeSet {
 
     public FaweChangeSet(String world) {
         this.worldName = world;
-        this.mainThread = (Fawe.get() == null) || Fawe.isMainThread();
+        this.mainThread = Fawe.get() == null || Fawe.isMainThread();
         this.layers = FaweCache.CHUNK_LAYERS;
     }
 
@@ -65,7 +59,7 @@ public abstract class FaweChangeSet implements ChangeSet {
         this.world = world;
         this.worldName = world.getName();
         this.mainThread = Fawe.isMainThread();
-        this.layers = (this.world.getMaxY() + 1) >> 4;
+        this.layers = this.world.getMaxY() + 1 >> 4;
     }
 
     public String getWorldName() {
@@ -177,6 +171,7 @@ public abstract class FaweChangeSet implements ChangeSet {
         addEntityRemove(tag);
     }
 
+    @Override
     public void add(Change change) {
         if (change.getClass() == BlockChange.class) {
             add((BlockChange) change);
@@ -211,11 +206,13 @@ public abstract class FaweChangeSet implements ChangeSet {
         try {
             if (from.hasNbtData()) {
                 CompoundTag nbt = from.getNbtData();
+                assert nbt != null;
                 MainUtil.setPosition(nbt, x, y, z);
                 addTileRemove(nbt);
             }
             if (to.hasNbtData()) {
                 CompoundTag nbt = to.getNbtData();
+                assert nbt != null;
                 MainUtil.setPosition(nbt, x, y, z);
                 addTileCreate(nbt);
             }
@@ -236,6 +233,7 @@ public abstract class FaweChangeSet implements ChangeSet {
         try {
             if (to.hasNbtData()) {
                 CompoundTag nbt = to.getNbtData();
+                assert nbt != null;
                 MainUtil.setPosition(nbt, x, y, z);
                 addTileCreate(nbt);
             }

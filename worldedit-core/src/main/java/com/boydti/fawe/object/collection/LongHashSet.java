@@ -35,7 +35,7 @@ public class LongHashSet {
     }
 
     public static int lsw(long l) {
-        return (int) (l & 0xFFFFFFFF) + Integer.MIN_VALUE;
+        return (int) l + Integer.MIN_VALUE;
     }
 
     public boolean containsKey(int msw, int lsw) {

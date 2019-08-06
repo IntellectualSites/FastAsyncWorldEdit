@@ -6,33 +6,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class StringMan {
-    public static String replaceFromMap(String string, Map<String, String> replacements) {
-        final StringBuilder sb = new StringBuilder(string);
-        int size = string.length();
-        for (Entry<String, String> entry : replacements.entrySet()) {
-            if (size == 0) {
-                break;
-            }
-            final String key = entry.getKey();
-            final String value = entry.getValue();
-            int start = sb.indexOf(key, 0);
-            while (start > -1) {
-                final int end = start + key.length();
-                final int nextSearchStart = start + value.length();
-                sb.replace(start, end, value);
-                size -= end - start;
-                start = sb.indexOf(key, nextSearchStart);
-            }
-        }
-        return sb.toString();
-    }
 
     public static boolean containsAny(CharSequence sequence, String any) {
         return IntStream.range(0, sequence.length())
@@ -516,10 +495,6 @@ public class StringMan {
     }
 
     public static String repeat(String s, int n) {
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            sb.append(s);
-        }
-        return sb.toString();
+        return IntStream.range(0, n).mapToObj(i -> s).collect(Collectors.joining());
     }
 }

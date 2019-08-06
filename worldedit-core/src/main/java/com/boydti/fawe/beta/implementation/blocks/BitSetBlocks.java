@@ -1,22 +1,17 @@
 package com.boydti.fawe.beta.implementation.blocks;
 
-import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.object.collection.BitArray4096;
-import com.boydti.fawe.object.collection.BlockSet;
 import com.boydti.fawe.object.collection.MemBlockSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 public class BitSetBlocks implements IChunkSet {
+
     private final MemBlockSet.RowZ row;
     private final BlockState blockState;
 
@@ -43,13 +38,16 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public void setTile(int x, int y, int z, CompoundTag tile) {}
+    public void setTile(int x, int y, int z, CompoundTag tile) {
+    }
 
     @Override
-    public void setEntity(CompoundTag tag) {}
+    public void setEntity(CompoundTag tag) {
+    }
 
     @Override
-    public void removeEntity(UUID uuid) {}
+    public void removeEntity(UUID uuid) {
+    }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {

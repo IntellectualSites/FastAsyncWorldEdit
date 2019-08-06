@@ -22,7 +22,6 @@ package com.sk89q.worldedit.command;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.visitor.Fast2DIterator;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -141,14 +140,14 @@ public class BiomeCommands {
             Region region = session.getSelection(world);
 
             if (region instanceof FlatRegion) {
-                for (BlockVector2 pt : new Fast2DIterator(((FlatRegion) region).asFlatRegion(), editSession)) {
+                for (BlockVector2 pt : ((FlatRegion) region).asFlatRegion()) {
                     biomes.add(world.getBiome(pt));
                 }
             } else {
                 RegionVisitor visitor = new RegionVisitor(region, position -> {
                     biomes.add(world.getBiome(position.toBlockVector2()));
                     return true;
-                }, editSession);
+                });
                 Operations.completeBlindly(visitor);
             }
 

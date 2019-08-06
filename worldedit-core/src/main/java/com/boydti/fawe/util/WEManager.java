@@ -99,9 +99,9 @@ public class WEManager {
             synchronized (masks) {
                 boolean removed = false;
                 if (!masks.isEmpty()) {
-                    Iterator<FaweMask> iter = masks.iterator();
-                    while (iter.hasNext()) {
-                        FaweMask mask = iter.next();
+                    Iterator<FaweMask> iterator = masks.iterator();
+                    while (iterator.hasNext()) {
+                        FaweMask mask = iterator.next();
                         if (mask.isValid(player, type)) {
                             Region region = mask.getRegion();
                             if (region.contains(loc.toBlockPoint())) {
@@ -112,7 +112,7 @@ public class WEManager {
                             }
                         } else {
                             removed = true;
-                            iter.remove();
+                            iterator.remove();
                         }
                     }
                 }

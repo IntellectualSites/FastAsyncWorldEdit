@@ -2,7 +2,6 @@ package com.boydti.fawe.object.changeset;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.jnbt.anvil.history.IAnvilHistory;
 import com.boydti.fawe.util.MainUtil;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
-public class AnvilHistory extends FaweChangeSet implements IAnvilHistory {
+public class AnvilHistory extends FaweChangeSet {
     private final File folder;
     private int size;
 
@@ -41,7 +40,7 @@ public class AnvilHistory extends FaweChangeSet implements IAnvilHistory {
         this.size = 0;
     }
 
-    @Override
+    //@Override
     public boolean addFileChange(File originalMCAFile) {
         try {
             Files.move(originalMCAFile.toPath(), Paths.get(folder.getPath(), originalMCAFile.getName()), StandardCopyOption.ATOMIC_MOVE);

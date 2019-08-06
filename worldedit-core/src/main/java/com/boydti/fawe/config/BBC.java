@@ -4,21 +4,13 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.RunnableVal3;
-import com.boydti.fawe.util.StringMan;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.extension.platform.Actor;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -28,10 +20,9 @@ public enum BBC {
      * Things to note about this class:
      * Can use multiple arguments %s, %s1, %s2, %s3 etc
      */
-    PREFIX("(FAWE)", "Info"),
     FILE_DELETED("%s0 has been deleted.", "Info"),
     SCHEMATIC_PASTING("&7The schematic is pasting. This cannot be undone.", "Info"),
-    LIGHTING_PROPOGATE_SELECTION("Lighting has been propogated in %s0 chunks. (Note: To remove light use //removelight)", "Info"),
+    LIGHTING_PROPAGATE_SELECTION("Lighting has been propogated in %s0 chunks. (Note: To remove light use //removelight)", "Info"),
     UPDATED_LIGHTING_SELECTION("Lighting has been updated in %s0 chunks. (It may take a second for the packets to send)", "Info"),
     SET_REGION("Selection set to your current allowed region", "Info"),
     WORLDEDIT_COMMAND_LIMIT("Please wait until your current action completes", "Info"),
@@ -304,7 +295,7 @@ public enum BBC {
     SEL_CUBOID("Cuboid: left click for point 1, right click for point 2", "Selection"),
     SEL_CUBOID_EXTEND("Cuboid: left click for a starting point, right click to extend", "Selection"),
     SEL_2D_POLYGON("2D polygon selector: Left/right click to add a point.", "Selection"),
-    SEL_ELLIPSIOD("Ellipsoid selector: left click=center, right click to extend", "Selection"),
+    SAL_ELLIPSOID("Ellipsoid selector: left click=center, right click to extend", "Selection"),
     SEL_SPHERE("Sphere selector: left click=center, right click to set radius", "Selection"),
     SEL_CYLINDRICAL("Cylindrical selector: Left click=center, right click to extend.", "Selection"),
     SEL_MAX("%s0 points maximum.", "Selection"),
@@ -365,16 +356,6 @@ public enum BBC {
     TIP_BIOME_PATTERN("Tip: The #biome[forest] pattern can be used in any command", "Tips"),
     TIP_BIOME_MASK("Tip: Restrict to a biome with the `$jungle` mask", "Tips"),;
 
-
-    private static final HashMap<String, String> replacements = new HashMap<>();
-    static {
-        for (char letter : "1234567890abcdefklmnor".toCharArray()) {
-            replacements.put("&" + letter, "\u00a7" + letter);
-        }
-        replacements.put("\\\\n", "\n");
-        replacements.put("\\n", "\n");
-        replacements.put("&-", "\n");
-    }
     /**
      * Translated
      */
@@ -460,7 +441,6 @@ public enum BBC {
                     changed = true;
                     yml.set(caption.category + "." + caption.name().toLowerCase(Locale.ROOT), caption.defaultMessage);
                 }
-                caption.translatedMessage = StringMan.replaceFromMap(caption.translatedMessage, replacements);
             }
             if (changed) {
                 yml.save(file);
@@ -481,15 +461,6 @@ public enum BBC {
 
     public int length() {
         return toString().length();
-    }
-
-    public static String color(String string) {
-        return StringMan.replaceFromMap(string, replacements);
-    }
-
-    public static String stripColor(String string) {
-
-        return StringMan.removeFromSet(string, replacements.values());
     }
 
     public String s() {
@@ -519,15 +490,11 @@ public enum BBC {
             try {
                 Method method = actor.getClass().getMethod("print", String.class);
                 method.setAccessible(true);
-                method.invoke(actor, (PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
+                method.invoke(actor, this.format(args));
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    public static String getPrefix() {
-        return PREFIX.isEmpty() ? "" : PREFIX.s() + " ";
     }
 
     public void send(FawePlayer<?> player, Object... args) {
@@ -537,7 +504,7 @@ public enum BBC {
         if (player == null) {
             Fawe.debug(this.format(args));
         } else {
-            player.sendMessage((PREFIX.isEmpty() ? "" : PREFIX.s() + " ") + this.format(args));
+            player.sendMessage(this.format(args));
         }
     }
     public void send(Actor player, Object... args) {
@@ -551,189 +518,4 @@ public enum BBC {
         }
     }
 
-    public static char getCode(String name) {
-        switch (name) {
-            case "BLACK":
-                return '0';
-            case "DARK_BLUE":
-                return '1';
-            case "DARK_GREEN":
-                return '2';
-            case "DARK_AQUA":
-                return '3';
-            case "DARK_RED":
-                return '4';
-            case "DARK_PURPLE":
-                return '5';
-            case "GOLD":
-                return '6';
-            case "GRAY":
-                return '7';
-            case "DARK_GRAY":
-                return '8';
-            case "BLUE":
-                return '9';
-            case "GREEN":
-                return 'a';
-            case "AQUA":
-                return 'b';
-            case "RED":
-                return 'c';
-            case "LIGHT_PURPLE":
-                return 'd';
-            case "YELLOW":
-                return 'e';
-            case "WHITE":
-                return 'f';
-            case "OBFUSCATED":
-                return 'k';
-            case "BOLD":
-                return 'l';
-            case "STRIKETHROUGH":
-                return 'm';
-            case "UNDERLINE":
-                return 'n';
-            case "ITALIC":
-                return 'o';
-            default:
-            case "RESET":
-                return 'r';
-        }
-    }
-
-    public static String getColorName(char code) {
-        switch (code) {
-            case '0':
-                return "BLACK";
-            case '1':
-                return "DARK_BLUE";
-            case '2':
-                return "DARK_GREEN";
-            case '3':
-                return "DARK_AQUA";
-            case '4':
-                return "DARK_RED";
-            case '5':
-                return "DARK_PURPLE";
-            case '6':
-                return "GOLD";
-            case '7':
-                return "GRAY";
-            case '8':
-                return "DARK_GRAY";
-            case '9':
-                return "BLUE";
-            case 'a':
-                return "GREEN";
-            case 'b':
-                return "AQUA";
-            case 'c':
-                return "RED";
-            case 'd':
-                return "LIGHT_PURPLE";
-            case 'e':
-                return "YELLOW";
-            case 'f':
-                return "WHITE";
-            case 'k':
-                return "OBFUSCATED";
-            case 'l':
-                return "BOLD";
-            case 'm':
-                return "STRIKETHROUGH";
-            case 'n':
-                return "UNDERLINE";
-            case 'o':
-                return "ITALIC";
-            case 'r':
-                return "RESET";
-            default:
-                return "GRAY";
-        }
-    }
-
-    private static Object[] append(StringBuilder builder, Map<String, Object> obj, String color, Map<String, Boolean> properties) {
-        Object[] style = new Object[] { color, properties };
-        for (Map.Entry<String, Object> entry : obj.entrySet()) {
-            switch (entry.getKey()) {
-                case "text":
-                    String text = (String) entry.getValue();
-                    String newColor = (String) obj.get("color");
-                    String newBold = (String) obj.get("bold");
-                    int index = builder.length();
-                    if (!Objects.equals(color, newColor)) {
-                        style[0] = newColor;
-                        char code = BBC.getCode(newColor.toUpperCase(Locale.ROOT));
-                        builder.append('\u00A7').append(code);
-                    }
-                    for (Map.Entry<String, Object> entry2 : obj.entrySet()) {
-                        if (StringMan.isEqualIgnoreCaseToAny(entry2.getKey(), "bold", "italic", "underlined", "strikethrough", "obfuscated")) {
-                            boolean newValue = Boolean.parseBoolean((String) entry2.getValue());
-                            if (properties.put(entry2.getKey(), newValue) != newValue) {
-                                if (newValue) {
-                                    char code = BBC.getCode(entry2.getKey().toUpperCase(Locale.ROOT));
-                                    builder.append('\u00A7').append(code);
-                                } else {
-                                    builder.insert(index, '\u00A7').append('r');
-                                    if (Objects.equals(color, newColor) && newColor != null) {
-                                        builder.append('\u00A7').append(BBC.getCode(newColor.toUpperCase(Locale.ROOT)));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    builder.append(text);
-                    break;
-                case "extra":
-                    List<Map<String, Object>> list = (List<Map<String, Object>>) entry.getValue();
-                    for (Map<String, Object> elem : list) {
-                        elem.putIfAbsent("color", obj.get("color"));
-                        for (Map.Entry<String, Object> entry2 : obj.entrySet()) {
-                            if (StringMan.isEqualIgnoreCaseToAny(entry2.getKey(), "bold", "italic", "underlined", "strikethrough", "obfuscated")) {
-                                elem.putIfAbsent(entry2.getKey(), entry2.getValue());
-                            }
-                        }
-                        style = append(builder, elem, (String) style[0], (Map) style[1]);
-                    }
-            }
-        }
-        return style;
-    }
-
-    public static String jsonToString(String text) {
-        Gson gson = new Gson();
-        StringBuilder builder = new StringBuilder();
-        Map<String, Object> obj = gson.fromJson(text, new TypeToken<Map<String, Object>>() {}.getType());
-        HashMap<String, Boolean> properties = new HashMap<>();
-        properties.put("bold", false);
-        properties.put("italic", false);
-        properties.put("underlined", false);
-        properties.put("strikethrough", false);
-        properties.put("obfuscated", false);
-        append(builder, obj, null, properties);
-        return builder.toString();
-    }
-
-    /**
-     * @param m
-     * @param runPart Part, Color, NewLine
-     */
-    public static void splitMessage(String m, RunnableVal3<String, String, Boolean> runPart) {
-        m = color(m);
-        String color = "GRAY";
-        boolean newline = false;
-        for (String line : m.split("\n")) {
-            boolean hasColor = line.charAt(0) == '\u00A7';
-            String[] splitColor = line.split("\u00A7");
-            for (String part : splitColor) {
-                if (hasColor) {
-                    color = getColorName(part.charAt(0));
-                    part = part.substring(1);
-                }
-                runPart.run(part, color, newline);
-                hasColor = true;
-            }
-            newline = true;
-        }
-    }
 }

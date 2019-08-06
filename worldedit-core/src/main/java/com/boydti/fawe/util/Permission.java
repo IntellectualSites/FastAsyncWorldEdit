@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.sk89q.worldedit.util.auth.Subject;
+import org.jetbrains.annotations.NotNull;
 
 public enum Permission {
     /*
@@ -17,11 +18,8 @@ public enum Permission {
     }
 
 
-    public static boolean hasPermission(Subject player, String permission) {
-        if (player == null || player.hasPermission(ADMIN.permission)) {
-            return true;
-        }
-        if (player.hasPermission(permission)) {
+    public static boolean hasPermission(@NotNull Subject player, String permission) {
+        if (player.hasPermission(ADMIN.permission) || player.hasPermission(permission)) {
             return true;
         }
         final String[] nodes = permission.split("\\.");

@@ -60,12 +60,11 @@ public class InspectBrush extends BrushTool implements DoubleActionTraceTool {
 
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
         if (!session.isToolControlEnabled() || !player.hasPermission("worldedit.tool.inspect")) {
-            player.print(BBC.getPrefix() + BBC.NO_PERM.format("worldedit.tool.inspect"));
+            player.print(BBC.NO_PERM.format("worldedit.tool.inspect"));
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(BBC.getPrefix() + BBC.SETTING_DISABLE
-                .format("history.use-database (Import with /frb #import )"));
+            player.print(BBC.SETTING_DISABLE.format("history.use-database (Import with /frb #import )"));
             return false;
         }
         BlockVector3 target = getTarget(player, rightClick).toBlockPoint();

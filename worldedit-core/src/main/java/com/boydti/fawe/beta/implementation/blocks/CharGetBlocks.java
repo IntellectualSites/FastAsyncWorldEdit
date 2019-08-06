@@ -7,18 +7,19 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
+
     @Override
-    public BaseBlock getFullBlock(final int x, final int y, final int z) {
+    public BaseBlock getFullBlock(int x, int y, int z) {
         return BlockTypes.states[get(x, y, z)].toBaseBlock();
     }
 
     @Override
-    public BlockState getBlock(final int x, final int y, final int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return BlockTypes.states[get(x, y, z)];
     }
 
     @Override
-    public boolean trim(final boolean aggressive) {
+    public boolean trim(boolean aggressive) {
         for (int i = 0; i < 16; i++) {
             sections[i] = EMPTY;
             blocks[i] = null;

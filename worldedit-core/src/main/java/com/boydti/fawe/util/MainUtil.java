@@ -11,7 +11,6 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.RunnableVal2;
-import com.boydti.fawe.object.changeset.CPUOptimizedChangeSet;
 import com.boydti.fawe.object.changeset.FaweStreamChangeSet;
 import com.boydti.fawe.object.io.AbstractDelegateOutputStream;
 import com.github.luben.zstd.ZstdInputStream;
@@ -93,7 +92,6 @@ public class MainUtil {
      *  e.g. sending messages
      */
     public static void sendMessage(final FawePlayer<?> player, String message) {
-        message = BBC.color(message);
         if (player == null) {
             Fawe.debug(message);
         } else {
@@ -237,8 +235,8 @@ public class MainUtil {
         if (changeSet instanceof FaweStreamChangeSet) {
             FaweStreamChangeSet fscs = (FaweStreamChangeSet) changeSet;
             return fscs.getSizeOnDisk() + fscs.getSizeInMemory();
-        } else if (changeSet instanceof CPUOptimizedChangeSet) {
-            return changeSet.size() + 32;
+//        } else if (changeSet instanceof CPUOptimizedChangeSet) {
+//            return changeSet.size() + 32;
         } else if (changeSet != null) {
             return changeSet.size() * 128;
         } else {
@@ -631,7 +629,6 @@ public class MainUtil {
         boolean reading = false;
         int index = 1;
         int numIndex = 1;
-        outer:
         for (int i = len; i >= 2; i--) {
             char c = fileName.charAt(i);
             if (!reading) {
@@ -644,7 +641,9 @@ public class MainUtil {
                     break;
                 case '.':
                     res[index--] = val;
-                    if (index == -1) return res;
+                    if (index == -1) {
+                        return res;
+                    }
                     val = 0;
                     numIndex = 1;
                     break;

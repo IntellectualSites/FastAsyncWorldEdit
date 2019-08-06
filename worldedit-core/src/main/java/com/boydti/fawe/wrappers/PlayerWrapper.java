@@ -170,7 +170,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public void findFreePosition(final Location searchPos) {
+    public void findFreePosition(Location searchPos) {
         TaskManager.IMP.sync(new RunnableVal<Boolean>() {
             @Override
             public void run(Boolean value) {
@@ -180,7 +180,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public void setOnGround(final Location searchPos) {
+    public void setOnGround(Location searchPos) {
         TaskManager.IMP.sync(new RunnableVal<Boolean>() {
             @Override
             public void run(Boolean value) {
@@ -284,7 +284,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public void floatAt(final int x, final int y, final int z, final boolean alwaysGlass) {
+    public void floatAt(int x, int y, int z, boolean alwaysGlass) {
         RuntimeException caught = null;
         try {
             EditSession edit = new EditSessionBuilder(parent.getWorld()).player(FawePlayer.wrap(this)).build();
@@ -309,7 +309,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public Location getBlockTrace(final int range, final boolean useLastBlock) {
+    public Location getBlockTrace(int range, boolean useLastBlock) {
         return TaskManager.IMP.sync(new RunnableVal<Location>() {
             @Override
             public void run(Location value) {
@@ -320,7 +320,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public Location getBlockTraceFace(final int range, final boolean useLastBlock) {
+    public Location getBlockTraceFace(int range, boolean useLastBlock) {
         return TaskManager.IMP.sync(new RunnableVal<Location>() {
             @Override
             public void run(Location value) {
@@ -331,7 +331,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public Location getSolidBlockTrace(final int range) {
+    public Location getSolidBlockTrace(int range) {
         return TaskManager.IMP.sync(new RunnableVal<Location>() {
             @Override
             public void run(Location value) {
@@ -347,7 +347,7 @@ public class PlayerWrapper extends AbstractPlayerActor {
     }
 
     @Override
-    public boolean passThroughForwardWall(final int range) {
+    public boolean passThroughForwardWall(int range) {
         return TaskManager.IMP.sync(() -> {
             int searchDist = 0;
             TargetBlock hitBlox = new TargetBlock(PlayerWrapper.this, range, 0.2);

@@ -247,12 +247,11 @@ public class ClipboardRemapper {
 
         mapPEtoPC.put(new BaseBlock(198,-1), new BaseBlock(208,-1));
         mapPEtoPC.put(new BaseBlock(207,-1), new BaseBlock(212,-1));
-        { // beetroot
-            mapPEtoPC.put(new BaseBlock(244, 2), new BaseBlock(207, 1));
-            mapPEtoPC.put(new BaseBlock(244, 4), new BaseBlock(207, 2));
-            mapPEtoPC.put(new BaseBlock(244, 7), new BaseBlock(207, 3));
-            for (int data = 3; data < 16; data++) mapPEtoPC.putIfAbsent(new BaseBlock(244, data), new BaseBlock(207, data));
-        }
+        // beetroot
+        mapPEtoPC.put(new BaseBlock(244, 2), new BaseBlock(207, 1));
+        mapPEtoPC.put(new BaseBlock(244, 4), new BaseBlock(207, 2));
+        mapPEtoPC.put(new BaseBlock(244, 7), new BaseBlock(207, 3));
+        for (int data = 3; data < 16; data++) mapPEtoPC.putIfAbsent(new BaseBlock(244, data), new BaseBlock(207, data));
 
         for (int data = 0; data < 16; data++) {
             mapPEtoPC.put(new BaseBlock(218, data), new BaseBlock(219 + data, -1));

@@ -121,6 +121,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         initFiles(folder);
     }
 
+    @Override
     public void delete() {
 //        Fawe.debug("Deleting history: " + getWorld().getName() + "/" + uuid + "/" + index);
         deleteFiles();

@@ -103,6 +103,7 @@ import com.sk89q.worldedit.internal.expression.runtime.ExpressionTimeoutExceptio
 import com.sk89q.worldedit.internal.expression.runtime.RValue;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector2;
@@ -150,12 +151,8 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An {@link Extent} that handles history, {@link BlockBag}s, change limits,
@@ -206,7 +203,6 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     private final World world;
     private final String worldName;
     private boolean wrapped;
-    private boolean fastMode;
     private final HistoryExtent history;
     private AbstractDelegateExtent bypassHistory;
     private AbstractDelegateExtent bypassAll;
@@ -1193,10 +1189,10 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
     /**
      * Fills an area recursively in the X/Z directions.
      *
-     * @param origin    the location to start from
-     * @param pattern     the block to fill with
-     * @param radius    the radius of the spherical area to fill
-     * @param depth     the maximum depth, starting from the origin
+     * @param origin the location to start from
+     * @param pattern the block to fill with
+     * @param radius the radius of the spherical area to fill
+     * @param depth the maximum depth, starting from the origin
      * @param direction the direction to fill
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -1399,6 +1395,29 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 position.add(adjustment));
         Pattern pattern = BlockTypes.AIR.getDefaultState();
         return replaceBlocks(region, mask, pattern);
+    }
+
+    /**
+     * Sets the blocks at the center of the given region to the given pattern.
+     * If the center sits between two blocks on a certain axis, then two blocks
+     * will be placed to mark the center.
+     *
+     * @param region the region to find the center of
+     * @param pattern the replacement pattern
+     * @return the number of blocks placed
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        checkNotNull(region);
+        checkNotNull(pattern);
+
+        Vector3 center = region.getCenter();
+        Region centerRegion = new CuboidRegion(
+            getWorld(), // Causes clamping of Y range
+            BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
+            BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
+                center.getY(), MathUtils.roundHalfUp(center.getZ())));
+        return setBlocks(centerRegion, pattern);
     }
 
     /**
@@ -2971,7 +2990,7 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
                 double scaledZ = (z - zero2D.getZ()) / unit2D.getZ();
 
                 try {
-                    if (expression.evaluateTimeout(timeout, scaledX, scaledZ, timeout) <= 0) {
+                    if (expression.evaluate(new double[]{scaledX, scaledZ}, timeout) <= 0) {
                         return null;
                     }
 

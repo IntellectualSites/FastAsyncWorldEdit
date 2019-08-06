@@ -7,7 +7,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
+
     public BiomeType[] biomes;
     public HashMap<Short, CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
@@ -57,7 +57,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         if (biomes == null) {
             biomes = new BiomeType[256];
         }
@@ -71,13 +71,13 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public boolean setBlock(final int x, final int y, final int z, final BlockStateHolder holder) {
+    public boolean setBlock(int x, int y, int z, BlockStateHolder holder) {
         set(x, y, z, holder.getOrdinalChar());
         return true;
     }
 
     @Override
-    public void setTile(final int x, final int y, final int z, final CompoundTag tile) {
+    public void setTile(int x, int y, int z, CompoundTag tile) {
         if (tiles == null) {
             tiles = new HashMap<>();
         }
@@ -86,7 +86,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void setEntity(final CompoundTag tag) {
+    public void setEntity(CompoundTag tag) {
         if (entities == null) {
             entities = new HashSet<>();
         }
@@ -94,7 +94,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void removeEntity(final UUID uuid) {
+    public void removeEntity(UUID uuid) {
         if (entityRemoves == null) {
             entityRemoves = new HashSet<>();
         }
@@ -103,7 +103,9 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public boolean isEmpty() {
-        if (biomes != null) return false;
+        if (biomes != null) {
+            return false;
+        }
         for (int i = 0; i < 16; i++) {
             if (hasSection(i)) {
                 return false;
