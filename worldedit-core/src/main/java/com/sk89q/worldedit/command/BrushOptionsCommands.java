@@ -140,13 +140,8 @@ public class BrushOptionsCommands {
             int page) throws WorldEditException {
         String baseCmd = "/brush loadbrush";
         File dir = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
-        UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
-//                new RunnableVal2<Message, String[]>() {
-//            @Override
-//            public void run(Message msg, String[] info) {
-//
-//            }
-//        });
+        // TODO NOT IMPLEMENTED
+//        UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
     }
 
     @Command(
@@ -275,14 +270,14 @@ public class BrushOptionsCommands {
         desc = "Set the targeting mask"
     )
     @CommandPermissions("worldedit.brush.targetmask")
-    public void targetMask(Player player, EditSession editSession, LocalSession session, Mask mask) throws WorldEditException {
+    public void targetMask(Player player, EditSession editSession, LocalSession session, @Arg(desc = "The destination mask", def = "") Mask maskArg) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             BBC.BRUSH_NONE.send(player);
             return;
         }
-        tool.setTraceMask(mask);
-        BBC.BRUSH_TARGET_MASK_SET.send(player, mask.toString());
+        tool.setTraceMask(maskArg);
+        BBC.BRUSH_TARGET_MASK_SET.send(player, maskArg.toString());
     }
 
     @Command(
@@ -342,7 +337,7 @@ public class BrushOptionsCommands {
     @Switch(name = 'h', desc = "TODO")
         boolean offHand,
     @Arg(desc = "The destination mask", def = "")
-             Mask mask,
+             Mask maskArg,
              Arguments arguments)
         throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -350,7 +345,7 @@ public class BrushOptionsCommands {
             player.print(BBC.BRUSH_NONE.s());
             return;
         }
-        if (mask == null) {
+        if (maskArg == null) {
             BBC.BRUSH_MASK_DISABLED.send(player);
             tool.setMask(null);
             return;
@@ -359,7 +354,7 @@ public class BrushOptionsCommands {
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         System.out.println(lastArg + " TODO check this is not the whole command");
         settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
-        settings.setMask(mask);
+        settings.setMask(maskArg);
         tool.update();
         BBC.BRUSH_MASK.send(player);
     }
@@ -373,7 +368,7 @@ public class BrushOptionsCommands {
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
     public void smask(Player player, LocalSession session, EditSession editSession,
     @Arg(desc = "The destination mask", def = "")
-              Mask mask,
+              Mask maskArg,
     @Switch(name = 'h', desc = "TODO")
               boolean offHand,
     Arguments arguments) throws WorldEditException {
@@ -382,7 +377,7 @@ public class BrushOptionsCommands {
             player.print(BBC.BRUSH_NONE.s());
             return;
         }
-        if (mask == null) {
+        if (maskArg == null) {
             BBC.BRUSH_SOURCE_MASK_DISABLED.send(player);
             tool.setSourceMask(null);
             return;
@@ -390,7 +385,7 @@ public class BrushOptionsCommands {
         BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
         String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
         settings.addSetting(BrushSettings.SettingType.SOURCE_MASK, lastArg);
-        settings.setSourceMask(mask);
+        settings.setSourceMask(maskArg);
         tool.update();
         BBC.BRUSH_SOURCE_MASK.send(player);
     }

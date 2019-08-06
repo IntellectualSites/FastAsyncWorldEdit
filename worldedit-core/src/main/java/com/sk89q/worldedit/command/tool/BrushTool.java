@@ -630,8 +630,8 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         return false;
     }
 
-    public void queueVisualization(FawePlayer player) {
-        Fawe.get().getVisualQueue().queue(player);
+    public void queueVisualization(FawePlayer fp) {
+        Fawe.get().getVisualQueue().queue(fp);
     }
 
     @Deprecated

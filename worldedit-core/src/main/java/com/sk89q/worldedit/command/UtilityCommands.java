@@ -176,9 +176,9 @@ public class UtilityCommands {
     )
     @CommandPermissions("fawe.cancel")
     @CommandQueued(false)
-    public void cancel(FawePlayer player) {
-        int cancelled = player.cancel(false);
-        BBC.WORLDEDIT_CANCEL_COUNT.send(player, cancelled);
+    public void cancel(FawePlayer fp) {
+        int cancelled = fp.cancel(false);
+        BBC.WORLDEDIT_CANCEL_COUNT.send(fp, cancelled);
     }
 
     @Command(
@@ -361,15 +361,15 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.removeabove")
     @Logging(PLACEMENT)
     public int removeAbove(Player player, LocalSession session, EditSession editSession,
-                           @Range(min=1) @Arg(desc = "The apothem of the square to remove from", def = "1")
-                               int size,
+                           @Range(min=1) @Arg(name = "size", desc = "The apothem of the square to remove from", def = "1")
+                               int sizeOpt,
                            @Arg(desc = "The maximum height above you to remove from", def = "")
                                Integer height) throws WorldEditException {
-        size = Math.max(1, size);
-        we.checkMaxRadius(size);
+        sizeOpt = Math.max(1, sizeOpt);
+        we.checkMaxRadius(sizeOpt);
         World world = player.getWorld();
         height = height != null ? Math.min((world.getMaxY() + 1), height + 1) : (world.getMaxY() + 1);
-        int affected = editSession.removeAbove(session.getPlacementPosition(player), size, height);
+        int affected = editSession.removeAbove(session.getPlacementPosition(player), sizeOpt, height);
         BBC.VISITOR_BLOCK.send(player, affected);
         return affected;
     }
@@ -382,16 +382,16 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.removebelow")
     @Logging(PLACEMENT)
     public int removeBelow(Player player, LocalSession session, EditSession editSession,
-                           @Arg(desc = "The apothem of the square to remove from", def = "1")
-                               int size,
+                           @Arg(name = "size", desc = "The apothem of the square to remove from", def = "1")
+                               int sizeOpt,
                            @Arg(desc = "The maximum height below you to remove from", def = "")
                                Integer height) throws WorldEditException {
-        size = Math.max(1, size);
-        we.checkMaxRadius(size);
+        sizeOpt = Math.max(1, sizeOpt);
+        we.checkMaxRadius(sizeOpt);
         World world = player.getWorld();
         height = height != null ? Math.min((world.getMaxY() + 1), height + 1) : (world.getMaxY() + 1);
 
-        int affected = editSession.removeBelow(session.getPlacementPosition(player), size, height);
+        int affected = editSession.removeBelow(session.getPlacementPosition(player), sizeOpt, height);
         BBC.VISITOR_BLOCK.send(player, affected);
         return affected;
     }

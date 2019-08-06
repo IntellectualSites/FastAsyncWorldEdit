@@ -115,8 +115,8 @@ public class AnvilCommands {
     @CommandPermissions("worldedit.anvil.replaceall")
     public void replaceAll(Player player, String folder,
         @Arg(name = "from", desc = "String", def = "")
-            String from,
-        String to,
+            String fromPattern,
+        String toPattern,
         @Switch(name = 'd', desc = "Disable wildcard data matching")
             boolean useData) throws WorldEditException {
 //        final FaweBlockMatcher matchFrom;  TODO NOT IMPLEMENTED

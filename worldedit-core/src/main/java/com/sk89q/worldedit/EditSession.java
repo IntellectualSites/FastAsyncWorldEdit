@@ -167,6 +167,12 @@ public class EditSession extends AbstractDelegateExtent implements SimpleWorld, 
 
     private static final Logger log = LoggerFactory.getLogger(EditSession.class);
 
+    //TODO
+    @Override
+    public String getId() {
+        return null;
+    }
+
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
      * determine which {@link Extent}s should be bypassed.

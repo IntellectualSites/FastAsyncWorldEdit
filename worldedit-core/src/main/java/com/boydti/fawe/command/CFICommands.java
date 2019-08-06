@@ -240,14 +240,14 @@ public class CFICommands {
             desc = "Set the floor and main block"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void column(FawePlayer fp, Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void column(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) {
-            gen.setColumn(load(image), pattern, !disableWhiteOnly);
+            gen.setColumn(load(image), patternArg, !disableWhiteOnly);
         } else if (mask != null) {
-            gen.setColumn(mask, pattern);
+            gen.setColumn(mask, patternArg);
         } else {
-            gen.setColumn(pattern);
+            gen.setColumn(patternArg);
         }
         fp.sendMessage("Set column!");
         assertSettings(fp).resetComponent();
@@ -259,21 +259,21 @@ public class CFICommands {
             desc = "Set the floor (default: grass)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void floorCmd(FawePlayer fp, Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        floor(fp, pattern, image, mask, disableWhiteOnly);
+    public void floorCmd(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        floor(fp, patternArg, image, mask, disableWhiteOnly);
         fp.sendMessage("Set floor!");
         assertSettings(fp).resetComponent();
         component(fp);
     }
 
-    private void floor(FawePlayer fp, Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
+    private void floor(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly) {
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) {
-            gen.setFloor(load(image), pattern, !disableWhiteOnly);
+            gen.setFloor(load(image), patternArg, !disableWhiteOnly);
         } else if (mask != null) {
-            gen.setFloor(mask, pattern);
+            gen.setFloor(mask, patternArg);
         } else {
-            gen.setFloor(pattern);
+            gen.setFloor(patternArg);
         }
     }
 
@@ -282,21 +282,21 @@ public class CFICommands {
             desc = "Set the main block (default: stone)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void mainCmd(FawePlayer fp, Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
-        main(fp, pattern, image, mask, disableWhiteOnly);
+    public void mainCmd(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+        main(fp, patternArg, image, mask, disableWhiteOnly);
         fp.sendMessage("Set main!");
         assertSettings(fp).resetComponent();
         component(fp);
     }
 
-    public void main(FawePlayer fp, Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void main(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) {
-            gen.setMain(load(image), pattern, !disableWhiteOnly);
+            gen.setMain(load(image), patternArg, !disableWhiteOnly);
         } else if (mask != null) {
-            gen.setMain(mask, pattern);
+            gen.setMain(mask, patternArg);
         } else {
-            gen.setMain(pattern);
+            gen.setMain(patternArg);
         }
     }
 
@@ -308,14 +308,14 @@ public class CFICommands {
                     "e.g. Tallgrass"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void overlay(FawePlayer fp, Pattern pattern, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void overlay(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) {
-            gen.setOverlay(load(image), pattern, !disableWhiteOnly);
+            gen.setOverlay(load(image), patternArg, !disableWhiteOnly);
         } else if (mask != null) {
-            gen.setOverlay(mask, pattern);
+            gen.setOverlay(mask, patternArg);
         } else {
-            gen.setOverlay(pattern);
+            gen.setOverlay(patternArg);
         }
         fp.sendMessage("Set overlay!");
         component(fp);
@@ -530,14 +530,14 @@ public class CFICommands {
                     " - If a mask is used, the biome will be set anywhere the mask applies"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void biome(FawePlayer fp, BiomeType biome, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
+    public void biome(FawePlayer fp, @Arg(name = "biome", desc = "Biome type") BiomeType biomeType, @Arg(def = "", desc = "image url or filename") ProvideBindings.ImageUri image, @Arg(name = "mask", desc = "Mask", def = "") Mask mask, @Switch(name = 'w', desc = "TODO") boolean disableWhiteOnly){
         HeightMapMCAGenerator gen = assertSettings(fp).getGenerator();
         if (image != null) {
-            gen.setBiome(load(image), biome, !disableWhiteOnly);
+            gen.setBiome(load(image), biomeType, !disableWhiteOnly);
         } else if (mask != null) {
-            gen.setBiome(mask, biome);
+            gen.setBiome(mask, biomeType);
         } else {
-            gen.setBiome(biome);
+            gen.setBiome(biomeType);
         }
         fp.toWorldEditPlayer().print(TextComponent.of("Set biome!"));
         assertSettings(fp).resetComponent();
@@ -561,8 +561,8 @@ public class CFICommands {
             descFooter = "Use a specific pattern and settings to generate ore"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void ore(FawePlayer fp, Mask mask, Pattern pattern, int size, int frequency, int rariry, int minY, int maxY) throws WorldEditException {
-        assertSettings(fp).getGenerator().addOre(mask, pattern, size, frequency, rariry, minY, maxY);
+    public void ore(FawePlayer fp, Mask mask, @Arg(name = "pattern", desc = "Pattern") Pattern patternArg, int size, int frequency, int rariry, int minY, int maxY) throws WorldEditException {
+        assertSettings(fp).getGenerator().addOre(mask, patternArg, size, frequency, rariry, minY, maxY);
         fp.toWorldEditPlayer().print(TextComponent.of("Added ore!"));
         populate(fp);
     }
@@ -630,8 +630,8 @@ public class CFICommands {
                     " - A value of 0 is the default and will not modify the height"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void worldthickness(FawePlayer fp, int height) throws WorldEditException {
-        assertSettings(fp).getGenerator().setWorldThickness(height);
+    public void worldthickness(FawePlayer fp, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
+        assertSettings(fp).getGenerator().setWorldThickness(heightArg);
         fp.toWorldEditPlayer().print(TextComponent.of("Set world thickness!"));
         component(fp);
     }
@@ -643,8 +643,8 @@ public class CFICommands {
                     " - A value of 0 is the default and will only set the top block"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void floorthickness(FawePlayer fp, int height) throws WorldEditException {
-        assertSettings(fp).getGenerator().setFloorThickness(height);
+    public void floorthickness(FawePlayer fp, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
+        assertSettings(fp).getGenerator().setFloorThickness(heightArg);
         fp.toWorldEditPlayer().print(TextComponent.of("Set floor thickness!"));
         component(fp);
     }
@@ -685,8 +685,8 @@ public class CFICommands {
                     " - By default water is disabled (with a value of 0)"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void waterheight(FawePlayer fp, int height) throws WorldEditException {
-        assertSettings(fp).getGenerator().setWaterHeight(height);
+    public void waterheight(FawePlayer fp, @Arg(name = "height", desc = "brush height") int heightArg) throws WorldEditException {
+        assertSettings(fp).getGenerator().setWaterHeight(heightArg);
         fp.toWorldEditPlayer().print(TextComponent.of("Set water height!"));
         component(fp);
     }
@@ -890,16 +890,16 @@ public class CFICommands {
             desc = "Select a pattern"
     )
     @CommandPermissions("worldedit.anvil.cfi")
-    public void pattern(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern", def = "") Pattern pattern, InjectedValueAccess context)throws CommandException {
+    public void pattern(FawePlayer fp, @Arg(name = "pattern", desc = "Pattern", def = "") Pattern patternArg, InjectedValueAccess context)throws CommandException {
         CFISettings settings = assertSettings(fp);
         String[] split = getArguments(context).split(" ");
         int index = 2;
-        settings.pattern = pattern;
-        settings.patternArg = pattern == null ? null : split[index++];
+        settings.pattern = patternArg;
+        settings.patternArg = patternArg == null ? null : split[index++];
 
         StringBuilder cmd = new StringBuilder("/cfi pattern ");
 
-        if (pattern != null) {
+        if (patternArg != null) {
             settings.getCategory().accept(fp);
         } else {
             String s = cmd + " stone";

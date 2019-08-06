@@ -3,15 +3,15 @@ package com.boydti.fawe.object.progress;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.object.RunnableVal2;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
+
+import java.util.function.BiConsumer;
 
 /**
  * The default progress tracker uses titles
  */
-public class DefaultProgressTracker extends RunnableVal2<IQueueExtent.ProgressType, Integer> {
+public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker.ProgressType, Integer> {
 
     private final FawePlayer player;
     private final long start;
@@ -54,8 +54,14 @@ public class DefaultProgressTracker extends RunnableVal2<IQueueExtent.ProgressTy
     // If the task is finished
     private boolean done = false;
 
+    public enum ProgressType {
+        DISPATCH,
+        QUEUE,
+        DONE
+    }
+
     @Override
-    public void run(IQueueExtent.ProgressType type, Integer amount) {
+    public void accept(ProgressType type, Integer amount) {
         switch (type) {
             case DISPATCH:
                 amountDispatch++;

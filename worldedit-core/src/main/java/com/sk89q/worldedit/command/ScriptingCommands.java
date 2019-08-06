@@ -94,7 +94,7 @@ public class ScriptingCommands {
                         @Arg(desc = "Filename of the CraftScript to load")
                             String filename,
                         @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
-                            List<String> args) throws WorldEditException {
+                            List<String> commandStr) throws WorldEditException {
         if (!player.hasPermission("worldedit.scripting.execute." + filename)) {
             BBC.SCRIPTING_NO_PERM.send(player);
             return;
@@ -105,7 +105,7 @@ public class ScriptingCommands {
         File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().scriptsDir);
         File f = worldEdit.getSafeOpenFile(player, dir, filename, "js", "js");
 
-        worldEdit.runScript(player, f, Stream.concat(Stream.of(filename), args.stream())
+        worldEdit.runScript(player, f, Stream.concat(Stream.of(filename), commandStr.stream())
                 .toArray(String[]::new));
     }
 
@@ -117,7 +117,7 @@ public class ScriptingCommands {
     @Logging(ALL)
     public void executeLast(Player player, LocalSession session,
                             @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
-                                    List<String> args) throws WorldEditException {
+                                    List<String> commandStr) throws WorldEditException {
 
         String lastScript = session.getLastScript();
 
@@ -134,7 +134,7 @@ public class ScriptingCommands {
         File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().scriptsDir);
         File f = worldEdit.getSafeOpenFile(player, dir, lastScript, "js", "js");
 
-        worldEdit.runScript(player, f, Stream.concat(Stream.of(lastScript), args.stream())
+        worldEdit.runScript(player, f, Stream.concat(Stream.of(lastScript), commandStr.stream())
                 .toArray(String[]::new));
     }
 }

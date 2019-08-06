@@ -497,17 +497,17 @@ public class BrushCommands {
             desc = "Scatter a schematic on a surface"
     )
     @CommandPermissions("worldedit.brush.populateschematic")
-    public BrushSettings scatterSchemBrush(Player player, LocalSession session, Mask mask, String clipboard, @Arg(name = "radius", desc = "Expression", def = "30") Expression radius, @Arg(name = "density", desc = "double", def = "50") double density, @Switch(name = 'r', desc = "Apply random rotation") boolean rotate, InjectedValueAccess context) throws WorldEditException {
+    public BrushSettings scatterSchemBrush(Player player, LocalSession session, Mask mask, @Arg(name = "clipboard", desc = "Clipboard uri") String clipboardStr, @Arg(name = "radius", desc = "Expression", def = "30") Expression radius, @Arg(name = "density", desc = "double", def = "50") double density, @Switch(name = 'r', desc = "Apply random rotation") boolean rotate, InjectedValueAccess context) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         try {
-            MultiClipboardHolder clipboards = ClipboardFormats.loadAllFromInput(player, clipboard, null, true);
+            MultiClipboardHolder clipboards = ClipboardFormats.loadAllFromInput(player, clipboardStr, null, true);
             if (clipboards == null) {
-                BBC.SCHEMATIC_NOT_FOUND.send(player, clipboard);
+                BBC.SCHEMATIC_NOT_FOUND.send(player, clipboardStr);
                 return null;
             }
             List<ClipboardHolder> holders = clipboards.getHolders();
             if (holders == null) {
-                BBC.SCHEMATIC_NOT_FOUND.send(player, clipboard);
+                BBC.SCHEMATIC_NOT_FOUND.send(player, clipboardStr);
                 return null;
             }
 

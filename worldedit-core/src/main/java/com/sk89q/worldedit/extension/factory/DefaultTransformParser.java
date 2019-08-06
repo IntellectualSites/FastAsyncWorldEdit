@@ -14,30 +14,18 @@ import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.command.ActorAuthorizer;
-import com.sk89q.worldedit.internal.command.WorldEditBinding;
 import com.sk89q.worldedit.internal.expression.Expression;
-import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.SimpleDispatcher;
-import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class DefaultTransformParser extends FaweParser<ResettableExtent> {
-    private final Pattern INTERSECTION_PATTERN = Pattern.compile("[&|;]+(?![^\\[]*\\])");
-    private final Dispatcher dispatcher;
 
     public DefaultTransformParser(WorldEdit worldEdit) {
         super(worldEdit);
-        this.dispatcher = new SimpleDispatcher();
         this.register(new TransformCommands());
     }
 
-    @Override
-    public Dispatcher getDispatcher() {
-        return dispatcher;
-    }
 
     public void register(Object clazz) {
         ParametricBuilder builder = new ParametricBuilder();

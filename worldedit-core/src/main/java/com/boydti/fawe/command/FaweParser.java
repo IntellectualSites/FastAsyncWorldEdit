@@ -4,13 +4,33 @@ import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 
 import java.util.*;
 
 public abstract class FaweParser<T> extends InputParser<T> {
-    protected FaweParser(WorldEdit worldEdit) {
+    private final PlatformCommandManager platform;
+    private final Class<T> type;
+
+    protected FaweParser(WorldEdit worldEdit, PlatformCommandManager commandManager, Class<T> type) {
         super(worldEdit);
+        this.platform = commandManager;
+        this.type = type;
+    }
+
+    public PlatformCommandManager getPlatform() {
+        return platform;
+    }
+
+    public Class<T> getType() {
+        return type;
+    }
+
+    public Collection<T> parse(String input, Actor actor) {
+        return getPlatform().parse(getType(), "pattern " + input, actor);
     }
 
     public T catchSuggestion(String currentInput, String nextInput, ParserContext context) throws InputParseException {

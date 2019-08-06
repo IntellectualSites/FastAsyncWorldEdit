@@ -164,7 +164,7 @@ public class ProvideBindings extends Bindings {
      *
      * @param context the context
      * @param direction the direction annotation
-     * @return a pattern
+     * @return a BlockVector3
      * @throws ParameterException on error
      * @throws UnknownDirectionException on an unknown direction
      */
@@ -181,7 +181,7 @@ public class ProvideBindings extends Bindings {
      * Gets an {@link TreeType} from a {@link ArgumentStack}.
      *
      * @param context the context
-     * @return a pattern
+     * @return a TreeType
      * @throws ParameterException on error
      * @throws WorldEditException on error
      */
@@ -204,7 +204,7 @@ public class ProvideBindings extends Bindings {
      * Gets an {@link BiomeType} from a {@link ArgumentStack}.
      *
      * @param context the context
-     * @return a pattern
+     * @return a BiomeType
      * @throws ParameterException on error
      * @throws WorldEditException on error
      */
