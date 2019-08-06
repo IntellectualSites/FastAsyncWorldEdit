@@ -12,6 +12,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
-public class FuzzyRegionSelector extends AbstractDelegateExtent implements RegionSelector {
+public class FuzzyRegionSelector extends PassthroughExtent implements RegionSelector {
 
     private final Player player;
     private FuzzyRegion region;

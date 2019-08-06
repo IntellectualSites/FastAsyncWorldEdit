@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.extent;
 
+import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -10,7 +11,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-public class TemporalExtent extends AbstractDelegateExtent {
+public class TemporalExtent extends PassthroughExtent {
     private int x, y, z = Integer.MAX_VALUE;
     private BlockStateHolder<?> block = BlockTypes.AIR.getDefaultState();
 

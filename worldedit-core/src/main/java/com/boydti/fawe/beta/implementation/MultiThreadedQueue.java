@@ -9,6 +9,7 @@ import com.boydti.fawe.beta.filters.DistrFilter;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -25,7 +26,7 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.IntStream;
 
-public class MultiThreadedQueue extends AbstractDelegateExtent implements IQueueWrapper {
+public class MultiThreadedQueue extends PassthroughExtent implements IQueueWrapper {
 
     private final World world;
     private final QueueHandler handler;

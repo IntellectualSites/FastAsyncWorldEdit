@@ -142,7 +142,7 @@ public class Settings extends Config {
         public int MAX_EXPRESSION_MS = 50;
         @Comment({
                 "Cinematic block placement:",
-                " - Adds a delay to block placement (ms/block)",
+                " - Adds a delay to block placement (nanoseconds/block)",
                 " - Having an artificial delay will use more CPU/Memory",
         })
         public int SPEED_REDUCTION = 0;
