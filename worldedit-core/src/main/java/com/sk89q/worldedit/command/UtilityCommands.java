@@ -103,7 +103,10 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Utility commands.
  */
-@CommandContainer(superTypes = {CommandQueuedConditionGenerator.Registration.class, CommandPermissionsConditionGenerator.Registration.class})
+@CommandContainer(superTypes = {
+//        CommandQueuedConditionGenerator.Registration.class,
+        CommandPermissionsConditionGenerator.Registration.class // TODO NOT IMPLEMENTED - Piston doesn't seem to work with multiple conditions???
+})
 public class UtilityCommands {
 
     private final WorldEdit we;
