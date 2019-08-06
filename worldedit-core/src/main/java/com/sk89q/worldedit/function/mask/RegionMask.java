@@ -20,8 +20,12 @@
 package com.sk89q.worldedit.function.mask;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import javax.annotation.Nullable;
+
+import javax.annotation.Nullable;
 
 /**
  * A mask that tests whether given positions are contained within a region.

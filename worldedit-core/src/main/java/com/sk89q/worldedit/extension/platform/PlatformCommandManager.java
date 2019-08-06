@@ -62,6 +62,7 @@ import com.sk89q.worldedit.command.NavigationCommands;
 import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
 import com.sk89q.worldedit.command.PatternCommands;
+import com.sk89q.worldedit.command.PatternCommandsRegistration;
 import com.sk89q.worldedit.command.RegionCommands;
 import com.sk89q.worldedit.command.RegionCommandsRegistration;
 import com.sk89q.worldedit.command.SchematicCommands;
@@ -117,7 +118,6 @@ import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
 import com.sk89q.worldedit.internal.util.Substring;
-import com.sk89q.worldedit.scripting.CommandScriptLoader;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
@@ -256,14 +256,14 @@ public final class PlatformCommandManager {
 
     public void registerAlwaysInjectedValues() {
         globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), Optional::of);
-        register(new AnnotatedBindings(worldEdit));
-        register(new CommandBindings(worldEdit));
-        register(new ConsumeBindings(worldEdit));
-        register(new ProvideBindings(worldEdit));
-        register(new ProvideBindings(worldEdit));
+        registerBinding(new AnnotatedBindings(worldEdit));
+        registerBinding(new CommandBindings(worldEdit));
+        registerBinding(new ConsumeBindings(worldEdit));
+        registerBinding(new ProvideBindings(worldEdit));
+        registerBinding(new ProvideBindings(worldEdit));
     }
 
-    public void register(Object classWithMethods) {
+    public void registerBinding(Object classWithMethods) {
         // TODO NOT IMPLEMENTED - register the following using a custom processor / annotations
     }
 
@@ -297,6 +297,10 @@ public final class PlatformCommandManager {
 
             cmd.condition(new SubCommandPermissionCondition.Generator(subCommands).build());
         });
+    }
+
+    public void getCommand(String arguments) {
+
     }
 
     public void registerAllCommands() {
@@ -411,11 +415,6 @@ public final class PlatformCommandManager {
                     commandManager,
                     GenerationCommandsRegistration.builder(),
                     new GenerationCommands(worldEdit)
-            );
-            this.registration.register(
-                    new CFICommand(commandManager),
-                    CFICommandsRegistration.builder(),
-                    new CFICommands(worldEdit)
             );
             this.registration.register(
                 commandManager,
@@ -535,7 +534,7 @@ public final class PlatformCommandManager {
 
         // Delay command registration to allow time for other plugins to hook into FAWE
         try {
-            new CommandScriptLoader().load();
+//            new CommandScriptLoader().load();
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -564,6 +563,7 @@ public final class PlatformCommandManager {
         }
 
         platform.registerCommands(commandManager);
+//        commandManager.getCommand("pattern").get()
     }
 
     void removeCommands() {

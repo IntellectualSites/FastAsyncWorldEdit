@@ -52,7 +52,6 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -65,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -135,6 +135,15 @@ public interface Extent extends InputExtent, OutputExtent {
     default @Nullable Entity createEntity(Location location, BaseEntity entity) {
         return null;
     }
+
+    /**
+     * Create an entity at the given location.
+     *
+     * @param entity the entity
+     * @param location the location
+     * @return a reference to the created entity, or null if the entity could not be created
+     */
+    default @Nullable void removeEntity(int x, int y, int z, UUID uuid) {}
 
     /*
     Queue based methods
@@ -618,10 +627,6 @@ public interface Extent extends InputExtent, OutputExtent {
             }
         }
         return count;
-    }
-
-    default World getWorld() {
-        return null;
     }
 
 }
