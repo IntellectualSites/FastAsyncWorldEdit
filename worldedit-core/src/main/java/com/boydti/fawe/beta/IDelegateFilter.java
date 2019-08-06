@@ -1,10 +1,10 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.worldedit.regions.Region;
-
 import javax.annotation.Nullable;
 
 public interface IDelegateFilter extends Filter {
+
     Filter getParent();
 
     @Override

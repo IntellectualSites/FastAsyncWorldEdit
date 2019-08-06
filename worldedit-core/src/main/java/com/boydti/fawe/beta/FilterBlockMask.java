@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta;
 
 public interface FilterBlockMask {
-    boolean applyBlock(final FilterBlock block);
+
+    boolean applyBlock(FilterBlock block);
 }

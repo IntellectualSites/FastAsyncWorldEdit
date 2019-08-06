@@ -6,11 +6,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class ChunkFuture implements Future<Void> {
+
     private final IChunk chunk;
     private volatile boolean cancelled;
     private volatile boolean done;
 
-    public ChunkFuture(final IChunk chunk) {
+    public ChunkFuture(IChunk chunk) {
         this.chunk = chunk;
     }
 
@@ -19,10 +20,9 @@ public class ChunkFuture implements Future<Void> {
     }
 
     @Override
-    public boolean cancel(final boolean mayInterruptIfRunning) {
+    public boolean cancel(boolean mayInterruptIfRunning) {
         cancelled = true;
-        if (done) return false;
-        return true;
+        return !done;
     }
 
     @Override
@@ -46,7 +46,8 @@ public class ChunkFuture implements Future<Void> {
     }
 
     @Override
-    public Void get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public Void get(long timeout, TimeUnit unit)
+        throws InterruptedException, ExecutionException, TimeoutException {
         synchronized (chunk) {
             if (!done) {
                 this.wait(unit.toMillis(timeout));

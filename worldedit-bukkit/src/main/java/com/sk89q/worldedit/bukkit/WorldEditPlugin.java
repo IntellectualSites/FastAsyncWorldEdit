@@ -527,6 +527,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     public Actor wrapCommandSender(CommandSender sender) {
         if (sender instanceof Player) {
             return wrapPlayer((Player) sender);
+        } else if (sender instanceof BlockCommandSender) {
+            return new BukkitBlockCommandSender(this, (BlockCommandSender) sender);
         }
 
         return new BukkitCommandSender(this, sender);

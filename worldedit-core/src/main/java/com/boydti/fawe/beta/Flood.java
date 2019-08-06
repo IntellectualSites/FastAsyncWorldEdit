@@ -6,27 +6,23 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Flood {
+
     private final int maxBranch;
     private final int maxDepth;
     private final Direction[] directions;
-
+    private final Long2ObjectLinkedOpenHashMap<long[][]> chunkVisits;
+    private final Long2ObjectLinkedOpenHashMap<int[][]> chunkQueues;
     private int[] queue;
     private long[] visit;
-
     private int[][] queues;
     private long[][] visits;
-
     private int chunkX;
     private int chunkYLayer;
     private int chunkZ;
-
     private ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
-    private final Long2ObjectLinkedOpenHashMap<long[][]> chunkVisits;
-    private final Long2ObjectLinkedOpenHashMap<int[][]> chunkQueues;
 
     public Flood(int maxBranch, int maxDepth, Direction[] directions) {
         this.maxBranch = maxBranch;
@@ -68,7 +64,7 @@ public class Flood {
         long pair = MathMan.pairInt(chunkX, chunkZ);
         int layer = y >> 4;
         int[] section = getOrCreateQueue(pair, layer);
-        int val = (x & 15) + ((z & 15) << 4)  + ((y & 15) << 8) + (depth << 12);
+        int val = (x & 15) + ((z & 15) << 4) + ((y & 15) << 8) + (depth << 12);
         push(section, val);
     }
 
@@ -171,12 +167,12 @@ public class Flood {
     }
 
     public void set(long[] bits, int i) {
-        bits[i >> 6] |= (1L << (i & 0x3F));
+        bits[i >> 6] |= 1L << (i & 0x3F);
     }
 
     public final boolean getAndSet(long[] bits, int i) {
         int index = i >> 6;
-        long offset = (1L << (i & 0x3F));
+        long offset = 1L << (i & 0x3F);
         long val = bits[index];
         if ((val & offset) != 0) {
             return true;
@@ -186,7 +182,7 @@ public class Flood {
         }
     }
 
-    public boolean get(long[] bits, final int i) {
-        return (bits[i >> 6] & (1L << (i & 0x3F))) != 0;
+    public boolean get(long[] bits, int i) {
+        return (bits[i >> 6] & 1L << (i & 0x3F)) != 0;
     }
 }

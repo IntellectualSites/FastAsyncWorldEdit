@@ -46,7 +46,7 @@ allprojects {
     def buildNumber = ""
     def date = ""
     ext {
-        git = Grgit.open(dir: '.git')
+        git = Grgit.open(dir: new File(rootDir.toString()+'/.git'))
         date = git.head().getDate().format("yy.MM.dd")
         revision = "-${git.head().abbreviatedId}"
         parents = git.head().parentIds;
@@ -63,6 +63,7 @@ allprojects {
 
     version = String.format("%s.%s", rootVersion, buildNumber)
 }
+
 description = rootProject.name
 
 subprojects {
@@ -99,7 +100,7 @@ subprojects {
     }
 }
 
-configure(['worldedit-core', 'worldedit-bukkit', 'favs'].collect { project("$it") }) {
+configure(['worldedit-core', 'worldedit-bukkit'].collect { project("$it") }) {
     apply plugin: 'java'
     apply plugin: 'maven'
 //    apply plugin: 'checkstyle'

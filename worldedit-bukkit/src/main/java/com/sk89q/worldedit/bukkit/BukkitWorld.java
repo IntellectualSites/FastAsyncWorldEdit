@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.bukkit.Effect;
@@ -154,6 +155,11 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public String getName() {
         return getWorld().getName();
+    }
+
+    @Override
+    public String getId() {
+        return getWorld().getName().replace(" ", "_").toLowerCase(Locale.ROOT);
     }
 
     @Override

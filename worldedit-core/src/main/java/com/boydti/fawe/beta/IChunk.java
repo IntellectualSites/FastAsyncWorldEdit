@@ -12,12 +12,14 @@ import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
 /**
- * Represents a chunk in the queue {@link IQueueExtent}
- * Used for getting and setting blocks / biomes / entities
+ * Represents a chunk in the queue {@link IQueueExtent} Used for getting and setting blocks / biomes
+ * / entities
  */
 public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChunkGet {
+
     /**
      * Initialize at the location
+     *
      * @param extent
      * @param x
      * @param z
@@ -31,7 +33,8 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     int getZ();
 
     /**
-     * If the chunk is a delegate, returns it's paren'ts root
+     * If the chunk is a delegate, returns it's parent's root
+     *
      * @return root IChunk
      */
     default IChunk getRoot() {
@@ -39,20 +42,25 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     }
 
     /**
+     * Checks if there are any queued changes for this chunk.
+     *
      * @return true if no changes are queued for this chunk
      */
     boolean isEmpty();
 
     /**
-     * Apply the queued changes to the world<br>
-     * The future returned may return another future<br>
-     * To ensure completion keep calling {@link Future#get()} on each result
+     * Apply the queued changes to the world containing this chunk.
+     * <p>The future returned may return another future. To ensure completion keep calling {@link
+     * Future#get()} on each result.</p>
+     *
      * @return Futures
      */
+    @Override
     T call();
 
     /**
      * Call and join
+     *
      * @throws ExecutionException
      * @throws InterruptedException
      */
@@ -66,11 +74,10 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
 
     /**
      * Filter
+     *
      * @param filter the filter
-     * @param block The filter block
+     * @param block  The filter block
      * @param region The region allowed to filter (may be null)
-     * @param unitialized a mutable block vector (buffer)
-     * @param unitialized2 a mutable block vector (buffer)
      */
     void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region);
 
@@ -81,13 +88,16 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
 
     boolean setBlock(int x, int y, int z, BlockStateHolder block);
 
-    /* get - from the world */
+    @Override
     BiomeType getBiomeType(int x, int z);
 
+    @Override
     BlockState getBlock(int x, int y, int z);
 
+    @Override
     BaseBlock getFullBlock(int x, int y, int z);
 
+    @Override
     CompoundTag getTag(int x, int y, int z);
 
     @Override

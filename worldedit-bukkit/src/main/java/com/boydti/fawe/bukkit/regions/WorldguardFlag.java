@@ -1,10 +1,10 @@
 package com.boydti.fawe.bukkit.regions;
 
-import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.bukkit.filter.WorldGuardFilter;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.RegionFilter;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldguard.LocalPlayer;
@@ -12,29 +12,29 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.*;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Map;
-
 public class WorldguardFlag extends BukkitMaskManager implements Listener {
-    private WorldGuardPlugin worldguard;
-    private FaweBukkit plugin;
 
-    public WorldguardFlag(Plugin p2, FaweBukkit p3) {
+    private WorldGuardPlugin worldguard;
+
+    public WorldguardFlag(Plugin p2) {
         super("worldguardflag");
         this.worldguard = (WorldGuardPlugin) p2; // this.getWorldGuard();
-        this.plugin = p3;
     }
 
     @Override
     public FaweMask getMask(FawePlayer<Player> fp, MaskType type) {
-        final Player player = fp.parent;
+        final Player player = BukkitAdapter.adapt(fp.toWorldEditPlayer());
         final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
-        final RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        final RegionContainer container = WorldGuard.getInstance().getPlatform()
+            .getRegionContainer();
         final RegionManager manager = container.get(fp.getWorld());
 
         return new FaweMask(new ManagerRegion(manager, localplayer)) {
@@ -55,6 +55,7 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
      * ManagerRegion wraps a RegionManager and will provide results based upon the regions enclosed
      */
     private static class ManagerRegion extends AbstractRegion {
+
         private final RegionManager manager;
         private final LocalPlayer localplayer;
 
@@ -105,7 +106,8 @@ public class WorldguardFlag extends BukkitMaskManager implements Listener {
         @Override
         public boolean contains(BlockVector3 position) {
             // Make sure that all these flags are not denied. Denies override allows. WorldGuardExtraFlags can add Flags.WORLDEDIT
-            return  manager.getApplicableRegions(position).testState(localplayer, Flags.BUILD, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK);
+            return manager.getApplicableRegions(position)
+                .testState(localplayer, Flags.BUILD, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK);
         }
 
     }
