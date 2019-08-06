@@ -257,7 +257,7 @@ public class HistoryCommands {
             if (undone == null) {
                 BBC.COMMAND_UNDO_ERROR.send(player);
             }
-        }, getArguments(context), times, 50, context);
+        }, "undo", times, 50, context);
     }
 
     @Command(

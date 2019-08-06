@@ -93,7 +93,7 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.caves")
     @Logging(PLACEMENT)
     public void caves(FawePlayer fp, LocalSession session, EditSession editSession, @Selection Region region,
-                      @Arg(desc = "TODO", def = "8") int size,
+                      @Arg(name = "size", desc = "TODO", def = "8") int sizeOpt,
                       @Arg(desc = "TODO", def = "40") int frequency,
                       @Arg(desc = "TODO", def = "7") int rarity,
                       @Arg(desc = "TODO", def = "8") int minY,
@@ -104,10 +104,10 @@ public class GenerationCommands {
                       @Arg(desc = "TODO", def = "0") int pocketMin,
                       @Arg(desc = "TODO", def = "3") int pocketMax, InjectedValueAccess context) throws WorldEditException {
         fp.checkConfirmationRegion(() -> {
-            CavesGen gen = new CavesGen(size, frequency, rarity, minY, maxY, systemFrequency, individualRarity, pocketChance, pocketMin, pocketMax);
+            CavesGen gen = new CavesGen(sizeOpt, frequency, rarity, minY, maxY, systemFrequency, individualRarity, pocketChance, pocketMin, pocketMax);
             editSession.generate(region, gen);
             BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());
-        }, getArguments(context), region, context);
+        }, "/caves", region, context);
     }
 
 
@@ -117,11 +117,11 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
-    public void ores(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, InjectedValueAccess context) throws WorldEditException {
-        player.checkConfirmationRegion(() -> {
+    public void ores(FawePlayer fp, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, InjectedValueAccess context) throws WorldEditException {
+        fp.checkConfirmationRegion(() -> {
             editSession.addOres(region, mask);
-            BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
-        }, getArguments(context), region, context);
+            BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());
+        }, "/ores", region, context);
     }
 
     @Command(
@@ -171,11 +171,11 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
-    public void ore(FawePlayer player, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, Pattern material, @Range(min = 0) int size, int freq, @Range(min = 0, max = 100) int rarity, @Range(min = 0, max = 255) int minY, @Range(min = 0, max = 255) int maxY, InjectedValueAccess context) throws WorldEditException {
-        player.checkConfirmationRegion(() -> {
+    public void ore(FawePlayer fp, LocalSession session, EditSession editSession, @Selection Region region, Mask mask, Pattern material, @Range(min = 0) int size, int freq, @Range(min = 0, max = 100) int rarity, @Range(min = 0, max = 255) int minY, @Range(min = 0, max = 255) int maxY, InjectedValueAccess context) throws WorldEditException {
+        fp.checkConfirmationRegion(() -> {
             editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
-            BBC.VISITOR_BLOCK.send(player, editSession.getBlockChangeCount());
-        }, getArguments(context), region, context);
+            BBC.VISITOR_BLOCK.send(fp, editSession.getBlockChangeCount());
+        }, "/ore", region, context);
     }
 
     @Command(
@@ -197,7 +197,7 @@ public class GenerationCommands {
         fp.checkConfirmationRadius(() -> {
             int affected = editSession.makeHollowCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), thickness - 1);
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max, context);
+        }, "/hcyl", (int) max, context);
     }
 
     @Command(
@@ -220,7 +220,7 @@ public class GenerationCommands {
         fp.checkConfirmationRadius(() -> {
             int affected = editSession.makeCylinder(pos, pattern, radius.getX(), radius.getZ(), Math.min(256, height), !hollow);
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max, context);
+        }, "/cyl", (int) max, context);
     }
 
     @Command(
@@ -262,7 +262,7 @@ public class GenerationCommands {
             int affected = editSession.makeSphere(finalPos, pattern, radii.getX(), radii.getY(), radii.getZ(), !hollow);
             player.findFreePosition();
             BBC.VISITOR_BLOCK.send(fp, affected);
-        }, getArguments(context), (int) max, context);
+        }, "sphere", (int) max, context);
     }
 
     @Command(
@@ -272,15 +272,15 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.forest")
     @Logging(POSITION)
     public int forestGen(Player player, LocalSession session, EditSession editSession,
-                         @Arg(desc = "The size of the forest, in blocks", def = "10")
-                             int size,
+                         @Arg(name = "size", desc = "The size of the forest, in blocks", def = "10")
+                             int sizeOpt,
                          @Arg(desc = "The type of forest", def = "tree")
                              TreeType type,
                          @Range(min = 0, max = 100) @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                              double density) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         density /= 100;
-        int affected = editSession.makeForest(session.getPlacementPosition(player), size, density, type);
+        int affected = editSession.makeForest(session.getPlacementPosition(player), sizeOpt, density, type);
         player.print(affected + " trees created.");
         return affected;
     }
@@ -292,12 +292,13 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
     public int pumpkins(Player player, LocalSession session, EditSession editSession,
-                        @Arg(desc = "The size of the patch", def = "10")
-                            int size,
+                        @Arg(name = "size", desc = "The size of the patch", def = "10")
+                            int sizeOpt,
                         @Arg(desc = "//TODO", def = "10")
                             int apothem,
-                        @Range(min = 0, max = 100) @Arg(desc = "//TODO ", def = "0.02")
+                        @Arg(desc = "//TODO ", def = "0.02")
                             double density) throws WorldEditException {
+        checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(player), apothem, density);
         BBC.COMMAND_PUMPKIN.send(player, affected);
         return affected;
@@ -401,7 +402,7 @@ public class GenerationCommands {
             } catch (ExpressionException e) {
                 player.printError(e.getMessage());
             }
-        }, getArguments(context), region, context);
+        }, "/generate", region, context);
     }
 
     @Command(
@@ -464,7 +465,7 @@ public class GenerationCommands {
             } catch (ExpressionException e) {
                 fp.printError(e.getMessage());
             }
-        }, getArguments(context), region, context);
+        }, "/generatebiome", region, context);
     }
 
 }

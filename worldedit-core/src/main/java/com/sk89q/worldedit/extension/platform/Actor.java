@@ -83,7 +83,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject {
      */
     void print(Component component);
 
-    /**
+    /**F
      * Returns true if the actor can destroy bedrock.
      *
      * @return true if bedrock can be broken by the actor

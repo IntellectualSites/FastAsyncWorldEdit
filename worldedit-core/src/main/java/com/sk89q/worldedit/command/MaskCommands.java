@@ -72,7 +72,7 @@ public class MaskCommands {
             name = "#simplex",
             desc = "Use simplex noise as the mask"
 )
-    public Mask simplex(double scale, double min, double max) {
+    public Mask simplex(double scale, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
         scale = 1d / Math.max(1, scale);
         min = (min - 50) / 50;
         max = (max - 50) / 50;
@@ -83,13 +83,12 @@ public class MaskCommands {
             name = "#light",
             desc = "Restrict to specific light levels"
 )
-    public Mask light(Extent extent, double min, double max) {
+    public Mask light(Extent extent, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
         return new LightMask(extent, (int) min, (int) max);
     }
 
     @Command(
             name = "#false",
-            aliases = {"false"},
             desc = "Always false"
     )
     public Mask falseMask(Extent extent) {
@@ -98,7 +97,6 @@ public class MaskCommands {
 
     @Command(
             name = "#true",
-            aliases = {"true"},
             desc = "Always true"
     )
     public Mask trueMask(Extent extent) {
@@ -109,8 +107,8 @@ public class MaskCommands {
             name = "#skylight",
             desc = "Restrict to specific sky light levels"
     )
-    public Mask skylight(Extent extent, double min, double max) {
-        return new SkyLightMask(extent, (int) min, (int) max);
+    public Mask skylight(Extent extent, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
+        return new SkyLightMask(extent, (int) minInt, (int) maxInt);
     }
 
     @Command(
@@ -118,24 +116,24 @@ public class MaskCommands {
             aliases = {"#emittedlight"},
             desc = "Restrict to specific block light levels"
 )
-    public Mask blocklight(Extent extent, double min, double max) {
-        return new BlockLightMask(extent, (int) min, (int) max);
+    public Mask blocklight(Extent extent, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
+        return new BlockLightMask(extent, (int) minInt, (int) maxInt);
     }
 
     @Command(
             name = "#opacity",
             desc = "Restrict to specific opacity levels"
 )
-    public Mask opacity(Extent extent, double min, double max) {
-        return new OpacityMask(extent, (int) min, (int) max);
+    public Mask opacity(Extent extent, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
+        return new OpacityMask(extent, (int) minInt, (int) maxInt);
     }
 
     @Command(
             name = "#brightness",
             desc = "Restrict to specific block brightness"
 )
-    public Mask brightness(Extent extent, double min, double max) {
-        return new BrightnessMask(extent, (int) min, (int) max);
+    public Mask brightness(Extent extent, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) {
+        return new BrightnessMask(extent, (int) minInt, (int) maxInt);
     }
 
     @Command(
@@ -288,17 +286,17 @@ public class MaskCommands {
                     "Example: /[3][20]\n" +
                     "Explanation: Allows any block where the adjacent block is between 3 and 20 blocks below"
 )
-    public Mask angle(Extent extent, String min, String max, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "1") int distance) throws ExpressionException {
+    public Mask angle(Extent extent, String minStr, String maxStr, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "1") int distance) throws ExpressionException {
         double y1, y2;
         boolean override;
-        if (max.endsWith("d")) {
-            double y1d = Expression.compile(min.substring(0, min.length() - 1)).evaluate();
-            double y2d = Expression.compile(max.substring(0, max.length() - 1)).evaluate();
+        if (maxStr.endsWith("d")) {
+            double y1d = Expression.compile(minStr.substring(0, minStr.length() - 1)).evaluate();
+            double y2d = Expression.compile(maxStr.substring(0, maxStr.length() - 1)).evaluate();
             y1 = Math.tan(y1d * (Math.PI / 180));
             y2 = Math.tan(y2d * (Math.PI / 180));
         } else {
-            y1 = Expression.compile(min).evaluate();
-            y2 = Expression.compile(max).evaluate();
+            y1 = Expression.compile(minStr).evaluate();
+            y2 = Expression.compile(maxStr).evaluate();
         }
         return new AngleMask(extent, y1, y2, overlay, distance);
     }
@@ -313,17 +311,17 @@ public class MaskCommands {
                     "Explanation: Restrict near where the angle changes between 0-45 degrees within 5 blocks\n" +
                     "Note: Use negatives for decreasing slope"
 )
-    public Mask roc(Extent extent, String min, String max, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distance) throws ExpressionException {
+    public Mask roc(Extent extent, String minStr, String maxStr, @Switch(name = 'o', desc = "TODO") boolean overlay, @Arg(name = "distance", desc = "int", def = "4") int distance) throws ExpressionException {
         double y1, y2;
         boolean override;
-        if (max.endsWith("d")) {
-            double y1d = Expression.compile(min.substring(0, min.length() - 1)).evaluate();
-            double y2d = Expression.compile(max.substring(0, max.length() - 1)).evaluate();
+        if (maxStr.endsWith("d")) {
+            double y1d = Expression.compile(minStr.substring(0, minStr.length() - 1)).evaluate();
+            double y2d = Expression.compile(maxStr.substring(0, maxStr.length() - 1)).evaluate();
             y1 = Math.tan(y1d * (Math.PI / 180));
             y2 = Math.tan(y2d * (Math.PI / 180));
         } else {
-            y1 = Expression.compile(min).evaluate();
-            y2 = Expression.compile(max).evaluate();
+            y1 = Expression.compile(minStr).evaluate();
+            y2 = Expression.compile(maxStr).evaluate();
         }
         return new ROCAngleMask(extent, y1, y2, overlay, distance);
     }
@@ -358,8 +356,8 @@ public class MaskCommands {
             aliases = {"#{"},
             desc = "Restricts blocks to within a specific radius range of the initial block"
 )
-    public Mask radius(double min, double max) throws ExpressionException {
-        return new RadiusMask((int) min, (int) max);
+    public Mask radius(@Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) throws ExpressionException {
+        return new RadiusMask((int) minInt, (int) maxInt);
     }
 
     @Command(
@@ -367,8 +365,8 @@ public class MaskCommands {
             aliases = {"#|", "#side"},
             desc = "sides with a specific number of other blocks"
 )
-    public Mask wall(Mask mask, double min, double max) throws ExpressionException {
-        return new WallMask(mask, (int) min, (int) max);
+    public Mask wall(Mask mask, @Arg(name="mine", desc = "min light") double minInt, @Arg(name="mine", desc = "max light") double maxInt) throws ExpressionException {
+        return new WallMask(mask, (int) minInt, (int) maxInt);
     }
 
     @Command(

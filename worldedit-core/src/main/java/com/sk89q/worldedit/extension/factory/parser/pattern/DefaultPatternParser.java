@@ -32,14 +32,11 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.command.ActorAuthorizer;
-import com.sk89q.worldedit.internal.command.WorldEditBinding;
 import com.sk89q.worldedit.internal.expression.Expression;
-import com.sk89q.worldedit.util.command.Dispatcher;
-import com.sk89q.worldedit.util.command.SimpleDispatcher;
-import com.sk89q.worldedit.util.command.parametric.ParametricBuilder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,24 +46,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DefaultPatternParser extends FaweParser<Pattern> {
-    private final Dispatcher dispatcher;
 
-    public DefaultPatternParser(WorldEdit worldEdit) {
-        super(worldEdit);
-        this.dispatcher = new SimpleDispatcher();
-        this.register(new PatternCommands());
-    }
-
-    @Override
-    public Dispatcher getDispatcher() {
-        return dispatcher;
-    }
-
-    public void register(Object clazz) {
-        ParametricBuilder builder = new ParametricBuilder();
-        builder.setAuthorizer(new ActorAuthorizer());
-        builder.addBinding(new WorldEditBinding(worldEdit));
-        builder.registerMethodsAsCommands(dispatcher, clazz);
+    public DefaultPatternParser(WorldEdit worldEdit, PlatformCommandManager commandManager) {
+        super(worldEdit, commandManager, Pattern.class);
     }
 
     @Override
@@ -161,7 +143,7 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
                                         String suggestion = suggestions.get(i);
                                         if (suggestion.indexOf(' ') != 0) {
                                             String[] split = suggestion.split(" ");
-                                            suggestion = BBC.color("[" + StringMan.join(split, "][") + "]");
+                                            suggestion = "[" + StringMan.join(split, "][") + "]";
                                             suggestions.set(i, suggestion);
                                         }
                                     }

@@ -29,12 +29,14 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.snapshot.InvalidSnapshotException;
 import com.sk89q.worldedit.world.snapshot.Snapshot;
 import com.sk89q.worldedit.world.storage.MissingWorldException;
@@ -67,24 +69,24 @@ public class SnapshotCommands {
         desc = "List snapshots"
     )
     @CommandPermissions("worldedit.snapshots.list")
-    public void list(Player player,
+    public void list(Actor actor, World world,
                      @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
                          int page) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
+            BBC.SNAPSHOT_NOT_CONFIGURED.send(actor);
             return;
         }
 
         try {
-            List<Snapshot> snapshots = config.snapshotRepo.getSnapshots(true, player.getWorld().getName());
+            List<Snapshot> snapshots = config.snapshotRepo.getSnapshots(true, world.getName());
 
             if (!snapshots.isEmpty()) {
-                player.print(new SnapshotListBox(player.getWorld().getName(), snapshots).create(page));
+                actor.print(new SnapshotListBox(world.getName(), snapshots).create(page));
             } else {
-                BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
+                BBC.SNAPSHOT_NOT_AVAILABLE.send(actor);
 
                 // Okay, let's toss some debugging information!
                 File dir = config.snapshotRepo.getDirectory();
@@ -99,7 +101,7 @@ public class SnapshotCommands {
                 }
             }
         } catch (MissingWorldException ex) {
-            BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+            BBC.SNAPSHOT_NOT_FOUND_WORLD.send(actor);
         }
     }
 
@@ -108,37 +110,37 @@ public class SnapshotCommands {
         desc = "Choose a snapshot to use"
     )
     @CommandPermissions("worldedit.snapshots.restore")
-    public void use(Player player, LocalSession session,
-                    @Arg(desc = "Snapeshot to use")
+    public void use(Actor actor, World world, LocalSession session,
+                    @Arg(desc = "Snapshot to use")
                         String name) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
         if (config.snapshotRepo == null) {
-            BBC.SNAPSHOT_NOT_CONFIGURED.send(player);
+            BBC.SNAPSHOT_NOT_CONFIGURED.send(actor);
             return;
         }
 
         // Want the latest snapshot?
         if (name.equalsIgnoreCase("latest")) {
             try {
-                Snapshot snapshot = config.snapshotRepo.getDefaultSnapshot(player.getWorld().getName());
+                Snapshot snapshot = config.snapshotRepo.getDefaultSnapshot(world.getName());
 
                 if (snapshot != null) {
                     session.setSnapshot(null);
-                    BBC.SNAPSHOT_NEWEST.send(player);
+                    BBC.SNAPSHOT_NEWEST.send(actor);
                 } else {
-                    BBC.SNAPSHOT_NOT_FOUND.send(player);
+                    BBC.SNAPSHOT_NOT_FOUND.send(actor);
                 }
             } catch (MissingWorldException ex) {
-                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(player);
+                BBC.SNAPSHOT_NOT_FOUND_WORLD.send(actor);
             }
         } else {
             try {
                 session.setSnapshot(config.snapshotRepo.getSnapshot(name));
-                BBC.SNAPSHOT_SET.send(player, name);
+                BBC.SNAPSHOT_SET.send(actor, name);
             } catch (InvalidSnapshotException e) {
-                BBC.SNAPSHOT_NOT_AVAILABLE.send(player);
+                BBC.SNAPSHOT_NOT_AVAILABLE.send(actor);
             }
         }
     }

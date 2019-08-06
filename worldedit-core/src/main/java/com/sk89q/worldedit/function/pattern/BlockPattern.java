@@ -21,13 +21,14 @@ package com.sk89q.worldedit.function.pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.boydti.fawe.beta.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 /**
  * A pattern that returns the same {@link BaseBlock} each time.
+ *
+ * @deprecated all BlockStateHolders can be used directly as a pattern
  */
 @Deprecated
 public class BlockPattern extends AbstractPattern {
@@ -39,7 +40,6 @@ public class BlockPattern extends AbstractPattern {
      *
      * @param block the block
      */
-    @Deprecated
     public BlockPattern(BlockStateHolder<?> block) {
         setBlock(block);
     }

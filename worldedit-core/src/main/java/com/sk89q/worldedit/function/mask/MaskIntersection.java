@@ -22,20 +22,20 @@ package com.sk89q.worldedit.function.mask;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.Fawe;
-import com.google.common.base.Function;
-
 import com.sk89q.worldedit.math.BlockVector3;
-
-import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
+import javax.annotation.Nullable;
 
 
 /**
@@ -100,7 +100,7 @@ public class MaskIntersection extends AbstractMask {
         }
     }
 
-    public Function<Map.Entry<Mask, Mask>, Mask> pairingFunction() {
+    public Function<Entry<Mask, Mask>, Mask> pairingFunction() {
         return input -> input.getKey().tryCombine(input.getValue());
     }
 
@@ -120,12 +120,11 @@ public class MaskIntersection extends AbstractMask {
         }
         if (changed) {
             masks.clear();
-            for (Mask mask : masksArray) masks.add(mask);
+            Collections.addAll(masks, masksArray);
         }
         // Optimize this
         boolean formArray = false;
-        for (int i = 0; i < masksArray.length; i++) {
-            Mask mask = masksArray[i];
+        for (Mask mask : masksArray) {
             if (mask.getClass() == this.getClass()) {
                 this.masks.remove(mask);
                 this.masks.addAll(((MaskIntersection) mask).getMasks());
@@ -162,7 +161,7 @@ public class MaskIntersection extends AbstractMask {
         return changed ? this : null;
     }
 
-    private boolean combineMasks(Function<Map.Entry<Mask, Mask>, Mask> pairing, Set<Map.Entry<Mask, Mask>> failedCombines) {
+    private boolean combineMasks(Function<Entry<Mask, Mask>, Mask> pairing, Set<Map.Entry<Mask, Mask>> failedCombines) {
         boolean hasOptimized = false;
         while (true) {
             Mask[] result = null;

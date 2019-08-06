@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.boydti.fawe.config.BBC;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -56,6 +57,9 @@ public class RegionVisitor implements Operation {
         this.region = iterable instanceof Region ? (Region) iterable : null;
         this.function = function;
         this.iterable = iterable;
+    }
+
+    public RegionVisitor(Region region, RegionFunction regionFunction, EditSession editSession) {
     }
 
     /**

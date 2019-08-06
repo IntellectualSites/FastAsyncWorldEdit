@@ -19,16 +19,14 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.google.common.base.Function;
 import com.sk89q.worldedit.math.BlockVector3;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -81,7 +79,7 @@ public class MaskUnion extends MaskIntersection {
     }
 
     @Override
-    public Function<Map.Entry<Mask, Mask>, Mask> pairingFunction() {
+    public Function<Entry<Mask, Mask>, Mask> pairingFunction() {
         return input -> input.getKey().tryOr(input.getValue());
     }
 

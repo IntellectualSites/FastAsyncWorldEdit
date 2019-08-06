@@ -32,6 +32,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -41,11 +42,12 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.util.Locale;
 
 /**
  * Represents a world (dimension).
  */
-public interface World extends Extent {
+public interface World extends Extent, Keyed {
 
     /**
      * Get the name of the world.
@@ -284,4 +286,8 @@ public interface World extends Extent {
         return true;
     }
 
+    @Override
+    default String getId() {
+        return getName().replace(" ", "_").toLowerCase(Locale.ROOT);
+    }
 }

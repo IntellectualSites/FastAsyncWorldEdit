@@ -19,6 +19,10 @@
 
 package com.sk89q.worldedit.command;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
+import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
+
 import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
@@ -35,10 +39,6 @@ import com.boydti.fawe.object.schematic.Schematic;
 import com.boydti.fawe.util.ImgurUtility;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MaskTraverser;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import org.enginehub.piston.inject.InjectedValueAccess;
-
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -47,8 +47,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
-import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.PasteEvent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -74,12 +72,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
-import org.enginehub.piston.annotation.param.Arg;
-import org.enginehub.piston.annotation.param.ArgFlag;
-import org.enginehub.piston.annotation.param.Switch;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -91,6 +83,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.enginehub.piston.annotation.Command;
+import org.enginehub.piston.annotation.CommandContainer;
+import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.ArgFlag;
+import org.enginehub.piston.annotation.param.Switch;
+import org.enginehub.piston.inject.InjectedValueAccess;
 
 
 /**
@@ -128,7 +126,8 @@ public class ClipboardCommands {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
-        long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
+        long volume =
+            ((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1);
         FaweLimit limit = FawePlayer.wrap(player).getLimit();
         if (volume >= limit.MAX_CHECKS) {
             throw FaweException.MAX_CHECKS;
@@ -159,7 +158,7 @@ public class ClipboardCommands {
             if (!player.hasPermission("fawe.tips")) {
                 BBC.TIP_PASTE.or(BBC.TIP_DOWNLOAD, BBC.TIP_ROTATE, BBC.TIP_COPYPASTE, BBC.TIP_REPLACE_MARKER, BBC.TIP_COPY_PATTERN).send(player);
             }
-        }, getArguments(context), region, context);
+        }, "/copy", region, context);
     }
 
     @Command(
@@ -283,7 +282,7 @@ public class ClipboardCommands {
             if (!player.hasPermission("fawe.tips")) {
                 BBC.TIP_LAZYCUT.send(player);
             }
-        }, getArguments(context), region, context);
+        }, "cut", region, context);
 
     }
 

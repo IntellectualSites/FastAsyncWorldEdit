@@ -10,11 +10,10 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.enginehub.piston.annotation.Command;
-import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.exception.StopExecutionException;
 
 //TODO This class breaks compilation
-@CommandContainer
+//@CommandContainer
 public class ListFilters {
     public class Filter {
         public boolean listPrivate() {
