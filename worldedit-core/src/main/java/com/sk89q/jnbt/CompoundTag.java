@@ -52,7 +52,7 @@ public class CompoundTag extends Tag {
     }
 
     @Override
-    public final Map<String, Tag> getValue() {
+    public Map<String, Tag> getValue() {
         return value;
     }
 

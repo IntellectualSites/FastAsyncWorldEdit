@@ -338,7 +338,7 @@ public class SchematicCommands {
             }
             if (other) {
                 if (!actor.hasPermission("worldedit.schematic.delete.other")) {
-                    BBC.NO_PERM.send(player, "worldedit.schematic.delete.other");
+                    BBC.NO_PERM.send(actor, "worldedit.schematic.delete.other");
                     return;
                 }
             }

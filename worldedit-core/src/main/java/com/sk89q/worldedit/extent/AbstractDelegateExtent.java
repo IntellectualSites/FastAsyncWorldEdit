@@ -27,6 +27,7 @@ import com.boydti.fawe.object.changeset.FaweChangeSet;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.LightingExtent;
 import com.boydti.fawe.util.ExtentTraverser;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -165,10 +166,14 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         return extent.setBlock(x, y, z, block);
     }
 
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile));
+    }
 
     /*
-    Light
-     */
+        Light
+         */
     public int getSkyLight(int x, int y, int z) {
         if (extent instanceof LightingExtent) {
             return ((LightingExtent) extent).getSkyLight(x, y, z);
