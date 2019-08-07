@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta.implementation.blocks;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.object.collection.MemBlockSet;
 import com.sk89q.jnbt.CompoundTag;
@@ -59,7 +60,8 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public char[] getArray(int layer) {
-
+        char[] arr = FaweCache.SECTION_BITS_TO_CHAR.get();
+        
     }
 
     @Override

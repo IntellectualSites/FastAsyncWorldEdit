@@ -15,7 +15,6 @@ import java.util.concurrent.Future;
  * - Using a non transparent block can cause FPS lag
  */
 public class VisualChunk extends ChunkHolder {
-    public static BlockState VISUALIZE_BLOCK = BlockTypes.BLACK_STAINED_GLASS.getDefaultState();
     private final IChunk parent;
     private final VisualExtent extent;
 
@@ -42,7 +41,7 @@ public class VisualChunk extends ChunkHolder {
     }
 
     @Override
-    public IChunkSet set() {
+    public IChunkSet createSet() {
         return new BitSetBlocks(VISUALIZE_BLOCK);
     }
 }

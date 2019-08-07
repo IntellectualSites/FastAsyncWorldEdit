@@ -24,6 +24,7 @@ import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.object.random.TrueRandom;
 import com.boydti.fawe.util.StringMan;
+import com.google.common.collect.Iterables;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.WorldEdit;
@@ -47,8 +48,8 @@ import java.util.stream.Stream;
 
 public class DefaultPatternParser extends FaweParser<Pattern> {
 
-    public DefaultPatternParser(WorldEdit worldEdit, PlatformCommandManager commandManager) {
-        super(worldEdit, commandManager, Pattern.class);
+    public DefaultPatternParser(WorldEdit worldEdit) {
+        super(worldEdit, Pattern.class);
     }
 
     @Override
@@ -72,90 +73,93 @@ public class DefaultPatternParser extends FaweParser<Pattern> {
                 double chance = 1;
                 if (command.isEmpty()) {
                     pattern = parseFromInput(StringMan.join(entry.getValue(), ','), context);
-                } else if (dispatcher.get(command) == null) {
-                    // Legacy patterns
-                    char char0 = command.charAt(0);
-                    boolean charMask = input.length() > 1 && input.charAt(1) != '[';
-                    if (charMask && input.charAt(0) == '=') {
-                        return parseFromInput(char0 + "[" + input.substring(1) + "]", context);
-                    }
-                    if (char0 == '#') {
-                        throw new SuggestInputParseException(new NoMatchException("Unknown pattern: " + full + ", See: //patterns"), full,
-                                () -> {
-                                    if (full.length() == 1) return new ArrayList<>(dispatcher.getPrimaryAliases());
-                                    return dispatcher.getAliases().stream().filter(
-                                            s -> s.startsWith(command.toLowerCase(Locale.ROOT))
-                                    ).collect(Collectors.toList());
-                                }
-                        );
-                    }
-
-
-                    if (charMask) {
-                        if (char0 == '$') {
-                            String value = command.substring(1) + ((entry.getValue().isEmpty()) ? ""
-                                : "[" + StringMan.join(entry.getValue(), "][") + "]");
-                            if (value.contains(":")) {
-                                if (value.charAt(0) == ':') {
-                                    value.replaceFirst(":", "");
-                                }
-                                value = value.replaceAll(":", "][");
-                            }
-                            pattern = parseFromInput(char0 + "[" + value + "]", context);
-                        }
-                    }
-                    if (pattern == null) {
-                        if (command.startsWith("[")) {
-                            int end = command.lastIndexOf(']');
-                            pattern = parseFromInput(command.substring(1, end == -1 ? command.length() : end), context);
-                        } else {
-                            int percentIndex = command.indexOf('%');
-                            if (percentIndex != -1) {  // Legacy percent pattern
-                                chance = Expression.compile(command.substring(0, percentIndex)).evaluate();
-                                String value = command.substring(percentIndex + 1);
-                                if (!entry.getValue().isEmpty()) {
-                                    if (!value.isEmpty()) value += " ";
-                                    value += StringMan.join(entry.getValue(), " ");
-                                }
-                                pattern = parseFromInput(value, context);
-                            } else { // legacy block pattern
-                                try {
-                                    pattern = worldEdit.getBlockFactory().parseFromInput(pe.full, context);
-                                } catch (NoMatchException e) {
-                                    throw new NoMatchException(e.getMessage() + " See: //patterns");
-                                }
-                            }
-                        }
-                    }
                 } else {
                     List<String> args = entry.getValue();
                     String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                     try {
-                        pattern = (Pattern) dispatcher.call(command + cmdArgs, locals, new String[0]);
+                        pattern = Iterables.getFirst(parse(cmdArgs, actor), null);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {
-                        throw SuggestInputParseException.of(e, full, () -> {
-                            try {
-                                List<String> suggestions = dispatcher.get(command).getCallable().getSuggestions(cmdArgs, locals);
-                                if (suggestions.size() <= 2) {
-                                    for (int i = 0; i < suggestions.size(); i++) {
-                                        String suggestion = suggestions.get(i);
-                                        if (suggestion.indexOf(' ') != 0) {
-                                            String[] split = suggestion.split(" ");
-                                            suggestion = "[" + StringMan.join(split, "][") + "]";
-                                            suggestions.set(i, suggestion);
-                                        }
+                        // TODO NOT IMPLEMENTED
+//                        throw SuggestInputParseException.of(e, full, () -> {
+//                            try {
+//                                List<String> suggestions = dispatcher.get(command).getCallable().getSuggestions(cmdArgs, locals);
+//                                if (suggestions.size() <= 2) {
+//                                    for (int i = 0; i < suggestions.size(); i++) {
+//                                        String suggestion = suggestions.get(i);
+//                                        if (suggestion.indexOf(' ') != 0) {
+//                                            String[] split = suggestion.split(" ");
+//                                            suggestion = "[" + StringMan.join(split, "][") + "]";
+//                                            suggestions.set(i, suggestion);
+//                                        }
+//                                    }
+//                                }
+//                                return suggestions;
+//                            } catch (CommandException e1) {
+//                                throw new InputParseException(e1.getMessage());
+//                            } catch (Throwable e2) {
+//                                e2.printStackTrace();
+//                                throw new InputParseException(e2.getMessage());
+//                            }
+//                        });
+                    }
+                    if (pattern == null) {
+                        // Legacy patterns
+                        char char0 = command.charAt(0);
+                        boolean charMask = input.length() > 1 && input.charAt(1) != '[';
+                        if (charMask && input.charAt(0) == '=') {
+                            return parseFromInput(char0 + "[" + input.substring(1) + "]", context);
+                        }
+                        if (char0 == '#') {
+                            // TODO NOT IMPLEMENTED
+//                            throw new SuggestInputParseException(new NoMatchException("Unknown pattern: " + full + ", See: //patterns"), full,
+//                                    () -> {
+//                                        if (full.length() == 1) return new ArrayList<>(dispatcher.getPrimaryAliases());
+//                                        return dispatcher.getAliases().stream().filter(
+//                                                s -> s.startsWith(command.toLowerCase(Locale.ROOT))
+//                                        ).collect(Collectors.toList());
+//                                    }
+//                            );
+                        }
+
+
+                        if (charMask) {
+                            if (char0 == '$') {
+                                String value = command.substring(1) + ((entry.getValue().isEmpty()) ? ""
+                                        : "[" + StringMan.join(entry.getValue(), "][") + "]");
+                                if (value.contains(":")) {
+                                    if (value.charAt(0) == ':') {
+                                        value.replaceFirst(":", "");
+                                    }
+                                    value = value.replaceAll(":", "][");
+                                }
+                                pattern = parseFromInput(char0 + "[" + value + "]", context);
+                            }
+                        }
+                        if (pattern == null) {
+                            if (command.startsWith("[")) {
+                                int end = command.lastIndexOf(']');
+                                pattern = parseFromInput(command.substring(1, end == -1 ? command.length() : end), context);
+                            } else {
+                                int percentIndex = command.indexOf('%');
+                                if (percentIndex != -1) {  // Legacy percent pattern
+                                    chance = Expression.compile(command.substring(0, percentIndex)).evaluate();
+                                    String value = command.substring(percentIndex + 1);
+                                    if (!entry.getValue().isEmpty()) {
+                                        if (!value.isEmpty()) value += " ";
+                                        value += StringMan.join(entry.getValue(), " ");
+                                    }
+                                    pattern = parseFromInput(value, context);
+                                } else { // legacy block pattern
+                                    try {
+                                        pattern = worldEdit.getBlockFactory().parseFromInput(pe.full, context);
+                                    } catch (NoMatchException e) {
+                                        throw new NoMatchException(e.getMessage() + " See: //patterns");
                                     }
                                 }
-                                return suggestions;
-                            } catch (CommandException e1) {
-                                throw new InputParseException(e1.getMessage());
-                            } catch (Throwable e2) {
-                                e2.printStackTrace();
-                                throw new InputParseException(e2.getMessage());
                             }
-                        });
+                        }
                     }
                 }
                 if (pattern != null) {

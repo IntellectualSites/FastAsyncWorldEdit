@@ -652,14 +652,13 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
                 .changeSetNull()
                 .combineStages(false);
         EditSession editSession = builder.build();
-
-        VisualExtent newVisualExtent = new VisualExtent(builder.getExtent(), builder.getQueue());
+        VisualExtent newVisualExtent = new VisualExtent(editSession, player);
         BlockVector3 position = getPosition(editSession, player);
         if (position != null) {
             editSession.setExtent(newVisualExtent);
             switch (mode) {
                 case POINT:
-                    editSession.setBlock(position, VisualChunk.VISUALIZE_BLOCK);
+                    editSession.setBlock(position, VisualExtent.VISUALIZE_BLOCK_DEFAULT);
                     break;
                 case OUTLINE: {
                     new PatternTraverser(current).reset(editSession);
@@ -670,7 +669,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         }
         if (visualExtent != null) {
             // clear old data
-            visualExtent.clear(newVisualExtent, fp);
+            visualExtent.clear(newVisualExtent, player);
         }
         visualExtent = newVisualExtent;
         newVisualExtent.visualize(fp);

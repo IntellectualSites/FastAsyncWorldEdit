@@ -1,11 +1,13 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.boydti.fawe.command.FaweParser;
+import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.extent.MultiTransform;
 import com.boydti.fawe.object.extent.RandomTransform;
 import com.boydti.fawe.object.extent.ResettableExtent;
 import com.boydti.fawe.object.random.TrueRandom;
 import com.boydti.fawe.util.StringMan;
+import com.google.common.collect.Iterables;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.TransformCommands;
@@ -22,16 +24,7 @@ import java.util.Map;
 public class DefaultTransformParser extends FaweParser<ResettableExtent> {
 
     public DefaultTransformParser(WorldEdit worldEdit) {
-        super(worldEdit);
-        this.register(new TransformCommands());
-    }
-
-
-    public void register(Object clazz) {
-        ParametricBuilder builder = new ParametricBuilder();
-        builder.setAuthorizer(new ActorAuthorizer());
-        builder.addBinding(new WorldEditBinding(worldEdit));
-        builder.registerMethodsAsCommands(dispatcher, clazz);
+        super(worldEdit, ResettableExtent.class);
     }
 
     @Override
@@ -57,49 +50,54 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
                 double chance = 1;
                 if (command.isEmpty()) {
                     transform = parseFromInput(StringMan.join(entry.getValue(), ','), context);
-                } else if (dispatcher.get(command) == null) {
-                    // Legacy syntax
-                    int percentIndex = command.indexOf('%');
-                    if (percentIndex != -1) {  // Legacy percent pattern
-                        chance = Expression.compile(command.substring(0, percentIndex)).evaluate();
-                        command = command.substring(percentIndex + 1);
-                        if (!entry.getValue().isEmpty()) {
-                            if (!command.isEmpty()) command += " ";
-                            command += StringMan.join(entry.getValue(), " ");
-                        }
-                        transform = parseFromInput(command, context);
-                    } else {
-                        throw new NoMatchException("See: //transforms");
-                    }
                 } else {
                     List<String> args = entry.getValue();
-                    if (!args.isEmpty()) {
-                        command += " " + StringMan.join(args, " ");
+                    String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
+                    try {
+                        transform = Iterables.getFirst(parse(cmdArgs, actor), null);
+                    } catch (SuggestInputParseException rethrow) {
+                        throw rethrow;
+                    } catch (Throwable e) {
+                        throw new NoMatchException("See: //transforms");
                     }
-                    transform = (ResettableExtent) dispatcher.call(command, locals, new String[0]);
-                }
-                if (pe.and) { // &
-                    intersectionChances.add(chance);
-                    intersection.add(transform);
-                } else {
-                    if (!intersection.isEmpty()) {
-                        if (intersection.size() == 1) {
-                            throw new InputParseException("Error, floating &");
+                    if (transform == null) {
+                        // Legacy syntax
+                        int percentIndex = command.indexOf('%');
+                        if (percentIndex != -1) {  // Legacy percent pattern
+                            chance = Expression.compile(command.substring(0, percentIndex)).evaluate();
+                            command = command.substring(percentIndex + 1);
+                            if (!entry.getValue().isEmpty()) {
+                                if (!command.isEmpty()) command += " ";
+                                command += StringMan.join(entry.getValue(), " ");
+                            }
+                            transform = parseFromInput(command, context);
+                        } else {
+                            throw new NoMatchException("See: //transforms");
                         }
-                        MultiTransform multi = new MultiTransform();
-                        double total = 0;
-                        for (int i = 0; i < intersection.size(); i++) {
-                            Double value = intersectionChances.get(i);
-                            total += value;
-                            multi.add(intersection.get(i), value);
-                        }
-                        union.add(multi);
-                        unionChances.add(total);
-                        intersection.clear();
-                        intersectionChances.clear();
                     }
-                    unionChances.add(chance);
-                    union.add(transform);
+                    if (pe.and) { // &
+                        intersectionChances.add(chance);
+                        intersection.add(transform);
+                    } else {
+                        if (!intersection.isEmpty()) {
+                            if (intersection.size() == 1) {
+                                throw new InputParseException("Error, floating &");
+                            }
+                            MultiTransform multi = new MultiTransform();
+                            double total = 0;
+                            for (int i = 0; i < intersection.size(); i++) {
+                                Double value = intersectionChances.get(i);
+                                total += value;
+                                multi.add(intersection.get(i), value);
+                            }
+                            union.add(multi);
+                            unionChances.add(total);
+                            intersection.clear();
+                            intersectionChances.clear();
+                        }
+                        unionChances.add(chance);
+                        union.add(transform);
+                    }
                 }
             }
         } catch (Throwable e) {

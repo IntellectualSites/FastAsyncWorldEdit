@@ -60,6 +60,7 @@ public final class FaweCache implements Trimable {
 
         MUTABLE_VECTOR3.clean();
         MUTABLE_BLOCKVECTOR3.clean();
+        SECTION_BITS_TO_CHAR.clean();
         return false;
     }
 
@@ -68,6 +69,14 @@ public final class FaweCache implements Trimable {
         public int[] init() {
             int[] result = new int[BlockTypes.states.length];
             Arrays.fill(result, Integer.MAX_VALUE);
+            return result;
+        }
+    };
+
+    public static final IterableThreadLocal<char[]> SECTION_BITS_TO_CHAR = new IterableThreadLocal<char[]>() {
+        @Override
+        public char[] init() {
+            char[] result = new char[4096];
             return result;
         }
     };

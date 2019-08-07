@@ -2,6 +2,7 @@ package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.WorldChunkCache;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -24,25 +25,54 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
     }
 
     /**
+     * Clear any block updates
+     * @param players
+     */
+    default void clearBlockUpdates(Player... players) {
+        throw new UnsupportedOperationException("TODO NOT IMPLEMENTED");
+    }
+
+    /**
+     * Send all the chunks as block updates
+     * @param players
+     */
+    default void sendBlockUpdates(Player... players) {
+        throw new UnsupportedOperationException("TODO NOT IMPLEMENTED");
+    }
+
+    /**
      * Must ensure that it is enqueued with QueueHandler
      */
     @Override
     void enableQueue();
 
     /**
-     * Must ensure it is not in the queue handler
+     * Must ensure it is not in the queue handler (i.e. does not change blocks in the world)
      */
     @Override
     void disableQueue();
 
-    void init(WorldChunkCache world);
+
+    void init(WorldChunkCache world); // TODO NOT IMPLEMENTED replace with supplier
 
     /**
-     * Get the {@link WorldChunkCache}
-     *
+     * Get the cached get object
+     *  - Faster than getting it using NMS and allows for wrapping
+     * @param x
+     * @param z
+     * @param supplier
      * @return
      */
     IChunkGet getCachedGet(int x, int z, Supplier<IChunkGet> supplier);
+
+    /**
+     * Get the cached chunk set object
+     * @param x
+     * @param z
+     * @param supplier
+     * @return
+     */
+    IChunkSet getCachedSet(int x, int z, Supplier<IChunkSet> supplier);
 
     /**
      * Get the IChunk at a position (and cache it if it's not already)
@@ -60,6 +90,8 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      * @return result
      */
     <T extends Future<T>> T submit(IChunk<T> chunk);
+
+    // standard get / set
 
     @Override
     default boolean setBlock(int x, int y, int z, BlockStateHolder state) {
@@ -126,11 +158,31 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
     @Override
     void flush();
 
+    /**
+     * A filter block is used to iterate over blocks / positions
+     *  - Essentially combines BlockVector3, Extent and BlockState functions in a way that avoids lookups
+     * @return
+     */
     ChunkFilterBlock initFilterBlock();
 
+    /**
+     * Number of chunks in queue
+     * @return
+     */
     int size();
 
+    /**
+     * @return If queue is empty
+     */
     boolean isEmpty();
 
+    /**
+     * Refresh a specific chunk with a bitMask (0 = default, 65535 = all block sections)
+     * Note: only 0 is guaranteed to send all tiles / entities
+     * Note: Only 65535 is guaranteed to send all blocks
+     * @param chunkX
+     * @param chunkZ
+     * @param bitMask
+     */
     void sendChunk(int chunkX, int chunkZ, int bitMask);
 }

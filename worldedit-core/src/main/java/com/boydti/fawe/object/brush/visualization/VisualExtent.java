@@ -5,30 +5,38 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.util.MathMan;
 
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
+import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.Future;
 
 public class VisualExtent extends AbstractDelegateExtent {
+    public static final BlockType VISUALIZE_BLOCK_DEFAULT = BlockTypes.BLACK_STAINED_GLASS;
+    private final BlockType visualizeBlock;
+    private final Player player;
 
-    private final IQueueExtent queue;
-    private Long2ObjectMap<VisualChunk> chunks = new Long2ObjectOpenHashMap<>();
-
-    public VisualExtent(Extent parent, IQueueExtent queue) {
-        super(parent);
-        this.queue = queue;
+    public VisualExtent(IQueueExtent parent, Player player) {
+        this(parent, player, VISUALIZE_BLOCK_DEFAULT);
     }
 
-    public VisualChunk getChunk(int cx, int cz) {
-        return chunks.get(MathMan.pairInt(cx, cz));
+    public VisualExtent(IQueueExtent parent, Player player, BlockType visualizeBlock) {
+        super(parent);
+        this.visualizeBlock = visualizeBlock;
+        this.player = player;
     }
 
     @Override
@@ -38,24 +46,19 @@ public class VisualExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockStateHolder block) throws WorldEditException {
-        BlockStateHolder previous = super.getBlock(x, y, z);
-        int cx = x >> 4;
-        int cz = z >> 4;
-        long chunkPair = MathMan.pairInt(cx, cz);
-        VisualChunk chunk = chunks.get(chunkPair);
-        if (previous.equals(block)) {
-            if (chunk != null) {
-                chunk.unset(x, y, z);
-            }
-            return false;
+        if (block.getMaterial().isAir()) {
+            return super.setBlock(x, y, z, block);
         } else {
-            if (chunk == null) {
-                chunk = new VisualChunk(cx, cz);
-                chunks.put(chunkPair, chunk);
-            }
-            chunk.setBlock(x, y, z, block.getInternalId());
-            return true;
+            return super.setBlock(x, y, z, visualizeBlock.getDefaultState());
         }
+    }
+
+    @Nullable
+    @Override
+    public Operation commit() {
+        IQueueExtent queue = (IQueueExtent) getExtent();
+        queue.sendBlockUpdates(this.player);
+        return null;
     }
 
     @Override
@@ -64,42 +67,9 @@ public class VisualExtent extends AbstractDelegateExtent {
         return false;
     }
 
-    public void clear(VisualExtent other, FawePlayer... players) {
-        for (Long2ObjectMap.Entry<VisualChunk> entry : chunks.long2ObjectEntrySet()) {
-            long pair = entry.getLongKey();
-            int cx = MathMan.unpairIntX(pair);
-            int cz = MathMan.unpairIntY(pair);
-            VisualChunk chunk = entry.getValue();
-            final VisualChunk otherChunk = other != null ? other.getChunk(cx, cz) : null;
-            final IntFaweChunk newChunk = new NullQueueIntFaweChunk(cx, cz);
-            final int bx = cx << 4;
-            final int bz = cz << 4;
-            if (otherChunk == null) {
-                chunk.forEachQueuedBlock((localX, y, localZ, combined) -> {
-                    combined = queue.getCombinedId4Data(bx + localX, y, bz + localZ, 0);
-                    newChunk.setBlock(localX, y, localZ, combined);
-                });
-            } else {
-                chunk.forEachQueuedBlock((localX, y, localZ, combined) -> {
-                    if (combined != otherChunk.getBlockCombinedId(localX, y, localZ)) {
-                        combined = queue.getCombinedId4Data(bx + localX, y, bz + localZ, 0);
-                        newChunk.setBlock(localX, y, localZ, combined);
-                    }
-                });
-            }
-            if (newChunk.getTotalCount() != 0) {
-                queue.sendBlockUpdate(newChunk, players);
-            }
-        }
-    }
-
-    public void visualize(FawePlayer players) {
-        for (VisualChunk chunk : chunks.values()) {
-            queue.sendBlockUpdate(chunk, players);
-        }
-    }
-
-    public Future sendChunkUpdate(VisualChunk visualChunk) {
-        return null; // TODO NOT IMPLEMENTED
+    public void clear() {
+        IQueueExtent queue = (IQueueExtent) getExtent();
+        queue.clearBlockUpdates(player);
+        queue.cancel();
     }
 }

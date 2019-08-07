@@ -12,17 +12,15 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 import java.util.*;
 
 public abstract class FaweParser<T> extends InputParser<T> {
-    private final PlatformCommandManager platform;
     private final Class<T> type;
 
-    protected FaweParser(WorldEdit worldEdit, PlatformCommandManager commandManager, Class<T> type) {
+    protected FaweParser(WorldEdit worldEdit, Class<T> type) {
         super(worldEdit);
-        this.platform = commandManager;
         this.type = type;
     }
 
     public PlatformCommandManager getPlatform() {
-        return platform;
+        return PlatformCommandManager.getInstance();
     }
 
     public Class<T> getType() {

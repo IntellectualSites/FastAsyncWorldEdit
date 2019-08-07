@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks
  */
-public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
+public abstract class ChunkHolder implements IChunk {
 
     public static final IBlockDelegate BOTH = new IBlockDelegate() {
         @Override
@@ -242,33 +242,69 @@ public abstract class ChunkHolder implements IChunk, Supplier<IChunkGet> {
         return set == null || set.isEmpty();
     }
 
+    /**
+     * Get or create the settable part of this chunk
+     * @return
+     */
     public final IChunkGet getOrCreateGet() {
         if (get == null) {
-            get = newGet();
+            get = newWrappedGet();
         }
         return get;
     }
 
+    /**
+     * Get or create the settable part of this chunk
+     * @return
+     */
     public final IChunkSet getOrCreateSet() {
         if (set == null) {
-            set = set();
+            set = newWrappedSet();
         }
         return set;
     }
 
-    public IChunkSet set() {
+    /**
+     * Create the settable part of this chunk (defaults to a char array)
+     * @return
+     */
+    public IChunkSet createSet() {
         return new CharSetBlocks();
     }
 
-    private IChunkGet newGet() {
+    /**
+     * Create a wrapped set object
+     *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
+     *  - E.g. caching, optimizations, filtering
+     * @return
+     */
+    private IChunkSet newWrappedSet() {
         if (extent instanceof SingleThreadQueueExtent) {
-            IChunkGet newGet = extent.getCachedGet(chunkX, chunkZ, this);
+            IChunkSet newSet = extent.getCachedSet(chunkX, chunkZ, this::createSet);
+            if (newSet != null) {
+                return newSet;
+            }
+        }
+        return createSet();
+    }
+
+    /**
+     * Create a wrapped get object
+     *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
+     *  - E.g. caching, optimizations, filtering
+     * @return
+     */
+    private IChunkGet newWrappedGet() {
+        if (extent instanceof SingleThreadQueueExtent) {
+            IChunkGet newGet = extent.getCachedGet(chunkX, chunkZ, this::get);
             if (newGet != null) {
                 return newGet;
             }
         }
         return get();
     }
+
+    public abstract IChunkGet get();
 
     @Override
     public void init(IQueueExtent extent, int chunkX, int chunkZ) {

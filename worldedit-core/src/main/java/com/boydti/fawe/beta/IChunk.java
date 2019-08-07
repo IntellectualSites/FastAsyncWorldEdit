@@ -19,17 +19,30 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
 
     /**
      * Initialize at the location
-     *
+     * (allows for reuse)
+     *  - It's expected initialization will clear any set fields
      * @param extent
      * @param x
      * @param z
      */
     void init(IQueueExtent extent, int x, int z);
 
+    /**
+     * Get the queue
+     * @return
+     */
     IQueueExtent getQueue();
 
+    /**
+     * Get chunkX
+     * @return
+     */
     int getX();
 
+    /**
+     * Get chunkZ
+     * @return
+     */
     int getZ();
 
     /**
@@ -53,14 +66,14 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
      * <p>The future returned may return another future. To ensure completion keep calling {@link
      * Future#get()} on each result.</p>
      *
-     * @return Futures
+     * @return Future
      */
     @Override
     T call();
 
     /**
      * Call and join
-     *
+     * - Should be done async, if at all
      * @throws ExecutionException
      * @throws InterruptedException
      */
@@ -73,7 +86,7 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     }
 
     /**
-     * Filter
+     * Filter through all the blocks in the chunk
      *
      * @param filter the filter
      * @param block  The filter block
@@ -81,6 +94,13 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
      */
     void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region);
 
+    /**
+     * Flood through all the blocks in the chunk
+     * TODO not implemented
+     * @param flood
+     * @param mask
+     * @param block
+     */
     void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block);
 
     /* set - queues a change */
@@ -100,6 +120,10 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     @Override
     CompoundTag getTag(int x, int y, int z);
 
+    /**
+     * Reset (defaults to just calling init)
+     * @return
+     */
     @Override
     default IBlocks reset() {
         init(getQueue(), getX(), getZ());
