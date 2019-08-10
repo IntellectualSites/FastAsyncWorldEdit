@@ -104,7 +104,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public String getWorld() {
-        return IMP.getWorld().getName();
+        return IMP.getId();
     }
 
     @Override

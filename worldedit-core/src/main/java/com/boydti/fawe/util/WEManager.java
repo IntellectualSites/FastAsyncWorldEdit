@@ -165,49 +165,4 @@ public class WEManager {
         }
         return false;
     }
-
-    public boolean delay(FawePlayer<?> player, String command) {
-        final long start = System.currentTimeMillis();
-        return this.delay(player, () -> {
-            try {
-                if (System.currentTimeMillis() - start > 1000) {
-                    BBC.WORLDEDIT_RUN.send(FawePlayer.wrap(player));
-                }
-                TaskManager.IMP.task(() -> {
-                    final long start1 = System.currentTimeMillis();
-                    player.executeCommand(command.substring(1));
-                    TaskManager.IMP.later(() -> SetQueue.IMP.addEmptyTask(() -> {
-                        if (System.currentTimeMillis() - start1 > 1000) {
-                            BBC.WORLDEDIT_COMPLETE.send(FawePlayer.wrap(player));
-                        }
-                    }), 2);
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, false, false);
-    }
-
-    public boolean delay(FawePlayer<?> player, Runnable whenDone, boolean delayed, boolean onlyDelayedExecution) {
-        final boolean free = SetQueue.IMP.addEmptyTask(null);
-        if (free) {
-            if (delayed) {
-                if (whenDone != null) {
-                    whenDone.run();
-                }
-            } else {
-                if (whenDone != null && !onlyDelayedExecution) {
-                    whenDone.run();
-                } else {
-                    return false;
-                }
-            }
-        } else {
-            if (!delayed && player != null) {
-                BBC.WORLDEDIT_DELAYED.send(player);
-            }
-            SetQueue.IMP.addEmptyTask(whenDone);
-        }
-        return true;
-    }
 }

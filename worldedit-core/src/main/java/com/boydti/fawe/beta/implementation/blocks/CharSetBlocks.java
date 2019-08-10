@@ -77,12 +77,13 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void setTile(int x, int y, int z, CompoundTag tile) {
+    public boolean setTile(int x, int y, int z, CompoundTag tile) {
         if (tiles == null) {
             tiles = new HashMap<>();
         }
         final short pair = MathMan.tripleBlockCoord(x, y, z);
         tiles.put(pair, tile);
+        return true;
     }
 
     @Override

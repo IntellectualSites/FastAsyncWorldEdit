@@ -123,10 +123,7 @@ public class AbstractDelegateExtent implements Extent, LightingExtent {
         }
     }
 
-    @Override
-    public World getWorld() {
-        return getExtent().getWorld();
-    }
+
 
     /*
         Bounds

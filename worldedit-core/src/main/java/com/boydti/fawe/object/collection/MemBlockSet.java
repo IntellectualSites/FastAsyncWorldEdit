@@ -827,6 +827,10 @@ public final class MemBlockSet extends BlockSet {
             reset();
         }
 
+        public IRow getRow(int i) {
+            return rows[i];
+        }
+
         @Override
         public boolean get(IRow[] parent, int x, int y, int z) {
             return rows[y >> 4].get(this.rows, x, y, z);
@@ -871,6 +875,10 @@ public final class MemBlockSet extends BlockSet {
 
         public RowY() {
             this.bits = new long[WORDS];
+        }
+
+        public long[] getBits() {
+            return bits;
         }
 
         @Override

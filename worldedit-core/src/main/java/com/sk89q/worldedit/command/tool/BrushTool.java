@@ -31,7 +31,6 @@ import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.TargetMode;
 import com.boydti.fawe.object.brush.scroll.ScrollAction;
 import com.boydti.fawe.object.brush.scroll.ScrollTool;
-import com.boydti.fawe.object.brush.visualization.VisualChunk;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.brush.visualization.VisualMode;
 import com.boydti.fawe.object.extent.ResettableExtent;
@@ -48,7 +47,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.MaxBrushRadiusException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -669,17 +667,17 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
         }
         if (visualExtent != null) {
             // clear old data
-            visualExtent.clear(newVisualExtent, player);
+            visualExtent.clear();
         }
         visualExtent = newVisualExtent;
-        newVisualExtent.visualize(fp);
+        newVisualExtent.commit();
     }
 
     public void clear(Player player) {
         FawePlayer<Object> fp = FawePlayer.wrap(player);
         Fawe.get().getVisualQueue().dequeue(fp);
         if (visualExtent != null) {
-            visualExtent.clear(null, fp);
+            visualExtent.clear();
         }
     }
 

@@ -77,44 +77,44 @@ public class FaweAPI {
         return TaskManager.IMP;
     }
 
-    /**
-     * Add a custom mask for use in e.g {@literal //mask #id:<input>}
-     *
-     * @param methods The class with a bunch of mask methods
-     * @return true if the mask was registered
-     * @see com.sk89q.worldedit.command.MaskCommands
-     */
-    public static boolean registerMasks(Object methods) {
-        DefaultMaskParser parser = getParser(DefaultMaskParser.class);
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
-
-    /**
-     * Add a custom material for use in e.g {@literal //material #id:<input>}
-     *
-     * @param methods The class with a bunch of pattern methods
-     * @return true if the mask was registered
-     * @see com.sk89q.worldedit.command.PatternCommands
-     */
-    public static boolean registerPatterns(Object methods) {
-        DefaultPatternParser parser = getParser(DefaultPatternParser.class);
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
-
-    /**
-     * Add a custom transform for use in
-     *
-     * @param methods The class with a bunch of transform methods
-     * @return true if the transform was registered
-     * @see com.sk89q.worldedit.command.TransformCommands
-     */
-    public static boolean registerTransforms(Object methods) {
-        DefaultTransformParser parser = Fawe.get().getTransformParser();
-        if (parser != null) parser.register(methods);
-        return parser != null;
-    }
+//    /**
+//     * Add a custom mask for use in e.g {@literal //mask #id:<input>}
+//     *
+//     * @param methods The class with a bunch of mask methods
+//     * @return true if the mask was registered
+//     * @see com.sk89q.worldedit.command.MaskCommands
+//     */
+//    public static boolean registerMasks(Object methods) {
+//        DefaultMaskParser parser = getParser(DefaultMaskParser.class);
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
+//
+//    /**
+//     * Add a custom material for use in e.g {@literal //material #id:<input>}
+//     *
+//     * @param methods The class with a bunch of pattern methods
+//     * @return true if the mask was registered
+//     * @see com.sk89q.worldedit.command.PatternCommands
+//     */
+//    public static boolean registerPatterns(Object methods) {
+//        DefaultPatternParser parser = getParser(DefaultPatternParser.class);
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
+//
+//    /**
+//     * Add a custom transform for use in
+//     *
+//     * @param methods The class with a bunch of transform methods
+//     * @return true if the transform was registered
+//     * @see com.sk89q.worldedit.command.TransformCommands
+//     */
+//    public static boolean registerTransforms(Object methods) {
+//        DefaultTransformParser parser = Fawe.get().getTransformParser();
+//        if (parser != null) parser.register(methods);
+//        return parser != null;
+//    }
 
     public static <T> T getParser(Class<T> parserClass) {
         try {

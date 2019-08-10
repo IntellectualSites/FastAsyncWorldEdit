@@ -22,6 +22,7 @@ import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.image.Drawable;
 import com.boydti.fawe.util.image.ImageViewer;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
@@ -1929,6 +1930,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     // These aren't implemented yet...
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return false;
+    }
+
     @Override
     public int getBlockLightLevel(BlockVector3 position) {
         return 0;

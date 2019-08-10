@@ -52,6 +52,7 @@ import com.sk89q.worldedit.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -609,7 +610,7 @@ public interface Extent extends InputExtent, OutputExtent {
 
         Vector3 center = region.getCenter();
         Region centerRegion = new CuboidRegion(
-                getWorld(), // Causes clamping of Y range
+                this instanceof World ? (World) this : null, // Causes clamping of Y range
                 BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
                 BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
                         center.getY(), MathUtils.roundHalfUp(center.getZ())));

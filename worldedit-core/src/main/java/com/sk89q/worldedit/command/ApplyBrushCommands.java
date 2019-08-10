@@ -40,6 +40,8 @@ import com.sk89q.worldedit.function.factory.Apply;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
+import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.internal.expression.runtime.Constant;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -96,7 +98,7 @@ public class ApplyBrushCommands {
                                Contextual<? extends RegionFunction> generatorFactory) throws WorldEditException {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));
         RegionFactory regionFactory = REGION_FACTORY.value(parameters).asSingle(RegionFactory.class);
-        BrushCommands.setOperationBasedBrush(player, localSession, radius,
+        BrushCommands.setOperationBasedBrush(player, localSession, new Expression(radius),
             new Apply(generatorFactory), regionFactory, "worldedit.brush.apply");
     }
 

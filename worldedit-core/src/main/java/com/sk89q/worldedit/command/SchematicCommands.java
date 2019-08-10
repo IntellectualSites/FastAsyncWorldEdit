@@ -38,7 +38,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.event.extent.PlayerSaveClipboardEvent;
+import com.sk89q.worldedit.event.extent.ActorSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -698,7 +698,7 @@ public class SchematicCommands {
                 if (holder instanceof URIClipboardHolder) {
                     uri = ((URIClipboardHolder) holder).getURI(clipboard);
                 }
-                if (new PlayerSaveClipboardEvent(player, clipboard, uri, file.toURI()).call()) {
+                if (new ActorSaveClipboardEvent(actor, clipboard, uri, file.toURI()).call()) {
                     if (writer instanceof MinecraftStructure) {
                         ((MinecraftStructure) writer).write(target, actor.getName());
                     } else {

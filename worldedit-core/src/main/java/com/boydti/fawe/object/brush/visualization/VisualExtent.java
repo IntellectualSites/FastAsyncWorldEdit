@@ -29,11 +29,11 @@ public class VisualExtent extends AbstractDelegateExtent {
     private final BlockType visualizeBlock;
     private final Player player;
 
-    public VisualExtent(IQueueExtent parent, Player player) {
+    public VisualExtent(Extent parent, Player player) {
         this(parent, player, VISUALIZE_BLOCK_DEFAULT);
     }
 
-    public VisualExtent(IQueueExtent parent, Player player, BlockType visualizeBlock) {
+    public VisualExtent(Extent parent, Player player, BlockType visualizeBlock) {
         super(parent);
         this.visualizeBlock = visualizeBlock;
         this.player = player;

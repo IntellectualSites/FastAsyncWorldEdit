@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.session.request;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -93,6 +94,11 @@ public class RequestExtent implements Extent {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         return getExtent().setBlock(position, block);
+    }
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return getExtent().setTile(x, y, z, tile);
     }
 
     @Override

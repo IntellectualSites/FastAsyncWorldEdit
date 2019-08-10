@@ -1,6 +1,7 @@
 package com.boydti.fawe.beta;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -53,6 +54,12 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     @Override
     public BlockState getBlock(int x, int y, int z) {
         return getExtent().getBlock(x, y, z);
+    }
+
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return getExtent().setTile(x, y, z, tile);
     }
 
     @Override

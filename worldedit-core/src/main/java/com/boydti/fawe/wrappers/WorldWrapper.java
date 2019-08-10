@@ -3,6 +3,7 @@ package com.boydti.fawe.wrappers;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -72,6 +73,11 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public boolean setBlock(BlockVector3 position, BlockStateHolder block, boolean notifyAndLight) throws WorldEditException {
         return parent.setBlock(position, block, notifyAndLight);
+    }
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return parent.setTile(x, y, z, tile);
     }
 
     @Override

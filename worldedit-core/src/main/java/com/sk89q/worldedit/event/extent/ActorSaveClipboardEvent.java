@@ -3,18 +3,19 @@ package com.sk89q.worldedit.event.extent;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.Cancellable;
 import com.sk89q.worldedit.event.Event;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 
 import java.net.URI;
 
-public class PlayerSaveClipboardEvent extends Event implements Cancellable {
-    private final Player player;
+public class ActorSaveClipboardEvent extends Event implements Cancellable {
+    private final Actor actor;
     private final Clipboard clipboard;
     private final URI source, destination;
     private boolean cancelled;
 
-    public PlayerSaveClipboardEvent(Player player, Clipboard clipboard, URI source, URI destination) {
-        this.player = player;
+    public ActorSaveClipboardEvent(Actor actor, Clipboard clipboard, URI source, URI destination) {
+        this.actor = actor;
         this.clipboard = clipboard;
         this.source = source;
         this.destination = destination;
@@ -42,7 +43,7 @@ public class PlayerSaveClipboardEvent extends Event implements Cancellable {
         return clipboard;
     }
 
-    public Player getPlayer() {
-        return player;
+    public Actor getActor() {
+        return actor;
     }
 }

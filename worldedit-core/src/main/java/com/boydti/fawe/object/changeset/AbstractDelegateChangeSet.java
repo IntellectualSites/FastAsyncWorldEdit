@@ -4,6 +4,7 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -17,20 +18,21 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.util.Iterator;
+import java.util.UUID;
+import java.util.concurrent.Future;
 
 public class AbstractDelegateChangeSet extends FaweChangeSet {
     public final FaweChangeSet parent;
+
+    public static FaweChangeSet getDefaultChangeSet(World world, UUID uuid) {
+        return FaweChangeSet.getDefaultChangeSet(world, uuid);
+    }
 
     public AbstractDelegateChangeSet(FaweChangeSet parent) {
         super(parent.getWorld());
         this.parent = parent;
         this.waitingCombined = parent.waitingCombined;
         this.waitingAsync = parent.waitingAsync;
-    }
-
-    @Override
-    public void addChangeTask(IQueueExtent queue) {
-        super.addChangeTask(queue);
     }
 
     @Override
@@ -61,6 +63,11 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     @Deprecated
     public boolean flushAsync() {
         return parent.flushAsync();
+    }
+
+    @Override
+    public boolean closeAsync() {
+        return parent.closeAsync();
     }
 
     @Override
@@ -129,6 +136,11 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
+    public EditSession toEditSession(FawePlayer player, Region[] regions) {
+        return parent.toEditSession(player, regions);
+    }
+
+    @Override
     public void add(EntityCreate change) {
         parent.add(change);
     }
@@ -169,14 +181,22 @@ public class AbstractDelegateChangeSet extends FaweChangeSet {
     }
 
     @Override
+    public Future<?> addWriteTask(Runnable writeTask) {
+        return parent.addWriteTask(writeTask);
+    }
+
+    @Override
+    public Future<?> addWriteTask(Runnable writeTask, boolean completeNow) {
+        return parent.addWriteTask(writeTask, completeNow);
+    }
+
+    @Override
     public boolean isRecordingChanges() {
-        // TODO Auto-generated method stub
-        return false;
+        return parent.isRecordingChanges();
     }
 
     @Override
     public void setRecordChanges(boolean recordChanges) {
-        // TODO Auto-generated method stub
-
+        parent.setRecordChanges(recordChanges);
     }
 }

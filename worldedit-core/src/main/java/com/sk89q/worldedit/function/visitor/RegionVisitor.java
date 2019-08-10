@@ -59,9 +59,6 @@ public class RegionVisitor implements Operation {
         this.iterable = iterable;
     }
 
-    public RegionVisitor(Region region, RegionFunction regionFunction, EditSession editSession) {
-    }
-
     /**
      * Get the number of affected objects.
      *

@@ -255,11 +255,6 @@ public class NullExtent extends FaweRegionExtent {
     }
 
     @Override
-    public World getWorld() {
-        throw reason;
-    }
-
-    @Override
     public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
         throw reason;
     }

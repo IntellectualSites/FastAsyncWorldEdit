@@ -34,8 +34,8 @@ public interface DelegateChunkSet extends IChunkSet {
     }
 
     @Override
-    default void setTile(int x, int y, int z, CompoundTag tile) {
-        getParent().setTile(x, y, z, tile);
+    default boolean setTile(int x, int y, int z, CompoundTag tile) {
+        return getParent().setTile(x, y, z, tile);
     }
 
     @Override

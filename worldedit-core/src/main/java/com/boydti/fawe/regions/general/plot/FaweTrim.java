@@ -40,11 +40,12 @@ public class FaweTrim extends SubCommand {
             @Override
             public void run() {
                 try {
-                    PlotTrim trim = new PlotTrim(plotPlayer, plotPlayer.getPlotAreaAbs(), strings[0], Boolean.parseBoolean(strings[1]));
-                    Location loc = plotPlayer.getLocation();
-                    trim.setChunk(loc.getX() >> 4, loc.getZ() >> 4);
-                    trim.run();
-                    plotPlayer.sendMessage("Done!");
+                    // TODO NOT IMPLEMENTED
+//                    PlotTrim trim = new PlotTrim(plotPlayer, plotPlayer.getPlotAreaAbs(), strings[0], Boolean.parseBoolean(strings[1]));
+//                    Location loc = plotPlayer.getLocation();
+//                    trim.setChunk(loc.getX() >> 4, loc.getZ() >> 4);
+//                    trim.run();
+//                    plotPlayer.sendMessage("Done!");
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }

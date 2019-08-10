@@ -7,6 +7,8 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -39,7 +41,8 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public void setTile(int x, int y, int z, CompoundTag tile) {
+    public boolean setTile(int x, int y, int z, CompoundTag tile) {
+        return false;
     }
 
     @Override
@@ -61,7 +64,32 @@ public class BitSetBlocks implements IChunkSet {
     @Override
     public char[] getArray(int layer) {
         char[] arr = FaweCache.SECTION_BITS_TO_CHAR.get();
-        
+        MemBlockSet.IRow nullRowY = row.getRow(layer);
+        if (nullRowY instanceof MemBlockSet.RowY) {
+            char value = blockState.getOrdinalChar();
+            MemBlockSet.RowY rowY = (MemBlockSet.RowY) nullRowY;
+            long[] bits = rowY.getBits();
+            for (int y = 0, longIndex = 0, blockIndex = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z += 4, longIndex++, blockIndex += 64) {
+                    long bitBuffer = bits[longIndex];
+                    if (bitBuffer != 0) {
+                        if (bitBuffer == -1L) {
+                            Arrays.fill(arr, blockIndex, blockIndex + 64, value);
+                            continue;
+                        }
+                        Arrays.fill(arr, Character.MIN_VALUE);
+                        do {
+                            final long lowBit = Long.lowestOneBit(bitBuffer);
+                            final int bitIndex = Long.bitCount(lowBit - 1);
+                            arr[blockIndex + bitIndex] = value;
+                            bitBuffer = bitBuffer ^ lowBit;
+                        } while (bitBuffer != 0);
+                    }
+
+                }
+            }
+        }
+        return arr;
     }
 
     @Override

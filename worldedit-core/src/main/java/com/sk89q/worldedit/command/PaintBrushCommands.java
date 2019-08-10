@@ -37,6 +37,7 @@ import com.sk89q.worldedit.function.factory.Paint;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
+import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -103,7 +104,7 @@ public class PaintBrushCommands {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));
         double density = requireNonNull(DENSITY.value(parameters).asSingle(double.class)) / 100;
         RegionFactory regionFactory = REGION_FACTORY.value(parameters).asSingle(RegionFactory.class);
-        BrushCommands.setOperationBasedBrush(player, localSession, radius,
+        BrushCommands.setOperationBasedBrush(player, localSession, new Expression(radius),
             new Paint(generatorFactory, density), regionFactory, "worldedit.brush.paint");
     }
 

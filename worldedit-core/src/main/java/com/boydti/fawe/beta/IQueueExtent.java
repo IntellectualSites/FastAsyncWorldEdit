@@ -5,6 +5,7 @@ import com.boydti.fawe.beta.implementation.WorldChunkCache;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -17,7 +18,7 @@ import java.util.function.Supplier;
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
  * uses chunks
  */
-public interface IQueueExtent extends Flushable, Trimable, Extent {
+public interface IQueueExtent extends Flushable, Trimable, Extent, Keyed {
 
     @Override
     default boolean isQueueEnabled() {
