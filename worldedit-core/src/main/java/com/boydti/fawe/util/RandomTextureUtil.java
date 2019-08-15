@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.sk89q.worldedit.world.block.BlockType;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import java.io.FileNotFoundException;
@@ -80,7 +81,7 @@ public class RandomTextureUtil extends CachedTextureUtil {
 
     @Override
     public BlockType getNearestBlock(int color) {
-        int offsetColor = offsets.getOrDefault(color, 0);
+        int offsetColor = offsets.getOrDefault((Object) color, 0);
         if (offsetColor != 0) {
             offsetColor = addRandomColor(color, offsetColor);
         } else {

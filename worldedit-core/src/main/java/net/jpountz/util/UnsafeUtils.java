@@ -43,11 +43,7 @@ public enum UnsafeUtils {
             INT_ARRAY_SCALE = UNSAFE.arrayIndexScale(int[].class);
             SHORT_ARRAY_OFFSET = UNSAFE.arrayBaseOffset(short[].class);
             SHORT_ARRAY_SCALE = UNSAFE.arrayIndexScale(short[].class);
-        } catch (IllegalAccessException e) {
-            throw new ExceptionInInitializerError("Cannot access Unsafe");
-        } catch (NoSuchFieldException e) {
-            throw new ExceptionInInitializerError("Cannot access Unsafe");
-        } catch (SecurityException e) {
+        } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
             throw new ExceptionInInitializerError("Cannot access Unsafe");
         }
     }

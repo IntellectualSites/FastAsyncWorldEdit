@@ -56,7 +56,7 @@ public class BlocksMaskParser extends InputParser<Mask> {
             if (holders.isEmpty()) {
                 return null;
             }
-            return new BlockMask(new RequestExtent(), holders);
+            return new BlockMask(context.getExtent(), holders);
         } catch (NoMatchException e) {
             return null;
         }

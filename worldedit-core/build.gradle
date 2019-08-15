@@ -15,6 +15,9 @@ configurations.all { Configuration it ->
     it.resolutionStrategy { ResolutionStrategy rs ->
         rs.force("com.google.guava:guava:21.0")
     }
+    it.resolutionStrategy { ResolutionStrategy rs ->
+        rs.force("it.unimi.dsi:fastutil:8.2.1")
+    }
 }
 
 dependencies {
@@ -28,6 +31,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.slf4j:slf4j-api:1.7.26'
+    compile "it.unimi.dsi:fastutil:8.2.1"
 
     compileOnly project(':worldedit-libs:core:ap')
     annotationProcessor project(':worldedit-libs:core:ap')

@@ -13,6 +13,9 @@ configurations.all { Configuration it ->
     it.resolutionStrategy { ResolutionStrategy rs ->
         rs.force("com.google.guava:guava:21.0")
     }
+    it.resolutionStrategy { ResolutionStrategy rs ->
+        rs.force("it.unimi.dsi:fastutil:8.2.1")
+    }
 }
 
 dependencies {
@@ -21,10 +24,11 @@ dependencies {
     api project(':worldedit-libs:core') // TODO remove once core can compile
     api project(':worldedit-libs:bukkit')
     compileOnly 'com.sk89q:dummypermscompat:1.10'
+    compile "it.unimi.dsi:fastutil:8.2.1"
     testCompile 'org.mockito:mockito-core:1.9.0-rc1'
     implementation('org.apache.logging.log4j:log4j-slf4j-impl:2.8.1'){transitive = false}
-    compileOnly 'com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT'
-    implementation('io.papermc:paperlib:1.0.2'){transitive = false}
+    implementation 'com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT'
+    implementation('io.papermc:paperlib:1.0.2')
     compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-SNAPSHOT'
     compileOnly 'BuildTools:lastSuccessfulBuild:spigot-1.14.4@jar'
     implementation('com.sk89q.worldguard:worldguard-core:7.0.0-20190215.210421-39'){transitive = false}
@@ -41,6 +45,12 @@ dependencies {
     implementation('com.thevoxelbox.voxelsniper:voxelsniper:5.171.0'){transitive = false}
     implementation('com.comphenix.protocol:ProtocolLib-API:4.4.0-SNAPSHOT'){transitive = false}
     implementation('com.wasteofplastic:askyblock:3.0.8.2'){transitive = false}
+}
+
+shadowJar {
+    relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
+        include("it.unimi.dsi:fastutil")
+    }
 }
 
 processResources {

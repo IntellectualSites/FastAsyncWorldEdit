@@ -54,7 +54,7 @@ public class BlockCategoryMaskParser extends InputParser<Mask> {
         if (category == null) {
             throw new InputParseException("Unrecognised tag '" + input.substring(2) + '\'');
         } else {
-            return new BlockCategoryMask(new RequestExtent(), category);
+            return new BlockCategoryMask(context.getExtent(), category);
         }
     }
 }
