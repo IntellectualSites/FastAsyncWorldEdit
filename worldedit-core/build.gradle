@@ -50,6 +50,11 @@ dependencies {
     compile 'com.mojang:datafixerupper:1.0.20'
     compile 'com.github.luben:zstd-jni:1.1.1'
     compile 'co.aikar:fastutil-lite:1.0'
+    testImplementation ("org.junit.jupiter:junit-jupiter-api:5.5.0")
+    testImplementation ("org.junit.jupiter:junit-jupiter-params:5.5.0")
+    testImplementation ("org.mockito:mockito-core:3.0.0")
+    testImplementation ("org.mockito:mockito-junit-jupiter:3.0.0")
+    testRuntime ("org.junit.jupiter:junit-jupiter-engine:5.5.0")
 }
 
 tasks.withType(JavaCompile).configureEach {
