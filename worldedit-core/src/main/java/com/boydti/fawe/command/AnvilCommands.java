@@ -475,7 +475,7 @@ public class AnvilCommands {
 //        });
 //        if (useData) {
 //            for (long[] c : map) {
-//                BaseBlock block = FaweCache.CACHE_BLOCK[(int) c[0]];
+//                BaseBlock block = FaweCache.IMP.CACHE_BLOCK[(int) c[0]];
 //                String name = BlockType.fromID(block.getId()).getName();
 //                String str = String.format("%-7s (%.3f%%) %s #%d:%d",
 //                        String.valueOf(c[1]),

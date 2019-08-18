@@ -1,24 +1,24 @@
 package com.boydti.fawe.beta;
 
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.WorldChunkCache;
+import com.boydti.fawe.beta.implementation.IChunkCache;
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.io.Flushable;
 import java.util.concurrent.Future;
-import java.util.function.Supplier;
 
 /**
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
  * uses chunks
  */
-public interface IQueueExtent extends Flushable, Trimable, Extent, Keyed {
+public interface IQueueExtent extends Flushable, Trimable, Extent {
 
     @Override
     default boolean isQueueEnabled() {
@@ -54,7 +54,7 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, Keyed {
     void disableQueue();
 
 
-    void init(WorldChunkCache world); // TODO NOT IMPLEMENTED replace with supplier
+    void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set);
 
     /**
      * Get the cached get object
@@ -64,7 +64,7 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, Keyed {
      * @param supplier
      * @return
      */
-    IChunkGet getCachedGet(int x, int z, Supplier<IChunkGet> supplier);
+    IChunkGet getCachedGet(int x, int z);
 
     /**
      * Get the cached chunk set object
@@ -73,7 +73,7 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, Keyed {
      * @param supplier
      * @return
      */
-    IChunkSet getCachedSet(int x, int z, Supplier<IChunkSet> supplier);
+    IChunkSet getCachedSet(int x, int z);
 
     /**
      * Get the IChunk at a position (and cache it if it's not already)
@@ -98,6 +98,12 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, Keyed {
     default boolean setBlock(int x, int y, int z, BlockStateHolder state) {
         final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
         return chunk.setBlock(x & 15, y, z & 15, state);
+    }
+
+    @Override
+    default boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        final IChunk chunk = getCachedChunk(x >> 4, z >> 4);
+        return chunk.setTile(x & 15, y, z & 15, tile);
     }
 
     @Override
@@ -130,7 +136,7 @@ public interface IQueueExtent extends Flushable, Trimable, Extent, Keyed {
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return BlockVector3.at(30000000, FaweCache.WORLD_MAX_Y, 30000000);
+        return BlockVector3.at(30000000, FaweCache.IMP.WORLD_MAX_Y, 30000000);
     }
 
     /**

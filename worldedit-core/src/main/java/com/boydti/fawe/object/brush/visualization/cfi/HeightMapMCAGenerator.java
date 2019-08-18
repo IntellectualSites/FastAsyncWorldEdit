@@ -1,7 +1,12 @@
 package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBlocks;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.FallbackChunkGet;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.object.FawePlayer;
@@ -44,6 +49,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -58,19 +64,13 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nullable;
 
 // TODO FIXME
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
-
-    private final ThreadLocal<int[]> indexStore = new ThreadLocal<int[]>() {
-        @Override
-        protected int[] initialValue() {
-            return new int[256];
-        }
-    };
 
     private final DifferentialBlockBuffer blocks;
     protected final DifferentialArray<byte[]> heights;
@@ -1571,7 +1571,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
         int[] floor = this.floor.get();
         int[] overlay = this.overlay != null ? this.overlay.get() : null;
         try {
-            int[] indexes = indexStore.get();
+            int[] indexes = FaweCache.IMP.INDEX_STORE.get();
 
             int index;
             int maxY = 0;
@@ -1903,12 +1903,6 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        IterableThreadLocal.clean(indexStore);
-        super.finalize();
-    }
-
-    @Override
     public int getMaxY() {
         return 255;
     }
@@ -1972,5 +1966,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     public BlockVector3 getSpawnPosition() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public IChunkGet get(int x, int z) {
+        Fawe.debug("Should not be using buffering with HMMG");
+        return new FallbackChunkGet(this, x, z);
     }
 }

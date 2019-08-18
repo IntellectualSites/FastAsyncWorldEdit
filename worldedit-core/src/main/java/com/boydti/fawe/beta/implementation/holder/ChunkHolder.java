@@ -1,5 +1,6 @@
 package com.boydti.fawe.beta.implementation.holder;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.FilterBlockMask;
@@ -10,19 +11,67 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.SingleThreadQueueExtent;
 import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
+import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks
  */
-public abstract class ChunkHolder implements IChunk {
+public class ChunkHolder<T extends Future<T>> implements IChunk {
+
+    private static FaweCache.Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
+
+    public static ChunkHolder newInstance() {
+        return POOL.poll();
+    }
+
+    private IChunkGet get;
+    private IChunkSet set;
+    private IBlockDelegate delegate;
+    private IQueueExtent extent;
+    private int chunkX;
+    private int chunkZ;
+
+    public ChunkHolder() {
+        this.delegate = NULL;
+    }
+
+    public void init(IBlockDelegate delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
+    public void recycle() {
+        delegate = NULL;
+    }
+
+    public IBlockDelegate getDelegate() {
+        return delegate;
+    }
+
+    @Override
+    public IQueueExtent getQueue() {
+        return extent;
+    }
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tag) {
+        return false;
+    }
+
+    @Override
+    public char[] load(int layer) {
+        return getOrCreateGet().load(layer);
+    }
 
     public static final IBlockDelegate BOTH = new IBlockDelegate() {
         @Override
@@ -160,20 +209,6 @@ public abstract class ChunkHolder implements IChunk {
             return chunk.getFullBlock(x, y, z);
         }
     };
-    private IChunkGet get;
-    private IChunkSet set;
-    private IBlockDelegate delegate;
-    private IQueueExtent extent;
-    private int chunkX;
-    private int chunkZ;
-
-    public ChunkHolder() {
-        this.delegate = NULL;
-    }
-
-    public ChunkHolder(IBlockDelegate delegate) {
-        this.delegate = delegate;
-    }
 
     @Override
     public void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
@@ -265,27 +300,13 @@ public abstract class ChunkHolder implements IChunk {
     }
 
     /**
-     * Create the settable part of this chunk (defaults to a char array)
-     * @return
-     */
-    public IChunkSet createSet() {
-        return new CharSetBlocks();
-    }
-
-    /**
      * Create a wrapped set object
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
      *  - E.g. caching, optimizations, filtering
      * @return
      */
     private IChunkSet newWrappedSet() {
-        if (extent instanceof SingleThreadQueueExtent) {
-            IChunkSet newSet = extent.getCachedSet(chunkX, chunkZ, this::createSet);
-            if (newSet != null) {
-                return newSet;
-            }
-        }
-        return createSet();
+        return extent.getCachedSet(chunkX, chunkZ);
     }
 
     /**
@@ -295,16 +316,8 @@ public abstract class ChunkHolder implements IChunk {
      * @return
      */
     private IChunkGet newWrappedGet() {
-        if (extent instanceof SingleThreadQueueExtent) {
-            IChunkGet newGet = extent.getCachedGet(chunkX, chunkZ, this::get);
-            if (newGet != null) {
-                return newGet;
-            }
-        }
-        return get();
+        return extent.getCachedGet(chunkX, chunkZ);
     }
-
-    public abstract IChunkGet get();
 
     @Override
     public void init(IQueueExtent extent, int chunkX, int chunkZ) {
@@ -318,6 +331,22 @@ public abstract class ChunkHolder implements IChunk {
             delegate = NULL;
         }
         get = null;
+    }
+
+    @Override
+    public synchronized T call() {
+        if (get != null && set != null) {
+            return getOrCreateGet().call(getOrCreateSet(), this::recycle);
+        }
+        return null;
+    }
+
+    @Override
+    public T call(IChunkSet set, Runnable finalize) {
+        if (get != null && set != null) {
+            return getOrCreateGet().call(set, finalize);
+        }
+        return null;
     }
 
     public IQueueExtent getExtent() {

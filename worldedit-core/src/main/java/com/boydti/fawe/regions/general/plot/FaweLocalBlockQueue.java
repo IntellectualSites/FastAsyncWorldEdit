@@ -25,10 +25,11 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     public final IQueueExtent IMP;
     private final LegacyMapper legacyMapper;
+    private final World world;
 
     public FaweLocalBlockQueue(String worldName) {
         super(worldName);
-        World world = FaweAPI.getWorld(worldName);
+        this.world = FaweAPI.getWorld(worldName);
         IMP = Fawe.get().getQueueHandler().getQueue(world);
         legacyMapper = LegacyMapper.getInstance();
     }
@@ -104,7 +105,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public String getWorld() {
-        return IMP.getId();
+        return world.getId();
     }
 
     @Override
@@ -134,7 +135,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        IMP.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.asTag(tag));
+        IMP.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.IMP.asTag(tag));
         return true;
     }
 }

@@ -54,7 +54,7 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Validate.notNull(key, "The provided key for the custom value was null");
         Validate.notNull(type, "The provided type for the custom value was null");
         Validate.notNull(value, "The provided value for the custom value was null");
-        get().put(key.toString(), FaweCache.asTag(type.toPrimitive(value, null)));
+        get().put(key.toString(), FaweCache.IMP.asTag(type.toPrimitive(value, null)));
     }
 
     public <T, Z> boolean has(NamespacedKey key, PersistentDataType<T, Z> type) {

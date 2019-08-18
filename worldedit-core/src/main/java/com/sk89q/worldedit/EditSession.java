@@ -164,7 +164,7 @@ import org.slf4j.LoggerFactory;
  * using the {@link ChangeSetExtent}.</p>
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-public class EditSession extends PassthroughExtent implements SimpleWorld, AutoCloseable {
+public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     private static final Logger log = LoggerFactory.getLogger(EditSession.class);
 
@@ -3023,33 +3023,10 @@ public class EditSession extends PassthroughExtent implements SimpleWorld, AutoC
             Direction.DOWN.toBlockVector(),
     };
 
-
-    @Override
-    public String getName() {
-        return worldName;
-    }
-
-    @Override public @org.jetbrains.annotations.Nullable Path getStoragePath() {
-        return null;
-    }
-
-    @Override
-    public boolean clearContainerBlockContents(BlockVector3 pos) {
-        BaseBlock block = getFullBlock(pos);
-        CompoundTag nbt = block.getNbtData();
-        if (nbt != null) {
-            if (nbt.containsKey("items")) {
-                return setBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(), block.toBlockState().toBaseBlock());
-            }
-        }
-        return false;
-    }
-
     public boolean regenerate(final Region region) {
         return regenerate(region, this);
     }
 
-    @Override
     public boolean regenerate(final Region region, final EditSession session) {
         return session.regenerate(region, null, null);
     }
@@ -3164,69 +3141,4 @@ public class EditSession extends PassthroughExtent implements SimpleWorld, AutoC
         }
         return false;
     }
-
-    @Override
-    public void simulateBlockMine(BlockVector3 position) {
-        TaskManager.IMP.sync((Supplier<Object>) () -> {
-            world.simulateBlockMine(position);
-            return null;
-        });
-    }
-
-    public boolean generateTree(TreeGenerator.TreeType type, BlockVector3 position) {
-        return generateTree(type, this, position);
-    }
-
-    @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) {
-        if (getWorld() != null) {
-            try {
-                return getWorld().generateTree(type, editSession, position);
-            } catch (MaxChangedBlocksException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public WeatherType getWeather() {
-        return world.getWeather();
-    }
-
-    @Override
-    public long getRemainingWeatherDuration() {
-        return world.getRemainingWeatherDuration();
-    }
-
-    @Override
-    public void setWeather(WeatherType weatherType) {
-        world.setWeather(weatherType);
-    }
-
-    @Override
-    public void setWeather(WeatherType weatherType, long duration) {
-        world.setWeather(weatherType, duration);
-    }
-
-    @Override
-    public void dropItem(Vector3 position, BaseItemStack item) {
-        world.dropItem(position, item);
-    }
-
-    @Override
-    public boolean playEffect(Vector3 position, int type, int data) {
-        return world.playEffect(position, type, data);
-    }
-
-    @Override
-    public boolean notifyAndLightBlock(BlockVector3 position, BlockState previousType) throws WorldEditException {
-        return world.notifyAndLightBlock(position, previousType);
-    }
-
-    @Override
-    public BlockVector3 getSpawnPosition() {
-        return world.getSpawnPosition();
-    }
-
 }

@@ -618,7 +618,7 @@ public class SelectionCommands {
                     maskOpt = new IdMask(world);
                 }
                 //TODO Make FuzzyRegionSelector accept actors
-                newSelector = new FuzzyRegionSelector((Player) actor, editSession, maskOpt);
+                newSelector = new FuzzyRegionSelector((Player) actor, world, maskOpt);
                 actor.print(BBC.SEL_FUZZY.s());
                 actor.print(BBC.SEL_LIST.s());
                 break;

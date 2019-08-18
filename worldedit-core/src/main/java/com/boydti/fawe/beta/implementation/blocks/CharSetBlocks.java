@@ -1,6 +1,8 @@
 package com.boydti.fawe.beta.implementation.blocks;
 
+import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -14,21 +16,21 @@ import java.util.Set;
 import java.util.UUID;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
+    private static FaweCache.Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
+    public static CharSetBlocks newInstance() {
+        return POOL.poll();
+    }
 
     public BiomeType[] biomes;
     public HashMap<Short, CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
 
-    public CharSetBlocks(CharBlocks other) {
-        super(other);
-        if (other instanceof CharSetBlocks) {
+    private CharSetBlocks() {}
 
-        }
-    }
-
-    public CharSetBlocks() {
-
+    @Override
+    public void recycle() {
+        POOL.offer(this);
     }
 
     @Override

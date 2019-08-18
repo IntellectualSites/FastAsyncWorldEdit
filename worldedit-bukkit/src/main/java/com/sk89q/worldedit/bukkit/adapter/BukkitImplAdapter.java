@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.bukkit.adapter;
 
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -33,6 +35,8 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -149,4 +153,8 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param player The player
      */
     void sendFakeOP(Player player);
+
+    default @org.jetbrains.annotations.Nullable World createWorld(WorldCreator creator) {
+        return ((FaweBukkit) Fawe.imp()).createWorldUnloaded(creator::createWorld);
+    }
 }

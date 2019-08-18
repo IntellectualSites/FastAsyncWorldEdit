@@ -1,40 +1,48 @@
 package com.boydti.fawe.beta.implementation;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.blocks.CharSetBlocks;
+import com.boydti.fawe.beta.implementation.holder.ChunkHolder;
 import com.boydti.fawe.beta.implementation.holder.ReferenceChunk;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
+import com.sk89q.worldedit.extent.Extent;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.function.Supplier;
 
 /**
  * Single threaded implementation for IQueueExtent (still abstract) - Does not implement creation of
  * chunks (that has to implemented by the platform e.g. Bukkit)
  * <p>
- * This queue is reusable {@link #init(WorldChunkCache)}
+ * This queue is reusable {@link #init(IChunkCache)}
  */
 public abstract class SingleThreadQueueExtent implements IQueueExtent {
 
-    // Pool discarded chunks for reuse (can safely be cleared by another thread)
-    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
+//    // Pool discarded chunks for reuse (can safely be cleared by another thread)
+//    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
     // Chunks currently being queued / worked on
     private final Long2ObjectLinkedOpenHashMap<IChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
-    private WorldChunkCache cache;
+
+    private IChunkCache<IChunkGet> cacheGet;
+    private IChunkCache<IChunkSet> cacheSet;
+    private boolean initialized;
+
     private Thread currentThread;
     private ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
     // Last access pointers
     private IChunk lastChunk;
     private long lastPair = Long.MAX_VALUE;
+
+    private boolean enabledQueue = true;
 
     /**
      * Safety check to ensure that the thread being used matches the one being initialized on. - Can
@@ -48,23 +56,42 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     }
 
     @Override
-    public IChunkGet getCachedGet(int x, int z, Supplier<IChunkGet> supplier) {
-        return cache.get(MathMan.pairInt(x, z), supplier);
+    public void enableQueue() {
+        enabledQueue = true;
+    }
+
+    @Override
+    public void disableQueue() {
+        enabledQueue = false;
+    }
+
+    @Override
+    public IChunkGet getCachedGet(int x, int z) {
+        return cacheGet.get(x, z);
+    }
+
+    @Override
+    public IChunkSet getCachedSet(int x, int z) {
+        return cacheSet.get(x, z);
     }
 
     /**
      * Resets the queue.
      */
     protected synchronized void reset() {
+        if (!initialized) return;
         checkThread();
-        cache = null;
         if (!chunks.isEmpty()) {
-            CHUNK_POOL.addAll(chunks.values());
+            for (IChunk chunk : chunks.values()) {
+                chunk.recycle();
+            }
             chunks.clear();
         }
+        enabledQueue = true;
         lastChunk = null;
         lastPair = Long.MAX_VALUE;
         currentThread = null;
+        initialized = false;
     }
 
     /**
@@ -73,17 +100,18 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
      * @param cache
      */
     @Override
-    public synchronized void init(WorldChunkCache cache) {
-        if (this.cache != null) {
-            reset();
-        }
+    public synchronized void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set) {
+        reset();
         currentThread = Thread.currentThread();
-        checkNotNull(cache);
-        this.cache = cache;
-    }
-
-    public void returnToPool(IChunk chunk) {
-        CHUNK_POOL.add(chunk);
+        if (get == null) {
+            get = (x, z) -> { throw new UnsupportedOperationException(); };
+        }
+        if (set == null) {
+            set = (x, z) -> CharSetBlocks.newInstance();
+        }
+        this.cacheGet = get;
+        this.cacheSet = set;
+        initialized = true;
     }
 
     @Override
@@ -116,8 +144,9 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
      */
     private <T extends Future<T>> T submitUnchecked(IChunk<T> chunk) {
         if (chunk.isEmpty()) {
-            CHUNK_POOL.add(chunk);
-            return (T) (Future) Futures.immediateFuture(null);
+            chunk.recycle();
+            Future result = Futures.immediateFuture(null);
+            return (T) result;
         }
 
         if (Fawe.isMainThread()) {
@@ -130,7 +159,8 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
     @Override
     public synchronized boolean trim(boolean aggressive) {
         // TODO trim individial chunk sections
-        CHUNK_POOL.clear();
+        cacheGet.trim(aggressive);
+        cacheSet.trim(aggressive);
         if (Thread.currentThread() == currentThread) {
             lastChunk = null;
             lastPair = Long.MAX_VALUE;
@@ -157,10 +187,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
      * @return IChunk
      */
     private IChunk poolOrCreate(int X, int Z) {
-        IChunk next = CHUNK_POOL.poll();
-        if (next == null) {
-            next = create(false);
-        }
+        IChunk next = create(false);
         next.init(this, X, Z);
         return next;
     }
@@ -187,7 +214,7 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         checkThread();
         final int size = chunks.size();
         final boolean lowMem = MemUtil.isMemoryLimited();
-        if (lowMem || size > Settings.IMP.QUEUE.TARGET_SIZE) {
+        if (enabledQueue && (lowMem || size > Settings.IMP.QUEUE.TARGET_SIZE)) {
             chunk = chunks.removeFirst();
             final Future future = submitUnchecked(chunk);
             if (future != null && !future.isDone()) {
@@ -209,6 +236,11 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         lastChunk = chunk;
 
         return chunk;
+    }
+
+    @Override
+    public IChunk create(boolean isFull) {
+        return ChunkHolder.newInstance();
     }
 
     private void pollSubmissions(int targetSize, boolean aggressive) {

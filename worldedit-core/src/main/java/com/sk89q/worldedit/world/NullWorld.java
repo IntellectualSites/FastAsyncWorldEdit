@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world;
 
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.NullChunkGet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -130,6 +132,11 @@ public class NullWorld extends AbstractWorld {
     @Override
     public BlockVector3 getSpawnPosition() {
         return BlockVector3.ZERO;
+    }
+
+    @Override
+    public IChunkGet get(int x, int z) {
+        return NullChunkGet.INSTANCE;
     }
 
     @Override

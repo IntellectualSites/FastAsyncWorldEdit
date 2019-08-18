@@ -1,13 +1,14 @@
 package com.boydti.fawe.bukkit.wrapper;
 
 import com.boydti.fawe.bukkit.wrapper.state.AsyncSign;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.destroystokyo.paper.block.BlockSoundGroup;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
+import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.FluidCollisionMode;
@@ -34,12 +35,10 @@ public class AsyncBlock implements Block {
     public int z;
     public int y;
     public int x;
-    public final FaweQueue queue;
     public final AsyncWorld world;
 
-    public AsyncBlock(AsyncWorld world, FaweQueue queue, int x, int y, int z) {
+    public AsyncBlock(AsyncWorld world, int x, int y, int z) {
         this.world = world;
-        this.queue = queue;
         this.x = x;
         this.y = Math.max(0, Math.min(255, y));
         this.z = z;
@@ -54,25 +53,24 @@ public class AsyncBlock implements Block {
     @Override
     @Deprecated
     public byte getData() {
-        return (byte) (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()) & 0xF);
+        return (byte) getPropertyId();
     }
 
     public int getPropertyId() {
-        return (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()) >> BlockTypes.BIT_OFFSET);
+        return world.getBlock(x, y, z).getInternalId() >> BlockTypes.BIT_OFFSET;
     }
 
     public int getCombinedId() {
-        return queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId());
+        return world.getBlock(x, y, z).getInternalId();
     }
 
     public int getTypeId() {
-        int id = (queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()));
-        return BlockTypes.getFromStateId(id).getInternalId();
+        return world.getBlock(x, y, z).getBlockType().getInternalId();
     }
 
     @NotNull @Override
     public AsyncBlock getRelative(int modX, int modY, int modZ) {
-        return new AsyncBlock(world, queue, x + modX, y + modY, z + modZ);
+        return new AsyncBlock(world, x + modX, y + modY, z + modZ);
     }
 
     @NotNull @Override
@@ -92,7 +90,7 @@ public class AsyncBlock implements Block {
 
     @NotNull @Override
     public BlockData getBlockData() {
-        return BukkitAdapter.getBlockData(queue.getCachedCombinedId4Data(x, y, z, BlockTypes.AIR.getInternalId()));
+        return BukkitAdapter.adapt(world.getBlock(x, y, z));
     }
 
     @Deprecated
@@ -102,7 +100,7 @@ public class AsyncBlock implements Block {
 
     @Deprecated
     public boolean setCombinedId(int combinedId) {
-        return queue.setBlock(x, y, z, combinedId);
+        return world.setBlock(x, y, z, BlockState.getFromInternalId(combinedId));
     }
 
     @Deprecated
@@ -112,7 +110,7 @@ public class AsyncBlock implements Block {
 
     @Deprecated
     public boolean setTypeId(int typeId) {
-        return queue.setBlock(x, y, z, BlockTypes.get(typeId).getDefaultState());
+        return world.setBlock(x, y, z, BlockTypes.get(typeId).getDefaultState());
     }
 
     @Deprecated
@@ -122,17 +120,17 @@ public class AsyncBlock implements Block {
 
     @Override
     public byte getLightLevel() {
-        return (byte) queue.getLight(x, y, z);
+        return (byte) world.getLight(x, y, z);
     }
 
     @Override
     public byte getLightFromSky() {
-        return (byte) queue.getSkyLight(x, y, z);
+        return (byte) world.getSkyLight(x, y, z);
     }
 
     @Override
     public byte getLightFromBlocks() {
-        return (byte) queue.getEmmittedLight(x, y, z);
+        return (byte) world.getBlockLight(x, y, z);
     }
 
     @NotNull @Override
@@ -179,7 +177,7 @@ public class AsyncBlock implements Block {
     @Override
     public void setBlockData(@NotNull BlockData blockData) {
         try {
-            queue.setBlock(x, y, z, BukkitAdapter.adapt(blockData));
+            world.setBlock(x, y, z, BukkitAdapter.adapt(blockData));
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
@@ -193,7 +191,7 @@ public class AsyncBlock implements Block {
     @Override
     public void setType(@NotNull Material type) {
         try {
-            queue.setBlock(x, y, z, BukkitAdapter.adapt(type).getDefaultState());
+            world.setBlock(x, y, z, BukkitAdapter.adapt(type).getDefaultState());
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
@@ -219,9 +217,8 @@ public class AsyncBlock implements Block {
 
     @NotNull @Override
     public AsyncBlockState getState() {
-        int combined = queue.getCombinedId4Data(x, y, z, 0);
-        BlockType type = BlockTypes.getFromStateId(combined);
-        switch (type.getInternalId()) {
+        BaseBlock state = world.getFullBlock(x, y, z);
+        switch (state.getBlockType().getInternalId()) {
             case BlockID.ACACIA_SIGN:
             case BlockID.SPRUCE_SIGN:
             case BlockID.ACACIA_WALL_SIGN:
@@ -234,9 +231,9 @@ public class AsyncBlock implements Block {
             case BlockID.JUNGLE_WALL_SIGN:
             case BlockID.OAK_SIGN:
             case BlockID.OAK_WALL_SIGN:
-                return new AsyncSign(this, combined);
+                return new AsyncSign(this, state);
             default:
-                return new AsyncBlockState(this, combined);
+                return new AsyncBlockState(this, state);
         }
     }
 
@@ -248,13 +245,13 @@ public class AsyncBlock implements Block {
 
     @NotNull @Override
     public Biome getBiome() {
-        return world.getAdapter().adapt(queue.getBiomeType(x, z));
+        return world.getAdapter().adapt(world.getBiomeType(x, z));
     }
 
     @Override
     public void setBiome(@NotNull Biome bio) {
         BiomeType biome = world.getAdapter().adapt(bio);
-        queue.setBiome(x, z, biome);
+        world.setBiome(x, 0, z, biome);
     }
 
     @Override
@@ -301,9 +298,7 @@ public class AsyncBlock implements Block {
 
     @Override
     public boolean isLiquid() {
-        int combined = queue.getCombinedId4Data(x, y, z, 0);
-        BlockType type = BlockTypes.getFromStateId(combined);
-        return type.getMaterial().isLiquid();
+        return world.getBlock(x, y, z).getMaterial().isLiquid();
     }
 
     @Override

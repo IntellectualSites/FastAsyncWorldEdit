@@ -330,10 +330,6 @@ public enum BukkitAdapter {
         return getAdapter().adapt(block);
     }
 
-    public static BlockData getBlockData(int combinedId) {
-        return getAdapter().getBlockData(combinedId);
-    }
-
     /**
      * Create a WorldEdit BlockState from a Bukkit ItemStack
      *

@@ -1,10 +1,14 @@
 package com.boydti.fawe.bukkit.util;
 
-import com.boydti.fawe.bukkit.v0.BukkitQueue_0;
+import com.boydti.fawe.bukkit.beta.BukkitQueue;
 import com.boydti.fawe.util.ReflectionUtils;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,6 +16,8 @@ import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
 public class ItemUtil {
 
@@ -21,10 +27,13 @@ public class ItemUtil {
     private final Method methodSetTag;
     private final Method methodAsBukkitCopy;
     private final Field fieldHandle;
+    private final BukkitImplAdapter adapter;
 
     private SoftReference<Int2ObjectOpenHashMap<WeakReference<Tag>>> hashToNMSTag = new SoftReference(new Int2ObjectOpenHashMap<>());
 
     public ItemUtil() throws Exception {
+        this.adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        checkNotNull(adapter);
         Class<?> classCraftItemStack = BukkitReflectionUtils.getCbClass("inventory.CraftItemStack");
         Class<?> classNMSItem = BukkitReflectionUtils.getNmsClass("ItemStack");
         this.methodAsNMSCopy = ReflectionUtils.setAccessible(classCraftItemStack.getDeclaredMethod("asNMSCopy", ItemStack.class));
@@ -68,7 +77,7 @@ public class ItemUtil {
                     Tag nativeTag = nativeTagRef.get();
                     if (nativeTag != null) return (CompoundTag) nativeTag;
                 }
-                Tag nativeTag = BukkitQueue_0.toNative(nmsTag);
+                Tag nativeTag = adapter.toNative(nmsTag);
                 map.put(nmsTag.hashCode(), new WeakReference<>(nativeTag));
                 return null;
             }
@@ -86,7 +95,7 @@ public class ItemUtil {
                 copy = true;
                 nmsItem = methodAsNMSCopy.invoke(null, item);
             }
-            Object nmsTag = BukkitQueue_0.fromNative(tag);
+            Object nmsTag = adapter.fromNative(tag);
             methodSetTag.invoke(nmsItem, nmsTag);
             if (copy) return (ItemStack) methodAsBukkitCopy.invoke(null, nmsItem);
             return item;

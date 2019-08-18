@@ -52,7 +52,7 @@ public abstract class FaweChangeSet implements ChangeSet {
     public FaweChangeSet(String world) {
         this.worldName = world;
         this.mainThread = Fawe.get() == null || Fawe.isMainThread();
-        this.layers = FaweCache.CHUNK_LAYERS;
+        this.layers = FaweCache.IMP.CHUNK_LAYERS;
     }
 
     public FaweChangeSet(World world) {

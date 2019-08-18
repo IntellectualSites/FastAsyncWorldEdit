@@ -1,11 +1,11 @@
 package com.boydti.fawe.bukkit.listener;
 
+import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.object.brush.visualization.cfi.HeightMapMCAGenerator;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.BrushSettings;
-import com.boydti.fawe.object.extent.FastWorldEditExtent;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
@@ -16,6 +16,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -286,7 +287,8 @@ public class BukkitImageListener implements Listener {
                             .combineStages(false).autoQueue(false).blockBag(null).limitUnlimited()
                             .build();
                         ExtentTraverser last = new ExtentTraverser(es.getExtent()).last();
-                        if (last.get() instanceof FastWorldEditExtent) {
+                        Extent extent = last.get();
+                        if (extent instanceof IQueueExtent) {
                             last = last.previous();
                         }
                         last.setNext(generator);

@@ -3,6 +3,8 @@ package com.boydti.fawe.beta.implementation;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.Trimable;
 import com.boydti.fawe.config.Settings;
@@ -11,6 +13,7 @@ import com.boydti.fawe.util.MemUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -33,16 +36,11 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
     private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
-    private ThreadPoolExecutor blockingExecutor = FaweCache.newBlockingExecutor();
+    private ThreadPoolExecutor blockingExecutor = FaweCache.IMP.newBlockingExecutor();
     private ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
 
-    private Map<World, WeakReference<WorldChunkCache>> chunkCache = new HashMap<>();
-    private IterableThreadLocal<IQueueExtent> queuePool = new IterableThreadLocal<IQueueExtent>() {
-        @Override
-        public IQueueExtent init() {
-            return create();
-        }
-    };
+    private Map<World, WeakReference<IChunkCache<IChunkGet>>> chunkCache = new HashMap<>();
+    private IterableThreadLocal<IQueueExtent> queuePool = new IterableThreadLocal<>(QueueHandler.this::create);
     /**
      * Used to calculate elapsed time in milliseconds and ensure block placement doesn't lag the
      * server
@@ -50,6 +48,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private long last;
     private long allocate = 50;
     private double targetTPS = 18;
+
     public QueueHandler() {
         TaskManager.IMP.repeat(this, 1);
     }
@@ -197,18 +196,18 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * @param world
      * @return
      */
-    public WorldChunkCache getOrCreate(World world) {
+    public IChunkCache<IChunkGet> getOrCreateWorldCache(World world) {
         world = WorldWrapper.unwrap(world);
 
         synchronized (chunkCache) {
-            final WeakReference<WorldChunkCache> ref = chunkCache.get(world);
+            final WeakReference<IChunkCache<IChunkGet>> ref = chunkCache.get(world);
             if (ref != null) {
-                final WorldChunkCache cached = ref.get();
+                final IChunkCache<IChunkGet> cached = ref.get();
                 if (cached != null) {
                     return cached;
                 }
             }
-            final WorldChunkCache created = new WorldChunkCache(world);
+            final IChunkCache<IChunkGet> created = new ChunkCache<>(world);
             chunkCache.put(world, new WeakReference<>(created));
             return created;
         }
@@ -222,7 +221,9 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     public IQueueExtent getQueue(World world) {
         final IQueueExtent queue = queuePool.get();
-        queue.init(getOrCreate(world));
+        IChunkCache<IChunkGet> cacheGet = getOrCreateWorldCache(world);
+        IChunkCache<IChunkSet> set = null; // TODO cache?
+        queue.init(world, cacheGet, set);
         return queue;
     }
 
@@ -230,13 +231,13 @@ public abstract class QueueHandler implements Trimable, Runnable {
     public boolean trim(boolean aggressive) {
         boolean result = true;
         synchronized (chunkCache) {
-            final Iterator<Map.Entry<World, WeakReference<WorldChunkCache>>> iter = chunkCache
+            final Iterator<Map.Entry<World, WeakReference<IChunkCache<IChunkGet>>>> iter = chunkCache
                 .entrySet().iterator();
             while (iter.hasNext()) {
-                final Map.Entry<World, WeakReference<WorldChunkCache>> entry = iter.next();
-                final WeakReference<WorldChunkCache> value = entry.getValue();
-                final WorldChunkCache cache = value.get();
-                if (cache == null || cache.size() == 0 || cache.trim(aggressive)) {
+                final Map.Entry<World, WeakReference<IChunkCache<IChunkGet>>> entry = iter.next();
+                final WeakReference<IChunkCache<IChunkGet>> value = entry.getValue();
+                final IChunkCache<IChunkGet> cache = value.get();
+                if (cache.trim(aggressive)) {
                     iter.remove();
                     continue;
                 }
