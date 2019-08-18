@@ -102,5 +102,6 @@ task copyFiles {
         }
     }
 }
+build.dependsOn(shadowJar)
 build.finalizedBy(copyFiles)
 copyFiles.dependsOn(createPom)
