@@ -44,6 +44,6 @@ public class ExistingMaskParser extends SimpleInputParser<Mask> {
 
     @Override
     public Mask parseFromSimpleInput(String input, ParserContext context) {
-        return new ExistingBlockMask(new RequestExtent());
+        return new ExistingBlockMask(context.getExtent());
     }
 }

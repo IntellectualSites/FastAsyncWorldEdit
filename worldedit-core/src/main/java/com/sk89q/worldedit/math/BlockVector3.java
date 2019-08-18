@@ -20,6 +20,10 @@
 package com.sk89q.worldedit.math;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.sk89q.worldedit.math.BitMath.mask;
+import static com.sk89q.worldedit.math.BitMath.unpackX;
+import static com.sk89q.worldedit.math.BitMath.unpackY;
+import static com.sk89q.worldedit.math.BitMath.unpackZ;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
@@ -65,6 +69,31 @@ public abstract class BlockVector3 {
         }
         */
         return new BlockVector3Imp(x, y, z);
+    }
+
+    private static final int WORLD_XZ_MINMAX = 30_000_000;
+    private static final int WORLD_Y_MAX = 4095;
+
+    private static boolean isHorizontallyInBounds(int h) {
+        return -WORLD_XZ_MINMAX <= h && h <= WORLD_XZ_MINMAX;
+    }
+
+    public static boolean isLongPackable(BlockVector3 location) {
+        return isHorizontallyInBounds(location.getX()) &&
+            isHorizontallyInBounds(location.getZ()) &&
+            0 <= location.getY() && location.getY() <= WORLD_Y_MAX;
+    }
+
+    public static void checkLongPackable(BlockVector3 location) {
+        checkArgument(isLongPackable(location),
+            "Location exceeds long packing limits: %s", location);
+    }
+
+    private static final long BITS_26 = mask(26);
+    private static final long BITS_12 = mask(12);
+
+    public static BlockVector3 fromLongPackedForm(long packed) {
+        return at(unpackX(packed), unpackY(packed), unpackZ(packed));
     }
 
     // thread-safe initialization idiom
@@ -153,6 +182,11 @@ public abstract class BlockVector3 {
 //    public BlockVector3 down(BlockVector3 orDefault) {
 //        return orDefault.setComponents(getX(), getY() - 1, getZ());
 //    }
+
+    public long toLongPackedForm() {
+        checkLongPackable(this);
+        return (getX() & BITS_26) | ((getZ() & BITS_26) << 26) | (((getY() & (long) BITS_12) << (26 + 26)));
+    }
 
     /**
      * Get the X coordinate.

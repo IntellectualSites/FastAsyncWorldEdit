@@ -78,6 +78,6 @@ public class BiomeMaskParser extends InputParser<Mask> {
             biomes.add(biome);
         }
 
-        return Masks.asMask(new BiomeMask2D(new RequestExtent(), biomes));
+        return Masks.asMask(new BiomeMask2D(context.getExtent(), biomes));
     }
 }

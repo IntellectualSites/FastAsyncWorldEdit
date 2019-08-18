@@ -62,6 +62,7 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.annotation.ClipboardMask;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -441,6 +442,7 @@ public class ClipboardCommands {
                       @Switch(name = 'b', desc = "Paste biomes if available")
                           boolean pasteBiomes,
                       @ArgFlag(name = 'm', desc = "Only paste blocks matching this mask", def = "")
+                      @ClipboardMask
                           Mask sourceMask) throws WorldEditException {
 
         ClipboardHolder holder = session.getClipboard();
