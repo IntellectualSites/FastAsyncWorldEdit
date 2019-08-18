@@ -47,9 +47,20 @@ dependencies {
 }
 
 shadowJar {
-    relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
-        include("it.unimi.dsi:fastutil")
+    dependencies {
+        relocate "org.slf4j", "com.sk89q.worldedit.slf4j"
+        relocate "org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge"
+        include(dependency(':worldedit-core'))
+        include(dependency(':worldedit-libs:core'))
+        include(dependency(':worldedit-libs:bukkit'))
+        include(dependency('org.slf4j:slf4j-api'))
+        include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
+        relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
+            include("it.unimi.dsi:fastutil")
+        }
     }
+    archiveName = "${parent.name}-${project.name.replaceAll("worldedit-", "")}-${parent.version}.jar"
+    destinationDir = file '../target'
 }
 
 processResources {
