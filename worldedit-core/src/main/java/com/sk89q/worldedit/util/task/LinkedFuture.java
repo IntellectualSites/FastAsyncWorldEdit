@@ -43,12 +43,10 @@ public class LinkedFuture<T extends Future<T>> implements Future<T> {
     @Override
     public synchronized T get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         if (task != null) {
-            T result = task.get(timeout, unit);
-            if (task != null || !task.isDone()) {
+            task = task.get(timeout, unit);
+            if (task != null) {
                 return (T) this;
             }
-            task = null;
-
         }
         return null;
     }

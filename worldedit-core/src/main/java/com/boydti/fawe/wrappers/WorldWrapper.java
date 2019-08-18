@@ -1,6 +1,8 @@
 package com.boydti.fawe.wrappers;
 
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.object.RunnableVal;
+import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.TaskManager;
 
 import com.sk89q.jnbt.CompoundTag;
@@ -12,6 +14,8 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -55,6 +59,18 @@ public class WorldWrapper extends AbstractWorld {
             return unwrap(((EditSession) world).getWorld());
         }
         return world;
+    }
+
+    public static World unwrap(Extent extent) {
+        if (extent.isWorld()) {
+            if (extent instanceof World) {
+                return unwrap((World) extent);
+            }
+            if (extent instanceof AbstractDelegateExtent) {
+                return unwrap(new ExtentTraverser<>(extent).find(World.class).get());
+            }
+        }
+        return null;
     }
 
     private WorldWrapper(World parent) {
@@ -266,5 +282,10 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public BlockVector3 getSpawnPosition() {
         return parent.getSpawnPosition();
+    }
+
+    @Override
+    public IChunkGet get(int x, int z) {
+        return parent.get(x, z);
     }
 }

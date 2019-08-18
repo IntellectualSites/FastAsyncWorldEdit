@@ -28,6 +28,10 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
         return root;
     }
 
+    @Override
+    default <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
+        return getParent().call(set, finalize);
+    }
 
     @Override
     default IQueueExtent getQueue() {
@@ -47,6 +51,11 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     @Override
     default void flood(Flood flood, FilterBlockMask mask, ChunkFilterBlock block) {
         getParent().flood(flood, mask, block);
+    }
+
+    @Override
+    default boolean setTile(int x, int y, int z, CompoundTag tag) {
+        return getParent().setTile(x, y, z, tag);
     }
 
     @Override
@@ -72,6 +81,11 @@ public interface IDelegateChunk<U extends IChunk> extends IChunk {
     @Override
     default BaseBlock getFullBlock(int x, int y, int z) {
         return getParent().getFullBlock(x, y, z);
+    }
+
+    @Override
+    default char[] load(int layer) {
+        return getParent().load(layer);
     }
 
     @Override

@@ -3,16 +3,12 @@ package com.boydti.fawe.bukkit.regions;
 import com.boydti.fawe.bukkit.wrapper.AsyncBlock;
 import com.boydti.fawe.bukkit.wrapper.AsyncWorld;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.queue.NullFaweQueue;
 import com.boydti.fawe.regions.FaweMask;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import jdk.nashorn.internal.ir.Block;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventException;
@@ -21,7 +17,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.RegisteredListener;
 
 import java.util.ArrayList;
-import org.bukkit.util.BlockVector;
 
 public class FreeBuildRegion extends BukkitMaskManager {
     private final ArrayList<RegisteredListener> listeners;
@@ -60,7 +55,7 @@ public class FreeBuildRegion extends BukkitMaskManager {
         BlockVector3 pos1 = BlockVector3.ZERO;
         BlockVector3 pos2 = BlockVector3.ZERO;
 
-        AsyncBlock block = new AsyncBlock(asyncWorld, new NullFaweQueue(asyncWorld.getWorldName(), BlockTypes.STONE.getDefaultState()), 0, 0, 0);
+        AsyncBlock block = new AsyncBlock(asyncWorld, 0, 0, 0);
         BlockBreakEvent event = new BlockBreakEvent(block, BukkitAdapter.adapt(player.toWorldEditPlayer()));
 
         return new FaweMask(pos1, pos2) {

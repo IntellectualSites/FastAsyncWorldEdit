@@ -2,15 +2,18 @@ package com.boydti.fawe.bukkit.beta;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IChunk;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.SimpleCharQueueExtent;
-import com.boydti.fawe.beta.implementation.WorldChunkCache;
+import com.boydti.fawe.beta.implementation.IChunkCache;
 import com.boydti.fawe.bukkit.v1_14.adapter.BlockMaterial_1_14;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.wrappers.WorldWrapper;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -43,29 +46,18 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BukkitQueue extends SimpleCharQueueExtent {
-
     private org.bukkit.World bukkitWorld;
     private WorldServer nmsWorld;
 
-    @Override
-    public void enableQueue() {
-
+    public BukkitQueue() {
     }
 
     @Override
-    public void disableQueue() {
-
-    }
-
-    @Override
-    public synchronized void init(WorldChunkCache cache) {
-        World world = cache.getWorld();
+    public synchronized void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set) {
+        World world = WorldWrapper.unwrap(extent);
+        if (world == null) throw new IllegalArgumentException("Get must be a world.");
         if (world instanceof BukkitWorld) {
             this.bukkitWorld = ((BukkitWorld) world).getWorld();
         } else {
@@ -74,36 +66,12 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         checkNotNull(this.bukkitWorld);
         CraftWorld craftWorld = ((CraftWorld) bukkitWorld);
         this.nmsWorld = craftWorld.getHandle();
-        super.init(cache);
-    }
-
-    public WorldServer getNmsWorld() {
-        return nmsWorld;
-    }
-
-    public org.bukkit.World getBukkitWorld() {
-        return bukkitWorld;
+        super.init(extent, get, set);
     }
 
     @Override
     protected synchronized void reset() {
         super.reset();
-    }
-
-//    private static final IterableThreadLocal<BukkitFullChunk> FULL_CHUNKS = new IterableThreadLocal<BukkitFullChunk>() {
-//        @Override
-//        public BukkitFullChunk init() {
-//            return new BukkitFullChunk();
-//        }
-//    };
-
-    @Override
-    public IChunk create(boolean isFull) {
-//        if (full) {
-//            //TODO implement
-//            return FULL_CHUNKS.get();
-//        }
-        return new BukkitChunkHolder();
     }
 
     /*
@@ -235,7 +203,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(X, Z));
     }
 
-    private PlayerChunk getPlayerChunk(final int cx, final int cz) {
+    private static PlayerChunk getPlayerChunk(net.minecraft.server.v1_14_R1.WorldServer nmsWorld, final int cx, final int cz) {
         PlayerChunkMap chunkMap = nmsWorld.getChunkProvider().playerChunkMap;
         PlayerChunk playerChunk = chunkMap.visibleChunks.get(ChunkCoordIntPair.pair(cx, cz));
         if (playerChunk == null) {
@@ -244,9 +212,8 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         return playerChunk;
     }
 
-    @Override
-    public void sendChunk(final int X, final int Z, final int mask) {
-        PlayerChunk playerChunk = getPlayerChunk(X, Z);
+    public static void sendChunk(net.minecraft.server.v1_14_R1.WorldServer nmsWorld, int X, int Z, int mask) {
+        PlayerChunk playerChunk = getPlayerChunk(nmsWorld, X, Z);
         if (playerChunk == null) {
             return;
         }
@@ -256,7 +223,7 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 //                sections[layer] = new ChunkSection(layer << 4);
 //            }
 //        }
-        if (playerChunk.k()) {
+        if (playerChunk.hasBeenLoaded()) {
             TaskManager.IMP.sync(new Supplier<Object>() {
                 @Override
                 public Object get() {
@@ -284,6 +251,11 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         return;
     }
 
+    @Override
+    public void sendChunk(final int X, final int Z, final int mask) {
+        sendChunk(nmsWorld, X, Z, mask);
+    }
+
     /*
     NMS conversion
      */
@@ -293,10 +265,10 @@ public class BukkitQueue extends SimpleCharQueueExtent {
         if (blocks == null) {
             return section;
         }
-        final int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
-        final int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
-        final long[] blockStates = FaweCache.BLOCK_STATES.get();
-        final int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
+        final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
+        final long[] blockStates = FaweCache.IMP.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
         try {
             int num_palette = 0;
             int air = 0;

@@ -51,6 +51,7 @@ import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -104,6 +105,7 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.slf4j.Logger;
@@ -249,6 +251,21 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
     // ------------------------------------------------------------------------
     // Code that is less likely to break
     // ------------------------------------------------------------------------
+
+    @Override
+    public int getDataVersion() {
+        return CraftMagicNumbers.INSTANCE.getDataVersion();
+    }
+
+    @Override
+    public DataFixer getDataFixer() {
+        try {
+            Class<?> converter = Class.forName("com.sk89q.worldedit.bukkit.adapter.impl.DataConverters_1_14_R4");
+            return (DataFixer) converter.getDeclaredField("INSTANCE").get(null);
+        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @SuppressWarnings("deprecation")
     @Override
@@ -409,15 +426,15 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
         for (IBlockState state : blockStateList.d()) {
             Property property;
             if (state instanceof BlockStateBoolean) {
-                property = new BooleanProperty(state.a(), ImmutableList.copyOf(state.d()));
+                property = new BooleanProperty(state.a(), ImmutableList.copyOf(state.getValues()));
             } else if (state instanceof BlockStateDirection) {
                 property = new DirectionalProperty(state.a(),
-                        (List<Direction>) state.d().stream().map(e -> Direction.valueOf(((INamable) e).getName().toUpperCase())).collect(Collectors.toList()));
+                        (List<Direction>) state.getValues().stream().map(e -> Direction.valueOf(((INamable) e).getName().toUpperCase())).collect(Collectors.toList()));
             } else if (state instanceof BlockStateEnum) {
                 property = new EnumProperty(state.a(),
-                        (List<String>) state.d().stream().map(e -> ((INamable) e).getName()).collect(Collectors.toList()));
+                        (List<String>) state.getValues().stream().map(e -> ((INamable) e).getName()).collect(Collectors.toList()));
             } else if (state instanceof BlockStateInteger) {
-                property = new IntegerProperty(state.a(), ImmutableList.copyOf(state.d()));
+                property = new IntegerProperty(state.a(), ImmutableList.copyOf(state.getValues()));
             } else {
                 throw new IllegalArgumentException("WorldEdit needs an update to support " + state.getClass().getSimpleName());
             }

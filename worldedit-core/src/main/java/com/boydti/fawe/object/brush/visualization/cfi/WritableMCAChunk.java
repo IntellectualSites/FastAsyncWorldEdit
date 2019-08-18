@@ -79,10 +79,10 @@ public class WritableMCAChunk {
     }
 
     public void write(NBTOutputStream nbtOut) throws IOException {
-        int[] blockToPalette = FaweCache.BLOCK_TO_PALETTE.get();
-        int[] paletteToBlock = FaweCache.PALETTE_TO_BLOCK.get();
-        long[] blockstates = FaweCache.BLOCK_STATES.get();
-        int[] blocksCopy = FaweCache.SECTION_BLOCKS.get();
+        int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
+        int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
+        long[] blockstates = FaweCache.IMP.BLOCK_STATES.get();
+        int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
 
         nbtOut.writeNamedTagName("", NBTConstants.TYPE_COMPOUND);
         nbtOut.writeNamedTag("DataVersion", 1631);

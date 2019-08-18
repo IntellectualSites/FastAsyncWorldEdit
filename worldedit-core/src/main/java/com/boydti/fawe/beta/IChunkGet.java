@@ -6,6 +6,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
+import java.util.concurrent.Future;
+
 /**
  * An interface for getting blocks.
  */
@@ -28,4 +30,8 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent {
     default void optimize() {
 
     }
+
+    <T extends Future<T>> T call(IChunkSet set, Runnable finalize);
+
+    char[] load(int layer);
 }

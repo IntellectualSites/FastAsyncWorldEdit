@@ -106,6 +106,8 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
     /* set - queues a change */
     boolean setBiome(int x, int y, int z, BiomeType biome);
 
+    boolean setTile(int x, int y, int z, CompoundTag tag);
+
     boolean setBlock(int x, int y, int z, BlockStateHolder block);
 
     @Override
@@ -126,7 +128,7 @@ public interface IChunk<T extends Future<T>> extends Trimable, Callable<T>, IChu
      */
     @Override
     default IBlocks reset() {
-        init(getQueue(), getX(), getZ());
+        init(null, getX(), getZ());
         return this;
     }
 }

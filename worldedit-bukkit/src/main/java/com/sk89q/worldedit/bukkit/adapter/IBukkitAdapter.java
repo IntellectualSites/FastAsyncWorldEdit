@@ -303,10 +303,6 @@ public interface IBukkitAdapter {
      */
     BlockData adapt(BlockStateHolder block);
 
-    default BlockData getBlockData(int combinedId) {
-        return adapt(BlockState.getFromInternalId(combinedId));
-    }
-
     /**
      * Create a WorldEdit BlockStateHolder from a Bukkit ItemStack
      *

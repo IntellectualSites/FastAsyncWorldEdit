@@ -58,10 +58,10 @@ public class LoggingChangeSet extends AbstractDelegateChangeSet {
 //        loc.x = x;
 //        loc.y = y;
 //        loc.z = z;
-//        oldBlock.id = FaweCache.getId(combinedId4DataFrom);
-//        oldBlock.data = FaweCache.getData(combinedId4DataFrom);
-//        newBlock.id = FaweCache.getId(combinedId4DataTo);
-//        newBlock.data = FaweCache.getData(combinedId4DataTo);
+//        oldBlock.id = FaweCache.IMP.getId(combinedId4DataFrom);
+//        oldBlock.data = FaweCache.IMP.getData(combinedId4DataFrom);
+//        newBlock.id = FaweCache.IMP.getId(combinedId4DataTo);
+//        newBlock.data = FaweCache.IMP.getData(combinedId4DataTo);
 //        // Log to BlocksHub and parent
 //        api.logBlock(loc, player, world, oldBlock, newBlock);
         parent.add(x, y, z, combinedId4DataFrom, combinedId4DataTo);

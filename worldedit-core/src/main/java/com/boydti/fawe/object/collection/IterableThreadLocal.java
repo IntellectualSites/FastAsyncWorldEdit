@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.collection;
 
+import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.MainUtil;
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
@@ -8,12 +9,27 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
 
-public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements Iterable<T> {
+public class IterableThreadLocal<T> extends ThreadLocal<T> implements Iterable<T> {
     private final ConcurrentLinkedDeque<T> allValues = new ConcurrentLinkedDeque<>();
+    private final Supplier<T> supplier;
 
-    public IterableThreadLocal() {
+    public IterableThreadLocal(Supplier<T> supplier) {
+        this.supplier = supplier;
+    }
+
+    public IterableThreadLocal(Supplier<T> supplier, Function<T, T> modifier) {
+        this.supplier = supplier;
+    }
+
+    public IterableThreadLocal(Supplier<T> supplier, Consumer<T> modifier) {
+        this.supplier = supplier;
     }
 
     @Override
@@ -33,7 +49,7 @@ public abstract class IterableThreadLocal<T> extends ThreadLocal<T> implements I
     }
 
     public T init() {
-        return null;
+        return supplier.get();
     }
 
     public void clean() {

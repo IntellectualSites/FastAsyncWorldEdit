@@ -36,7 +36,7 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
                 .player(FawePlayer.wrap(player))
                 .changeSetNull()
                 .checkMemory(false)
-                .autoQueue(true)
+                .autoQueue(false)
                 .build());
         this.player = player;
         this.region = new FuzzyRegion(world, getExtent(), mask);

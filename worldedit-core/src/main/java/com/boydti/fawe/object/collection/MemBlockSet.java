@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class MemBlockSet extends BlockSet {
     public final static int BITS_PER_WORD = 6;
-    public final static int WORDS = FaweCache.BLOCKS_PER_LAYER >> BITS_PER_WORD;
+    public final static int WORDS = FaweCache.IMP.BLOCKS_PER_LAYER >> BITS_PER_WORD;
     public final static IRow NULL_ROW_X = new NullRowX();
     public final static IRow NULL_ROW_Z = new NullRowZ();
     public final static IRow NULL_ROW_Y = new NullRowY();
@@ -354,7 +354,7 @@ public final class MemBlockSet extends BlockSet {
                                     maxy = y + 1;
                                 }
                                 by = (Y << 4) + y;
-                                if (by == FaweCache.WORLD_MAX_Y) return FaweCache.WORLD_MAX_Y;
+                                if (by == FaweCache.IMP.WORLD_MAX_Y) return FaweCache.IMP.WORLD_MAX_Y;
                                 break outer;
                             }
                         }
@@ -823,7 +823,7 @@ public final class MemBlockSet extends BlockSet {
         private final IRow[] rows;
 
         public RowZ() {
-            this.rows = new IRow[FaweCache.CHUNK_LAYERS];
+            this.rows = new IRow[FaweCache.IMP.CHUNK_LAYERS];
             reset();
         }
 
@@ -866,7 +866,7 @@ public final class MemBlockSet extends BlockSet {
         }
 
         public void reset() {
-            for (int i = 0; i < FaweCache.CHUNK_LAYERS; i++) rows[i] = NULL_ROW_Y;
+            for (int i = 0; i < FaweCache.IMP.CHUNK_LAYERS; i++) rows[i] = NULL_ROW_Y;
         }
     }
 

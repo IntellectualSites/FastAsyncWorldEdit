@@ -14,4 +14,6 @@ public interface Trimable {
      * @return if this object is empty at the end of the trim, and can therefore be deleted
      */
     boolean trim(boolean aggressive);
+
+    default void recycle() {}
 }

@@ -6,6 +6,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.concurrent.Future;
+
 public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
     @Override

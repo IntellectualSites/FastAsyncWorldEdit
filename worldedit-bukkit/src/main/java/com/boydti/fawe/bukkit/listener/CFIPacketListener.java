@@ -1,12 +1,9 @@
 package com.boydti.fawe.bukkit.listener;
 
 import com.boydti.fawe.command.CFICommands;
-import com.boydti.fawe.object.FaweChunk;
 import com.boydti.fawe.object.FawePlayer;
-import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.RunnableVal3;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
-import com.boydti.fawe.util.SetQueue;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -58,98 +55,99 @@ public class CFIPacketListener implements Listener {
         this.plugin = plugin;
         this.protocolmanager = ProtocolLibrary.getProtocolManager();
 
-        // Direct digging to the virtual world
-        registerBlockEvent(PacketType.Play.Client.BLOCK_DIG, false, new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
-            @Override
-            public void run(Builder event, URI gen, String pt) {
-                try {
-                    Player plr = event.getPlayer();
-                    BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
-                    if (!sendBlockChange(plr, gen, pt, Interaction.HIT)) {
-                        gen.setBlock(pt, BlockTypes.AIR.getDefaultState());
-                    }
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        // Direct placing to the virtual world
-        RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> placeTask = new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
-            @Override
-            public void run(Builder event, URI gen, String pt) {
-                try {
-                    Player plr = event.getPlayer();
-                    List<EnumWrappers.Hand> hands = event.getPacket().getHands().getValues();
-
-                    EnumWrappers.Hand enumHand = hands.isEmpty() ? EnumWrappers.Hand.MAIN_HAND : hands.get(0);
-                    PlayerInventory inv = plr.getInventory();
-                    ItemStack hand = enumHand == EnumWrappers.Hand.MAIN_HAND ? inv.getItemInMainHand() : inv.getItemInOffHand();
-                    if (hand.getType().isBlock()) {
-                        Material type = hand.getType();
-                        switch (type) {
-                            case AIR:
-                            case CAVE_AIR:
-                            case VOID_AIR:
-                                break;
-                            default: {
-                                BlockStateHolder block = BukkitAdapter.asBlockState(hand);
-                                if (block != null) {
-                                    gen.setBlock(pt, block);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    pt = getRelPos(event, gen);
-                    sendBlockChange(plr, gen, pt, Interaction.OPEN);
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        registerBlockEvent(PacketType.Play.Client.BLOCK_PLACE, true, placeTask);
-        registerBlockEvent(PacketType.Play.Client.USE_ITEM, true, placeTask);
-
-        // Cancel block change packets where the real world overlaps with the virtual one
-        registerBlockEvent(PacketType.Play.Server.BLOCK_CHANGE, false, new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
-            @Override
-            public void run(Builder event, URI gen, String pt) {
-                // Do nothing
-            }
-        });
-
-        // Modify chunk packets where the real world overlaps with the virtual one
-        protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.MAP_CHUNK) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                if (!event.isServerPacket()) return;
-
-                VirtualWorld gen = getGenerator(event);
-                if (gen != null) {
-                    BlockVector3 origin = gen.getOrigin().toBlockPoint();
-                    PacketContainer packet = event.getPacket();
-                    StructureModifier<Integer> ints = packet.getIntegers();
-                    int cx = ints.read(0);
-                    int cz = ints.read(1);
-
-                    int ocx = origin.getBlockX() >> 4;
-                    int ocz = origin.getBlockZ() >> 4;
-
-                    if (gen.contains(BlockVector3.at((cx - ocx) << 4, 0, (cz - ocz) << 4))) {
-                        event.setCancelled(true);
-
-                        Player plr = event.getPlayer();
-
-                        FaweQueue queue = SetQueue.IMP.getNewQueue(plr.getWorld().getName(), true, false);
-
-                        FaweChunk toSend = gen.getSnapshot(cx - ocx, cz - ocz);
-                        toSend.setLoc(gen, cx, cz);
-                        queue.sendChunkUpdate(toSend, FawePlayer.wrap(plr));
-                    }
-                }
-            }
-        });
+        // TODO NOT IMPLEMENTED
+//        // Direct digging to the virtual world
+//        registerBlockEvent(PacketType.Play.Client.BLOCK_DIG, false, new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
+//            @Override
+//            public void run(Builder event, URI gen, String pt) {
+//                try {
+//                    Player plr = event.getPlayer();
+//                    BlockVector3 realPos = pt.add(gen.getOrigin().toBlockPoint());
+//                    if (!sendBlockChange(plr, gen, pt, Interaction.HIT)) {
+//                        gen.setBlock(pt, BlockTypes.AIR.getDefaultState());
+//                    }
+//                } catch (WorldEditException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//
+//        // Direct placing to the virtual world
+//        RunnableVal3<PacketEvent, VirtualWorld, BlockVector3> placeTask = new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
+//            @Override
+//            public void run(Builder event, URI gen, String pt) {
+//                try {
+//                    Player plr = event.getPlayer();
+//                    List<EnumWrappers.Hand> hands = event.getPacket().getHands().getValues();
+//
+//                    EnumWrappers.Hand enumHand = hands.isEmpty() ? EnumWrappers.Hand.MAIN_HAND : hands.get(0);
+//                    PlayerInventory inv = plr.getInventory();
+//                    ItemStack hand = enumHand == EnumWrappers.Hand.MAIN_HAND ? inv.getItemInMainHand() : inv.getItemInOffHand();
+//                    if (hand.getType().isBlock()) {
+//                        Material type = hand.getType();
+//                        switch (type) {
+//                            case AIR:
+//                            case CAVE_AIR:
+//                            case VOID_AIR:
+//                                break;
+//                            default: {
+//                                BlockStateHolder block = BukkitAdapter.asBlockState(hand);
+//                                if (block != null) {
+//                                    gen.setBlock(pt, block);
+//                                    return;
+//                                }
+//                            }
+//                        }
+//                    }
+//                    pt = getRelPos(event, gen);
+//                    sendBlockChange(plr, gen, pt, Interaction.OPEN);
+//                } catch (WorldEditException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//        registerBlockEvent(PacketType.Play.Client.BLOCK_PLACE, true, placeTask);
+//        registerBlockEvent(PacketType.Play.Client.USE_ITEM, true, placeTask);
+//
+//        // Cancel block change packets where the real world overlaps with the virtual one
+//        registerBlockEvent(PacketType.Play.Server.BLOCK_CHANGE, false, new RunnableVal3<PacketEvent, VirtualWorld, BlockVector3>() {
+//            @Override
+//            public void run(Builder event, URI gen, String pt) {
+//                // Do nothing
+//            }
+//        });
+//
+//        // Modify chunk packets where the real world overlaps with the virtual one
+//        protocolmanager.addPacketListener(new PacketAdapter(plugin, ListenerPriority.NORMAL, PacketType.Play.Server.MAP_CHUNK) {
+//            @Override
+//            public void onPacketSending(PacketEvent event) {
+//                if (!event.isServerPacket()) return;
+//
+//                VirtualWorld gen = getGenerator(event);
+//                if (gen != null) {
+//                    BlockVector3 origin = gen.getOrigin().toBlockPoint();
+//                    PacketContainer packet = event.getPacket();
+//                    StructureModifier<Integer> ints = packet.getIntegers();
+//                    int cx = ints.read(0);
+//                    int cz = ints.read(1);
+//
+//                    int ocx = origin.getBlockX() >> 4;
+//                    int ocz = origin.getBlockZ() >> 4;
+//
+//                    if (gen.contains(BlockVector3.at((cx - ocx) << 4, 0, (cz - ocz) << 4))) {
+//                        event.setCancelled(true);
+//
+//                        Player plr = event.getPlayer();
+//
+//                        FaweQueue queue = SetQueue.IMP.getNewQueue(plr.getWorld().getName(), true, false);
+//
+//                        FaweChunk toSend = gen.getSnapshot(cx - ocx, cz - ocz);
+//                        toSend.setLoc(gen, cx, cz);
+//                        queue.sendChunkUpdate(toSend, FawePlayer.wrap(plr));
+//                    }
+//                }
+//            }
+//        });
 
         // The following few listeners are to ignore block collisions where the virtual and real world overlap
 
