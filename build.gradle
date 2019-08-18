@@ -89,7 +89,7 @@ subprojects {
         ivy {
             url 'https://ci.athion.net/job'
             layout 'pattern', {
-                artifact '/[organisation]/[module]/artifact/[revision].[ext]'
+                artifact '/[organisation]/[revision]/artifact/[module].[ext]'
             }
         }
     }
