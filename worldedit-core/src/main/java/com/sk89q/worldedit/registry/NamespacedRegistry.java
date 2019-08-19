@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 
-public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Registry<V> {
+public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
     private static final String MINECRAFT_NAMESPACE = "minecraft";
     private final Set<String> knownNamespaces = new HashSet<>();
     private final String defaultNamespace;
@@ -60,7 +60,9 @@ public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Re
         if (existing != null) {
             throw new UnsupportedOperationException("Replacing existing registrations is not supported");
         }
-        value.setInternalId(lastInternalId++);
+        if (value instanceof RegistryItem) {
+            ((RegistryItem)value).setInternalId(lastInternalId++);
+        }
         values.add(value);
         super.register(key, value);
         if (key.startsWith(defaultNamespace)) {
@@ -78,7 +80,10 @@ public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Re
     }
 
     public int getInternalId(V value) {
-        return value.getInternalId();
+        if (value instanceof RegistryItem) {
+            return ((RegistryItem)value).getInternalId();
+        }
+        return 0;
     }
 
     public int size() {

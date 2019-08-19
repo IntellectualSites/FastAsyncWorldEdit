@@ -954,15 +954,14 @@ public final class BlockTypes {
         try {
             Field field = BlockTypes.class.getDeclaredField(enumName);
             ReflectionUtils.setFailsafeFieldValue(field, null, existing);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
         // register states
         if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
         $REGISTRY.put(typeName, existing);
+        BlockType.REGISTRY.register(typeName,existing);
         String nameSpace = typeName.substring(0, typeName.indexOf(':'));
         $NAMESPACES.add(nameSpace);
         return existing;

@@ -37,16 +37,24 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
+import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.command.CommandUtil;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
+import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.entity.EntityType;
+import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -214,7 +222,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         PaperLib.suggestPaper(this);
     }
 
-    public void setupRegistries() {
+    private void setupRegistries() {
         // Biome
         for (Biome biome : Biome.values()) {
             String lowerCaseBiomeName = biome.name().toLowerCase(Locale.ROOT);
@@ -259,6 +267,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                 EntityType.REGISTRY.register("minecraft:" + lowerCaseMcId, new EntityType("minecraft:" + lowerCaseMcId));
             }
         }
+        // ... :|
+        GameModes.get("");
+        WeatherTypes.get("");
     }
 
     private void setupTags() {
@@ -428,7 +439,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = "/" + cmd.getName();
+        split[0] = "/" + commandLabel;
 
         CommandEvent event = new CommandEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
         getWorldEdit().getEventBus().post(event);
@@ -443,7 +454,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = "/" + cmd.getName();
+        split[0] = "/" + commandLabel;
 
         String arguments = Joiner.on(" ").join(split);
         CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), arguments);
@@ -577,9 +588,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             if (!event.isCommand()) return;
 
             String buffer = event.getBuffer();
-            final String[] parts = buffer.split(" ");
-            if (parts.length < 1) return;
-            final String label = parts[0];
+            int firstSpace = buffer.indexOf(' ');
+            if (firstSpace < 0) return;
+            final String label = buffer.substring(0, firstSpace);
             final Optional<org.enginehub.piston.Command> command
                     = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(label);
             if (!command.isPresent()) return;
