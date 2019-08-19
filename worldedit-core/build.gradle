@@ -21,35 +21,35 @@ configurations.all { Configuration it ->
 }
 
 dependencies {
-    compile project(':worldedit-libs:core')
-    compile 'de.schlichtherle:truezip:6.8.3'
-    compile 'rhino:js:1.7R2'
-    compile 'org.yaml:snakeyaml:1.23'
-    compile 'com.google.guava:guava:21.0'
-    compile 'com.google.code.findbugs:jsr305:1.3.9'
-    compile 'com.thoughtworks.paranamer:paranamer:2.6'
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.googlecode.json-simple:json-simple:1.1.1'
-    compile 'org.slf4j:slf4j-api:1.7.26'
+    compile project(":worldedit-libs:core")
+    compile "de.schlichtherle:truezip:6.8.3"
+    compile "rhino:js:1.7R2"
+    compile "org.yaml:snakeyaml:1.23"
+    compile "com.google.guava:guava:21.0"
+    compile "com.google.code.findbugs:jsr305:1.3.9"
+    compile "com.thoughtworks.paranamer:paranamer:2.6"
+    compile "com.google.code.gson:gson:2.8.0"
+    compile "com.googlecode.json-simple:json-simple:1.1.1"
+    compile "org.slf4j:slf4j-api:1.7.26"
     compile "it.unimi.dsi:fastutil:8.2.1"
 
-    compileOnly project(':worldedit-libs:core:ap')
-    annotationProcessor project(':worldedit-libs:core:ap')
+    compileOnly project(":worldedit-libs:core:ap")
+    annotationProcessor project(":worldedit-libs:core:ap")
     annotationProcessor "com.google.guava:guava:21.0"
     def avVersion = "1.6.5"
     compileOnly "com.google.auto.value:auto-value-annotations:$avVersion"
     annotationProcessor "com.google.auto.value:auto-value:$avVersion"
-    //compile 'net.sf.trove4j:trove4j:3.0.3'
-    testCompile 'org.mockito:mockito-core:1.9.0-rc1'
+    //compile "net.sf.trove4j:trove4j:3.0.3"
+    testCompile "org.mockito:mockito-core:1.9.0-rc1"
 
     // Fawe depends
-    compileOnly 'net.fabiozumbi12:redprotect:1.9.6'
+    compileOnly "net.fabiozumbi12:redprotect:1.9.6"
     compileOnly ("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         transitive = false
     }
-    compile 'com.mojang:datafixerupper:1.0.20'
-    compile 'com.github.luben:zstd-jni:1.1.1'
-    compile 'co.aikar:fastutil-lite:1.0'
+    compile "com.mojang:datafixerupper:1.0.20"
+    compile "com.github.luben:zstd-jni:1.1.1"
+    compile "co.aikar:fastutil-lite:1.0"
     testImplementation ("org.junit.jupiter:junit-jupiter-api:5.5.0")
     testImplementation ("org.junit.jupiter:junit-jupiter-params:5.5.0")
     testImplementation ("org.mockito:mockito-core:3.0.0")
@@ -66,18 +66,18 @@ tasks.withType(JavaCompile).configureEach {
 sourceSets {
     main {
         java {
-            srcDir 'src/main/java'
-            srcDir 'src/legacy/java'
+            srcDir "src/main/java"
+            srcDir "src/legacy/java"
         }
         resources {
-            srcDir 'src/main/resources'
+            srcDir "src/main/resources"
         }
     }
 }
 
 processResources {
-    from('src/main/resources') {
-        include 'fawe.properties'
+    from("src/main/resources") {
+        include "fawe.properties"
         expand(
                 version: "${project.parent.version}",
                 name: project.parent.name,
@@ -88,13 +88,13 @@ processResources {
 }
 
 jar.archiveName="fawe-api-${project.parent.version}.jar"
-jar.destinationDir = file '../mvn/com/boydti/fawe-api/' + project.parent.version
+jar.destinationDir = file "../mvn/com/boydti/fawe-api/" + project.parent.version
 task createPom {
     doLast {
         pom {
             project {
-                groupId 'com.boydti'
-                artifactId 'fawe-api'
+                groupId "com.boydti"
+                artifactId "fawe-api"
                 version project.parent.version
             }
         }
@@ -103,9 +103,9 @@ task createPom {
                 .writeTo("../mvn/com/boydti/fawe-api/${project.parent.version}/fawe-api-${project.parent.version}.pom")
         pom {
             project {
-                groupId 'com.boydti'
-                artifactId 'fawe-api'
-                version 'latest'
+                groupId "com.boydti"
+                artifactId "fawe-api"
+                version "latest"
             }
         }
         .getEffectivePom()
@@ -117,9 +117,9 @@ task copyFiles {
     doLast {
         copy {
             from "../mvn/com/boydti/fawe-api/${project.parent.version}/"
-            into '../mvn/com/boydti/fawe-api/latest/'
-            include('*.jar')
-            rename ("fawe-api-${project.parent.version}.jar", 'fawe-api-latest.jar')
+            into "../mvn/com/boydti/fawe-api/latest/"
+            include("*.jar")
+            rename ("fawe-api-${project.parent.version}.jar", "fawe-api-latest.jar")
         }
     }
 }
