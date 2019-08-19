@@ -2,7 +2,7 @@ rootProject.name = "FastAsyncWorldEdit"
 
 include("worldedit-libs")
 
-listOf("core", "bukkit").forEach {
+listOf("bukkit", "core").forEach {
     include("worldedit-libs:$it")
     include("worldedit-$it")
 }
