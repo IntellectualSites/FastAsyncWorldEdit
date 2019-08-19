@@ -22,6 +22,12 @@ buildscript {
 plugins {
     id "org.ajoberstar.grgit" version "3.1.1"
     id "com.github.johnrengelman.shadow" version "5.1.0"
+    id 'com.gradle.build-scan' version '1.16'
+}
+
+buildScan {
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
 }
 
 println """
