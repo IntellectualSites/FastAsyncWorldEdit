@@ -13,7 +13,7 @@ logger.lifecycle("""
  Output files will be in [subproject]/build/libs
 *******************************************
 """)
-
+//TODO FIX THIS WHEN I FEEL LIKE IT
 //def rootVersion = "1.13"
 //def revision = ""
 //def buildNumber = ""
