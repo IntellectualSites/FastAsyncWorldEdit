@@ -61,8 +61,6 @@ import com.sk89q.worldedit.command.HistoryCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
 import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
-import com.sk89q.worldedit.command.PatternCommands;
-import com.sk89q.worldedit.command.PatternCommandsRegistration;
 import com.sk89q.worldedit.command.RegionCommands;
 import com.sk89q.worldedit.command.RegionCommandsRegistration;
 import com.sk89q.worldedit.command.SchematicCommands;
@@ -81,8 +79,8 @@ import com.sk89q.worldedit.command.ToolCommands;
 import com.sk89q.worldedit.command.ToolCommandsRegistration;
 import com.sk89q.worldedit.command.ToolUtilCommands;
 import com.sk89q.worldedit.command.ToolUtilCommandsRegistration;
-import com.sk89q.worldedit.command.TransformCommands;
-import com.sk89q.worldedit.command.TransformCommandsRegistration;
+//import com.sk89q.worldedit.command.TransformCommands;
+//import com.sk89q.worldedit.command.TransformCommandsRegistration;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.command.UtilityCommandsRegistration;
 import com.sk89q.worldedit.command.WorldEditCommands;
@@ -306,20 +304,20 @@ public final class PlatformCommandManager {
     public void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
             // TODO NOT IMPLEMENTED dunno why these have issues generating
-            registerSubCommands(
-                "patterns",
-                ImmutableList.of(),
-                "Patterns determine what blocks are placed",
-                PatternCommandsRegistration.builder(),
-                new PatternCommands()
-            );
-            registerSubCommands(
-                "transforms",
-                ImmutableList.of(),
-                "Transforms modify how a block is placed",
-                TransformCommandsRegistration.builder(),
-                new TransformCommands()
-            );
+//            registerSubCommands(
+//                "patterns",
+//                ImmutableList.of(),
+//                "Patterns determine what blocks are placed",
+//                PatternCommandsRegistration.builder(),
+//                new PatternCommands()
+//            );
+//            registerSubCommands(
+//                "transforms",
+//                ImmutableList.of(),
+//                "Transforms modify how a block is placed",
+//                TransformCommandsRegistration.builder(),
+//                new TransformCommands()
+//            );
             registerSubCommands(
                 "schematic",
                 ImmutableList.of("schem", "/schematic", "/schem"),
@@ -380,17 +378,17 @@ public final class PlatformCommandManager {
                 AnvilCommandsRegistration.builder(),
                 new AnvilCommands(worldEdit)
             );
-            registerSubCommands(
-                "transforms",
-                ImmutableList.of(),
-                "Transforms modify how a block is placed\n" +
-                    " - Use [brackets] for arguments\n" +
-                    " - Use , to OR multiple\n" +
-                    " - Use & to AND multiple\n" +
-                    "More Info: https://git.io/v9KHO",
-                TransformCommandsRegistration.builder(),
-                new TransformCommands()
-            );
+//            registerSubCommands(
+//                "transforms",
+//                ImmutableList.of(),
+//                "Transforms modify how a block is placed\n" +
+//                    " - Use [brackets] for arguments\n" +
+//                    " - Use , to OR multiple\n" +
+//                    " - Use & to AND multiple\n" +
+//                    "More Info: https://git.io/v9KHO",
+//                TransformCommandsRegistration.builder(),
+//                new TransformCommands()
+//            );
             this.registration.register(
                 commandManager,
                 BiomeCommandsRegistration.builder(),
