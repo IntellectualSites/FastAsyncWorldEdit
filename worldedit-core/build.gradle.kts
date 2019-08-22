@@ -24,7 +24,6 @@ dependencies {
     "compile"("it.unimi.dsi:fastutil:8.2.1")
     "compile"("com.googlecode.json-simple:json-simple:1.1.1")
 
-
     "compileOnly"(project(":worldedit-libs:core:ap"))
     "annotationProcessor"(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP
@@ -59,9 +58,8 @@ sourceSets {
 
 tasks.named<Copy>("processResources") {
     filesMatching("fawe.properties") {
-        expand("version" to (project.parent?.version ?: "UNKNOWN"))
-        expand("name" to (project.parent?.name ?: "FAWE"))
-        expand("commit" to "TODO GIT")
-        expand("date" to "TODO Date")
+//        expand("version" to project.ext["internalVersion"])
+//        expand("commit" to "TODO GIT")
+//        expand("date" to "TODO Date")
     }
 }

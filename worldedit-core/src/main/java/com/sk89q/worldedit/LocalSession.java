@@ -72,6 +72,7 @@ import com.sk89q.worldedit.regions.selector.RegionSelectorType;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -395,7 +396,7 @@ public class LocalSession implements TextureHolder {
         return null;
     }
 
-    public synchronized void remember(Player player, World world, ChangeSet changeSet, FaweLimit limit) {
+    public synchronized void remember(Identifiable player, World world, ChangeSet changeSet, FaweLimit limit) {
         if (Settings.IMP.HISTORY.USE_DISK) {
             LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
         }
@@ -438,7 +439,7 @@ public class LocalSession implements TextureHolder {
         }
     }
 
-    public synchronized void remember(final EditSession editSession, final boolean append, int limitMb) {
+    public synchronized void remember(EditSession editSession, boolean append, int limitMb) {
         if (Settings.IMP.HISTORY.USE_DISK) {
             LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
         }

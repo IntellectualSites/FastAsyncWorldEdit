@@ -1,10 +1,10 @@
 name: WorldEdit
 main: com.sk89q.worldedit.bukkit.WorldEditPlugin
-version: ${version}
+version: "${internalVersion}"
+load: STARTUP
 api-version: 1.13
 description: Fast Async WorldEdit plugin
 authors: [Empire92]
-load: STARTUP
 loadbefore: [BannerBoard, WorldGuard, PlotSquared, AsyncWorldEdit, AsyncWorldEditInjector]
 database: false
 permissions:

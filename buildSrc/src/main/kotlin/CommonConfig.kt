@@ -13,7 +13,6 @@ fun Project.applyCommonConfiguration() {
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
         maven { url = uri("http://empcraft.com/maven2") }
         maven { url = uri("https://repo.destroystokyo.com/repository/maven-public") }
-        //maven { url = uri("https://ci.athion.net/job/FAWE-Piston/ws/") }
         ivy { url = uri("https://ci.athion.net/job")
             patternLayout {
                 artifact("/[organisation]/[module]/artifact/[revision].[ext]")

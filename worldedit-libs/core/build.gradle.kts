@@ -13,9 +13,4 @@ dependencies {
     "shade"("org.enginehub.piston:core:${Versions.PISTON}")
     "shade"("org.enginehub.piston.core-ap:runtime:${Versions.PISTON}")
     "shade"("org.enginehub.piston:default-impl:${Versions.PISTON}")
-/*
-    "shade"("FAWE-Piston:core/build/libs/core-${Versions.PISTON}:lastSuccessfulBuild@jar")
-    "shade"("FAWE-Piston:core-ap/runtime/build/libs/runtime-${Versions.PISTON}:lastSuccessfulBuild@jar")
-    "shade"("FAWE-Piston:default-impl/build/libs/default-impl-${Versions.PISTON}:lastSuccessfulBuild@jar")
-*/
 }

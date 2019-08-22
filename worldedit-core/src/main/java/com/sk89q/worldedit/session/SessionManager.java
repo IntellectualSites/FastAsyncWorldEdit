@@ -71,7 +71,7 @@ public class SessionManager {
     private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
     private static boolean warnedInvalidTool;
 
-    private final Timer timer = new Timer();
+    private final Timer timer = new Timer("WorldEdit Session Manager");
     private final WorldEdit worldEdit;
     private final Map<UUID, SessionHolder> sessions = new HashMap<>();
     private SessionStore store = new VoidStore();
