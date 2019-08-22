@@ -20,12 +20,11 @@ dependencies {
     "compile"("rhino:js:1.7R2")
     "compile"("org.yaml:snakeyaml:1.23")
     "compile"("com.google.guava:guava:21.0")
-    "compile"("com.google.code.findbugs:jsr305:1.3.9")
+    "compile"("com.google.code.findbugs:jsr305:3.0.2")
     "compile"("com.google.code.gson:gson:2.8.0")
     "compile"("org.slf4j:slf4j-api:1.7.26")
     "compile"("it.unimi.dsi:fastutil:8.2.1")
-    "compile"("com.googlecode.json-simple:json-simple:1.1.1")
-
+    "compile"("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
     "compileOnly"(project(":worldedit-libs:core:ap"))
     "annotationProcessor"(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP

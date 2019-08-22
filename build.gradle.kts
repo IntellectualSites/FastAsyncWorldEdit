@@ -1,5 +1,9 @@
 import org.ajoberstar.grgit.Grgit
 
+plugins {
+    id("com.gradle.build-scan") version "2.4.1"
+}
+
 logger.lifecycle("""
 *******************************************
  You are building WorldEdit!
@@ -45,4 +49,11 @@ if (!project.hasProperty("gitCommitHash")) {
 
         "no_git_id"
     }
+}
+
+buildScan {
+    setTermsOfServiceUrl("https://gradle.com/terms-of-service")
+    setTermsOfServiceAgree("yes")
+
+    publishAlways()
 }
