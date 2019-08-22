@@ -32,7 +32,7 @@ dependencies {
     "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     "compile"("co.aikar:fastutil-lite:1.0")
     "compile"("com.github.luben:zstd-jni:1.1.1")
-    "compile"("com.mojang:datafixerupper:1.0.20")
+    //"compile"("com.mojang:datafixerupper:1.0.20")
     "compileOnly"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
