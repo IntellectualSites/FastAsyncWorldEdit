@@ -33,7 +33,7 @@ dependencies {
     "compileOnly"("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
     "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     "compile"("co.aikar:fastutil-lite:1.0")
-    "compile"("com.github.luben:zstd-jni:1.1.1")
+    "compile"("com.github.luben:zstd-jni:1.4.3-1")
     //"compile"("com.mojang:datafixerupper:1.0.20")
     "compileOnly"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
@@ -67,7 +67,7 @@ tasks.named<Copy>("processResources") {
 }
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
-        include(dependency("com.github.luben:zstd-jni:1.1.1"))
+        include(dependency("com.github.luben:zstd-jni:1.4.3-1"))
 
     }
 }
