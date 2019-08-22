@@ -1099,6 +1099,11 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public int getViewDistance() {
+        return parent.getViewDistance();
+    }
+
+    @Override
     public RayTraceResult rayTrace(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3, boolean arg4,
             double arg5, Predicate<Entity> arg6) {
         return parent.rayTrace(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
