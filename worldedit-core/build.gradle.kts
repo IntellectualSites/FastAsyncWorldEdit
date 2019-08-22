@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("java-library")
     id("net.ltgt.apt-eclipse")
@@ -61,5 +63,11 @@ tasks.named<Copy>("processResources") {
 //        expand("version" to project.ext["internalVersion"])
 //        expand("commit" to "TODO GIT")
 //        expand("date" to "TODO Date")
+    }
+}
+tasks.named<ShadowJar>("shadowJar") {
+    dependencies {
+        include(dependency("com.github.luben:zstd-jni:1.1.1"))
+
     }
 }
