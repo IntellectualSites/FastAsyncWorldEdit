@@ -21,9 +21,9 @@ package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.v1_14.adapter.Spigot_v1_14_R1;
 import com.boydti.fawe.util.MainUtil;
 
+import com.boydti.fawe.bukkit.adapter.mc1_14.Spigot_v1_14_R1;
 import com.google.common.base.Joiner;
 import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.util.yaml.YAMLProcessor;

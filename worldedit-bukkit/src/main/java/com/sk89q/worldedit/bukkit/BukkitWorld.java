@@ -22,7 +22,7 @@ package com.sk89q.worldedit.bukkit;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.bukkit.beta.BukkitGetBlocks;
+import com.boydti.fawe.bukkit.adapter.mc1_14.BukkitGetBlocks_1_14;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -510,7 +510,12 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
+    public void sendChunk(int X, int Z, int mask) {
+
+    }
+
+    @Override
     public IChunkGet get(int chunkX, int chunkZ) {
-        return new BukkitGetBlocks(getWorldChecked(), chunkX, chunkZ, Settings.IMP.QUEUE.POOL);
+        return new BukkitGetBlocks_1_14(getWorldChecked(), chunkX, chunkZ, Settings.IMP.QUEUE.POOL);
     }
 }

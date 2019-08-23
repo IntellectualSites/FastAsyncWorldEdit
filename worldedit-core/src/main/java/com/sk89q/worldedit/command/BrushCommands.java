@@ -597,13 +597,13 @@ public class BrushCommands {
 
     @Command(
             name = "clipboard",
-            aliases = { "copy" },
-            desc = "Choose the clipboard brush (Recommended: `/br copypaste`)",
+            desc = "@Deprecated use instead: `/br copypaste`)",
             descFooter = "Chooses the clipboard brush.\n" +
                    "Without the -p flag, the paste will appear centered at the target location. " +
                    "With the flag, then the paste will appear relative to where you had " +
                    "stood relative to the copied area when you copied it."
     )
+    @Deprecated
     @CommandPermissions("worldedit.brush.clipboard")
     public BrushSettings clipboardBrush(Player player,LocalSession session,
                                @Switch(name = 'a', desc = "Don't paste air from the clipboard")

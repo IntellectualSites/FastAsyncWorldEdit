@@ -33,14 +33,18 @@ import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.task.ThrowableSupplier;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import com.google.common.reflect.TypeToken;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.ApplyBrushCommands;
+import com.sk89q.worldedit.command.ApplyBrushCommandsRegistration;
 import com.sk89q.worldedit.command.BiomeCommands;
 import com.sk89q.worldedit.command.BiomeCommandsRegistration;
 import com.sk89q.worldedit.command.BrushCommands;
@@ -61,6 +65,7 @@ import com.sk89q.worldedit.command.HistoryCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
 import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
+import com.sk89q.worldedit.command.PaintBrushCommandsRegistration;
 import com.sk89q.worldedit.command.PatternCommands;
 import com.sk89q.worldedit.command.PatternCommandsRegistration;
 import com.sk89q.worldedit.command.RegionCommands;
@@ -131,13 +136,19 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -194,6 +205,7 @@ public final class PlatformCommandManager {
     private final DynamicStreamHandler dynamicHandler = new DynamicStreamHandler();
     private final WorldEditExceptionConverter exceptionConverter;
     public final CommandRegistrationHandler registration;
+
     private static PlatformCommandManager INSTANCE;
 
     /**
@@ -267,45 +279,74 @@ public final class PlatformCommandManager {
         // TODO NOT IMPLEMENTED - register the following using a custom processor / annotations
     }
 
-    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-                                      CommandRegistration<CI> registration, CI instance) {
-        registerSubCommands(name, aliases, desc, registration, instance, m -> {});
+    public org.enginehub.piston.annotation.Command createAnnotation(String name, List<String> aliases, String desc) {
+        return new org.enginehub.piston.annotation.Command() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return getClass();
+            }
+
+            @Override
+            public String name() {
+                return name;
+            }
+
+            @Override
+            public String[] aliases() {
+                return aliases.toArray(new String[0]);
+            }
+
+            @Override
+            public String desc() {
+                return desc;
+            }
+
+            @Override
+            public String descFooter() {
+                return "";
+            }
+        };
     }
 
-    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-                                          CommandRegistration<CI> registration, CI instance,
-                                          Consumer<CommandManager> additionalConfig) {
-        commandManager.register(name, cmd -> {
-            cmd.aliases(aliases);
-            cmd.description(TextComponent.of(desc));
-            cmd.action(Command.Action.NULL_ACTION);
+    public <CI> void registerSubCommands(org.enginehub.piston.annotation.Command annotation, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
+        registerSubCommands(annotation, commandManager, handlerInstance);
+    }
+
+    public <CI> void registerSubCommands(org.enginehub.piston.annotation.Command annotation, CommandManager commandManager, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
+        commandManager.register(annotation.name(), builder -> {
+            builder.description(TextComponent.of(annotation.desc()));
+            builder.action(org.enginehub.piston.Command.Action.NULL_ACTION);
 
             CommandManager manager = commandManagerService.newCommandManager();
-            this.registration.register(
-                manager,
-                registration,
-                instance
-            );
-            additionalConfig.accept(manager);
+
+            handlerInstance.accept((handler, instance) -> registration.register(
+                    manager,
+                    handler,
+                    instance
+            ));
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
-            cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
-                TextComponent.of("Sub-command to run."))
-                .withCommands(subCommands)
-                .required()
-                .build());
+            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
+                    TextComponent.of("Sub-command to run."))
+                    .withCommands(subCommands)
+                    .required()
+                    .build());
 
-            cmd.condition(new SubCommandPermissionCondition.Generator(subCommands).build());
+            builder.condition(new SubCommandPermissionCondition.Generator(subCommands).build());
         });
     }
 
-    public void getCommand(String arguments) {
+    public <CI> void registerSubCommands(String name, List<String> aliases, String desc,
+                                         CommandRegistration<CI> registration, CI instance) {
+        registerSubCommands(createAnnotation(name, aliases, desc), commandManager, c -> c.accept(registration, instance));
+    }
 
+    public <CI> void registerSubCommands(String name, List<String> aliases, String desc, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
+        registerSubCommands(createAnnotation(name, aliases, desc), commandManager, handlerInstance);
     }
 
     public void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
-            // TODO NOT IMPLEMENTED dunno why these have issues generating
             registerSubCommands(
                 "patterns",
                 ImmutableList.of(),
@@ -342,19 +383,16 @@ public final class PlatformCommandManager {
                 new SuperPickaxeCommands(worldEdit)
             );
             registerSubCommands(
-                    "brush",
-                    ImmutableList.of("br", "/brush", "/br"),
-                    "Brushing commands",
-                    BrushCommandsRegistration.builder(),
-                    new BrushCommands(worldEdit),
-                    manager -> {
-                        PaintBrushCommands.register(commandManagerService, manager, registration);
-                        ApplyBrushCommands.register(commandManagerService, manager, registration);
+                    createAnnotation("brush", Arrays.asList("br", "/brush", "/br", "/tool", "tool"), "Brushing commands"),
+                    c -> {
+                        c.accept(BrushCommandsRegistration.builder(), new BrushCommands(worldEdit));
+                        c.accept(PaintBrushCommandsRegistration.builder(), new PaintBrushCommands());
+                        c.accept(ApplyBrushCommandsRegistration.builder(), new ApplyBrushCommands());
                     }
             );
             registerSubCommands(
                 "brush",
-                ImmutableList.of("br", "/b"),
+                    ImmutableList.of("br", "/brush", "/br", "/tool", "tool"),
                 "Tool commands",
                 BrushOptionsCommandsRegistration.builder(),
                 new BrushOptionsCommands(worldEdit)

@@ -19,29 +19,44 @@
 
 package com.sk89q.worldedit.registry;
 
+import com.google.common.collect.Maps;
+
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static org.enginehub.piston.converter.SuggestionHelper.byPrefix;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
-public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Registry<V> {
+public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
     private static final String MINECRAFT_NAMESPACE = "minecraft";
     private final Set<String> knownNamespaces = new HashSet<>();
     private final String defaultNamespace;
     private final List<V> values = new ArrayList<>();
     private int lastInternalId = 0;
 
+    public NamespacedRegistry(final String name, Map<String, V> map) {
+        this(name, map, MINECRAFT_NAMESPACE);
+    }
+
     public NamespacedRegistry(final String name) {
         this(name, MINECRAFT_NAMESPACE);
     }
 
     public NamespacedRegistry(final String name, final String defaultNamespace) {
-        super(name);
+        this(name, Maps.newHashMap(), defaultNamespace);
+    }
+
+    public NamespacedRegistry(final String name, Map<String, V> map, final String defaultNamespace) {
+        super(name, map);
         this.defaultNamespace = defaultNamespace;
     }
 
@@ -60,7 +75,9 @@ public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Re
         if (existing != null) {
             throw new UnsupportedOperationException("Replacing existing registrations is not supported");
         }
-        value.setInternalId(lastInternalId++);
+        if (value instanceof RegistryItem) {
+            ((RegistryItem) value).setInternalId(lastInternalId++);
+        }
         values.add(value);
         super.register(key, value);
         if (key.startsWith(defaultNamespace)) {
@@ -75,10 +92,6 @@ public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Re
         } catch (IndexOutOfBoundsException e) {
             return null;
         }
-    }
-
-    public int getInternalId(V value) {
-        return value.getInternalId();
     }
 
     public int size() {
@@ -108,5 +121,33 @@ public final class NamespacedRegistry<V extends RegistryItem & Keyed> extends Re
             return defaultNamespace + ':' + key;
         }
         return key;
+    }
+
+    @Override
+    public <V1 extends Keyed> Stream<String> getSuggestions(String input) {
+        if (input.isEmpty() || input.equals(":")) {
+            final Set<String> namespaces = getKnownNamespaces();
+            if (namespaces.size() == 1) {
+                return keySet().stream();
+            } else {
+                return namespaces.stream().map(s -> s + ":");
+            }
+        }
+        if (input.startsWith(":")) { // special case - search across namespaces
+            final String term = input.substring(1).toLowerCase(Locale.ROOT);
+            Predicate<String> search = byPrefix(term);
+            return keySet().stream().filter(s -> search.test(s.substring(s.indexOf(':') + 1)));
+        }
+        // otherwise, we actually have some text to search
+        if (input.indexOf(':') < 0) {
+            // don't yet have namespace - search namespaces + default
+            final String lowerSearch = input.toLowerCase(Locale.ROOT);
+            String defKey = getDefaultNamespace() + ":" + lowerSearch;
+            return Stream.concat(keySet().stream().filter(s -> s.startsWith(defKey)),
+                    getKnownNamespaces().stream().filter(n -> n.startsWith(lowerSearch)).map(n -> n + ":"));
+        }
+        // have a namespace - search that
+        Predicate<String> search = byPrefix(input.toLowerCase(Locale.ROOT));
+        return keySet().stream().filter(search);
     }
 }
