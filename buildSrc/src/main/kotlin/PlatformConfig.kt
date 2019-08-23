@@ -94,12 +94,13 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
 fun Project.applyShadowConfiguration() {
     tasks.named<ShadowJar>("shadowJar") {
-        archiveClassifier.set("dist")
+//        archiveClassifier.set("dist")
         dependencies {
             include(project(":worldedit-libs:core"))
             include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
             include(project(":worldedit-core"))
         }
+        archiveName = "FastAsyncWorldEdit-${project.version}.jar"
         exclude("GradleStart**")
         exclude(".cache")
         exclude("LICENSE*")
