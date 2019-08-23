@@ -780,7 +780,7 @@ public class BrushCommands {
 
     @Command(
             name = "copypaste",
-            aliases = {"copy", "paste", "cp", "copypasta"},
+            aliases = {"cp", "copypasta"},
             desc = "Copy Paste brush",
             descFooter = "Left click the base of an object to copy.\n" +
                    "Right click to paste\n" +
