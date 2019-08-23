@@ -59,9 +59,9 @@ sourceSets {
 
 tasks.named<Copy>("processResources") {
     filesMatching("fawe.properties") {
-//        expand("version" to project.ext["internalVersion"])
-//        expand("commit" to "TODO GIT")
-//        expand("date" to "TODO Date")
+        expand("version" to "$version")
+        expand("commit" to "${rootProject.ext["revision"]}")
+        expand("date" to "${rootProject.ext["date"]}")
     }
 }
 tasks.named<ShadowJar>("shadowJar") {

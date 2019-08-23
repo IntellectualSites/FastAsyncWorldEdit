@@ -1,4 +1,5 @@
 import org.ajoberstar.grgit.Grgit
+import java.time.format.DateTimeFormatter
 
 plugins {
     id("com.gradle.build-scan") version "2.4.1"
@@ -18,6 +19,28 @@ logger.lifecycle("""
 *******************************************
 """)
 //TODO FIX THIS WHEN I FEEL LIKE IT
+var rootVersion = "1.13"
+var revision: String = ""
+var buildNumber = ""
+var date: String = ""
+ext {
+    val git: Grgit = Grgit.open {
+        dir = File(rootDir.toString() + "/.git");
+    }
+    ext["date"] = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"));
+    ext["revision"] = "-${git.head().abbreviatedId}";
+    var parents: MutableList<String>? = git.head().parentIds;
+    if (project.hasProperty("buildnumber")) {
+        buildNumber = project.properties["buildnumber"] as String;
+    } else {
+        var index = -2109;  // Offset to match CI
+        while (parents != null && parents.isNotEmpty()) {
+            parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
+            index++;
+        }
+        buildNumber = index.toString();
+    }
+}
 //def rootVersion = "1.13"
 //def revision = ""
 //def buildNumber = ""
@@ -39,6 +62,8 @@ logger.lifecycle("""
 //}
 //
 //version = String.format("%s.%s", rootVersion, buildNumber)
+
+version = String.format("%s.%s", rootVersion, buildNumber)
 
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
