@@ -141,8 +141,11 @@ configure(['worldedit-core', 'worldedit-bukkit'].collect { project("$it") }) {
         build.dependsOn(sourcesJar)
     }
 
+    compileJava.options.encoding = 'UTF-8'
+
 //    build.dependsOn(checkstyleMain)
 //    build.dependsOn(checkstyleTest)
+
 
     dependencies {
         compileOnly 'org.jetbrains:annotations:17.0.0'
