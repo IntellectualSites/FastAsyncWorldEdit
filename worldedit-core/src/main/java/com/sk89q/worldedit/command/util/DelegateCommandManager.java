@@ -61,7 +61,7 @@ public class DelegateCommandManager implements CommandManager {
     }
 
     @Override
-    public int execute(InjectedValueAccess context, List<String> args) {
+    public Object execute(InjectedValueAccess context, List<String> args) {
         return parent.execute(context, args);
     }
 
