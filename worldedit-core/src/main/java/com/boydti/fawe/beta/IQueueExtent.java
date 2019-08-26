@@ -182,14 +182,4 @@ public interface IQueueExtent extends Flushable, Trimable, Extent {
      * @return If queue is empty
      */
     boolean isEmpty();
-
-    /**
-     * Refresh a specific chunk with a bitMask (0 = default, 65535 = all block sections)
-     * Note: only 0 is guaranteed to send all tiles / entities
-     * Note: Only 65535 is guaranteed to send all blocks
-     * @param chunkX
-     * @param chunkZ
-     * @param bitMask
-     */
-    void sendChunk(int chunkX, int chunkZ, int bitMask);
 }

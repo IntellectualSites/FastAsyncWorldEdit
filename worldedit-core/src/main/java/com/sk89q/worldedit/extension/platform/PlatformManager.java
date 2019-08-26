@@ -72,7 +72,9 @@ public class PlatformManager {
     private static final Logger logger = LoggerFactory.getLogger(PlatformManager.class);
 
     private final WorldEdit worldEdit;
-    private final PlatformCommandManager platformCommandManager;
+
+    private PlatformCommandManager platformCommandManager;
+
     private final List<Platform> platforms = new ArrayList<>();
     private final Map<Capability, Platform> preferences = new EnumMap<>(Capability.class);
     private @Nullable String firstSeenVersion;
@@ -87,7 +89,6 @@ public class PlatformManager {
     public PlatformManager(WorldEdit worldEdit) {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
-        this.platformCommandManager = new PlatformCommandManager(worldEdit, this);
 
         // Register this instance for events
         worldEdit.getEventBus().register(this);
@@ -116,6 +117,10 @@ public class PlatformManager {
             }
         } else {
             firstSeenVersion = platform.getVersion();
+        }
+
+        if (this.platformCommandManager == null) {
+            this.platformCommandManager = new PlatformCommandManager(worldEdit, this);
         }
     }
 

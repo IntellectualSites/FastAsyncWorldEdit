@@ -135,6 +135,11 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
+    public void sendChunk(int X, int Z, int mask) {
+
+    }
+
+    @Override
     public IChunkGet get(int x, int z) {
         return NullChunkGet.INSTANCE;
     }

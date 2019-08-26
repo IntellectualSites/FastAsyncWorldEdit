@@ -1,12 +1,9 @@
 package com.boydti.fawe.bukkit.util;
 
-import com.boydti.fawe.bukkit.beta.BukkitQueue;
 import com.boydti.fawe.util.ReflectionUtils;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;

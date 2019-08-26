@@ -160,11 +160,6 @@ public interface IDelegateQueueExtent extends IQueueExtent {
     }
 
     @Override
-    default void sendChunk(int chunkX, int chunkZ, int bitMask) {
-        getParent().sendChunk(chunkX, chunkZ, bitMask);
-    }
-
-    @Override
     default boolean trim(boolean aggressive) {
         return getParent().trim(aggressive);
     }

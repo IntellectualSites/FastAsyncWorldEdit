@@ -22,6 +22,8 @@ package com.sk89q.worldedit.world.registry;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -76,6 +78,15 @@ public final class BundledBlockData {
     private void loadFromResource() throws IOException {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
+        gsonBuilder.registerTypeAdapter(int.class, (JsonDeserializer<Integer>) (json, typeOfT, context) -> {
+            JsonPrimitive primitive = (JsonPrimitive) json;
+            if (primitive.isString()) {
+                String value = primitive.getAsString();
+                if (value.charAt(0) == '#') return Integer.parseInt(value.substring(1), 16);
+                return Integer.parseInt(value);
+            }
+            return primitive.getAsInt();
+        });
         Gson gson = gsonBuilder.create();
         URL url = null;
         final int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();

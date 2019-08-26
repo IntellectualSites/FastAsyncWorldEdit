@@ -26,11 +26,17 @@ import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.registry.IRegistry;
+import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.registry.Registry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import com.sk89q.worldedit.world.registry.Registries;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -871,18 +877,22 @@ public final class BlockTypes {
     public static final int BIT_OFFSET; // Used internally
     protected static final int BIT_MASK; // Used internally
 
-    private static final Map<String, BlockType> $REGISTRY = new HashMap<>();
+//    private static final Map<String, BlockType> $REGISTRY = new HashMap<>();
+//    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type", $REGISTRY);
 
     public static final BlockType[] values;
     public static final BlockState[] states;
 
-    private static final Set<String> $NAMESPACES = new LinkedHashSet<String>();
+    private static final Set<String> $NAMESPACES = new LinkedHashSet<>();
 
     static {
         try {
             ArrayList<BlockState> stateList = new ArrayList<>();
 
-            Collection<String> blocks = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().registerBlocks();
+            Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS);
+            Registries registries = platform.getRegistries();
+            BlockRegistry blockReg = registries.getBlockRegistry();
+            Collection<String> blocks = blockReg.registerBlocks();
             Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
 
             int size = blockMap.size();
@@ -928,7 +938,7 @@ public final class BlockTypes {
 
             // Add to $Registry
             for (BlockType type : values) {
-                $REGISTRY.put(type.getId().toLowerCase(Locale.ROOT), type);
+                BlockType.REGISTRY.register(type.getId().toLowerCase(Locale.ROOT), type);
             }
             states = stateList.toArray(new BlockState[stateList.size()]);
 
@@ -954,15 +964,13 @@ public final class BlockTypes {
         try {
             Field field = BlockTypes.class.getDeclaredField(enumName);
             ReflectionUtils.setFailsafeFieldValue(field, null, existing);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
         // register states
-        if (typeName.startsWith("minecraft:")) $REGISTRY.put(typeName.substring(10), existing);
-        $REGISTRY.put(typeName, existing);
+        if (typeName.startsWith("minecraft:")) BlockType.REGISTRY.register(typeName.substring(10), existing);
+        BlockType.REGISTRY.register(typeName, existing);
         String nameSpace = typeName.substring(0, typeName.indexOf(':'));
         $NAMESPACES.add(nameSpace);
         return existing;
@@ -980,7 +988,7 @@ public final class BlockTypes {
         String input = inputLower;
 
         if (!input.split("\\[", 2)[0].contains(":")) input = "minecraft:" + input;
-        BlockType result = $REGISTRY.get(input);
+        BlockType result = BlockType.REGISTRY.get(input);
         if (result != null) return result;
 
         try {
@@ -1002,11 +1010,11 @@ public final class BlockTypes {
     }
 
     public static @Nullable BlockType get(final String id) {
-        return $REGISTRY.get(id);
+        return BlockType.REGISTRY.getMap().get(id);
     }
 
     public static @Nullable BlockType get(final CharSequence id) {
-        return $REGISTRY.get(id);
+        return BlockType.REGISTRY.getMap().get(id);
     }
 
     @Deprecated

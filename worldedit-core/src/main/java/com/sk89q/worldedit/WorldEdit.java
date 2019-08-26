@@ -81,7 +81,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
 
-import org.mozilla.javascript.NativeJavaObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +108,8 @@ public final class WorldEdit {
     private final PlatformManager platformManager = new PlatformManager(this);
     private final EditSessionFactory editSessionFactory = new EditSessionFactory.EditSessionFactoryImpl(eventBus);
     private final SessionManager sessions = new SessionManager(this);
-    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20));;
+    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
+            EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
     private final Supervisor supervisor = new SimpleSupervisor();
 
     private final BlockFactory blockFactory = new BlockFactory(this);
@@ -635,14 +635,14 @@ public final class WorldEdit {
      * @param args arguments for the script
      * @throws WorldEditException
      */
-    public Object runScript(Player player, File f, String[] args) throws WorldEditException {
+    public void runScript(Player player, File f, String[] args) throws WorldEditException {
         String filename = f.getPath();
         int index = filename.lastIndexOf('.');
         String ext = filename.substring(index + 1);
 
         if (!ext.equalsIgnoreCase("js")) {
             player.printError("Only .js scripts are currently supported");
-            return null;
+            return;
         }
 
         String script;
@@ -655,7 +655,7 @@ public final class WorldEdit {
 
                 if (file == null) {
                     player.printError("Script does not exist: " + filename);
-                    return null;
+                    return;
                 }
             } else {
                 file = new FileInputStream(f);
@@ -668,7 +668,7 @@ public final class WorldEdit {
             script = new String(data, 0, data.length, StandardCharsets.UTF_8);
         } catch (IOException e) {
             player.printError("Script read error: " + e.getMessage());
-            return null;
+            return;
         }
 
         LocalSession session = getSessionManager().get(player);
@@ -681,8 +681,8 @@ public final class WorldEdit {
             engine = new RhinoCraftScriptEngine();
         } catch (NoClassDefFoundError ignored) {
             player.printError("Failed to find an installed script engine.");
-            player.printError("Please see https://worldedit.readthedocs.io/en/latest/usage/other/craftscripts/");
-            return null;
+            player.printError("Please see https://worldedit.enginehub.org/en/latest/usage/other/craftscripts/");
+            return;
         }
 
         engine.setTimeLimit(getConfiguration().scriptTimeout);
@@ -693,11 +693,7 @@ public final class WorldEdit {
         vars.put("player", player);
 
         try {
-            Object result = engine.evaluate(script, filename, vars);
-            if (result instanceof NativeJavaObject) {
-                result = ((NativeJavaObject) result).unwrap();
-            }
-            return result;
+            engine.evaluate(script, filename, vars);
         } catch (ScriptException e) {
             player.printError("Failed to execute:");
             player.printRaw(e.getMessage());
@@ -714,7 +710,6 @@ public final class WorldEdit {
                 session.remember(editSession);
             }
         }
-        return null;
     }
 
     /**

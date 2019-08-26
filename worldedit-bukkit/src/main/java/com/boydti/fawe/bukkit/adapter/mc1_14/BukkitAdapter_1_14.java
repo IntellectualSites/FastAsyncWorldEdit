@@ -1,20 +1,12 @@
-package com.boydti.fawe.bukkit.beta;
+package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.SimpleCharQueueExtent;
-import com.boydti.fawe.beta.implementation.IChunkCache;
-import com.boydti.fawe.bukkit.v1_14.adapter.BlockMaterial_1_14;
+import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
-import com.boydti.fawe.wrappers.WorldWrapper;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -31,8 +23,6 @@ import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
-import net.minecraft.server.v1_14_R1.WorldServer;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import sun.misc.Unsafe;
@@ -45,38 +35,26 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public class BukkitQueue extends SimpleCharQueueExtent {
-    private org.bukkit.World bukkitWorld;
-    private WorldServer nmsWorld;
-
-    public BukkitQueue() {
-    }
-
-    @Override
-    public synchronized void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set) {
-        World world = WorldWrapper.unwrap(extent);
-        if (world == null) throw new IllegalArgumentException("Get must be a world.");
-        if (world instanceof BukkitWorld) {
-            this.bukkitWorld = ((BukkitWorld) world).getWorld();
-        } else {
-            this.bukkitWorld = Bukkit.getWorld(world.getName());
-        }
-        checkNotNull(this.bukkitWorld);
-        CraftWorld craftWorld = ((CraftWorld) bukkitWorld);
-        this.nmsWorld = craftWorld.getHandle();
-        super.init(extent, get, set);
-    }
-
-    @Override
-    protected synchronized void reset() {
-        super.reset();
-    }
+public class BukkitAdapter_1_14 {
 
     /*
-    NMS fields
-    */
+
+    World world = WorldWrapper.unwrap(extent);
+    if (world == null) throw new IllegalArgumentException("Get must be a world.");
+    if (world instanceof BukkitWorld) {
+        this.bukkitWorld = ((BukkitWorld) world).getWorld();
+    } else {
+        this.bukkitWorld = Bukkit.getWorld(world.getName());
+    }
+    checkNotNull(this.bukkitWorld);
+    CraftWorld craftWorld = ((CraftWorld) bukkitWorld);
+    this.nmsWorld = craftWorld.getHandle();
+
+     */
+
+    /*
+        NMS fields
+        */
     public final static Field fieldBits;
     public final static Field fieldPalette;
     public final static Field fieldSize;
@@ -172,10 +150,6 @@ public class BukkitQueue extends SimpleCharQueueExtent {
 
     private static boolean PAPER = true;
 
-    public Chunk ensureLoaded(int X, int Z) {
-        return ensureLoaded(nmsWorld, X, Z);
-    }
-
     public static Chunk ensureLoaded(net.minecraft.server.v1_14_R1.World nmsWorld, int X, int Z) {
         Chunk nmsChunk = nmsWorld.getChunkIfLoaded(X, Z);
         if (nmsChunk != null) {
@@ -249,11 +223,6 @@ public class BukkitQueue extends SimpleCharQueueExtent {
             return;
         }
         return;
-    }
-
-    @Override
-    public void sendChunk(final int X, final int Z, final int mask) {
-        sendChunk(nmsWorld, X, Z, mask);
     }
 
     /*

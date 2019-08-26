@@ -1,11 +1,11 @@
-package com.boydti.fawe.bukkit.beta;
+package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.QueueHandler;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
-import com.boydti.fawe.bukkit.v1_14.adapter.Spigot_v1_14_R1;
+import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.object.collection.BitArray4096;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
@@ -51,14 +51,14 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-public class BukkitGetBlocks extends CharGetBlocks {
+public class BukkitGetBlocks_1_14 extends CharGetBlocks {
     public ChunkSection[] sections;
     public Chunk nmsChunk;
     public CraftWorld world;
     public int X, Z;
     private boolean forceLoad;
 
-    public BukkitGetBlocks(World world, int X, int Z, boolean forceLoad) {
+    public BukkitGetBlocks_1_14(World world, int X, int Z, boolean forceLoad) {
         this.world = (CraftWorld) world;
         this.X = X;
         this.Z = Z;
@@ -91,7 +91,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
         return load(layer, null);
     }
 
-    private void updateGet(BukkitGetBlocks get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
+    private void updateGet(BukkitGetBlocks_1_14 get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
         synchronized (get) {
             if (this.nmsChunk != nmsChunk) {
                 this.nmsChunk = nmsChunk;
@@ -117,7 +117,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         try {
             WorldServer nmsWorld = world.getHandle();
-            Chunk nmsChunk = BukkitQueue.ensureLoaded(nmsWorld, X, Z);
+            Chunk nmsChunk = BukkitAdapter_1_14.ensureLoaded(nmsWorld, X, Z);
 
             // Remove existing tiles
 
@@ -157,8 +157,8 @@ public class BukkitGetBlocks extends CharGetBlocks {
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
-                        newSection = BukkitQueue.newChunkSection(layer, setArr);
-                        if (BukkitQueue.setSectionAtomic(sections, null, newSection, layer)) {
+                        newSection = BukkitAdapter_1_14.newChunkSection(layer, setArr);
+                        if (BukkitAdapter_1_14.setSectionAtomic(sections, null, newSection, layer)) {
                             updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             continue;
                         } else {
@@ -169,7 +169,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
                             }
                         }
                     }
-                    DelegateLock lock = BukkitQueue.applyLock(existingSection);
+                    DelegateLock lock = BukkitAdapter_1_14.applyLock(existingSection);
                     synchronized (this) {
                         synchronized (lock) {
                             lock.untilFree();
@@ -194,8 +194,8 @@ public class BukkitGetBlocks extends CharGetBlocks {
                                     getArr[i] = value;
                                 }
                             }
-                            newSection = BukkitQueue.newChunkSection(layer, getArr);
-                            if (!BukkitQueue.setSectionAtomic(sections, existingSection, newSection, layer)) {
+                            newSection = BukkitAdapter_1_14.newChunkSection(layer, getArr);
+                            if (!BukkitAdapter_1_14.setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 System.out.println("Failed to set chunk section:" + X + "," + Z + " layer: " + layer);
                                 continue;
                             } else {
@@ -344,7 +344,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
                         // send to player
-                        BukkitQueue.sendChunk(nmsWorld, X, Z, finalMask);
+                        BukkitAdapter_1_14.sendChunk(nmsWorld, X, Z, finalMask);
                         if (finalizer != null) finalizer.run();
                     };
                 }
@@ -397,7 +397,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
         if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
             data = new char[4096];
         }
-        DelegateLock lock = BukkitQueue.applyLock(section);
+        DelegateLock lock = BukkitAdapter_1_14.applyLock(section);
         synchronized (lock) {
             lock.untilFree();
             lock.setModified(false);
@@ -406,8 +406,8 @@ public class BukkitGetBlocks extends CharGetBlocks {
                 Spigot_v1_14_R1 adapter = ((Spigot_v1_14_R1) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                final DataBits bits = (DataBits) BukkitQueue.fieldBits.get(blocks);
-                final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitQueue.fieldPalette.get(blocks);
+                final DataBits bits = (DataBits) BukkitAdapter_1_14.fieldBits.get(blocks);
+                final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_14.fieldPalette.get(blocks);
 
                 final int bitsPerEntry = bits.c();
                 final long[] blockStates = bits.a();
@@ -506,7 +506,7 @@ public class BukkitGetBlocks extends CharGetBlocks {
             synchronized (this) {
                 tmp = nmsChunk;
                 if (tmp == null) {
-                    nmsChunk = tmp = BukkitQueue.ensureLoaded(this.world.getHandle(), X, Z);
+                    nmsChunk = tmp = BukkitAdapter_1_14.ensureLoaded(this.world.getHandle(), X, Z);
                 }
             }
         }

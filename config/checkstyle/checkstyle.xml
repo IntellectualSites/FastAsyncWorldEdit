@@ -65,10 +65,6 @@
       <property name="format" value="(?!Character)\.to(Lower|Upper)Case\(\)"/>
       <property name="illegalPattern" value="true"/>
     </module>
-    <module name="EmptyCatchBlock">
-      <property name="exceptionVariableName" value="ignored|ignore"/>
-    </module>
-
   </module>
   <!-- Validate that command annotations are formatted correctly -->
   <module name="RegexpMultiline">

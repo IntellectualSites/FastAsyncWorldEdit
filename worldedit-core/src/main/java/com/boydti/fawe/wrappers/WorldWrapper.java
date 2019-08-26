@@ -229,6 +229,11 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
+    public void sendChunk(int X, int Z, int mask) {
+        parent.sendChunk(X, Z, mask);
+    }
+
+    @Override
     public List<? extends Entity> getEntities(final Region region) {
         return TaskManager.IMP.sync(new RunnableVal<List<? extends Entity>>() {
             @Override

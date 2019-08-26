@@ -1,19 +1,13 @@
-package com.boydti.fawe.bukkit.beta;
+package com.boydti.fawe.bukkit.adapter;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.QueueHandler;
-import com.boydti.fawe.bukkit.v0.ChunkListener;
+import com.boydti.fawe.bukkit.listener.ChunkListener;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class BukkitQueueHandler extends QueueHandler {
-    @Override
-    public IQueueExtent create() {
-        return new BukkitQueue();
-    }
-
     private volatile boolean timingsEnabled;
     private static boolean alertTimingsChange = true;
 

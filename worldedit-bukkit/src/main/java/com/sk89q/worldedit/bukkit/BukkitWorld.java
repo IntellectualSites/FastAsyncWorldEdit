@@ -28,6 +28,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -36,6 +37,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -252,9 +254,6 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean clearContainerBlockContents(BlockVector3 pt) {
         Block block = getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
-        if (block == null) {
-            return false;
-        }
         BlockState state = block.getState();
         if (!(state instanceof InventoryHolder)) {
             return false;
@@ -321,14 +320,12 @@ public class BukkitWorld extends AbstractWorld {
     public void checkLoadedChunk(BlockVector3 pt) {
         World world = getWorld();
 
-        if (!world.isChunkLoaded(pt.getBlockX() >> 4, pt.getBlockZ() >> 4)) {
-            world.loadChunk(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
-        }
+        world.getChunkAt(pt.getBlockX() >> 4, pt.getBlockZ() >> 4);
     }
 
     @Override
     public boolean equals(Object other) {
-        World ref = worldRef.get();
+        final World ref = worldRef.get();
         if (ref == null) {
             return false;
         } else if (other == null) {
@@ -337,7 +334,7 @@ public class BukkitWorld extends AbstractWorld {
             World otherWorld = ((BukkitWorld) other).worldRef.get();
             return ref.equals(otherWorld);
         } else if (other instanceof com.sk89q.worldedit.world.World) {
-            return ((com.sk89q.worldedit.world.World) other).getName().equals(getName());
+            return ((com.sk89q.worldedit.world.World) other).getName().equals(ref.getName());
         } else {
             return false;
         }

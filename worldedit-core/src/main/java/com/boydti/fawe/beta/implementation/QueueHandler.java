@@ -2,6 +2,7 @@ package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -213,7 +214,9 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
     }
 
-    public abstract IQueueExtent create();
+    public IQueueExtent create() {
+        return new SingleThreadQueueExtent();
+    }
 
     public abstract void startSet(boolean parallel);
 

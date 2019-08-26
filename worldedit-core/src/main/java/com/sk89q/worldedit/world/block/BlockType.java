@@ -29,6 +29,7 @@ import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.FawePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
+import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
@@ -36,6 +37,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,9 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 
 public class BlockType implements FawePattern, Keyed {
+
+    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
+
     private final String id;
     private final BlockTypes.Settings settings;
 

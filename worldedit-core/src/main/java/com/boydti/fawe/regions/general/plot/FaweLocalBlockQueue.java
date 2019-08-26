@@ -121,7 +121,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     @Override
     public void refreshChunk(int x, int z) {
-        IMP.sendChunk(x, z, 0);
+        world.sendChunk(x, z, 0);
     }
 
     @Override

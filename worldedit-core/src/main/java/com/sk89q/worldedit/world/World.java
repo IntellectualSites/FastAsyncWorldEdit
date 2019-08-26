@@ -72,7 +72,6 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      *
      * @return the maximum Y
      */
-    @Override
     int getMaxY();
 
     /**

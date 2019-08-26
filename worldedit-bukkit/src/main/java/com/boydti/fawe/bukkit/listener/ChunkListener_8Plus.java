@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.v0;
+package com.boydti.fawe.bukkit.listener;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

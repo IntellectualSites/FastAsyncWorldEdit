@@ -42,7 +42,7 @@ public class CFICommand extends CommandProcessor<Object, Object> {
     }
 
     @Override
-    public Object process(InjectedValueAccess context, List<String> args, Object result) {
+    public int process(InjectedValueAccess context, List<String> args, int result) {
         return result;
     }
 

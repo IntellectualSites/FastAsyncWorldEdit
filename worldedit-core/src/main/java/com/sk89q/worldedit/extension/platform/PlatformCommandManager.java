@@ -88,6 +88,7 @@ import com.sk89q.worldedit.command.ToolUtilCommands;
 import com.sk89q.worldedit.command.ToolUtilCommandsRegistration;
 import com.sk89q.worldedit.command.TransformCommands;
 import com.sk89q.worldedit.command.TransformCommandsRegistration;
+import com.sk89q.worldedit.command.TransformCommandsRegistration;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.command.UtilityCommandsRegistration;
 import com.sk89q.worldedit.command.WorldEditCommands;

@@ -10,7 +10,7 @@ import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.Iterables;
 import com.sk89q.minecraft.util.commands.CommandLocals;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.TransformCommands;
+//import com.sk89q.worldedit.command.TransformCommands;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;

@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.v0;
+package com.boydti.fawe.bukkit.listener;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;

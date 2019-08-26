@@ -1,11 +1,7 @@
-package com.boydti.fawe.bukkit.beta;
+package com.boydti.fawe.bukkit.adapter;
 
-import org.apache.commons.lang.mutable.MutableInt;
-
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

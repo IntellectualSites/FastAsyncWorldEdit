@@ -2,9 +2,7 @@ package com.boydti.fawe.object.brush.visualization.cfi;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.FallbackChunkGet;
 import com.boydti.fawe.object.FaweInputStream;
@@ -16,7 +14,6 @@ import com.boydti.fawe.object.change.StreamChange;
 import com.boydti.fawe.object.changeset.CFIChangeSet;
 import com.boydti.fawe.object.collection.DifferentialArray;
 import com.boydti.fawe.object.collection.DifferentialBlockBuffer;
-import com.boydti.fawe.object.collection.IterableThreadLocal;
 import com.boydti.fawe.object.collection.LocalBlockVector2DSet;
 import com.boydti.fawe.object.collection.SummedAreaTable;
 import com.boydti.fawe.object.exception.FaweException;
@@ -47,14 +44,16 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
+import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -64,9 +63,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.annotation.Nullable;
 
 // TODO FIXME
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
@@ -319,6 +316,11 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 //                }
 //            }
 //        }
+    }
+
+    @Override
+    public void sendChunk(int X, int Z, int mask) {
+        throw new UnsupportedOperationException("TODO NOT IMPLEMENTED"); // add method to adapter to send custom chunk
     }
 
     public TextureUtil getRawTextureUtil() {
@@ -849,7 +851,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
     @Override
     public void close(boolean update) {
         if (chunkOffset != null && player != null && update) {
-            IQueueExtent packetQueue = Fawe.get().getQueueHandler().getQueue(player.getWorld());
+            World world = player.getWorld();
 
             int lenCX = (getWidth() + 15) >> 4;
             int lenCZ = (getLength() + 15) >> 4;
@@ -868,7 +870,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
             for (int cz = scz; cz <= ecz; cz++) {
                 for (int cx = scx; cx <= ecx; cx++) {
-                    packetQueue.sendChunk(cx + OX, cz + OZ, 0);
+                    world.sendChunk(cx + OX, cz + OZ, 0);
                 }
             }
         }

@@ -1,6 +1,8 @@
 package com.boydti.fawe.beta.implementation;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.CharFilterBlock;
+import com.boydti.fawe.beta.ChunkFilterBlock;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -25,7 +27,7 @@ import java.util.concurrent.Future;
  * <p>
  * This queue is reusable {@link #init(IChunkCache)}
  */
-public abstract class SingleThreadQueueExtent implements IQueueExtent {
+public class SingleThreadQueueExtent implements IQueueExtent {
 
 //    // Pool discarded chunks for reuse (can safely be cleared by another thread)
 //    private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
@@ -298,5 +300,10 @@ public abstract class SingleThreadQueueExtent implements IQueueExtent {
         }
         pollSubmissions(0, true);
         reset();
+    }
+
+    @Override
+    public ChunkFilterBlock initFilterBlock() {
+        return new CharFilterBlock(this);
     }
 }

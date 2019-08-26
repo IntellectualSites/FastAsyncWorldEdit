@@ -59,9 +59,9 @@ public class PlotSetBiome extends Command {
         Collection<BiomeType> knownBiomes = BiomeTypes.values();
         final BiomeType biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
         if (biome == null) {
-            String biomes = StringMan.join(WorldUtil.IMP.getBiomeList(), Captions.BLOCK_LIST_SEPARATER.s());
+            String biomes = StringMan.join(WorldUtil.IMP.getBiomeList(), Captions.BLOCK_LIST_SEPARATER.toString());
             Captions.NEED_BIOME.send(player);
-            MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER.s() + biomes);
+            MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER.toString() + biomes);
             return;
         }
         confirm.run(this, new Runnable() {

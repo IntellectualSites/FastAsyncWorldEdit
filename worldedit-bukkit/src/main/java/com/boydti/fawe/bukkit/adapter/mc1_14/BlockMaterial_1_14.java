@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.v1_14.adapter;
+package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
