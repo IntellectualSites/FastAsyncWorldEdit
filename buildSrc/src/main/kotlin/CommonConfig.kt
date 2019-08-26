@@ -16,7 +16,7 @@ fun Project.applyCommonConfiguration() {
         maven { url = uri("https://ci.athion.net/job/FAWE-Piston/ws/") }
         ivy { url = uri("https://ci.athion.net/job")
             patternLayout {
-                artifact("/[organisation]/[revision]/artifact/[module].[ext]")
+                artifact("/[organisation]/[module]/artifact/[revision].[ext]")
             }}
     }
     configurations.all {

@@ -88,7 +88,6 @@ import com.sk89q.worldedit.command.ToolUtilCommands;
 import com.sk89q.worldedit.command.ToolUtilCommandsRegistration;
 import com.sk89q.worldedit.command.TransformCommands;
 import com.sk89q.worldedit.command.TransformCommandsRegistration;
-import com.sk89q.worldedit.command.TransformCommandsRegistration;
 import com.sk89q.worldedit.command.UtilityCommands;
 import com.sk89q.worldedit.command.UtilityCommandsRegistration;
 import com.sk89q.worldedit.command.WorldEditCommands;
@@ -419,17 +418,17 @@ public final class PlatformCommandManager {
                 AnvilCommandsRegistration.builder(),
                 new AnvilCommands(worldEdit)
             );
-            registerSubCommands(
-                "transforms",
-                ImmutableList.of(),
-                "Transforms modify how a block is placed\n" +
-                    " - Use [brackets] for arguments\n" +
-                    " - Use , to OR multiple\n" +
-                    " - Use & to AND multiple\n" +
-                    "More Info: https://git.io/v9KHO",
-                TransformCommandsRegistration.builder(),
-                new TransformCommands()
-            );
+//            registerSubCommands(
+//                "transforms",
+//                ImmutableList.of(),
+//                "Transforms modify how a block is placed\n" +
+//                    " - Use [brackets] for arguments\n" +
+//                    " - Use , to OR multiple\n" +
+//                    " - Use & to AND multiple\n" +
+//                    "More Info: https://git.io/v9KHO",
+//                TransformCommandsRegistration.builder(),
+//                new TransformCommands()
+//            );
             this.registration.register(
                 commandManager,
                 BiomeCommandsRegistration.builder(),
