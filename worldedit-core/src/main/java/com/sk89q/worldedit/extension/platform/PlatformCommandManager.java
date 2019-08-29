@@ -19,38 +19,30 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.AnvilCommandsRegistration;
-import com.boydti.fawe.command.CFICommand;
 import com.boydti.fawe.command.CFICommands;
 import com.boydti.fawe.command.CFICommandsRegistration;
 import com.boydti.fawe.config.BBC;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.task.ThrowableSupplier;
+import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
 import com.google.common.reflect.TypeToken;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.ApplyBrushCommands;
-import com.sk89q.worldedit.command.ApplyBrushCommandsRegistration;
 import com.sk89q.worldedit.command.BiomeCommands;
 import com.sk89q.worldedit.command.BiomeCommandsRegistration;
 import com.sk89q.worldedit.command.BrushCommands;
 import com.sk89q.worldedit.command.BrushCommandsRegistration;
-import com.sk89q.worldedit.command.BrushOptionsCommands;
-import com.sk89q.worldedit.command.BrushOptionsCommandsRegistration;
 import com.sk89q.worldedit.command.ChunkCommands;
 import com.sk89q.worldedit.command.ChunkCommandsRegistration;
 import com.sk89q.worldedit.command.ClipboardCommands;
@@ -62,10 +54,11 @@ import com.sk89q.worldedit.command.GenerationCommands;
 import com.sk89q.worldedit.command.GenerationCommandsRegistration;
 import com.sk89q.worldedit.command.HistoryCommands;
 import com.sk89q.worldedit.command.HistoryCommandsRegistration;
+import com.sk89q.worldedit.command.MaskCommands;
+import com.sk89q.worldedit.command.MaskCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
 import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
-import com.sk89q.worldedit.command.PaintBrushCommandsRegistration;
 import com.sk89q.worldedit.command.PatternCommands;
 import com.sk89q.worldedit.command.PatternCommandsRegistration;
 import com.sk89q.worldedit.command.RegionCommands;
@@ -123,6 +116,7 @@ import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
 import com.sk89q.worldedit.internal.util.Substring;
+import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
@@ -132,29 +126,6 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.TextConfig;
@@ -179,6 +150,28 @@ import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -234,6 +227,7 @@ public final class PlatformCommandManager {
     }
 
     private void initialize() {
+        System.out.println("========== INITIALIZE");
         // Register this instance for command events
         worldEdit.getEventBus().register(this);
 
@@ -279,42 +273,14 @@ public final class PlatformCommandManager {
         // TODO NOT IMPLEMENTED - register the following using a custom processor / annotations
     }
 
-    public org.enginehub.piston.annotation.Command createAnnotation(String name, List<String> aliases, String desc) {
-        return new org.enginehub.piston.annotation.Command() {
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return getClass();
-            }
-
-            @Override
-            public String name() {
-                return name;
-            }
-
-            @Override
-            public String[] aliases() {
-                return aliases.toArray(new String[0]);
-            }
-
-            @Override
-            public String desc() {
-                return desc;
-            }
-
-            @Override
-            public String descFooter() {
-                return "";
-            }
-        };
+    public <CI> void registerSubCommands(String name, List<String> aliases, String desc, CommandManager commandManager, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
+        registerSubCommands(name, aliases, desc, commandManager, handlerInstance, m -> {});
     }
 
-    public <CI> void registerSubCommands(org.enginehub.piston.annotation.Command annotation, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
-        registerSubCommands(annotation, commandManager, handlerInstance);
-    }
-
-    public <CI> void registerSubCommands(org.enginehub.piston.annotation.Command annotation, CommandManager commandManager, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
-        commandManager.register(annotation.name(), builder -> {
-            builder.description(TextComponent.of(annotation.desc()));
+    public <CI> void registerSubCommands(String name, List<String> aliases, String desc, CommandManager commandManager, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance, Consumer<CommandManager> additionalConfig) {
+        commandManager.register(name, builder -> {
+            builder.aliases(aliases);
+            builder.description(TextComponent.of(desc));
             builder.action(org.enginehub.piston.Command.Action.NULL_ACTION);
 
             CommandManager manager = commandManagerService.newCommandManager();
@@ -338,21 +304,28 @@ public final class PlatformCommandManager {
 
     public <CI> void registerSubCommands(String name, List<String> aliases, String desc,
                                          CommandRegistration<CI> registration, CI instance) {
-        registerSubCommands(createAnnotation(name, aliases, desc), commandManager, c -> c.accept(registration, instance));
+        registerSubCommands(name, aliases, desc, commandManager, c -> c.accept(registration, instance));
     }
 
     public <CI> void registerSubCommands(String name, List<String> aliases, String desc, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
-        registerSubCommands(createAnnotation(name, aliases, desc), commandManager, handlerInstance);
+        registerSubCommands(name, aliases, desc, commandManager, handlerInstance);
     }
 
     public void registerAllCommands() {
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
             registerSubCommands(
-                "patterns",
-                ImmutableList.of(),
-                "Patterns determine what blocks are placed",
-                PatternCommandsRegistration.builder(),
-                new PatternCommands()
+                    "patterns",
+                    ImmutableList.of(),
+                    "Patterns determine what blocks are placed",
+                    PatternCommandsRegistration.builder(),
+                    new PatternCommands()
+            );
+            registerSubCommands(
+                    "masks",
+                    ImmutableList.of(),
+                    "Masks determine which blocks are placed",
+                    MaskCommandsRegistration.builder(),
+                    new MaskCommands(worldEdit)
             );
             registerSubCommands(
                 "transforms",
@@ -383,19 +356,16 @@ public final class PlatformCommandManager {
                 new SuperPickaxeCommands(worldEdit)
             );
             registerSubCommands(
-                    createAnnotation("brush", Arrays.asList("br", "/brush", "/br", "/tool", "tool"), "Brushing commands"),
+                    "brush", Arrays.asList("br", "/brush", "/br", "/tool", "tool"), "Brushing commands",
+                    commandManager,
                     c -> {
                         c.accept(BrushCommandsRegistration.builder(), new BrushCommands(worldEdit));
-                        c.accept(PaintBrushCommandsRegistration.builder(), new PaintBrushCommands());
-                        c.accept(ApplyBrushCommandsRegistration.builder(), new ApplyBrushCommands());
+                        c.accept(ToolCommandsRegistration.builder(), new ToolCommands(worldEdit));
+                    },
+                    manager -> {
+                        PaintBrushCommands.register(commandManagerService, manager, registration);
+                        ApplyBrushCommands.register(commandManagerService, manager, registration);
                     }
-            );
-            registerSubCommands(
-                "brush",
-                    ImmutableList.of("br", "/brush", "/br", "/tool", "tool"),
-                "Tool commands",
-                BrushOptionsCommandsRegistration.builder(),
-                new BrushOptionsCommands(worldEdit)
             );
             registerSubCommands(
                 "worldedit",
@@ -418,17 +388,6 @@ public final class PlatformCommandManager {
                 AnvilCommandsRegistration.builder(),
                 new AnvilCommands(worldEdit)
             );
-//            registerSubCommands(
-//                "transforms",
-//                ImmutableList.of(),
-//                "Transforms modify how a block is placed\n" +
-//                    " - Use [brackets] for arguments\n" +
-//                    " - Use , to OR multiple\n" +
-//                    " - Use & to AND multiple\n" +
-//                    "More Info: https://git.io/v9KHO",
-//                TransformCommandsRegistration.builder(),
-//                new TransformCommands()
-//            );
             this.registration.register(
                 commandManager,
                 BiomeCommandsRegistration.builder(),
@@ -491,15 +450,16 @@ public final class PlatformCommandManager {
                 new ToolCommands(worldEdit)
             );
             this.registration.register(
-                commandManager,
-                ToolUtilCommandsRegistration.builder(),
-                new ToolUtilCommands(worldEdit)
+                    commandManager,
+                    ToolUtilCommandsRegistration.builder(),
+                    new ToolUtilCommands(worldEdit)
             );
             this.registration.register(
                 commandManager,
                 UtilityCommandsRegistration.builder(),
                 new UtilityCommands(worldEdit)
             );
+            System.out.println("========== REGISTERED COMMANDS");
         }
     }
 
@@ -609,7 +569,7 @@ public final class PlatformCommandManager {
     }
 
     public Stream<Substring> parseArgs(String input) {
-        return new CommandArgParser(CommandArgParser.spaceSplit(input.substring(1))).parseArgs();
+        return new CommandArgParser(CommandArgParser.spaceSplit(input)).parseArgs();
     }
 
     public <T> Collection<T> parse(Class<T> clazz, String arguments, @Nullable Actor actor) {
@@ -667,24 +627,30 @@ public final class PlatformCommandManager {
         Request.reset();
         Actor actor = event.getActor();
         String args = event.getArguments();
-        CommandEvent finalEvent = new CommandEvent(actor, args);
+        CommandEvent finalEvent = event;
         final FawePlayer<Object> fp = FawePlayer.wrap(actor);
+        System.out.println(1);
         TaskManager.IMP.taskNow(() -> {
             int space0 = args.indexOf(' ');
             String arg0 = space0 == -1 ? args : args.substring(0, space0);
             Optional<Command> optional = commandManager.getCommand(arg0);
-            if (!optional.isPresent()) return;
+            if (!optional.isPresent()) {
+                System.out.println("No command for '" + arg0 + "' " + StringMan.getString(commandManager.getAllCommands().map(command -> command.getName()).collect(Collectors.toList())));
+                return;
+            }
             Command cmd = optional.get();
             CommandQueuedCondition queued = cmd.getCondition().as(CommandQueuedCondition.class).orElse(null);
             if (queued != null && !queued.isQueued()) {
                 handleCommandOnCurrentThread(finalEvent);
                 return;
             }
-            if (!fp.runAction(
-                () -> PlatformCommandManager.this.handleCommandOnCurrentThread(finalEvent), false, true)) {
-                BBC.WORLDEDIT_COMMAND_LIMIT.send(fp);
+            LocalSession session = worldEdit.getSessionManager().get(actor);
+            synchronized (session) {
+                SessionKey key = actor.getSessionKey();
+                if (key.isActive()) {
+                    PlatformCommandManager.this.handleCommandOnCurrentThread(finalEvent);
+                }
             }
-            finalEvent.setCancelled(true);
         }, Fawe.isMainThread());
     }
 
@@ -707,7 +673,6 @@ public final class PlatformCommandManager {
                 Request.request().setWorld(((World) extent));
             }
         }
-        LocalConfiguration config = worldEdit.getConfiguration();
 
         MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor);
 

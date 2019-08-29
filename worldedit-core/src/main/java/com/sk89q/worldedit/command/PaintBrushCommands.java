@@ -77,6 +77,28 @@ public class PaintBrushCommands {
         .ofTypes(ImmutableList.of(Key.of(double.class)))
         .build();
 
+    public static void register(CommandManagerService service, CommandManager commandManager, CommandRegistrationHandler registration) {
+        commandManager.register("paint", builder -> {
+            builder.description(TextComponent.of("Paint brush, apply a function to a surface"));
+            builder.action(org.enginehub.piston.Command.Action.NULL_ACTION);
+
+            CommandManager manager = service.newCommandManager();
+            registration.register(
+                manager,
+                PaintBrushCommandsRegistration.builder(),
+                new PaintBrushCommands()
+            );
+
+            builder.condition(new PermissionCondition(ImmutableSet.of("worldedit.brush.paint")));
+
+            builder.addParts(REGION_FACTORY, RADIUS, DENSITY);
+            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type"), TextComponent.of("Type of brush to use"))
+                .withCommands(manager.getAllCommands().collect(Collectors.toList()))
+                .required()
+                .build());
+        });
+    }
+
     private void setPaintBrush(CommandParameters parameters, Player player, LocalSession localSession,
         Contextual<? extends RegionFunction> generatorFactory) throws WorldEditException {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));

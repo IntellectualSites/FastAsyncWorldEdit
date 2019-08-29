@@ -12,7 +12,7 @@ dependencies {
     "shade"("com.thoughtworks.paranamer:paranamer:2.6")
     "shade"("com.sk89q.lib:jlibnoise:1.0.0")
 
-        "shade"("FAWE-Piston:core/build/libs/core-${Versions.PISTON}:lastSuccessfulBuild@jar")
+    "shade"("FAWE-Piston:core/build/libs/core-${Versions.PISTON}:lastSuccessfulBuild@jar")
     "shade"("FAWE-Piston:core-ap/runtime/build/libs/runtime-${Versions.PISTON}:lastSuccessfulBuild@jar")
     "shade"("FAWE-Piston:default-impl/build/libs/default-impl-${Versions.PISTON}:lastSuccessfulBuild@jar")
 

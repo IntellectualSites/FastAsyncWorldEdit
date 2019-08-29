@@ -403,7 +403,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
             lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {
-                Spigot_v1_14_R1 adapter = ((Spigot_v1_14_R1) WorldEditPlugin.getInstance().getBukkitImplAdapter());
+                Spigot_v1_14_R4 adapter = ((Spigot_v1_14_R4) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
                 final DataBits bits = (DataBits) BukkitAdapter_1_14.fieldBits.get(blocks);
@@ -478,7 +478,7 @@ public class BukkitGetBlocks_1_14 extends CharGetBlocks {
         }
     }
 
-    private final char ordinal(IBlockData ibd, Spigot_v1_14_R1 adapter) {
+    private final char ordinal(IBlockData ibd, Spigot_v1_14_R4 adapter) {
         if (ibd == null) {
             return BlockTypes.AIR.getDefaultState().getOrdinalChar();
         } else {

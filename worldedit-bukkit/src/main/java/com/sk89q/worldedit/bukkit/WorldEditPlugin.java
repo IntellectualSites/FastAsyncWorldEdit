@@ -19,11 +19,12 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.bekvon.bukkit.residence.commands.message;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.util.MainUtil;
 
-import com.boydti.fawe.bukkit.adapter.mc1_14.Spigot_v1_14_R1;
+import com.boydti.fawe.bukkit.adapter.mc1_14.Spigot_v1_14_R4;
 import com.google.common.base.Joiner;
 import static com.google.common.base.Preconditions.checkNotNull;
 import com.sk89q.util.yaml.YAMLProcessor;
@@ -37,19 +38,13 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
-import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.command.CommandUtil;
-import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
@@ -305,7 +300,11 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             try {
                 Bukkit.getPluginManager().loadPlugin(dummy);
             } catch (Throwable e) {
-                e.printStackTrace();
+                if (Bukkit.getUpdateFolderFile().mkdirs()) {
+                    MainUtil.copyFile(MainUtil.getJarFile(), "DummyFawe.src", pluginsFolder, Bukkit.getUpdateFolder() + File.separator + "DummyFawe.jar");
+                } else {
+                    getLogger().info("Please delete DummyFawe.jar and restart");
+                }
             }
             getLogger().info("Please restart the server if you have any plugins which depend on FAWE.");
         } else if (dummy == null) {
@@ -343,7 +342,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // Attempt to load a Bukkit adapter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
         try {
-            adapterLoader.addClass(Spigot_v1_14_R1.class);
+            adapterLoader.addClass(Spigot_v1_14_R4.class);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
@@ -439,7 +438,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = "/" + commandLabel;
+        split[0] = commandLabel;
 
         CommandEvent event = new CommandEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
         getWorldEdit().getEventBus().post(event);

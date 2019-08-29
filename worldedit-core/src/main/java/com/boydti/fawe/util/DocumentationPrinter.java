@@ -29,7 +29,6 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.command.BiomeCommands;
 import com.sk89q.worldedit.command.BrushCommands;
-import com.sk89q.worldedit.command.BrushOptionsCommands;
 import com.sk89q.worldedit.command.ChunkCommands;
 import com.sk89q.worldedit.command.ClipboardCommands;
 import com.sk89q.worldedit.command.GenerationCommands;
@@ -124,7 +123,6 @@ public final class DocumentationPrinter {
             writePermissionsWikiTable(stream, builder, "/", ScriptingCommands.class);
             writePermissionsWikiTable(stream, builder, "/", ChunkCommands.class);
             writePermissionsWikiTable(stream, builder, "/", ToolUtilCommands.class);
-            writePermissionsWikiTable(stream, builder, "/", BrushOptionsCommands.class);
             writePermissionsWikiTable(stream, builder, "/tool ", ToolCommands.class);
             writePermissionsWikiTable(stream, builder, "/brush ", BrushCommands.class);
             //writePermissionsWikiTable(stream, builder, "", MaskCommands.class, "/Masks");

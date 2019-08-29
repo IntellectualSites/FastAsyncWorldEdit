@@ -937,9 +937,9 @@ public final class BlockTypes {
             }
 
             // Add to $Registry
-            for (BlockType type : values) {
-                BlockType.REGISTRY.register(type.getId().toLowerCase(Locale.ROOT), type);
-            }
+//            for (BlockType type : values) {
+//                BlockType.REGISTRY.register(type.getId().toLowerCase(Locale.ROOT), type);
+//            }
             states = stateList.toArray(new BlockState[stateList.size()]);
 
 
@@ -969,7 +969,6 @@ public final class BlockTypes {
         }
 
         // register states
-        if (typeName.startsWith("minecraft:")) BlockType.REGISTRY.register(typeName.substring(10), existing);
         BlockType.REGISTRY.register(typeName, existing);
         String nameSpace = typeName.substring(0, typeName.indexOf(':'));
         $NAMESPACES.add(nameSpace);

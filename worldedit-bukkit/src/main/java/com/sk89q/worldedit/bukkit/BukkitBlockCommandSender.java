@@ -29,8 +29,12 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -149,14 +153,20 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
 
             @Override
             public boolean isActive() {
-                return sender.getBlock().getType() == Material.COMMAND_BLOCK
-                    || sender.getBlock().getType() == Material.CHAIN_COMMAND_BLOCK
-                    || sender.getBlock().getType() == Material.REPEATING_COMMAND_BLOCK;
+                @NotNull Block block = sender.getBlock();
+                @NotNull World world = block.getWorld();
+                if (world.isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)) {
+                    @NotNull Material type = block.getType();
+                    return type == Material.COMMAND_BLOCK
+                            || type == Material.CHAIN_COMMAND_BLOCK
+                            || type == Material.REPEATING_COMMAND_BLOCK;
+                }
+                return false;
             }
 
             @Override
             public boolean isPersistent() {
-                return false;
+                return true;
             }
 
             @Override

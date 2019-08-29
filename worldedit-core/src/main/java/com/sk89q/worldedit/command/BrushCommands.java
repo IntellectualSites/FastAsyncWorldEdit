@@ -56,7 +56,9 @@ import com.boydti.fawe.object.brush.heightmap.ScalableHeightMap;
 import com.boydti.fawe.object.brush.heightmap.ScalableHeightMap.Shape;
 import com.boydti.fawe.object.brush.sweep.SweepBrush;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
+import com.boydti.fawe.object.io.PGZIPOutputStream;
 import com.boydti.fawe.object.mask.IdMask;
+import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.boydti.fawe.util.image.ImageUtil;
@@ -67,6 +69,7 @@ import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.factory.TreeGeneratorFactory;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.InvalidToolBindException;
@@ -112,13 +115,19 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.FileSystems;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
+
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -928,6 +937,91 @@ public class BrushCommands {
                                   Expression radius) throws WorldEditException, EvaluationException {
         setOperationBasedBrush(player, localSession, radius,
             new Deform("y+=1"), shape, "worldedit.brush.lower");
+    }
+
+    @Command(
+            name = "savebrush",
+            aliases = {"save"},
+            desc = "Save your current brush"
+    )
+    @CommandPermissions("worldedit.brush.save")
+    public void saveBrush(Player player, LocalSession session, String name,
+                          @Switch(name = 'g', desc = "Save the brush globally") boolean root) throws WorldEditException, IOException {
+        BrushTool tool = session.getBrushTool(player);
+        if (tool != null) {
+            root |= name.startsWith("../");
+            name = FileSystems.getDefault().getPath(name).getFileName().toString();
+            File folder = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
+            name = name.endsWith(".jsgz") ? name : name + ".jsgz";
+            File file;
+            if (root && player.hasPermission("worldedit.brush.save.other")) {
+                file = new File(folder, name);
+            } else {
+                file = new File(folder, player.getUniqueId() + File.separator + name);
+            }
+            File parent = file.getParentFile();
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+            file.createNewFile();
+            try (DataOutputStream out = new DataOutputStream(
+                    new PGZIPOutputStream(new FileOutputStream(file)))) {
+                out.writeUTF(tool.toString());
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            BBC.SCHEMATIC_SAVED.send(player, name);
+        } else {
+            BBC.BRUSH_NONE.send(player);
+        }
+    }
+
+    @Command(
+            name = "loadbrush",
+            aliases = {"load"},
+            desc = "Load a brush"
+    )
+    @CommandPermissions("worldedit.brush.load")
+    public void loadBrush(Player player, LocalSession session, String name)
+            throws WorldEditException, IOException {
+        name = FileSystems.getDefault().getPath(name).getFileName().toString();
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
+        name = name.endsWith(".jsgz") ? name : name + ".jsgz";
+        File file = new File(folder, player.getUniqueId() + File.separator + name);
+        if (!file.exists()) {
+            file = new File(folder, name);
+        }
+        if (!file.exists()) {
+            File[] files = folder.listFiles(pathname -> false);
+            BBC.BRUSH_NOT_FOUND.send(player, name);
+            return;
+        }
+        try (DataInputStream in = new DataInputStream(
+                new GZIPInputStream(new FileInputStream(file)))) {
+            String json = in.readUTF();
+            BrushTool tool = BrushTool.fromString(player, session, json);
+            BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
+            session.setTool(item, tool, player);
+            BBC.BRUSH_EQUIPPED.send(player, name);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            BBC.BRUSH_INCOMPATIBLE.send(player);
+        }
+    }
+
+    @Command(
+            name = "/listbrush",
+            desc = "List saved brushes",
+            descFooter = "List all brushes in the brush directory"
+    )
+    @CommandPermissions("worldedit.brush.list")
+    public void list(Actor actor, InjectedValueAccess args,
+                     @ArgFlag(name = 'p', desc = "Prints the requested page", def = "0")
+                             int page) throws WorldEditException {
+        String baseCmd = "/brush loadbrush";
+        File dir = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
+        // TODO NOT IMPLEMENTED
+//        UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
     }
 
     static void setOperationBasedBrush(Player player, LocalSession session, Expression radius,

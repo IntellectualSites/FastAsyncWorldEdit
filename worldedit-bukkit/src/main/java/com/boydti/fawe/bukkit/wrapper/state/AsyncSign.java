@@ -16,7 +16,8 @@ import org.bukkit.DyeColor;
 import org.bukkit.block.Sign;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 public class AsyncSign extends AsyncBlockState implements Sign {
     public AsyncSign(AsyncBlock block, BaseBlock state) {
