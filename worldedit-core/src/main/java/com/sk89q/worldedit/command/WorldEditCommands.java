@@ -108,7 +108,7 @@ public class WorldEditCommands {
             }
         }
         actor.printDebug("");
-        actor.printDebug("Wiki: " + "https://github.com/boy0001/FastAsyncWorldedit/wiki");
+        actor.printDebug("Wiki: " + "https://github.com/IntellectualSites/FastAsyncWorldEdit-1.13/wiki");
     }
 
     @Command(

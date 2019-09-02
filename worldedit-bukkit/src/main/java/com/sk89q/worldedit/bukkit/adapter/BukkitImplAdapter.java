@@ -24,6 +24,7 @@ import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -42,8 +43,10 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.OptionalInt;
 
 import javax.annotation.Nullable;
 
@@ -75,9 +78,6 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     BaseBlock getBlock(Location location);
 
-    boolean setBlock(Chunk chunk, int x, int y, int z, BlockStateHolder<?> state, boolean update);
-
-    boolean isChunkInUse(Chunk chunk);
     /**
      * Set the block at the given location.
      *
@@ -86,7 +86,11 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param notifyAndLight notify and light if set
      * @return true if a block was likely changed
      */
-    boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight);
+    default boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
+        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
+    }
+
+    boolean setBlock(Chunk chunk, int x, int y, int z, BlockStateHolder<?> state, boolean update);
 
     /**
      * Notifies the simulation that the block at the given location has
@@ -124,22 +128,6 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     Map<String, ? extends Property<?>> getProperties(BlockType blockType);
 
-    default BlockMaterial getMaterial(BlockType blockType) {
-        return null;
-    }
-
-    default BlockMaterial getMaterial(BlockState blockState) {
-        return null;
-    }
-
-    default Tag toNative(T foreign) {
-        return null;
-    }
-
-    default T fromNative(Tag foreign) {
-        return null;
-    }
-
     /**
      * Send the given NBT data to the player.
      *
@@ -170,7 +158,52 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         return false;
     }
 
-    default @org.jetbrains.annotations.Nullable World createWorld(WorldCreator creator) {
+    /**
+     * Create a Bukkit ItemStack with NBT, if available.
+     *
+     * @param item the WorldEdit BaseItemStack to adapt
+     * @return the Bukkit ItemStack
+     */
+    ItemStack adapt(BaseItemStack item);
+
+    /**
+     * Create a WorldEdit ItemStack with NBT, if available.
+     *
+     * @param itemStack the Bukkit ItemStack to adapt
+     * @return the WorldEdit BaseItemStack
+     */
+    BaseItemStack adapt(ItemStack itemStack);
+
+
+    /**
+     * Retrieve the internal ID for a given state, if possible.
+     *
+     * @param state The block state
+     * @return the internal ID of the state
+     */
+    default OptionalInt getInternalBlockStateId(BlockState state) {
+        return OptionalInt.empty();
+    }
+
+    boolean isChunkInUse(Chunk chunk);
+
+    default BlockMaterial getMaterial(BlockType blockType) {
+        return null;
+    }
+
+    default BlockMaterial getMaterial(BlockState blockState) {
+        return null;
+    }
+
+    default Tag toNative(T foreign) {
+        return null;
+    }
+
+    default T fromNative(Tag foreign) {
+        return null;
+    }
+
+    default @Nullable World createWorld(WorldCreator creator) {
         return ((FaweBukkit) Fawe.imp()).createWorldUnloaded(creator::createWorld);
     }
 

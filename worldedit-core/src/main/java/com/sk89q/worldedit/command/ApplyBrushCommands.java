@@ -93,6 +93,7 @@ public class ApplyBrushCommands {
                 .build());
         });
     }
+
     private void setApplyBrush(CommandParameters parameters, Player player, LocalSession localSession,
                                Contextual<? extends RegionFunction> generatorFactory) throws WorldEditException {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));

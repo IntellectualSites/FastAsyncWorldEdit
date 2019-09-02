@@ -20,14 +20,26 @@
 package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.config.BBC;
+import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.InspectBrush;
+import com.boydti.fawe.object.brush.TargetMode;
+import com.boydti.fawe.object.brush.scroll.ScrollAction;
+import com.boydti.fawe.object.brush.visualization.VisualMode;
+import com.boydti.fawe.object.extent.ResettableExtent;
+import com.boydti.fawe.util.MathMan;
+import com.boydti.fawe.util.StringMan;
+import com.google.common.collect.Iterables;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.tool.BlockDataCyler;
 import com.sk89q.worldedit.command.tool.BlockReplacer;
+import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.command.tool.DistanceWand;
 import com.sk89q.worldedit.command.tool.FloatingTreeRemover;
 import com.sk89q.worldedit.command.tool.FloodFillTool;
@@ -39,7 +51,12 @@ import com.sk89q.worldedit.command.tool.TreePlanter;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.event.platform.CommandEvent;
+import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.annotation.Range;
+import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
@@ -47,6 +64,9 @@ import com.sk89q.worldedit.world.item.ItemType;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
+
+import java.util.List;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ToolCommands {
@@ -54,16 +74,6 @@ public class ToolCommands {
 
     public ToolCommands(WorldEdit we) {
         this.we = we;
-    }
-
-    @Command(
-        name = "none",
-        desc = "Unbind a bound tool from your current item"
-    )
-    public void none(Player player, LocalSession session) throws WorldEditException {
-
-        session.setTool(player, null);
-        player.print("Tool unbound from your current item.");
     }
 
     @Command(

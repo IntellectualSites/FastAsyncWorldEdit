@@ -20,6 +20,9 @@
 package com.boydti.fawe.bukkit.adapter.mc1_14;
 
 import com.boydti.fawe.Fawe;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -37,6 +40,8 @@ import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.blocks.BaseItem;
+import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
@@ -71,11 +76,17 @@ import net.minecraft.server.v1_14_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_14_R1.ChunkSection;
 import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityTypes;
+import net.minecraft.server.v1_14_R1.EnumDirection;
+import net.minecraft.server.v1_14_R1.EnumHand;
+import net.minecraft.server.v1_14_R1.EnumInteractionResult;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.IBlockState;
 import net.minecraft.server.v1_14_R1.INamable;
 import net.minecraft.server.v1_14_R1.IRegistry;
+import net.minecraft.server.v1_14_R1.ItemActionContext;
+import net.minecraft.server.v1_14_R1.ItemStack;
 import net.minecraft.server.v1_14_R1.MinecraftKey;
+import net.minecraft.server.v1_14_R1.MovingObjectPositionBlock;
 import net.minecraft.server.v1_14_R1.NBTBase;
 import net.minecraft.server.v1_14_R1.NBTTagByte;
 import net.minecraft.server.v1_14_R1.NBTTagByteArray;
@@ -94,6 +105,7 @@ import net.minecraft.server.v1_14_R1.PacketPlayOutEntityStatus;
 import net.minecraft.server.v1_14_R1.PacketPlayOutTileEntityData;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import net.minecraft.server.v1_14_R1.TileEntity;
+import net.minecraft.server.v1_14_R1.Vec3D;
 import net.minecraft.server.v1_14_R1.World;
 import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.Bukkit;
@@ -105,6 +117,7 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
@@ -120,12 +133,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
+public final class Spigot_v1_14_R4 extends CachedBukkitAdapter implements BukkitImplAdapter<NBTBase>{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -141,7 +155,7 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
 
-    public Spigot_v1_14_R1() throws NoSuchFieldException, NoSuchMethodException {
+    public Spigot_v1_14_R4() throws NoSuchFieldException, NoSuchMethodException {
         // The list of tags on an NBTTagList
         nbtListTagListField = NBTTagList.class.getDeclaredField("list");
         nbtListTagListField.setAccessible(true);
@@ -259,12 +273,7 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
 
     @Override
     public DataFixer getDataFixer() {
-        try {
-            Class<?> converter = Class.forName("com.sk89q.worldedit.bukkit.adapter.impl.DataConverters_1_14_R4");
-            return (DataFixer) converter.getDeclaredField("INSTANCE").get(null);
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return DataConverters_1_14_R4.INSTANCE;
     }
 
     @SuppressWarnings("deprecation")
@@ -633,14 +642,74 @@ public final class Spigot_v1_14_R1 extends CachedBukkitAdapter implements Bukkit
     }
 
     @Override
-    public boolean setBlock(Location location, BlockStateHolder<?> state, boolean notifyAndLight) {
-        return this.setBlock(location.getChunk(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), state, notifyAndLight);
-    }
-
-    @Override
     public void sendFakeOP(Player player) {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityStatus(
                 ((CraftPlayer) player).getHandle(), (byte) 28
         ));
+    }
+
+    private static EnumDirection adapt(Direction face) {
+        switch (face) {
+            case NORTH: return EnumDirection.NORTH;
+            case SOUTH: return EnumDirection.SOUTH;
+            case WEST: return EnumDirection.WEST;
+            case EAST: return EnumDirection.EAST;
+            case DOWN: return EnumDirection.DOWN;
+            case UP:
+            default:
+                return EnumDirection.UP;
+        }
+    }
+
+    private LoadingCache<WorldServer, FakePlayer_v1_14_R4> fakePlayers = CacheBuilder.newBuilder().weakKeys().softValues().build(CacheLoader.from(FakePlayer_v1_14_R4::new));
+
+    @Override
+    public synchronized boolean simulateItemUse(org.bukkit.World world, BlockVector3 position, BaseItem item, Direction face) {
+        CraftWorld craftWorld = (CraftWorld) world;
+        WorldServer worldServer = craftWorld.getHandle();
+        ItemStack stack = CraftItemStack.asNMSCopy(BukkitAdapter.adapt(item instanceof BaseItemStack
+                ? ((BaseItemStack) item) : new BaseItemStack(item.getType(), item.getNbtData(), 1)));
+        stack.setTag((NBTTagCompound) fromNative(item.getNbtData()));
+
+        FakePlayer_v1_14_R4 fakePlayer;
+        try {
+            fakePlayer = fakePlayers.get(worldServer);
+        } catch (ExecutionException ignored) {
+            return false;
+        }
+        fakePlayer.a(EnumHand.MAIN_HAND, stack);
+        fakePlayer.setLocation(position.getBlockX(), position.getBlockY(), position.getBlockZ(),
+                (float) face.toVector().toYaw(), (float) face.toVector().toPitch());
+
+        final BlockPosition blockPos = new BlockPosition(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        final Vec3D blockVec = new Vec3D(blockPos);
+        final EnumDirection enumFacing = adapt(face);
+        MovingObjectPositionBlock rayTrace = new MovingObjectPositionBlock(blockVec, enumFacing, blockPos, false);
+        ItemActionContext context = new ItemActionContext(fakePlayer, EnumHand.MAIN_HAND, rayTrace);
+        EnumInteractionResult result = stack.placeItem(context, EnumHand.MAIN_HAND);
+        if (result != EnumInteractionResult.SUCCESS) {
+            if (worldServer.getType(blockPos).interact(worldServer, fakePlayer, EnumHand.MAIN_HAND, rayTrace)) {
+                result = EnumInteractionResult.SUCCESS;
+            } else {
+                result = stack.getItem().a(worldServer, fakePlayer, EnumHand.MAIN_HAND).a();
+            }
+        }
+
+        return result == EnumInteractionResult.SUCCESS;
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack adapt(BaseItemStack item) {
+        ItemStack stack = new ItemStack(IRegistry.ITEM.get(MinecraftKey.a(item.getType().getId())), item.getAmount());
+        stack.setTag(((NBTTagCompound) fromNative(item.getNbtData())));
+        return CraftItemStack.asCraftMirror(stack);
+    }
+
+    @Override
+    public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
+        final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
+        weStack.setNbtData(((CompoundTag) toNative(nmsStack.getTag())));
+        return weStack;
     }
 }

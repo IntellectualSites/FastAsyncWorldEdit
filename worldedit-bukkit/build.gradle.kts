@@ -30,6 +30,7 @@ configurations.all {
 dependencies {
     "compile"("net.milkbowl.vault:VaultAPI:1.7") { isTransitive = false }
     "api"(project(":worldedit-core"))
+    "api"(project(":worldedit-libs:core"))
     "api"(project(":worldedit-libs:bukkit"))
     "compile"("it.unimi.dsi:fastutil:8.2.1")
     "api"("com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT") {
