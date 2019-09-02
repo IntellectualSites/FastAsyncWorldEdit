@@ -194,20 +194,20 @@ public class GeneralCommands {
         }
     }
 
-    @Command(
-        name = "/world",
-        desc = "Sets the world override"
-    )
-    @CommandPermissions("worldedit.world")
-    public void worldOverride(Actor actor, LocalSession session,
-        @Arg(desc = "The world override", def = "") World world) {
-        session.setWorldOverride(world);
-        if (world == null) {
-            actor.print("Removed world override.");
-        } else {
-            actor.print("Set the world override to " + world.getId() + ". (Use //world to go back to default)");
-        }
-    }
+//    @Command(
+//        name = "/world",
+//        desc = "Sets the world override"
+//    )
+//    @CommandPermissions("worldedit.world")
+//    public void worldOverride(Actor actor, LocalSession session,
+//        @Arg(desc = "The world override", def = "") World world) {
+//        session.setWorldOverride(world);
+//        if (world == null) {
+//            actor.print("Removed world override.");
+//        } else {
+//            actor.print("Set the world override to " + world.getId() + ". (Use //world to go back to default)");
+//        }
+//    }
 
     @Command(
             name = "gmask",
