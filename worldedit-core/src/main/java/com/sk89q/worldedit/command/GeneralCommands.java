@@ -199,7 +199,7 @@ public class GeneralCommands {
         desc = "Sets the world override"
     )
     @CommandPermissions("worldedit.world")
-    public void world(Actor actor, LocalSession session,
+    public void worldOverride(Actor actor, LocalSession session,
         @Arg(desc = "The world override", def = "") World world) {
         session.setWorldOverride(world);
         if (world == null) {
