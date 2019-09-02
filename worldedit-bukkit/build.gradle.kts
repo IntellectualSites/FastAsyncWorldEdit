@@ -12,6 +12,7 @@ repositories {
     maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
     maven { url = uri("http://empcraft.com/maven2") }
+    maven { url = uri("https://maven.enginehub.org/repo/") }
     maven { url = uri("http://ci.frostcast.net/plugin/repository/everything") }
     maven { url = uri("http://dl.bintray.com/tastybento/maven-repo") }
     maven { url = uri("http://ci.emc.gs/nexus/content/groups/aikar/") }
@@ -38,10 +39,15 @@ dependencies {
     "implementation"("io.papermc:paperlib:1.0.2")
     "compileOnly"("com.sk89q:dummypermscompat:1.10")
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
-    "implementation"("org.bstats:bstats-bukkit:1.5")
-    "testCompile"("org.mockito:mockito-core:1.9.0-rc1")
-    "implementation"("com.sk89q.worldguard:worldguard-core:7.0.0-20190215.210421-39") { isTransitive = false }
-    "implementation"("com.sk89q.worldguard:worldguard-legacy:7.0.0-20190215.210421-39") { isTransitive = false }
+    "testCompile"("org.mockito:mockito-core:1.9.0-rc1") {
+        exclude("junit", "junit")
+    }
+    "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.0.0") {
+        exclude("com.sk89q.worldedit", "worldedit-bukkit")
+        exclude("com.sk89q.worldedit", "worldedit-core")
+        exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
+        exclude("com.sk89q.worldedit.worldedit-libs", "core")
+    }
     "implementation"("com.massivecraft:factions:2.8.0") { isTransitive = false }
     "implementation"("com.drtshock:factions:1.6.9.5") { isTransitive = false }
     "implementation"("com.factionsone:FactionsOne:1.2.2") { isTransitive = false }

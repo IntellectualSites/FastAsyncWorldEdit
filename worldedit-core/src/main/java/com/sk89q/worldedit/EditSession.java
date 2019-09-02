@@ -1010,7 +1010,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @Override
     @Nullable
-    public Entity createEntity(Location location, final BaseEntity entity) {
+    public Entity createEntity(com.sk89q.worldedit.util.Location location, BaseEntity entity) {
         return getExtent().createEntity(location, entity);
     }
 
@@ -1233,7 +1233,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public <B extends BlockStateHolder<B>> int fillXZ(BlockVector3 origin, B block, double radius, int depth, boolean recursive) throws MaxChangedBlocksException {
-        return fillXZ(origin, block, radius, depth, recursive);
+        return fillXZ(origin, (Pattern) block, radius, depth, recursive);
     }
 
     /**

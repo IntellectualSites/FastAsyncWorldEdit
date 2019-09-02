@@ -19,6 +19,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 public class AsyncBlockState implements BlockState {
 
@@ -99,6 +100,7 @@ public class AsyncBlockState implements BlockState {
         return block.getLocation(loc);
     }
 
+    @NotNull
     @Override
     public Chunk getChunk() {
         return block.getChunk();

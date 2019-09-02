@@ -152,6 +152,7 @@ public class LocalSession implements TextureHolder {
     private transient VirtualWorld virtual;
     private transient BlockVector3 cuiTemporaryBlock;
     private transient List<Countable<BlockState>> lastDistribution;
+    private transient World worldOverride;
 
     // Saved properties
     private String lastScript;
@@ -569,6 +570,19 @@ public class LocalSession implements TextureHolder {
         return null;
     }
 
+    public boolean hasWorldOverride() {
+        return this.worldOverride != null;
+    }
+
+    @Nullable
+    public World getWorldOverride() {
+        return this.worldOverride;
+    }
+    public void setWorldOverride(@Nullable World worldOverride) {
+        this.worldOverride = worldOverride;
+    }
+
+
     public void unregisterTools(Player player) {
         for (Tool tool : tools) {
             if (tool instanceof BrushTool) {
@@ -614,6 +628,9 @@ public class LocalSession implements TextureHolder {
             if (selector.getWorld() == null || !selector.getWorld().equals(world)) {
                 selector.setWorld(world);
                 selector.clear();
+                if (hasWorldOverride() && !world.equals(getWorldOverride())) {
+                    setWorldOverride(null);
+                }
             }
         } catch (Throwable ignore) {
             selector.clear();
@@ -632,6 +649,9 @@ public class LocalSession implements TextureHolder {
         checkNotNull(selector);
         selector.setWorld(world);
         this.selector = selector;
+        if (hasWorldOverride() && !world.equals(getWorldOverride())) {
+            setWorldOverride(null);
+        }
     }
 
     /**
@@ -1328,17 +1348,23 @@ public class LocalSession implements TextureHolder {
     /**
      * Construct a new edit session.
      *
-     * @param player the actor
+     * @param actor the actor
      * @return an edit session
      */
-    public EditSession createEditSession(Player player) {
-        checkNotNull(player);
-
-        BlockBag blockBag = getBlockBag(player);
-
-        World world = player.getWorld();
+    public EditSession createEditSession(Actor actor) {
+        checkNotNull(actor);
+        BlockBag blockBag = null;
+        if (actor.isPlayer() && actor instanceof Player) {
+            blockBag = getBlockBag((Player) actor);
+        }
+        World world = null;
+        if (hasWorldOverride()) {
+            world = getWorldOverride();
+        } else if (actor instanceof Locatable && ((Locatable) actor).getExtent() instanceof World) {
+            world = (World) ((Locatable) actor).getExtent();
+        }
         EditSessionBuilder builder = new EditSessionBuilder(world);
-        if (player.isPlayer()) builder.player(FawePlayer.wrap(player));
+        if (actor.isPlayer() && actor instanceof Player) builder.player(FawePlayer.wrap(actor));
         builder.blockBag(blockBag);
         builder.fastmode(fastMode);
 

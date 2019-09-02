@@ -34,6 +34,8 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import com.sk89q.worldedit.world.weather.WeatherType;
+import com.sk89q.worldedit.world.weather.WeatherTypes;
 import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.PriorityQueue;
@@ -132,6 +134,23 @@ public abstract class AbstractWorld implements World {
         return null;
     }
 
+    @Override
+    public WeatherType getWeather() {
+        return WeatherTypes.CLEAR;
+    }
+
+    @Override
+    public long getRemainingWeatherDuration() {
+        return 0;
+    }
+
+    @Override
+    public void setWeather(WeatherType weatherType) {
+    }
+
+    @Override
+    public void setWeather(WeatherType weatherType, long duration) {
+    }
     private class QueuedEffect implements Comparable<QueuedEffect> {
         private final Vector3 position;
         private final BlockType blockType;

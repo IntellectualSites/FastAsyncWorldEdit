@@ -54,7 +54,7 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
     @SuppressWarnings("unchecked")
     public static void register(CommandManager commandManager) {
         ImmutableList.of(
-            BlockTypes.class,
+            BlockType.class,
             BlockCategory.class,
             ItemType.class,
             ItemCategory.class,

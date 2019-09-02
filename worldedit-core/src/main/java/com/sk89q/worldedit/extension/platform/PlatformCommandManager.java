@@ -393,7 +393,7 @@ public final class PlatformCommandManager {
             registerSubCommands(
                 "brush",
                     ImmutableList.of("br", "/brush", "/br", "/tool", "tool"),
-                "Tool commands",
+                "Brushing commands",
                 BrushOptionsCommandsRegistration.builder(),
                 new BrushOptionsCommands(worldEdit)
             );
@@ -729,6 +729,7 @@ public final class PlatformCommandManager {
             // exceptions without writing a hook into every dispatcher, we need to unwrap these
             // exceptions and rethrow their converted form, if their is one.
             try {
+                //Why the hell do we need to return an object if we aren't doing anything with it?
                 Object result = task.get();
             } catch (Throwable t) {
                 // Use the exception converter to convert the exception if any of its causes

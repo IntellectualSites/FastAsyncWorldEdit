@@ -23,9 +23,11 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -33,6 +35,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
+import java.util.OptionalInt;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -154,7 +157,30 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     void sendFakeOP(Player player);
 
+    /**
+     * Simulates a player using an item.
+     *
+     * @param world the world
+     * @param position the location
+     * @param item the item to be used
+     * @param face the direction in which to "face" when using the item
+     * @return whether the usage was successful
+     */
+    default boolean simulateItemUse(World world, BlockVector3 position, BaseItem item, Direction face) {
+        return false;
+    }
+
     default @org.jetbrains.annotations.Nullable World createWorld(WorldCreator creator) {
         return ((FaweBukkit) Fawe.imp()).createWorldUnloaded(creator::createWorld);
+    }
+
+    /**
+     * Retrieve the internal ID for a given state, if possible.
+     *
+     * @param state The block state
+     * @return the internal ID of the state
+     */
+    default OptionalInt getInternalBlockStateId(BlockState state) {
+        return OptionalInt.empty();
     }
 }

@@ -383,7 +383,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public Location getBlockOn() {
-        return getLocation().setPosition(getLocation().setY(getLocation().getY() - 1).toVector().floor());
+        final Location location = getLocation();
+        return location.setPosition(location.setY(location.getY() - 1).toVector().floor());
     }
 
     @Override
@@ -524,7 +525,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public void setPosition(Vector3 pos) {
-        setPosition(pos, getLocation().getPitch(), getLocation().getYaw());
+        final Location location = getLocation();
+        setPosition(pos, location.getPitch(), location.getYaw());
     }
 
     @Override
