@@ -23,6 +23,7 @@ import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Raid;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.StructureType;
@@ -55,7 +56,6 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -65,6 +65,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Modify the world from an async thread<br>
@@ -1026,6 +1027,16 @@ public class AsyncWorld extends PassthroughExtent implements World {
     @Override
     public Spigot spigot() {
         return parent.spigot();
+    }
+
+    @Override
+    public @Nullable Raid locateNearestRaid(@NotNull Location location, int i) {
+        return parent.locateNearestRaid(location, i);
+    }
+
+    @Override
+    public @NotNull List<Raid> getRaids() {
+        return parent.getRaids();
     }
 
     @Override

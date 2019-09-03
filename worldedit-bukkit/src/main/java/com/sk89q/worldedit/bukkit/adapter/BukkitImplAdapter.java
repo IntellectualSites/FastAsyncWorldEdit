@@ -174,17 +174,6 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      */
     BaseItemStack adapt(ItemStack itemStack);
 
-
-    /**
-     * Retrieve the internal ID for a given state, if possible.
-     *
-     * @param state The block state
-     * @return the internal ID of the state
-     */
-    default OptionalInt getInternalBlockStateId(BlockState state) {
-        return OptionalInt.empty();
-    }
-
     boolean isChunkInUse(Chunk chunk);
 
     default BlockMaterial getMaterial(BlockType blockType) {
@@ -213,6 +202,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param state The block state
      * @return the internal ID of the state
      */
+
     default OptionalInt getInternalBlockStateId(BlockState state) {
         return OptionalInt.empty();
     }
