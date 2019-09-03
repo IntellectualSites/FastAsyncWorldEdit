@@ -35,6 +35,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -397,7 +398,7 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                     "brush",
-                    ImmutableList.of("br", "/brush", "/br", "/tool", "tool"),
+                    Lists.newArrayList("br", "/brush", "/br", "/tool", "tool"),
                     "Brushing commands",
                     commandManager,
                     c -> {
