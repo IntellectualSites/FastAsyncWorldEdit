@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.command.AnvilCommands;
 import com.boydti.fawe.command.AnvilCommandsRegistration;
@@ -35,8 +37,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MissingWorldException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.ApplyBrushCommands;
 import com.sk89q.worldedit.command.BiomeCommands;
@@ -92,6 +96,7 @@ import com.sk89q.worldedit.command.argument.DirectionConverter;
 import com.sk89q.worldedit.command.argument.DirectionVectorConverter;
 import com.sk89q.worldedit.command.argument.EntityRemoverConverter;
 import com.sk89q.worldedit.command.argument.EnumConverter;
+import com.sk89q.worldedit.command.argument.ExpressionConverter;
 import com.sk89q.worldedit.command.argument.FactoryConverter;
 import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
@@ -106,17 +111,16 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
-import com.sk89q.worldedit.extension.platform.binding.AnnotatedBindings;
-import com.sk89q.worldedit.extension.platform.binding.CommandBindings;
-import com.sk89q.worldedit.extension.platform.binding.ConsumeBindings;
-import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
+import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.util.Substring;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
@@ -127,6 +131,24 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.TextConfig;
@@ -151,28 +173,6 @@ import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -228,7 +228,6 @@ public final class PlatformCommandManager {
     }
 
     private void initialize() {
-        System.out.println("========== INITIALIZE");
         // Register this instance for command events
         worldEdit.getEventBus().register(this);
 
@@ -260,57 +259,96 @@ public final class PlatformCommandManager {
         EntityRemoverConverter.register(commandManager);
         RegionFactoryConverter.register(commandManager);
         WorldConverter.register(commandManager);
+        ExpressionConverter.register(commandManager);
     }
 
-    public void registerAlwaysInjectedValues() {
-        globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), Optional::of);
-        registerBinding(new AnnotatedBindings(worldEdit));
-        registerBinding(new CommandBindings(worldEdit));
-        registerBinding(new ConsumeBindings(worldEdit));
-        registerBinding(new ProvideBindings(worldEdit));
-        registerBinding(new ProvideBindings(worldEdit));
+    private void registerAlwaysInjectedValues() {
+        globalInjectedValues.injectValue(Key.of(Region.class, Selection.class),
+                context -> {
+                    LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
+                            .orElseThrow(() -> new IllegalStateException("No LocalSession"));
+                    return context.injectedValue(Key.of(World.class))
+                            .map(world -> {
+                                try {
+                                    return localSession.getSelection(world);
+                                } catch (IncompleteRegionException e) {
+                                    exceptionConverter.convert(e);
+                                    throw new AssertionError("Should have thrown a new exception.", e);
+                                }
+                            });
+                });
+        globalInjectedValues.injectValue(Key.of(EditSession.class),
+                context -> {
+                    LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
+                            .orElseThrow(() -> new IllegalStateException("No LocalSession"));
+                    return context.injectedValue(Key.of(Actor.class))
+                            .map(actor -> {
+                                EditSession editSession = localSession.createEditSession(actor);
+                                editSession.enableStandardMode();
+                                return editSession;
+                            });
+                });
+        globalInjectedValues.injectValue(Key.of(World.class),
+                context -> {
+                    LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
+                            .orElseThrow(() -> new IllegalStateException("No LocalSession"));
+                    return context.injectedValue(Key.of(Actor.class))
+                            .map(actor -> {
+                                try {
+                                    if (localSession.hasWorldOverride()) {
+                                        return localSession.getWorldOverride();
+                                    } else if (actor instanceof Locatable && ((Locatable) actor).getExtent() instanceof World) {
+                                        return (World) ((Locatable) actor).getExtent();
+                                    } else {
+                                        throw new MissingWorldException();
     }
 
-    public void registerBinding(Object classWithMethods) {
-        // TODO NOT IMPLEMENTED - register the following using a custom processor / annotations
+                                } catch (MissingWorldException e) {
+                                    exceptionConverter.convert(e);
+                                    throw new AssertionError("Should have thrown a new exception.", e);
+                                }
+                            });
+                });
     }
 
-    public <CI> void registerSubCommands(String name, List<String> aliases, String desc, CommandManager commandManager, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
+    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
+        CommandManager commandManager,
+        Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance) {
         registerSubCommands(name, aliases, desc, commandManager, handlerInstance, m -> {});
     }
 
-    public <CI> void registerSubCommands(String name, List<String> aliases, String desc, CommandManager commandManager, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance, Consumer<CommandManager> additionalConfig) {
-        commandManager.register(name, builder -> {
-            builder.aliases(aliases);
-            builder.description(TextComponent.of(desc));
-            builder.action(org.enginehub.piston.Command.Action.NULL_ACTION);
+    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
+        CommandManager commandManager,
+        Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
+        Consumer<CommandManager> additionalConfig) {
+        commandManager.register(name, cmd -> {
+            cmd.aliases(aliases);
+            cmd.description(TextComponent.of(desc));
+            cmd.action(Command.Action.NULL_ACTION);
 
             CommandManager manager = commandManagerService.newCommandManager();
 
-            handlerInstance.accept((handler, instance) -> registration.register(
+            handlerInstance.accept((handler, instance) ->
+            this.registration.register(
                     manager,
                     handler,
                     instance
             ));
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
-            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
+            cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
                     TextComponent.of("Sub-command to run."))
                     .withCommands(subCommands)
                     .required()
                     .build());
 
-            builder.condition(new SubCommandPermissionCondition.Generator(subCommands).build());
+            cmd.condition(new SubCommandPermissionCondition.Generator(subCommands).build());
         });
     }
 
     public <CI> void registerSubCommands(String name, List<String> aliases, String desc,
                                          CommandRegistration<CI> registration, CI instance) {
         registerSubCommands(name, aliases, desc, commandManager, c -> c.accept(registration, instance));
-    }
-
-    public <CI> void registerSubCommands(String name, List<String> aliases, String desc, Consumer<BiConsumer<CommandRegistration,CI>> handlerInstance) {
-        registerSubCommands(name, aliases, desc, commandManager, handlerInstance);
     }
 
     public void registerAllCommands() {
@@ -463,65 +501,8 @@ public final class PlatformCommandManager {
                 UtilityCommandsRegistration.builder(),
                 new UtilityCommands(worldEdit)
             );
-            System.out.println("========== REGISTERED COMMANDS");
         }
     }
-
-//    /**
-//     * Initialize the dispatcher
-//     */
-//    public synchronized void setupDispatcher() {
-//        if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
-//            DispatcherNode graph = new CommandGraph().builder(builder).commands();
-//
-//            for (Map.Entry<Object, String[]> entry : methodMap.entrySet()) {
-//                // add  command
-//                String[] aliases = entry.getValue();
-//                if (aliases.length == 0) {
-//                    graph = graph.registerMethods(entry.getKey());
-//                } else {
-//                    graph = graph.group(aliases).registerMethods(entry.getKey()).parent();
-//                }
-//            }
-//
-//            for (Map.Entry<CommandCallable, String[][]> entry : commandMap.entrySet()) {
-//                String[][] aliases = entry.getValue();
-//                CommandCallable callable = entry.getKey();
-//                if (aliases[0].length == 0) {
-//                    graph = graph.register(callable, aliases[1]);
-//                } else {
-//                    graph = graph.group(aliases[0]).register(callable, aliases[1]).parent();
-//                }
-//            }
-//
-//            commandMap.clear();
-//            methodMap.clear();
-//
-//            dispatcher = graph
-//                    .group("/anvil")
-//                    .describeAs("Anvil command")
-//                    .registerMethods(new AnvilCommands(worldEdit)).parent()
-//                    .registerMethods(new CFICommand(worldEdit, builder))
-//                    .registerMethods(new OptionsCommands(worldEdit))
-//                    .registerMethods(new BrushOptionsCommands(worldEdit))
-//                    .registerMethods(new BrushOptionsCommands(worldEdit))
-//                    .register(adapt(new ShapedBrushCommand(new DeformCommand(), "worldedit.brush.deform")), "deform")
-//                    .register(adapt(new ShapedBrushCommand(new ApplyCommand(new ReplaceParser(), "Set all blocks within region"), "worldedit.brush.set")), "set")
-//                    .register(adapt(new ShapedBrushCommand(new PaintCommand(), "worldedit.brush.paint")), "paint")
-//                    .register(adapt(new ShapedBrushCommand(new ApplyCommand(), "worldedit.brush.apply")), "apply")
-//                    .register(adapt(new ShapedBrushCommand(new PaintCommand(new TreeGeneratorParser("treeType")), "worldedit.brush.forest")), "forest")
-//                    .register(adapt(new ShapedBrushCommand(ProvidedValue.create(new Deform("y-=1", Mode.RAW_COORD), "Raise one block"), "worldedit.brush.raise")), "raise")
-//                    .register(adapt(new ShapedBrushCommand(ProvidedValue.create(new Deform("y+=1", Mode.RAW_COORD), "Lower one block"), "worldedit.brush.lower")), "lower")
-//                    .parent()
-//                    .group("superpickaxe", "pickaxe", "sp").describeAs("Super-pickaxe commands")
-//                    .registerMethods(new SuperPickaxeCommands(worldEdit))
-//                    .parent().graph().getDispatcher();
-//
-//            if (platform != null) {
-//                platform.registerCommands(dispatcher);
-//            }
-//        }
-//    }
 
     public static PlatformCommandManager getInstance() {
         return INSTANCE;
@@ -572,7 +553,7 @@ public final class PlatformCommandManager {
         dynamicHandler.setHandler(null);
     }
 
-    public Stream<Substring> parseArgs(String input) {
+    private Stream<Substring> parseArgs(String input) {
         return new CommandArgParser(CommandArgParser.spaceSplit(input)).parseArgs();
     }
 
