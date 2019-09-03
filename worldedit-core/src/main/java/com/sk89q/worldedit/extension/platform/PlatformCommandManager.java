@@ -96,6 +96,7 @@ import com.sk89q.worldedit.command.argument.FactoryConverter;
 import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
+import com.sk89q.worldedit.command.argument.WorldConverter;
 import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandQueuedCondition;
@@ -258,6 +259,7 @@ public final class PlatformCommandManager {
         BooleanConverter.register(commandManager);
         EntityRemoverConverter.register(commandManager);
         RegionFactoryConverter.register(commandManager);
+        WorldConverter.register(commandManager);
     }
 
     public void registerAlwaysInjectedValues() {
@@ -356,7 +358,9 @@ public final class PlatformCommandManager {
                 new SuperPickaxeCommands(worldEdit)
             );
             registerSubCommands(
-                    "brush", Arrays.asList("br", "/brush", "/br", "/tool", "tool"), "Brushing commands",
+                    "brush",
+                    ImmutableList.of("br", "/brush", "/br", "/tool", "tool"),
+                    "Brushing commands",
                     commandManager,
                     c -> {
                         c.accept(BrushCommandsRegistration.builder(), new BrushCommands(worldEdit));
@@ -627,7 +631,6 @@ public final class PlatformCommandManager {
         Request.reset();
         Actor actor = event.getActor();
         String args = event.getArguments();
-        CommandEvent finalEvent = event;
         final FawePlayer<Object> fp = FawePlayer.wrap(actor);
         System.out.println(1);
         TaskManager.IMP.taskNow(() -> {
@@ -635,20 +638,21 @@ public final class PlatformCommandManager {
             String arg0 = space0 == -1 ? args : args.substring(0, space0);
             Optional<Command> optional = commandManager.getCommand(arg0);
             if (!optional.isPresent()) {
-                System.out.println("No command for '" + arg0 + "' " + StringMan.getString(commandManager.getAllCommands().map(command -> command.getName()).collect(Collectors.toList())));
+                System.out.println("No command for '" + arg0 + "' " + StringMan.getString(commandManager.getAllCommands().map(
+                    Command::getName).collect(Collectors.toList())));
                 return;
             }
             Command cmd = optional.get();
             CommandQueuedCondition queued = cmd.getCondition().as(CommandQueuedCondition.class).orElse(null);
             if (queued != null && !queued.isQueued()) {
-                handleCommandOnCurrentThread(finalEvent);
+                handleCommandOnCurrentThread(event);
                 return;
             }
             LocalSession session = worldEdit.getSessionManager().get(actor);
             synchronized (session) {
                 SessionKey key = actor.getSessionKey();
                 if (key.isActive()) {
-                    PlatformCommandManager.this.handleCommandOnCurrentThread(finalEvent);
+                    PlatformCommandManager.this.handleCommandOnCurrentThread(event);
                 }
             }
         }, Fawe.isMainThread());
@@ -694,8 +698,7 @@ public final class PlatformCommandManager {
             // exceptions without writing a hook into every dispatcher, we need to unwrap these
             // exceptions and rethrow their converted form, if their is one.
             try {
-                //Why the hell do we need to return an object if we aren't doing anything with it?
-                Object result = task.get();
+                task.get();
             } catch (Throwable t) {
                 // Use the exception converter to convert the exception if any of its causes
                 // can be converted, otherwise throw the original exception
