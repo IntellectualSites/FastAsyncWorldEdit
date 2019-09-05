@@ -37,12 +37,15 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
+import com.sk89q.worldedit.command.util.HookMode;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -209,10 +212,33 @@ public class GeneralCommands {
 //    }
 
     @Command(
-            name = "gmask",
-            aliases = {"/gmask"},
-            descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
-            desc = "Set the global mask"
+        name = "/watchdog",
+        desc = "Changes watchdog hook state.",
+        descFooter = "This is dependent on platform implementation. " +
+            "Not all platforms support watchdog hooks, or contain a watchdog."
+    )
+    @CommandPermissions("worldedit.watchdog")
+    public void watchdog(Actor actor, LocalSession session,
+                         @Arg(desc = "The mode to set the watchdog hook to", def = "")
+                             HookMode hookMode) {
+        if (WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWatchdog() == null) {
+            actor.printError("This platform has no watchdog hook.");
+            return;
+        }
+        boolean previousMode = session.isTickingWatchdog();
+        if (hookMode != null && (hookMode == HookMode.ACTIVE) == previousMode) {
+            actor.printError("Watchdog hook already " + (previousMode ? "active" : "inactive") + ".");
+            return;
+        }
+        session.setTickingWatchdog(!previousMode);
+        actor.print("Watchdog hook now " + (previousMode ? "inactive" : "active") + ".");
+    }
+
+    @Command(
+        name = "gmask",
+        aliases = {"/gmask"},
+        descFooter = "The global destination mask applies to all edits you do and masks based on the destination blocks (i.e., the blocks in the world).",
+        desc = "Set the global mask"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
     public void gmask(Actor actor, LocalSession session, @Arg(desc = "The mask to set", def = "") Mask mask) {

@@ -47,9 +47,18 @@ import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.MaskingExtent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
+import com.sk89q.worldedit.extent.cache.LastAccessExtentCache;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
+import com.sk89q.worldedit.extent.reorder.ChunkBatchingExtent;
+import com.sk89q.worldedit.extent.reorder.MultiStageReorder;
+import com.sk89q.worldedit.extent.validation.BlockChangeLimiter;
+import com.sk89q.worldedit.extent.validation.DataValidatorExtent;
+import com.sk89q.worldedit.extent.world.BlockQuirkExtent;
+import com.sk89q.worldedit.extent.world.ChunkLoadingExtent;
+import com.sk89q.worldedit.extent.world.FastModeExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
+import com.sk89q.worldedit.extent.world.WatchdogTickingExtent;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.block.BlockReplace;
@@ -112,6 +121,7 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.eventbus.EventBus;
+import com.sk89q.worldedit.world.NullWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -720,6 +730,29 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public void disableBuffering() {
         disableQueue();
+    }
+
+    /**
+     * Check if this session will tick the watchdog.
+     *
+     * @return {@code true} if any watchdog extent is enabled
+     */
+    public boolean isTickingWatchdog() {
+        /*
+        return watchdogExtents.stream().anyMatch(WatchdogTickingExtent::isEnabled);
+        */
+        return false;
+    }
+
+    /**
+     * Set all watchdog extents to the given mode.
+     */
+    public void setTickingWatchdog(boolean active) {
+        /*
+        for (WatchdogTickingExtent extent : watchdogExtents) {
+            extent.setEnabled(active);
+        }
+        */
     }
 
     /**

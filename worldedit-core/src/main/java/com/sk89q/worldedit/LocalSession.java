@@ -155,6 +155,7 @@ public class LocalSession implements TextureHolder {
     private transient BlockVector3 cuiTemporaryBlock;
     private transient List<Countable<BlockState>> lastDistribution;
     private transient World worldOverride;
+    private transient boolean tickingWatchdog = false;
 
     private transient boolean loadDefaults = true;
 
@@ -604,18 +605,12 @@ public class LocalSession implements TextureHolder {
         this.worldOverride = worldOverride;
     }
 
-    public void unregisterTools(Player player) {
-        synchronized (tools) {
-            for (Tool tool : tools.values()) {
-                if (tool instanceof BrushTool) {
-                    ((BrushTool) tool).clear(player);
-                }
-            }
-        }
+    public boolean isTickingWatchdog() {
+        return tickingWatchdog;
     }
 
-    public int getSize() {
-        return history.size();
+    public void setTickingWatchdog(boolean tickingWatchdog) {
+        this.tickingWatchdog = tickingWatchdog;
     }
 
     /**
@@ -1459,6 +1454,7 @@ public class LocalSession implements TextureHolder {
         if (transform != null) {
             editSession.addTransform(transform);
         }
+        editSession.setTickingWatchdog(tickingWatchdog);
 
         return editSession;
     }
@@ -1598,5 +1594,13 @@ public class LocalSession implements TextureHolder {
         this.transform = transform;
     }
 
-
+    public void unregisterTools(Player player) {
+        synchronized (tools) {
+            for (Tool tool : tools.values()) {
+                if (tool instanceof BrushTool) {
+                    ((BrushTool) tool).clear(player);
+                }
+            }
+        }
+    }
 }
