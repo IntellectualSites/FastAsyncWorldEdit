@@ -25,15 +25,12 @@ import com.boydti.fawe.example.MappedFaweQueue;
 import com.boydti.fawe.object.FaweQueue;
 import com.boydti.fawe.object.HasFaweQueue;
 import com.boydti.fawe.object.exception.FaweException;
-
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -48,30 +45,22 @@ public class RegionVisitor implements Operation {
     public final Iterable<? extends BlockVector3> iterable;
     private final MappedFaweQueue queue;
 
-    /**
-     * Deprecated in favor of the other constructors which will preload chunks during iteration
-     *
-     * @param region
-     * @param function
-     */
-    @Deprecated
+
     public RegionVisitor(Region region, RegionFunction function) {
         this(region, function, (FaweQueue) null);
     }
 
-    public RegionVisitor(Region region, RegionFunction function, EditSession editSession) {
-        this(region, function, editSession != null ? editSession.getQueue() : null);
-    }
-
-    public RegionVisitor(Region region, RegionFunction function, FaweQueue queue) {
+    public RegionVisitor(Region region, RegionFunction function, HasFaweQueue queue) {
         this((Iterable<BlockVector3>) region, function, queue);
     }
 
-    public RegionVisitor(Iterable<? extends BlockVector3> iterable, RegionFunction function, HasFaweQueue hasQueue) {
+    public RegionVisitor(Iterable<? extends BlockVector3> iterable, RegionFunction function,
+        HasFaweQueue hasQueue) {
         this.region = iterable instanceof Region ? (Region) iterable : null;
         this.function = function;
         this.iterable = iterable;
-        this.queue = hasQueue != null && hasQueue.getQueue() instanceof MappedFaweQueue ? (MappedFaweQueue) hasQueue.getQueue() : null;
+        this.queue = hasQueue != null && hasQueue.getQueue() instanceof MappedFaweQueue
+            ? (MappedFaweQueue) hasQueue.getQueue() : null;
     }
 
     /**
@@ -86,39 +75,44 @@ public class RegionVisitor implements Operation {
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         if (queue != null && Settings.IMP.QUEUE.PRELOAD_CHUNKS > 1) {
-        	/*
+            /*
              * The following is done to reduce iteration cost
              *  - Preload chunks just in time
              *  - Only check every 16th block for potential chunk loads
              *  - Stop iteration on exception instead of hasNext
              *  - Do not calculate the stacktrace as it is expensive
              */
-            Iterator<? extends BlockVector3> trailIter = iterable.iterator();
-            Iterator<? extends BlockVector3> leadIter = iterable.iterator();
+            /*
+            Stopping the iteration only on an exception is stupid and can result in crashes. It
+            should have never been considered. --MattBDev 2019-09-08
+             */
+
+            Iterator<? extends BlockVector3> trailingIterator = iterable.iterator();
+            Iterator<? extends BlockVector3> leadingIterator = iterable.iterator();
             int lastTrailChunkX = Integer.MIN_VALUE;
             int lastTrailChunkZ = Integer.MIN_VALUE;
             int lastLeadChunkX = Integer.MIN_VALUE;
             int lastLeadChunkZ = Integer.MIN_VALUE;
             int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNKS;
             try {
-                for (; ; ) {
-                    BlockVector3 pt = trailIter.next();
-                    apply(pt);
-                    int cx = pt.getBlockX() >> 4;
-                    int cz = pt.getBlockZ() >> 4;
-                    if (cx != lastTrailChunkX || cz != lastTrailChunkZ) {
-                        lastTrailChunkX = cx;
-                        lastTrailChunkZ = cz;
+                while (trailingIterator.hasNext()) {
+                    BlockVector3 pt = trailingIterator.next();
+                    this.apply(pt);
+                    int chunkX = pt.getBlockX() >> 4;
+                    int chunkZ = pt.getBlockZ() >> 4;
+                    if (chunkX != lastTrailChunkX || chunkZ != lastTrailChunkZ) {
+                        lastTrailChunkX = chunkX;
+                        lastTrailChunkZ = chunkZ;
                         int amount;
                         if (lastLeadChunkX == Integer.MIN_VALUE) {
-                            lastLeadChunkX = cx;
-                            lastLeadChunkZ = cz;
+                            lastLeadChunkX = chunkX;
+                            lastLeadChunkZ = chunkZ;
                             amount = loadingTarget;
                         } else {
                             amount = 1;
                         }
-                        for (int count = 0; count < amount; ) {
-                            BlockVector3 v = leadIter.next();
+                        for (int count = 0; count < amount;) {
+                            BlockVector3 v = leadingIterator.next();
                             int vcx = v.getBlockX() >> 4;
                             int vcz = v.getBlockZ() >> 4;
                             if (vcx != lastLeadChunkX || vcz != lastLeadChunkZ) {
@@ -128,48 +122,23 @@ public class RegionVisitor implements Operation {
                                 count++;
                             }
                             // Skip the next 15 blocks
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
+                            for (int x = 0; x <= 14; x++) {
+                                leadingIterator.next();
+                            }
                         }
                     }
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
+                    for (int x = 0; x <= 14; x++) {
+                        this.apply(trailingIterator.next());
+                    }
                 }
             } catch (FaweException e) {
                 throw new RuntimeException(e);
-            } catch (Throwable ignore) {
-                ignore.printStackTrace();
+            } catch (Throwable event) {
+                event.printStackTrace();
             }
             try {
-                while (true) {
-                    apply(trailIter.next());
-                    apply(trailIter.next());
+                while (trailingIterator.hasNext()) {
+                    apply(trailingIterator.next());
                 }
             } catch (FaweException e) {
                 throw new RuntimeException(e);
