@@ -42,12 +42,14 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -154,6 +156,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         if (INSTANCE != null) return;
         rename();
         INSTANCE = this;
+        PaperLib.suggestPaper(this);
         FaweBukkit imp = new FaweBukkit(this);
 
         //noinspection ResultOfMethodCallIgnored

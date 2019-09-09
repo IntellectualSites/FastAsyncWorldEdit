@@ -41,6 +41,7 @@ import com.boydti.fawe.util.TaskManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.world.World;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
@@ -91,13 +92,6 @@ public class FaweBukkit implements IFawe, Listener {
                 e.printStackTrace();
                 debug("===================================");
             }
-            if (Bukkit.getVersion().contains("git-Spigot")) {
-                debug("====== USE PAPER ======");
-                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
-                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
-                debug(" - This is only a recommendation");
-                debug("==============================");
-            }
             if (Bukkit.getVersion().contains("git-Paper") && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
@@ -127,18 +121,10 @@ public class FaweBukkit implements IFawe, Listener {
                 new ChunkListener_9();
             }
 
-            try {
-                Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
+            if (PaperLib.isPaper()) {
                 Bukkit.getPluginManager().registerEvents(new AsyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
-            } catch (Throwable ignore) {
-                debug("====== USE PAPER ======");
-                debug("DOWNLOAD: https://papermc.io/ci/job/Paper-1.13/");
-                debug("GUIDE: https://www.spigotmc.org/threads/21726/");
-                debug(" - This is only a recommendation");
-                debug(" - Allows the use of Async Tab Completetion as provided by Paper");
-                debug("==============================");
-                Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
             }
+            else Bukkit.getPluginManager().registerEvents(new SyncTabCompleteListener(WorldEditPlugin.getInstance()), plugin);
         });
     }
 
