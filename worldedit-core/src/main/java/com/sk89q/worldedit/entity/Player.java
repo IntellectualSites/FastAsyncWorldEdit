@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.entity;
 
+import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.FaweLimit;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -32,7 +35,6 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
-
 import javax.annotation.Nullable;
 
 /**
@@ -277,4 +279,20 @@ public interface Player extends Entity, Actor {
      * @param block The block to send, null to reset
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
+
+    /**
+     * Get the player's current LocalSession
+     *
+     * @return
+     */
+    LocalSession getSession();
+
+    /**
+     * Get the player's limit
+     *
+     * @return
+     */
+    default FaweLimit getLimit() {
+        return Settings.IMP.getLimit(this);
+    }
 }

@@ -97,7 +97,7 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     protected int range = 240;
     private VisualMode visualMode = VisualMode.NONE;
     private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
-    private Mask targetMask = null;
+    private Mask targetMask;
     private int targetOffset;
 
     private transient BrushSettings primary = new BrushSettings();
@@ -105,7 +105,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     private transient BrushSettings context = primary;
 
     private transient VisualExtent visualExtent;
-    private transient Lock lock = new ReentrantLock();
 
     private transient BaseItem holder;
 
@@ -205,7 +204,6 @@ public class BrushTool implements DoubleActionTraceTool, ScrollTool, MovableTool
     }
 
     private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
-        lock = new ReentrantLock();
         boolean multi = stream.readBoolean();
         primary = (BrushSettings) stream.readObject();
         if (multi) {

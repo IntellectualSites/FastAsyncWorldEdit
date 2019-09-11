@@ -639,8 +639,7 @@ public class BrushCommands extends BrushProcessor {
 
         getWorldEdit().checkMaxBrushRadius(radius);
 
-        FawePlayer fp = FawePlayer.wrap(player);
-        FaweLimit limit = Settings.IMP.getLimit(fp);
+        FaweLimit limit = Settings.IMP.getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
 
         return set(session, context,

@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.Fawe;
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
@@ -52,6 +54,8 @@ import java.io.File;
  * players that make use of WorldEdit.
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
+
+    private LocalSession session;
 
     @Override
     public final Extent getExtent() {
@@ -523,5 +527,16 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     @Override
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
 
+    }
+
+    /**
+     * Get the player's current LocalSession
+     *
+     * @return
+     */
+    @Override
+    public LocalSession getSession() {
+        if (this.session != null || Fawe.get() == null) return this.session;
+        else return session = Fawe.get().getWorldEdit().getSessionManager().get(this);
     }
 }

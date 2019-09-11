@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.BBC;
-import com.boydti.fawe.object.FawePlayer;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
@@ -9,7 +8,6 @@ import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -24,8 +22,8 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CopyPastaBrush implements Brush, ResettableTool {
@@ -51,7 +49,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
 
     @Override
     public void build(final EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-        FawePlayer fp = editSession.getPlayer();
+        Player player = editSession.getPlayer().toWorldEditPlayer();
         ClipboardHolder clipboard = session.getExistingClipboard();
         if (clipboard == null) {
             if (editSession.getExtent() instanceof VisualExtent) {
@@ -88,12 +86,12 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             ClipboardHolder holder = new ClipboardHolder(newClipboard);
             session.setClipboard(holder);
             int blocks = builder.size();
-            BBC.COMMAND_COPY.send(fp, blocks);
+            BBC.COMMAND_COPY.send(player, blocks);
             return;
         } else {
             AffineTransform transform = null;
             if (randomRotate) {
-                if (transform == null) transform = new AffineTransform();
+                transform = new AffineTransform();
                 int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
                 transform = transform.rotateY(rotate);
             }

@@ -177,7 +177,7 @@ public class ClipboardCommands extends MethodCommands {
             clipboard.setOrigin(pos);
             ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
             copy.setCopyingEntities(copyEntities);
-            copy.setCopyBiomes(copyBiomes);
+            copy.setCopyingBiomes(copyBiomes);
             Mask sourceMask = editSession.getSourceMask();
             if (sourceMask != null) {
                 new MaskTraverser(sourceMask).reset(editSession);
@@ -269,7 +269,7 @@ public class ClipboardCommands extends MethodCommands {
             copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
             copy.setCopyingEntities(copyEntities);
             copy.setRemovingEntities(true);
-            copy.setCopyBiomes(copyBiomes);
+            copy.setCopyingBiomes(copyBiomes);
             Mask sourceMask = editSession.getSourceMask();
             if (sourceMask != null) {
                 new MaskTraverser(sourceMask).reset(editSession);

@@ -42,7 +42,7 @@ public abstract class ArbitraryShape {
     private int cacheSizeZ;
 
     /**
-     * Cache entires:
+     * Cache entries:
      * 0 = unknown
      * -1 = outside
      * 1 = inside

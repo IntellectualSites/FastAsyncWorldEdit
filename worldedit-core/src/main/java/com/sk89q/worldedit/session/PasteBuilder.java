@@ -113,7 +113,7 @@ public class PasteBuilder {
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), targetExtent, to);
         copy.setTransform(transform);
         copy.setCopyingEntities(!ignoreEntities);
-        copy.setCopyBiomes((!ignoreBiomes) && (!(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP.hasBiomes()));
+        copy.setCopyingBiomes((!ignoreBiomes) && (!(clipboard instanceof BlockArrayClipboard) || ((BlockArrayClipboard) clipboard).IMP.hasBiomes()));
         if (this.canApply != null) {
             copy.setFilterFunction(this.canApply);
         }

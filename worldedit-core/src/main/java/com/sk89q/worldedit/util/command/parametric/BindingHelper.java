@@ -113,11 +113,11 @@ public class BindingHelper implements Binding {
      */
     private BindingMap.BoundMethod match(ParameterData parameter) {
         for (BindingMap.BoundMethod binding : bindings) {
-            Annotation classifer = parameter.getClassifier();
+            Annotation classifier = parameter.getClassifier();
             Type type = parameter.getType();
 
             if (binding.classifier != null) {
-                if (classifer != null && classifer.annotationType().equals(binding.classifier)) {
+                if (classifier != null && classifier.annotationType().equals(binding.classifier)) {
                     if (binding.type == null || binding.type.equals(type)) {
                         return binding;
                     }

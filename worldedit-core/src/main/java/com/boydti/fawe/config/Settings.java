@@ -1,7 +1,7 @@
 package com.boydti.fawe.config;
 
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.FawePlayer;
+import com.sk89q.worldedit.entity.Player;
 import java.io.File;
 import java.util.*;
 
@@ -457,7 +457,7 @@ public class Settings extends Config {
         save(file);
     }
 
-    public FaweLimit getLimit(FawePlayer player) {
+    public FaweLimit getLimit(Player player) {
         FaweLimit limit;
         if (player.hasPermission("fawe.limit.*") || player.hasPermission("fawe.bypass")) {
             limit = FaweLimit.MAX.copy();
@@ -469,7 +469,7 @@ public class Settings extends Config {
 
         boolean limitFound = false;
         for (String key : keys) {
-            if ((player != null && player.hasPermission("fawe.limit." + key)) || (!limitFound && key.equals("default"))) {
+            if (player.hasPermission("fawe.limit." + key) || !limitFound && key.equals("default")) {
                 limitFound = true;
                 LIMITS newLimit = LIMITS.get(key);
                 limit.MAX_ACTIONS = Math.max(limit.MAX_ACTIONS, newLimit.MAX_ACTIONS != -1 ? newLimit.MAX_ACTIONS : Integer.MAX_VALUE);

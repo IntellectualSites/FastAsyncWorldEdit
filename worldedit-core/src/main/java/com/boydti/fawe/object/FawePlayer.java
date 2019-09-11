@@ -427,7 +427,7 @@ public abstract class FawePlayer<T> extends Metadatable {
      * @return
      */
     public FaweLimit getLimit() {
-        return Settings.IMP.getLimit(this);
+        return Settings.IMP.getLimit(toWorldEditPlayer());
     }
 
     /**

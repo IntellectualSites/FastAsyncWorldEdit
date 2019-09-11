@@ -150,7 +150,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -2043,7 +2042,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
         BlockVector3 to = region.getMinimumPoint();
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
         copy.setCopyingEntities(copyEntities);
-        copy.setCopyBiomes(copyBiomes);
+        copy.setCopyingBiomes(copyBiomes);
         copy.setRepetitions(count);
         copy.setTransform(new AffineTransform().translate(dir.multiply(size)));
         Mask sourceMask = getSourceMask();
@@ -2090,7 +2089,7 @@ public class EditSession extends AbstractDelegateExtent implements HasFaweQueue,
 
         if (replacement == null) replacement = BlockTypes.AIR.getDefaultState();
         final BlockReplace remove = replacement instanceof ExistingPattern ? null : new BlockReplace(this, replacement);
-        copy.setCopyBiomes(copyBiomes);
+        copy.setCopyingBiomes(copyBiomes);
         copy.setCopyingEntities(copyEntities);
         copy.setSourceFunction(remove); // Remove
         copy.setRemovingEntities(true);

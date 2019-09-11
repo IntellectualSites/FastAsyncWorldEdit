@@ -45,12 +45,15 @@ import java.util.function.Consumer;
          desc = "Manipulate billions of blocks: [More Info](https://github.com/boy0001/FastAsyncWorldedit/wiki/Anvil-API)")
 public class AnvilCommands {
 
+    private WorldEdit worldEdit;
+
     /**
      * Create a new instance.
      *
      * @param worldEdit reference to WorldEdit
      */
     public AnvilCommands(WorldEdit worldEdit) {
+        this.worldEdit = worldEdit;
         checkNotNull(worldEdit);
     }
 
@@ -101,7 +104,7 @@ public class AnvilCommands {
      * @return
      */
     @Deprecated
-    public static <G, T extends MCAFilter<G>> T runWithSelection(Player player, EditSession editSession, Region selection, T filter) {
+    public <G, T extends MCAFilter<G>> T runWithSelection(Player player, EditSession editSession, Region selection, T filter) {
         if (!(selection instanceof CuboidRegion)) {
             BBC.NO_REGION.send(player);
             return null;
@@ -113,20 +116,20 @@ public class AnvilCommands {
         MCAQueue queue = new MCAQueue(tmp);
         FawePlayer<Object> fp = FawePlayer.wrap(player);
         fp.checkAllowedRegion(selection);
-        recordHistory(fp, editSession.getWorld(), iAnvilHistory -> {
+        recordHistory(player, editSession.getWorld(), iAnvilHistory -> {
             queue.filterCopy(filter, wrappedRegion, iAnvilHistory);
         });
         return filter;
     }
 
-    public static void recordHistory(FawePlayer fp, World world, Consumer<IAnvilHistory> run) {
+    public void recordHistory(Player fp, World world, Consumer<IAnvilHistory> run) {
         LocalSession session = fp.getSession();
         if (session == null || session.hasFastMode()) {
             run.accept(new NullAnvilHistory());
         } else {
-            AnvilHistory history = new AnvilHistory(world.getName(), fp.getUUID());
+            AnvilHistory history = new AnvilHistory(world.getName(), fp.getUniqueId());
             run.accept(history);
-            session.remember(fp.getPlayer(), world, history, fp.getLimit());
+            session.remember(fp, world, history, fp.getLimit());
         }
     }
 
