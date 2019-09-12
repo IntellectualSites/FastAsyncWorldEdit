@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -169,7 +170,7 @@ public class AsyncChunk implements Chunk {
 
     @Override
     public boolean isSlimeChunk() {
-        return false;
+        return world.getChunkAt(x, z).isSlimeChunk();
     }
 
 	@Override
@@ -195,5 +196,20 @@ public class AsyncChunk implements Chunk {
     @Override
     public Collection<Plugin> getPluginChunkTickets() {
         return world.getPluginChunkTickets(this.getX(), this.getZ());
+    }
+
+    @Override
+    public long getInhabitedTime() {
+        return world.getChunkAt(x, z).getInhabitedTime();
+    }
+
+    @Override
+    public void setInhabitedTime(long l) {
+        world.getChunkAt(x, z).setInhabitedTime(l);
+    }
+
+    @Override
+    public boolean contains(@NotNull BlockData blockData) {
+        return world.getChunkAt(x, z).contains(blockData);
     }
 }

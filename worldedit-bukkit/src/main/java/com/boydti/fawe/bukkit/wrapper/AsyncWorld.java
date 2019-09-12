@@ -50,6 +50,7 @@ import org.bukkit.util.Consumer;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Modify the world from an async thread<br>
@@ -1043,6 +1044,16 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
     }
 
     @Override
+    public @Nullable Raid locateNearestRaid(@NotNull Location location, int i) {
+        return parent.locateNearestRaid(location, i);
+    }
+
+    @Override
+    public @NotNull List<Raid> getRaids() {
+        return parent.getRaids();
+    }
+
+    @Override
     public void setMetadata(final String key, final MetadataValue meta) {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override
@@ -1112,7 +1123,12 @@ public class AsyncWorld extends DelegateFaweQueue implements World, HasFaweQueue
 		return parent.locateNearestStructure(arg0, arg1, arg2, arg3);
 	}
 
-	@Override
+    @Override
+    public int getViewDistance() {
+        return parent.getViewDistance();
+    }
+
+    @Override
 	public RayTraceResult rayTrace(Location arg0, Vector arg1, double arg2, FluidCollisionMode arg3, boolean arg4,
 			double arg5, Predicate<Entity> arg6) {
 		return parent.rayTrace(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
