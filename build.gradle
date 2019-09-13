@@ -21,6 +21,13 @@ buildscript {
 
 plugins {
     id "org.ajoberstar.grgit" version "3.1.1"
+    id 'com.gradle.build-scan' version "1.16"
+
+}
+
+buildScan {
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
 }
 
 println """
@@ -134,8 +141,11 @@ configure(['worldedit-core', 'worldedit-bukkit'].collect { project("$it") }) {
         build.dependsOn(sourcesJar)
     }
 
+    compileJava.options.encoding = 'UTF-8'
+
 //    build.dependsOn(checkstyleMain)
 //    build.dependsOn(checkstyleTest)
+
 
     dependencies {
         compileOnly 'org.jetbrains:annotations:17.0.0'

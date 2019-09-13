@@ -61,39 +61,38 @@ public class PlotSetBiome extends Command {
         Collection<BiomeType> knownBiomes = BiomeTypes.values();
         final BiomeType biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
         if (biome == null) {
-            String biomes = StringMan.join(WorldUtil.IMP.getBiomeList(), Captions.BLOCK_LIST_SEPARATOR.formatted());
+
+            String biomes = StringMan.join(WorldUtil.IMP.getBiomeList(), ", ");
             Captions.NEED_BIOME.send(player);
-            MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER.formatted() + biomes);
+            MainUtil.sendMessage(player, Captions.format(Captions.SUBCOMMAND_SET_OPTIONS_HEADER, biomes));
+
             return CompletableFuture.completedFuture(true);
         }
-        confirm.run(this, new Runnable() {
-            @Override
-            public void run() {
-                if (plot.getRunning() != 0) {
-                    Captions.WAIT_FOR_TIMER.send(player);
-                    return;
-                }
-                plot.addRunning();
-                TaskManager.IMP.async(new Runnable() {
-                    @Override
-                    public void run() {
-                        EditSession session = new EditSessionBuilder(plot.getArea().worldname)
-                                .autoQueue(false)
-                                .checkMemory(false)
-                                .allowedRegionsEverywhere()
-                                .player(FawePlayer.wrap(player.getName()))
-                                .limitUnlimited()
-                                .build();
-                        long seed = ThreadLocalRandom.current().nextLong();
-                        for (RegionWrapper region : regions) {
-                            CuboidRegion cuboid = new CuboidRegion(BlockVector3.at(region.minX, 0, region.minZ), BlockVector3.at(region.maxX, 256, region.maxZ));
-                            session.regenerate(cuboid, biome, seed);
-                        }
-                        session.flushQueue();
-                        plot.removeRunning();
-                    }
-                });
+        confirm.run(this, () -> {
+            if (plot.getRunning() != 0) {
+                Captions.WAIT_FOR_TIMER.send(player);
+                return;
             }
+            plot.addRunning();
+            TaskManager.IMP.async(new Runnable() {
+                @Override
+                public void run() {
+                    EditSession session = new EditSessionBuilder(plot.getArea().worldname)
+                            .autoQueue(false)
+                            .checkMemory(false)
+                            .allowedRegionsEverywhere()
+                            .player(FawePlayer.wrap(player.getName()))
+                            .limitUnlimited()
+                            .build();
+                    long seed = ThreadLocalRandom.current().nextLong();
+                    for (RegionWrapper region : regions) {
+                        CuboidRegion cuboid = new CuboidRegion(BlockVector3.at(region.minX, 0, region.minZ), BlockVector3.at(region.maxX, 256, region.maxZ));
+                        session.regenerate(cuboid, biome, seed);
+                    }
+                    session.flushQueue();
+                    plot.removeRunning();
+                }
+            });
         }, null);
 
         return CompletableFuture.completedFuture(true);

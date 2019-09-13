@@ -44,7 +44,7 @@ public class CFIRedirect extends Command {
             player.sendMessage("The command has been changed to: //cfi");
         } else {
             player.sendMessage("Must have the `worlds` component enabled in the PlotSquared config.yml");
-            return null;
+            return CompletableFuture.completedFuture(true);
         }
         return CompletableFuture.completedFuture(true);
     }
