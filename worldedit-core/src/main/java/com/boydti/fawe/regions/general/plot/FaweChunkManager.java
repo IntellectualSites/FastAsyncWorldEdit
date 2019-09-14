@@ -30,15 +30,14 @@ public class FaweChunkManager extends ChunkManager {
     }
 
     @Override
-    public CompletableFuture loadChunk(String world, ChunkLoc loc, boolean force) {
+    public boolean loadChunk(String world, ChunkLoc loc, boolean force) {
         return parent.loadChunk(world, loc, force);
     }
 
     @Override
-    public void unloadChunk(String s, ChunkLoc chunkLoc, boolean save) {
-        parent.unloadChunk(s, chunkLoc, save);
+    public void unloadChunk(String world, ChunkLoc loc, boolean save, boolean safe) {
+        parent.unloadChunk(world, loc, save, safe);
     }
-
     @Override
     public void clearAllEntities(Location pos1, Location pos2) {
         parent.clearAllEntities(pos1, pos2);
